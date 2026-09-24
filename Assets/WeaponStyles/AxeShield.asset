@@ -1,0 +1,77 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1befb91565965ca42bf5745ee2ab7848, type: 3}
+  m_Name: AxeShield
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponStyle
+  styleName: Hache a une main + bouclier (viking)
+  notes: 'Hache (0,180,0) dans handslot.r : au repos manche horizontal vers l''avant,
+    fer a l''avant, tranchant vers le sol (demande utilisateur). Identite = meme
+    tenue avec le tranchant vers le ciel. Bouclier identite dans handslot.l. Pas
+    de bascule. Attaque = Melee_1H_Attack_Chop. Voir AxeShield.md.'
+  attachments:
+  - prefab: {fileID: 919132149155446097, guid: 2a15f8835122b2648a6ffb51c7c7edaa, type: 3}
+    boneName: handslot.r
+    localPosition: {x: 0, y: 0, z: 0}
+    localEuler: {x: 0, y: 180, z: 0}
+    localScale: 1
+    hasAlternate: 0
+    alternateLabel: 
+    alternateBone: 
+    alternatePosition: {x: 0, y: 0, z: 0}
+    alternateEuler: {x: 0, y: 0, z: 0}
+    alternateBlendSeconds: 0
+  - prefab: {fileID: 919132149155446097, guid: 20f9acde9d06af5459176de6316463f1, type: 3}
+    boneName: handslot.l
+    localPosition: {x: 0, y: 0, z: 0}
+    localEuler: {x: 0, y: 0, z: 0}
+    localScale: 1
+    hasAlternate: 0
+    alternateLabel: 
+    alternateBone: 
+    alternatePosition: {x: 0, y: 0, z: 0}
+    alternateEuler: {x: 0, y: 0, z: 0}
+    alternateBlendSeconds: 0
+  requiredSockets:
+  - prefab: {fileID: 0}
+    boneName: hand.r -> handslot.r
+    localPosition: {x: 0, y: 0.096, z: -0.057}
+    localEuler: {x: 0, y: 0, z: 270}
+    localScale: 1
+    hasAlternate: 0
+    alternateLabel: 
+    alternateBone: 
+    alternatePosition: {x: 0, y: 0, z: 0}
+    alternateEuler: {x: 0, y: 0, z: 0}
+    alternateBlendSeconds: 0
+  - prefab: {fileID: 0}
+    boneName: hand.l -> handslot.l
+    localPosition: {x: 0, y: 0.096, z: -0.057}
+    localEuler: {x: 0, y: 0, z: 90}
+    localScale: 1
+    hasAlternate: 0
+    alternateLabel: 
+    alternateBone: 
+    alternatePosition: {x: 0, y: 0, z: 0}
+    alternateEuler: {x: 0, y: 0, z: 0}
+    alternateBlendSeconds: 0
+  idle: {fileID: -5624545281902316504, guid: b1c0e3347a15f9146815c3a63dd8e52b, type: 3}
+  walk: {fileID: 7060811993321468294, guid: f3d018d923e635741ae7993f77defe2c, type: 3}
+  run: {fileID: 3543698089625107784, guid: f3d018d923e635741ae7993f77defe2c, type: 3}
+  attacks:
+  - {fileID: 4043807988371827432, guid: 2e2d132d19b4bc341bbe0f045df41929, type: 3}
+  - {fileID: 5034251128425565466, guid: 2e2d132d19b4bc341bbe0f045df41929, type: 3}
+  - {fileID: -8653722278162725603, guid: 2e2d132d19b4bc341bbe0f045df41929, type: 3}
+  guard: {fileID: 7400000, guid: 252b5019df60c1b4795f3e1f95e6b67c, type: 2}
+  guardHit: {fileID: 7887112853433613186, guid: 2e2d132d19b4bc341bbe0f045df41929, type: 3}
+  extraClips: []
+  controller: {fileID: 9100000, guid: fb795408918f18947a9b38fa5e52e0ea, type: 2}
+  stanceScript: 

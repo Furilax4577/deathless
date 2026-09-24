@@ -1,0 +1,84 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1befb91565965ca42bf5745ee2ab7848, type: 3}
+  m_Name: DaggerCrossbow
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponStyle
+  styleName: Dague + arbalete dans le dos (rogue / assassin)
+  notes: 'BASCULE (switch) : bool Crossbow, AltWeaponSwitch reparente et interpole
+    en 0.15 s. Dague en main (0,180,0) dans handslot.r : horizontale, pointe vers
+    l''avant, tranchant (+X) vers le sol (lame symetrique : identite equivalente)
+    ; attaque = Melee_1H_Attack_Stab (la pointe mene l''estoc, cos +0.99 a t=0.4
+    s). Arbalete sortie : dague rangee dans le dos sur chest (0.12,0.15,-0.35) rot
+    (0,0,135). Arbalete (0,271,0) en main, rangee sur chest (0.05,-0.323,-0.5) rot
+    (305,270,90). Voir DaggerCrossbow.md.'
+  attachments:
+  - prefab: {fileID: 919132149155446097, guid: 6474806b534ac0d42aaa0d89a11b6d41, type: 3}
+    boneName: handslot.r
+    localPosition: {x: 0, y: 0, z: 0}
+    localEuler: {x: 0, y: 180, z: 0}
+    localScale: 1
+    hasAlternate: 1
+    alternateLabel: 'Crossbow = vrai : dague rangee dans le dos (meme socket chest
+      que l''arbalete rangee)'
+    alternateBone: chest
+    alternatePosition: {x: 0.12, y: 0.15, z: -0.35}
+    alternateEuler: {x: 0, y: 0, z: 135}
+    alternateBlendSeconds: 0.15
+  - prefab: {fileID: 919132149155446097, guid: cefa947239270a64cae7c372726d1740, type: 3}
+    boneName: chest
+    localPosition: {x: 0.05, y: -0.323, z: -0.5}
+    localEuler: {x: 305, y: 270, z: 90}
+    localScale: 1
+    hasAlternate: 1
+    alternateLabel: 'Crossbow = vrai : arbalete en main droite'
+    alternateBone: handslot.r
+    alternatePosition: {x: 0, y: 0, z: 0}
+    alternateEuler: {x: 0, y: 271, z: 0}
+    alternateBlendSeconds: 0.15
+  requiredSockets:
+  - prefab: {fileID: 0}
+    boneName: hand.r -> handslot.r
+    localPosition: {x: 0, y: 0.096, z: -0.057}
+    localEuler: {x: 0, y: 0, z: 270}
+    localScale: 1
+    hasAlternate: 0
+    alternateLabel: 
+    alternateBone: 
+    alternatePosition: {x: 0, y: 0, z: 0}
+    alternateEuler: {x: 0, y: 0, z: 0}
+    alternateBlendSeconds: 0
+  - prefab: {fileID: 0}
+    boneName: hand.l -> handslot.l
+    localPosition: {x: 0, y: 0.096, z: -0.057}
+    localEuler: {x: 0, y: 0, z: 90}
+    localScale: 1
+    hasAlternate: 0
+    alternateLabel: 
+    alternateBone: 
+    alternatePosition: {x: 0, y: 0, z: 0}
+    alternateEuler: {x: 0, y: 0, z: 0}
+    alternateBlendSeconds: 0
+  idle: {fileID: -5624545281902316504, guid: b1c0e3347a15f9146815c3a63dd8e52b, type: 3}
+  walk: {fileID: 7060811993321468294, guid: f3d018d923e635741ae7993f77defe2c, type: 3}
+  run: {fileID: 3543698089625107784, guid: f3d018d923e635741ae7993f77defe2c, type: 3}
+  attacks:
+  - {fileID: -929289162156707164, guid: 2e2d132d19b4bc341bbe0f045df41929, type: 3}
+  - {fileID: 3433596340313048746, guid: 0db9b1e346d22df4d98e0119109b82f3, type: 3}
+  guard: {fileID: 0}
+  guardHit: {fileID: 0}
+  extraClips:
+  - {fileID: 7400000, guid: aeca60ee529115949ae36711823b0f86, type: 2}
+  - {fileID: -874035235834337175, guid: 0db9b1e346d22df4d98e0119109b82f3, type: 3}
+  - {fileID: 4043807988371827432, guid: 2e2d132d19b4bc341bbe0f045df41929, type: 3}
+  - {fileID: 5034251128425565466, guid: 2e2d132d19b4bc341bbe0f045df41929, type: 3}
+  controller: {fileID: 9100000, guid: ea0e6ac84afb39d41987d4100513a6b1, type: 2}
+  stanceScript: AltWeaponSwitch (bool Crossbow)
