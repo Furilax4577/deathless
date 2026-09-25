@@ -23,9 +23,9 @@ L'écran de score met les joueurs en compétition. Pour chaque catégorie, le me
 | Dégâts infligés | le plus élevé | {décidé} |
 | Ennemis tués | le plus élevé | {décidé} |
 | Nombre de morts | le plus bas | {décidé} |
-| Coups critiques | le plus élevé | {à confirmer} |
-| Dégâts évités à Nyxessa | le plus élevé | {à confirmer} |
-| Soins prodigués | le plus élevé | {à confirmer} |
+| Coups critiques | le plus élevé | {décidé} |
+| Dégâts évités à Nyxessa | le plus élevé | {décidé} |
+| Soins prodigués | le plus élevé | {décidé} |
 
 L'écran rappelle aussi le résultat de l'équipe : victoire ou nuit atteinte, durée de la partie, or total.
 
