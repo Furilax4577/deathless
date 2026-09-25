@@ -1,0 +1,52 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:dl="Deathless.UI" editor-extension-mode="False">
+    <Style src="../V01.uss" />
+    <ui:VisualElement class="v01-plein v01-voile v01-voile--fort score">
+        <ui:VisualElement class="score__entete">
+            <ui:VisualElement>
+                <ui:Label name="score-resultat" text="DÉFAITE" class="score__resultat" />
+                <ui:Label name="score-titre" text="Nyxessa est tombée à la nuit 3" class="dl-title score__titre" />
+            </ui:VisualElement>
+            <ui:VisualElement class="score__chiffres">
+                <ui:VisualElement class="score__chiffre">
+                    <ui:Label text="DURÉE" class="score__chiffre-titre" />
+                    <ui:Label name="score-duree" text="0:00" class="score__chiffre-valeur" />
+                </ui:VisualElement>
+                <ui:VisualElement class="score__chiffre">
+                    <ui:Label text="OR DE L’ÉQUIPE" class="score__chiffre-titre" />
+                    <ui:Label name="score-or" text="0" class="score__chiffre-valeur" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement class="dl-panel score__table">
+            <ui:VisualElement class="score-ligne score-ligne--entete">
+                <ui:Label text="JOUEUR" class="dl-section-label score-joueur" />
+                <ui:Label text="OR RAPPORTÉ" class="dl-section-label score-cellule" />
+                <ui:Label text="DÉGÂTS INFLIGÉS" class="dl-section-label score-cellule" />
+                <ui:Label text="ENNEMIS TUÉS" class="dl-section-label score-cellule" />
+                <ui:Label text="MORTS" class="dl-section-label score-cellule" />
+            </ui:VisualElement>
+            <ui:VisualElement name="score-lignes" />
+        </ui:VisualElement>
+
+        <ui:VisualElement class="score__actions">
+            <ui:Button name="score-rejouer" class="score-bouton score-bouton--rejouer">
+                <dl:InputPrompt action="UI/Submit" />
+                <ui:Label text="Rejouer" class="score-bouton__texte" />
+                <ui:Label name="score-prets" text="Prêts 0 / 1" class="score-bouton__prets" />
+            </ui:Button>
+            <ui:Button name="score-arreter" class="score-bouton score-bouton--arreter">
+                <dl:InputPrompt action="UI/Cancel" />
+                <ui:Label text="Arrêter" class="score-bouton__texte" />
+            </ui:Button>
+        </ui:VisualElement>
+
+        <ui:VisualElement class="dl-prompt-bar">
+            <ui:VisualElement class="dl-prompt-bar__group">
+                <dl:InputPrompt action="UI/Submit" label="Valider" />
+                <dl:InputPrompt action="UI/Cancel" label="Arrêter" />
+            </ui:VisualElement>
+            <ui:Label text="Clavier et souris" class="dl-text dl-text--small dl-text--muted dl-device-name" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

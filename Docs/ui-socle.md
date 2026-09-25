@@ -2,7 +2,9 @@
 
 Construit le 25/09/2026 dans `sandbox-ui` et **reporté dans `main` le même jour** (mêmes chemins, mêmes GUID). Règles : `main/Wiki/pages/commandes.md` et `interface.md`. Style : maquettes « Deathless — Menus et HUD » (canevas 1280×720).
 
-Démo : scène `Assets/Scenes/UISocle.unity` (première scène du build). Captures : `Assets/Screenshots/UISocle_xbox.png`, `UISocle_playstation.png`, `UISocle_clavier.png`, `UISocle_focus.png`, `UISocle_x3.png` (taille ×3).
+Écrans de la version 0.1 construits sur ce socle : voir `ui-v01.md`.
+
+Démo : scène `Assets/Scenes/UISocle.unity`. Captures : `Assets/Screenshots/UISocle_xbox.png`, `UISocle_playstation.png`, `UISocle_clavier.png`, `UISocle_focus.png`, `UISocle_x3.png` (taille ×3).
 
 ## Structure des dossiers
 
@@ -77,6 +79,7 @@ Les contrôles Unity sont restylés globalement : un `Button`, `Toggle`, `Slider
 3. Dans le script de l'écran, à l'activation :
    - `UINavigation.SetupScreen(root)`, qui fait deux choses. D'abord la sélection du panneau dans l'EventSystem à chaque focus : sans elle, un `Focus()` fait par le code laisse la manette inerte ; le ScrollView parent défile aussi jusqu'à l'élément focus. Ensuite, la sortie des TextField, qui sinon gardent la navigation pour leur curseur ;
    - `UIScale.TagRoot(root)` (et à chaque `UIScale.Changed`) pour recevoir la classe `dl-scale-N` ;
+   - table ou liste de lignes focusables dans un ScrollView : `UINavigation.ChainerVerticalement(lignes)` (la navigation spatiale ne passe pas toujours d'une ligne à la suivante) ;
    - focus initial : `UINavigation.Focus(premierBouton)` (idéalement après un court délai, `schedule.Execute(...).StartingIn(50)`) ;
    - au passage à la manette sans focus (`InputDeviceWatcher.Changed`), redonner le focus au premier bouton.
 4. Actions propres à l'écran (onglets, réinitialiser…) : `actions.FindAction("UI/TabNext").performed += …` et activer la carte UI.

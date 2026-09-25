@@ -1,0 +1,79 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:dl="Deathless.UI" editor-extension-mode="False">
+    <Style src="Hud.uss" />
+    <ui:VisualElement name="hud" class="hud" picking-mode="Ignore">
+        <!-- Mort : voile et compte à rebours (sous le reste du HUD) -->
+        <ui:VisualElement name="mort" class="hud-mort" picking-mode="Ignore">
+            <ui:Label text="Vous êtes tombé" class="dl-display hud-mort__titre" />
+            <ui:Label name="mort-texte" text="Réapparition dans 8 s" class="hud-mort__texte" />
+            <ui:Label text="Tant que Nyxessa tient, vous revenez au village." class="dl-text dl-text--muted hud-mort__aide" />
+        </ui:VisualElement>
+
+        <!-- Centre : réticule et action possible -->
+        <dl:Reticule name="reticule" class="hud-reticule" />
+        <ui:VisualElement name="interaction" class="hud-pastille hud-interaction" picking-mode="Ignore">
+            <dl:InputPrompt action="Gameplay/Interact" class="dl-prompt--small" />
+            <ui:Label name="interaction-texte" text="Parler au sorcier" class="hud-interaction__texte" />
+        </ui:VisualElement>
+
+        <!-- Haut, au centre : Nyxessa, bouclier, temps, vote, alertes -->
+        <ui:VisualElement name="haut" class="hud-haut" picking-mode="Ignore">
+            <ui:VisualElement class="hud-nyx">
+                <dl:GemmeNyxessa class="hud-nyx__gemme" />
+                <ui:VisualElement class="hud-nyx__barre">
+                    <ui:VisualElement class="hud-nyx__piste-vie">
+                        <ui:VisualElement name="nyx-vie" class="hud-nyx__vie" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="nyx-piste-bouclier" class="hud-nyx__piste-bouclier">
+                        <ui:VisualElement name="nyx-bouclier" class="hud-nyx__bouclier" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="hud-pastille hud-temps">
+                <dl:IconeJourNuit name="temps-icone" class="hud-temps__icone" />
+                <ui:Label name="temps-texte" text="Jour · 1:42 avant la nuit" class="hud-temps__texte" />
+                <ui:VisualElement name="prets" class="hud-prets">
+                    <ui:Label name="prets-texte" text="Prêts 0 / 1" class="hud-prets__texte" />
+                    <dl:InputPrompt action="Gameplay/Ready" class="dl-prompt--small" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:Label name="alerte-bouclier" text="Bouclier de Nyxessa à 32 %" class="hud-alerte-bouclier" />
+            <ui:VisualElement name="alerte-nuit" class="hud-pastille hud-alerte-nuit">
+                <dl:IconeJourNuit nuit="true" class="hud-temps__icone" />
+                <ui:Label name="alerte-nuit-texte" text="La nuit tombe dans 15 s" class="hud-alerte-nuit__texte" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- Bannière de début de nuit -->
+        <ui:VisualElement name="banniere" class="hud-banniere" picking-mode="Ignore">
+            <ui:Label name="banniere-titre" text="NUIT 1" class="hud-banniere__titre" />
+            <ui:Label text="Tenez jusqu’à l’aube" class="hud-banniere__sous-titre" />
+        </ui:VisualElement>
+
+        <!-- Indicateur de bord d'écran -->
+        <ui:VisualElement name="attaque" class="hud-attaque hud-attaque--gauche" picking-mode="Ignore">
+            <dl:FlecheHud name="attaque-fleche" angle="180" class="hud-attaque__fleche" />
+            <ui:Label text="Nyxessa attaquée" class="hud-attaque__texte" />
+        </ui:VisualElement>
+
+        <!-- Haut, à droite : or de l'équipe -->
+        <ui:VisualElement class="hud-pastille hud-or">
+            <dl:PieceOr class="hud-or__piece" />
+            <ui:Label name="or-valeur" text="0" class="hud-or__valeur" />
+            <ui:Label text="caisse commune" class="hud-or__legende" />
+        </ui:VisualElement>
+
+        <!-- Bas, à gauche : portrait, vie, endurance -->
+        <ui:VisualElement class="hud-joueur">
+            <ui:VisualElement name="portrait" class="hud-joueur__portrait">
+                <ui:Label name="portrait-initiale" text="P" class="hud-joueur__initiale" />
+            </ui:VisualElement>
+            <ui:VisualElement class="hud-joueur__jauges">
+                <dl:Gauge name="joueur-vie" label="Vie" value="100" max="100" class="dl-gauge--life" />
+                <dl:Gauge name="joueur-endurance" label="Endurance" value="100" max="100" class="dl-gauge--stamina dl-gauge--thin" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- Bas, au centre : compétences (construites par EcranHud) -->
+        <ui:VisualElement name="competences" class="hud-competences" picking-mode="Ignore" />
+    </ui:VisualElement>
+</ui:UXML>

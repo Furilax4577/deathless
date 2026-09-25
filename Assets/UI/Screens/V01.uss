@@ -1,0 +1,187 @@
+/* Menus de la version 0.1 (menu principal, pause, options, crédits, score). Maquettes × 1,5. */
+
+.v01-plein {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.v01-voile { background-color: rgba(13, 16, 23, 0.84); }
+.v01-voile--fort { background-color: rgba(13, 16, 23, 0.9); }
+
+/* ---------- Menu principal ---------- */
+.menu__volet {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 810px;
+    background-color: rgba(16, 19, 27, 0.93);
+}
+
+.menu__titres { position: absolute; left: 108px; top: 108px; }
+.menu__sous-titre { font-size: 26px; margin-top: 3px; }
+.menu__liste { position: absolute; left: 90px; top: 390px; width: 600px; }
+.menu__classe { position: absolute; right: 84px; bottom: 144px; width: 495px; padding: 27px 30px; background-color: rgba(22, 26, 36, 0.94); }
+.menu__note { margin-top: var(--dl-space-2); }
+.menu__version { position: absolute; right: 60px; top: 36px; font-size: var(--dl-text-small); color: #e9eef5; margin: 0; padding: 0; }
+
+/* ---------- Pause ---------- */
+.pause {
+    position: absolute;
+    left: 50%;
+    top: 225px;
+    width: 720px;
+    translate: -50% 0;
+    padding: 42px;
+    background-color: rgba(35, 42, 58, 0.97);
+    border-radius: 24px;
+}
+
+.pause__aide { margin: 6px 0 21px 0; }
+.pause__item { min-height: 78px; }
+.pause__label {
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Medium-SDF.asset");
+    font-size: var(--dl-text-large);
+    margin: 0;
+    padding: 0;
+}
+
+/* ---------- Options ---------- */
+.options { padding: 54px 102px 0 102px; }
+.options__entete { flex-direction: row; align-items: center; margin-bottom: var(--dl-space-4); }
+.options__titre { margin-right: auto; }
+.options__page { width: 100%; max-height: 780px; }
+.options__page--jeu { width: 840px; }
+.options__tailles { flex-direction: row; margin: var(--dl-space-2) -6px var(--dl-space-3) -6px; }
+.options__taille { flex-grow: 1; flex-basis: 0; min-height: 96px; margin: 0 6px; flex-direction: column; }
+.options__taille-titre { -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); font-size: var(--dl-text-heading); margin: 0; padding: 0; }
+.options__taille-pc { font-size: var(--dl-text-small); color: var(--dl-color-text-muted); margin: 0; padding: 0; }
+.options__table { flex-shrink: 1; }
+.options__note { margin-top: var(--dl-space-2); }
+.options__retour { position: absolute; right: 102px; bottom: 114px; width: 240px; }
+
+.options-ligne {
+    flex-direction: row;
+    align-items: center;
+    min-height: 46px;
+    padding: 0 12px;
+    border-top-width: 1px;
+    border-color: var(--dl-color-line);
+    border-left-width: 3px;
+    border-left-color: rgba(0, 0, 0, 0);
+}
+
+.options-ligne:focus { background-color: var(--dl-color-panel-active); border-left-color: var(--dl-color-gold); }
+.options-ligne--entete { border-top-width: 0; min-height: 36px; }
+.options-ligne--entete > .dl-section-label { margin: 0; }
+.options-ligne__libelle { flex-grow: 2; flex-basis: 0; font-size: var(--dl-text-body); margin: 0; padding: 0; }
+.options-ligne__entete { flex-grow: 1; flex-basis: 0; }
+.options-ligne__invite { flex-grow: 1; flex-basis: 0; --dl-prompt-size: 42px; --dl-key-height: 30px; --dl-key-text: 16px; }
+
+/* ---------- Crédits ---------- */
+.credits {
+    position: absolute;
+    left: 50%;
+    top: 90px;
+    width: 1200px;
+    translate: -50% 0;
+    padding: 45px 54px;
+    background-color: rgba(35, 42, 58, 0.97);
+    border-radius: 24px;
+}
+
+.credits__intro { margin: 3px 0 12px 0; }
+.credits__section { margin-top: var(--dl-space-4); }
+.credits-ligne {
+    flex-direction: row;
+    align-items: center;
+    padding: 12px 0;
+    border-top-width: 1px;
+    border-color: var(--dl-color-line);
+}
+
+.credits-ligne__quoi { flex-grow: 3; flex-basis: 0; font-size: var(--dl-text-body); white-space: normal; margin: 0 var(--dl-space-3) 0 0; padding: 0; }
+.credits-ligne__qui { flex-grow: 1.4; flex-basis: 0; font-size: var(--dl-text-body); white-space: normal; margin: 0; padding: 0; }
+.credits-ligne__licence { flex-grow: 0.8; flex-basis: 0; font-size: var(--dl-text-body); color: var(--dl-color-text-muted); margin: 0; padding: 0; }
+.credits__note { margin-top: var(--dl-space-4); }
+.credits__retour { align-self: flex-end; width: 240px; margin-top: var(--dl-space-3); }
+
+/* ---------- Score ---------- */
+.score { padding: 60px 120px 0 120px; }
+.score__entete { flex-direction: row; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; }
+.score__resultat { font-size: var(--dl-text-small); letter-spacing: 2px; color: #ff9a8a; margin: 0; padding: 0; -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Medium-SDF.asset"); }
+.score-resultat--victoire { color: var(--dl-color-gold); }
+.score__titre { font-size: 66px; -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Bold-SDF.asset"); }
+.score__chiffres { flex-direction: row; }
+.score__chiffre { align-items: flex-end; margin-left: 42px; }
+.score__chiffre-titre { font-size: 18px; letter-spacing: 1.5px; color: var(--dl-color-text-muted); margin: 0; padding: 0; }
+.score__chiffre-valeur { font-size: var(--dl-text-heading); -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); margin: 0; padding: 0; }
+
+.score__table { padding: 24px 39px; background-color: rgba(35, 42, 58, 0.97); }
+.score-ligne { flex-direction: row; align-items: center; min-height: 96px; border-top-width: 1px; border-color: var(--dl-color-line); }
+.score-ligne--entete { min-height: 51px; border-top-width: 0; }
+.score-ligne--entete > .dl-section-label { margin: 0; }
+.score-ligne--local .score-joueur__nom { color: #ffffff; }
+.score-joueur { flex-grow: 2; flex-basis: 0; flex-direction: row; align-items: center; }
+.score-joueur__pastille {
+    width: 60px;
+    height: 60px;
+    border-radius: 30px;
+    margin: 0 18px 0 0;
+    padding: 0;
+    -unity-text-align: middle-center;
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Bold-SDF.asset");
+    font-size: 27px;
+    color: var(--dl-color-ink);
+}
+.score-joueur__nom { -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); font-size: 27px; margin: 0; padding: 0; }
+.score-joueur__classe { font-size: var(--dl-text-small); color: var(--dl-color-text-muted); margin: 0; padding: 0; }
+.score-cellule { flex-grow: 1; flex-basis: 0; align-items: flex-start; }
+.score-valeur {
+    flex-direction: row;
+    align-items: center;
+    height: 51px;
+    padding: 0 18px;
+    border-radius: 26px;
+    border-width: 2px;
+    border-color: rgba(0, 0, 0, 0);
+}
+.score-valeur--meilleur { background-color: #3a3420; border-color: var(--dl-color-gold); }
+.score-valeur__texte { -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); font-size: 27px; margin: 0; padding: 0; }
+.score-valeur--meilleur .score-valeur__texte { color: #ffffff; }
+.score-valeur__couronne { width: 24px; height: 18px; margin-left: 9px; }
+
+.score__actions { flex-direction: row; margin-top: 30px; }
+.score-bouton {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 96px;
+    padding: 0 33px;
+    border-radius: 18px;
+}
+.score-bouton--rejouer { flex-grow: 1; margin-right: 24px; }
+.score-bouton--arreter { width: 480px; }
+.score-bouton__texte { -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); font-size: var(--dl-text-heading); margin: 0 0 0 18px; padding: 0; }
+.score-bouton__prets { margin: 0 0 0 auto; padding: 0; font-size: var(--dl-text-body); color: var(--dl-color-text-muted); }
+.score-bouton--pret .score-bouton__prets { color: var(--dl-color-gold); }
+
+/* ---------- Taille ×3 ---------- */
+.dl-scale-3 .menu__volet { width: 640px; }
+.dl-scale-3 .menu__titres { left: 60px; top: 50px; }
+.dl-scale-3 .menu__titres .dl-display { font-size: 72px; }
+.dl-scale-3 .menu__liste { left: 42px; top: 220px; width: 560px; }
+.dl-scale-3 .menu__classe { right: 36px; bottom: 120px; width: 420px; }
+.dl-scale-3 .pause { top: 60px; }
+.dl-scale-3 .options { padding: 30px 48px 0 48px; }
+.dl-scale-3 .options__page { max-height: 520px; }
+.dl-scale-3 .options__retour { right: 48px; bottom: 100px; }
+.dl-scale-3 .credits { top: 24px; width: 1300px; padding: 30px 36px; }
+.dl-scale-3 .score { padding: 30px 48px 0 48px; }
+.dl-scale-3 .score__titre { font-size: 48px; }
+.dl-scale-3 .score-ligne { min-height: 72px; }
+.dl-scale-3 .score__actions { margin-top: 18px; }
+.dl-scale-3 .dl-prompt-bar { padding: 0 var(--dl-space-4); }

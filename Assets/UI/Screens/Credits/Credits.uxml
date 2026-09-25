@@ -1,0 +1,49 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:dl="Deathless.UI" editor-extension-mode="False">
+    <Style src="../V01.uss" />
+    <ui:VisualElement class="v01-plein v01-voile">
+        <ui:VisualElement class="dl-panel credits">
+            <ui:Label text="Crédits" class="dl-title" />
+            <ui:Label text="Deathless est développé par Quentin Douville." class="dl-text dl-text--muted credits__intro" />
+
+            <ui:Label text="ASSETS GRAPHIQUES" class="dl-section-label credits__section" />
+            <ui:VisualElement class="credits-ligne">
+                <ui:Label text="Personnages, animations, armes, squelettes, forêt, bâtiments, donjon (packs KayKit)" class="credits-ligne__quoi" />
+                <ui:Label text="Kay Lousberg" class="credits-ligne__qui" />
+                <ui:Label text="CC0" class="credits-ligne__licence" />
+            </ui:VisualElement>
+            <ui:VisualElement class="credits-ligne">
+                <ui:Label text="Icônes de boutons Xbox, PlayStation, clavier et souris (Input Prompts)" class="credits-ligne__quoi" />
+                <ui:Label text="Kenney" class="credits-ligne__qui" />
+                <ui:Label text="CC0" class="credits-ligne__licence" />
+            </ui:VisualElement>
+
+            <ui:Label text="SONS" class="dl-section-label credits__section" />
+            <ui:VisualElement class="credits-ligne">
+                <ui:Label text="Combats, compétences, ennemis, Nyxessa et portail, musiques du village et du donjon" class="credits-ligne__quoi" />
+                <ui:Label text="Créés pour le projet" class="credits-ligne__qui" />
+                <ui:Label text="Projet" class="credits-ligne__licence" />
+            </ui:VisualElement>
+            <ui:VisualElement class="credits-ligne">
+                <ui:Label text="Sons d’objets et de pas (RPG Audio), sons d’interface (Interface Sounds)" class="credits-ligne__quoi" />
+                <ui:Label text="Kenney" class="credits-ligne__qui" />
+                <ui:Label text="CC0" class="credits-ligne__licence" />
+            </ui:VisualElement>
+
+            <ui:Label text="POLICE" class="dl-section-label credits__section" />
+            <ui:VisualElement class="credits-ligne">
+                <ui:Label text="Fredoka" class="credits-ligne__quoi" />
+                <ui:Label text="The Fredoka Project Authors" class="credits-ligne__qui" />
+                <ui:Label text="SIL OFL 1.1" class="credits-ligne__licence" />
+            </ui:VisualElement>
+
+            <ui:Label text="Les licences CC0 n’exigent pas de crédit : ils figurent ici par reconnaissance." class="dl-text dl-text--small dl-text--muted credits__note" />
+            <ui:Button name="credits-retour" text="Retour" class="credits__retour" />
+        </ui:VisualElement>
+        <ui:VisualElement class="dl-prompt-bar">
+            <ui:VisualElement class="dl-prompt-bar__group">
+                <dl:InputPrompt action="UI/Cancel" label="Retour" />
+            </ui:VisualElement>
+            <ui:Label text="Clavier et souris" class="dl-text dl-text--small dl-text--muted dl-device-name" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

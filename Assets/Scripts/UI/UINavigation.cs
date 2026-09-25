@@ -90,6 +90,28 @@ namespace Deathless.UI
             field.focusController?.IgnoreEvent(evt);
         }
 
+        /// Chaîne haut / bas une liste d'éléments focusables (lignes d'une table dans un ScrollView) : la navigation
+        /// spatiale d'UI Toolkit ne passe pas toujours d'une ligne à la suivante dans un ScrollView. Au-dessus de la
+        /// première ligne, la navigation normale reprend (vers les onglets, par exemple).
+        public static void ChainerVerticalement(IList<VisualElement> elements)
+        {
+            for (var i = 0; i < elements.Count; i++)
+            {
+                var precedent = i > 0 ? elements[i - 1] : null;
+                var suivant = i < elements.Count - 1 ? elements[i + 1] : null;
+                elements[i].RegisterCallback<NavigationMoveEvent>(evt =>
+                {
+                    var cible = evt.direction == NavigationMoveEvent.Direction.Down ? suivant
+                        : evt.direction == NavigationMoveEvent.Direction.Up ? precedent : null;
+                    var bas = evt.direction == NavigationMoveEvent.Direction.Down;
+                    if (cible == null && !bas) return;   // en haut de la liste : navigation normale
+                    if (cible != null) cible.Focus();
+                    evt.StopPropagation();
+                    (evt.currentTarget as VisualElement)?.focusController?.IgnoreEvent(evt);
+                });
+            }
+        }
+
         /// Donne le focus à l'élément focusable le plus proche de <paramref name="from"/> dans la direction donnée.
         /// Renvoie false s'il n'y en a pas (le focus ne bouge pas).
         public static bool Move(VisualElement from, NavigationMoveEvent.Direction direction)

@@ -1,0 +1,53 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:dl="Deathless.UI" editor-extension-mode="False">
+    <Style src="../V01.uss" />
+    <ui:VisualElement class="v01-plein menu">
+        <ui:VisualElement class="menu__volet" />
+        <ui:VisualElement class="menu__titres">
+            <ui:Label text="DEATHLESS" class="dl-display" />
+            <ui:Label text="Défendre Nyxessa, de jour comme de nuit" class="dl-subtitle menu__sous-titre" />
+        </ui:VisualElement>
+        <ui:VisualElement class="menu__liste">
+            <ui:Button name="menu-solo" class="dl-menu-item">
+                <ui:VisualElement class="dl-menu-item__texts">
+                    <ui:Label text="Solo" class="dl-menu-item__label" />
+                    <ui:Label text="Défendre Nyxessa seul, avec le Paladin" class="dl-menu-item__desc" />
+                </ui:VisualElement>
+                <dl:InputPrompt action="UI/Submit" class="dl-menu-item__prompt" />
+            </ui:Button>
+            <ui:Button name="menu-options" class="dl-menu-item">
+                <ui:VisualElement class="dl-menu-item__texts">
+                    <ui:Label text="Options" class="dl-menu-item__label" />
+                    <ui:Label text="Taille de l’interface, commandes" class="dl-menu-item__desc" />
+                </ui:VisualElement>
+                <dl:InputPrompt action="UI/Submit" class="dl-menu-item__prompt" />
+            </ui:Button>
+            <ui:Button name="menu-credits" class="dl-menu-item">
+                <ui:VisualElement class="dl-menu-item__texts">
+                    <ui:Label text="Crédits" class="dl-menu-item__label" />
+                    <ui:Label text="Auteurs des assets et de la police" class="dl-menu-item__desc" />
+                </ui:VisualElement>
+                <dl:InputPrompt action="UI/Submit" class="dl-menu-item__prompt" />
+            </ui:Button>
+            <ui:Button name="menu-quitter" class="dl-menu-item">
+                <ui:VisualElement class="dl-menu-item__texts">
+                    <ui:Label text="Quitter" class="dl-menu-item__label" />
+                    <ui:Label text="Fermer le jeu" class="dl-menu-item__desc" />
+                </ui:VisualElement>
+                <dl:InputPrompt action="UI/Submit" class="dl-menu-item__prompt" />
+            </ui:Button>
+        </ui:VisualElement>
+        <ui:VisualElement class="dl-panel menu__classe">
+            <ui:Label text="CLASSE" class="dl-section-label" />
+            <ui:Label text="Paladin" class="dl-heading" />
+            <ui:Label text="Épée et bouclier. Garde et parade, charge bélier, soin sur soi." class="dl-text dl-text--muted" />
+            <ui:Label text="Seule classe de la version 0.1." class="dl-text dl-text--small dl-text--muted menu__note" />
+        </ui:VisualElement>
+        <ui:Label text="Version 0.1" class="menu__version" />
+        <ui:VisualElement class="dl-prompt-bar">
+            <ui:VisualElement class="dl-prompt-bar__group">
+                <dl:InputPrompt action="UI/Submit" label="Valider" />
+            </ui:VisualElement>
+            <ui:Label text="Clavier et souris" class="dl-text dl-text--small dl-text--muted dl-device-name" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

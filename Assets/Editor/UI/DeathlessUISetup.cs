@@ -302,6 +302,53 @@ namespace Deathless.UI.EditorTools
             }
         }
 
+        const string V01ScenePath = "Assets/Scenes/UIv01.unity";
+
+        [MenuItem("Deathless/UI/5. Scène des écrans 0.1 (UIv01)")]
+        public static void CreateV01Scene()
+        {
+            var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+
+            var cameraGo = new GameObject("Main Camera", typeof(Camera));
+            cameraGo.tag = "MainCamera";
+            var camera = cameraGo.GetComponent<Camera>();
+            camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.backgroundColor = new Color32(0x16, 0x1a, 0x24, 0xff);
+
+            var actions = AssetDatabase.LoadAssetAtPath<InputActionAsset>(ActionsPath);
+            var eventSystemGo = new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
+            AssignUIModule(eventSystemGo.GetComponent<InputSystemUIInputModule>(), actions);
+
+            // Données factices (le vrai jeu les remplace dans main).
+            var donnees = new GameObject("Donnees (factices)");
+            donnees.AddComponent<Deathless.UI.Dev.EtatFactice>().actions = actions;
+
+            var panel = AssetDatabase.LoadAssetAtPath<PanelSettings>(PanelPath);
+            var uiGo = new GameObject("UI");
+            var document = uiGo.AddComponent<UIDocument>();
+            document.panelSettings = panel;
+            document.visualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/UI/Screens/UIv01/UIv01.uxml");
+            uiGo.AddComponent<UIScale>().panels = new[] { panel };
+            var nav = uiGo.AddComponent<Deathless.UI.Ecrans.NavigateurEcrans>();
+            nav.actions = actions;
+            VisualTreeAsset Uxml(string nom) => AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"Assets/UI/Screens/{nom}/{nom}.uxml");
+            nav.menuPrincipal = Uxml("MenuPrincipal");
+            nav.options = Uxml("Options");
+            nav.credits = Uxml("Credits");
+            nav.hud = Uxml("Hud");
+            nav.pause = Uxml("Pause");
+            nav.score = Uxml("Score");
+            uiGo.AddComponent<Deathless.UI.Dev.DemoV01>();
+
+            EditorSceneManager.SaveScene(scene, V01ScenePath);
+            var scenes = EditorBuildSettings.scenes.ToList();
+            if (scenes.All(sc => sc.path != V01ScenePath))
+            {
+                scenes.Insert(0, new EditorBuildSettingsScene(V01ScenePath, true));
+                EditorBuildSettings.scenes = scenes.ToArray();
+            }
+        }
+
         /// Branche le module d'entrée UI sur la carte UI de DeathlessControls (références sous-assets de l'importeur).
         public static void AssignUIModule(InputSystemUIInputModule module, InputActionAsset actions)
         {

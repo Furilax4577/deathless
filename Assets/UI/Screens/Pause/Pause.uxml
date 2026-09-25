@@ -1,0 +1,32 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:dl="Deathless.UI" editor-extension-mode="False">
+    <Style src="../V01.uss" />
+    <ui:VisualElement class="v01-plein v01-voile">
+        <ui:VisualElement class="dl-panel pause">
+            <ui:Label text="Pause" class="dl-title" />
+            <ui:Label text="La partie continue pendant que ce menu est ouvert." class="dl-text dl-text--muted pause__aide" />
+            <ui:Button name="pause-reprendre" class="dl-menu-item pause__item">
+                <ui:Label text="Reprendre" class="pause__label" />
+                <dl:InputPrompt action="UI/Submit" class="dl-menu-item__prompt" />
+            </ui:Button>
+            <ui:Button name="pause-options" class="dl-menu-item pause__item">
+                <ui:Label text="Options" class="pause__label" />
+                <dl:InputPrompt action="UI/Submit" class="dl-menu-item__prompt" />
+            </ui:Button>
+            <ui:Button name="pause-quitter-partie" class="dl-menu-item pause__item">
+                <ui:Label text="Quitter la partie" class="pause__label" />
+                <dl:InputPrompt action="UI/Submit" class="dl-menu-item__prompt" />
+            </ui:Button>
+            <ui:Button name="pause-quitter-jeu" class="dl-menu-item pause__item">
+                <ui:Label text="Quitter le jeu" class="pause__label" />
+                <dl:InputPrompt action="UI/Submit" class="dl-menu-item__prompt" />
+            </ui:Button>
+        </ui:VisualElement>
+        <ui:VisualElement class="dl-prompt-bar">
+            <ui:VisualElement class="dl-prompt-bar__group">
+                <dl:InputPrompt action="UI/Submit" label="Valider" />
+                <dl:InputPrompt action="UI/Cancel" label="Reprendre" />
+            </ui:VisualElement>
+            <ui:Label text="Clavier et souris" class="dl-text dl-text--small dl-text--muted dl-device-name" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

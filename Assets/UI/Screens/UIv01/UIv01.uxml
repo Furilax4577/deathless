@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:dev="Deathless.UI.Dev" editor-extension-mode="False">
+    <!-- Racine de la démo 0.1 : décor factice (à la place de la scène 3D) puis le conteneur des écrans. -->
+    <ui:VisualElement name="racine-v01" style="flex-grow: 1;">
+        <dev:FondDemo name="fond-demo" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0;" />
+        <ui:VisualElement name="ecrans" picking-mode="Ignore" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0;" />
+    </ui:VisualElement>
+</ui:UXML>

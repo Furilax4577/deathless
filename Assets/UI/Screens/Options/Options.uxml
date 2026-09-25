@@ -1,0 +1,57 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:dl="Deathless.UI" editor-extension-mode="False">
+    <Style src="../V01.uss" />
+    <ui:VisualElement class="v01-plein v01-voile options">
+        <ui:VisualElement class="options__entete">
+            <ui:Label text="Options" class="dl-title options__titre" />
+            <ui:VisualElement class="dl-tabs">
+                <dl:InputPrompt action="UI/TabPrevious" />
+                <ui:Button name="onglet-jeu" text="Jeu" class="dl-tab" />
+                <ui:Button name="onglet-commandes" text="Commandes" class="dl-tab" />
+                <dl:InputPrompt action="UI/TabNext" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="options-jeu" class="dl-panel options__page options__page--jeu">
+            <ui:Label text="JEU" class="dl-section-label" />
+            <ui:Label text="Taille de l’interface" class="dl-text" />
+            <ui:VisualElement class="options__tailles">
+                <ui:Button name="taille-1" class="options__taille">
+                    <ui:Label text="×1" class="options__taille-titre" />
+                    <ui:Label text="80 %" class="options__taille-pc" />
+                </ui:Button>
+                <ui:Button name="taille-2" class="options__taille">
+                    <ui:Label text="×2" class="options__taille-titre" />
+                    <ui:Label text="100 %" class="options__taille-pc" />
+                </ui:Button>
+                <ui:Button name="taille-3" class="options__taille">
+                    <ui:Label text="×3" class="options__taille-titre" />
+                    <ui:Label text="135 %" class="options__taille-pc" />
+                </ui:Button>
+            </ui:VisualElement>
+            <ui:Label text="×3 pour lire confortablement sur une télévision." class="dl-text dl-text--small dl-text--muted" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="options-commandes" class="dl-panel options__page">
+            <ui:VisualElement class="options-ligne options-ligne--entete">
+                <ui:Label text="ACTION" class="dl-section-label options-ligne__libelle" />
+                <ui:Label text="CLAVIER ET SOURIS" class="dl-section-label options-ligne__entete" />
+                <ui:Label name="options-entete-manette" text="MANETTE XBOX" class="dl-section-label options-ligne__entete" />
+            </ui:VisualElement>
+            <ui:ScrollView name="options-table" class="options__table" mode="Vertical" horizontal-scroller-visibility="Hidden" />
+            <ui:Label text="Lecture seule : la personnalisation des touches viendra plus tard." class="dl-text dl-text--small dl-text--muted options__note" />
+        </ui:VisualElement>
+
+        <ui:Button name="options-retour" text="Retour" class="options__retour" />
+
+        <ui:VisualElement class="dl-prompt-bar">
+            <ui:VisualElement class="dl-prompt-bar__group">
+                <dl:InputPrompt action="UI/Submit" label="Valider" />
+                <dl:InputPrompt action="UI/Cancel" label="Retour" />
+                <dl:InputPrompt action="UI/TabPrevious" class="dl-prompt--joined" />
+                <dl:InputPrompt action="UI/TabNext" label="Onglets" />
+                <dl:InputPrompt action="UI/Reset" label="Réinitialiser" />
+            </ui:VisualElement>
+            <ui:Label text="Clavier et souris" class="dl-text dl-text--small dl-text--muted dl-device-name" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

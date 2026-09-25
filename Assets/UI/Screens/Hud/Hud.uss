@@ -1,0 +1,288 @@
+/* HUD en jeu (version 0.1). Valeurs des maquettes HUD_Jour / HUD_Nuit × 1,5. */
+
+.hud {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.hud-pastille {
+    flex-direction: row;
+    align-items: center;
+    height: 51px;
+    padding: 0 21px;
+    border-radius: 26px;
+    background-color: rgba(16, 19, 27, 0.88);
+}
+
+/* ---------- Haut, au centre ---------- */
+.hud-haut {
+    position: absolute;
+    top: 30px;
+    left: 50%;
+    width: 780px;
+    translate: -50% 0;
+    align-items: center;
+}
+
+.hud-nyx { flex-direction: row; align-items: center; width: 100%; margin-bottom: 12px; }
+.hud-nyx__gemme { width: 33px; height: 42px; margin-right: 15px; }
+
+.hud-nyx__barre {
+    flex-grow: 1;
+    height: 27px;
+    border-radius: 13px;
+    border-width: 1px;
+    border-color: var(--dl-color-border);
+    background-color: var(--dl-color-well);
+    overflow: hidden;
+}
+
+.hud-nyx__piste-vie { flex-grow: 2; }
+.hud-nyx__vie { height: 100%; width: 100%; background-color: var(--dl-color-nyxessa); }
+.hud-nyx__piste-bouclier { flex-grow: 1; background-color: rgba(0, 0, 0, 0.35); }
+.hud-nyx__bouclier { height: 100%; width: 100%; background-color: var(--dl-color-shield); }
+.hud-nyx__bouclier--entame { background-color: var(--dl-color-shield-warn); }
+.hud-nyx__bouclier--critique { background-color: var(--dl-color-life); }
+
+.hud-temps__icone { width: 27px; height: 27px; margin-right: 15px; }
+.hud-temps__texte { font-size: var(--dl-text-body); margin: 0; padding: 0; }
+
+.hud-prets { flex-direction: row; align-items: center; margin-left: 18px; }
+.hud-prets__texte { font-size: var(--dl-text-small); color: var(--dl-color-text-muted); margin: 0 9px 0 0; padding: 0; }
+
+.hud-alerte-bouclier {
+    font-size: var(--dl-text-small);
+    color: #ff9a8a;
+    margin: 9px 0 0 0;
+    padding: 0;
+}
+
+.hud-alerte-nuit {
+    margin-top: 12px;
+    border-width: 2px;
+    border-color: var(--dl-color-shield-warn);
+    background-color: rgba(58, 36, 16, 0.88);
+}
+
+.hud-alerte-nuit--pulse { border-color: #ffd166; background-color: rgba(96, 58, 20, 0.92); }
+.hud-alerte-nuit__texte {
+    font-size: var(--dl-text-body);
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+    color: #ffd9a0;
+    margin: 0;
+    padding: 0;
+}
+
+/* ---------- Bannière NUIT N ---------- */
+.hud-banniere {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 225px;
+    align-items: center;
+    opacity: 0;
+    scale: 0.92 0.92;
+    transition-property: opacity, scale;
+    transition-duration: 0.5s, 0.5s;
+}
+
+.hud-banniere--visible { opacity: 1; scale: 1 1; }
+
+.hud-banniere__titre {
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Bold-SDF.asset");
+    font-size: 96px;
+    letter-spacing: 9px;
+    color: var(--dl-color-text);
+    margin: 0;
+    padding: 0;
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+.hud-banniere__sous-titre {
+    font-size: var(--dl-text-large);
+    color: var(--dl-color-gold);
+    margin: 0;
+    padding: 0;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+/* ---------- Nyxessa attaquée (bord de l'écran) ---------- */
+.hud-attaque {
+    position: absolute;
+    flex-direction: row;
+    align-items: center;
+    height: 60px;
+    padding: 0 21px 0 12px;
+    border-radius: 30px;
+    background-color: rgba(200, 53, 44, 0.9);
+}
+
+.hud-attaque--gauche { left: 24px; }
+.hud-attaque--droite { right: 24px; flex-direction: row-reverse; padding: 0 12px 0 21px; }
+.hud-attaque--haut { top: 290px; left: 50%; translate: -50% 0; }
+.hud-attaque--bas { bottom: 250px; left: 50%; translate: -50% 0; }
+.hud-attaque__fleche { width: 33px; height: 33px; margin: 0 9px; }
+.hud-attaque__texte {
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+    font-size: 22px;
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+
+/* ---------- Or (haut, à droite) ---------- */
+.hud-or { position: absolute; right: 48px; top: 33px; height: 60px; border-radius: 30px; }
+.hud-or__piece { width: 33px; height: 33px; margin-right: 15px; }
+.hud-or__valeur {
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+    font-size: var(--dl-text-large);
+    margin: 0 12px 0 0;
+    padding: 0;
+}
+.hud-or__legende { font-size: var(--dl-text-small); color: var(--dl-color-text-muted); margin: 0; padding: 0; }
+
+/* ---------- Joueur (bas, à gauche) ---------- */
+.hud-joueur {
+    position: absolute;
+    left: 48px;
+    bottom: 39px;
+    flex-direction: row;
+    align-items: flex-end;
+}
+
+.hud-joueur__portrait {
+    width: 108px;
+    height: 108px;
+    border-radius: 54px;
+    border-width: 4px;
+    border-color: var(--dl-color-text);
+    background-color: var(--dl-color-gold);
+    align-items: center;
+    justify-content: center;
+    margin-right: 21px;
+}
+
+.hud-joueur__initiale {
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Bold-SDF.asset");
+    font-size: 45px;
+    color: var(--dl-color-ink);
+    margin: 0;
+    padding: 0;
+}
+
+.hud-joueur__jauges { width: 420px; padding: 12px 18px 6px 18px; border-radius: 18px; background-color: rgba(16, 19, 27, 0.78); }
+.hud-joueur__jauges > .dl-gauge { margin-bottom: 6px; }
+
+/* ---------- Compétences (bas, au centre) ---------- */
+.hud-competences {
+    position: absolute;
+    bottom: 33px;
+    left: 50%;
+    translate: -50% 0;
+    flex-direction: row;
+    align-items: flex-end;
+}
+
+.hud-emplacement { align-items: center; margin: 0 9px; }
+
+.hud-emplacement__case {
+    width: 96px;
+    height: 96px;
+    border-radius: 18px;
+    border-width: 3px;
+    border-color: var(--dl-color-border);
+    background-color: var(--dl-color-panel);
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-bottom: 9px;
+}
+
+.hud-emplacement__case--prete { border-color: var(--dl-color-border-strong); }
+.hud-emplacement__case--active { border-color: var(--dl-color-gold); background-color: #3a3420; }
+.hud-emplacement__case--indisponible .hud-emplacement__abrev { color: var(--dl-color-text-disabled); }
+
+.hud-emplacement__icone { position: absolute; left: 12px; top: 12px; right: 12px; bottom: 12px; -unity-background-scale-mode: scale-to-fit; }
+
+.hud-emplacement__abrev {
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+    font-size: 33px;
+    color: var(--dl-color-text);
+    margin: 0;
+    padding: 0;
+}
+
+.hud-emplacement__voile {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    background-color: rgba(10, 12, 18, 0.62);
+}
+
+.hud-emplacement__recharge {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    -unity-text-align: middle-center;
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Bold-SDF.asset");
+    font-size: 36px;
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+
+.hud-emplacement__invite { --dl-prompt-size: 40px; --dl-key-height: 28px; --dl-key-text: 15px; }
+.hud-competences--mort { opacity: 0.45; }
+
+/* ---------- Centre ---------- */
+.hud-reticule {
+    position: absolute;
+    width: 36px;
+    height: 36px;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+}
+
+.hud-interaction { position: absolute; top: 678px; left: 50%; translate: -50% 0; height: 60px; border-radius: 30px; background-color: rgba(16, 19, 27, 0.82); }
+.hud-interaction__texte { font-size: var(--dl-text-body); margin: 0 0 0 12px; padding: 0; }
+
+/* ---------- Mort ---------- */
+.hud-mort {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(28, 8, 10, 0.62);
+}
+
+.hud-mort__titre { font-size: 84px; color: #ffb3a8; }
+.hud-mort__texte {
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+    font-size: 42px;
+    color: var(--dl-color-gold);
+    margin: 6px 0 12px 0;
+    padding: 0;
+}
+.hud-mort__aide { font-size: var(--dl-text-body); }
+
+/* ---------- Taille ×3 : le HUD tient dans ~1422 × 800 ---------- */
+.dl-scale-3 .hud-haut { width: 620px; top: 20px; }
+.dl-scale-3 .hud-or { right: 24px; top: 20px; }
+.dl-scale-3 .hud-or__legende { display: none; }
+.dl-scale-3 .hud-joueur { left: 24px; bottom: 24px; }
+.dl-scale-3 .hud-joueur__jauges { width: 320px; }
+.dl-scale-3 .hud-joueur__portrait { width: 84px; height: 84px; border-radius: 42px; }
+.dl-scale-3 .hud-competences { bottom: 24px; left: auto; right: 24px; translate: 0 0; }
+.dl-scale-3 .hud-interaction { top: 480px; }
+.dl-scale-3 .hud-banniere { top: 150px; }
