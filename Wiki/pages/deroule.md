@@ -84,7 +84,7 @@ Ces parts sont {à équilibrer}. Rentrer par le portail avant la nuit garde touj
 - **Clairières actives** : une au début, deux à partir de la nuit 3, les trois à partir de la nuit 5. Les clairières actives sont annoncées au crépuscule.
 - **À l'aube** : les squelettes encore debout se désintègrent {effet validé}. L'enjeu est de tenir jusqu'au jour, pas de tout tuer.
 
-### Montée en difficulté {à équilibrer}
+### Montée en difficulté {décidé}
 
 Pour un joueur :
 
