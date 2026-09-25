@@ -8,6 +8,7 @@ Ce wiki fixe les règles du jeu. Quand une page dit une chose et que le jeu en f
 
 - {décidé} : la règle est tranchée par Quentin et s'applique.
 - {effet validé} : l'apparence est validée, mais les règles de jeu restent à fixer.
+- {à équilibrer} : la règle est décidée, les chiffres sont des valeurs de départ à régler en jouant.
 - {à confirmer} : c'est une proposition ou une piste. Elle ne fait pas encore foi.
 - La page [À décider](a-decider.md) liste ce qui reste ouvert.
 

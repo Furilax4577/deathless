@@ -24,13 +24,33 @@ Nyxessa tire des missiles en forme de crâne faits de gemmes vertes, une fois et
 - **Dégâts** : ils dépendent aussi du palier d'amélioration, comme les deux temps de recharge.
 - **Décision de tir** : Nyxessa choisit elle-même quand tirer et combien de missiles envoyer, selon le stock disponible.
 
-| Palier | Stock N | Régénération d'un missile | Intervalle de tir | Dégâts |
-|---|---|---|---|---|
-| 1 | {à confirmer} | {à confirmer} | {à confirmer} | {à confirmer} |
-| 2 | {à confirmer} | {à confirmer} | {à confirmer} | {à confirmer} |
-| 3 | {à confirmer} | {à confirmer} | {à confirmer} | {à confirmer} |
+### Paliers {à équilibrer}
 
-- Nombre de paliers, coût des améliorations et règle de choix des cibles : {à confirmer}.
+Cinq paliers, soit environ un palier toutes les deux nuits sur une partie de 45 minutes. Les dégâts supposent un squelette sbire à 100 points de vie.
+
+| Palier | Stock N | Régénération d'un missile | Intervalle de tir | Dégâts | Missiles par nuit | Dégâts par nuit |
+|---|---|---|---|---|---|---|
+| 1 | 2 | 12 s | 1,5 s | 40 | 12 | 480 |
+| 2 | 3 | 10 s | 1,2 s | 55 | 15 | 825 |
+| 3 | 4 | 8 s | 1,0 s | 75 | 19 | 1 425 |
+| 4 | 6 | 6,5 s | 0,8 s | 100 | 24 | 2 400 |
+| 5 | 8 | 5 s | 0,6 s | 130 | 32 | 4 160 |
+
+- Au palier 1, il faut trois missiles pour un sbire : Nyxessa aide, mais ne tient pas seule.
+- Au palier 5, un missile tue un sbire, et le stock permet des salves.
+- **Coût** des paliers 2 à 5 : ×1, ×2, ×3,5 et ×5,5 d'un coût de base, payé par la caisse commune. Le coût de base est {à confirmer}.
+
+### Règles de tir {décidé}
+
+- **Portée** : 30 m, jusqu'à la lisière de la forêt. Les ennemis sous les arbres sont hors d'atteinte.
+- **Priorité des cibles** :
+  - d'abord un ennemi qui frappe Nyxessa ou son bouclier ;
+  - ensuite un nécromancien ou un ennemi d'élite ;
+  - sinon l'ennemi le plus proche de Nyxessa.
+- **Salves** :
+  - en temps normal, un missile par cible, en gardant un missile en réserve ;
+  - contre un groupe de trois ennemis ou plus, ou contre un élite, une salve jusqu'à vider le stock sauf un ;
+  - si Nyxessa est frappée, elle vide tout son stock.
 
 ## Bouclier
 

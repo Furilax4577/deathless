@@ -2,6 +2,10 @@
 
 Une partie enchaîne des cycles de jour et de nuit autour de Nyxessa.
 
+## Die and retry {décidé}
+
+Deathless est un jeu de type **die and retry** : on recommence après une défaite. Une partie dure **environ 45 minutes en moyenne**, soit une dizaine de cycles.
+
 ## Le cycle {décidé}
 
 | Phase | Durée | Ce qui se passe |

@@ -31,6 +31,7 @@ BADGES = {
     "décidé": '<span class="badge ok">décidé</span>',
     "à confirmer": '<span class="badge wait">à confirmer</span>',
     "effet validé": '<span class="badge fx">effet validé</span>',
+    "à équilibrer": '<span class="badge tune">à équilibrer</span>',
 }
 
 
@@ -40,7 +41,7 @@ def inline(txt):
     t = re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", t)
     t = re.sub(r"\[([^\]]+)\]\(([^)#]+)\.md(#[^)]*)?\)", lambda m: '<a href="%s.html%s">%s</a>' % (m.group(2), m.group(3) or "", m.group(1)), t)
     t = re.sub(r"\[([^\]]+)\]\((https?://[^)]+)\)", r'<a href="\2">\1</a>', t)
-    t = re.sub(r"\{(décidé|à confirmer|effet validé)\}", lambda m: BADGES[m.group(1)], t)
+    t = re.sub(r"\{(décidé|à confirmer|effet validé|à équilibrer)\}", lambda m: BADGES[m.group(1)], t)
     t = re.sub(r"\{couleur (#[0-9a-fA-F]{6})\}", r'<span class="swatch" style="background:\1"></span><code>\1</code>', t)
     return t
 
@@ -109,9 +110,9 @@ def convertir(md):
 
 CSS = """
 :root{--fond:#f6f3ec;--surface:#ffffff;--encre:#1f2433;--doux:#5b5f6b;--ligne:#e2dccd;--accent:#8a6a1f;--nyx:#1e7a45;
---ok-fond:#dcf1e3;--ok:#1b6a3a;--wait-fond:#fbe8c8;--wait:#7a4a06;--fx-fond:#dde6f7;--fx:#23457a;--code:#efe9dc;color-scheme:light}
+--ok-fond:#dcf1e3;--ok:#1b6a3a;--wait-fond:#fbe8c8;--wait:#7a4a06;--fx-fond:#dde6f7;--fx:#23457a;--tune-fond:#efe3f5;--tune:#5e2a7a;--code:#efe9dc;color-scheme:light}
 @media (prefers-color-scheme: dark){:root{--fond:#161a24;--surface:#1f2533;--encre:#f4ecd8;--doux:#b9b3a3;--ligne:#333b52;
---accent:#d9b264;--nyx:#6fd08f;--ok-fond:#1d3b2a;--ok:#9fe0b4;--wait-fond:#3d2f16;--wait:#f5c77a;--fx-fond:#1f2d47;--fx:#a9c3f0;--code:#2a3142;color-scheme:dark}}
+--accent:#d9b264;--nyx:#6fd08f;--ok-fond:#1d3b2a;--ok:#9fe0b4;--wait-fond:#3d2f16;--wait:#f5c77a;--fx-fond:#1f2d47;--fx:#a9c3f0;--tune-fond:#35243f;--tune:#dcb6ef;--code:#2a3142;color-scheme:dark}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--fond);color:var(--encre);font:16px/1.6 "Segoe UI",system-ui,sans-serif}
 .cadre{display:grid;grid-template-columns:260px minmax(0,1fr);min-height:100vh}
@@ -133,7 +134,7 @@ code{background:var(--code);padding:1px 6px;border-radius:5px;font-size:.9em}
 th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--ligne);vertical-align:top}
 th{font-size:13px;letter-spacing:.5px;text-transform:uppercase;color:var(--doux)}
 .badge{display:inline-block;padding:0 9px;border-radius:999px;font-size:12px;font-weight:600;vertical-align:2px;margin-left:4px}
-.badge.ok{background:var(--ok-fond);color:var(--ok)}.badge.fx{background:var(--fx-fond);color:var(--fx)}.badge.wait{background:var(--wait-fond);color:var(--wait)}
+.badge.ok{background:var(--ok-fond);color:var(--ok)}.badge.fx{background:var(--fx-fond);color:var(--fx)}.badge.tune{background:var(--tune-fond);color:var(--tune)}.badge.wait{background:var(--wait-fond);color:var(--wait)}
 .note{border:1px solid var(--ligne);background:var(--surface);border-radius:10px;padding:12px 16px;margin:16px 0;color:var(--doux)}
 .swatch{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px;border:1px solid var(--ligne)}
 .maj{margin-top:48px;color:var(--doux);font-size:13px}

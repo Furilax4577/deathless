@@ -31,4 +31,4 @@ Le nécromancien tire un **missile en forme de crâne** fait de gemmes {effet va
 
 - Cible prioritaire : Nyxessa, les joueurs, ou le plus proche.
 - Détection des joueurs, en particulier de l'assassin en mode furtif, qui n'est repéré que de près.
-- Vie, vitesse, dégâts et or rapporté par type.
+- Vie, vitesse, dégâts et or rapporté par type. Les calculs de Nyxessa supposent un sbire à 100 points de vie {à équilibrer}.
