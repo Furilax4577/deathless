@@ -23,6 +23,8 @@ public class MortAllie : MonoBehaviour
     [Tooltip("Vitesse du flux d'énergie (m/s) : durée = distance / vitesse, bornée.")]
     [SerializeField] private float vitesseFlux = 12f;
     [SerializeField] private Vector2 dureeFlux = new Vector2(0.6f, 2.2f);
+    [Tooltip("Ampleur du flux d'énergie (ChargeNyxessa, 1 = charge du portail, massive) : 0,35 pour une mort isolée.")]
+    [SerializeField] private float echelleFlux = 0.35f;
 
     public static MortAllie Instance { get; private set; }
 
@@ -52,7 +54,7 @@ public class MortAllie : MonoBehaviour
         float d = Vector3.Distance(ame, cristal);
         ChargeNyxessa.Lancer(ame, cristal, Mathf.Clamp(d / vitesseFlux, dureeFlux.x, dureeFlux.y), materiau,
             () => { if (nyxessa != null) nyxessa.Reagir(ReactionNyxessa.PassageJoueur); if (fin != null) fin(); },
-            Mathf.Clamp(d * 0.2f, 1.2f, 5f));
+            Mathf.Clamp(d * 0.2f, 1.2f, 5f), echelleFlux);
     }
 
     private IEnumerator SequenceReapparition(GameObject personnage, Vector3 point, Nyxessa nyxessa, System.Action fin, System.Action recomposition)
@@ -69,7 +71,7 @@ public class MortAllie : MonoBehaviour
             float d = Vector3.Distance(ame, cristal);
             bool arrive = false;
             ChargeNyxessa.Lancer(cristal, ame, Mathf.Clamp(d / vitesseFlux, dureeFlux.x, dureeFlux.y), materiau, () => arrive = true,
-                Mathf.Clamp(d * 0.2f, 1.2f, 5f));
+                Mathf.Clamp(d * 0.2f, 1.2f, 5f), echelleFlux);
             while (!arrive) yield return null;
         }
         PortalTransit.Arrive(corps, ame, materiau, dureeRecomposition);

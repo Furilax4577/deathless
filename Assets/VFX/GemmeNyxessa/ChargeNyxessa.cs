@@ -5,9 +5,14 @@ using UnityEngine;
 // queue qui s'éteint par la taille (vif, base) ; une VfxLumiere (Nyxessa, moyenne) voyage avec la tête et éclaire le
 // sol le long du trajet. `aLArrivee` est appelé quand la tête arrive ; la queue finit de converger puis l'objet se
 // détruit. Utilisé par Nyxessa.EnvoyerCharge (ouverture du portail) et Nyxessa.ReprendreCharge (fermeture).
+// `echelle` (25/09/2026, agent gameplay) : ampleur du flux, 1 = charge du portail (480 gemmes, lumière grande). En dessous
+// de 1, moins de gemmes (480 × échelle, 40 au moins), gemmes et écart à l'arc réduits (× √échelle), lumière moyenne sous
+// 0,6 : MortAllie l'utilise à 0,35 pour l'énergie d'un allié mort, bien plus discrète que la charge du portail.
 public class ChargeNyxessa : MonoBehaviour
 {
-    private const int Gemmes = 480;
+    private const int GemmesMax = 480;
+    private int Gemmes = GemmesMax;
+    private float echelle = 1f;
     private const float Queue = 0.45f;       // longueur de la queue en fraction du trajet
     private const float Resorption = 0.35f;  // la queue finit d'arriver après la tête (s)
 
@@ -19,16 +24,16 @@ public class ChargeNyxessa : MonoBehaviour
     private Mesh mesh;
     private Vector3[] vertices;
     private Color[] colors;
-    private readonly float[] retard = new float[Gemmes];
-    private readonly Vector3[] ecart = new Vector3[Gemmes];
-    private readonly Quaternion[] rotation = new Quaternion[Gemmes];
-    private readonly Vector3[] axe = new Vector3[Gemmes];
-    private readonly float[] taille = new float[Gemmes];
+    private float[] retard;
+    private Vector3[] ecart;
+    private Quaternion[] rotation;
+    private Vector3[] axe;
+    private float[] taille;
     private VfxLumiere lumiere;
 
     private static Color Teinte(VfxRole role, Color defaut) { return VfxPalette.Couleur(VfxTheme.Nyxessa, role, defaut); }
 
-    public static ChargeNyxessa Lancer(Vector3 depart, Vector3 arrivee, float duree, Material materiau, System.Action aLArrivee, float hauteur = 2.5f)
+    public static ChargeNyxessa Lancer(Vector3 depart, Vector3 arrivee, float duree, Material materiau, System.Action aLArrivee, float hauteur = 2.5f, float echelle = 1f)
     {
         if (materiau == null)
         {
@@ -37,6 +42,8 @@ public class ChargeNyxessa : MonoBehaviour
         }
         GameObject go = new GameObject("ChargeNyxessa");
         ChargeNyxessa c = go.AddComponent<ChargeNyxessa>();
+        c.echelle = Mathf.Clamp(echelle, 0.05f, 1f);
+        c.Gemmes = Mathf.Max(40, Mathf.RoundToInt(GemmesMax * c.echelle));
         c.Construire(depart, arrivee, Mathf.Max(0.1f, duree), materiau, aLArrivee, hauteur);
         return c;
     }
@@ -59,14 +66,17 @@ public class ChargeNyxessa : MonoBehaviour
         p2 = Vector3.Lerp(depart, arrivee, 0.75f) + leve;
         duree = d;
         aLArrivee = rappel;
+        retard = new float[Gemmes]; ecart = new Vector3[Gemmes]; rotation = new Quaternion[Gemmes];
+        axe = new Vector3[Gemmes]; taille = new float[Gemmes];
+        float reduc = Mathf.Sqrt(echelle);
         for (int i = 0; i < Gemmes; i++)
         {
             float r = Random.value;
             retard[i] = r * r * Queue;              // plus de gemmes près de la tête
-            ecart[i] = Random.insideUnitSphere * Mathf.Lerp(0.14f, 0.7f, r);
+            ecart[i] = Random.insideUnitSphere * Mathf.Lerp(0.14f, 0.7f, r) * reduc;
             rotation[i] = Random.rotation;
             axe[i] = Random.onUnitSphere;
-            taille[i] = Random.Range(0.08f, 0.14f);
+            taille[i] = Random.Range(0.08f, 0.14f) * reduc;
         }
         vertices = new Vector3[Gemmes * LowPolyGem.VerticesPerGem];
         colors = new Color[vertices.Length];
@@ -80,7 +90,7 @@ public class ChargeNyxessa : MonoBehaviour
         mr.sharedMaterial = materiau;
         mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         mr.receiveShadows = false;
-        lumiere = VfxLumiere.Creer(transform, Vector3.zero, VfxTheme.Nyxessa, VfxTailleLumiere.Grande);
+        lumiere = VfxLumiere.Creer(transform, Vector3.zero, VfxTheme.Nyxessa, echelle < 0.6f ? VfxTailleLumiere.Moyenne : VfxTailleLumiere.Grande);
         Dessiner();
     }
 

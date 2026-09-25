@@ -1,0 +1,373 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+namespace Deathless.Jeu
+{
+    /// Autorité de la partie (un par scène) : seule horloge du jeu (jour 120 s, crépuscule 5 s, nuit 120 s, aube 5 s),
+    /// vote « prêt », victoire à l'aube de la nuit 12, défaite quand Nyxessa est détruite, morts et réapparitions, score.
+    /// Tout l'état qui fait foi est dans `Etat` (données pures) ; les vues (ambiance, sons, HUD) s'abonnent aux événements.
+    /// En réseau, seule cette classe (et ce qu'elle possède) tournera chez l'hôte.
+    [DefaultExecutionOrder(-50)]
+    public class Partie : MonoBehaviour
+    {
+        public static Partie Instance { get; private set; }
+        /// Rejouer : la scène rechargée relance aussitôt une partie.
+        public static bool LancerAuChargement;
+
+        [Header("Réglages")]
+        public GameBalance reglages;
+        [Header("Scène")]
+        public GameObject prefabHeros;
+        public Sante nyxessa;
+        public Transform[] pointsReapparition;
+        public Transform pointDepart;
+        public CameraEpaule cameraJeu;
+
+        public EtatPartie Etat { get; private set; } = new EtatPartie();
+        public GameBalance B => reglages != null ? reglages : GameBalance.Courant;
+        public bool EnCours => Etat.phase != Phase.Attente && Etat.phase != Phase.Terminee && !m_Chute;
+
+        readonly Dictionary<int, Heros> m_Heros = new Dictionary<int, Heros>();
+        public Heros HerosLocal { get; private set; }
+        public EtatJoueur JoueurLocal => Etat.joueurs.Count > 0 ? Etat.joueurs[0] : null;
+        bool m_Chute;          // Nyxessa détruite, écran de score imminent
+        float m_ChuteDepuis;
+        bool m_AlerteDonnee;
+
+        // ----------------------------------------------------------------- Événements (vues)
+        public event Action<Phase, Phase> PhaseChangee;     // ancienne, nouvelle
+        public event Action<int> NuitCommencee;
+        public event Action AlerteNuit;
+        public event Action<float, Vector3> NyxessaTouchee;
+        public event Action NyxessaDetruite;
+        public event Action PartieLancee;
+        public event Action PartieTerminee;
+        public event Action<int, bool> PretChange;           // joueur, prêt
+        public event Action<int> JoueurMort;
+        public event Action<int> JoueurReapparu;
+
+        void Awake()
+        {
+            Instance = this;
+            if (reglages != null) GameBalance.Courant = reglages;
+        }
+
+        void OnDestroy() { if (Instance == this) Instance = null; }
+
+        void Start()
+        {
+            if (nyxessa != null)
+            {
+                nyxessa.equipe = Equipe.Relique;
+                nyxessa.Initialiser(B.nyxessaPV);
+                nyxessa.Touche += OnNyxessaTouchee;
+                nyxessa.Tue += _ => OnNyxessaDetruite();
+            }
+            Etat.nyxessa.pvMax = B.nyxessaPV;
+            Etat.nyxessa.pv = B.nyxessaPV;
+            if (LancerAuChargement || B.lancerDirectement)
+            {
+                LancerAuChargement = false;
+                StartCoroutine(LancerApresUneImage());
+            }
+        }
+
+        // Une image d'attente : toutes les vues (vagues, ambiance, HUD) se sont abonnées dans leur Start.
+        System.Collections.IEnumerator LancerApresUneImage()
+        {
+            yield return null;
+            LancerSolo();
+        }
+
+        // ----------------------------------------------------------------- Commandes (IPartieCommandes)
+
+        /// Menu principal > Solo : crée le Paladin et lance la partie au jour qui précède la nuit de départ.
+        public void LancerSolo()
+        {
+            if (Etat.phase != Phase.Attente) return;
+            var b = B;
+            var j = new EtatJoueur { id = 1, nom = "Joueur", classe = "Paladin", pvMax = b.herosPV, pv = b.herosPV, enduranceMax = b.endurance, endurance = b.endurance };
+            Etat.joueurs.Add(j);
+            if (prefabHeros != null)
+            {
+                Vector3 p = pointDepart != null ? pointDepart.position : PointReapparition(Vector3.zero);
+                Quaternion r = pointDepart != null ? pointDepart.rotation : Quaternion.LookRotation(-new Vector3(p.x, 0f, p.z).normalized);
+                var go = Instantiate(prefabHeros, p, r);
+                go.name = "Heros_Paladin";
+                var h = go.GetComponent<Heros>();
+                h.Initialiser(this, j);
+                m_Heros[j.id] = h;
+                HerosLocal = h;
+                if (cameraJeu != null) cameraJeu.Suivre(h.transform);
+            }
+            Etat.nuit = Mathf.Clamp(b.nuitDeDepart, 1, b.nuitsPourGagner);
+            Etat.duree = 0f;
+            Journal("Partie lancée (nuit de départ " + Etat.nuit + ", vitesse ×" + b.vitesseCycle + ")");
+            PartieLancee?.Invoke();
+            Passer(b.commencerALaNuit ? Phase.Crepuscule : Phase.Jour);
+        }
+
+        /// Vote « prêt » (jour) ou Rejouer (écran de score).
+        public void BasculerPret(int joueurId = 1)
+        {
+            var j = Joueur(joueurId);
+            if (j == null) return;
+            if (Etat.phase == Phase.Terminee)
+            {
+                j.pret = !j.pret;
+                PretChange?.Invoke(joueurId, j.pret);
+                if (TousPrets()) Recharger(true);
+                return;
+            }
+            if (Etat.phase != Phase.Jour) return;
+            j.pret = !j.pret;
+            AudioBank.Jouer2D(j.pret ? SonsDuJeu.Pret : SonsDuJeu.PretAnnule);
+            PretChange?.Invoke(joueurId, j.pret);
+            if (TousPrets() && !Etat.comptePret)
+            {
+                Etat.comptePret = true;
+                // Le jour est écourté : il reste le compte à rebours (5 s).
+                float reste = Mathf.Min(Etat.TempsRestant, B.compteAReboursPret);
+                Etat.tempsPhase = Etat.dureePhase - reste;
+                AudioBank.Jouer2D(SonsDuJeu.TousPrets);
+            }
+            else if (!TousPrets() && Etat.comptePret)
+            {
+                // Vote annulé pendant le compte à rebours : le jour reprend son cours normal (temps restant gardé).
+                Etat.comptePret = false;
+            }
+        }
+
+        public void QuitterPartie() => Recharger(false);
+
+        public void QuitterJeu()
+        {
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
+        }
+
+        void Recharger(bool relancer)
+        {
+            LancerAuChargement = relancer;
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex >= 0 ? SceneManager.GetActiveScene().path : SceneManager.GetActiveScene().name);
+        }
+
+        bool TousPrets()
+        {
+            if (Etat.joueurs.Count == 0) return false;
+            foreach (var j in Etat.joueurs) if (!j.pret) return false;
+            return true;
+        }
+
+        public int JoueursPrets { get { int n = 0; foreach (var j in Etat.joueurs) if (j.pret) n++; return n; } }
+
+        // ----------------------------------------------------------------- Horloge
+
+        void Update()
+        {
+            if (Etat.phase == Phase.Attente || Etat.phase == Phase.Terminee) return;
+            float dt = Time.deltaTime;
+            if (m_Chute)
+            {
+                m_ChuteDepuis += dt;
+                if (m_ChuteDepuis >= B.delaiScoreDefaite) Terminer(Resultat.Defaite);
+                return;
+            }
+            Etat.duree += dt;
+            Etat.tempsPhase += dt;
+
+            // Alerte avant la nuit (wiki : 15 s avant le crépuscule).
+            if (Etat.phase == Phase.Jour && !m_AlerteDonnee && Etat.TempsRestant <= B.alerteAvantNuit / Mathf.Max(0.01f, B.vitesseCycle) && Etat.dureePhase > B.alerteAvantNuit / Mathf.Max(0.01f, B.vitesseCycle))
+            {
+                m_AlerteDonnee = true;
+                AudioBank.Jouer2D(SonsDuJeu.AlerteNuit);
+                AlerteNuit?.Invoke();
+            }
+
+            MettreAJourJoueurs(dt);
+
+            if (Etat.tempsPhase >= Etat.dureePhase)
+            {
+                switch (Etat.phase)
+                {
+                    case Phase.Jour: Passer(Phase.Crepuscule); break;
+                    case Phase.Crepuscule: Passer(Phase.Nuit); break;
+                    case Phase.Nuit: Passer(Phase.Aube); break;
+                    case Phase.Aube:
+                        if (Etat.nuit >= B.nuitsPourGagner) Terminer(Resultat.Victoire);
+                        else { Etat.nuit++; Passer(Phase.Jour); }
+                        break;
+                }
+            }
+        }
+
+        void Passer(Phase nouvelle)
+        {
+            var ancienne = Etat.phase;
+            Etat.phase = nouvelle;
+            Etat.tempsPhase = 0f;
+            Etat.dureePhase = B.Duree(nouvelle);
+            if (nouvelle == Phase.Jour)
+            {
+                m_AlerteDonnee = false;
+                Etat.comptePret = false;
+                foreach (var j in Etat.joueurs) j.pret = false;
+            }
+            if (nouvelle == Phase.Aube)
+            {
+                // Wiki : un joueur mort revient au début de la nouvelle journée, même si son délai n'est pas écoulé.
+                foreach (var j in Etat.joueurs) if (j.mort) Reapparaitre(j);
+                if (B.nyxessaRegenAube > 0f && nyxessa != null) nyxessa.Soigner(nyxessa.pvMax * B.nyxessaRegenAube);
+            }
+            Journal("Phase " + nouvelle + " (nuit " + Etat.nuit + ", " + Etat.dureePhase.ToString("F1") + " s)");
+            PhaseChangee?.Invoke(ancienne, nouvelle);
+            if (nouvelle == Phase.Nuit) NuitCommencee?.Invoke(Etat.nuit);
+        }
+
+        void Terminer(Resultat r)
+        {
+            if (Etat.phase == Phase.Terminee) return;
+            Etat.resultat = r;
+            Etat.nuitAtteinte = r == Resultat.Victoire ? B.nuitsPourGagner : Etat.nuit;
+            foreach (var j in Etat.joueurs) j.pret = false;
+            var ancienne = Etat.phase;
+            Etat.phase = Phase.Terminee;
+            m_Chute = false;
+            if (r == Resultat.Victoire) AudioBank.Jouer2D(SonsDuJeu.Victoire);
+            Journal("Fin de partie : " + r + " (nuit " + Etat.nuitAtteinte + ", " + Etat.duree.ToString("F0") + " s)");
+            PhaseChangee?.Invoke(ancienne, Phase.Terminee);
+            PartieTerminee?.Invoke();
+        }
+
+        /// Test : fin forcée.
+        public void ForcerFin(Resultat r) => Terminer(r);
+
+        /// Test : saute à une phase (nuit donnée).
+        public void ForcerPhase(Phase p, int nuit)
+        {
+            Etat.nuit = Mathf.Clamp(nuit, 1, B.nuitsPourGagner);
+            Passer(p);
+        }
+
+        // ----------------------------------------------------------------- Nyxessa
+
+        void OnNyxessaTouchee(InfoDegats info, float reel)
+        {
+            Etat.nyxessa.pv = nyxessa.Pv;
+            Etat.nyxessa.dernierCoup = Time.time;
+            NyxessaTouchee?.Invoke(reel, info.point);
+        }
+
+        void OnNyxessaDetruite()
+        {
+            if (!EnCours) return;
+            Etat.nyxessa.pv = 0f;
+            Etat.nyxessa.detruite = true;
+            m_Chute = true;
+            m_ChuteDepuis = 0f;
+            Journal("Nyxessa est détruite (nuit " + Etat.nuit + ")");
+            NyxessaDetruite?.Invoke();
+        }
+
+        // ----------------------------------------------------------------- Joueurs
+
+        public EtatJoueur Joueur(int id)
+        {
+            foreach (var j in Etat.joueurs) if (j.id == id) return j;
+            return null;
+        }
+
+        public Heros HerosDe(int id) => m_Heros.TryGetValue(id, out var h) ? h : null;
+        public IEnumerable<Heros> TousLesHeros => m_Heros.Values;
+
+        void MettreAJourJoueurs(float dt)
+        {
+            foreach (var j in Etat.joueurs)
+            {
+                var h = HerosDe(j.id);
+                if (h != null) h.EcrireEtat(j);
+                if (!j.mort) continue;
+                j.reapparitionRestante = Mathf.Max(0f, j.reapparitionRestante - dt);
+                if (j.reapparitionRestante <= 0f && nyxessa != null && !nyxessa.Mort) Reapparaitre(j);
+            }
+        }
+
+        /// Appelé par le héros à sa mort.
+        public void SignalerMort(int joueurId)
+        {
+            var j = Joueur(joueurId);
+            if (j == null || j.mort) return;
+            j.mort = true;
+            // Wiki : chaque mort allonge le délai (8 s + 4 s par mort précédente dans la partie).
+            j.reapparitionRestante = B.DelaiReapparition(j.score.morts);
+            j.score.morts++;
+            Journal("Joueur " + joueurId + " mort (" + j.score.morts + "e mort, réapparition dans " + j.reapparitionRestante.ToString("F0") + " s)");
+            JoueurMort?.Invoke(joueurId);
+        }
+
+        void Reapparaitre(EtatJoueur j)
+        {
+            if (!j.mort) return;
+            j.mort = false;
+            j.reapparitionRestante = 0f;
+            var h = HerosDe(j.id);
+            if (h != null) h.Reapparaitre(PointReapparition(h.transform.position));
+            Journal("Joueur " + j.id + " réapparaît");
+            JoueurReapparu?.Invoke(j.id);
+        }
+
+        /// Point de réapparition libre le plus proche de la position donnée (autour de Nyxessa).
+        public Vector3 PointReapparition(Vector3 depuis)
+        {
+            if (pointsReapparition == null || pointsReapparition.Length == 0) return new Vector3(0f, 0f, -10f);
+            Transform meilleur = null;
+            float d = float.MaxValue;
+            foreach (var t in pointsReapparition)
+            {
+                if (t == null) continue;
+                bool occupe = Physics.CheckSphere(t.position + Vector3.up, 0.6f, ~0, QueryTriggerInteraction.Ignore);
+                float dd = (t.position - depuis).sqrMagnitude + (occupe ? 10000f : 0f);
+                if (dd < d) { d = dd; meilleur = t; }
+            }
+            return meilleur != null ? meilleur.position : Vector3.zero;
+        }
+
+        // ----------------------------------------------------------------- Score
+
+        public void CompterDegats(int joueurId, float montant, bool critique)
+        {
+            var j = Joueur(joueurId);
+            if (j == null) return;
+            j.score.degatsInfliges += montant;
+            if (critique) j.score.coupsCritiques++;
+        }
+
+        public void CompterTue(int joueurId)
+        {
+            var j = Joueur(joueurId);
+            if (j != null) j.score.ennemisTues++;
+        }
+
+        public void CompterDegatsEvites(int joueurId, float montant)
+        {
+            var j = Joueur(joueurId);
+            if (j != null && montant > 0f) j.score.degatsEvitesNyxessa += montant;
+        }
+
+        public void CompterSoins(int joueurId, float montant)
+        {
+            var j = Joueur(joueurId);
+            if (j != null && montant > 0f) j.score.soinsProdigues += montant;
+        }
+
+        public void Journal(string texte)
+        {
+            if (B.journal) Debug.Log("[Partie " + Etat.duree.ToString("F1") + " s] " + texte);
+        }
+    }
+}

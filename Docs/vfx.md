@@ -312,7 +312,7 @@ Une paire prefab + script par effet sous `Assets/VFX/<Effet>/`, matériau `Porta
   - Réglages : `dureeDissolution` 1,1 s, `dureeRecomposition` 1 s, `vitesseFlux` 12 m/s, `dureeFlux` (0,6 ; 2,2).
 - **Palette** : Nyxessa (dissolution, flux, recomposition) ; lumières : celles de `PortalTransit` et de `ChargeNyxessa`.
 - **Banc** : `Postes/GemmeNyxessa/AllieMort` (mannequin sans arme, en (−21 ; 0 ; 25)) : il tombe (`Death_A`), se dissout, son énergie rejoint la relique, puis il réapparaît près de la relique (`VfxBench.pointReapparition` = (−26,5 ; 0 ; 23)) et revient à pied. Captures : `VfxBench_mort_dissolution.png`, `VfxBench_mort_energie.png`, `VfxBench_reapparition.png`.
-- **Manque** : le flux est celui de la charge du portail (massif, 480 gemmes) ; une version plus légère pour une mort isolée serait un paramètre d'échelle à ajouter à `ChargeNyxessa`.
+- **Flux allégé** (25/09/2026, agent gameplay) : `ChargeNyxessa.Lancer(…, hauteur, echelle = 1)` a un paramètre d'échelle (1 = charge du portail : 480 gemmes, lumière grande ; en dessous : 480 × échelle gemmes, 40 au moins, gemmes et écart à l'arc × √échelle, lumière moyenne sous 0,6). `MortAllie.echelleFlux` = **0,35** (≈ 170 gemmes) pour la mort et la réapparition d'un allié.
 
 ## Banc `VfxBench`
 

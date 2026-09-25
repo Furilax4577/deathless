@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <!-- Racine de l'interface en jeu (scène Village) : le conteneur des écrans de NavigateurEcrans, par-dessus la scène 3D. -->
+    <ui:VisualElement name="racine-jeu" picking-mode="Ignore" style="flex-grow: 1;">
+        <ui:VisualElement name="ecrans" picking-mode="Ignore" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0;" />
+    </ui:VisualElement>
+</ui:UXML>

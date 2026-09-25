@@ -99,6 +99,14 @@ public class KayKitImportSettings : AssetPostprocessor
             return null;
 
         Texture texture = material.mainTexture;
+        // Texture d'atlas introuvable à côté du FBX (ex. forest_texture.png du pack Forest : son GUID est déjà pris par la
+        // copie de Assets/VFX/GemmeNyxessa/, elle n'est donc pas recopiée dans le pack) : on retrouve le matériau partagé
+        // par le nom du matériau embarqué (« forest » → KayKit_Forest.mat).
+        if (texture == null && !string.IsNullOrEmpty(material.name) && !IsUntexturedHelper(assetPath))
+        {
+            Material parNom = OnAssignMaterialModelParNom(material.name + "_texture");
+            if (parNom != null) return parNom;
+        }
         if (texture == null)
         {
             if (!IsUntexturedHelper(assetPath))
@@ -106,12 +114,30 @@ public class KayKitImportSettings : AssetPostprocessor
             return null;
         }
 
-        string materialPath = MaterialPathForTexture(texture.name);
+        Material partage = OnAssignMaterialModelParNom(texture.name);
+        return partage != null ? partage : AvertirIntrouvable(texture.name);
+    }
+
+    private Material AvertirIntrouvable(string textureName)
+    {
+        Debug.LogWarning("KayKit : matériau partagé introuvable " + MaterialPathForTexture(textureName) + " (texture '" + textureName + "', modèle " + assetPath + ").");
+        return null;
+    }
+
+    private static Material OnAssignMaterialModelParNom(string textureName)
+    {
+        string materialPath = MaterialPathForTexture(textureName);
         Material shared = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
+        // Matériau partagé rangé ailleurs dans main (ex. KayKit_Forest.mat, copié avec la relique dans
+        // Assets/VFX/GemmeNyxessa/ ; même GUID que dans les bacs à sable) : on le cherche par son nom.
         if (shared == null)
         {
-            Debug.LogWarning("KayKit : matériau partagé introuvable " + materialPath + " (texture '" + texture.name + "', modèle " + assetPath + ").");
-            return null;
+            string nom = System.IO.Path.GetFileNameWithoutExtension(materialPath);
+            foreach (string guid in AssetDatabase.FindAssets(nom + " t:Material"))
+            {
+                string p = AssetDatabase.GUIDToAssetPath(guid);
+                if (System.IO.Path.GetFileNameWithoutExtension(p) == nom) { shared = AssetDatabase.LoadAssetAtPath<Material>(p); break; }
+            }
         }
         return shared;
     }
