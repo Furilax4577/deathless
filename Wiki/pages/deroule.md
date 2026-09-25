@@ -99,7 +99,7 @@ Pour un joueur :
 | 7 | 3 | 34 | Deux élites par nuit |
 | 8 | 3 | 38 | |
 | 9 | 3 | 42 | Quatre vagues, points de vie +10 % |
-| 10 | 3 | 44 | Mini-boss : le **Golem** |
+| 10 | 3 | 44 | Mini-boss : **Morgrim, le Roi des os** |
 | 11 | 3 | 46 | Points de vie +20 % |
 | 12 | 3 | 48 | Boss final : **Nyxar, le Nécromancien**, victoire à l'aube |
 
