@@ -85,7 +85,7 @@
     "fichier": "Relic/vote_ready.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "vote_tous_prets",
@@ -95,7 +95,7 @@
     "fichier": "Relic/vote_all_ready.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "vote_annule",
@@ -105,7 +105,7 @@
     "fichier": "Relic/vote_cancel.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "player_hurt",
@@ -235,7 +235,7 @@
     ],
     "source": "Généré pour Deathless (synth_physique.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "a_ecouter"
+    "statut": "disponible"
   },
   {
     "id": "bow_shot_v2",
@@ -260,7 +260,7 @@
     "fichier": "Relic/bow_shot_v3_charged.wav",
     "source": "Généré pour Deathless (synth_physique.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "a_ecouter"
+    "statut": "disponible"
   },
   {
     "id": "bow_shot_charged",
@@ -289,7 +289,7 @@
     ],
     "source": "Généré pour Deathless (synth_physique.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "a_ecouter"
+    "statut": "disponible"
   },
   {
     "id": "crossbow_shot",
@@ -373,7 +373,7 @@
     ],
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "a_ecouter"
+    "statut": "disponible"
   },
   {
     "id": "coup_critique_meilleur",
@@ -383,7 +383,7 @@
     "fichier": "Relic/critical_best.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "a_ecouter"
+    "statut": "disponible"
   },
   {
     "id": "arbalete_recharge",
@@ -393,7 +393,7 @@
     "fichier": "Relic/crossbow_reload.wav",
     "source": "Généré pour Deathless (synth_physique.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "a_ecouter"
+    "statut": "disponible"
   },
   {
     "id": "fireball_cast",
@@ -459,7 +459,7 @@
     "id": "brulure",
     "nom": "Brûlure — crépitement (boucle)",
     "categorie": "Sorts du mage",
-    "usage": "Un ennemi touché par le feu brûle pendant un moment : petites flammes et braises (boucle de 2 s sur l'ennemi).",
+    "usage": "Un ennemi touché par le feu brûle pendant un moment : petites flammes et braises (boucle de 4 s sur l'ennemi).",
     "fichier": "Relic/burn_loop.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
@@ -592,7 +592,7 @@
     "fichier": "Relic/bow_draw.wav",
     "source": "Généré pour Deathless (synth_physique.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "a_ecouter"
+    "statut": "disponible"
   },
   {
     "id": "arc_charge_complete",
@@ -602,7 +602,7 @@
     "fichier": "Relic/bow_full_charge.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "a_ecouter"
+    "statut": "disponible"
   },
   {
     "id": "nuee_marqueur",
@@ -612,7 +612,7 @@
     "fichier": "Relic/arrow_rain_marker.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "a_ecouter"
+    "statut": "disponible"
   },
   {
     "id": "assassin_furtif",
@@ -622,7 +622,7 @@
     "fichier": "Relic/stealth_enter.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "a_ecouter"
+    "statut": "disponible"
   },
   {
     "id": "assassin_furtif_sortie",
@@ -632,7 +632,7 @@
     "fichier": "Relic/stealth_exit.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "a_ecouter"
+    "statut": "disponible"
   },
   {
     "id": "assassin_repere",
@@ -642,7 +642,7 @@
     "fichier": "Relic/stealth_spotted.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "a_ecouter"
+    "statut": "disponible"
   },
   {
     "id": "grenade_lancer",
@@ -652,7 +652,7 @@
     "fichier": "Relic/smoke_bomb_throw.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "a_ecouter"
+    "statut": "disponible"
   },
   {
     "id": "portal_open",
@@ -791,7 +791,7 @@
     "fichier": "Relic/nyxessa_charge.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "nyxessa_retour_energie",
@@ -801,7 +801,7 @@
     "fichier": "Relic/nyxessa_charge_return.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "portail_goutte",
@@ -811,7 +811,7 @@
     "fichier": "Relic/portal_drop_in.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "a_ecouter"
+    "statut": "disponible"
   },
   {
     "id": "portail_goutte_sortie",
@@ -821,7 +821,7 @@
     "fichier": "Relic/portal_drop_out.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "a_ecouter"
+    "statut": "disponible"
   },
   {
     "id": "portail_arrivee",
@@ -831,7 +831,7 @@
     "fichier": "Relic/portal_arrive.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "a_ecouter"
+    "statut": "disponible"
   },
   {
     "id": "nyxessa_onde_passage",
@@ -841,7 +841,7 @@
     "fichier": "Relic/nyxessa_belt_wave.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "nyxessa_rappel",
@@ -851,7 +851,7 @@
     "fichier": "Relic/nyxessa_recall.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "a_ecouter"
+    "statut": "disponible"
   },
   {
     "id": "nyxessa_palier",
@@ -861,7 +861,7 @@
     "fichier": "Relic/nyxessa_upgrade.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "a_ecouter"
+    "statut": "disponible"
   },
   {
     "id": "sorcier_incantation",
@@ -871,7 +871,7 @@
     "fichier": "Relic/sorcerer_cast_loop.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "a_ecouter"
+    "statut": "disponible"
   },
   {
     "id": "nyxessa_destruction",
@@ -881,7 +881,7 @@
     "fichier": "Relic/nyxessa_destroyed.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "skeleton_spawn",
@@ -1029,7 +1029,7 @@
     "fichier": "Relic/night_warning.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "partie_victoire",
@@ -1039,7 +1039,7 @@
     "fichier": "Relic/victory.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "musique_dehors_jour",

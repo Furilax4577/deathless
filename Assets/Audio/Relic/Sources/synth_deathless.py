@@ -464,19 +464,60 @@ def smoke_bomb_throw():
     return master(buf, d)
 
 
+def _random_env(seconds, step=(0.12, 0.45), lo=0.5, hi=1.0):
+    """Enveloppe lente et irrégulière : points tirés au hasard à intervalles variables, raccordés en cosinus.
+    Aucune périodicité (une modulation régulière donne un « tchou-tchou » de locomotive)."""
+    n = int(seconds * RATE)
+    pts = [(0, random.uniform(lo, hi))]
+    t = 0.0
+    while t < seconds:
+        t += random.uniform(*step)
+        pts.append((int(t * RATE), random.uniform(lo, hi)))
+    out, j = [], 0
+    for i in range(n):
+        while pts[j + 1][0] <= i:
+            j += 1
+        (i0, v0), (i1, v1) = pts[j], pts[j + 1]
+        w = (1 - math.cos(math.pi * (i - i0) / max(1, i1 - i0))) / 2
+        out.append(v0 + (v1 - v0) * w)
+    return out
+
+
+def _embers(seconds, rate, loud, band=(1800, 7000), dur=(0.0008, 0.004)):
+    """Braises : pops très courts à instants aléatoires (loi de Poisson), parfois en petites grappes."""
+    buf = zeros(seconds)
+    t = 0.0
+    while True:
+        t += random.expovariate(rate)
+        if t >= seconds - 0.05:
+            break
+        count = 1 if random.random() > 0.12 else random.randint(3, 6)  # grappe : quelques pops serrés
+        tt = t
+        for _ in range(count):
+            f = random.uniform(*band)
+            d = random.uniform(*dur)
+            pop = bandpass(white(int(d * RATE) + 8), lambda k, f=f: f, 2.5)
+            pop = envelope(pop, lambda x, k: math.exp(-6 * k))
+            mix(buf, pop, min(tt, seconds - 0.02), random.uniform(*loud))
+            tt += random.uniform(0.006, 0.03)
+    return buf
+
+
 def burn_loop():
-    # Brûlure (boucle 2 s) : petites flammes qui lèchent (souffle grave qui palpite) et crépitements de braises.
-    d, fade = 2.0, 0.4
+    # Brûlure (boucle 4 s), refaite le 25/09/2026 (« ça fait trop locomotive ») : plus aucune modulation régulière.
+    # Braises qui crépitent au hasard au premier plan, souffle de flamme discret dont le niveau dérive lentement,
+    # quelques claquements plus gros et rares. Boucle longue pour qu'on n'entende pas la répétition.
+    d, fade = 4.0, 0.6
     total = d + fade
     n = int(total * RATE)
-    flick = cycles(d, 9)
-    slow = cycles(d, 1.5)
-    buf = lowpass(v4.brown(n, 0.012), 700)
-    buf = [s * (0.6 + 0.25 * math.sin(2 * math.pi * flick * i / RATE) + 0.15 * math.sin(2 * math.pi * slow * i / RATE))
-           for i, s in enumerate(buf)]
-    lick = bandpass(white(n), lambda k: 1300, 0.7)
-    mix(buf, [s * (0.5 + 0.5 * math.sin(2 * math.pi * flick * i / RATE + 1)) for i, s in enumerate(lick)], 0.0, 0.25)
-    mix(buf, v4.fire_crackle(total, 30, (0.1, 0.5)), 0.0, 1.0)
+    body = lowpass(v4.brown(n, 0.01), 450)
+    env = _random_env(total, (0.15, 0.5), 0.45, 1.0)
+    buf = [s * e * 0.35 for s, e in zip(body, env)]
+    hiss = bandpass(white(n), lambda k: 2600, 0.5)
+    env2 = _random_env(total, (0.1, 0.35), 0.2, 1.0)
+    mix(buf, [s * e for s, e in zip(hiss, env2)], 0.0, 0.05)
+    mix(buf, _embers(total, 16, (0.15, 0.55)), 0.0, 1.0)
+    mix(buf, _embers(total, 1.3, (0.5, 0.9), band=(700, 1800), dur=(0.004, 0.012)), 0.0, 1.0)
     return loop_master(buf, d, fade)
 
 
