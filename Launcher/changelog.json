@@ -1,6 +1,16 @@
 {
   "versions": [
     {
+      "version": "0.4.1",
+      "date": "2026-09-25",
+      "titre": "Éclat de nuit",
+      "notes": [
+        "Nyxessa d'un vert émeraude plus profond, et une légère brillance la nuit sur les vraies sources de lumière : cristal, portail, lanternes, fenêtres.",
+        "Aura de soin du Paladin en blanc et or, croix vertes.",
+        "Menu principal : la caméra laisse voir un peu de ciel et les nuages."
+      ]
+    },
+    {
       "version": "0.4.0",
       "date": "2026-09-25",
       "titre": "Ensemble contre la nuit",
