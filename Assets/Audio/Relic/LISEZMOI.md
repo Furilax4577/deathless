@@ -76,3 +76,41 @@ Régénérer : depuis `Sources/` (les scripts s'importent entre eux) : `python s
 | `musique_dedans_donjon.wav` | Donjon | `synth_music.py donjon` (graine 9003) |
 
 Boucles sans raccord (nappes fondues fin/début, queues de réverbération rabattues au début), stéréo. Importées en flux (Streaming, Vorbis 0,7) par `Relic > Sons > Installer`, qui les branche aussi sur GameMusic.
+
+## Sons créés pour Deathless (25 septembre 2026)
+
+Même méthode (Python pur, graines fixes, reproductibles à l'octet près), mêmes conventions, rangés ici à côté des sons de Relic. En attente d'écoute par Quentin : encart « À écouter » de la page Sons du wiki. Les anciennes versions (`bow_shot_1..3`, `bow_shot_v2_1..3`, `bow_shot_charged_1..2`, `crossbow_shot_1..3`) sont gardées pour comparer.
+
+| Fichier | Usage | Durée | Généré par |
+|---|---|---|---|
+| `bow_shot_v3_1..3.wav` | Tir de l'arc (remplace `bow_shot_v2`) : corde, branches, protège-bras, flèche qui s'éloigne ; sec | 0,33-0,38 s | `synth_physique.py`, `bow_shot_v3` (graine 772) |
+| `bow_shot_v3_charged.wav` | Tir de l'arc bandé à fond (remplace `bow_shot_charged`) | 0,49 s | `synth_physique.py`, `bow_shot_v3_charged` (773) |
+| `bow_draw.wav` | Bander l'arc : grincement des branches et de la corde qui se tend | 0,89 s | `synth_physique.py`, `bow_draw` (774) |
+| `crossbow_shot_v3_1..3.wav` | Tir de l'arbalète (remplace `crossbow_shot`) : détente, noix, corde, butée, carreau | 0,26 s | `synth_physique.py`, `crossbow_shot_v3` (775) |
+| `crossbow_reload.wav` | Recharger l'arbalète : levier, cliquet, clic d'armement | 1,01 s | `synth_physique.py`, `crossbow_reload` (776) |
+| `nyxessa_charge.wav` | Charge de Nyxessa vers le portail (0,7 s de voyage, impact doux) | 1,89 s | `synth_deathless.py`, `nyxessa_charge` (780) |
+| `nyxessa_charge_return.wav` | Retour de l'énergie du portail vers Nyxessa (la charge à l'envers) | 2,22 s | `synth_deathless.py`, `nyxessa_charge_return` (781) |
+| `portal_drop_in.wav` | Goutte d'eau du portail, entrée (goutte grave, trois anneaux) | 1,51 s | `synth_deathless.py`, `portal_drop_in` (782) |
+| `portal_drop_out.wav` | Goutte d'eau du portail, sortie (l'entrée aspirée) | 1,89 s | `synth_deathless.py`, `portal_drop_out` (783) |
+| `portal_arrive.wav` | Arrivée d'un joueur par le portail | 1,86 s | `synth_deathless.py`, `portal_arrive` (784) |
+| `nyxessa_belt_wave.wav` | Onde de la ceinture au passage d'un joueur | 2,00 s | `synth_deathless.py`, `nyxessa_belt_wave` (785) |
+| `nyxessa_recall.wav` | Rappel forcé d'un joueur resté au donjon | 2,07 s | `synth_deathless.py`, `nyxessa_recall` (786) |
+| `nyxessa_upgrade.wav` | Palier de Nyxessa amélioré | 2,15 s | `synth_deathless.py`, `nyxessa_upgrade` (787) |
+| `sorcerer_cast_loop.wav` | Incantation du bouclier par le sorcier (boucle) | 3,00 s | `synth_deathless.py`, `sorcerer_cast_loop` (788) |
+| `nyxessa_destroyed.wav` | Destruction de Nyxessa (défaite) | 5,39 s | `synth_deathless.py`, `nyxessa_destroyed` (789) |
+| `night_warning.wav` | Alerte avant la nuit (joueurs au donjon), répétable | 1,42 s | `synth_deathless.py`, `night_warning` (790) |
+| `victory.wav` | Victoire (jingle) | 3,44 s | `synth_deathless.py`, `victory` (791) |
+| `vote_ready.wav` | Vote « prêt » : joueur prêt | 0,51 s | `synth_deathless.py`, `vote_ready` (792) |
+| `vote_all_ready.wav` | Vote « prêt » : tout le monde est prêt | 1,05 s | `synth_deathless.py`, `vote_all_ready` (793) |
+| `vote_cancel.wav` | Vote « prêt » annulé | 0,44 s | `synth_deathless.py`, `vote_cancel` (794) |
+| `critical_hit_1..3.wav` | Coup critique | 0,23-0,27 s | `synth_deathless.py`, `critical_hit` (795) |
+| `critical_best.wav` | Meilleur critique (deux couches) | 0,60 s | `synth_deathless.py`, `critical_best` (796) |
+| `bow_full_charge.wav` | Arc chargé à fond (éclat de la flèche) | 0,27 s | `synth_deathless.py`, `bow_full_charge` (797) |
+| `arrow_rain_marker.wav` | Marqueur de la nuée de flèches | 0,40 s | `synth_deathless.py`, `arrow_rain_marker` (798) |
+| `stealth_enter.wav` | Passage en mode furtif | 0,51 s | `synth_deathless.py`, `stealth_enter` (799) |
+| `stealth_exit.wav` | Sortie du mode furtif | 0,35 s | `synth_deathless.py`, `stealth_exit` (800) |
+| `stealth_spotted.wav` | Assassin repéré | 0,22 s | `synth_deathless.py`, `stealth_spotted` (801) |
+| `smoke_bomb_throw.wav` | Lancer de la grenade fumigène | 0,95 s | `synth_deathless.py`, `smoke_bomb_throw` (802) |
+| `burn_loop.wav` | Brûlure : petites flammes et braises (boucle) | 2,00 s | `synth_deathless.py`, `burn_loop` (803) |
+
+Régénérer : depuis `Sources/`, `python -B synth_physique.py .. [nom ...]` et `python -B synth_deathless.py .. [nom ...]` (`-B` : pas de `__pycache__` dans `Assets/`). Volume perçu aligné sur la médiane des sons du projet (voir `Docs/sons.md`).

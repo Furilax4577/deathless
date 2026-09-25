@@ -78,6 +78,36 @@
     "statut": "utilise"
   },
   {
+    "id": "vote_pret",
+    "nom": "Vote « prêt » — joueur prêt",
+    "categorie": "Interface",
+    "usage": "Un joueur se déclare prêt (F1, Vue, pavé tactile) ; le HUD affiche « Prêts 2 / 3 ».",
+    "fichier": "Relic/vote_ready.wav",
+    "source": "Généré pour Deathless (synth_deathless.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "vote_tous_prets",
+    "nom": "Vote « prêt » — tout le monde est prêt",
+    "categorie": "Interface",
+    "usage": "Tous les joueurs sont prêts : le compte à rebours de 5 s avant le crépuscule commence.",
+    "fichier": "Relic/vote_all_ready.wav",
+    "source": "Généré pour Deathless (synth_deathless.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "vote_annule",
+    "nom": "Vote « prêt » — vote annulé",
+    "categorie": "Interface",
+    "usage": "Un joueur annule son vote « prêt ».",
+    "fichier": "Relic/vote_cancel.wav",
+    "source": "Généré pour Deathless (synth_deathless.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
+  },
+  {
     "id": "player_hurt",
     "nom": "Joueur — touché",
     "categorie": "Joueurs",
@@ -193,10 +223,25 @@
     "statut": "disponible"
   },
   {
-    "id": "bow_shot_v2",
+    "id": "bow_shot_v3",
     "nom": "Arc — tir",
     "categorie": "Armes",
-    "usage": "Tir d'une flèche du rôdeur, arc pas complètement bandé (son 3D au départ de la flèche).",
+    "usage": "Tir d'une flèche du rôdeur (son 3D au départ de la flèche). Modélisation physique : claquement de la corde, vibration des branches, protège-bras, flèche qui s'éloigne ; sec, 0,35 s.",
+    "fichier": "Relic/bow_shot_v3_1.wav",
+    "variantes": [
+      "Relic/bow_shot_v3_1.wav",
+      "Relic/bow_shot_v3_2.wav",
+      "Relic/bow_shot_v3_3.wav"
+    ],
+    "source": "Généré pour Deathless (synth_physique.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "bow_shot_v2",
+    "nom": "Arc — tir (ancienne version)",
+    "categorie": "Armes",
+    "usage": "Deuxième version de Relic (corde de synthèse qui tient la note, souffle qui monte, réverbération), remplacée par « Arc — tir » ; gardée pour comparer.",
     "fichier": "Relic/bow_shot_v2_1.wav",
     "variantes": [
       "Relic/bow_shot_v2_1.wav",
@@ -205,13 +250,23 @@
     ],
     "source": "Relic (généré en Python pour le projet)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "utilise"
+    "statut": "disponible"
+  },
+  {
+    "id": "bow_shot_v3_charged",
+    "nom": "Arc — tir chargé",
+    "categorie": "Armes",
+    "usage": "Flèche tirée arc bandé à fond : corde plus tendue, claquement plus fort, souffle plus long (0,5 s).",
+    "fichier": "Relic/bow_shot_v3_charged.wav",
+    "source": "Généré pour Deathless (synth_physique.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
   },
   {
     "id": "bow_shot_charged",
-    "nom": "Arc — tir chargé",
+    "nom": "Arc — tir chargé (ancienne version)",
     "categorie": "Armes",
-    "usage": "Flèche tirée arc bandé : un tir plus précis rapporte davantage.",
+    "usage": "Tir chargé de Relic, remplacé par « Arc — tir chargé » ; gardé pour comparer.",
     "fichier": "Relic/bow_shot_charged_1.wav",
     "variantes": [
       "Relic/bow_shot_charged_1.wav",
@@ -219,13 +274,28 @@
     ],
     "source": "Relic (généré en Python pour le projet)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "utilise"
+    "statut": "disponible"
+  },
+  {
+    "id": "crossbow_shot_v3",
+    "nom": "Arbalète — tir",
+    "categorie": "Armes",
+    "usage": "Tir d'un carreau de l'arbalète de l'assassin : détente et noix (clics métalliques), corde courte et tendue, branches contre la butée, carreau qui siffle ; sec, 0,25 s.",
+    "fichier": "Relic/crossbow_shot_v3_1.wav",
+    "variantes": [
+      "Relic/crossbow_shot_v3_1.wav",
+      "Relic/crossbow_shot_v3_2.wav",
+      "Relic/crossbow_shot_v3_3.wav"
+    ],
+    "source": "Généré pour Deathless (synth_physique.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
   },
   {
     "id": "crossbow_shot",
-    "nom": "Arbalète — tir",
+    "nom": "Arbalète — tir (ancienne version)",
     "categorie": "Armes",
-    "usage": "Tir d'un carreau de l'arbalète de l'assassin.",
+    "usage": "Tir d'arbalète de Relic, remplacé par « Arbalète — tir » ; gardé pour comparer.",
     "fichier": "Relic/crossbow_shot_1.wav",
     "variantes": [
       "Relic/crossbow_shot_1.wav",
@@ -234,7 +304,7 @@
     ],
     "source": "Relic (généré en Python pour le projet)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "arrow_impact",
@@ -289,6 +359,41 @@
     "source": "Relic (généré en Python pour le projet)",
     "licence": "Aucune : créé pour le projet",
     "statut": "disponible"
+  },
+  {
+    "id": "coup_critique",
+    "nom": "Coup critique",
+    "categorie": "Armes",
+    "usage": "Retour de tout coup critique : tir à la tête, coup dans le dos, coup furtif (thème Critique, bref et lumineux).",
+    "fichier": "Relic/critical_hit_1.wav",
+    "variantes": [
+      "Relic/critical_hit_1.wav",
+      "Relic/critical_hit_2.wav",
+      "Relic/critical_hit_3.wav"
+    ],
+    "source": "Généré pour Deathless (synth_deathless.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "coup_critique_meilleur",
+    "nom": "Coup critique — meilleur critique",
+    "categorie": "Armes",
+    "usage": "Le meilleur critique du jeu (assassin furtif et dans le dos) : deux couches, plus fort.",
+    "fichier": "Relic/critical_best.wav",
+    "source": "Généré pour Deathless (synth_deathless.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "arbalete_recharge",
+    "nom": "Arbalète — rechargement",
+    "categorie": "Armes",
+    "usage": "Rechargement de l'arbalète : levier, cliquet qui saute neuf dents, crosse et corde qui grincent, clic d'armement quand la corde tombe dans la noix (1 s ; clip Ranged_1H_Reload de 1,17 s).",
+    "fichier": "Relic/crossbow_reload.wav",
+    "source": "Généré pour Deathless (synth_physique.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
   },
   {
     "id": "fireball_cast",
@@ -349,6 +454,16 @@
     "source": "Relic (généré en Python pour le projet)",
     "licence": "Aucune : créé pour le projet",
     "statut": "disponible"
+  },
+  {
+    "id": "brulure",
+    "nom": "Brûlure — crépitement (boucle)",
+    "categorie": "Sorts du mage",
+    "usage": "Un ennemi touché par le feu brûle pendant un moment : petites flammes et braises (boucle de 2 s sur l'ennemi).",
+    "fichier": "Relic/burn_loop.wav",
+    "source": "Généré pour Deathless (synth_deathless.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
   },
   {
     "id": "shield_block",
@@ -463,11 +578,81 @@
     "id": "ranger_focus",
     "nom": "Rôdeur — concentration",
     "categorie": "Assassin et rôdeur",
-    "usage": "Concentration de Relic (inspiration retenue, arc qui se tend). Piste : base pour « Arc — chargé à fond » ou « Arc — bander ».",
+    "usage": "Concentration de Relic (inspiration retenue, arc qui se tend). Sans usage : « Arc — bander » et « Arc — chargé à fond » sont créés.",
     "fichier": "Relic/ranger_focus.wav",
     "source": "Relic (généré en Python pour le projet)",
     "licence": "Aucune : créé pour le projet",
     "statut": "disponible"
+  },
+  {
+    "id": "arc_bander",
+    "nom": "Arc — bander",
+    "categorie": "Assassin et rôdeur",
+    "usage": "Maintenir l'attaque bande l'arc : froissement, flèche qui glisse, grincement des branches et des fibres de la corde qui monte avec la tension, ancrage (0,9 s ; le clip Ranged_Bow_Draw dure 1,33 s).",
+    "fichier": "Relic/bow_draw.wav",
+    "source": "Généré pour Deathless (synth_physique.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "arc_charge_complete",
+    "nom": "Arc — chargé à fond",
+    "categorie": "Assassin et rôdeur",
+    "usage": "L'arc est complètement bandé : petit tintement bref avec l'éclat de la flèche (0,25 s).",
+    "fichier": "Relic/bow_full_charge.wav",
+    "source": "Généré pour Deathless (synth_deathless.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "nuee_marqueur",
+    "nom": "Nuée de flèches — marqueur au sol",
+    "categorie": "Assassin et rôdeur",
+    "usage": "Le marqueur de zone apparaît au sol avant la pluie de flèches.",
+    "fichier": "Relic/arrow_rain_marker.wav",
+    "source": "Généré pour Deathless (synth_deathless.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "assassin_furtif",
+    "nom": "Assassin — passage en mode furtif",
+    "categorie": "Assassin et rôdeur",
+    "usage": "L'assassin passe en marche discrète et devient furtif (aussi en entrant dans la fumée).",
+    "fichier": "Relic/stealth_enter.wav",
+    "source": "Généré pour Deathless (synth_deathless.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "assassin_furtif_sortie",
+    "nom": "Assassin — sortie du mode furtif",
+    "categorie": "Assassin et rôdeur",
+    "usage": "L'assassin quitte le mode furtif (il court, attaque ou sort de la fumée en courant).",
+    "fichier": "Relic/stealth_exit.wav",
+    "source": "Généré pour Deathless (synth_deathless.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "assassin_repere",
+    "nom": "Assassin — repéré",
+    "categorie": "Assassin et rôdeur",
+    "usage": "Un ennemi repère l'assassin : alerte sèche.",
+    "fichier": "Relic/stealth_spotted.wav",
+    "source": "Généré pour Deathless (synth_deathless.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "grenade_lancer",
+    "nom": "Grenade fumigène — lancer",
+    "categorie": "Assassin et rôdeur",
+    "usage": "L'assassin lance la grenade (animation Throw) ; l'impact existe déjà.",
+    "fichier": "Relic/smoke_bomb_throw.wav",
+    "source": "Généré pour Deathless (synth_deathless.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
   },
   {
     "id": "portal_open",
@@ -597,6 +782,106 @@
     "source": "Kenney, Interface Sounds",
     "licence": "CC0",
     "statut": "utilise"
+  },
+  {
+    "id": "nyxessa_charge_portail",
+    "nom": "Nyxessa — charge vers le portail",
+    "categorie": "Nyxessa et portail",
+    "usage": "À l'aube, Nyxessa envoie une charge d'énergie en arc jusqu'au portail ; le portail s'ouvre à son arrivée (enchaîner sur « Portail — ouverture »).",
+    "fichier": "Relic/nyxessa_charge.wav",
+    "source": "Généré pour Deathless (synth_deathless.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "nyxessa_retour_energie",
+    "nom": "Nyxessa — retour de l'énergie",
+    "categorie": "Nyxessa et portail",
+    "usage": "Au crépuscule, l'énergie repart du portail vers Nyxessa, puis la ceinture se resserre et la lumière baisse.",
+    "fichier": "Relic/nyxessa_charge_return.wav",
+    "source": "Généré pour Deathless (synth_deathless.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "portail_goutte",
+    "nom": "Portail — goutte d'eau, entrée",
+    "categorie": "Nyxessa et portail",
+    "usage": "Un joueur entre dans le portail : une goutte grave, puis trois anneaux qui s'élargissent du centre vers le bord (0,32 s d'écart).",
+    "fichier": "Relic/portal_drop_in.wav",
+    "source": "Généré pour Deathless (synth_deathless.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "portail_goutte_sortie",
+    "nom": "Portail — goutte d'eau, sortie",
+    "categorie": "Nyxessa et portail",
+    "usage": "Un joueur sort d'un portail : les anneaux convergent du bord vers le centre et s'y résorbent (l'entrée aspirée), petite bosse à la fin.",
+    "fichier": "Relic/portal_drop_out.wav",
+    "source": "Généré pour Deathless (synth_deathless.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "portail_arrivee",
+    "nom": "Portail — arrivée d'un joueur",
+    "categorie": "Nyxessa et portail",
+    "usage": "Les gemmes jaillissent du portail de sortie et reconstituent le corps (village ou donjon).",
+    "fichier": "Relic/portal_arrive.wav",
+    "source": "Généré pour Deathless (synth_deathless.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "nyxessa_onde_passage",
+    "nom": "Nyxessa — onde de la ceinture",
+    "categorie": "Nyxessa et portail",
+    "usage": "Une onde fait le tour de la ceinture à chaque passage d'un joueur dans le portail.",
+    "fichier": "Relic/nyxessa_belt_wave.wav",
+    "source": "Généré pour Deathless (synth_deathless.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "nyxessa_rappel",
+    "nom": "Nyxessa — rappel forcé",
+    "categorie": "Nyxessa et portail",
+    "usage": "Un joueur encore au donjon au crépuscule est ramené de force au village et perd tout ou partie de son butin.",
+    "fichier": "Relic/nyxessa_recall.wav",
+    "source": "Généré pour Deathless (synth_deathless.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "nyxessa_palier",
+    "nom": "Nyxessa — palier amélioré",
+    "categorie": "Nyxessa et portail",
+    "usage": "Nyxessa passe au palier suivant (missiles, part du butin sauvée).",
+    "fichier": "Relic/nyxessa_upgrade.wav",
+    "source": "Généré pour Deathless (synth_deathless.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "sorcier_incantation",
+    "nom": "Sorcier — incantation du bouclier (boucle)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Le villageois sorcier invoque le bouclier de Nyxessa (boucle de 3 s, pendant l'incantation), avant « Bouclier de Nyxessa — levée ».",
+    "fichier": "Relic/sorcerer_cast_loop.wav",
+    "source": "Généré pour Deathless (synth_deathless.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "nyxessa_destruction",
+    "nom": "Nyxessa — destruction (défaite)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Nyxessa est détruite : la partie est perdue, l'écran de score suit.",
+    "fichier": "Relic/nyxessa_destroyed.wav",
+    "source": "Généré pour Deathless (synth_deathless.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
   },
   {
     "id": "skeleton_spawn",
@@ -735,6 +1020,26 @@
     "source": "Kenney, Interface Sounds",
     "licence": "CC0",
     "statut": "utilise"
+  },
+  {
+    "id": "donjon_alerte_nuit",
+    "nom": "Donjon — alerte avant la nuit",
+    "categorie": "Jour et nuit",
+    "usage": "15 s avant le crépuscule, les joueurs encore au donjon sont prévenus à l'écran et par un son.",
+    "fichier": "Relic/night_warning.wav",
+    "source": "Généré pour Deathless (synth_deathless.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "partie_victoire",
+    "nom": "Partie — victoire",
+    "categorie": "Jour et nuit",
+    "usage": "Aube après la nuit 12 et son boss final : la partie est gagnée.",
+    "fichier": "Relic/victory.wav",
+    "source": "Généré pour Deathless (synth_deathless.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
   },
   {
     "id": "musique_dehors_jour",
@@ -1961,215 +2266,5 @@
     "source": "Kenney, Interface Sounds",
     "licence": "CC0",
     "statut": "disponible"
-  },
-  {
-    "id": "vote_pret",
-    "nom": "Vote « prêt » — joueur prêt, vote annulé",
-    "categorie": "Interface",
-    "usage": "Un joueur se déclare prêt (F1, Vue, pavé tactile) ou annule son vote ; le HUD affiche « Prêts 2 / 3 ».",
-    "fichier": null,
-    "source": "à créer",
-    "licence": "",
-    "statut": "a_creer"
-  },
-  {
-    "id": "coup_critique",
-    "nom": "Coup critique",
-    "categorie": "Armes",
-    "usage": "Retour de tout coup critique : tir à la tête, coup dans le dos, coup furtif (thème Critique, bref et lumineux).",
-    "fichier": null,
-    "source": "à créer",
-    "licence": "",
-    "statut": "a_creer"
-  },
-  {
-    "id": "arbalete_recharge",
-    "nom": "Arbalète — rechargement",
-    "categorie": "Armes",
-    "usage": "Gros temps de recharge de l'arbalète de l'assassin.",
-    "fichier": null,
-    "source": "à créer",
-    "licence": "",
-    "statut": "a_creer"
-  },
-  {
-    "id": "brulure",
-    "nom": "Brûlure — crépitement",
-    "categorie": "Sorts du mage",
-    "usage": "Un ennemi touché par le feu brûle pendant un moment (piste : « Mage — embrasement », en plus court).",
-    "fichier": null,
-    "source": "à créer",
-    "licence": "",
-    "statut": "a_creer"
-  },
-  {
-    "id": "arc_bander",
-    "nom": "Arc — bander",
-    "categorie": "Assassin et rôdeur",
-    "usage": "Maintenir l'attaque bande l'arc : tension qui monte avec la jauge de charge (piste : « Rôdeur — concentration »).",
-    "fichier": null,
-    "source": "à créer",
-    "licence": "",
-    "statut": "a_creer"
-  },
-  {
-    "id": "arc_charge_complete",
-    "nom": "Arc — chargé à fond",
-    "categorie": "Assassin et rôdeur",
-    "usage": "L'arc est complètement bandé : la flèche brille brièvement, un son court l'annonce.",
-    "fichier": null,
-    "source": "à créer",
-    "licence": "",
-    "statut": "a_creer"
-  },
-  {
-    "id": "nuee_marqueur",
-    "nom": "Nuée de flèches — marqueur au sol",
-    "categorie": "Assassin et rôdeur",
-    "usage": "Le marqueur de zone apparaît au sol avant la pluie de flèches.",
-    "fichier": null,
-    "source": "à créer",
-    "licence": "",
-    "statut": "a_creer"
-  },
-  {
-    "id": "assassin_furtif",
-    "nom": "Assassin — passage en mode furtif",
-    "categorie": "Assassin et rôdeur",
-    "usage": "L'assassin passe en marche discrète et devient furtif (aussi en entrant dans la fumée).",
-    "fichier": null,
-    "source": "à créer",
-    "licence": "",
-    "statut": "a_creer"
-  },
-  {
-    "id": "assassin_repere",
-    "nom": "Assassin — repéré",
-    "categorie": "Assassin et rôdeur",
-    "usage": "L'assassin sort du mode furtif : il court, attaque ou un ennemi le repère.",
-    "fichier": null,
-    "source": "à créer",
-    "licence": "",
-    "statut": "a_creer"
-  },
-  {
-    "id": "grenade_lancer",
-    "nom": "Grenade fumigène — lancer",
-    "categorie": "Assassin et rôdeur",
-    "usage": "L'assassin lance la grenade (animation Throw) ; l'impact existe déjà.",
-    "fichier": null,
-    "source": "à créer",
-    "licence": "",
-    "statut": "a_creer"
-  },
-  {
-    "id": "nyxessa_charge_portail",
-    "nom": "Nyxessa — charge vers le portail",
-    "categorie": "Nyxessa et portail",
-    "usage": "À l'aube, Nyxessa envoie une charge d'énergie en arc jusqu'au portail ; le portail s'ouvre à son arrivée (enchaîner sur « Portail — ouverture »).",
-    "fichier": null,
-    "source": "à créer",
-    "licence": "",
-    "statut": "a_creer"
-  },
-  {
-    "id": "nyxessa_retour_energie",
-    "nom": "Nyxessa — retour de l'énergie",
-    "categorie": "Nyxessa et portail",
-    "usage": "Au crépuscule, l'énergie repart du portail vers Nyxessa, puis la ceinture se resserre et la lumière baisse.",
-    "fichier": null,
-    "source": "à créer",
-    "licence": "",
-    "statut": "a_creer"
-  },
-  {
-    "id": "portail_goutte",
-    "nom": "Portail — goutte d'eau",
-    "categorie": "Nyxessa et portail",
-    "usage": "Anneaux du centre vers le bord quand un joueur entre, comme une goutte tombée dans l'eau ; chemin inverse quand il sort.",
-    "fichier": null,
-    "source": "à créer",
-    "licence": "",
-    "statut": "a_creer"
-  },
-  {
-    "id": "portail_arrivee",
-    "nom": "Portail — arrivée d'un joueur",
-    "categorie": "Nyxessa et portail",
-    "usage": "Les gemmes jaillissent du portail de sortie et reconstituent le corps (village ou donjon).",
-    "fichier": null,
-    "source": "à créer",
-    "licence": "",
-    "statut": "a_creer"
-  },
-  {
-    "id": "nyxessa_onde_passage",
-    "nom": "Nyxessa — onde de la ceinture",
-    "categorie": "Nyxessa et portail",
-    "usage": "Une onde fait le tour de la ceinture à chaque passage d'un joueur dans le portail.",
-    "fichier": null,
-    "source": "à créer",
-    "licence": "",
-    "statut": "a_creer"
-  },
-  {
-    "id": "nyxessa_rappel",
-    "nom": "Nyxessa — rappel forcé",
-    "categorie": "Nyxessa et portail",
-    "usage": "Un joueur encore au donjon au crépuscule est ramené de force au village et perd tout ou partie de son butin.",
-    "fichier": null,
-    "source": "à créer",
-    "licence": "",
-    "statut": "a_creer"
-  },
-  {
-    "id": "nyxessa_palier",
-    "nom": "Nyxessa — palier amélioré",
-    "categorie": "Nyxessa et portail",
-    "usage": "Nyxessa passe au palier suivant (missiles, part du butin sauvée).",
-    "fichier": null,
-    "source": "à créer",
-    "licence": "",
-    "statut": "a_creer"
-  },
-  {
-    "id": "sorcier_incantation",
-    "nom": "Sorcier — incantation du bouclier",
-    "categorie": "Nyxessa et portail",
-    "usage": "Le villageois sorcier invoque le bouclier de Nyxessa, avant « Bouclier de Nyxessa — levée ».",
-    "fichier": null,
-    "source": "à créer",
-    "licence": "",
-    "statut": "a_creer"
-  },
-  {
-    "id": "nyxessa_destruction",
-    "nom": "Nyxessa — destruction (défaite)",
-    "categorie": "Nyxessa et portail",
-    "usage": "Nyxessa est détruite : la partie est perdue, l'écran de score suit.",
-    "fichier": null,
-    "source": "à créer",
-    "licence": "",
-    "statut": "a_creer"
-  },
-  {
-    "id": "donjon_alerte_nuit",
-    "nom": "Donjon — alerte avant la nuit",
-    "categorie": "Jour et nuit",
-    "usage": "15 s avant le crépuscule, les joueurs encore au donjon sont prévenus à l'écran et par un son.",
-    "fichier": null,
-    "source": "à créer",
-    "licence": "",
-    "statut": "a_creer"
-  },
-  {
-    "id": "partie_victoire",
-    "nom": "Partie — victoire",
-    "categorie": "Jour et nuit",
-    "usage": "Aube après la nuit 12 et son boss final : la partie est gagnée.",
-    "fichier": null,
-    "source": "à créer",
-    "licence": "",
-    "statut": "a_creer"
   }
 ]

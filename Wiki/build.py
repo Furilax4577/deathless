@@ -15,9 +15,10 @@
 # Markdown pris en charge (volontairement réduit) : titres # ## ###, paragraphes, listes "- " et sous-listes "  - ", tableaux "| a | b |",
 # encadrés "> ", gras **x**, code `x`, liens [texte](page.md), pastilles {couleur #rrggbb}, et trois étiquettes :
 # {décidé}, {à confirmer} et {effet validé} (l'apparence est validée, les règles de jeu restent à fixer).
-# Balises de catalogue, seules sur leur ligne : {catalogue sons} (un tableau par catégorie avec lecteurs audio, filtres)
-# et {sons à créer} (sons nécessaires qui n'existent pas), lues dans data/sons.json ; les fichiers audio sont copiés de
-# Assets/Audio/ vers site/sons/ à chaque génération (seulement s'ils ont changé).
+# Balises de catalogue, seules sur leur ligne : {catalogue sons} (un tableau par catégorie avec lecteurs audio, filtres),
+# {sons à écouter} (encart : liens vers les sons créés qui attendent l'écoute de Quentin) et {sons à créer} (sons
+# nécessaires qui n'existent pas), lues dans data/sons.json ; les fichiers audio sont copiés de Assets/Audio/ vers
+# site/sons/ à chaque génération (seulement s'ils ont changé).
 import html, io, json, os, re, datetime, shutil, unicodedata, urllib.parse
 
 ICI = os.path.dirname(os.path.abspath(__file__))
@@ -76,7 +77,9 @@ def slug(txt):
 
 # ------------------------------------------------------------------ catalogue des sons (data/sons.json)
 
-STATUTS_SONS = {"utilise": ("utilisé", "ok"), "disponible": ("disponible", "dispo"), "a_creer": ("à créer", "wait")}
+# statut -> (libellé du badge, classe CSS, libellé du filtre) ; a_ecouter : créé, pas encore validé à l'écoute.
+STATUTS_SONS = {"a_ecouter": ("à écouter", "ecoute", "À écouter"), "utilise": ("utilisé", "ok", "Utilisés"),
+                "disponible": ("disponible", "dispo", "Disponibles"), "a_creer": ("à créer", "wait", "À créer")}
 SONS_COPIES = set()  # chemins sous Assets/Audio/ référencés par les pages, copiés dans site/sons/ en fin de génération
 _sons = None
 
@@ -111,7 +114,7 @@ def lecteur(rel):
 
 
 def ligne_son(s, colonnes):
-    libelle, classe = STATUTS_SONS[s["statut"]]
+    libelle, classe = STATUTS_SONS[s["statut"]][:2]
     q = sans_accents(" ".join(str(s.get(k) or "") for k in ("nom", "categorie", "usage", "source", "id", "fichier")))
     attrs = ' id="son-%s" data-cat="%s" data-statut="%s" data-q="%s"' % (
         html.escape(s["id"], quote=True), html.escape(s["categorie"], quote=True), s["statut"], html.escape(q, quote=True))
@@ -165,9 +168,9 @@ def catalogue_sons():
     out = ['<div class="filtres-sons" role="search">'
            '<input id="sons-q" type="search" placeholder="Rechercher un son, un usage, un fichier…" aria-label="Rechercher un son" autocomplete="off">'
            '<select id="sons-cat" aria-label="Catégorie"><option value="">Toutes les catégories</option>%s</select>'
-           '<select id="sons-statut" aria-label="Statut"><option value="">Tous les statuts</option><option value="utilise">Utilisés</option>'
-           '<option value="disponible">Disponibles</option><option value="a_creer">À créer</option></select>'
-           '<span id="sons-nb" aria-live="polite"></span></div>' % options]
+           '<select id="sons-statut" aria-label="Statut"><option value="">Tous les statuts</option>%s</select>'
+           '<span id="sons-nb" aria-live="polite"></span></div>'
+           % (options, "".join('<option value="%s">%s</option>' % (k, v[2]) for k, v in STATUTS_SONS.items()))]
     titres = []
     for cat in cats:
         lignes = [ligne_son(s, "catalogue") for s in sons if s["categorie"] == cat]
@@ -175,7 +178,8 @@ def catalogue_sons():
             continue
         ident = slug(cat)
         titres.append((2, cat, ident))
-        titres.extend((4, s["nom"], "son-" + s["id"]) for s in sons if s["categorie"] == cat and s["statut"] == "utilise")
+        titres.extend((4, s["nom"], "son-" + s["id"]) for s in sons
+                      if s["categorie"] == cat and s["statut"] in ("utilise", "a_ecouter"))
         out.append('<section class="bloc-sons"><h2 id="%s">%s <small>(%d)</small></h2><div class="table"><table class="sons">'
                    '<thead><tr><th>Son</th><th>Écouter</th><th>Usage dans Deathless</th><th>Source</th></tr></thead>'
                    '<tbody>%s</tbody></table></div></section>' % (ident, html.escape(cat), len(lignes), "".join(lignes)))
@@ -186,14 +190,34 @@ def catalogue_sons():
 def sons_a_creer():
     """{sons à créer} : les sons dont Deathless a besoin et qui n'existent pas encore."""
     sons = [s for s in charger_sons() if s["statut"] == "a_creer"]
-    lignes = "".join(ligne_son(s, "a_creer") for s in sons)
     titres = [(2, "À créer", "a-creer")] + [(4, s["nom"], "son-" + s["id"]) for s in sons]
+    if not sons:
+        return "<h2 id=\"a-creer\">À créer <small>(0)</small></h2><p>Aucun son à créer pour l'instant.</p>", titres
+    lignes = "".join(ligne_son(s, "a_creer") for s in sons)
     return ('<section class="bloc-sons"><h2 id="a-creer">À créer <small>(%d)</small></h2><div class="table"><table class="sons">'
             '<thead><tr><th>Son</th><th>Catégorie</th><th>Quand il joue</th></tr></thead><tbody>%s</tbody></table></div></section>'
             % (len(sons), lignes)), titres
 
 
-BALISES = {"{catalogue sons}": catalogue_sons, "{sons à créer}": sons_a_creer}
+def sons_a_ecouter():
+    """{sons à écouter} : encart qui liste, par catégorie, les sons créés en attente d'écoute, avec un lien vers chacun."""
+    sons = [s for s in charger_sons() if s["statut"] == "a_ecouter"]
+    if not sons:
+        return "<aside class=\"note encart-ecoute\" id=\"a-ecouter\">Aucun son en attente d'écoute.</aside>", []
+    cats = []
+    for s in sons:
+        if s["categorie"] not in cats:
+            cats.append(s["categorie"])
+    lignes = "".join('<li><strong>%s</strong> : %s</li>' % (html.escape(c), ", ".join(
+        '<a href="#son-%s">%s</a>' % (html.escape(s["id"], quote=True), html.escape(s["nom"])) for s in sons if s["categorie"] == c))
+        for c in cats)
+    return ('<aside class="note encart-ecoute" id="a-ecouter"><p><span class="badge ecoute">à écouter</span> '
+            "<strong>%d sons créés attendent d'être écoutés par Quentin</strong> : un clic mène au son dans le catalogue. Une fois validé, "
+            'son statut passe à « utilisé » dans <code>Wiki/data/sons.json</code>.</p><ul>%s</ul></aside>'
+            % (len(sons), lignes)), [(2, "À écouter", "a-ecouter")]
+
+
+BALISES = {"{catalogue sons}": catalogue_sons, "{sons à créer}": sons_a_creer, "{sons à écouter}": sons_a_ecouter}
 
 
 def copier_sons():
@@ -387,7 +411,9 @@ th{font-size:13px;letter-spacing:.5px;text-transform:uppercase;color:var(--doux)
 .note{border:1px solid var(--ligne);background:var(--surface);border-radius:10px;padding:12px 16px;margin:16px 0;color:var(--doux)}
 .swatch{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px;border:1px solid var(--ligne)}
 .maj{margin-top:48px;color:var(--doux);font-size:13px}
-.badge.dispo{background:var(--code);color:var(--doux)}
+.badge.dispo{background:var(--code);color:var(--doux)}.badge.ecoute{background:var(--accent);color:var(--surface)}
+.encart-ecoute{color:var(--encre);border-color:var(--accent)}.encart-ecoute p{margin:0 0 6px}.encart-ecoute ul{margin:0;font-size:14px}
+table.sons tr:target td{background:var(--wait-fond)}
 .filtres-sons{position:sticky;top:0;z-index:2;display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:18px 0 0;padding:10px 0;background:var(--fond);border-bottom:1px solid var(--ligne)}
 .filtres-sons input,.filtres-sons select{padding:7px 10px;border-radius:8px;border:1px solid var(--ligne);background:var(--surface);color:var(--encre);font:inherit;font-size:14px}
 .filtres-sons input{flex:1 1 220px}#sons-nb{color:var(--doux);font-size:13px}
