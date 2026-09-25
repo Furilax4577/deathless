@@ -1,6 +1,18 @@
 {
   "versions": [
     {
+      "version": "0.4.2",
+      "date": "2026-09-25",
+      "titre": "La caméra retrouve son héros",
+      "notes": [
+        "Correctif : la caméra suit de nouveau votre héros à l'épaule, en solo comme en multijoueur (elle restait figée sur le plan du menu).",
+        "Sentiers de pierre qui s'enfoncent dans la forêt vers les trois zones d'où sortent les squelettes, de plus en plus abîmés, jalonnés de lanternes.",
+        "Les squelettes ont les yeux jaune-orangé ; les élites, porteurs d'un éclat de Nyx, les ont verts, avec une légère aura.",
+        "Volumes par défaut plus doux : musique 10 %, effets 15 %, interface 15 %.",
+        "Mise à jour plus légère : le launcher 1.1.0 ne télécharge que les fichiers modifiés."
+      ]
+    },
+    {
       "version": "0.4.1",
       "date": "2026-09-25",
       "titre": "Éclat de nuit",
