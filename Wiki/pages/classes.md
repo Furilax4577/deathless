@@ -30,12 +30,14 @@ Les rôles, les armes et leurs animations sont {décidé}.
 - **Cône de flammes** maintenu devant le mage {effet validé}.
 - **Brûlure** : les ennemis touchés brûlent pendant un moment {effet validé}.
 - **Mana** {décidé} : jauge de 100. Elle remonte d'environ 1 par seconde, plus un bonus à chaque ennemi touché par la boule de feu. Les compétences coûtent du mana ; le cône de flammes en consomme tant qu'il est maintenu. Valeurs {à équilibrer}.
-- Ultime et valeurs chiffrées : {à confirmer}.
+- **Pas d'ultime** {décidé} : le mage garde la boule de feu, le cône de flammes et la brûlure.
+- Valeurs chiffrées : {à confirmer}.
 
 ## Rôdeur
 
 - Arc et carquois {décidé} : au repos, l'arc est tenu le long du corps ; il se lève et se bande pour viser.
 - **Compétence 1 : Nuée de flèches** {décidé} : un marqueur apparaît au sol, puis une pluie de flèches tombe sur la zone ciblée.
+- **Compétence 2 : Roulade arrière** {décidé} : le rôdeur roule en arrière pour reprendre ses distances et tire en même temps une **salve de flèches devant lui**. Nombre de flèches, écart et dégâts {à équilibrer}.
 - **Visée récompensée** {décidé} : un tir plus précis rapporte davantage.
   - **Tir à la tête** : une flèche dans la tête est un **coup critique**.
   - **Arc bandé** : maintenir l'attaque bande l'arc, avec une jauge de charge. Plus l'arc est tendu, plus les dégâts sont élevés.
@@ -44,7 +46,7 @@ Les rôles, les armes et leurs animations sont {décidé}.
   - **Traînée** : en vol, la flèche laisse une traînée d'air fine, sans lueur, non magique.
 - **Flèches non magiques** {décidé} : les flèches, du rôdeur comme toutes les autres, ne brillent pas. Elles laissent une traînée d'air, jamais lumineuse. Seule exception, le bref éclat de la charge complète.
 - Durée de charge, dégâts minimum et maximum, multiplicateur de critique : {à confirmer}.
-- Autres compétences et valeurs chiffrées : {à confirmer}.
+- Valeurs chiffrées des compétences : {à confirmer}.
 
 ## Assassin
 
@@ -68,7 +70,7 @@ Les rôles, les armes et leurs animations sont {décidé}.
 - Portée de détection des ennemis : {à confirmer}.
 ### Style de jeu {décidé}
 
-L'assassin joue **principalement à la dague**. L'arbalète et la grenade sont des outils ponctuels.
+L'assassin joue **principalement à la dague**. L'arbalète et la grenade sont des outils ponctuels. **Pas d'autre compétence active** : dague, passifs, arbalète et grenade fumigène forment son kit complet.
 
 ### Arbalète {décidé}
 
