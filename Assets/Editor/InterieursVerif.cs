@@ -211,12 +211,18 @@ public static class InterieursVerif
     // vers l'arrière sur 4,5 m, recul minimal 0,6 m. `corrigee` : variante proposée pour main (épaule recalée par un
     // SphereCast du pivot vers l'épaule, recul minimal 0,3 m) ; sans elle, une épaule collée à un mur fait partir le
     // SphereCast de l'intérieur du collider (ignoré par PhysX) et la caméra traverse le mur.
+    static readonly RaycastHit[] s_Hits = new RaycastHit[16];
     public static Vector3 PositionCamera(Vector3 pieds, float lacet, float tangage, out float dist, bool corrigee = false)
     {
         Quaternion rot = Quaternion.Euler(tangage, lacet, 0f);
         Vector3 pivot = pieds + Vector3.up * 1.6f;
+        if (corrigee)
+        {
+            // CameraEpaule de main depuis le 26/09/2026 : même calcul, par sa fonction.
+            dist = Deathless.Jeu.CameraEpaule.Recul(pivot, rot, 0.6f, 4.5f, s_Hits, out Vector3 ep);
+            return ep + rot * Vector3.back * dist;
+        }
         Vector3 droite = rot * Vector3.right; float epauleD = 0.6f; RaycastHit h;
-        if (corrigee && Physics.SphereCast(pivot, 0.25f, droite, out h, 0.6f, ~0, QueryTriggerInteraction.Ignore)) epauleD = Mathf.Max(0f, h.distance - 0.02f);
         Vector3 epaule = pivot + droite * epauleD;
         Vector3 dir = rot * Vector3.back;
         float d = 4.5f;
@@ -247,7 +253,7 @@ public static class InterieursVerif
                         }
                         n++; somme += d; mini = Mathf.Min(mini, d); if (!in_) dehors++; if (d < 1.2f) proches++;
                     }
-            r += (corrigee ? " | épaule recalée (proposition) : " : "CameraEpaule actuelle : ") + n + " positions, recul moyen " + (somme / n).ToString("F2") + " m (min " + mini.ToString("F2") + "), " + proches + " à moins de 1,2 m, " + (dehors == 0 ? "toujours dans la pièce" : dehors + " derrière un mur" + (corrigee ? " SORTIE" : ""));
+            r += (corrigee ? " | CameraEpaule (épaule recalée, main) : " : "ancienne CameraEpaule : ") + n + " positions, recul moyen " + (somme / n).ToString("F2") + " m (min " + mini.ToString("F2") + "), " + proches + " à moins de 1,2 m, " + (dehors == 0 ? "toujours dans la pièce" : dehors + " derrière un mur" + (corrigee ? " SORTIE" : ""));
         }
         return r;
     }

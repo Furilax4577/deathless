@@ -76,6 +76,47 @@ namespace Deathless.Jeu
         /// Direction « avant » à plat de la caméra (déplacement relatif).
         public Vector3 AvantPlat => Quaternion.Euler(0f, lacet, 0f) * Vector3.forward;
 
+        /// Recul minimal derrière l'épaule (m) : petit, pour les pièces étroites (intérieurs des maisons).
+        public const float ReculMin = 0.3f;
+        const float Rayon = 0.25f;
+
+        /// Place l'épaule puis la caméra, sans traverser les murs (personnages ignorés). 1) L'épaule est recalée par un
+        /// SphereCast du pivot (centre du héros, à hauteur des yeux) vers la droite : collée à un mur, elle revient vers le
+        /// héros, et le second test ne part plus de l'intérieur d'un collider (PhysX l'ignorerait et la caméra passerait
+        /// à travers le mur). 2) SphereCast de l'épaule vers l'arrière. 3) Tête -> caméra dégagée. Rend le recul libre
+        /// (au moins ReculMin).
+        public static float Recul(Vector3 pivot, Quaternion rot, float epauleVoulue, float distance, RaycastHit[] hits, out Vector3 epaule)
+        {
+            Vector3 droite = rot * Vector3.right;
+            float e = Premier(pivot, droite, epauleVoulue, hits);
+            epaule = pivot + droite * (e < epauleVoulue ? Mathf.Max(0f, e - 0.02f) : epauleVoulue);
+            float d = Premier(epaule, rot * Vector3.back, distance, hits);
+            // 3) Le héros doit rester visible : un obstacle entre sa tête et la caméra (bord d'un battant de porte, d'un
+            // montant, que le test depuis l'épaule longe sans le toucher) rapproche la caméra d'autant.
+            Vector3 cam = epaule + rot * Vector3.back * d;
+            Vector3 vers = cam - pivot; float l = vers.magnitude;
+            if (l > 0.01f)
+            {
+                float t = Premier(pivot, vers / l, l, hits, 0.12f);
+                if (t < l) d = d * (t / l) - 0.05f;
+            }
+            return Mathf.Max(ReculMin, d);
+        }
+
+        // Distance du premier obstacle (hors personnages) sur `longueur`, ou `longueur`.
+        static float Premier(Vector3 depart, Vector3 dir, float longueur, RaycastHit[] hits, float rayon = Rayon)
+        {
+            float d = longueur;
+            int n = Physics.SphereCastNonAlloc(depart, rayon, dir, hits, longueur, ~0, QueryTriggerInteraction.Ignore);
+            for (int i = 0; i < n; i++)
+            {
+                var h = hits[i];
+                if (h.collider.GetComponentInParent<Sante>() != null) continue;   // personnages ignorés (Nyxessa comprise)
+                if (h.distance > 0f && h.distance < d) d = h.distance;
+            }
+            return d;
+        }
+
         void LateUpdate()
         {
             var b = GameBalance.Courant;
@@ -92,19 +133,10 @@ namespace Deathless.Jeu
             if (m_Camera != null) m_Camera.fieldOfView = m_ChampJeu * (1f - 0.25f * m_Visee);
             Quaternion rot = Quaternion.Euler(tangage, lacet, 0f);
             Vector3 pivot = cible.position + Vector3.up * b.cameraHauteur;
-            Vector3 epaule = pivot + rot * Vector3.right * (b.cameraEpaule * (1f + 0.3f * m_Visee));
+            float d = Recul(pivot, rot, b.cameraEpaule * (1f + 0.3f * m_Visee), b.cameraDistance * (1f - 0.3f * m_Visee), m_Hits, out Vector3 epaule);
             Vector3 dir = rot * Vector3.back;
-            float voulu = b.cameraDistance * (1f - 0.3f * m_Visee);
-            float d = voulu;
-            int n = Physics.SphereCastNonAlloc(epaule, 0.25f, dir, m_Hits, voulu, ~0, QueryTriggerInteraction.Ignore);
-            for (int i = 0; i < n; i++)
-            {
-                var h = m_Hits[i];
-                if (h.collider.GetComponentInParent<Sante>() != null) continue;   // personnages ignorés (Nyxessa comprise)
-                if (h.distance > 0f && h.distance < d) d = h.distance;
-            }
             m_Distance = m_Distance <= 0f ? d : (d < m_Distance ? d : Mathf.Lerp(m_Distance, d, 1f - Mathf.Exp(-6f * Time.deltaTime)));
-            transform.position = epaule + dir * Mathf.Max(0.6f, m_Distance);
+            transform.position = epaule + dir * Mathf.Max(ReculMin, m_Distance);
             transform.rotation = rot;
         }
     }
