@@ -1,6 +1,17 @@
 {
   "versions": [
     {
+      "version": "0.4.5",
+      "date": "2026-09-25",
+      "titre": "Tous les effets pour tous",
+      "notes": [
+        "Multijoueur : chacun voit les effets des autres (soin, charge bélier, rugissement, saut, attaque tournante, cône de flammes, nuée, tirs, critiques…), avec leur son.",
+        "Élites : yeux rouges et aura rouge.",
+        "Rôdeur : clic droit maintenu pour viser, sans zoom ; clic gauche pour bander, relâcher pour tirer.",
+        "Paladin plus mobile : épée plus longue (2,6 m) qui touche jusqu'à 3 ennemis devant lui, un pas en avant à chaque coup, déplacement plus rapide en garde."
+      ]
+    },
+    {
       "version": "0.4.4",
       "date": "2026-09-25",
       "titre": "Portes ouvertes",
