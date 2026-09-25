@@ -27,15 +27,15 @@ Ordre d'apparition dans la partie : sbires dès la nuit 1, guerriers nuit 2, vol
 
 ## Yeux {décidé}
 
-Les squelettes ordinaires ont les **yeux jaune-orangé lumineux**, comme les modèles KayKit. Les **élites** et **Nyxar** ont les **yeux verts** : ils portent un éclat de Nyx.
+Les squelettes ordinaires ont les **yeux jaune-orangé lumineux**, comme les modèles KayKit. Les **élites** ont les **yeux rouges**. **Nyxar** a les **yeux verts** : il porte des éclats de Nyx.
 
 ## Élites {décidé}
 
-Un élite est un squelette ordinaire qui porte un **éclat de Nyx** (voir [L'univers](univers.md)) :
+Un élite est un squelette ordinaire **plus fort**, sans éclat de Nyx (décision du 25/09/2026) :
 
 - environ **1,3 fois plus grand** ;
 - **trois fois plus de points de vie** et des dégâts plus forts ;
-- **yeux verts** et légère **aura de gemmes vertes**.
+- **yeux rouges** et légère **aura rouge**, pour les distinguer.
 
 Valeurs exactes : {à équilibrer}.
 

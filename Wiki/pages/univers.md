@@ -18,9 +18,8 @@ Il possède encore **deux éclats de Nyx** {décidé} : l'un est serti dans le *
 
 Un **éclat de Nyx** est un morceau de la force de Nyxessa. Celui qui en porte un voit sa **puissance augmentée**. C'est le cas de Nyxar, dont l'éclat nourrit ses pouvoirs, mais le principe vaut pour tous, squelettes comme héros.
 
-- Les **élites** portent un éclat : d'où leurs yeux verts, leur aura de gemmes vertes et leur force accrue.
 - Sur Nyxar, les deux éclats brillent et ce sont ses **points faibles**.
-- **Pas une ressource** pour le moment {décidé} : les héros ne ramassent ni n'utilisent d'éclats. Les éclats expliquent la force de Nyxar et des élites.
+- **Pas une ressource** pour le moment {décidé} : les héros ne ramassent ni n'utilisent d'éclats. Les éclats expliquent la force de Nyxar.
 - Piste : le **sorcier** pourrait porter un éclat quand il crée le lien avec la relique (canalisation, voir [Nyxessa](nyxessa.md)) {à confirmer}.
 
 ## Ce que ça change dans le jeu {dev}

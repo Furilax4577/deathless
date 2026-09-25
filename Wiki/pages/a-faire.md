@@ -5,6 +5,15 @@ Travaux prévus ou notés, pas encore faits. Une ligne quitte cette page quand l
 ## Noté par Quentin
 
 - **Revoir le menu des options de jeu.** (noté le 25/09/2026)
+- **Paladin plus mobile** : un peu plus de portée, et un angle d'attaque vers l'avant qui touche plusieurs ennemis en face, moins large que celui du Viking.
+- **Rôdeur** : clic droit maintenu pour viser, clic gauche pour bander, sans zoom de caméra.
+- **Effets visibles par tous** : soin, charge bélier, nuée de flèches… aujourd'hui visibles seulement par le lanceur en multijoueur.
+- **Achats à la relique** : touche E près de Nyxessa, menu d'achat des paliers (missiles, bouclier).
+- **Élites** : yeux rouges et légère aura rouge (plus d'éclat de Nyx, les yeux verts restent à Nyxar).
+- **Barde** : nouvelle passe pour qu'il soit aussi lisse que les personnages KayKit.
+- **Menu du personnage (Tab)** : le personnage, l'inventaire et l'amélioration des compétences.
+- **Points de compétence** : 1 point par jour survécu.
+- **Taverne** : se restaurer et boire une bière, de jour uniquement ; « payer une tournée » rend tout le monde ivre quelques secondes. Des breuvages viendront plus tard.
 - **Idées de personnages** (classes jouables possibles, noté le 25/09/2026) :
   - une **Bavaroise** qui se bat à coups de chopes de bière ;
   - un **barde** et son luth ;
