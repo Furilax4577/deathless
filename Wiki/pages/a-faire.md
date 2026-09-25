@@ -26,6 +26,7 @@ Travaux prévus ou notés, pas encore faits. Une ligne quitte cette page quand l
 
 ## Plus tard
 
+- Lobby à la taille ×3 sur un écran très large : le bas passe sous la barre des invites.
 - Achat des paliers de Nyxessa et du bouclier à la relique (l'or s'accumule sans pouvoir être dépensé).
 - Deux versions du mini-boss : massue et martache.
 - Effet visuel de la parade, son à chaque coup de l'attaque tournante.
