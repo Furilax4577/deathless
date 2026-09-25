@@ -31,6 +31,7 @@ Les rôles sont {à confirmer}. Les armes et leurs animations sont {décidé}.
 
 - Arc et carquois {décidé} : au repos, l'arc est tenu le long du corps ; il se lève et se bande pour viser.
 - **Compétence 1 : Nuée de flèches** {décidé} : une pluie de flèches sur une zone ciblée.
+- **Visée récompensée** {décidé} : un tir plus précis doit rapporter davantage. La façon de le mesurer est {à confirmer}.
 - Autres compétences et valeurs chiffrées : {à confirmer}.
 
 ## Assassin
@@ -53,7 +54,22 @@ Les rôles sont {à confirmer}. Les armes et leurs animations sont {décidé}.
 - Multiplicateurs : {à confirmer}. Pour mémoire, Relic utilisait ×3 dans le dos et ×2 en furtivité, cumulables.
 - **Déclenchement** {décidé} : automatique. Hors combat, dès que l'assassin marche sans courir ni sprinter, il passe en marche discrète et devient furtif. Courir, attaquer ou être repéré le fait sortir du mode furtif.
 - Portée de détection des ennemis : {à confirmer}.
-- Compétences actives : {à confirmer}.
+### Style de jeu {décidé}
+
+L'assassin joue **principalement à la dague**. L'arbalète et la grenade sont des outils ponctuels.
+
+### Arbalète {décidé}
+
+- Un carreau dans la **tête** est un **coup critique**.
+- **Gros temps de recharge** : l'arbalète ne remplace pas la dague.
+- Durée exacte du temps de recharge : {à confirmer}.
+
+### Grenade fumigène {décidé}
+
+- L'assassin la lance ; elle crée un nuage de fumée.
+- Elle sert à **s'extraire d'un combat**.
+- Repasser en mode furtif quand il est dans la fumée : {à confirmer}.
+- Nombre de grenades et recharge : {à confirmer}.
 
 ## Viking
 
