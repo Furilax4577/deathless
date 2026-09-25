@@ -175,7 +175,9 @@
 
 .hud-joueur__furtif { position: absolute; right: -15px; top: -15px; width: 54px; height: 54px; border-radius: 27px; background-color: #2b1840; border-width: 2px; border-color: #5b3a8a; display: none; align-items: center; justify-content: center; }
 .hud-joueur__furtif-icone { width: 40px; height: 40px; }
-.hud-joueur__jauge-icone { width: 36px; height: 36px; margin: -9px 6px -9px -6px; }
+/* Icône de jauge (goutte, poing) masquée dans le HUD : elle jurait à côté de la barre (Quentin, 25/09/2026).
+   Les libellés Vie / Endurance / Mana suffisent ; les icônes restent dans le choix de classe et le wiki. */
+.hud-joueur__jauge-icone { display: none; width: 36px; height: 36px; margin: -9px 6px -9px -6px; }
 .hud-joueur__jauge-classe .dl-gauge__label { flex-grow: 1; }
 .hud-potion { align-items: center; margin-left: 15px; display: none; }
 .hud-potion__case { width: 72px; height: 72px; border-radius: 15px; border-width: 3px; border-color: var(--dl-color-border-strong); background-color: var(--dl-color-panel); align-items: center; justify-content: center; margin-bottom: 9px; }
