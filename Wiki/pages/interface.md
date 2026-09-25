@@ -7,7 +7,7 @@
 - **Police** : Fredoka partout, titres en SemiBold ou Bold, texte en Regular ou Medium.
 - **Technologie** : UI Toolkit.
 - **Style** : celui des maquettes : fond ardoise sombre, panneaux bleu nuit, texte ivoire, et une bordure or pour l'élément sélectionné à la manette.
-- **Taille de l'interface** : réglable ×1, ×2 ou ×3 dans les options.
+- **Taille de l'interface** : réglable ×1, ×2 ou ×3 dans les options, soit 80 %, 100 % (défaut) et 135 % de la taille des maquettes, pour lire confortablement sur une télévision.
 
 ## Menus {à confirmer}
 
