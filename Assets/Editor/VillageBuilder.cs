@@ -893,6 +893,9 @@ public static class VillageBuilder
         // maisons : matériau à fenêtres émissives, lanterne allumée près de chaque porte
         Material houseMat = HouseNightMaterial();
         Material flameMat = FlatMaterial("Assets/Art/Materials/Lanterne_Flamme.mat", "Universal Render Pipeline/Unlit", new Color(1f, 0.62f, 0.28f) * 2.2f);
+        // lanternes (sandbox-vfx, 25/09/2026) : matériau à vitres émissives et réglages communs (couleur, scintillement)
+        Material lanterneMat = LanterneAssets.Materiau();
+        LanternesReglages lanterneReglages = LanterneAssets.Reglages();
         var lights = new List<Light>(); var flames = new List<GameObject>(); var houses = new List<Renderer>();
         Transform lanternes = Group(amb, "Lanternes");
         Transform ms = root.Find("Maisons");
@@ -916,6 +919,9 @@ public static class VillageBuilder
                 fl.SetActive(false); flames.Add(fl);
                 GameObject lg = new GameObject("Lumiere"); lg.transform.SetParent(lan.transform, false); lg.transform.position = glass + f * 0.15f;
                 Light l = lg.AddComponent<Light>(); l.type = LightType.Point; l.range = LanternRange; l.color = new Color(1f, 0.64f, 0.34f); l.intensity = 0f; l.shadows = LightShadows.None; l.enabled = false;
+                // flamme et lumière au centre de la cage (calculé d'après le maillage des vitres), lanterne sans ombre portée,
+                // vitres émissives ; couleur et scintillement par LanterneLumiere, allumage par CycleJourNuit
+                LanterneLumiere.Configurer(lan, l, fl.transform, lanterneMat, lanterneReglages, 2.2f, false, false);
                 lights.Add(l);
             }
 
@@ -995,11 +1001,13 @@ public static class VillageBuilder
         Material m = AssetDatabase.LoadAssetAtPath<Material>(matPath);
         if (m == null) { m = new Material(src); AssetDatabase.CreateAsset(m, matPath); }
         else m.CopyPropertiesFromMaterial(src);
-        m.EnableKeyword("_EMISSION");
-        m.globalIlluminationFlags = MaterialGlobalIlluminationFlags.None;
         m.SetTexture("_EmissionMap", AssetDatabase.LoadAssetAtPath<Texture2D>(texPath));
-        // presque noir le jour (pas tout à fait : URP couperait le mot-clé _EMISSION) ; CycleJourNuit allume les fenêtres la nuit
-        m.SetColor("_EmissionColor", Color.white * 0.001f);
+        // Fenêtres éteintes hors jeu ; CycleJourNuit les allume la nuit (MaterialPropertyBlock, sans copie du matériau).
+        // Drapeau RealtimeEmissive : URP (BaseShaderGUI.SetMaterialKeywords) ne garde le mot-clé _EMISSION que si les
+        // drapeaux GI contiennent AnyEmissive ; avec None il le retirait à l'enregistrement, quelle que soit la couleur.
+        m.SetColor("_EmissionColor", Color.black);
+        m.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
+        m.EnableKeyword("_EMISSION");
         EditorUtility.SetDirty(m);
         return m;
     }
@@ -1073,6 +1081,39 @@ public static class VillageBuilder
     // sombre (dessus abaissé de SupportDrop), habillé de dalles découpées au contour (dessus) et de blocs chanfreinés (contremarche
     // visible entre `bottom` et `top`). `inner` = rayon de l'assise du dessus (0 s'il n'y en a pas) : les dalles entièrement
     // dessous sont omises.
+    /// Lanternes et fenêtres (sandbox-vfx, 25/09/2026) appliquées à la scène ouverte sans la regénérer : matériau des
+    /// maisons (fenêtres pilotées par MaterialPropertyBlock), lanternes existantes réglées par LanterneLumiere (lumière et
+    /// flamme au centre de la cage, vitres émissives, couleur commune LanternesReglages, scintillement ±10 %).
+    [MenuItem("Deathless/Village/Mettre à jour les lanternes et fenêtres")]
+    public static string MettreAJourLanternes()
+    {
+        GameObject rootGo = GameObject.Find("VillageBlockout");
+        if (rootGo == null) return "VillageBlockout introuvable";
+        Material houseMat = HouseNightMaterial();
+        Transform ms = rootGo.transform.Find("Maisons");
+        int maisons = 0;
+        if (ms != null && houseMat != null)
+            foreach (Transform h in ms) { var mr = h.GetComponent<MeshRenderer>(); if (mr != null) { mr.sharedMaterial = houseMat; maisons++; } }
+        Material lanterneMat = LanterneAssets.Materiau();
+        LanternesReglages reglages = LanterneAssets.Reglages();
+        int n = 0;
+        Transform lanternes = rootGo.transform.Find("Ambiance/Lanternes");
+        if (lanternes != null)
+            foreach (Transform lan in lanternes)
+            {
+                Light l = lan.GetComponentInChildren<Light>(true);
+                Transform fl = lan.Find("Flamme");
+                if (l == null) continue;
+                LanterneLumiere.Configurer(lan.gameObject, l, fl, lanterneMat, reglages, 2.2f, false, false);
+                n++;
+            }
+        UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(rootGo.scene);
+        AssetDatabase.SaveAssets();
+        string r = "Lanternes : " + n + " réglées (LanterneLumiere) ; fenêtres : matériau des maisons mis à jour (" + maisons + " maisons)";
+        Debug.Log(r);
+        return r;
+    }
+
     /// Refait seulement le plateau de Nyxessa (marches, habillage) dans la scène ouverte, aux dimensions ci-dessus, et retire
     /// les pavés de l'anneau entièrement recouverts ; le reste du village ne bouge pas.
     [MenuItem("Deathless/Village/Refaire le plateau de Nyxessa")]

@@ -61,13 +61,19 @@ public class CycleJourNuit : MonoBehaviour
 
     private MaterialPropertyBlock bloc;
     private static readonly int EmissionId = Shader.PropertyToID("_EmissionColor");
+    // Lanternes réglées par LanterneLumiere (couleur, scintillement, vitres) : le cycle ne leur donne que l'allumage.
+    private LanterneLumiere[] pilotes;
 
     private void Start()
     {
         bloc = new MaterialPropertyBlock();
-        // URP retire le mot-clé _EMISSION de l'asset à l'enregistrement quand l'émission est presque noire : on l'active sur
-        // une instance du matériau de chaque maison, à l'exécution (l'asset n'est pas modifié).
-        if (maisons != null) foreach (Renderer r in maisons) if (r != null) r.material.EnableKeyword("_EMISSION");
+        // Fenêtres : le matériau des maisons garde son mot-clé _EMISSION (drapeau GI RealtimeEmissive, VillageBuilder
+        // .HouseNightMaterial) ; plus de copie du matériau par maison, l'émission passe par MaterialPropertyBlock.
+        if (lanternes != null)
+        {
+            pilotes = new LanterneLumiere[lanternes.Length];
+            for (int i = 0; i < lanternes.Length; i++) if (lanternes[i] != null) pilotes[i] = lanternes[i].GetComponentInParent<LanterneLumiere>();
+        }
         PhaseCourante = phaseDepart;
         TempsPhase = fige ? Duree(phaseDepart) * 0.5f : 0f;
         Appliquer();
@@ -165,9 +171,12 @@ public class CycleJourNuit : MonoBehaviour
             lumiereNyxessa.color = VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Coeur, new Color(0.62f, 0.91f, 0.44f));
         }
         if (lanternes != null)
-            foreach (Light l in lanternes)
+            for (int i = 0; i < lanternes.Length; i++)
             {
+                Light l = lanternes[i];
                 if (l == null) continue;
+                LanterneLumiere ll = pilotes != null ? pilotes[i] : null;
+                if (ll != null) { ll.allumage = allume; ll.intensite = intensiteLanterne; continue; }   // couleur, scintillement ±10 %, vitres
                 l.enabled = allume > 0.01f;
                 l.intensity = intensiteLanterne * allume * (0.92f + 0.08f * Mathf.PerlinNoise(Time.time * 3f, l.GetInstanceID() * 0.01f));
             }

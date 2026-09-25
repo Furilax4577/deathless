@@ -98,6 +98,15 @@ public class KayKitImportSettings : AssetPostprocessor
         if (!IsKayKit(assetPath) || IsAnimationFile(assetPath))
             return null;
 
+        // Medieval Builder Pack : pas de texture, les couleurs sont dans les sommets → matériau partagé à couleurs par
+        // sommet (shader Deathless/VertexColorLit), un seul pour tout le pack.
+        if (assetPath.Contains("/KayKit_Medieval_Builder_Pack"))
+        {
+            Material vc = AssetDatabase.LoadAssetAtPath<Material>(MaterialsRoot + "KayKit_Builder.mat");
+            if (vc == null) Debug.LogWarning("KayKit : matériau Assets/Art/Materials/KayKit_Builder.mat absent (" + assetPath + ").");
+            return vc;
+        }
+
         Texture texture = material.mainTexture;
         // Texture d'atlas introuvable à côté du FBX (ex. forest_texture.png du pack Forest : son GUID est déjà pris par la
         // copie de Assets/VFX/GemmeNyxessa/, elle n'est donc pas recopiée dans le pack) : on retrouve le matériau partagé
