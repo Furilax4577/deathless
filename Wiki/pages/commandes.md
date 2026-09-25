@@ -24,6 +24,10 @@ Le jeu se joue à la manette Xbox ou PlayStation, ou au clavier et à la souris.
 
 Au clavier, les touches sont données sur une disposition AZERTY. Le déplacement se fait avec ZQSD et la caméra avec la souris.
 
+## Combinaisons à la manette {décidé}
+
+Les combinaisons LB + RB et L3 + R3 utilisent un **court délai** : quand on appuie sur LB, le jeu attend environ 0,1 s {à équilibrer}. Si RB arrive dans ce délai, c'est la compétence 3 ; sinon, la compétence 1 part. Même règle pour L3 et R3 face à l'ultime. Aucune compétence ne part par erreur, et le délai reste imperceptible.
+
 ## Dans les menus {à confirmer}
 
 | Action | Xbox | PlayStation | Clavier et souris |
