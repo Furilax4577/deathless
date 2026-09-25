@@ -20,7 +20,8 @@ Un **éclat de Nyx** est un morceau de la force de Nyxessa. Celui qui en porte u
 
 - Les **élites** portent un éclat : d'où leurs yeux verts, leur aura de gemmes vertes et leur force accrue.
 - Sur Nyxar, l'éclat brille et c'est son **point faible**.
-- Les éclats sont-ils aussi une ressource que les héros ramassent et utilisent ? {à confirmer}
+- **Pas une ressource** pour le moment {décidé} : les héros ne ramassent ni n'utilisent d'éclats. Les éclats expliquent la force de Nyxar et des élites.
+- Piste : le **sorcier** pourrait porter un éclat quand il crée le lien avec la relique (canalisation, voir [Nyxessa](nyxessa.md)) {à confirmer}.
 
 ## Ce que ça change dans le jeu {dev}
 

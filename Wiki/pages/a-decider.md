@@ -7,5 +7,5 @@ Ce qui reste ouvert. Une ligne quitte cette page quand la règle est tranchée e
 | Nyxessa | Équilibrage des valeurs en jeu | [Nyxessa](nyxessa.md) |
 | Classes | Valeurs chiffrées | [Classes](classes.md) |
 | Ennemis | Vie, vitesse, dégâts et or rapporté par type | [Ennemis](ennemis.md) |
-| Univers | Origine de Nyxessa, comment elle a échappé au Nécromancien, rôle du donjon, éclats de Nyx comme ressource des héros | [L'univers](univers.md) |
+| Univers | Origine de Nyxessa, comment elle a échappé au Nécromancien, rôle du donjon, éclat du sorcier pendant la canalisation | [L'univers](univers.md) |
 | Progression | Améliorations, points de compétence, économie | à créer |
