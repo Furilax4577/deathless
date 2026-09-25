@@ -70,8 +70,8 @@ Points de vie, dégâts et cadence : {à équilibrer}.
 - C'est le même missile que celui de Nyxessa, à taille normale ; celui de Nyxessa est une fois et demie plus gros {décidé}.
 - Modèle : le squelette mage KayKit {décidé}. Sa vie et son comportement sont {à confirmer}.
 
-## Comportement et détection {à confirmer}
+## Comportement et détection
 
-- Cible prioritaire : Nyxessa, les joueurs, ou le plus proche.
-- Détection des joueurs, en particulier de l'assassin en mode furtif, qui n'est repéré que de près.
+- **Cible prioritaire** {décidé} : les squelettes marchent vers Nyxessa. Un joueur qui les frappe, ou qui passe à moins de 4 m, devient leur cible pendant quelques secondes, puis ils reprennent leur route. Le voleur fait exception : il chasse les joueurs isolés. Distance et durée {à équilibrer}.
+- **Détection de l'assassin furtif** {décidé} : cône de vue d'environ 6 m devant le squelette, 1,5 m dans son dos. Voir [Classes](classes.md).
 - Vie, vitesse, dégâts et or rapporté par type. Les calculs de Nyxessa supposent un sbire à 100 points de vie {à équilibrer}.

@@ -18,9 +18,9 @@ Deux règles tranchées : **le feu est couleur feu**, et **le vert est réservé
 
 La **zone d'apparition** des squelettes est verte elle aussi, dans la famille de Nyxessa {décidé} : les squelettes sont issus de sa force (voir [L'univers](univers.md)).
 
-### Nouveaux thèmes {à confirmer}
+### Thèmes des compétences {décidé}
 
-Proposés pour les nouvelles compétences, en cours de réalisation :
+Validés le 25/09/2026 pour les nouvelles compétences :
 
 | Thème | Intention | Effets |
 |---|---|---|
