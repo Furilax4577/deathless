@@ -28,6 +28,13 @@ Validés le 25/09/2026 pour les nouvelles compétences :
 | Chasse | Verts forêt et ocres, distincts du vert Nyxessa | Marqueur de zone de la Nuée de flèches |
 | Ombre | Violets sombres | Mode furtif et fumée de l'assassin |
 
+## Ambiance de nuit {décidé}
+
+- La nuit est **plus sombre** et tirée vers le **violet**, sans perdre en lisibilité : on distingue toujours le héros, les squelettes et le sol.
+- Une **légère brume au sol** couvre la forêt et les bords du village, sans masquer les squelettes.
+- Le vert de Nyxessa et du portail ressort sur ce fond violet ; les lanternes restent chaudes.
+- Rendu : {à confirmer}.
+
 ## Fin des effets {décidé}
 
 Les effets disparaissent par la taille, jamais par transparence. La fumée de la boule de feu, par exemple, est faite de bouffées à facettes gris charbon qui montent, s'élargissent puis rapetissent jusqu'à disparaître.
