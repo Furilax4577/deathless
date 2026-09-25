@@ -1,205 +1,2175 @@
 [
-  {"id": "kenney_rpg_handlecoins", "nom": "Or — pièces", "categorie": "Interface", "usage": "De l'or entre dans la caisse commune ou en sort (palier de Nyxessa acheté).", "fichier": "Kenney/RPGAudio/handleCoins.ogg", "variantes": ["Kenney/RPGAudio/handleCoins.ogg", "Kenney/RPGAudio/handleCoins2.ogg"], "source": "Kenney, RPG Audio", "licence": "CC0", "statut": "utilise"},
-  {"id": "ui_clic", "nom": "Interface — clic de validation", "categorie": "Interface", "usage": "Valider un bouton dans un menu (A, Croix, Entrée ou clic).", "fichier": "Kenney/InterfaceSounds/click_002.ogg", "variantes": ["Kenney/InterfaceSounds/click_002.ogg", "Kenney/InterfaceSounds/click_003.ogg"], "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "utilise"},
-  {"id": "ui_survol", "nom": "Interface — survol d'un bouton", "categorie": "Interface", "usage": "La sélection passe sur un bouton, à la souris ou à la manette.", "fichier": "Kenney/InterfaceSounds/tick_002.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "utilise"},
-  {"id": "ui_retour", "nom": "Interface — retour", "categorie": "Interface", "usage": "Revenir à l'écran précédent (B, Rond, Échap).", "fichier": "Kenney/InterfaceSounds/back_001.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "utilise"},
-  {"id": "ui_refus", "nom": "Interface — action refusée", "categorie": "Interface", "usage": "Action impossible : vote « prêt » inactif, or insuffisant…", "fichier": "Kenney/InterfaceSounds/error_004.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "utilise"},
-  {"id": "ui_confirmation", "nom": "Interface — confirmation", "categorie": "Interface", "usage": "Action acceptée : palier de Nyxessa acheté, choix de classe validé.", "fichier": "Kenney/InterfaceSounds/confirmation_002.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "utilise"},
-  {"id": "ui_decompte", "nom": "Interface — décompte", "categorie": "Interface", "usage": "Chaque seconde du compte à rebours de 5 s quand tous les joueurs sont prêts.", "fichier": "Kenney/InterfaceSounds/tick_001.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "utilise"},
-  {"id": "player_hurt", "nom": "Joueur — touché", "categorie": "Joueurs", "usage": "Un joueur perd des points de vie.", "fichier": "Relic/player_hurt_1.wav", "variantes": ["Relic/player_hurt_1.wav", "Relic/player_hurt_2.wav", "Relic/player_hurt_3.wav"], "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "player_death", "nom": "Joueur — mort", "categorie": "Joueurs", "usage": "Mort d'un joueur.", "fichier": "Relic/player_death.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "respawn", "nom": "Joueur — réapparition", "categorie": "Joueurs", "usage": "Un joueur mort réapparaît, tant que Nyxessa tient.", "fichier": "Relic/respawn.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "dodge", "nom": "Joueur — esquive, roulade", "categorie": "Joueurs", "usage": "Esquive (B, Rond, Ctrl).", "fichier": "Relic/dodge_1.wav", "variantes": ["Relic/dodge_1.wav", "Relic/dodge_2.wav"], "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "land", "nom": "Joueur — réception d'un saut", "categorie": "Joueurs", "usage": "Le joueur retombe au sol après un saut.", "fichier": "Relic/land_1.wav", "variantes": ["Relic/land_1.wav", "Relic/land_2.wav", "Relic/land_3.wav"], "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "kenney_rpg_footstep", "nom": "Joueur — pas", "categorie": "Joueurs", "usage": "Pas des joueurs au sol, un par foulée (plus discrets en marche discrète).", "fichier": "Kenney/RPGAudio/footstep00.ogg", "variantes": ["Kenney/RPGAudio/footstep00.ogg", "Kenney/RPGAudio/footstep01.ogg", "Kenney/RPGAudio/footstep02.ogg", "Kenney/RPGAudio/footstep03.ogg", "Kenney/RPGAudio/footstep04.ogg", "Kenney/RPGAudio/footstep05.ogg", "Kenney/RPGAudio/footstep06.ogg", "Kenney/RPGAudio/footstep07.ogg", "Kenney/RPGAudio/footstep08.ogg", "Kenney/RPGAudio/footstep09.ogg"], "source": "Kenney, RPG Audio", "licence": "CC0", "statut": "utilise"},
-  {"id": "kenney_rpg_handlesmallleather", "nom": "Potion — sortie de la sacoche", "categorie": "Joueurs", "usage": "Boire une potion (bruit de cuir, emprunté par Relic).", "fichier": "Kenney/RPGAudio/handleSmallLeather.ogg", "variantes": ["Kenney/RPGAudio/handleSmallLeather.ogg", "Kenney/RPGAudio/handleSmallLeather2.ogg"], "source": "Kenney, RPG Audio", "licence": "CC0", "statut": "utilise"},
-  {"id": "water_step", "nom": "Joueur — pas dans l'eau", "categorie": "Joueurs", "usage": "Pas dans une salle inondée de Relic. Piste : eau du donjon ou du village.", "fichier": "Relic/water_step_1.wav", "variantes": ["Relic/water_step_1.wav", "Relic/water_step_2.wav", "Relic/water_step_3.wav"], "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "disponible"},
-  {"id": "bow_shot_v2", "nom": "Arc — tir", "categorie": "Armes", "usage": "Tir d'une flèche du rôdeur, arc pas complètement bandé (son 3D au départ de la flèche).", "fichier": "Relic/bow_shot_v2_1.wav", "variantes": ["Relic/bow_shot_v2_1.wav", "Relic/bow_shot_v2_2.wav", "Relic/bow_shot_v2_3.wav"], "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "bow_shot_charged", "nom": "Arc — tir chargé", "categorie": "Armes", "usage": "Flèche tirée arc bandé : un tir plus précis rapporte davantage.", "fichier": "Relic/bow_shot_charged_1.wav", "variantes": ["Relic/bow_shot_charged_1.wav", "Relic/bow_shot_charged_2.wav"], "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "crossbow_shot", "nom": "Arbalète — tir", "categorie": "Armes", "usage": "Tir d'un carreau de l'arbalète de l'assassin.", "fichier": "Relic/crossbow_shot_1.wav", "variantes": ["Relic/crossbow_shot_1.wav", "Relic/crossbow_shot_2.wav", "Relic/crossbow_shot_3.wav"], "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "arrow_impact", "nom": "Flèche — impact", "categorie": "Armes", "usage": "Flèche ou carreau qui se fiche dans un ennemi, un joueur ou le décor.", "fichier": "Relic/arrow_impact_1.wav", "variantes": ["Relic/arrow_impact_1.wav", "Relic/arrow_impact_2.wav", "Relic/arrow_impact_3.wav"], "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "kenney_rpg_chop", "nom": "Hache — coup", "categorie": "Armes", "usage": "Coup de hache du viking (attaque principale).", "fichier": "Kenney/RPGAudio/chop.ogg", "source": "Kenney, RPG Audio", "licence": "CC0", "statut": "utilise"},
-  {"id": "kenney_rpg_knifeslice", "nom": "Lame — coup", "categorie": "Armes", "usage": "Coup d'épée du paladin ou de dague de l'assassin (attaque principale).", "fichier": "Kenney/RPGAudio/knifeSlice.ogg", "variantes": ["Kenney/RPGAudio/knifeSlice.ogg", "Kenney/RPGAudio/knifeSlice2.ogg"], "source": "Kenney, RPG Audio", "licence": "CC0", "statut": "utilise"},
-  {"id": "bow_shot", "nom": "Arc — tir (première version)", "categorie": "Armes", "usage": "Première version du tir d'arc, remplacée par « Arc — tir » dans Relic, gardée pour comparer.", "fichier": "Relic/bow_shot_1.wav", "variantes": ["Relic/bow_shot_1.wav", "Relic/bow_shot_2.wav", "Relic/bow_shot_3.wav"], "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "disponible"},
-  {"id": "fireball_cast", "nom": "Boule de feu — lancer", "categorie": "Sorts du mage", "usage": "Attaque de base du mage : la boule de feu part du bâton.", "fichier": "Relic/fireball_cast.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "fireball_flight_loop", "nom": "Boule de feu — vol (boucle)", "categorie": "Sorts du mage", "usage": "Vol de la boule de feu, boucle 3D attachée au projectile.", "fichier": "Relic/fireball_flight_loop.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "fireball_explosion", "nom": "Boule de feu — explosion", "categorie": "Sorts du mage", "usage": "Explosion de la boule de feu à l'impact.", "fichier": "Relic/fireball_explosion.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "mage_flame_cone_loop", "nom": "Cône de flammes (boucle)", "categorie": "Sorts du mage", "usage": "Cône de flammes maintenu devant le mage, tant qu'il dure.", "fichier": "Relic/mage_flame_cone_loop.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "mage_ignite", "nom": "Mage — embrasement", "categorie": "Sorts du mage", "usage": "Embrasement de Relic (le feu prend d'un coup, 1,4 s). Piste : départ de la brûlure ou compétence du mage.", "fichier": "Relic/mage_ignite.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "disponible"},
-  {"id": "mage_avatar", "nom": "Mage — avatar du feu", "categorie": "Sorts du mage", "usage": "Avatar du feu de Relic (grondement puis colonne de flammes, 2,8 s). Piste : ultime du mage, encore à confirmer.", "fichier": "Relic/mage_avatar.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "disponible"},
-  {"id": "shield_block", "nom": "Bouclier — coup bloqué", "categorie": "Paladin", "usage": "Coup encaissé par la garde du paladin (attaque secondaire).", "fichier": "Relic/shield_block_1.wav", "variantes": ["Relic/shield_block_1.wav", "Relic/shield_block_2.wav", "Relic/shield_block_3.wav"], "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "parry", "nom": "Bouclier — parade", "categorie": "Paladin", "usage": "Garde déclenchée au bon moment face à un coup : la parade (joué par-dessus le blocage).", "fichier": "Relic/parry.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "knight_charge", "nom": "Paladin — charge bélier", "categorie": "Paladin", "usage": "Le paladin s'élance d'environ 7 m sous sa tête de bélier et percute à l'arrivée.", "fichier": "Relic/knight_charge.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "knight_heal", "nom": "Paladin — soin sur soi", "categorie": "Paladin", "usage": "Aura de croix vertes qui montent autour du paladin.", "fichier": "Relic/knight_heal.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "knight_bash", "nom": "Paladin — poussée au bouclier", "categorie": "Paladin", "usage": "Poussée au bouclier (compétence encore à confirmer dans Deathless).", "fichier": "Relic/knight_bash.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "disponible"},
-  {"id": "viking_roar", "nom": "Viking — rugissement", "categorie": "Viking", "usage": "Rugissement : le crâne de barbare en gemmes rouges surgit et rugit.", "fichier": "Relic/viking_roar_1.wav", "variantes": ["Relic/viking_roar_1.wav", "Relic/viking_roar_2.wav"], "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "viking_leap_land", "nom": "Viking — saut percutant, impact", "categorie": "Viking", "usage": "Le viking retombe et frappe le sol, une onde de terre part du point d'impact.", "fichier": "Relic/viking_leap_land.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "whirlwind_loop", "nom": "Viking — attaque tournante (boucle)", "categorie": "Viking", "usage": "Attaque tournante, hache tendue : boucle tant que le viking tourne.", "fichier": "Relic/whirlwind_loop.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "arrow_rain", "nom": "Rôdeur — nuée de flèches", "categorie": "Assassin et rôdeur", "usage": "Compétence 1 du rôdeur : sifflements qui descendent puis pluie de flèches sur la zone ciblée.", "fichier": "Relic/arrow_rain.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "smoke_bomb", "nom": "Grenade fumigène — impact", "categorie": "Assassin et rôdeur", "usage": "La grenade de l'assassin éclate et le nuage de fumée s'étale.", "fichier": "Relic/smoke_bomb.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "ranger_focus", "nom": "Rôdeur — concentration", "categorie": "Assassin et rôdeur", "usage": "Concentration de Relic (inspiration retenue, arc qui se tend). Piste : base pour « Arc — chargé à fond » ou « Arc — bander ».", "fichier": "Relic/ranger_focus.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "disponible"},
-  {"id": "portal_open", "nom": "Portail — ouverture", "categorie": "Nyxessa et portail", "usage": "À l'aube, le portail s'ouvre à l'arrivée de la charge de Nyxessa.", "fichier": "Relic/portal_open.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "portal_close", "nom": "Portail — fermeture", "categorie": "Nyxessa et portail", "usage": "Au crépuscule, le portail se referme et disparaît.", "fichier": "Relic/portal_close.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "portal_hum_loop", "nom": "Portail — bourdonnement (boucle)", "categorie": "Nyxessa et portail", "usage": "Portail ouvert, audible de près seulement (boucle 3D, environ 12 m).", "fichier": "Relic/portal_hum_loop.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "portal_pass", "nom": "Portail — entrée d'un joueur", "categorie": "Nyxessa et portail", "usage": "Un joueur entre dans le portail : son corps se défait en gemmes aspirées (1,1 s).", "fichier": "Relic/portal_pass.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "relic_pulse", "nom": "Nyxessa — impulsion", "categorie": "Nyxessa et portail", "usage": "Le cristal pulse : tir d'un missile magique, et ceinture qui s'élargit à l'ouverture du portail.", "fichier": "Relic/relic_pulse.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "relic_hit", "nom": "Nyxessa — frappée", "categorie": "Nyxessa et portail", "usage": "Un ennemi frappe Nyxessa.", "fichier": "Relic/relic_hit_1.wav", "variantes": ["Relic/relic_hit_1.wav", "Relic/relic_hit_2.wav"], "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "shield_raise", "nom": "Bouclier de Nyxessa — levée", "categorie": "Nyxessa et portail", "usage": "Le bouclier de gemmes se lève après l'incantation du sorcier.", "fichier": "Relic/shield_raise.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "shield_hit", "nom": "Bouclier de Nyxessa — coup encaissé", "categorie": "Nyxessa et portail", "usage": "Un coup frappe le bouclier (qui renvoie des dégâts à l'attaquant).", "fichier": "Relic/shield_hit_1.wav", "variantes": ["Relic/shield_hit_1.wav", "Relic/shield_hit_2.wav", "Relic/shield_hit_3.wav"], "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "shield_break", "nom": "Bouclier de Nyxessa — rupture", "categorie": "Nyxessa et portail", "usage": "Le bouclier cède.", "fichier": "Relic/shield_break.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "skull_flight_loop", "nom": "Missile en crâne — vol (boucle)", "categorie": "Nyxessa et portail", "usage": "Vol du missile en crâne de Nyxessa et de celui du nécromancien (boucle 3D sur le missile).", "fichier": "Relic/skull_flight_loop.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "skull_explosion", "nom": "Missile en crâne — éclatement", "categorie": "Nyxessa et portail", "usage": "Le missile en crâne éclate à l'impact (Nyxessa ou nécromancien).", "fichier": "Relic/skull_explosion.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "nyxessa_alerte", "nom": "Nyxessa — alerte, relique attaquée", "categorie": "Nyxessa et portail", "usage": "Alerte au HUD quand Nyxessa ou son bouclier sont frappés.", "fichier": "Kenney/InterfaceSounds/error_008.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "utilise"},
-  {"id": "skeleton_spawn", "nom": "Squelette — sortie de terre", "categorie": "Ennemis", "usage": "Un squelette remonte du sol dans une clairière, avec sa gerbe de mottes.", "fichier": "Relic/skeleton_spawn_1.wav", "variantes": ["Relic/skeleton_spawn_1.wav", "Relic/skeleton_spawn_2.wav"], "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "skeleton_hit", "nom": "Squelette — touché", "categorie": "Ennemis", "usage": "Un squelette reçoit un coup.", "fichier": "Relic/skeleton_hit_1.wav", "variantes": ["Relic/skeleton_hit_1.wav", "Relic/skeleton_hit_2.wav", "Relic/skeleton_hit_3.wav"], "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "skeleton_death", "nom": "Squelette — mort", "categorie": "Ennemis", "usage": "Un squelette vaincu se désintègre.", "fichier": "Relic/skeleton_death_1.wav", "variantes": ["Relic/skeleton_death_1.wav", "Relic/skeleton_death_2.wav", "Relic/skeleton_death_3.wav"], "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "dawn_vaporize", "nom": "Squelette — désintégration à l'aube", "categorie": "Ennemis", "usage": "À l'aube, les squelettes encore debout se désintègrent.", "fichier": "Relic/dawn_vaporize_1.wav", "variantes": ["Relic/dawn_vaporize_1.wav", "Relic/dawn_vaporize_2.wav"], "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "kenney_rpg_drawknife", "nom": "Squelette — préparation d'un coup", "categorie": "Ennemis", "usage": "Un squelette arme son coup de mêlée : signal pour lever la garde ou parer.", "fichier": "Kenney/RPGAudio/drawKnife1.ogg", "variantes": ["Kenney/RPGAudio/drawKnife1.ogg", "Kenney/RPGAudio/drawKnife2.ogg", "Kenney/RPGAudio/drawKnife3.ogg"], "source": "Kenney, RPG Audio", "licence": "CC0", "statut": "utilise"},
-  {"id": "skeleton_bow_shot", "nom": "Squelette archer — tir", "categorie": "Ennemis", "usage": "Tir d'un archer squelette de Relic. Piste : si un type de squelette tire à l'arc.", "fichier": "Relic/skeleton_bow_shot_1.wav", "variantes": ["Relic/skeleton_bow_shot_1.wav", "Relic/skeleton_bow_shot_2.wav", "Relic/skeleton_bow_shot_3.wav"], "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "disponible"},
-  {"id": "necro_summon", "nom": "Nécromancien — invocation", "categorie": "Ennemis", "usage": "Incantation d'invocation du nécromancien de Relic (3 s). Comportement du nécromancien à confirmer.", "fichier": "Relic/necro_summon.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "disponible"},
-  {"id": "necro_heal_loop", "nom": "Nécromancien — soin en canal (boucle)", "categorie": "Ennemis", "usage": "Soin en canal du nécromancien de Relic. Comportement du nécromancien à confirmer.", "fichier": "Relic/necro_heal_loop.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "disponible"},
-  {"id": "nightfall", "nom": "Tombée de la nuit", "categorie": "Jour et nuit", "usage": "Crépuscule : annonce globale (2D) de la nuit et des clairières actives.", "fichier": "Relic/nightfall.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "dawn", "nom": "L'aube", "categorie": "Jour et nuit", "usage": "Aube : annonce globale (2D) du retour du jour.", "fichier": "Relic/dawn.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "nuit_vague", "nom": "Nuit — nouvelle vague", "categorie": "Jour et nuit", "usage": "Une vague de squelettes est lancée (0, 40 et 80 s de la nuit).", "fichier": "Kenney/InterfaceSounds/bong_001.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "utilise"},
-  {"id": "musique_dehors_jour", "nom": "Musique — village, le jour", "categorie": "Musique", "usage": "Village le jour, menu principal, écran de score.", "fichier": "Relic/Musique/musique_dehors_jour.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "musique_dehors_nuit", "nom": "Musique — village, la nuit", "categorie": "Musique", "usage": "Village la nuit, pendant les vagues.", "fichier": "Relic/Musique/musique_dehors_nuit.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "musique_dedans_donjon", "nom": "Musique — donjon", "categorie": "Musique", "usage": "Exploration du donjon.", "fichier": "Relic/Musique/musique_dedans_donjon.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "utilise"},
-  {"id": "incompetech_village_consort", "nom": "Musique — « Village Consort » (Kevin MacLeod)", "categorie": "Musique", "usage": "Ancienne musique du village de jour et du menu de Relic, remplacée par les musiques générées.", "fichier": "Incompetech/Village Consort.mp3", "source": "Kevin MacLeod (incompetech.com)", "licence": "CC BY 4.0 : crédit obligatoire", "statut": "disponible"},
-  {"id": "incompetech_crunk_knight", "nom": "Musique — « Crunk Knight » (Kevin MacLeod)", "categorie": "Musique", "usage": "Ancienne musique des vagues de Relic, remplacée par les musiques générées.", "fichier": "Incompetech/Crunk Knight.mp3", "source": "Kevin MacLeod (incompetech.com)", "licence": "CC BY 4.0 : crédit obligatoire", "statut": "disponible"},
-  {"id": "incompetech_myst_on_the_moor", "nom": "Musique — « Myst on the Moor » (Kevin MacLeod)", "categorie": "Musique", "usage": "Ancienne musique du donjon de Relic, remplacée par les musiques générées.", "fichier": "Incompetech/Myst on the Moor.mp3", "source": "Kevin MacLeod (incompetech.com)", "licence": "CC BY 4.0 : crédit obligatoire", "statut": "disponible"},
-  {"id": "chest_open", "nom": "Coffre — ouverture", "categorie": "Donjon et défenses", "usage": "Couvercle d'un coffre du donjon de Relic. Piste : butin du donjon.", "fichier": "Relic/chest_open.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "disponible"},
-  {"id": "crystal_light", "nom": "Cristal de passage — allumage", "categorie": "Donjon et défenses", "usage": "Cristal de passage qui s'allume dans le donjon de Relic.", "fichier": "Relic/crystal_light_1.wav", "variantes": ["Relic/crystal_light_1.wav", "Relic/crystal_light_2.wav"], "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "disponible"},
-  {"id": "trap_spikes", "nom": "Piège à piques", "categorie": "Donjon et défenses", "usage": "Piège à piques du donjon de Relic.", "fichier": "Relic/trap_spikes.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "disponible"},
-  {"id": "trap_flames", "nom": "Grille à flammes", "categorie": "Donjon et défenses", "usage": "Grille à flammes du donjon de Relic.", "fichier": "Relic/trap_flames.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "disponible"},
-  {"id": "structure_place", "nom": "Tour ou mur — pose", "categorie": "Donjon et défenses", "usage": "Tour ou mur posé (Relic). Les tours ont été retirées du village de Deathless.", "fichier": "Relic/structure_place.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "disponible"},
-  {"id": "structure_hit", "nom": "Tour ou mur — frappé", "categorie": "Donjon et défenses", "usage": "Tour ou mur frappé (Relic).", "fichier": "Relic/structure_hit_1.wav", "variantes": ["Relic/structure_hit_1.wav", "Relic/structure_hit_2.wav"], "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "disponible"},
-  {"id": "structure_destroyed", "nom": "Tour ou mur — détruit", "categorie": "Donjon et défenses", "usage": "Tour ou mur détruit (Relic).", "fichier": "Relic/structure_destroyed.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "disponible"},
-  {"id": "tower_shot", "nom": "Tour — tir", "categorie": "Donjon et défenses", "usage": "Tir d'une tour de Relic.", "fichier": "Relic/tower_shot_1.wav", "variantes": ["Relic/tower_shot_1.wav", "Relic/tower_shot_2.wav"], "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "disponible"},
-  {"id": "turret_turn_loop", "nom": "Tourelle — pivot (boucle)", "categorie": "Donjon et défenses", "usage": "Tête de tourelle qui pivote (Relic).", "fichier": "Relic/turret_turn_loop.wav", "source": "Relic (généré en Python pour le projet)", "licence": "Aucune : créé pour le projet", "statut": "disponible"},
-  {"id": "kenney_rpg_belthandle", "nom": "Ceinture — manipulation", "categorie": "Kenney divers : objets", "usage": "", "fichier": "Kenney/RPGAudio/beltHandle1.ogg", "variantes": ["Kenney/RPGAudio/beltHandle1.ogg", "Kenney/RPGAudio/beltHandle2.ogg"], "source": "Kenney, RPG Audio", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_rpg_bookclose", "nom": "Livre — fermeture", "categorie": "Kenney divers : objets", "usage": "Piste : fermeture du menu du personnage.", "fichier": "Kenney/RPGAudio/bookClose.ogg", "source": "Kenney, RPG Audio", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_rpg_bookopen", "nom": "Livre — ouverture", "categorie": "Kenney divers : objets", "usage": "Piste : ouverture du menu du personnage.", "fichier": "Kenney/RPGAudio/bookOpen.ogg", "source": "Kenney, RPG Audio", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_rpg_bookflip", "nom": "Livre — page tournée", "categorie": "Kenney divers : objets", "usage": "Piste : changer d'onglet dans le menu du personnage.", "fichier": "Kenney/RPGAudio/bookFlip1.ogg", "variantes": ["Kenney/RPGAudio/bookFlip1.ogg", "Kenney/RPGAudio/bookFlip2.ogg", "Kenney/RPGAudio/bookFlip3.ogg"], "source": "Kenney, RPG Audio", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_rpg_bookplace", "nom": "Livre — posé", "categorie": "Kenney divers : objets", "usage": "", "fichier": "Kenney/RPGAudio/bookPlace1.ogg", "variantes": ["Kenney/RPGAudio/bookPlace1.ogg", "Kenney/RPGAudio/bookPlace2.ogg", "Kenney/RPGAudio/bookPlace3.ogg"], "source": "Kenney, RPG Audio", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_rpg_cloth", "nom": "Tissu — froissement", "categorie": "Kenney divers : objets", "usage": "", "fichier": "Kenney/RPGAudio/cloth1.ogg", "variantes": ["Kenney/RPGAudio/cloth1.ogg", "Kenney/RPGAudio/cloth2.ogg", "Kenney/RPGAudio/cloth3.ogg", "Kenney/RPGAudio/cloth4.ogg"], "source": "Kenney, RPG Audio", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_rpg_clothbelt", "nom": "Tissu et ceinture", "categorie": "Kenney divers : objets", "usage": "", "fichier": "Kenney/RPGAudio/clothBelt.ogg", "variantes": ["Kenney/RPGAudio/clothBelt.ogg", "Kenney/RPGAudio/clothBelt2.ogg"], "source": "Kenney, RPG Audio", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_rpg_creak", "nom": "Bois — grincement", "categorie": "Kenney divers : objets", "usage": "", "fichier": "Kenney/RPGAudio/creak1.ogg", "variantes": ["Kenney/RPGAudio/creak1.ogg", "Kenney/RPGAudio/creak2.ogg", "Kenney/RPGAudio/creak3.ogg"], "source": "Kenney, RPG Audio", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_rpg_doorclose", "nom": "Porte — fermeture", "categorie": "Kenney divers : objets", "usage": "Piste : portes des maisons ou du donjon.", "fichier": "Kenney/RPGAudio/doorClose_1.ogg", "variantes": ["Kenney/RPGAudio/doorClose_1.ogg", "Kenney/RPGAudio/doorClose_2.ogg", "Kenney/RPGAudio/doorClose_3.ogg", "Kenney/RPGAudio/doorClose_4.ogg"], "source": "Kenney, RPG Audio", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_rpg_dooropen", "nom": "Porte — ouverture", "categorie": "Kenney divers : objets", "usage": "Piste : portes des maisons ou du donjon.", "fichier": "Kenney/RPGAudio/doorOpen_1.ogg", "variantes": ["Kenney/RPGAudio/doorOpen_1.ogg", "Kenney/RPGAudio/doorOpen_2.ogg"], "source": "Kenney, RPG Audio", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_rpg_dropleather", "nom": "Cuir — lâché au sol", "categorie": "Kenney divers : objets", "usage": "", "fichier": "Kenney/RPGAudio/dropLeather.ogg", "source": "Kenney, RPG Audio", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_rpg_metalclick", "nom": "Métal — clic", "categorie": "Kenney divers : objets", "usage": "", "fichier": "Kenney/RPGAudio/metalClick.ogg", "source": "Kenney, RPG Audio", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_rpg_metallatch", "nom": "Métal — loquet", "categorie": "Kenney divers : objets", "usage": "", "fichier": "Kenney/RPGAudio/metalLatch.ogg", "source": "Kenney, RPG Audio", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_rpg_metalpot", "nom": "Métal — casserole heurtée", "categorie": "Kenney divers : objets", "usage": "", "fichier": "Kenney/RPGAudio/metalPot1.ogg", "variantes": ["Kenney/RPGAudio/metalPot1.ogg", "Kenney/RPGAudio/metalPot2.ogg", "Kenney/RPGAudio/metalPot3.ogg"], "source": "Kenney, RPG Audio", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_back_002", "nom": "Interface — retour (2)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/back_002.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_back_003", "nom": "Interface — retour (3)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/back_003.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_back_004", "nom": "Interface — retour (4)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/back_004.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_click_001", "nom": "Interface — clic (1)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/click_001.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_click_004", "nom": "Interface — clic (4)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/click_004.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_click_005", "nom": "Interface — clic (5)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/click_005.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_close_001", "nom": "Interface — fermeture (1)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/close_001.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_close_002", "nom": "Interface — fermeture (2)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/close_002.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_close_003", "nom": "Interface — fermeture (3)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/close_003.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_close_004", "nom": "Interface — fermeture (4)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/close_004.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_confirmation_001", "nom": "Interface — confirmation (1)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/confirmation_001.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_confirmation_003", "nom": "Interface — confirmation (3)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/confirmation_003.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_confirmation_004", "nom": "Interface — confirmation (4)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/confirmation_004.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_drop_001", "nom": "Interface — objet lâché (1)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/drop_001.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_drop_002", "nom": "Interface — objet lâché (2)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/drop_002.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_drop_003", "nom": "Interface — objet lâché (3)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/drop_003.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_drop_004", "nom": "Interface — objet lâché (4)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/drop_004.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_error_001", "nom": "Interface — erreur (1)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/error_001.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_error_002", "nom": "Interface — erreur (2)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/error_002.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_error_003", "nom": "Interface — erreur (3)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/error_003.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_error_005", "nom": "Interface — erreur (5)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/error_005.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_error_006", "nom": "Interface — erreur (6)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/error_006.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_error_007", "nom": "Interface — erreur (7)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/error_007.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_glass_001", "nom": "Interface — verre (1)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/glass_001.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_glass_002", "nom": "Interface — verre (2)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/glass_002.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_glass_003", "nom": "Interface — verre (3)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/glass_003.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_glass_004", "nom": "Interface — verre (4)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/glass_004.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_glass_005", "nom": "Interface — verre (5)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/glass_005.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_glass_006", "nom": "Interface — verre (6)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/glass_006.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_glitch_001", "nom": "Interface — parasite numérique (1)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/glitch_001.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_glitch_002", "nom": "Interface — parasite numérique (2)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/glitch_002.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_glitch_003", "nom": "Interface — parasite numérique (3)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/glitch_003.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_glitch_004", "nom": "Interface — parasite numérique (4)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/glitch_004.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_maximize_001", "nom": "Interface — agrandissement (1)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/maximize_001.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_maximize_002", "nom": "Interface — agrandissement (2)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/maximize_002.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_maximize_003", "nom": "Interface — agrandissement (3)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/maximize_003.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_maximize_004", "nom": "Interface — agrandissement (4)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/maximize_004.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_maximize_005", "nom": "Interface — agrandissement (5)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/maximize_005.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_maximize_006", "nom": "Interface — agrandissement (6)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/maximize_006.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_maximize_007", "nom": "Interface — agrandissement (7)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/maximize_007.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_maximize_008", "nom": "Interface — agrandissement (8)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/maximize_008.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_maximize_009", "nom": "Interface — agrandissement (9)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/maximize_009.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_minimize_001", "nom": "Interface — réduction (1)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/minimize_001.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_minimize_002", "nom": "Interface — réduction (2)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/minimize_002.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_minimize_003", "nom": "Interface — réduction (3)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/minimize_003.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_minimize_004", "nom": "Interface — réduction (4)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/minimize_004.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_minimize_005", "nom": "Interface — réduction (5)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/minimize_005.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_minimize_006", "nom": "Interface — réduction (6)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/minimize_006.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_minimize_007", "nom": "Interface — réduction (7)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/minimize_007.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_minimize_008", "nom": "Interface — réduction (8)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/minimize_008.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_minimize_009", "nom": "Interface — réduction (9)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/minimize_009.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_open_001", "nom": "Interface — ouverture (1)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/open_001.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_open_002", "nom": "Interface — ouverture (2)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/open_002.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_open_003", "nom": "Interface — ouverture (3)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/open_003.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_open_004", "nom": "Interface — ouverture (4)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/open_004.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_pluck_001", "nom": "Interface — corde pincée (1)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/pluck_001.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_pluck_002", "nom": "Interface — corde pincée (2)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/pluck_002.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_question_001", "nom": "Interface — question (1)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/question_001.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_question_002", "nom": "Interface — question (2)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/question_002.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_question_003", "nom": "Interface — question (3)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/question_003.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_question_004", "nom": "Interface — question (4)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/question_004.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_scratch_001", "nom": "Interface — grattement (1)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/scratch_001.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_scratch_002", "nom": "Interface — grattement (2)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/scratch_002.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_scratch_003", "nom": "Interface — grattement (3)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/scratch_003.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_scratch_004", "nom": "Interface — grattement (4)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/scratch_004.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_scratch_005", "nom": "Interface — grattement (5)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/scratch_005.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_scroll_001", "nom": "Interface — défilement (1)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/scroll_001.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_scroll_002", "nom": "Interface — défilement (2)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/scroll_002.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_scroll_003", "nom": "Interface — défilement (3)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/scroll_003.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_scroll_004", "nom": "Interface — défilement (4)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/scroll_004.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_scroll_005", "nom": "Interface — défilement (5)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/scroll_005.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_select_001", "nom": "Interface — sélection (1)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/select_001.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_select_002", "nom": "Interface — sélection (2)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/select_002.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_select_003", "nom": "Interface — sélection (3)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/select_003.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_select_004", "nom": "Interface — sélection (4)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/select_004.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_select_005", "nom": "Interface — sélection (5)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/select_005.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_select_006", "nom": "Interface — sélection (6)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/select_006.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_select_007", "nom": "Interface — sélection (7)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/select_007.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_select_008", "nom": "Interface — sélection (8)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/select_008.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_switch_001", "nom": "Interface — commutateur (1)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/switch_001.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_switch_002", "nom": "Interface — commutateur (2)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/switch_002.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_switch_003", "nom": "Interface — commutateur (3)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/switch_003.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_switch_004", "nom": "Interface — commutateur (4)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/switch_004.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_switch_005", "nom": "Interface — commutateur (5)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/switch_005.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_switch_006", "nom": "Interface — commutateur (6)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/switch_006.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_switch_007", "nom": "Interface — commutateur (7)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/switch_007.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_tick_004", "nom": "Interface — tic (4)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/tick_004.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_toggle_001", "nom": "Interface — bascule (1)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/toggle_001.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_toggle_002", "nom": "Interface — bascule (2)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/toggle_002.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_toggle_003", "nom": "Interface — bascule (3)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/toggle_003.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "kenney_ui_toggle_004", "nom": "Interface — bascule (4)", "categorie": "Kenney divers : interface", "usage": "", "fichier": "Kenney/InterfaceSounds/toggle_004.ogg", "source": "Kenney, Interface Sounds", "licence": "CC0", "statut": "disponible"},
-  {"id": "vote_pret", "nom": "Vote « prêt » — joueur prêt, vote annulé", "categorie": "Interface", "usage": "Un joueur se déclare prêt (F1, Vue, pavé tactile) ou annule son vote ; le HUD affiche « Prêts 2 / 3 ».", "fichier": null, "source": "à créer", "licence": "", "statut": "a_creer"},
-  {"id": "coup_critique", "nom": "Coup critique", "categorie": "Armes", "usage": "Retour de tout coup critique : tir à la tête, coup dans le dos, coup furtif (thème Critique, bref et lumineux).", "fichier": null, "source": "à créer", "licence": "", "statut": "a_creer"},
-  {"id": "arbalete_recharge", "nom": "Arbalète — rechargement", "categorie": "Armes", "usage": "Gros temps de recharge de l'arbalète de l'assassin.", "fichier": null, "source": "à créer", "licence": "", "statut": "a_creer"},
-  {"id": "brulure", "nom": "Brûlure — crépitement", "categorie": "Sorts du mage", "usage": "Un ennemi touché par le feu brûle pendant un moment (piste : « Mage — embrasement », en plus court).", "fichier": null, "source": "à créer", "licence": "", "statut": "a_creer"},
-  {"id": "arc_bander", "nom": "Arc — bander", "categorie": "Assassin et rôdeur", "usage": "Maintenir l'attaque bande l'arc : tension qui monte avec la jauge de charge (piste : « Rôdeur — concentration »).", "fichier": null, "source": "à créer", "licence": "", "statut": "a_creer"},
-  {"id": "arc_charge_complete", "nom": "Arc — chargé à fond", "categorie": "Assassin et rôdeur", "usage": "L'arc est complètement bandé : la flèche brille brièvement, un son court l'annonce.", "fichier": null, "source": "à créer", "licence": "", "statut": "a_creer"},
-  {"id": "nuee_marqueur", "nom": "Nuée de flèches — marqueur au sol", "categorie": "Assassin et rôdeur", "usage": "Le marqueur de zone apparaît au sol avant la pluie de flèches.", "fichier": null, "source": "à créer", "licence": "", "statut": "a_creer"},
-  {"id": "assassin_furtif", "nom": "Assassin — passage en mode furtif", "categorie": "Assassin et rôdeur", "usage": "L'assassin passe en marche discrète et devient furtif (aussi en entrant dans la fumée).", "fichier": null, "source": "à créer", "licence": "", "statut": "a_creer"},
-  {"id": "assassin_repere", "nom": "Assassin — repéré", "categorie": "Assassin et rôdeur", "usage": "L'assassin sort du mode furtif : il court, attaque ou un ennemi le repère.", "fichier": null, "source": "à créer", "licence": "", "statut": "a_creer"},
-  {"id": "grenade_lancer", "nom": "Grenade fumigène — lancer", "categorie": "Assassin et rôdeur", "usage": "L'assassin lance la grenade (animation Throw) ; l'impact existe déjà.", "fichier": null, "source": "à créer", "licence": "", "statut": "a_creer"},
-  {"id": "nyxessa_charge_portail", "nom": "Nyxessa — charge vers le portail", "categorie": "Nyxessa et portail", "usage": "À l'aube, Nyxessa envoie une charge d'énergie en arc jusqu'au portail ; le portail s'ouvre à son arrivée (enchaîner sur « Portail — ouverture »).", "fichier": null, "source": "à créer", "licence": "", "statut": "a_creer"},
-  {"id": "nyxessa_retour_energie", "nom": "Nyxessa — retour de l'énergie", "categorie": "Nyxessa et portail", "usage": "Au crépuscule, l'énergie repart du portail vers Nyxessa, puis la ceinture se resserre et la lumière baisse.", "fichier": null, "source": "à créer", "licence": "", "statut": "a_creer"},
-  {"id": "portail_goutte", "nom": "Portail — goutte d'eau", "categorie": "Nyxessa et portail", "usage": "Anneaux du centre vers le bord quand un joueur entre, comme une goutte tombée dans l'eau ; chemin inverse quand il sort.", "fichier": null, "source": "à créer", "licence": "", "statut": "a_creer"},
-  {"id": "portail_arrivee", "nom": "Portail — arrivée d'un joueur", "categorie": "Nyxessa et portail", "usage": "Les gemmes jaillissent du portail de sortie et reconstituent le corps (village ou donjon).", "fichier": null, "source": "à créer", "licence": "", "statut": "a_creer"},
-  {"id": "nyxessa_onde_passage", "nom": "Nyxessa — onde de la ceinture", "categorie": "Nyxessa et portail", "usage": "Une onde fait le tour de la ceinture à chaque passage d'un joueur dans le portail.", "fichier": null, "source": "à créer", "licence": "", "statut": "a_creer"},
-  {"id": "nyxessa_rappel", "nom": "Nyxessa — rappel forcé", "categorie": "Nyxessa et portail", "usage": "Un joueur encore au donjon au crépuscule est ramené de force au village et perd tout ou partie de son butin.", "fichier": null, "source": "à créer", "licence": "", "statut": "a_creer"},
-  {"id": "nyxessa_palier", "nom": "Nyxessa — palier amélioré", "categorie": "Nyxessa et portail", "usage": "Nyxessa passe au palier suivant (missiles, part du butin sauvée).", "fichier": null, "source": "à créer", "licence": "", "statut": "a_creer"},
-  {"id": "sorcier_incantation", "nom": "Sorcier — incantation du bouclier", "categorie": "Nyxessa et portail", "usage": "Le villageois sorcier invoque le bouclier de Nyxessa, avant « Bouclier de Nyxessa — levée ».", "fichier": null, "source": "à créer", "licence": "", "statut": "a_creer"},
-  {"id": "nyxessa_destruction", "nom": "Nyxessa — destruction (défaite)", "categorie": "Nyxessa et portail", "usage": "Nyxessa est détruite : la partie est perdue, l'écran de score suit.", "fichier": null, "source": "à créer", "licence": "", "statut": "a_creer"},
-  {"id": "donjon_alerte_nuit", "nom": "Donjon — alerte avant la nuit", "categorie": "Jour et nuit", "usage": "15 s avant le crépuscule, les joueurs encore au donjon sont prévenus à l'écran et par un son.", "fichier": null, "source": "à créer", "licence": "", "statut": "a_creer"},
-  {"id": "partie_victoire", "nom": "Partie — victoire", "categorie": "Jour et nuit", "usage": "Aube après la nuit 12 et son boss final : la partie est gagnée.", "fichier": null, "source": "à créer", "licence": "", "statut": "a_creer"}
+  {
+    "id": "kenney_rpg_handlecoins",
+    "nom": "Or — pièces",
+    "categorie": "Interface",
+    "usage": "De l'or entre dans la caisse commune ou en sort (palier de Nyxessa acheté).",
+    "fichier": "Kenney/RPGAudio/handleCoins.ogg",
+    "variantes": [
+      "Kenney/RPGAudio/handleCoins.ogg",
+      "Kenney/RPGAudio/handleCoins2.ogg"
+    ],
+    "source": "Kenney, RPG Audio",
+    "licence": "CC0",
+    "statut": "utilise"
+  },
+  {
+    "id": "ui_clic",
+    "nom": "Interface — clic de validation",
+    "categorie": "Interface",
+    "usage": "Valider un bouton dans un menu (A, Croix, Entrée ou clic).",
+    "fichier": "Kenney/InterfaceSounds/click_002.ogg",
+    "variantes": [
+      "Kenney/InterfaceSounds/click_002.ogg",
+      "Kenney/InterfaceSounds/click_003.ogg"
+    ],
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "utilise"
+  },
+  {
+    "id": "ui_survol",
+    "nom": "Interface — survol d'un bouton",
+    "categorie": "Interface",
+    "usage": "La sélection passe sur un bouton, à la souris ou à la manette.",
+    "fichier": "Kenney/InterfaceSounds/tick_002.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "utilise"
+  },
+  {
+    "id": "ui_retour",
+    "nom": "Interface — retour",
+    "categorie": "Interface",
+    "usage": "Revenir à l'écran précédent (B, Rond, Échap).",
+    "fichier": "Kenney/InterfaceSounds/back_001.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "utilise"
+  },
+  {
+    "id": "ui_refus",
+    "nom": "Interface — action refusée",
+    "categorie": "Interface",
+    "usage": "Action impossible : vote « prêt » inactif, or insuffisant…",
+    "fichier": "Kenney/InterfaceSounds/error_004.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "utilise"
+  },
+  {
+    "id": "ui_confirmation",
+    "nom": "Interface — confirmation",
+    "categorie": "Interface",
+    "usage": "Action acceptée : palier de Nyxessa acheté, choix de classe validé.",
+    "fichier": "Kenney/InterfaceSounds/confirmation_002.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "utilise"
+  },
+  {
+    "id": "ui_decompte",
+    "nom": "Interface — décompte",
+    "categorie": "Interface",
+    "usage": "Chaque seconde du compte à rebours de 5 s quand tous les joueurs sont prêts.",
+    "fichier": "Kenney/InterfaceSounds/tick_001.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "utilise"
+  },
+  {
+    "id": "player_hurt",
+    "nom": "Joueur — touché",
+    "categorie": "Joueurs",
+    "usage": "Un joueur perd des points de vie.",
+    "fichier": "Relic/player_hurt_1.wav",
+    "variantes": [
+      "Relic/player_hurt_1.wav",
+      "Relic/player_hurt_2.wav",
+      "Relic/player_hurt_3.wav"
+    ],
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "player_death",
+    "nom": "Joueur — mort",
+    "categorie": "Joueurs",
+    "usage": "Mort d'un joueur.",
+    "fichier": "Relic/player_death.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "respawn",
+    "nom": "Joueur — réapparition",
+    "categorie": "Joueurs",
+    "usage": "Un joueur mort réapparaît, tant que Nyxessa tient.",
+    "fichier": "Relic/respawn.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "dodge",
+    "nom": "Joueur — esquive, roulade",
+    "categorie": "Joueurs",
+    "usage": "Esquive (B, Rond, Ctrl).",
+    "fichier": "Relic/dodge_1.wav",
+    "variantes": [
+      "Relic/dodge_1.wav",
+      "Relic/dodge_2.wav"
+    ],
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "land",
+    "nom": "Joueur — réception d'un saut",
+    "categorie": "Joueurs",
+    "usage": "Le joueur retombe au sol après un saut.",
+    "fichier": "Relic/land_1.wav",
+    "variantes": [
+      "Relic/land_1.wav",
+      "Relic/land_2.wav",
+      "Relic/land_3.wav"
+    ],
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "kenney_rpg_footstep",
+    "nom": "Joueur — pas",
+    "categorie": "Joueurs",
+    "usage": "Pas des joueurs au sol, un par foulée (plus discrets en marche discrète).",
+    "fichier": "Kenney/RPGAudio/footstep00.ogg",
+    "variantes": [
+      "Kenney/RPGAudio/footstep00.ogg",
+      "Kenney/RPGAudio/footstep01.ogg",
+      "Kenney/RPGAudio/footstep02.ogg",
+      "Kenney/RPGAudio/footstep03.ogg",
+      "Kenney/RPGAudio/footstep04.ogg",
+      "Kenney/RPGAudio/footstep05.ogg",
+      "Kenney/RPGAudio/footstep06.ogg",
+      "Kenney/RPGAudio/footstep07.ogg",
+      "Kenney/RPGAudio/footstep08.ogg",
+      "Kenney/RPGAudio/footstep09.ogg"
+    ],
+    "source": "Kenney, RPG Audio",
+    "licence": "CC0",
+    "statut": "utilise"
+  },
+  {
+    "id": "kenney_rpg_handlesmallleather",
+    "nom": "Potion — sortie de la sacoche",
+    "categorie": "Joueurs",
+    "usage": "Boire une potion (bruit de cuir, emprunté par Relic).",
+    "fichier": "Kenney/RPGAudio/handleSmallLeather.ogg",
+    "variantes": [
+      "Kenney/RPGAudio/handleSmallLeather.ogg",
+      "Kenney/RPGAudio/handleSmallLeather2.ogg"
+    ],
+    "source": "Kenney, RPG Audio",
+    "licence": "CC0",
+    "statut": "utilise"
+  },
+  {
+    "id": "water_step",
+    "nom": "Joueur — pas dans l'eau",
+    "categorie": "Joueurs",
+    "usage": "Pas dans une salle inondée de Relic. Piste : eau du donjon ou du village.",
+    "fichier": "Relic/water_step_1.wav",
+    "variantes": [
+      "Relic/water_step_1.wav",
+      "Relic/water_step_2.wav",
+      "Relic/water_step_3.wav"
+    ],
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "disponible"
+  },
+  {
+    "id": "bow_shot_v2",
+    "nom": "Arc — tir",
+    "categorie": "Armes",
+    "usage": "Tir d'une flèche du rôdeur, arc pas complètement bandé (son 3D au départ de la flèche).",
+    "fichier": "Relic/bow_shot_v2_1.wav",
+    "variantes": [
+      "Relic/bow_shot_v2_1.wav",
+      "Relic/bow_shot_v2_2.wav",
+      "Relic/bow_shot_v2_3.wav"
+    ],
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "bow_shot_charged",
+    "nom": "Arc — tir chargé",
+    "categorie": "Armes",
+    "usage": "Flèche tirée arc bandé : un tir plus précis rapporte davantage.",
+    "fichier": "Relic/bow_shot_charged_1.wav",
+    "variantes": [
+      "Relic/bow_shot_charged_1.wav",
+      "Relic/bow_shot_charged_2.wav"
+    ],
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "crossbow_shot",
+    "nom": "Arbalète — tir",
+    "categorie": "Armes",
+    "usage": "Tir d'un carreau de l'arbalète de l'assassin.",
+    "fichier": "Relic/crossbow_shot_1.wav",
+    "variantes": [
+      "Relic/crossbow_shot_1.wav",
+      "Relic/crossbow_shot_2.wav",
+      "Relic/crossbow_shot_3.wav"
+    ],
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "arrow_impact",
+    "nom": "Flèche — impact",
+    "categorie": "Armes",
+    "usage": "Flèche ou carreau qui se fiche dans un ennemi, un joueur ou le décor.",
+    "fichier": "Relic/arrow_impact_1.wav",
+    "variantes": [
+      "Relic/arrow_impact_1.wav",
+      "Relic/arrow_impact_2.wav",
+      "Relic/arrow_impact_3.wav"
+    ],
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "kenney_rpg_chop",
+    "nom": "Hache — coup",
+    "categorie": "Armes",
+    "usage": "Coup de hache du viking (attaque principale).",
+    "fichier": "Kenney/RPGAudio/chop.ogg",
+    "source": "Kenney, RPG Audio",
+    "licence": "CC0",
+    "statut": "utilise"
+  },
+  {
+    "id": "kenney_rpg_knifeslice",
+    "nom": "Lame — coup",
+    "categorie": "Armes",
+    "usage": "Coup d'épée du paladin ou de dague de l'assassin (attaque principale).",
+    "fichier": "Kenney/RPGAudio/knifeSlice.ogg",
+    "variantes": [
+      "Kenney/RPGAudio/knifeSlice.ogg",
+      "Kenney/RPGAudio/knifeSlice2.ogg"
+    ],
+    "source": "Kenney, RPG Audio",
+    "licence": "CC0",
+    "statut": "utilise"
+  },
+  {
+    "id": "bow_shot",
+    "nom": "Arc — tir (première version)",
+    "categorie": "Armes",
+    "usage": "Première version du tir d'arc, remplacée par « Arc — tir » dans Relic, gardée pour comparer.",
+    "fichier": "Relic/bow_shot_1.wav",
+    "variantes": [
+      "Relic/bow_shot_1.wav",
+      "Relic/bow_shot_2.wav",
+      "Relic/bow_shot_3.wav"
+    ],
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "disponible"
+  },
+  {
+    "id": "fireball_cast",
+    "nom": "Boule de feu — lancer",
+    "categorie": "Sorts du mage",
+    "usage": "Attaque de base du mage : la boule de feu part du bâton.",
+    "fichier": "Relic/fireball_cast.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "fireball_flight_loop",
+    "nom": "Boule de feu — vol (boucle)",
+    "categorie": "Sorts du mage",
+    "usage": "Vol de la boule de feu, boucle 3D attachée au projectile.",
+    "fichier": "Relic/fireball_flight_loop.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "fireball_explosion",
+    "nom": "Boule de feu — explosion",
+    "categorie": "Sorts du mage",
+    "usage": "Explosion de la boule de feu à l'impact.",
+    "fichier": "Relic/fireball_explosion.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "mage_flame_cone_loop",
+    "nom": "Cône de flammes (boucle)",
+    "categorie": "Sorts du mage",
+    "usage": "Cône de flammes maintenu devant le mage, tant qu'il dure.",
+    "fichier": "Relic/mage_flame_cone_loop.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "mage_ignite",
+    "nom": "Mage — embrasement",
+    "categorie": "Sorts du mage",
+    "usage": "Embrasement de Relic (le feu prend d'un coup, 1,4 s). Piste : départ de la brûlure ou compétence du mage.",
+    "fichier": "Relic/mage_ignite.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "disponible"
+  },
+  {
+    "id": "mage_avatar",
+    "nom": "Mage — avatar du feu",
+    "categorie": "Sorts du mage",
+    "usage": "Avatar du feu de Relic (grondement puis colonne de flammes, 2,8 s). Piste : ultime du mage, encore à confirmer.",
+    "fichier": "Relic/mage_avatar.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "disponible"
+  },
+  {
+    "id": "shield_block",
+    "nom": "Bouclier — coup bloqué",
+    "categorie": "Paladin",
+    "usage": "Coup encaissé par la garde du paladin (attaque secondaire).",
+    "fichier": "Relic/shield_block_1.wav",
+    "variantes": [
+      "Relic/shield_block_1.wav",
+      "Relic/shield_block_2.wav",
+      "Relic/shield_block_3.wav"
+    ],
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "parry",
+    "nom": "Bouclier — parade",
+    "categorie": "Paladin",
+    "usage": "Garde déclenchée au bon moment face à un coup : la parade (joué par-dessus le blocage).",
+    "fichier": "Relic/parry.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "knight_charge",
+    "nom": "Paladin — charge bélier",
+    "categorie": "Paladin",
+    "usage": "Le paladin s'élance d'environ 7 m sous sa tête de bélier et percute à l'arrivée.",
+    "fichier": "Relic/knight_charge.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "knight_heal",
+    "nom": "Paladin — soin sur soi",
+    "categorie": "Paladin",
+    "usage": "Aura de croix vertes qui montent autour du paladin.",
+    "fichier": "Relic/knight_heal.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "knight_bash",
+    "nom": "Paladin — poussée au bouclier",
+    "categorie": "Paladin",
+    "usage": "Poussée au bouclier (compétence encore à confirmer dans Deathless).",
+    "fichier": "Relic/knight_bash.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "disponible"
+  },
+  {
+    "id": "viking_roar",
+    "nom": "Viking — rugissement",
+    "categorie": "Viking",
+    "usage": "Rugissement : le crâne de barbare en gemmes rouges surgit et rugit.",
+    "fichier": "Relic/viking_roar_1.wav",
+    "variantes": [
+      "Relic/viking_roar_1.wav",
+      "Relic/viking_roar_2.wav"
+    ],
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "viking_leap_land",
+    "nom": "Viking — saut percutant, impact",
+    "categorie": "Viking",
+    "usage": "Le viking retombe et frappe le sol, une onde de terre part du point d'impact.",
+    "fichier": "Relic/viking_leap_land.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "whirlwind_loop",
+    "nom": "Viking — attaque tournante (boucle)",
+    "categorie": "Viking",
+    "usage": "Attaque tournante, hache tendue : boucle tant que le viking tourne.",
+    "fichier": "Relic/whirlwind_loop.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "arrow_rain",
+    "nom": "Rôdeur — nuée de flèches",
+    "categorie": "Assassin et rôdeur",
+    "usage": "Compétence 1 du rôdeur : sifflements qui descendent puis pluie de flèches sur la zone ciblée.",
+    "fichier": "Relic/arrow_rain.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "smoke_bomb",
+    "nom": "Grenade fumigène — impact",
+    "categorie": "Assassin et rôdeur",
+    "usage": "La grenade de l'assassin éclate et le nuage de fumée s'étale.",
+    "fichier": "Relic/smoke_bomb.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "ranger_focus",
+    "nom": "Rôdeur — concentration",
+    "categorie": "Assassin et rôdeur",
+    "usage": "Concentration de Relic (inspiration retenue, arc qui se tend). Piste : base pour « Arc — chargé à fond » ou « Arc — bander ».",
+    "fichier": "Relic/ranger_focus.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "disponible"
+  },
+  {
+    "id": "portal_open",
+    "nom": "Portail — ouverture",
+    "categorie": "Nyxessa et portail",
+    "usage": "À l'aube, le portail s'ouvre à l'arrivée de la charge de Nyxessa.",
+    "fichier": "Relic/portal_open.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "portal_close",
+    "nom": "Portail — fermeture",
+    "categorie": "Nyxessa et portail",
+    "usage": "Au crépuscule, le portail se referme et disparaît.",
+    "fichier": "Relic/portal_close.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "portal_hum_loop",
+    "nom": "Portail — bourdonnement (boucle)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Portail ouvert, audible de près seulement (boucle 3D, environ 12 m).",
+    "fichier": "Relic/portal_hum_loop.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "portal_pass",
+    "nom": "Portail — entrée d'un joueur",
+    "categorie": "Nyxessa et portail",
+    "usage": "Un joueur entre dans le portail : son corps se défait en gemmes aspirées (1,1 s).",
+    "fichier": "Relic/portal_pass.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "relic_pulse",
+    "nom": "Nyxessa — impulsion",
+    "categorie": "Nyxessa et portail",
+    "usage": "Le cristal pulse : tir d'un missile magique, et ceinture qui s'élargit à l'ouverture du portail.",
+    "fichier": "Relic/relic_pulse.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "relic_hit",
+    "nom": "Nyxessa — frappée",
+    "categorie": "Nyxessa et portail",
+    "usage": "Un ennemi frappe Nyxessa.",
+    "fichier": "Relic/relic_hit_1.wav",
+    "variantes": [
+      "Relic/relic_hit_1.wav",
+      "Relic/relic_hit_2.wav"
+    ],
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "shield_raise",
+    "nom": "Bouclier de Nyxessa — levée",
+    "categorie": "Nyxessa et portail",
+    "usage": "Le bouclier de gemmes se lève après l'incantation du sorcier.",
+    "fichier": "Relic/shield_raise.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "shield_hit",
+    "nom": "Bouclier de Nyxessa — coup encaissé",
+    "categorie": "Nyxessa et portail",
+    "usage": "Un coup frappe le bouclier (qui renvoie des dégâts à l'attaquant).",
+    "fichier": "Relic/shield_hit_1.wav",
+    "variantes": [
+      "Relic/shield_hit_1.wav",
+      "Relic/shield_hit_2.wav",
+      "Relic/shield_hit_3.wav"
+    ],
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "shield_break",
+    "nom": "Bouclier de Nyxessa — rupture",
+    "categorie": "Nyxessa et portail",
+    "usage": "Le bouclier cède.",
+    "fichier": "Relic/shield_break.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "skull_flight_loop",
+    "nom": "Missile en crâne — vol (boucle)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Vol du missile en crâne de Nyxessa et de celui du nécromancien (boucle 3D sur le missile).",
+    "fichier": "Relic/skull_flight_loop.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "skull_explosion",
+    "nom": "Missile en crâne — éclatement",
+    "categorie": "Nyxessa et portail",
+    "usage": "Le missile en crâne éclate à l'impact (Nyxessa ou nécromancien).",
+    "fichier": "Relic/skull_explosion.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "nyxessa_alerte",
+    "nom": "Nyxessa — alerte, relique attaquée",
+    "categorie": "Nyxessa et portail",
+    "usage": "Alerte au HUD quand Nyxessa ou son bouclier sont frappés.",
+    "fichier": "Kenney/InterfaceSounds/error_008.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "utilise"
+  },
+  {
+    "id": "skeleton_spawn",
+    "nom": "Squelette — sortie de terre",
+    "categorie": "Ennemis",
+    "usage": "Un squelette remonte du sol dans une clairière, avec sa gerbe de mottes.",
+    "fichier": "Relic/skeleton_spawn_1.wav",
+    "variantes": [
+      "Relic/skeleton_spawn_1.wav",
+      "Relic/skeleton_spawn_2.wav"
+    ],
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "skeleton_hit",
+    "nom": "Squelette — touché",
+    "categorie": "Ennemis",
+    "usage": "Un squelette reçoit un coup.",
+    "fichier": "Relic/skeleton_hit_1.wav",
+    "variantes": [
+      "Relic/skeleton_hit_1.wav",
+      "Relic/skeleton_hit_2.wav",
+      "Relic/skeleton_hit_3.wav"
+    ],
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "skeleton_death",
+    "nom": "Squelette — mort",
+    "categorie": "Ennemis",
+    "usage": "Un squelette vaincu se désintègre.",
+    "fichier": "Relic/skeleton_death_1.wav",
+    "variantes": [
+      "Relic/skeleton_death_1.wav",
+      "Relic/skeleton_death_2.wav",
+      "Relic/skeleton_death_3.wav"
+    ],
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "dawn_vaporize",
+    "nom": "Squelette — désintégration à l'aube",
+    "categorie": "Ennemis",
+    "usage": "À l'aube, les squelettes encore debout se désintègrent.",
+    "fichier": "Relic/dawn_vaporize_1.wav",
+    "variantes": [
+      "Relic/dawn_vaporize_1.wav",
+      "Relic/dawn_vaporize_2.wav"
+    ],
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "kenney_rpg_drawknife",
+    "nom": "Squelette — préparation d'un coup",
+    "categorie": "Ennemis",
+    "usage": "Un squelette arme son coup de mêlée : signal pour lever la garde ou parer.",
+    "fichier": "Kenney/RPGAudio/drawKnife1.ogg",
+    "variantes": [
+      "Kenney/RPGAudio/drawKnife1.ogg",
+      "Kenney/RPGAudio/drawKnife2.ogg",
+      "Kenney/RPGAudio/drawKnife3.ogg"
+    ],
+    "source": "Kenney, RPG Audio",
+    "licence": "CC0",
+    "statut": "utilise"
+  },
+  {
+    "id": "skeleton_bow_shot",
+    "nom": "Squelette archer — tir",
+    "categorie": "Ennemis",
+    "usage": "Tir d'un archer squelette de Relic. Piste : si un type de squelette tire à l'arc.",
+    "fichier": "Relic/skeleton_bow_shot_1.wav",
+    "variantes": [
+      "Relic/skeleton_bow_shot_1.wav",
+      "Relic/skeleton_bow_shot_2.wav",
+      "Relic/skeleton_bow_shot_3.wav"
+    ],
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "disponible"
+  },
+  {
+    "id": "necro_summon",
+    "nom": "Nécromancien — invocation",
+    "categorie": "Ennemis",
+    "usage": "Incantation d'invocation du nécromancien de Relic (3 s). Comportement du nécromancien à confirmer.",
+    "fichier": "Relic/necro_summon.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "disponible"
+  },
+  {
+    "id": "necro_heal_loop",
+    "nom": "Nécromancien — soin en canal (boucle)",
+    "categorie": "Ennemis",
+    "usage": "Soin en canal du nécromancien de Relic. Comportement du nécromancien à confirmer.",
+    "fichier": "Relic/necro_heal_loop.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "disponible"
+  },
+  {
+    "id": "nightfall",
+    "nom": "Tombée de la nuit",
+    "categorie": "Jour et nuit",
+    "usage": "Crépuscule : annonce globale (2D) de la nuit et des clairières actives.",
+    "fichier": "Relic/nightfall.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "dawn",
+    "nom": "L'aube",
+    "categorie": "Jour et nuit",
+    "usage": "Aube : annonce globale (2D) du retour du jour.",
+    "fichier": "Relic/dawn.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "nuit_vague",
+    "nom": "Nuit — nouvelle vague",
+    "categorie": "Jour et nuit",
+    "usage": "Une vague de squelettes est lancée (0, 40 et 80 s de la nuit).",
+    "fichier": "Kenney/InterfaceSounds/bong_001.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "utilise"
+  },
+  {
+    "id": "musique_dehors_jour",
+    "nom": "Musique — village, le jour",
+    "categorie": "Musique",
+    "usage": "Village le jour, menu principal, écran de score.",
+    "fichier": "Relic/Musique/musique_dehors_jour.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "musique_dehors_nuit",
+    "nom": "Musique — village, la nuit",
+    "categorie": "Musique",
+    "usage": "Village la nuit, pendant les vagues.",
+    "fichier": "Relic/Musique/musique_dehors_nuit.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "musique_dedans_donjon",
+    "nom": "Musique — donjon",
+    "categorie": "Musique",
+    "usage": "Exploration du donjon.",
+    "fichier": "Relic/Musique/musique_dedans_donjon.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "utilise"
+  },
+  {
+    "id": "chest_open",
+    "nom": "Coffre — ouverture",
+    "categorie": "Donjon et défenses",
+    "usage": "Couvercle d'un coffre du donjon de Relic. Piste : butin du donjon.",
+    "fichier": "Relic/chest_open.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "disponible"
+  },
+  {
+    "id": "crystal_light",
+    "nom": "Cristal de passage — allumage",
+    "categorie": "Donjon et défenses",
+    "usage": "Cristal de passage qui s'allume dans le donjon de Relic.",
+    "fichier": "Relic/crystal_light_1.wav",
+    "variantes": [
+      "Relic/crystal_light_1.wav",
+      "Relic/crystal_light_2.wav"
+    ],
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "disponible"
+  },
+  {
+    "id": "trap_spikes",
+    "nom": "Piège à piques",
+    "categorie": "Donjon et défenses",
+    "usage": "Piège à piques du donjon de Relic.",
+    "fichier": "Relic/trap_spikes.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "disponible"
+  },
+  {
+    "id": "trap_flames",
+    "nom": "Grille à flammes",
+    "categorie": "Donjon et défenses",
+    "usage": "Grille à flammes du donjon de Relic.",
+    "fichier": "Relic/trap_flames.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "disponible"
+  },
+  {
+    "id": "structure_place",
+    "nom": "Tour ou mur — pose",
+    "categorie": "Donjon et défenses",
+    "usage": "Tour ou mur posé (Relic). Les tours ont été retirées du village de Deathless.",
+    "fichier": "Relic/structure_place.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "disponible"
+  },
+  {
+    "id": "structure_hit",
+    "nom": "Tour ou mur — frappé",
+    "categorie": "Donjon et défenses",
+    "usage": "Tour ou mur frappé (Relic).",
+    "fichier": "Relic/structure_hit_1.wav",
+    "variantes": [
+      "Relic/structure_hit_1.wav",
+      "Relic/structure_hit_2.wav"
+    ],
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "disponible"
+  },
+  {
+    "id": "structure_destroyed",
+    "nom": "Tour ou mur — détruit",
+    "categorie": "Donjon et défenses",
+    "usage": "Tour ou mur détruit (Relic).",
+    "fichier": "Relic/structure_destroyed.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "disponible"
+  },
+  {
+    "id": "tower_shot",
+    "nom": "Tour — tir",
+    "categorie": "Donjon et défenses",
+    "usage": "Tir d'une tour de Relic.",
+    "fichier": "Relic/tower_shot_1.wav",
+    "variantes": [
+      "Relic/tower_shot_1.wav",
+      "Relic/tower_shot_2.wav"
+    ],
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "disponible"
+  },
+  {
+    "id": "turret_turn_loop",
+    "nom": "Tourelle — pivot (boucle)",
+    "categorie": "Donjon et défenses",
+    "usage": "Tête de tourelle qui pivote (Relic).",
+    "fichier": "Relic/turret_turn_loop.wav",
+    "source": "Relic (généré en Python pour le projet)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_rpg_belthandle",
+    "nom": "Ceinture — manipulation",
+    "categorie": "Kenney divers : objets",
+    "usage": "",
+    "fichier": "Kenney/RPGAudio/beltHandle1.ogg",
+    "variantes": [
+      "Kenney/RPGAudio/beltHandle1.ogg",
+      "Kenney/RPGAudio/beltHandle2.ogg"
+    ],
+    "source": "Kenney, RPG Audio",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_rpg_bookclose",
+    "nom": "Livre — fermeture",
+    "categorie": "Kenney divers : objets",
+    "usage": "Piste : fermeture du menu du personnage.",
+    "fichier": "Kenney/RPGAudio/bookClose.ogg",
+    "source": "Kenney, RPG Audio",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_rpg_bookopen",
+    "nom": "Livre — ouverture",
+    "categorie": "Kenney divers : objets",
+    "usage": "Piste : ouverture du menu du personnage.",
+    "fichier": "Kenney/RPGAudio/bookOpen.ogg",
+    "source": "Kenney, RPG Audio",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_rpg_bookflip",
+    "nom": "Livre — page tournée",
+    "categorie": "Kenney divers : objets",
+    "usage": "Piste : changer d'onglet dans le menu du personnage.",
+    "fichier": "Kenney/RPGAudio/bookFlip1.ogg",
+    "variantes": [
+      "Kenney/RPGAudio/bookFlip1.ogg",
+      "Kenney/RPGAudio/bookFlip2.ogg",
+      "Kenney/RPGAudio/bookFlip3.ogg"
+    ],
+    "source": "Kenney, RPG Audio",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_rpg_bookplace",
+    "nom": "Livre — posé",
+    "categorie": "Kenney divers : objets",
+    "usage": "",
+    "fichier": "Kenney/RPGAudio/bookPlace1.ogg",
+    "variantes": [
+      "Kenney/RPGAudio/bookPlace1.ogg",
+      "Kenney/RPGAudio/bookPlace2.ogg",
+      "Kenney/RPGAudio/bookPlace3.ogg"
+    ],
+    "source": "Kenney, RPG Audio",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_rpg_cloth",
+    "nom": "Tissu — froissement",
+    "categorie": "Kenney divers : objets",
+    "usage": "",
+    "fichier": "Kenney/RPGAudio/cloth1.ogg",
+    "variantes": [
+      "Kenney/RPGAudio/cloth1.ogg",
+      "Kenney/RPGAudio/cloth2.ogg",
+      "Kenney/RPGAudio/cloth3.ogg",
+      "Kenney/RPGAudio/cloth4.ogg"
+    ],
+    "source": "Kenney, RPG Audio",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_rpg_clothbelt",
+    "nom": "Tissu et ceinture",
+    "categorie": "Kenney divers : objets",
+    "usage": "",
+    "fichier": "Kenney/RPGAudio/clothBelt.ogg",
+    "variantes": [
+      "Kenney/RPGAudio/clothBelt.ogg",
+      "Kenney/RPGAudio/clothBelt2.ogg"
+    ],
+    "source": "Kenney, RPG Audio",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_rpg_creak",
+    "nom": "Bois — grincement",
+    "categorie": "Kenney divers : objets",
+    "usage": "",
+    "fichier": "Kenney/RPGAudio/creak1.ogg",
+    "variantes": [
+      "Kenney/RPGAudio/creak1.ogg",
+      "Kenney/RPGAudio/creak2.ogg",
+      "Kenney/RPGAudio/creak3.ogg"
+    ],
+    "source": "Kenney, RPG Audio",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_rpg_doorclose",
+    "nom": "Porte — fermeture",
+    "categorie": "Kenney divers : objets",
+    "usage": "Piste : portes des maisons ou du donjon.",
+    "fichier": "Kenney/RPGAudio/doorClose_1.ogg",
+    "variantes": [
+      "Kenney/RPGAudio/doorClose_1.ogg",
+      "Kenney/RPGAudio/doorClose_2.ogg",
+      "Kenney/RPGAudio/doorClose_3.ogg",
+      "Kenney/RPGAudio/doorClose_4.ogg"
+    ],
+    "source": "Kenney, RPG Audio",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_rpg_dooropen",
+    "nom": "Porte — ouverture",
+    "categorie": "Kenney divers : objets",
+    "usage": "Piste : portes des maisons ou du donjon.",
+    "fichier": "Kenney/RPGAudio/doorOpen_1.ogg",
+    "variantes": [
+      "Kenney/RPGAudio/doorOpen_1.ogg",
+      "Kenney/RPGAudio/doorOpen_2.ogg"
+    ],
+    "source": "Kenney, RPG Audio",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_rpg_dropleather",
+    "nom": "Cuir — lâché au sol",
+    "categorie": "Kenney divers : objets",
+    "usage": "",
+    "fichier": "Kenney/RPGAudio/dropLeather.ogg",
+    "source": "Kenney, RPG Audio",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_rpg_metalclick",
+    "nom": "Métal — clic",
+    "categorie": "Kenney divers : objets",
+    "usage": "",
+    "fichier": "Kenney/RPGAudio/metalClick.ogg",
+    "source": "Kenney, RPG Audio",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_rpg_metallatch",
+    "nom": "Métal — loquet",
+    "categorie": "Kenney divers : objets",
+    "usage": "",
+    "fichier": "Kenney/RPGAudio/metalLatch.ogg",
+    "source": "Kenney, RPG Audio",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_rpg_metalpot",
+    "nom": "Métal — casserole heurtée",
+    "categorie": "Kenney divers : objets",
+    "usage": "",
+    "fichier": "Kenney/RPGAudio/metalPot1.ogg",
+    "variantes": [
+      "Kenney/RPGAudio/metalPot1.ogg",
+      "Kenney/RPGAudio/metalPot2.ogg",
+      "Kenney/RPGAudio/metalPot3.ogg"
+    ],
+    "source": "Kenney, RPG Audio",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_back_002",
+    "nom": "Interface — retour (2)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/back_002.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_back_003",
+    "nom": "Interface — retour (3)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/back_003.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_back_004",
+    "nom": "Interface — retour (4)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/back_004.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_click_001",
+    "nom": "Interface — clic (1)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/click_001.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_click_004",
+    "nom": "Interface — clic (4)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/click_004.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_click_005",
+    "nom": "Interface — clic (5)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/click_005.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_close_001",
+    "nom": "Interface — fermeture (1)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/close_001.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_close_002",
+    "nom": "Interface — fermeture (2)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/close_002.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_close_003",
+    "nom": "Interface — fermeture (3)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/close_003.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_close_004",
+    "nom": "Interface — fermeture (4)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/close_004.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_confirmation_001",
+    "nom": "Interface — confirmation (1)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/confirmation_001.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_confirmation_003",
+    "nom": "Interface — confirmation (3)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/confirmation_003.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_confirmation_004",
+    "nom": "Interface — confirmation (4)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/confirmation_004.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_drop_001",
+    "nom": "Interface — objet lâché (1)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/drop_001.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_drop_002",
+    "nom": "Interface — objet lâché (2)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/drop_002.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_drop_003",
+    "nom": "Interface — objet lâché (3)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/drop_003.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_drop_004",
+    "nom": "Interface — objet lâché (4)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/drop_004.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_error_001",
+    "nom": "Interface — erreur (1)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/error_001.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_error_002",
+    "nom": "Interface — erreur (2)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/error_002.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_error_003",
+    "nom": "Interface — erreur (3)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/error_003.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_error_005",
+    "nom": "Interface — erreur (5)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/error_005.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_error_006",
+    "nom": "Interface — erreur (6)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/error_006.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_error_007",
+    "nom": "Interface — erreur (7)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/error_007.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_glass_001",
+    "nom": "Interface — verre (1)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/glass_001.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_glass_002",
+    "nom": "Interface — verre (2)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/glass_002.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_glass_003",
+    "nom": "Interface — verre (3)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/glass_003.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_glass_004",
+    "nom": "Interface — verre (4)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/glass_004.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_glass_005",
+    "nom": "Interface — verre (5)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/glass_005.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_glass_006",
+    "nom": "Interface — verre (6)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/glass_006.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_glitch_001",
+    "nom": "Interface — parasite numérique (1)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/glitch_001.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_glitch_002",
+    "nom": "Interface — parasite numérique (2)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/glitch_002.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_glitch_003",
+    "nom": "Interface — parasite numérique (3)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/glitch_003.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_glitch_004",
+    "nom": "Interface — parasite numérique (4)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/glitch_004.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_maximize_001",
+    "nom": "Interface — agrandissement (1)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/maximize_001.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_maximize_002",
+    "nom": "Interface — agrandissement (2)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/maximize_002.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_maximize_003",
+    "nom": "Interface — agrandissement (3)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/maximize_003.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_maximize_004",
+    "nom": "Interface — agrandissement (4)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/maximize_004.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_maximize_005",
+    "nom": "Interface — agrandissement (5)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/maximize_005.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_maximize_006",
+    "nom": "Interface — agrandissement (6)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/maximize_006.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_maximize_007",
+    "nom": "Interface — agrandissement (7)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/maximize_007.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_maximize_008",
+    "nom": "Interface — agrandissement (8)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/maximize_008.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_maximize_009",
+    "nom": "Interface — agrandissement (9)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/maximize_009.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_minimize_001",
+    "nom": "Interface — réduction (1)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/minimize_001.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_minimize_002",
+    "nom": "Interface — réduction (2)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/minimize_002.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_minimize_003",
+    "nom": "Interface — réduction (3)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/minimize_003.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_minimize_004",
+    "nom": "Interface — réduction (4)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/minimize_004.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_minimize_005",
+    "nom": "Interface — réduction (5)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/minimize_005.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_minimize_006",
+    "nom": "Interface — réduction (6)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/minimize_006.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_minimize_007",
+    "nom": "Interface — réduction (7)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/minimize_007.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_minimize_008",
+    "nom": "Interface — réduction (8)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/minimize_008.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_minimize_009",
+    "nom": "Interface — réduction (9)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/minimize_009.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_open_001",
+    "nom": "Interface — ouverture (1)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/open_001.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_open_002",
+    "nom": "Interface — ouverture (2)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/open_002.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_open_003",
+    "nom": "Interface — ouverture (3)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/open_003.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_open_004",
+    "nom": "Interface — ouverture (4)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/open_004.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_pluck_001",
+    "nom": "Interface — corde pincée (1)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/pluck_001.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_pluck_002",
+    "nom": "Interface — corde pincée (2)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/pluck_002.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_question_001",
+    "nom": "Interface — question (1)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/question_001.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_question_002",
+    "nom": "Interface — question (2)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/question_002.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_question_003",
+    "nom": "Interface — question (3)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/question_003.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_question_004",
+    "nom": "Interface — question (4)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/question_004.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_scratch_001",
+    "nom": "Interface — grattement (1)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/scratch_001.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_scratch_002",
+    "nom": "Interface — grattement (2)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/scratch_002.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_scratch_003",
+    "nom": "Interface — grattement (3)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/scratch_003.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_scratch_004",
+    "nom": "Interface — grattement (4)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/scratch_004.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_scratch_005",
+    "nom": "Interface — grattement (5)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/scratch_005.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_scroll_001",
+    "nom": "Interface — défilement (1)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/scroll_001.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_scroll_002",
+    "nom": "Interface — défilement (2)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/scroll_002.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_scroll_003",
+    "nom": "Interface — défilement (3)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/scroll_003.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_scroll_004",
+    "nom": "Interface — défilement (4)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/scroll_004.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_scroll_005",
+    "nom": "Interface — défilement (5)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/scroll_005.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_select_001",
+    "nom": "Interface — sélection (1)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/select_001.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_select_002",
+    "nom": "Interface — sélection (2)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/select_002.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_select_003",
+    "nom": "Interface — sélection (3)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/select_003.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_select_004",
+    "nom": "Interface — sélection (4)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/select_004.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_select_005",
+    "nom": "Interface — sélection (5)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/select_005.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_select_006",
+    "nom": "Interface — sélection (6)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/select_006.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_select_007",
+    "nom": "Interface — sélection (7)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/select_007.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_select_008",
+    "nom": "Interface — sélection (8)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/select_008.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_switch_001",
+    "nom": "Interface — commutateur (1)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/switch_001.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_switch_002",
+    "nom": "Interface — commutateur (2)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/switch_002.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_switch_003",
+    "nom": "Interface — commutateur (3)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/switch_003.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_switch_004",
+    "nom": "Interface — commutateur (4)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/switch_004.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_switch_005",
+    "nom": "Interface — commutateur (5)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/switch_005.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_switch_006",
+    "nom": "Interface — commutateur (6)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/switch_006.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_switch_007",
+    "nom": "Interface — commutateur (7)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/switch_007.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_tick_004",
+    "nom": "Interface — tic (4)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/tick_004.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_toggle_001",
+    "nom": "Interface — bascule (1)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/toggle_001.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_toggle_002",
+    "nom": "Interface — bascule (2)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/toggle_002.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_toggle_003",
+    "nom": "Interface — bascule (3)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/toggle_003.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "kenney_ui_toggle_004",
+    "nom": "Interface — bascule (4)",
+    "categorie": "Kenney divers : interface",
+    "usage": "",
+    "fichier": "Kenney/InterfaceSounds/toggle_004.ogg",
+    "source": "Kenney, Interface Sounds",
+    "licence": "CC0",
+    "statut": "disponible"
+  },
+  {
+    "id": "vote_pret",
+    "nom": "Vote « prêt » — joueur prêt, vote annulé",
+    "categorie": "Interface",
+    "usage": "Un joueur se déclare prêt (F1, Vue, pavé tactile) ou annule son vote ; le HUD affiche « Prêts 2 / 3 ».",
+    "fichier": null,
+    "source": "à créer",
+    "licence": "",
+    "statut": "a_creer"
+  },
+  {
+    "id": "coup_critique",
+    "nom": "Coup critique",
+    "categorie": "Armes",
+    "usage": "Retour de tout coup critique : tir à la tête, coup dans le dos, coup furtif (thème Critique, bref et lumineux).",
+    "fichier": null,
+    "source": "à créer",
+    "licence": "",
+    "statut": "a_creer"
+  },
+  {
+    "id": "arbalete_recharge",
+    "nom": "Arbalète — rechargement",
+    "categorie": "Armes",
+    "usage": "Gros temps de recharge de l'arbalète de l'assassin.",
+    "fichier": null,
+    "source": "à créer",
+    "licence": "",
+    "statut": "a_creer"
+  },
+  {
+    "id": "brulure",
+    "nom": "Brûlure — crépitement",
+    "categorie": "Sorts du mage",
+    "usage": "Un ennemi touché par le feu brûle pendant un moment (piste : « Mage — embrasement », en plus court).",
+    "fichier": null,
+    "source": "à créer",
+    "licence": "",
+    "statut": "a_creer"
+  },
+  {
+    "id": "arc_bander",
+    "nom": "Arc — bander",
+    "categorie": "Assassin et rôdeur",
+    "usage": "Maintenir l'attaque bande l'arc : tension qui monte avec la jauge de charge (piste : « Rôdeur — concentration »).",
+    "fichier": null,
+    "source": "à créer",
+    "licence": "",
+    "statut": "a_creer"
+  },
+  {
+    "id": "arc_charge_complete",
+    "nom": "Arc — chargé à fond",
+    "categorie": "Assassin et rôdeur",
+    "usage": "L'arc est complètement bandé : la flèche brille brièvement, un son court l'annonce.",
+    "fichier": null,
+    "source": "à créer",
+    "licence": "",
+    "statut": "a_creer"
+  },
+  {
+    "id": "nuee_marqueur",
+    "nom": "Nuée de flèches — marqueur au sol",
+    "categorie": "Assassin et rôdeur",
+    "usage": "Le marqueur de zone apparaît au sol avant la pluie de flèches.",
+    "fichier": null,
+    "source": "à créer",
+    "licence": "",
+    "statut": "a_creer"
+  },
+  {
+    "id": "assassin_furtif",
+    "nom": "Assassin — passage en mode furtif",
+    "categorie": "Assassin et rôdeur",
+    "usage": "L'assassin passe en marche discrète et devient furtif (aussi en entrant dans la fumée).",
+    "fichier": null,
+    "source": "à créer",
+    "licence": "",
+    "statut": "a_creer"
+  },
+  {
+    "id": "assassin_repere",
+    "nom": "Assassin — repéré",
+    "categorie": "Assassin et rôdeur",
+    "usage": "L'assassin sort du mode furtif : il court, attaque ou un ennemi le repère.",
+    "fichier": null,
+    "source": "à créer",
+    "licence": "",
+    "statut": "a_creer"
+  },
+  {
+    "id": "grenade_lancer",
+    "nom": "Grenade fumigène — lancer",
+    "categorie": "Assassin et rôdeur",
+    "usage": "L'assassin lance la grenade (animation Throw) ; l'impact existe déjà.",
+    "fichier": null,
+    "source": "à créer",
+    "licence": "",
+    "statut": "a_creer"
+  },
+  {
+    "id": "nyxessa_charge_portail",
+    "nom": "Nyxessa — charge vers le portail",
+    "categorie": "Nyxessa et portail",
+    "usage": "À l'aube, Nyxessa envoie une charge d'énergie en arc jusqu'au portail ; le portail s'ouvre à son arrivée (enchaîner sur « Portail — ouverture »).",
+    "fichier": null,
+    "source": "à créer",
+    "licence": "",
+    "statut": "a_creer"
+  },
+  {
+    "id": "nyxessa_retour_energie",
+    "nom": "Nyxessa — retour de l'énergie",
+    "categorie": "Nyxessa et portail",
+    "usage": "Au crépuscule, l'énergie repart du portail vers Nyxessa, puis la ceinture se resserre et la lumière baisse.",
+    "fichier": null,
+    "source": "à créer",
+    "licence": "",
+    "statut": "a_creer"
+  },
+  {
+    "id": "portail_goutte",
+    "nom": "Portail — goutte d'eau",
+    "categorie": "Nyxessa et portail",
+    "usage": "Anneaux du centre vers le bord quand un joueur entre, comme une goutte tombée dans l'eau ; chemin inverse quand il sort.",
+    "fichier": null,
+    "source": "à créer",
+    "licence": "",
+    "statut": "a_creer"
+  },
+  {
+    "id": "portail_arrivee",
+    "nom": "Portail — arrivée d'un joueur",
+    "categorie": "Nyxessa et portail",
+    "usage": "Les gemmes jaillissent du portail de sortie et reconstituent le corps (village ou donjon).",
+    "fichier": null,
+    "source": "à créer",
+    "licence": "",
+    "statut": "a_creer"
+  },
+  {
+    "id": "nyxessa_onde_passage",
+    "nom": "Nyxessa — onde de la ceinture",
+    "categorie": "Nyxessa et portail",
+    "usage": "Une onde fait le tour de la ceinture à chaque passage d'un joueur dans le portail.",
+    "fichier": null,
+    "source": "à créer",
+    "licence": "",
+    "statut": "a_creer"
+  },
+  {
+    "id": "nyxessa_rappel",
+    "nom": "Nyxessa — rappel forcé",
+    "categorie": "Nyxessa et portail",
+    "usage": "Un joueur encore au donjon au crépuscule est ramené de force au village et perd tout ou partie de son butin.",
+    "fichier": null,
+    "source": "à créer",
+    "licence": "",
+    "statut": "a_creer"
+  },
+  {
+    "id": "nyxessa_palier",
+    "nom": "Nyxessa — palier amélioré",
+    "categorie": "Nyxessa et portail",
+    "usage": "Nyxessa passe au palier suivant (missiles, part du butin sauvée).",
+    "fichier": null,
+    "source": "à créer",
+    "licence": "",
+    "statut": "a_creer"
+  },
+  {
+    "id": "sorcier_incantation",
+    "nom": "Sorcier — incantation du bouclier",
+    "categorie": "Nyxessa et portail",
+    "usage": "Le villageois sorcier invoque le bouclier de Nyxessa, avant « Bouclier de Nyxessa — levée ».",
+    "fichier": null,
+    "source": "à créer",
+    "licence": "",
+    "statut": "a_creer"
+  },
+  {
+    "id": "nyxessa_destruction",
+    "nom": "Nyxessa — destruction (défaite)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Nyxessa est détruite : la partie est perdue, l'écran de score suit.",
+    "fichier": null,
+    "source": "à créer",
+    "licence": "",
+    "statut": "a_creer"
+  },
+  {
+    "id": "donjon_alerte_nuit",
+    "nom": "Donjon — alerte avant la nuit",
+    "categorie": "Jour et nuit",
+    "usage": "15 s avant le crépuscule, les joueurs encore au donjon sont prévenus à l'écran et par un son.",
+    "fichier": null,
+    "source": "à créer",
+    "licence": "",
+    "statut": "a_creer"
+  },
+  {
+    "id": "partie_victoire",
+    "nom": "Partie — victoire",
+    "categorie": "Jour et nuit",
+    "usage": "Aube après la nuit 12 et son boss final : la partie est gagnée.",
+    "fichier": null,
+    "source": "à créer",
+    "licence": "",
+    "statut": "a_creer"
+  }
 ]

@@ -11,7 +11,6 @@ Tous les sons du projet s'écoutent dans le wiki, page **Sons** (`Wiki/pages/son
 | `Relic/Sources/` | Scripts de synthèse (`synth_sounds2.py` à `synth_sounds7.py`, `synth_b_fix2.py`, `synth_music.py`) ; Unity ignore les `.py` | Aucune |
 | `Kenney/RPGAudio/` | 51 sons d'objets (pas, pièces, portes, livres, cuir, lames, métal) | CC0, `License.txt` |
 | `Kenney/InterfaceSounds/` | 100 sons d'interface (clics, tics, confirmations, erreurs, gong…) | CC0, `License.txt` |
-| `Incompetech/` | 3 musiques de Kevin MacLeod, non jouées | CC BY 4.0 : **crédit obligatoire** si un morceau est joué (texte dans `Wiki/pages/credits.md`) |
 
 Conventions héritées de Relic : noms de fichiers en anglais, en minuscules ; variantes d'un même son numérotées `_1`, `_2`… (tirées au hasard en jeu) ; boucles suffixées `_loop`. Les `.wav`, `.ogg` et `.mp3` sont suivis par Git LFS (`.gitattributes`).
 
