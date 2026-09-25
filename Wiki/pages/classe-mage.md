@@ -33,4 +33,13 @@ Actions communes à toutes les classes : voir [Classes](classes.md#actions-commu
 - **Mana** {décidé} : jauge de 100. Elle remonte d'environ 1 par seconde, plus un bonus à chaque ennemi touché par la boule de feu. Les compétences coûtent du mana ; le cône de flammes en consomme tant qu'il est maintenu. Valeurs {à équilibrer}.
 - **Pas d'ultime** {décidé} : le mage garde la boule de feu, le cône de flammes et la brûlure.
 - **Compétences LB et RB** : vides pour l'instant {décidé}. Le mage joue avec la boule de feu (attaque principale) et le cône de flammes (attaque secondaire maintenue). Ses compétences : {à confirmer}.
-- Valeurs chiffrées : {à confirmer}.
+- **Valeurs de départ** de la version 0.2 {à équilibrer} {{dev: (réglées dans `Assets/Jeu/Resources/GameBalance.asset`)}} :
+
+| Sujet | Valeur |
+|---|---|
+| Vie | 100 |
+| Boule de feu | 25 dégâts à l'impact, plus 15 en zone sur 2 m ; une toutes les 0,9 s |
+| Mana | +4 par ennemi touché par la boule de feu |
+| Cône de flammes | 22 dégâts par seconde, 14 mana par seconde |
+| Brûlure | 5 dégâts par seconde pendant 3 s |
+

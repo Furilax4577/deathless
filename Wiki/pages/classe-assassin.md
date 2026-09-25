@@ -42,6 +42,18 @@ Actions communes à toutes les classes : voir [Classes](classes.md#actions-commu
 - Multiplicateurs {décidé} : ×2 en furtif, ×3 dans le dos, ×5 pour les deux ensemble. Valeurs {à équilibrer}.
 - **Déclenchement** {décidé} : automatique. Hors combat, dès que l'assassin marche sans courir ni sprinter, il passe en marche discrète et devient furtif. Courir, attaquer ou être repéré le fait sortir du mode furtif.
 - **Détection** {décidé} : un squelette repère l'assassin furtif dans un **cône de vue** devant lui, jusqu'à environ 6 m ; dans son dos, seulement à moins de 1,5 m. Il faut contourner pour frapper. Distances {à équilibrer}.
+## Valeurs de départ {à équilibrer}
+
+Version 0.2 {{dev: (réglées dans `Assets/Jeu/Resources/GameBalance.asset`)}} :
+
+| Sujet | Valeur |
+|---|---|
+| Vie | 100 |
+| Dague | 20 dégâts (×2 furtif, ×3 dans le dos, ×5 les deux) |
+| Marche discrète | 3,2 m/s |
+| Retour hors combat | 4 s sans combat |
+| Carreau | 45 dégâts, ×2 à la tête, recharge 6 s |
+
 ## Style de jeu {décidé}
 
 L'assassin joue **principalement à la dague**. L'arbalète et la grenade sont des outils ponctuels. **Pas d'autre compétence active** : dague, passifs, arbalète et grenade fumigène forment son kit complet.

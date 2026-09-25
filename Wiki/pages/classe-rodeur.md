@@ -34,4 +34,11 @@ Actions communes à toutes les classes : voir [Classes](classes.md#actions-commu
   - **Traînée** : en vol, la flèche laisse une traînée d'air fine, sans lueur, non magique.
 - **Flèches non magiques** {décidé} : les flèches, du rôdeur comme toutes les autres, ne brillent pas. Elles laissent une traînée d'air, jamais lumineuse. Seule exception, le bref éclat de la charge complète.
 - Valeurs de départ : charge complète en **1,2 s** ; **10 dégâts** sans charge, **40** chargé à fond ; tir à la tête **×2** {à équilibrer}.
-- Valeurs chiffrées des compétences : {à confirmer}.
+- **Valeurs de départ** des compétences, version 0.2 {à équilibrer} {{dev: (réglées dans `Assets/Jeu/Resources/GameBalance.asset`)}} :
+
+| Sujet | Valeur |
+|---|---|
+| Vie | 110 |
+| Nuée de flèches | 5 salves de 10 dégâts, recharge 12 s |
+| Roulade arrière | recul d'environ 3,7 m, salve de 5 flèches de 15 dégâts, recharge 8 s |
+
