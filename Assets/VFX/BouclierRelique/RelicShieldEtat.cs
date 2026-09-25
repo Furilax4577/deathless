@@ -18,15 +18,21 @@ public class RelicShieldEtat : MonoBehaviour
     [Range(0f, 1f)] public float warnRatio = 0.4f;
     [Range(0f, 1f)] public float criticalRatio = 0.15f;
 
+    [Header("Aperçu figé (vitrine du banc) : levé, vie fixée, sans incantation ; aussi hors Play")]
+    public bool figer;
+    [Range(0f, 1f)] public float vieFigee = 1f;
+
+    private bool leve;
+
     public bool IsCasting { get; private set; }
-    public bool IsUp { get; private set; }
+    public bool IsUp { get { return figer || leve; } private set { leve = value; } }
     public float Health { get; private set; }
     public float MaxHealth => maxHealth;
     public float Radius => radius;
     public float Height => height;
     public float CastSeconds => Mathf.Max(0.3f, castSeconds);
     public Vector3 BasePosition => transform.position - Vector3.up * GroundOffset;
-    public float LifeRatio => IsUp && MaxHealth > 0f ? Mathf.Clamp01(Health / MaxHealth) : 1f;
+    public float LifeRatio => figer ? vieFigee : IsUp && MaxHealth > 0f ? Mathf.Clamp01(Health / MaxHealth) : 1f;
     public float LastHitTime { get; private set; } = float.NegativeInfinity;
     public Vector3 LastHitPoint { get; private set; }
 

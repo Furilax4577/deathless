@@ -12,7 +12,14 @@ using UnityEngine;
 // - Impact : quand le porteur a parcouru `distance` le long de `direction` (ou sur Impact()), la bulle éclate vers
 //   l'avant (GemBurst.Shatter, chaque gemme part de sa place) et l'onde au sol `onde` (OndeDeChoc_ChargeBelier) part
 //   devant lui.
-// API : Jouer(porteur, direction, distance). La translation du porteur est faite par le gameplay (ou le banc).
+// - (25/09/2026, retour de l'utilisateur) La tête est avancée : museau et cornes devant le porteur, le porteur dans la
+//   partie arrière de la bulle (`avance`). Règles montrées : ennemis sur le chemin repoussés sur les côtés avec un court
+//   étourdissement (Repousser : gerbe latérale de gemmes Sacré du côté où il part + Etourdissement court) ; à l'impact
+//   final, gros étourdissement de la cible (le jeu appelle Etourdissement.Jouer, ou EtourdirCible) et éclatement + onde
+//   dont l'intensité grandit avec la distance parcourue (force = parcouru / distanceMax ; dégâts proportionnels côté jeu).
+// API : Jouer(porteur, direction, distance, distanceMax) ; Repousser(ennemi, duréeÉtourdi) → côté (vecteur latéral) ;
+//   Impact() / Impact(force) ; EtourdirCible(cible, durée) ; Parcouru ; Force ; événement AImpact(force). La translation
+//   du porteur (et des ennemis repoussés) est faite par le gameplay (ou le banc).
 public class ChargeBelier : MonoBehaviour
 {
     [SerializeField] private Material materiau;
@@ -23,6 +30,11 @@ public class ChargeBelier : MonoBehaviour
     [SerializeField] private float hauteur = 1.6f;
     [SerializeField] private float largeur = 1.3f;
     [SerializeField] private float tailleGemme = 0.05f;
+    [Tooltip("Avancée de la tête devant le porteur (fraction de la longueur) : 0 = porteur au tiers arrière (première version), 0,22 = porteur dans la partie arrière, museau et cornes devant lui.")]
+    [Range(0f, 0.4f)] [SerializeField] private float avance = 0.22f;
+    [Tooltip("Étourdissement : court pour les ennemis repoussés, long pour la cible de l'impact (s).")]
+    [SerializeField] private float etourdiCourt = 1f;
+    [SerializeField] private float etourdiLong = 3f;
     [Tooltip("Durée du pop d'apparition (s).")]
     [SerializeField] private float pop = 0.1f;
     [Tooltip("Traînée : une salve de gemmes tous les `pasTrainee` m parcourus, durée de vie (s).")]
@@ -81,8 +93,15 @@ public class ChargeBelier : MonoBehaviour
     private float parcouruEmis;
     private bool actif;
     private VfxLumiere lumiere;
+    private float distanceMax;
+    private float rayonOndeBase = -1f;
+    private GemmesVolantes gerbes;
 
     public bool EnCours { get { return actif; } }
+    // Distance parcourue le long de la direction depuis Jouer (m) et force d'impact (0..1) qui en découle.
+    public float Parcouru { get { return actif || debut >= 0f ? Vector3.Dot(transform.position - depart, direction) : 0f; } }
+    public float Force { get { return distanceMax > 0f ? Mathf.Clamp01(Parcouru / distanceMax) : 1f; } }
+    public event System.Action<float> AImpact;
 
     private void Awake()
     {
@@ -98,8 +117,10 @@ public class ChargeBelier : MonoBehaviour
 
     // Lance la charge : la bulle apparaît autour de `porteur` (pieds), orientée sur `direction` ; l'impact part quand le
     // porteur a parcouru `distance` m le long de `direction`.
-    public void Jouer(Transform porteur, Vector3 direction, float distance)
+    // `distanceMax` : distance de charge qui donne la force d'impact maximale (0 : toujours pleine force).
+    public void Jouer(Transform porteur, Vector3 direction, float distance, float distanceMax = 0f)
     {
+        this.distanceMax = distanceMax;
         if (maillage == null) Construire();
         this.porteur = porteur;
         direction.y = 0f;
@@ -117,11 +138,19 @@ public class ChargeBelier : MonoBehaviour
         lumiere.Allumer();
     }
 
-    // Impact immédiat (charge interrompue par un obstacle, par exemple).
+    // Impact immédiat (charge interrompue par un obstacle, par exemple) ; la force suit la distance parcourue.
     public void Impact()
+    {
+        Impact(Force);
+    }
+
+    // Impact de force donnée (0..1) : éclatement, onde et éclat plus forts avec la force.
+    public void Impact(float force)
     {
         if (!actif) return;
         actif = false;
+        force = Mathf.Clamp01(force);
+        float k = 0.65f + 0.7f * force;
         Suivre();
         Vector3[] positions = new Vector3[gemmes.Count];
         Color[] couleurs = new Color[gemmes.Count];
@@ -131,17 +160,55 @@ public class ChargeBelier : MonoBehaviour
             couleurs[i] = gemmes[i].c;
         }
         Vector3 centre = bulle.TransformPoint(new Vector3(0f, hauteur * 0.5f, -longueur * 0.15f));
-        GemBurst eclat = GemBurst.Shatter(centre, positions, couleurs, tailleGemme, vitesseEclat, direction * elanEclat, materiau);
+        GemBurst eclat = GemBurst.Shatter(centre, positions, couleurs, tailleGemme, vitesseEclat * k, direction * elanEclat * k, materiau);
         // Éclat de la gerbe au thème Sacre (GemBurst est Nyxessa par défaut).
         if (eclat != null && eclat.Lumiere != null)
             eclat.Lumiere.theme = VfxTheme.Sacre;
         if (lumiere != null) lumiere.Eteindre();
         rendu.enabled = false;
+        VfxLumiere.Eclat(bulle.TransformPoint(new Vector3(0f, hauteur * 0.5f, Z(0.85f))), VfxTheme.Sacre,
+            force >= 0.66f ? VfxTailleLumiere.Grande : VfxTailleLumiere.Moyenne, 0.06f + 0.12f * force);
         if (onde != null)
         {
-            onde.transform.SetPositionAndRotation(transform.position + direction * 0.5f, Quaternion.LookRotation(direction));
+            if (rayonOndeBase < 0f) rayonOndeBase = onde.rayonMax;
+            onde.rayonMax = rayonOndeBase * (0.7f + 0.5f * force);
+            onde.transform.SetPositionAndRotation(transform.position + direction * Mathf.Max(0.5f, Z(0.8f)), Quaternion.LookRotation(direction));
             onde.Jouer();
         }
+        if (AImpact != null) AImpact(force);
+    }
+
+    // Un ennemi traversé par la bulle : gerbe latérale de gemmes Sacré qui part du côté où il est repoussé, court
+    // étourdissement. Renvoie la direction latérale (le jeu pousse l'ennemi de ce côté).
+    public Vector3 Repousser(Transform ennemi, float dureeEtourdi = -1f)
+    {
+        if (ennemi == null) return Vector3.zero;
+        Vector3 droite = Vector3.Cross(Vector3.up, direction);
+        Vector3 rel = ennemi.position - (porteur != null ? porteur.position : transform.position);
+        Vector3 cote = Vector3.Dot(rel, droite) >= 0f ? droite : -droite;
+        if (gerbes == null)
+        {
+            gerbes = GemmesVolantes.Creer("ChargeBelier_Gerbes", materiau, 240);
+            gerbes.transform.SetParent(transform, false);
+        }
+        Vector3 p = ennemi.position + Vector3.up * 0.9f - cote * 0.15f;
+        for (int i = 0; i < 24; i++)
+        {
+            float r = Random.value;
+            Color c = r < 0.4f ? Or : r < 0.7f ? OrClair * 1.2f : r < 0.9f ? OrSombre : Acier;
+            Vector3 vit = cote * Random.Range(2.5f, 5f) + direction * Random.Range(0.8f, 2.5f) + Vector3.up * Random.Range(0.4f, 2.4f)
+                + Random.insideUnitSphere * 0.6f;
+            gerbes.Emettre(p + Random.insideUnitSphere * 0.2f, vit, Random.Range(0.045f, 0.08f), Random.Range(0.45f, 0.7f), c, 6f, 1.5f, 0.03f, 0.45f);
+        }
+        VfxLumiere.Eclat(p, VfxTheme.Sacre, VfxTailleLumiere.Petite, 0.04f);
+        Etourdissement.Jouer(ennemi, dureeEtourdi > 0f ? dureeEtourdi : etourdiCourt, true, materiau, VfxTheme.Sacre);
+        return cote;
+    }
+
+    // Gros étourdissement de la cible au bout de la trajectoire.
+    public void EtourdirCible(Transform cible, float duree = -1f)
+    {
+        Etourdissement.Jouer(cible, duree > 0f ? duree : etourdiLong, false, materiau, VfxTheme.Sacre);
     }
 
     private void Suivre()
@@ -213,7 +280,7 @@ public class ChargeBelier : MonoBehaviour
         maillage.vertices = vertices;
         maillage.colors = colors;
         maillage.triangles = LowPolyGem.Triangles(gemmes.Count);
-        maillage.bounds = new Bounds(new Vector3(0f, hauteur * 0.5f, 0f), new Vector3(largeur + 2f, hauteur + 1.5f, longueur + 1f));
+        maillage.bounds = new Bounds(new Vector3(0f, hauteur * 0.5f, longueur * avance), new Vector3(largeur + 2f, hauteur + 1.5f, longueur + 1.5f));
         ConstruireTrainee();
     }
 
@@ -225,7 +292,7 @@ public class ChargeBelier : MonoBehaviour
         return Mathf.Max(0.06f, f);
     }
 
-    private float Z(float u) { return Mathf.Lerp(-longueur * 0.36f, longueur * 0.64f, u); }
+    private float Z(float u) { return Mathf.Lerp(-longueur * (0.36f - avance), longueur * (0.64f + avance), u); }
     private float CentreY(float u) { return hauteur * 0.53f - hauteur * 0.16f * Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.4f, 1f, u)); }
 
     private Vector3 Surface(float u, float theta, out Vector3 normale)

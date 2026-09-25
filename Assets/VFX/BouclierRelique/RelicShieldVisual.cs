@@ -10,11 +10,34 @@ using UnityEngine;
 // en pluie (GemBurst) ; à l'aube, il redescend dans le sol. La hauteur de la paroi suit ses points de vie et sa
 // couleur aussi : bleu, puis orange, puis rouge (RelicShield.LifeTint, seuils dans GameBalance), la lumière suit.
 // Purement visuel et local : lit les SyncVar de RelicShield (même objet). Matériau PortalVoxel (couleurs par sommet).
+// Ajouts Deathless (25/09/2026) : deux pistes d'amélioration à départager par l'utilisateur, par palier (1 = bouclier
+// de base, inchangé) — A « intensité » (mêmes gemmes, plus lumineuses et plus saturées, lumière plus forte) et
+// B « quantité » (mur plus dense et gemmes en lévitation autour) ; aperçu hors Play (`apercuEdition`, avec
+// RelicShieldEtat.figer) pour la vitrine du banc. En Play et sans ces réglages, le comportement est celui de Relic.
+[ExecuteAlways]
 [RequireComponent(typeof(RelicShieldEtat))]
 public class RelicShieldVisual : MonoBehaviour
 {
     [SerializeField] private Material gemMaterial;
     [SerializeField] private int gems = 900;
+
+    [Header("Améliorations (pistes à départager ; palier 1 = bouclier de base)")]
+    [Tooltip("Piste A : mêmes gemmes, plus lumineuses et plus saturées, lumière plus forte à chaque palier.")]
+    [Range(1, 5)] public int palierIntensite = 1;
+    [Tooltip("Piste B : mur plus dense et gemmes en lévitation autour, à chaque palier.")]
+    [Range(1, 5)] public int palierQuantite = 1;
+    [Tooltip("A : luminosité ajoutée par palier (× sur la couleur, HDR permis).")]
+    public float luminositeParPalier = 0.25f;
+    [Tooltip("A : saturation ajoutée par palier.")]
+    public float saturationParPalier = 0.15f;
+    [Tooltip("A : intensité de lumière ajoutée par palier.")]
+    public float lumiereParPalier = 0.35f;
+    [Tooltip("B : gemmes du mur ajoutées par palier (fraction de `gems`).")]
+    public float gemmesParPalier = 0.3f;
+    [Tooltip("B : gemmes en lévitation ajoutées par palier.")]
+    public int levitationParPalier = 70;
+    [Tooltip("Dessiner hors Play (vitrine du banc : à utiliser avec RelicShieldEtat.figer).")]
+    public bool apercuEdition;
 
     // Trois teintes par palier, du plus sombre au plus clair, plus un reflet (index 3).
     private static Color[] BluePalette => VfxPalette.Cache("Bouclier.Plein", () => new[]
@@ -60,18 +83,27 @@ public class RelicShieldVisual : MonoBehaviour
     private float presence;         // 0 absent, 1 levé (lissé)
     private bool wasUp;
     private readonly Color[] palette = new Color[4];   // palette du moment, fondue selon la vie
+    private bool[] levite;          // piste B : gemme en lévitation autour du mur
+    private int total, palierConstruit = -1;
 
-    private void Start()
+    private bool Apercu => !Application.isPlaying;
+
+    // Construit (ou reconstruit quand le palier de quantité change) les gemmes, le maillage et le porteur.
+    private void Construire()
     {
+        Nettoyer();
         shield = GetComponent<RelicShieldEtat>();
-        if (gemMaterial == null)
-        {
-            enabled = false;
+        if (gemMaterial == null || shield == null)
             return;
-        }
+        palierConstruit = palierQuantite;
+        int mur = Mathf.RoundToInt(this.gems * (1f + gemmesParPalier * (palierQuantite - 1)));
+        int lev = levitationParPalier * (palierQuantite - 1);
+        int gems = mur + lev;
+        total = gems;
         float wallHeight = shield.Height;
         System.Random random = new System.Random(3131);
         float R() => (float)random.NextDouble();
+        levite = new bool[gems];
         dir = new Vector3[gems];
         height = new float[gems];
         radial = new float[gems];
@@ -94,6 +126,15 @@ public class RelicShieldVisual : MonoBehaviour
             order[i] = Mathf.Clamp01(height[i] / wallHeight);   // du bas vers le haut
             rotation[i] = Quaternion.Euler(R() * 360f, R() * 360f, R() * 360f);
             spinAxis[i] = new Vector3(R() - 0.5f, R() - 0.5f, R() - 0.5f).normalized;
+            if (i >= mur)
+            {
+                // Lévitation : un peu à l'extérieur du mur, jusqu'à 1,5 m au-dessus du rebord, gemmes un peu plus grosses.
+                levite[i] = true;
+                radial[i] = 0.5f + R() * 0.9f;
+                height[i] = R() * (wallHeight + 1.5f);
+                size[i] = 0.07f + 0.07f * R();
+                order[i] = Mathf.Clamp01(height[i] / (wallHeight + 1.5f));
+            }
         }
         vertices = new Vector3[gems * LowPolyGem.VerticesPerGem];
         colors = new Color[vertices.Length];
@@ -106,12 +147,23 @@ public class RelicShieldVisual : MonoBehaviour
         // décalé de la position de la relique une deuxième fois.
         holder = new GameObject("RelicShieldGems");
         holder.transform.position = Vector3.zero;
+        if (Apercu)
+        {
+            holder.hideFlags = HideFlags.DontSave | HideFlags.NotEditable;
+            mesh.hideFlags = HideFlags.DontSave;
+        }
         holder.AddComponent<MeshFilter>().sharedMesh = mesh;
         MeshRenderer meshRenderer = holder.AddComponent<MeshRenderer>();
         meshRenderer.sharedMaterial = gemMaterial;
         meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         meshRenderer.receiveShadows = false;
-        // Lumière commune des effets (grande classe), couleur imposée par l'état de vie (thèmes Bouclier*).
+        // Lumière commune des effets (grande classe), couleur imposée par l'état de vie (thèmes Bouclier*). Pas de
+        // lumière dans l'aperçu hors Play (VfxLumiere ne tourne qu'en Play).
+        if (Apercu)
+        {
+            holder.SetActive(false);
+            return;
+        }
         lumiere = VfxLumiere.Creer(holder.transform, shield.BasePosition + Vector3.up * (wallHeight * 0.5f), VfxTheme.BouclierPlein, VfxTailleLumiere.Grande);
         lumiere.couleurImposee = true;
         lumiere.couleur = BlueGlow;
@@ -120,13 +172,52 @@ public class RelicShieldVisual : MonoBehaviour
         holder.SetActive(false);
     }
 
-    private void OnDestroy()
+    private void Nettoyer()
     {
         if (holder != null)
-            Destroy(holder);
+        {
+            if (Application.isPlaying) Destroy(holder); else DestroyImmediate(holder);
+        }
         if (mesh != null)
-            Destroy(mesh);
+        {
+            if (Application.isPlaying) Destroy(mesh); else DestroyImmediate(mesh);
+        }
+        holder = null;
+        mesh = null;
+        lumiere = null;
+        glow = null;
     }
+
+    private void OnEnable()
+    {
+        if (Apercu && apercuEdition) Rafraichir();
+    }
+
+    private void OnDisable()
+    {
+        if (Apercu) Nettoyer();
+    }
+
+    // Aperçu hors Play : construit et dessine tout de suite (ouverture de la scène, réglage dans l'inspecteur), sans
+    // attendre une mise à jour de l'éditeur.
+    [ContextMenu("Construire l'aperçu")]
+    public void Rafraichir()
+    {
+        LateUpdate();
+    }
+
+    private void OnDestroy()
+    {
+        Nettoyer();
+    }
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        if (Apercu)
+            UnityEditor.EditorApplication.delayCall += () => { if (this != null && isActiveAndEnabled) Rafraichir(); };
+    }
+#endif
 
     // Palette du moment : chaque teinte fondue entre bleu, orange et rouge selon la vie du bouclier.
     private void UpdatePalette()
@@ -142,11 +233,11 @@ public class RelicShieldVisual : MonoBehaviour
         if (mesh == null || presence <= 0.05f)
             return;
         UpdatePalette();
-        Vector3[] world = new Vector3[gems];
-        Color[] tints = new Color[gems];
+        Vector3[] world = new Vector3[total];
+        Color[] tints = new Color[total];
         Vector3 basePosition = shield.BasePosition;
         float radius = shield.Radius;
-        for (int i = 0; i < gems; i++)
+        for (int i = 0; i < total; i++)
         {
             world[i] = basePosition + dir[i] * (radius + radial[i]) + Vector3.up * height[i];
             tints[i] = palette[1 + i % 3];
@@ -161,8 +252,22 @@ public class RelicShieldVisual : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (Apercu && !apercuEdition)
+        {
+            if (holder != null) Nettoyer();
+            return;
+        }
+        if (mesh == null || palierConstruit != palierQuantite)
+            Construire();
         if (mesh == null || shield == null)
             return;
+        if (shield.figer)
+        {
+            presence = 1f;
+            if (!holder.activeSelf) holder.SetActive(true);
+            Draw(Application.isPlaying ? Time.time : 0f);
+            return;
+        }
         // Présence : monte d'une traite pendant l'incantation, de zéro à la hauteur finale en exactement la durée de
         // l'incantation (demande de Quentin : « fais-le se lever d'une traite »), puis reste ; retombe à l'aube.
         float wanted = shield.IsUp || shield.IsCasting ? 1f : 0f;
@@ -198,9 +303,22 @@ public class RelicShieldVisual : MonoBehaviour
             toHit.y = 0f;
             hitDir = toHit.sqrMagnitude > 1e-4f ? toHit.normalized : Vector3.zero;
         }
+        // Piste A : couleurs plus saturées et plus lumineuses (palier 1 : inchangées).
+        if (palierIntensite > 1)
+        {
+            float lum = 1f + luminositeParPalier * (palierIntensite - 1);
+            float sat = 1f + saturationParPalier * (palierIntensite - 1);
+            for (int k = 0; k < 4; k++)
+            {
+                float h, sa, v;
+                Color.RGBToHSV(palette[k], out h, out sa, out v);
+                Color c = Color.HSVToRGB(h, Mathf.Clamp01(sa * sat), 1f, true) * (v * lum);
+                palette[k] = c;
+            }
+        }
         // Rotation lente du cylindre entier, dans un sens, et une deuxième couche (une gemme sur trois) dans l'autre.
         float turnA = t * 0.18f, turnB = -t * 0.26f;
-        for (int i = 0; i < gems; i++)
+        for (int i = 0; i < total; i++)
         {
             // Pendant l'incantation, les gemmes montent du sol, du bas vers le haut, en une seule montée continue (et y
             // redescendent à l'aube) ; blessé, les plus hautes disparaissent : la paroi baisse avec la vie.
@@ -211,10 +329,11 @@ public class RelicShieldVisual : MonoBehaviour
                 LowPolyGem.Write(vertices, colors, i, Vector3.zero, 0f, Vector3.one, Quaternion.identity, Color.black, LowPolyGem.DefaultLight);
                 continue;
             }
-            Vector3 d = Quaternion.Euler(0f, (i % 3 == 0 ? turnB : turnA) * Mathf.Rad2Deg, 0f) * dir[i];
+            Vector3 d = Quaternion.Euler(0f, (levite[i] ? turnA * 0.5f : i % 3 == 0 ? turnB : turnA) * Mathf.Rad2Deg, 0f) * dir[i];
             float breathe = Mathf.Sin(t * 1.5f + phase[i]) * 0.06f;
             float r = radius + radial[i] + breathe;
             float y = height[i] * Mathf.SmoothStep(0f, 1f, rise);
+            if (levite[i]) y += Mathf.Sin(t * 0.9f + phase[i]) * 0.25f;   // lévitation : lente oscillation verticale
             // Onde depuis le point d'impact : un anneau qui s'élargit le long de la paroi (distance sur le cylindre :
             // arc horizontal et écart de hauteur) ; les gemmes proches du front sont poussées et éclaircies.
             float ripple = 0f;
@@ -235,12 +354,12 @@ public class RelicShieldVisual : MonoBehaviour
         }
         mesh.vertices = vertices;
         mesh.colors = colors;
-        mesh.bounds = new Bounds(basePosition + Vector3.up * (wallHeight * 0.5f), new Vector3((radius + 1f) * 2f, wallHeight + 3f, (radius + 1f) * 2f));
+        mesh.bounds = new Bounds(basePosition + Vector3.up * (wallHeight * 0.5f), new Vector3((radius + 2.5f) * 2f, wallHeight + 5f, (radius + 2.5f) * 2f));
         if (lumiere != null)
         {
             // Présence du mur, plus un éclat bref à chaque coup (pas de scintillement : réservé au feu).
             lumiere.couleur = shield.LifeTint(BlueGlow, OrangeGlow, RedGlow);
-            lumiere.facteur = presence * 0.6f + (hitAge < 0.3f ? 0.6f * (1f - hitAge / 0.3f) : 0f);
+            lumiere.facteur = (presence * 0.6f + (hitAge < 0.3f ? 0.6f * (1f - hitAge / 0.3f) : 0f)) * (1f + lumiereParPalier * (palierIntensite - 1));
         }
     }
 }

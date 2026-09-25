@@ -142,6 +142,11 @@ public class VfxBench : MonoBehaviour
     [Header("Charge bélier (chevalier épée + bouclier) : ruée, bulle en tête de bélier, traînée, onde")]
     public GameObject chevalier;
     public ChargeBelier charge;
+    [Tooltip("Squelettes sur la trajectoire (repoussés sur les côtés, court étourdissement) et squelette au bout (gros étourdissement).")]
+    public GameObject[] squelettesChemin;
+    public GameObject squeletteFinCharge;
+    [Tooltip("Distance de charge qui donne la force d'impact maximale (dégâts proportionnels à la distance côté jeu).")]
+    public float distanceMaxCharge = 7f;
     public float distanceCharge = 7f;
     public float dureeRuee = 0.5f;
     public float anticipation = 0.18f;
@@ -155,6 +160,14 @@ public class VfxBench : MonoBehaviour
     public float vitesseClipSortie = 1.5f;
     public float profondeurSortie = 1.9f;
     public float intervalleSquelettes = 6f;
+
+    [Header("Zone d'apparition des vagues (squelettes)")]
+    public ZoneApparition zoneApparition;
+    public ZoneApparition zoneApparitionPetite;
+    [Tooltip("Rayon de la zone principale, appliqué en temps réel (curseur du banc).")]
+    [Range(2f, 20f)] public float rayonZone = 7f;
+    public int squelettesParPulse = 2;
+    private readonly List<GameObject> squelettesZone = new List<GameObject>();
 
     // Instants clés mesurés au démarrage (s dans le clip) : exposés pour la doc et les captures.
     public float TempsImpactSaut { get; private set; }
@@ -183,7 +196,9 @@ public class VfxBench : MonoBehaviour
         if (voyageur != null) voyageurOrigine = voyageur.transform.parent != null ? voyageur.transform.parent.position : Vector3.zero;
         if (chevalier != null) { chevalierOrigine = chevalier.transform.position; chevalierAxe = chevalier.transform.forward; }
         if (barbare != null) { barbareOrigine = barbare.transform.position; barbareRotation = barbare.transform.rotation; }
-        foreach (GameObject s in new[] { squeletteDesintegration, squeletteSortie, cibleCone, cibleBoule, cibleMissile })
+        List<GameObject> poses = new List<GameObject> { squeletteDesintegration, squeletteSortie, cibleCone, cibleBoule, cibleMissile, squeletteFinCharge };
+        if (squelettesChemin != null) poses.AddRange(squelettesChemin);
+        foreach (GameObject s in poses)
             if (s != null && clipSortie != null)
             {
                 Animator a = s.GetComponentInChildren<Animator>();
@@ -251,6 +266,86 @@ public class VfxBench : MonoBehaviour
         StartCoroutine(PosteFumigene());
         StartCoroutine(PosteArbalete());
         StartCoroutine(PosteTournante());
+        foreach (GameObject sq in squelettesZone) if (sq != null) Destroy(sq);
+        squelettesZone.Clear();
+        StartCoroutine(PosteZone(zoneApparition, 0f, true));
+        StartCoroutine(PosteZone(zoneApparitionPetite, 2f, false));
+    }
+
+    // Curseur de rayon de la zone principale (réglable en Play dans l'inspecteur).
+    private void Update()
+    {
+        if (zoneApparition != null && !Mathf.Approximately(zoneApparition.Rayon, rayonZone)) zoneApparition.Rayon = rayonZone;
+    }
+
+    // Zone d'apparition : Annoncer (crépuscule) → Activer (nuit) avec 3 vagues (Pulse + squelettes qui sortent de terre
+    // dans le cercle) → Éteindre (aube : les squelettes se désintègrent, l'empreinte se résorbe).
+    private IEnumerator PosteZone(ZoneApparition z, float decalage, bool signaux)
+    {
+        if (z == null) yield break;
+        z.Couper();
+        yield return new WaitForSeconds(decalage);
+        while (true)
+        {
+            z.Annoncer();
+            yield return new WaitForSeconds(4f);
+            if (signaux) Signal("zone.annonce");
+            yield return new WaitForSeconds(2.5f);
+            z.Activer();
+            yield return new WaitForSeconds(2f);
+            for (int vague = 0; vague < 3; vague++)
+            {
+                z.Pulse();
+                for (int k = 0; k < squelettesParPulse; k++) StartCoroutine(SortieZone(z, k * 0.35f));
+                if (signaux) Signal(vague == 1 ? "zone.active" : "zone.pulse");
+                yield return new WaitForSeconds(3.5f);
+            }
+            z.Eteindre();
+            foreach (GameObject sq in squelettesZone)
+            {
+                if (sq == null) continue;
+                Bounds b = new Bounds(sq.transform.position + Vector3.up, new Vector3(0.8f, 2f, 0.8f));
+                bool premier = true;
+                foreach (Renderer r in sq.GetComponentsInChildren<Renderer>())
+                {
+                    if (premier) { b = r.bounds; premier = false; } else b.Encapsulate(r.bounds);
+                }
+                if (gemmes != null) GemBurst.Rise(b, gemmes);
+                Destroy(sq);
+            }
+            squelettesZone.Clear();
+            yield return new WaitForSeconds(5f);
+        }
+    }
+
+    // Un squelette sort de terre en un point de la zone (même séquence que la sortie de terre de Relic).
+    private IEnumerator SortieZone(ZoneApparition z, float retard)
+    {
+        if (squeletteSortie == null || clipSortie == null) yield break;
+        yield return new WaitForSeconds(retard);
+        Vector3 sol = z.PointAleatoire();
+        GameObject sq = Instantiate(squeletteSortie, z.transform.parent, true);
+        sq.name = "SqueletteZone";
+        sq.transform.localScale = squeletteSortie.transform.lossyScale;
+        Quaternion rot = Quaternion.Euler(0f, 180f + Random.Range(-60f, 60f), 0f);
+        squelettesZone.Add(sq);
+        float joue = clipSortie.length / vitesseClipSortie;
+        float finMontee = joue * 0.75f;
+        bool seconde = false;
+        if (feu != null) DirtBurst.Spawn(sol, feu, 1f);
+        for (float t = 0f; t < joue && sq != null; t += Time.deltaTime)
+        {
+            if (!seconde && t >= joue * 0.35f)
+            {
+                seconde = true;
+                if (feu != null) DirtBurst.Spawn(sol, feu, 0.55f);
+            }
+            clipSortie.SampleAnimation(sq, Mathf.Min(clipSortie.length, t * vitesseClipSortie));
+            float k = Mathf.Clamp01(t / finMontee);
+            float eased = 1f - Mathf.Pow(1f - k, 2f);
+            sq.transform.SetPositionAndRotation(sol + Vector3.down * profondeurSortie * (1f - eased), rot);
+            yield return null;
+        }
     }
 
     private void Boucle(float intervalle, System.Action action)
@@ -437,11 +532,26 @@ public class VfxBench : MonoBehaviour
         Transform t0 = chevalier.transform;
         Quaternion droit = Quaternion.LookRotation(chevalierAxe);
         float debutCoup = Mathf.Max(0f, dureeRuee - TempsCoupBouclier);
+        int nChemin = squelettesChemin != null ? squelettesChemin.Length : 0;
+        bool[] repousse = new bool[nChemin];
         while (true)
         {
             t0.SetPositionAndRotation(chevalierOrigine, droit);
+            // Squelettes remis en place (poses de départ relevées une fois).
+            for (int i = 0; i < nChemin; i++)
+            {
+                repousse[i] = false;
+                if (squelettesChemin[i] == null) continue;
+                Pose ps = PoseInitiale(squelettesChemin[i].transform);
+                squelettesChemin[i].transform.SetPositionAndRotation(ps.position, ps.rotation);
+            }
+            if (squeletteFinCharge != null)
+            {
+                Pose pf = PoseInitiale(squeletteFinCharge.transform);
+                squeletteFinCharge.transform.SetPositionAndRotation(pf.position, pf.rotation);
+            }
             yield return Tenir(a, clipIdle, 0.8f);
-            if (charge != null) charge.Jouer(t0, chevalierAxe, distanceCharge);
+            if (charge != null) charge.Jouer(t0, chevalierAxe, distanceCharge, distanceMaxCharge);
             for (float t = 0f; t < anticipation; t += Time.deltaTime)
             {
                 float k = t / anticipation;
@@ -454,14 +564,34 @@ public class VfxBench : MonoBehaviour
                 float s = Mathf.Clamp01(t / dureeRuee);
                 float avance = 0.6f * (1f - (1f - s) * (1f - s)) + 0.4f * s;   // départ franc, léger freinage
                 t0.SetPositionAndRotation(chevalierOrigine + chevalierAxe * distanceCharge * avance, droit * Quaternion.Euler(penche, 0f, 0f));
+                if (t >= dureeRuee * 0.3f && t - Time.deltaTime < dureeRuee * 0.3f) Signal("charge.elan");
+                // La bulle traverse un squelette du chemin (sa tête passe devant le porteur) : repoussé sur le côté.
+                float ici = distanceCharge * avance;
+                for (int i = 0; i < nChemin; i++)
+                {
+                    if (repousse[i] || squelettesChemin[i] == null || charge == null) continue;
+                    float le = Vector3.Dot(PoseInitiale(squelettesChemin[i].transform).position - chevalierOrigine, chevalierAxe);
+                    if (ici < le - 1.2f) continue;
+                    repousse[i] = true;
+                    Vector3 cote = charge.Repousser(squelettesChemin[i].transform);
+                    StartCoroutine(Glisser(squelettesChemin[i].transform, cote * 1.5f + chevalierAxe * 0.4f, 0.3f));
+                    if (i == 0) Signal("charge.repousse");
+                }
                 if (t < debutCoup)
                     a.Poser(clipCourse, t * 1.8f, null, 0f, 0f, clipGarde, 0.3f, 1f);
                 else
                     a.Poser(clipCourse, t * 1.8f, null, 0f, 0f, clipCoupBouclier, t - debutCoup, 1f);
                 yield return null;
             }
-            // Arrivée : le porteur est à `distanceCharge`, ChargeBelier éclate et lance l'onde (LateUpdate de cette image).
+            // Arrivée : le porteur est à `distanceCharge`, ChargeBelier éclate et lance l'onde (LateUpdate de cette image),
+            // la cible du bout est étourdie (gros étourdissement) et reculée.
             t0.position = chevalierOrigine + chevalierAxe * distanceCharge;
+            if (squeletteFinCharge != null && charge != null)
+            {
+                charge.EtourdirCible(squeletteFinCharge.transform);
+                StartCoroutine(Glisser(squeletteFinCharge.transform, chevalierAxe * 0.6f, 0.2f));
+                Signal("charge.impact");
+            }
             for (float t = TempsCoupBouclier; t < clipCoupBouclier.length; t += Time.deltaTime)
             {
                 float k = Mathf.Clamp01((t - TempsCoupBouclier) / 0.2f);
@@ -472,6 +602,19 @@ public class VfxBench : MonoBehaviour
             t0.rotation = droit;
             yield return Fondre(a, clipCoupBouclier, clipIdle, Mathf.Max(0.5f, intervalleCharge - 0.8f - anticipation - dureeRuee - (clipCoupBouclier.length - TempsCoupBouclier)));
         }
+    }
+
+    // Déplacement court d'un objet (ennemi repoussé), départ franc et freinage.
+    private IEnumerator Glisser(Transform t, Vector3 deplacement, float duree)
+    {
+        Vector3 a = t.position;
+        for (float k = 0f; k < duree; k += Time.deltaTime)
+        {
+            float u = k / duree;
+            t.position = a + deplacement * (1f - (1f - u) * (1f - u));
+            yield return null;
+        }
+        t.position = a + deplacement;
     }
 
     // Aura de soin : le paladin lève l'épée (Ranged_Magic_Raise) ; l'aura part sous l'allié quand l'épée est en haut.
@@ -704,6 +847,7 @@ public class VfxBench : MonoBehaviour
             for (float t = 0f; t < bander; t += Time.deltaTime)
             {
                 float c = t / clipBander.length;
+                if (k == 1 && c >= 0.4f && arcBande.Charge < 0.4f) Signal("arc.debut");
                 arcBande.Charge = c;
                 ArcVisee(rodeurArc, true, c);
                 a.Poser(clipBander, t, clipIdle, Time.time, 1f - Mathf.Clamp01(t / Fondu));
@@ -727,6 +871,7 @@ public class VfxBench : MonoBehaviour
                     bool tete = tetes[k];
                     Vector3 cible = Surface(tete ? Tete(cibleArc) : Poitrine(cibleArc), pointe.position, tete);
                     arcBande.Relacher(pointe.position, cible, (p, d) => { if (tete && critique != null) critique.Jouer(p, d, false); Signal(tete ? "arc.critique" : "arc.impact"); });
+                    if (k == 1) Signal("arc.tir");
                     ArcVisee(rodeurArc, true, -1f);
                 }
                 yield return null;

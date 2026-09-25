@@ -4,7 +4,8 @@ using UnityEngine;
 // Nuée de flèches du rôdeur (25/09/2026) : marqueur de zone au sol (anneau de gemmes Chasse qui apparaît en 0,3 s),
 // puis pluie de flèches (modèle KayKit arrow_bow) qui tombent dans la zone en `dureePluie` s, chacune plantée au sol
 // avec une petite gerbe de terre en gemmes (thème Terre) ; les flèches restent plantées un instant puis rapetissent.
-// Les flèches ne sont pas magiques : modèle KayKit tel quel, sans lueur, sans lumière, sans traînée.
+// Les flèches ne sont pas magiques : modèle KayKit tel quel, sans lueur ni lumière ; seulement une traînée d'air fine et
+// claire (TraineeAir, non émissive) pendant la chute.
 // API : Jouer(centre, rayon) ; `nombre`, `dureePluie`, `hauteurDepart`, `vitesseChute` exposés.
 public class NueeDeFleches : MonoBehaviour
 {
@@ -63,6 +64,10 @@ public class NueeDeFleches : MonoBehaviour
         GameObject f = modeleFleche != null ? Instantiate(modeleFleche) : GameObject.CreatePrimitive(PrimitiveType.Cube);
         f.name = "Nuee_Fleche";
         f.transform.rotation = Quaternion.LookRotation(penche);
+        // Traînée d'air (non magique : fine, claire, sans lueur), depuis l'empennage.
+        MeshFilter mf = f.GetComponentInChildren<MeshFilter>();
+        float demi = mf != null && mf.sharedMesh != null ? mf.sharedMesh.bounds.extents.z : 0f;
+        TraineeAir trainee = TraineeAir.Attacher(f.transform, new Vector3(0f, 0f, -demi), materiau, 1.8f, 0.01f);
         float duree = hauteurDepart / vitesseChute;
         for (float t = 0f; t < duree; t += Time.deltaTime)
         {
@@ -71,6 +76,7 @@ public class NueeDeFleches : MonoBehaviour
         }
         // Plantée : la pointe s'enfonce de 15 cm.
         f.transform.position = sol + penche * 0.15f;
+        if (trainee != null) trainee.Detacher();
         Color t1 = VfxPalette.Couleur(VfxTheme.Terre, VfxRole.Base, new Color(0.36f, 0.25f, 0.16f));
         Color t2 = VfxPalette.Couleur(VfxTheme.Terre, VfxRole.Vif, new Color(0.54f, 0.42f, 0.28f));
         for (int k = 0; k < 7; k++)
