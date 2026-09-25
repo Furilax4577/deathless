@@ -12,10 +12,9 @@ Travaux prévus ou notés, pas encore faits. Une ligne quitte cette page quand l
 
 ## En cours
 
-- **URGENT** : caméra figée sur le plan du menu en partie (0.4.1, solo et multi) ; correctif en 0.4.2.
-- Launcher : mise à jour incrémentielle (seuls les fichiers modifiés), ménage des anciens téléchargements ; puis bouton Rafraîchir et vérification automatique.
-- Jeu : lobby sans décalage, intérieurs des maisons et forgeron, caméra dans les petites pièces.
-- Donjon (bac à sable) : générateur livré ; ajout d'un vrai 2e étage en cours ; puis report dans main.
+- Jeu : caméra dans les petites pièces.
+- Donjon : générateur prêt dans le bac à sable (2e étage compris) ; report dans main et branchement au portail.
+- Barde : modèle prêt dans le bac à sable ; en attente de validation, animation de luth à créer.
 
 ## Plus tard
 
