@@ -30,7 +30,7 @@ La combinaison LB + RB utilise un **court délai** : quand on appuie sur LB, le 
 
 {dev} Plus d'ultime ni d'accroupissement {décidé} : les actions `Ultimate` et `Crouch` et l'accord L3 + R3 sont à retirer de `DeathlessControls` et de `InputChordResolver`. R3 reste libre.
 
-## Dans les menus {à confirmer}
+## Dans les menus {décidé}
 
 | Action | Xbox | PlayStation | Clavier et souris |
 |---|---|---|---|

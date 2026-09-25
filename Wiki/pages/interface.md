@@ -9,7 +9,7 @@
 - {dev} **Style** : celui des maquettes : fond ardoise sombre, panneaux bleu nuit, texte ivoire, et une bordure or pour l'élément sélectionné à la manette.
 - **Taille de l'interface** : réglable ×1, ×2 ou ×3 dans les options, soit 80 %, 100 % (défaut) et 135 % de la taille des maquettes, pour lire confortablement sur une télévision.
 
-## Menus {à confirmer}
+## Menus {décidé}
 
 - **Menu principal** : Solo, Multijoueur, Options, Quitter. La dernière classe jouée est présentée à côté.
 - **Choix de classe** : les cinq classes, avec leur arme et leurs actions.
@@ -17,7 +17,7 @@
 - **Pause** : la partie continue pendant la pause. Reprendre, Options, Quitter la partie, Quitter le jeu.
 - **Écran de score** {décidé} : en fin de partie, classement des joueurs par catégorie, puis Rejouer (vote prêt) ou Arrêter. Voir [Déroulé d'une partie](deroule.md).
 
-## HUD en jeu {à confirmer}
+## HUD en jeu {décidé}
 
 | Zone | Contenu |
 |---|---|
