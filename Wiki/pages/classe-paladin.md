@@ -31,7 +31,7 @@ Actions communes à toutes les classes : voir [Classes](classes.md#actions-commu
   - **Sur le chemin** : les ennemis traversés sont **repoussés sur les côtés** et brièvement étourdis {décidé}.
   - **Dégâts à l'impact** : **proportionnels à la distance parcourue** : une charge courte fait peu de dégâts, une charge complète fait le maximum {décidé}.
   - Valeurs de départ : étourdissement final 2,5 s, repoussés 0,6 s et 2,5 m sur le côté, dégâts de 15 à 60 selon la distance {à équilibrer}.
-- **Soin sur soi** : aura de croix qui montent autour du paladin {effet validé}. Couleur : **blanc chaud et or** {décidé}, pour laisser le vert à Nyxessa ; l'effet est à recolorer {{dev: (palette `Soin`)}}.
+- **Soin sur soi** : aura de croix qui montent autour du paladin {effet validé}. Couleur : aura **blanc chaud et or**, mais **les croix restent vertes** {décidé} (exception voulue par Quentin) ; l'effet est à recolorer {{dev: (palette `Soin`)}}.
 - **Valeurs de départ** de la version 0.1 {à équilibrer} {{dev: (réglées dans `Assets/Jeu/Resources/GameBalance.asset`)}} :
 
 | Sujet | Valeur |
