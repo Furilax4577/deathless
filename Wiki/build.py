@@ -1,7 +1,7 @@
 # Génère le wiki statique de Deathless : pages/*.md -> site/*.html (Python 3, bibliothèque standard seulement).
 # Lancer : python Wiki/build.py (ou double-clic sur Wiki/ouvrir-wiki.cmd, qui génère puis ouvre le site).
 #
-# Markdown pris en charge (volontairement réduit) : titres # ## ###, paragraphes, listes "- ", tableaux "| a | b |",
+# Markdown pris en charge (volontairement réduit) : titres # ## ###, paragraphes, listes "- " et sous-listes "  - ", tableaux "| a | b |",
 # encadrés "> ", gras **x**, code `x`, liens [texte](page.md), pastilles {couleur #rrggbb}, et trois étiquettes :
 # {décidé}, {à confirmer} et {effet validé} (l'apparence est validée, les règles de jeu restent à fixer).
 import html, io, json, os, re, datetime
@@ -71,8 +71,13 @@ def convertir(md):
         if l.startswith("- "):
             items = []
             while i < len(lignes) and lignes[i].startswith("- "):
-                items.append("<li>%s</li>" % inline(lignes[i][2:].strip()))
+                texte = inline(lignes[i][2:].strip())
                 i += 1
+                sous = []
+                while i < len(lignes) and lignes[i].startswith("  - "):
+                    sous.append("<li>%s</li>" % inline(lignes[i][4:].strip()))
+                    i += 1
+                items.append("<li>%s%s</li>" % (texte, "<ul>%s</ul>" % "".join(sous) if sous else ""))
             out.append("<ul>%s</ul>" % "".join(items))
             continue
         if l.startswith("|"):

@@ -31,7 +31,10 @@ Les rôles sont {à confirmer}. Les armes et leurs animations sont {décidé}.
 
 - Arc et carquois {décidé} : au repos, l'arc est tenu le long du corps ; il se lève et se bande pour viser.
 - **Compétence 1 : Nuée de flèches** {décidé} : une pluie de flèches sur une zone ciblée.
-- **Visée récompensée** {décidé} : un tir plus précis doit rapporter davantage. La façon de le mesurer est {à confirmer}.
+- **Visée récompensée** {décidé} : un tir plus précis rapporte davantage.
+  - **Tir à la tête** : une flèche dans la tête est un **coup critique**.
+  - **Arc bandé** : maintenir l'attaque bande l'arc, avec une jauge de charge. Plus l'arc est tendu, plus les dégâts sont élevés.
+- Durée de charge, dégâts minimum et maximum, multiplicateur de critique : {à confirmer}.
 - Autres compétences et valeurs chiffrées : {à confirmer}.
 
 ## Assassin
