@@ -42,6 +42,13 @@ Le donjon est **régénéré chaque nuit** : chaque jour, le portail mène à un
 
 Ces parts sont {à équilibrer}. Rentrer par le portail avant la nuit garde toujours 100 % du butin.
 
+## Vote « prêt » {décidé}
+
+- Pendant le jour, chaque joueur peut se déclarer **prêt**, et annuler son vote.
+- Le vote n'est possible que quand **toute l'équipe est rentrée** au village : si un joueur est au donjon, le vote est inactif.
+- Quand **tous les joueurs** sont prêts, le jour est écourté : le crépuscule commence après un court compte à rebours de 5 s {à équilibrer}.
+- Le HUD affiche le nombre de joueurs prêts, par exemple « Prêts 2 / 3 ».
+
 ## Les nuits {décidé}
 
 ### Structure d'une nuit
@@ -79,5 +86,4 @@ Pour un joueur :
 
 ## À décider
 
-- Un vote « prêt » pour écourter le jour quand toute l'équipe est rentrée. {à confirmer}
 - La défaite, et ce qu'on garde ou perd d'une partie à l'autre. {à confirmer}
