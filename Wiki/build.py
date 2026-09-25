@@ -85,7 +85,7 @@ def icone(m):
     """{icone nom} : petite icône en ligne ; {icone-grande nom} : grande icône (en-tête d'une page de classe).
     Le SVG est pris dans ArtSources/Icones/Classes ou ArtSources/Icones/Competences, puis copié dans <version>/icones/."""
     nom = m.group(2)
-    for sous in ("Classes", "Competences"):
+    for sous in ("Classes", "Competences", "Nyxessa"):
         if os.path.exists(os.path.join(ICONES, sous, nom + ".svg")):
             ICONES_COPIEES.add((sous, nom))
             return '<img class="icone%s" src="icones/%s.svg" alt="">' % (" grande" if m.group(1) else "", nom)
