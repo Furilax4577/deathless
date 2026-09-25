@@ -71,6 +71,9 @@ namespace Deathless.Jeu
             {
                 // Achats des paliers à la relique (touche Interagir, de jour).
                 if (nyxessa.GetComponent<AchatRelique>() == null) nyxessa.gameObject.AddComponent<AchatRelique>();
+                // Taverne : au comptoir (ancre d'échange de l'intérieur), si la maison est ouverte.
+                var comptoir = GameObject.Find("VillageBlockout/Interieurs/Interieur_Taverne/Ancre_Echange_Taverne");
+                if (comptoir != null && comptoir.GetComponent<Taverne>() == null) comptoir.AddComponent<Taverne>();
                 nyxessa.equipe = Equipe.Relique;
                 nyxessa.Initialiser(B.nyxessaPV);
                 nyxessa.Touche += OnNyxessaTouchee;
@@ -523,6 +526,53 @@ namespace Deathless.Jeu
 
         /// Un palier vient d'être acheté (tous les postes) : amélioration, nouveau palier, pseudo de l'acheteur.
         public event Action<Amelioration, int, string> PalierAchete;
+
+        // ----------------------------------------------------------------- Taverne (de jour, caisse commune)
+
+        /// Raison pour laquelle cet achat à la taverne est impossible (null s'il est possible).
+        public string RefusTaverne(Taverne.Article a, Heros h)
+        {
+            if (Etat.phase != Phase.Jour) return "Le tavernier ne sert que de jour.";
+            if (Etat.orEquipe < Taverne.Prix(a)) return "Pas assez d’or dans la caisse commune.";
+            if (a == Taverne.Article.Repas && h != null && h.Sante.Pv >= h.Sante.pvMax - 0.5f) return "Vous êtes déjà en pleine forme.";
+            return null;
+        }
+
+        /// Achat à la taverne : l'autorité (hôte, ou ce poste en solo) décide et prend l'or ; un client transmet sa demande.
+        /// Repas et bière font effet sur l'acheteur ; la tournée enivre tous les joueurs.
+        public string PayerTaverne(Taverne.Article a, int joueurId, out bool ok)
+        {
+            ok = false;
+            if (ClientReseau) { PartieReseau.Instance?.DemanderTaverne((byte)a); return "Commande passée au tavernier…"; }
+            var h = HerosDe(joueurId);
+            string refus = RefusTaverne(a, h);
+            if (refus != null) return refus;
+            int prix = Taverne.Prix(a);
+            Etat.orEquipe -= prix;
+            ok = true;
+            var j = Joueur(joueurId);
+            string qui = j != null ? j.nom : "Joueur";
+            Journal("Taverne : " + a + " (" + prix + " or, par " + qui + ")");
+            if (a == Taverne.Article.Tournee)
+            {
+                Tournee(qui);
+                if (ReseauJeu.EnPartie) PartieReseau.Instance?.AnnoncerTournee(qui);
+                return "Tournée payée (" + prix + " or) : santé !";
+            }
+            if (m_Local != null && joueurId == m_Local.id) Taverne.AppliquerLocal(a);
+            return (a == Taverne.Article.Repas ? "Ragoût servi" : "Bière servie") + " (" + prix + " or).";
+        }
+
+        /// Tous les postes : une tournée vient d'être payée, le joueur local est ivre quelques secondes.
+        public void Tournee(string qui)
+        {
+            Ivresse.Commencer(B.ivresseTournee);
+            if (HerosLocal != null) AudioBank.Jouer(SonsDuJeu.Biere, HerosLocal.transform.position + Vector3.up, 0.8f);
+            TourneePayee?.Invoke(qui);
+        }
+
+        /// Une tournée vient d'être payée (pseudo du généreux).
+        public event Action<string> TourneePayee;
 
         /// Un point de compétence vient d'être gagné (joueur local) : total à dépenser.
         public event Action<int> PointCompetenceGagne;

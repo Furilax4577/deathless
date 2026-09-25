@@ -159,6 +159,30 @@ namespace Deathless.Reseau
         /// Client : réponse de l'hôte à sa demande d'achat.
         public static event Action<string> ReponseAchat;
 
+        /// Commande d'un client à la taverne : l'hôte décide (caisse commune) et lui répond ; l'effet (repas, bière) est
+        /// appliqué par le client à la réponse ; une tournée passe par AnnoncerTournee.
+        public void DemanderTaverne(byte article) => TaverneRpc(article);
+
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        void TaverneRpc(byte article, RpcParams p = default)
+        {
+            var partie = Partie.Instance;
+            if (partie == null) return;
+            ulong client = p.Receive.SenderClientId;
+            string msg = partie.PayerTaverne((Taverne.Article)article, Partie.IdJoueur(client), out bool ok);
+            ReponseTaverneRpc(new FixedString128Bytes(msg), ok, article, RpcTarget.Single(client, RpcTargetUse.Temp));
+        }
+
+        [Rpc(SendTo.SpecifiedInParams)]
+        void ReponseTaverneRpc(FixedString128Bytes message, bool ok, byte article, RpcParams p = default)
+            => Taverne.Reponse(message.ToString(), ok, (Taverne.Article)article);
+
+        /// Hôte : une tournée a été payée ; chaque client enivre son joueur.
+        public void AnnoncerTournee(string qui) { if (IsServer) TourneeRpc(new FixedString64Bytes(qui ?? "")); }
+
+        [Rpc(SendTo.NotServer)]
+        void TourneeRpc(FixedString64Bytes qui) => Partie.Instance?.Tournee(qui.ToString());
+
         /// Hôte : un palier a été acheté ; les clients jouent le son et l'annonce.
         public void AnnoncerPalier(byte amelioration, int palier, string qui)
         {

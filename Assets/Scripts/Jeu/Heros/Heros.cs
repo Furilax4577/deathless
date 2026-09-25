@@ -407,6 +407,8 @@ namespace Deathless.Jeu
                 case Etat.Libre:
                 {
                     if (Classe != null && Classe.DeplacementImpose(dt, out Vector3 v)) { deplacement = v; impose = true; break; }
+                    // Ivresse (taverne) : démarche hésitante, la direction de marche ondule (pas pendant une action de classe).
+                    if (Ivresse.Active && !Distant && dir.sqrMagnitude > 0.01f && (Classe == null || !Classe.Occupe)) dir = Quaternion.Euler(0f, Ivresse.Deviation, 0f) * dir;
                     float facteur = Classe != null ? Classe.FacteurVitesse : 1f;
                     bool occupe = Classe != null && Classe.Occupe;
                     m_Sprint = Entrees.SprintMaintenu && dir.sqrMagnitude > 0.01f && m_Endurance > 0f && !occupe && facteur >= 0.99f && (Classe == null || !Classe.BloqueSprint);

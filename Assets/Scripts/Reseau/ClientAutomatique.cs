@@ -13,6 +13,7 @@ namespace Deathless.Reseau
     ///   -deathless-pseudo=Bot -deathless-classe=mage -deathless-duree=60 [-deathless-profil=client2] [-deathless-direct]
     ///   -deathless-attendre=2 : ne se déclare prêt qu'une fois 2 joueurs dans le salon (hôte construit)
     ///   -deathless-or=250 : hôte ou solo, caisse commune remplie au lancement (test des achats)
+    ///   -deathless-taverne : paie une tournée à la taverne (l'hôte décide, tous ivres)
     ///   -deathless-achat : achète le palier 2 des missiles à la relique (l'hôte décide)
     ///   -deathless-competences : le héros enchaîne toutes ses compétences (effets vus par les autres postes)
     ///   -deathless-solo : partie solo lancée aussitôt avec la classe donnée (vérification du build : caméra, héros)
@@ -53,7 +54,8 @@ namespace Deathless.Reseau
             c.m_Heberger = heberger;
             c.m_Solo = solo;
             c.m_Competences = Drapeau("deathless-competences");
-            c.m_Achat = Drapeau("deathless-achat");
+            c.m_Achat = Drapeau("deathless-achat") || Drapeau("deathless-taverne");
+            c.m_Taverne = Drapeau("deathless-taverne");
             if (int.TryParse(Arg("deathless-or"), out var or)) c.m_Or = or;
             if (int.TryParse(Arg("deathless-attendre"), out var att)) c.m_Attendre = att;
             c.m_Classe = Arg("deathless-classe") ?? "mage";
@@ -229,7 +231,39 @@ namespace Deathless.Reseau
             }
         }
 
-        bool m_Competences, m_Achat;
+        bool m_Competences, m_Achat, m_Taverne;
+
+        /// Test de la taverne (-deathless-taverne) : vers 6 s, le héros va au comptoir, ouvre le menu et paie une tournée ;
+        /// l'hôte décide, tous les joueurs sont ivres (le journal donne la réponse et l'ivresse).
+        bool Taverne(Partie p, Heros h, float t)
+        {
+            var comptoir = GameObject.Find("VillageBlockout/Interieurs/Interieur_Taverne/Ancre_Echange_Taverne");
+            if (m_EtapeAchat == 0 && t > 6f)
+            {
+                m_EtapeAchat = 1;
+                h.Entrees.DeplacementTest = Vector2.zero;
+                if (comptoir == null) { ReseauJeu.Journal("[auto] pas de taverne"); m_EtapeAchat = 3; return false; }
+                Vector3 pos = comptoir.transform.position + comptoir.transform.forward * 1.1f; pos.y = comptoir.transform.position.y - 0.85f;
+                h.Teleporter(pos);
+                return true;
+            }
+            if (m_EtapeAchat == 1 && t > 7.5f)
+            {
+                m_EtapeAchat = 2;
+                PointInteraction.Courant(h, out string invite);
+                bool ok = PointInteraction.InteragirIci(h);
+                var tv = comptoir != null ? comptoir.GetComponent<Deathless.Jeu.Taverne>() : null;
+                ReseauJeu.Journal("[auto] taverne : invite « " + invite + " », menu ouvert : " + ok + ", or " + p.Etat.orEquipe);
+                if (tv != null) { tv.Acheter(2); ReseauJeu.Journal("[auto] tournée demandée : " + tv.Message); }
+                return true;
+            }
+            if (m_EtapeAchat == 2 && t > 10f)
+            {
+                m_EtapeAchat = 3;
+                ReseauJeu.Journal("[auto] après la tournée : or " + p.Etat.orEquipe + ", ivresse " + Ivresse.Force.ToString("F2") + ", message « " + (comptoir != null ? comptoir.GetComponent<Deathless.Jeu.Taverne>()?.Message : "") + " »");
+            }
+            return m_EtapeAchat < 3;
+        }
         int m_Or;
         int m_EtapeAchat;
 
@@ -238,6 +272,7 @@ namespace Deathless.Reseau
         bool Achat(Partie p, float t)
         {
             var h = p.HerosLocal;
+            if (m_Taverne) return Taverne(p, h, t);
             if (m_EtapeAchat == 0 && t > 6f)
             {
                 m_EtapeAchat = 1;

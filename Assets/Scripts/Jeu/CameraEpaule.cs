@@ -138,6 +138,12 @@ namespace Deathless.Jeu
             m_Distance = m_Distance <= 0f ? d : (d < m_Distance ? d : Mathf.Lerp(m_Distance, d, 1f - Mathf.Exp(-6f * Time.deltaTime)));
             transform.position = epaule + dir * Mathf.Max(ReculMin, m_Distance);
             transform.rotation = rot;
+            // Ivresse (taverne) : la caméra tangue doucement, sans toucher à la visée (le centre de l'écran reste le même).
+            if (Ivresse.Active)
+            {
+                transform.position += rot * Vector3.right * Ivresse.Balancement;
+                transform.rotation = rot * Quaternion.Euler(0f, 0f, Ivresse.Roulis);
+            }
         }
     }
 }

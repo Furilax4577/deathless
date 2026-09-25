@@ -6,7 +6,6 @@ Travaux prévus ou notés, pas encore faits. Une ligne quitte cette page quand l
 
 - **Revoir le menu des options de jeu.** (noté le 25/09/2026)
 - **Barde** : nouvelle passe pour qu'il soit aussi lisse que les personnages KayKit.
-- **Taverne** : se restaurer et boire une bière, de jour uniquement ; « payer une tournée » rend tout le monde ivre quelques secondes. Des breuvages viendront plus tard.
 - **Roue à emotes** : 11 animations s'y prêtent (voir la rubrique Animations), assez pour une roue de 8. Pas de danse, rire ni applaudissement dans les packs.
 - **Idées de personnages** (classes jouables possibles, noté le 25/09/2026) :
   - une **Bavaroise** qui se bat à coups de chopes de bière ;
@@ -24,6 +23,7 @@ Travaux prévus ou notés, pas encore faits. Une ligne quitte cette page quand l
 - Lobby à la taille ×3 sur un écran très large : le bas passe sous la barre des invites.
 - Deux versions du mini-boss : massue et martache.
 - Bouclier plus dense à chaque palier (davantage de gemmes), lien d'énergie de la canalisation au palier 4.
+- Taverne : breuvages (plus tard).
 - Effet visuel de la parade, son à chaque coup de l'attaque tournante.
 - Caméra qui passe dans les feuillages en forêt.
 - Réseau : penché du buste en visée, arrivée en cours de partie.

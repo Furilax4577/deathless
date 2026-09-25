@@ -43,6 +43,8 @@ namespace Deathless.Jeu
         public static readonly string[] PalierAchete = { "nyxessa_palier", "ui_confirmation" };
         public static readonly string[] AchatRefuse = { "ui_refus" };
         public static readonly string[] PointDepense = { "ui_confirmation" };
+        public static readonly string[] Repas = { "kenney_rpg_metalpot" };
+        public static readonly string[] Biere = { "kenney_rpg_metalclick" };
         public static readonly string[] PointGagne = { "vote_tous_prets", "ui_confirmation" };
 
         public static readonly string[] PortailOuverture = { "portal_open" };

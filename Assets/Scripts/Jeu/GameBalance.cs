@@ -164,6 +164,23 @@ namespace Deathless.Jeu
 
         public const int PalierMax = 5;
 
+        [Header("Taverne (Maison_1_A ; décision du 26/09/2026) : de jour seulement, payée par la caisse commune")]
+        public int tavernePrixRepas = 15;
+        [Tooltip("Vie rendue par le repas.")]
+        public float taverneSoinRepas = 40f;
+        public int tavernePrixBiere = 5;
+        public int tavernePrixTournee = 30;
+        [Tooltip("Distance horizontale au comptoir pour parler au tavernier (m).")]
+        public float taverneDistance = 2.4f;
+        [Tooltip("Ivresse d'une bière (s).")]
+        public float ivresseBiere = 8f;
+        [Tooltip("Ivresse d'une tournée, pour tous les joueurs (s).")]
+        public float ivresseTournee = 15f;
+        [Tooltip("Roulis de la caméra à pleine ivresse (degrés) : un tangage doux.")]
+        public float ivresseRoulis = 4f;
+        [Tooltip("Ondulation de la direction de marche à pleine ivresse (degrés) : une démarche hésitante.")]
+        public float ivresseDeviation = 14f;
+
         /// Valeur d'un tableau par palier (1 à 5 ; bornée aux extrémités).
         public static T AuPalier<T>(T[] valeurs, int palier) => valeurs == null || valeurs.Length == 0 ? default : valeurs[Mathf.Clamp(palier, 1, valeurs.Length) - 1];
         public float Palier(float[] valeurs, int palier) => AuPalier(valeurs, palier);

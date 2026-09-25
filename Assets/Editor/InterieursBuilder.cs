@@ -21,8 +21,8 @@ using UnityEngine.Rendering;
 public static class InterieursBuilder
 {
     // ---------------- Paramètres ----------------
-    public static readonly string[] Noms = { "Druide", "Mecano", "Forgeron", "Sorcier" };
-    public static readonly string[] Maisons = { "Maison_6_B", "Maison_2_B", "Maison_4_B", "Maison_5_A" };
+    public static readonly string[] Noms = { "Druide", "Mecano", "Forgeron", "Sorcier", "Taverne" };
+    public static readonly string[] Maisons = { "Maison_6_B", "Maison_2_B", "Maison_4_B", "Maison_5_A", "Maison_1_A" };
     public const string Racine = "Interieurs";
     public const float Doublage = 0.12f;      // épaisseur du doublage intérieur (m)
     public const float Jeu = 0.01f;           // écart entre la face extérieure du mur et le doublage (m)
@@ -167,6 +167,7 @@ public static class InterieursBuilder
                 case "Druide": MeublerDruide(ctx); break;
                 case "Mecano": MeublerMecano(ctx); break;
                 case "Forgeron": MeublerForgeron(ctx); break;
+                case "Taverne": MeublerTaverne(ctx); break;
                 default: MeublerSorcier(ctx); break;
             }
             ctx.Fin();
@@ -175,7 +176,8 @@ public static class InterieursBuilder
         amb.feux = ctx.Feux.ToArray(); amb.feuxIntensite = ctx.FeuxI.ToArray();
         amb.lampes = ctx.Lampes.ToArray(); amb.lampesIntensite = ctx.LampesI.ToArray();
         amb.vitres = ctx.Vitres.ToArray(); amb.braises = ctx.Braises.ToArray();
-        rapport.AppendLine(ForgeronBuilder.Poser());   // forgeron de la forge (main, 26/09/2026)
+        rapport.AppendLine(ForgeronBuilder.Poser());   // forgeron
+        rapport.AppendLine(TavernierBuilder.Poser());  // tavernier de la taverne (main, 26/09/2026) de la forge (main, 26/09/2026)
         AssetDatabase.SaveAssets();
         EditorSceneManager.MarkSceneDirty(village.scene);
         EditorSceneManager.SaveScene(village.scene);
@@ -1501,6 +1503,70 @@ public static class InterieursBuilder
         Ancre(c, "Villageois", new Vector3(1.0f, y, -1.3f), 0f);
         Ancre(c, "Echange", pu + new Vector3(0, 1.0f, 0), -15f);
     }
+    // ---------------- Taverne (Maison_1_A ; décision de Quentin du 26/09/2026) ----------------
+    // De jour, on s'y restaure et on y boit une bière ; « payer une tournée » enivre tout le monde quelques secondes
+    // (runtime : Taverne). Âtre au fond, comptoir le long du mur droit (le tavernier derrière, face à la salle), tonneaux
+    // en perce dans l'angle du fond, deux tables et leurs tabourets à gauche, chopes et assiettes posées, bougies.
+    const string AventuriersDir = "Assets/Art/KayKit/KayKit_Adventurers_2.0_FREE/Assets/fbx(unity)/";
+    static void MeublerTaverne(Contexte c)
+    {
+        Piece p = c.p; MB mb = c.meubles; float y = p.yF;
+        // âtre (comme chez le sorcier)
+        mb.BoxMinMax(new Vector3(-0.62f, y, p.zbi), new Vector3(0.62f, y + 0.18f, -1.72f), Pierre);
+        mb.BoxMinMax(new Vector3(-0.62f, y + 0.18f, p.zbi), new Vector3(-0.42f, y + 1.05f, -1.8f), PierreClaire);
+        mb.BoxMinMax(new Vector3(0.42f, y + 0.18f, p.zbi), new Vector3(0.62f, y + 1.05f, -1.8f), PierreClaire);
+        mb.BoxMinMax(new Vector3(-0.72f, y + 1.05f, p.zbi), new Vector3(0.72f, y + 1.2f, -1.7f), Colombage);
+        mb.BoxMinMax(new Vector3(-0.5f, y + 1.2f, p.zbi), new Vector3(0.5f, p.Plafond(0.5f) + 0.05f, -1.9f), PierreClaire);
+        mb.Quad(new Vector3(-0.42f, y + 0.18f, p.zbi + 0.01f), new Vector3(0.42f, y + 0.18f, p.zbi + 0.01f), new Vector3(0.42f, y + 1.05f, p.zbi + 0.01f), new Vector3(-0.42f, y + 1.05f, p.zbi + 0.01f), Vector3.forward, Suie);
+        ColBox(c, "Meuble_Atre", new Vector3(-0.72f, y, p.zbi), new Vector3(0.72f, y + 1.2f, -1.7f));
+        Vector3 fb = new Vector3(0f, y + 0.18f, -2.0f);
+        Braises(c, fb + new Vector3(-0.3f, 0, -0.15f), fb + new Vector3(0.3f, 0.06f, 0.15f), 22, 0.07f);
+        Buches(c, fb + new Vector3(0, 0.06f, 0), 0.6f, 95f);
+        Flamme(c.flammes, fb + new Vector3(-0.1f, 0.08f, 0), 0.3f, 0.07f); Flamme(c.flammes, fb + new Vector3(0.12f, 0.08f, 0.02f), 0.26f, 0.06f); Flamme(c.flammes, fb + new Vector3(0.0f, 0.08f, 0.05f), 0.36f, 0.07f);
+        Lumiere(c, "Feu_Atre", fb + new Vector3(0, 0.45f, 0.35f), new Color(1f, 0.55f, 0.25f), 1.8f, 4.5f, true);
+        // manteau : chopes et bougie
+        Poser(c, AventuriersDir + "mug_full", new Vector3(-0.5f, y + 1.2f, -1.84f), 20f, 0.3f, false);
+        Poser(c, AventuriersDir + "mug_full", new Vector3(0.45f, y + 1.2f, -1.86f), -30f, 0.3f, false);
+        Bougie(c, new Vector3(0.05f, y + 1.2f, -1.86f), 0.3f);
+        // comptoir le long du mur droit (le tavernier passe derrière)
+        float x0 = 0.72f, x1 = 1.02f, z0 = -1.3f, z1 = 0.9f, h = 0.88f;
+        mb.BoxMinMax(new Vector3(x0, y, z0), new Vector3(x1, y + h - 0.06f, z1), BoisSombre);
+        mb.BoxMinMax(new Vector3(x0 - 0.06f, y + h - 0.06f, z0 - 0.04f), new Vector3(x1 + 0.08f, y + h, z1 + 0.04f), BoisBrun);
+        mb.BoxMinMax(new Vector3(x0 - 0.02f, y + 0.02f, z0), new Vector3(x0, y + 0.12f, z1), BoisNoir);   // plinthe
+        for (float z = z0 + 0.35f; z < z1; z += 0.55f) mb.BoxMinMax(new Vector3(x0 - 0.02f, y + 0.12f, z - 0.03f), new Vector3(x0, y + h - 0.08f, z + 0.03f), Colombage);   // montants
+        ColBox(c, "Meuble_Comptoir", new Vector3(x0 - 0.06f, y, z0 - 0.04f), new Vector3(x1 + 0.08f, y + h, z1 + 0.04f));
+        // sur le comptoir : chopes, bouteilles, assiette
+        float yc = y + h;
+        Poser(c, AventuriersDir + "mug_full", new Vector3(0.84f, yc, 0.55f), 70f, 0.3f, false);
+        Poser(c, AventuriersDir + "mug_full", new Vector3(0.9f, yc, 0.3f), -20f, 0.3f, false);
+        Poser(c, AventuriersDir + "mug_empty", new Vector3(0.86f, yc, -0.9f), 40f, 0.3f, false);
+        Poser(c, DungeonDir + "bottle_A_brown", new Vector3(0.95f, yc, -1.1f), 0f, 0.28f, false);
+        Poser(c, DungeonDir + "bottle_B_green", new Vector3(0.93f, yc, -0.98f), 30f, 0.28f, false);
+        Poser(c, DungeonDir + "plate_food_A", new Vector3(0.87f, yc, -0.45f), 15f, 0.22f, false);
+        Lumiere(c, "Lampe_Comptoir", new Vector3(1.0f, y + 1.9f, -0.2f), new Color(1f, 0.72f, 0.42f), 1.0f, 3.6f, false);
+        Bougie(c, new Vector3(0.9f, yc, 0.8f), 0.26f, true);
+        // tonneaux en perce dans l'angle du fond, derrière le comptoir ; pile de tonnelets au fond à gauche
+        Poser(c, DungeonDir + "keg", new Vector3(1.3f, y, -1.82f), -90f, 0.4f, true);
+        Poser(c, DungeonDir + "barrel_small_stack", new Vector3(-1.3f, y, -1.9f), 90f, 0.42f, true);
+        Poser(c, DungeonDir + "barrel_small", new Vector3(-1.42f, y, 1.97f), 30f, 0.45f, true);
+        // deux tables et leurs tabourets, côté gauche
+        // (le passage de la porte au comptoir reste libre : tabourets devant et derrière les tables, pas côté allée)
+        foreach (float zt in new[] { -0.6f, 0.85f })
+        {
+            const float xt = -1.12f;
+            Poser(c, DungeonDir + "table_small", new Vector3(xt, y, zt), 0f, 0.74f, true);
+            Poser(c, DungeonDir + "stool", new Vector3(xt, y, zt - 0.62f), c.rng.Next(360), 0.85f, true);
+            Poser(c, DungeonDir + "stool", new Vector3(xt + 0.1f, y, zt + 0.62f), c.rng.Next(360), 0.85f, true);
+            Poser(c, AventuriersDir + "mug_full", new Vector3(xt - 0.12f, y + 0.74f, zt + 0.12f), c.rng.Next(360), 0.3f, false);
+            Poser(c, AventuriersDir + "mug_empty", new Vector3(xt + 0.15f, y + 0.74f, zt - 0.18f), c.rng.Next(360), 0.3f, false);
+            Poser(c, DungeonDir + "plate_food_B", new Vector3(xt + 0.05f, y + 0.74f, zt + 0.02f), c.rng.Next(360), 0.22f, false);
+            Bougie(c, new Vector3(xt - 0.25f, y + 0.74f, zt - 0.2f), 0.22f);
+        }
+        Tapis(c, new Vector3(0.0f, y + 0.002f, 0.4f), 0.75f, Rouge, Tan);
+        Ancre(c, "Villageois", new Vector3(1.38f, y, -0.2f), -90f);
+        Ancre(c, "Echange", new Vector3(0.87f, y + 0.9f, -0.2f), -90f);
+    }
+
     // Gemme low poly (éclat de Nyxessa) : couronne de six sommets, pointe haute et pointe basse.
     public static void Gemme(MB mb, Vector3 bas, float h, float r, Vector2 texel)
     {

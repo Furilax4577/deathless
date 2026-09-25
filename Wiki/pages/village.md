@@ -44,8 +44,18 @@ Les portes des maisons sont à l'échelle du joueur : 2,1 m pour un personnage d
 
 ## Intérieurs {décidé}
 
-Les maisons des villageois ont un **intérieur** où l'on entre par la porte : la boutique du druide (fioles, herbes, chaudron), celle du mécano (établi, engrenages, armes exposées), la forge du forgeron (enclume, braises) et la maison du sorcier (pupitre et carte du village, éclat de Nyx, croquis de la relique, grimoires). Les portes restent ouvertes, le battant presque contre le mur, sur de beaux gonds. Les squelettes n'entrent pas {décidé}.
+Les maisons des villageois ont un **intérieur** où l'on entre par la porte : la boutique du druide (fioles, herbes, chaudron), celle du mécano (établi, engrenages, armes exposées), la forge du forgeron (enclume, braises ; le forgeron y bat le fer, jour et nuit), la maison du sorcier (pupitre et carte du village, éclat de Nyx, croquis de la relique, grimoires ; on le voit à sa place le jour) et la taverne (comptoir, tonneaux, tables, tavernier). Les portes restent ouvertes, le battant presque contre le mur, sur de beaux gonds. Les squelettes n'entrent pas {décidé}.
 
 ## Rôle des maisons {décidé}
 
-Le druide, le mécano et le forgeron ont **chacun leur maison**, qui leur sert de boutique : on y entre le jour pour acheter. Le sorcier a aussi sa maison, où il passe la journée ; il ne vend rien. Les autres maisons restent du décor.
+Le druide, le mécano et le forgeron ont **chacun leur maison**, qui leur sert de boutique : on y entre le jour pour acheter. Le sorcier a aussi sa maison, où il passe la journée ; il ne vend rien. Une maison est la **taverne** (ci-dessous). La dernière reste du décor.
+
+## Taverne {décidé}
+
+Une des maisons (celle du nord-est de la place) est la **taverne** : comptoir, tonneaux en perce, tables et tabourets, âtre, et le **tavernier** derrière son comptoir. **De jour uniquement**, au comptoir, la touche **Interagir** (E, X, Carré) ouvre son menu ; l'or est pris dans la **caisse commune** :
+
+- **Se restaurer** : un bol de ragoût, un peu de vie (+40 points de vie pour 15 or) ;
+- **Boire une bière** : la tête tourne quelques secondes (8 s, 5 or) ;
+- **Payer une tournée** : **tous les joueurs** sont ivres quelques secondes (15 s, 30 or).
+
+**Ivresse** {décidé} : la caméra tangue doucement et la démarche hésite, sans rien de handicapant pour le combat (la visée, les attaques et les compétences ne changent pas). Prix, soin et durées : {à équilibrer}. Des **breuvages** viendront plus tard {à confirmer}. En multijoueur, l'hôte décide des achats. {{dev: (`Taverne`, `Ivresse`, `Partie.PayerTaverne` ; intérieur par `InterieursBuilder`, tavernier par `TavernierBuilder`)}}
