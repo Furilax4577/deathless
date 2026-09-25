@@ -116,3 +116,4 @@ InitTestScene*.unity*
 /Launcher/Outils/*/obj/
 /Launcher/__pycache__/
 !/Launcher/Outils/FabVideo/FabVideo.csproj
+__pycache__/
