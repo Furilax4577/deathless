@@ -13,9 +13,24 @@ Nyxessa réagit visiblement à ce qui se passe autour d'elle.
 | Tir d'un missile magique | Le cristal pulse et recule légèrement, un éclat part au point de tir. |
 | Passage d'un joueur dans le portail | Une onde fait le tour de la ceinture. |
 
-## Missile magique
+## Missiles magiques {décidé}
 
-Nyxessa peut tirer un missile en forme de crâne fait de gemmes vertes {décidé}. Il est une fois et demie plus gros que le missile du même type tiré par un ennemi {décidé}. Les règles de tir (cible, cadence, dégâts) sont {à confirmer}.
+Nyxessa tire des missiles en forme de crâne faits de gemmes vertes, une fois et demie plus gros que le missile du nécromancien.
+
+- **Stock** : Nyxessa dispose d'un stock de N missiles. N dépend du **palier d'amélioration** de Nyxessa.
+- **Deux temps de recharge** :
+  - **Régénération** : le temps pour récupérer un missile dans le stock.
+  - **Intervalle de tir** : le temps minimum entre deux tirs.
+- **Dégâts** : ils dépendent aussi du palier d'amélioration, comme les deux temps de recharge.
+- **Décision de tir** : Nyxessa choisit elle-même quand tirer et combien de missiles envoyer, selon le stock disponible.
+
+| Palier | Stock N | Régénération d'un missile | Intervalle de tir | Dégâts |
+|---|---|---|---|---|
+| 1 | {à confirmer} | {à confirmer} | {à confirmer} | {à confirmer} |
+| 2 | {à confirmer} | {à confirmer} | {à confirmer} | {à confirmer} |
+| 3 | {à confirmer} | {à confirmer} | {à confirmer} | {à confirmer} |
+
+- Nombre de paliers, coût des améliorations et règle de choix des cibles : {à confirmer}.
 
 ## Bouclier
 

@@ -18,6 +18,7 @@ MENU = [
     ("nyxessa", "Nyxessa, la relique"),
     ("portail", "Le portail"),
     ("classes", "Classes"),
+    ("ennemis", "Ennemis"),
     ("commandes", "Commandes"),
     ("interface", "Interface"),
     ("effets", "Effets et couleurs"),

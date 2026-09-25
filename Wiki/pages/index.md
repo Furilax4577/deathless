@@ -20,6 +20,7 @@ Ce wiki fixe les règles du jeu. Quand une page dit une chose et que le jeu en f
 | [Nyxessa, la relique](nyxessa.md) | La relique, ses réactions, son bouclier, ses missiles |
 | [Le portail](portail.md) | Ouverture par Nyxessa, passage, portail de retour |
 | [Classes](classes.md) | Les cinq classes, leurs armes et leurs compétences |
+| [Ennemis](ennemis.md) | Squelettes, apparition, mort, nécromancien |
 | [Commandes](commandes.md) | Manette Xbox, PlayStation, clavier et souris |
 | [Interface](interface.md) | Menus, HUD, icônes de boutons |
 | [Effets et couleurs](effets.md) | Palettes par thème, lumière des sorts |
