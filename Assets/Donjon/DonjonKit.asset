@@ -1,0 +1,93 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7cfd60125d3b66543b3839b6e91560e4, type: 3}
+  m_Name: DonjonKit
+  m_EditorClassIdentifier: Assembly-CSharp::Deathless.Donjon.DonjonKit
+  solsRez:
+  - {fileID: 919132149155446097, guid: 92a55501f29bfa545beec9a38ee0cc24, type: 3}
+  - {fileID: 919132149155446097, guid: 92a55501f29bfa545beec9a38ee0cc24, type: 3}
+  - {fileID: 919132149155446097, guid: 92a55501f29bfa545beec9a38ee0cc24, type: 3}
+  - {fileID: 919132149155446097, guid: 92a55501f29bfa545beec9a38ee0cc24, type: 3}
+  - {fileID: 919132149155446097, guid: 92a55501f29bfa545beec9a38ee0cc24, type: 3}
+  - {fileID: 919132149155446097, guid: 92a55501f29bfa545beec9a38ee0cc24, type: 3}
+  - {fileID: 919132149155446097, guid: 92a55501f29bfa545beec9a38ee0cc24, type: 3}
+  - {fileID: 919132149155446097, guid: dfc87f75b17c027488235c8f91bfeb82, type: 3}
+  solsPierre:
+  - {fileID: 919132149155446097, guid: 92a55501f29bfa545beec9a38ee0cc24, type: 3}
+  solsBois:
+  - {fileID: 919132149155446097, guid: 1803df3d99c46a841aea8d6bd18ae385, type: 3}
+  - {fileID: 919132149155446097, guid: 1803df3d99c46a841aea8d6bd18ae385, type: 3}
+  - {fileID: 919132149155446097, guid: b8c10b57237e6e4429d3d48eb4f2c22b, type: 3}
+  plafond: {fileID: 0}
+  murs:
+  - {fileID: 919132149155446097, guid: 7151f0d581458bb448ca3345a55843af, type: 3}
+  - {fileID: 919132149155446097, guid: 7151f0d581458bb448ca3345a55843af, type: 3}
+  - {fileID: 919132149155446097, guid: 7151f0d581458bb448ca3345a55843af, type: 3}
+  - {fileID: 919132149155446097, guid: 2c7b4e1cc530f22408d769c2d4ee93b2, type: 3}
+  - {fileID: 919132149155446097, guid: 1f8a9347842e1cb4cb3e416328b7aad8, type: 3}
+  - {fileID: 919132149155446097, guid: 18f943e300a5371489f75e780bb9e612, type: 3}
+  - {fileID: 919132149155446097, guid: 18f943e300a5371489f75e780bb9e612, type: 3}
+  - {fileID: 919132149155446097, guid: 4cf6ebff0d323b941bdaf04fef9da473, type: 3}
+  - {fileID: 919132149155446097, guid: 38f441d36449fd043998fd1a04ab4ecc, type: 3}
+  - {fileID: 919132149155446097, guid: da250fb0f13350c48ad7eaf93cf118ae, type: 3}
+  mursHauts:
+  - {fileID: 919132149155446097, guid: 61d97b72e82ee3542a2ee8402f8a6361, type: 3}
+  - {fileID: 919132149155446097, guid: 449a8edcfe5075c49afa43237b3af94e, type: 3}
+  - {fileID: 919132149155446097, guid: 61d97b72e82ee3542a2ee8402f8a6361, type: 3}
+  gardeCorps: {fileID: 919132149155446097, guid: 224376dc28276b540b1eb7589148386a, type: 3}
+  pilier: {fileID: 919132149155446097, guid: 280ad2f7ea6df3042a8a6f8b6710f358, type: 3}
+  poteau: {fileID: 919132149155446097, guid: 173559ac3999b9043a784a7ee78b4055, type: 3}
+  escalier: {fileID: 919132149155446097, guid: 0571a0a1998b1a744b1864c922afb06f, type: 3}
+  escalierBassin: {fileID: 919132149155446097, guid: 86b2129b35674614383936e144aa9688, type: 3}
+  arcade: {fileID: 919132149155446097, guid: 79786993a83366d4eac966a54b0890f3, type: 3}
+  fondationBassin: {fileID: 919132149155446097, guid: 4ca5729b5477697468a5ad90fff42ba2, type: 3}
+  eau: {fileID: 2100000, guid: 9c57f11ab14ab0845b7fbe5b2014caf7, type: 2}
+  tonneauFlottant: {fileID: 919132149155446097, guid: 455880f36d587914a8a40c9ce5437810, type: 3}
+  grandCoffre: {fileID: 919132149155446097, guid: 694a21033eedae74a81d98554e3874a8, type: 3}
+  coffre: {fileID: 919132149155446097, guid: 8b765d0b6958a774d975e399b3afad86, type: 3}
+  tasOr:
+  - {fileID: 919132149155446097, guid: 70f0b9e03d13159458afe55b0fc3ac13, type: 3}
+  - {fileID: 919132149155446097, guid: 24af4a26e1c652c48a980134b40e2af6, type: 3}
+  decorsCoin:
+  - {fileID: 919132149155446097, guid: 455880f36d587914a8a40c9ce5437810, type: 3}
+  - {fileID: 919132149155446097, guid: 46828ef6833705a4c9e47b93165818a4, type: 3}
+  - {fileID: 919132149155446097, guid: 455880f36d587914a8a40c9ce5437810, type: 3}
+  - {fileID: 919132149155446097, guid: 0c8da77f0287bbb4db7181bb3260ffec, type: 3}
+  - {fileID: 919132149155446097, guid: d411a7a490a84d34b91bcd5a8140dd41, type: 3}
+  - {fileID: 919132149155446097, guid: 5c1be46cfdad01746aac7f96c1942c01, type: 3}
+  - {fileID: 919132149155446097, guid: ff3ea2cf76ab5bc4d97651ec38423027, type: 3}
+  tableLongue: {fileID: 919132149155446097, guid: f122fd1c5115b3c409d18e12118e6320, type: 3}
+  bannieres:
+  - {fileID: 919132149155446097, guid: 60d4a342dd63d6948be0dad9a8f32092, type: 3}
+  - {fileID: 919132149155446097, guid: 880c36b67c0724d43ae3422f28d9e90f, type: 3}
+  - {fileID: 919132149155446097, guid: 2161e087452aab840aad56db3ec06ade, type: 3}
+  - {fileID: 919132149155446097, guid: ee1428c4456864b4bbd6b14134b80569, type: 3}
+  - {fileID: 919132149155446097, guid: 9eb0a790167c48d4389e035c342ceb63, type: 3}
+  - {fileID: 919132149155446097, guid: 36a40ec96a9d6a3498a8c5a51921780e, type: 3}
+  - {fileID: 919132149155446097, guid: 79f0bd8e8c5c8e64f9898543e3cd55e5, type: 3}
+  os:
+  - {fileID: 919132149155446097, guid: 778200b316e680347849d083ab341c34, type: 3}
+  - {fileID: 919132149155446097, guid: 0bb2103d9b9b7c44093e630e9b5857e4, type: 3}
+  - {fileID: 919132149155446097, guid: 7e047c73d1ed69b45804e69f607ed468, type: 3}
+  - {fileID: 919132149155446097, guid: 46961154c4a24a64bb181368b69049ec, type: 3}
+  - {fileID: 919132149155446097, guid: d9a45adf15c5fba4f8bfaaedf3e15b0b, type: 3}
+  dalleArrivee: {fileID: 0}
+  torcheMurale: {fileID: 919132149155446097, guid: b423af8fcc8641e4dbce487565a5085f, type: 3}
+  torcheSurPied: {fileID: 919132149155446097, guid: 1d85d0174a2b9074ab890f9e01edf78d, type: 3}
+  colonneTorchere: {fileID: 919132149155446097, guid: 173559ac3999b9043a784a7ee78b4055, type: 3}
+  couleurTorche: {r: 1, g: 0.56, b: 0.24, a: 1}
+  intensiteTorche: 5
+  porteeTorche: 11
+  socle: {fileID: 919132149155446097, guid: bd4753ea479afbd4e97cb2f7cf2c4eec, type: 3}
+  anneau: {fileID: 2100000, guid: e0f06295ab01fd1418d16ac7cb9a3663, type: 2}
+  couleurPortail: {r: 1, g: 0.78, b: 0.45, a: 1}
+  intensitePortail: 4

@@ -112,6 +112,7 @@ namespace Deathless.Jeu
             {
                 var h = hits[i];
                 if (h.collider.GetComponentInParent<Sante>() != null) continue;   // personnages ignorés (Nyxessa comprise)
+                if (Deathless.Donjon.DonjonMasquage.ColliderMasque(h.collider)) continue;   // étage du donjon masqué : la caméra le traverse
                 if (h.distance > 0f && h.distance < d) d = h.distance;
             }
             return d;
