@@ -1,6 +1,17 @@
 {
   "versions": [
     {
+      "version": "0.3",
+      "date": "2026-09-25",
+      "titre": "Visages et emblèmes",
+      "notes": [
+        "Choix de classe : chaque héros apparaît en 3D, avec son arme, et tourne lentement. On peut le faire pivoter à la souris ou au stick droit.",
+        "Nouvelles icônes à facettes pour les cinq classes et toutes leurs actions : dans le HUD, le choix de classe et le menu principal.",
+        "HUD : icônes des compétences à la place des abréviations, goutte de mana, poing de rage, indicateur furtif de l'assassin.",
+        "Manette : les invites de boutons repassent sur la manette dès le premier appui après la souris."
+      ]
+    },
+    {
       "version": "0.2",
       "date": "2026-09-25",
       "titre": "Cinq héros",
