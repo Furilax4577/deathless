@@ -218,6 +218,16 @@ namespace Deathless.Jeu
             return meilleur;
         }
 
+        /// Distance de frappe de Nyxessa : bouclier levé, les squelettes frappent la paroi (un peu au-delà de son rayon).
+        protected float RayonContact
+        {
+            get
+            {
+                var bo = BouclierNyxessa.Instance;
+                return bo != null && bo.Leve ? Mathf.Max(B.rayonContactNyxessa, bo.Rayon + 0.4f) : B.rayonContactNyxessa;
+            }
+        }
+
         protected float DistanceNyxessa()
         {
             var n = Nyxessa;
@@ -230,7 +240,7 @@ namespace Deathless.Jeu
         {
             if (Provoque) { m_Cible = m_Provocateur; m_Etat = Etat.Poursuite; return; }
             // Nyxessa au contact : on la frappe (priorité).
-            if (DistanceNyxessa() <= B.rayonContactNyxessa)
+            if (DistanceNyxessa() <= RayonContact)
             {
                 if (Time.time - m_DernierCoup >= m_Stats.intervalle) CommencerAttaque(null);
                 else { Agent.isStopped = true; Tourner(Nyxessa.position); }
@@ -252,7 +262,7 @@ namespace Deathless.Jeu
         {
             if (Provoque) { m_Cible = m_Provocateur; m_SansFrapper = 0f; }
             else if (m_Cible != null && !Voit(m_Cible)) { m_Cible = null; m_Etat = Etat.Marche; return; }
-            if (!Provoque && DistanceNyxessa() <= B.rayonContactNyxessa && (m_Cible == null || !m_Cible.Vivant || Distance(m_Cible.transform.position) > m_Stats.portee))
+            if (!Provoque && DistanceNyxessa() <= RayonContact && (m_Cible == null || !m_Cible.Vivant || Distance(m_Cible.transform.position) > m_Stats.portee))
             {
                 m_Cible = null;
                 m_Etat = Etat.Marche;
@@ -319,7 +329,15 @@ namespace Deathless.Jeu
         {
             if (m_CibleNyxessa)
             {
-                if (P != null && P.nyxessa != null && DistanceNyxessa() <= B.rayonContactNyxessa + 0.6f)
+                // Le sorcier à portée, sans bouclier levé : il prend le coup (les squelettes le visent comme Nyxessa).
+                var so = Sorcier.Instance;
+                var bo = BouclierNyxessa.Instance;
+                if (so != null && so.Ciblable && (bo == null || !bo.Leve) && Distance(so.transform.position) <= m_Stats.portee + 0.8f)
+                {
+                    so.Sante.Encaisser(new InfoDegats { montant = m_Stats.degatsJoueur, equipeSource = Equipe.Ennemis, source = gameObject, point = so.transform.position + Vector3.up, direction = transform.forward });
+                    return;
+                }
+                if (P != null && P.nyxessa != null && DistanceNyxessa() <= RayonContact + 0.6f)
                 {
                     m_DernierCoupNyxessa = Time.time;
                     Vector3 point = P.nyxessa.transform.position + Vector3.up * 1.2f + (transform.position - P.nyxessa.transform.position).normalized * 1.3f;
@@ -348,7 +366,7 @@ namespace Deathless.Jeu
             if (info.sourceId > 0 && m_Etat == Etat.Marche && P != null)
             {
                 var h = P.HerosDe(info.sourceId);
-                if (h != null && Distance(h.transform.position) < B.detectionJoueur && DistanceNyxessa() > B.rayonContactNyxessa && !ClasseAssassin.DansLaFumee(h.transform.position))
+                if (h != null && Distance(h.transform.position) < B.detectionJoueur && DistanceNyxessa() > RayonContact && !ClasseAssassin.DansLaFumee(h.transform.position))
                 {
                     m_Cible = h; m_Etat = Etat.Poursuite; m_SansFrapper = 0f;
                     if (h.Classe is ClasseAssassin a) a.Reperer();
@@ -378,6 +396,19 @@ namespace Deathless.Jeu
         }
 
         public virtual bool Repoussable => true;
+
+        /// Or rapporté à sa mort (GameBalance, wiki : ennemis) ; rien s'il est désintégré à l'aube.
+        public int OrRapporte
+        {
+            get
+            {
+                var b = B;
+                if (type == TypeEnnemi.Golem) return b.orMorgrim;
+                if (type == TypeEnnemi.Necromancien) return b.orNyxar;
+                if (elite) return b.orElite;
+                return type == TypeEnnemi.Guerrier ? b.orGuerrier : b.orSbire;
+            }
+        }
         public virtual float FacteurEtourdissement => 1f;
 
         void OnTue(InfoDegats info)
@@ -385,6 +416,8 @@ namespace Deathless.Jeu
             if (m_Etat == Etat.Mort) return;
             bool surNyx = SurNyxessa;
             m_Etat = Etat.Mort;
+            // Or des vagues (règle provisoire sans donjon) : à la caisse commune, attribué à qui porte le coup fatal.
+            if (P != null) P.GagnerOr(OrRapporte, info.sourceId, transform.position + Vector3.up * 1.6f);
             if (info.sourceId > 0 && P != null)
             {
                 P.CompterTue(info.sourceId);

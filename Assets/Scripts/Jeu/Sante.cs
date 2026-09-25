@@ -37,6 +37,9 @@ namespace Deathless.Jeu
         /// Garde du héros : appelé avant d'appliquer un coup parable.
         public Func<InfoDegats, Interception> intercepteur;
 
+        /// Bouclier du sorcier (Nyxessa, sorcier) : reçoit chaque coup et renvoie la part qui le traverse (0 : tout absorbé).
+        public Func<InfoDegats, float> absorbeur;
+
         public event Action<InfoDegats, float> Touche;           // coup appliqué, dégâts réels
         public event Action<InfoDegats, Interception> Intercepte; // coup bloqué ou paré
         public event Action<InfoDegats> Tue;
@@ -67,6 +70,11 @@ namespace Deathless.Jeu
                 }
             }
             if (invulnerable) return 0f;
+            if (absorbeur != null && info.equipeSource == Equipe.Ennemis)
+            {
+                info.montant = absorbeur(info);
+                if (info.montant <= 0f) return 0f;
+            }
             float avant = pv;
             pv = Mathf.Max(0f, pv - Mathf.Max(0f, info.montant));
             float reel = avant - pv;

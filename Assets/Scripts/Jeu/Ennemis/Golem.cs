@@ -58,7 +58,8 @@ namespace Deathless.Jeu
                 if (P.nyxessa != null)
                 {
                     Vector3 dn = P.nyxessa.transform.position - impact; dn.y = 0f;
-                    if (dn.magnitude <= r + 1.3f)
+                    var bo = BouclierNyxessa.Instance;
+                    if (dn.magnitude <= (bo != null && bo.Leve ? RayonContact + 0.8f : r + 1.3f))
                     {
                         m_DernierCoupNyxessa = Time.time;
                         P.nyxessa.Encaisser(new InfoDegats { montant = m_Stats.degatsNyxessa, equipeSource = Equipe.Ennemis, source = gameObject, point = impact + Vector3.up * 1.5f, direction = transform.forward });

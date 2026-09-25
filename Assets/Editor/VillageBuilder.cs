@@ -53,7 +53,11 @@ public static class VillageBuilder
     // Plateau de la relique : 3 marches octogonales concentriques de 0,25 m (Ø 6 m au sommet, bord à r = 4,2 m au sol).
     // Chaque marche = un prisme (MeshCollider convexe exact : volumes et circulation inchangés) + un habillage sans collider.
     public const int PlateauSides = 8, PlateauSteps = 3;
-    public const float PlateauTopRadius = 3f, StepHeight = 0.25f, StepWidth = 0.6f;
+    // 25/09/2026 (Quentin) : plateau agrandi pour que son bord porte le bouclier du sorcier (cylindre de 5,5 m) : marche du
+    // bas à r = 5,8 m aux sommets (≈ 5,5 m en moyenne sur l'octogone), girons de 0,3 m, sommet de 5,2 m (place du sorcier,
+    // dos à Nyxessa, avec la place de tomber en arrière). Avant : sommet 3 m, girons 0,6 m. Refaire : Deathless > Village >
+    // Refaire le plateau de Nyxessa (puis recuire le NavMesh).
+    public const float PlateauTopRadius = 5.2f, StepHeight = 0.25f, StepWidth = 0.3f;
     // Habillage des marches et des assises (style KayKit : le détail vient de la géométrie, UV fixes sur l'atlas KayKit_Dungeon).
     // Dessus : dalles floor_tile_small* réduites, découpées au contour octogonal (maillage recalculé), 2 mm au-dessus du dessus.
     // Contremarches : une rangée de blocs chanfreinés par côté, en saillie, dont le dessus déborde sur le giron (nez de marche).
@@ -1069,6 +1073,41 @@ public static class VillageBuilder
     // sombre (dessus abaissé de SupportDrop), habillé de dalles découpées au contour (dessus) et de blocs chanfreinés (contremarche
     // visible entre `bottom` et `top`). `inner` = rayon de l'assise du dessus (0 s'il n'y en a pas) : les dalles entièrement
     // dessous sont omises.
+    /// Refait seulement le plateau de Nyxessa (marches, habillage) dans la scène ouverte, aux dimensions ci-dessus, et retire
+    /// les pavés de l'anneau entièrement recouverts ; le reste du village ne bouge pas.
+    [MenuItem("Deathless/Village/Refaire le plateau de Nyxessa")]
+    public static string RefairePlateau()
+    {
+        GameObject rootGo = GameObject.Find("VillageBlockout");
+        if (rootGo == null) return "VillageBlockout introuvable";
+        Transform nexus = rootGo.transform.Find("Nexus");
+        Transform ancien = nexus != null ? nexus.Find("Plateau") : null;
+        if (ancien != null) Object.DestroyImmediate(ancien.gameObject);
+        Transform plateau = Group(nexus, "Plateau");
+        plateau.SetSiblingIndex(1);
+        Material dungeonMat = AssetDatabase.LoadAssetAtPath<Material>("Assets/Art/Materials/KayKit_Dungeon.mat");
+        var dressRng = new System.Random(DressSeed);
+        for (int k = 0; k < PlateauSteps; k++)
+        {
+            float radius = PlateauTopRadius + StepWidth * (PlateauSteps - 1 - k);
+            StoneTier(plateau, "Marche_" + (k + 1), radius, k + 1 < PlateauSteps ? radius - StepWidth : 0f, StepHeight * k, StepHeight * (k + 1),
+                PlateauTileScale, PlateauBlockLength, PlateauBlockRows, dungeonMat, dressRng);
+        }
+        int retires = 0;
+        Transform pavage = nexus.Find("Pavage_Anneau");
+        float apotheme = (PlateauTopRadius + StepWidth * (PlateauSteps - 1)) * Mathf.Cos(Mathf.PI / PlateauSides);
+        if (pavage != null)
+            for (int i = pavage.childCount - 1; i >= 0; i--)
+            {
+                Transform t = pavage.GetChild(i);
+                if (RadOf(t.position) + 1.42f < apotheme) { Object.DestroyImmediate(t.gameObject); retires++; }
+            }
+        UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(rootGo.scene);
+        string r = "Plateau refait : marche du bas r = " + (PlateauTopRadius + StepWidth * (PlateauSteps - 1)) + " m (apothème " + apotheme.ToString("F2") + "), sommet " + PlateauTopRadius + " m ; " + retires + " pavés recouverts retirés";
+        Debug.Log(r);
+        return r;
+    }
+
     private static GameObject StoneTier(Transform parent, string name, float radius, float inner, float bottom, float top,
         float tileScale, Vector2 blockLength, int rows, Material mat, System.Random rng)
     {

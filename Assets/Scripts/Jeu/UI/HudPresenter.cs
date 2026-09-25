@@ -96,9 +96,10 @@ namespace Deathless.Jeu
         public float TempsRestantPhase => P != null ? P.Etat.TempsRestant : 0f;
         public float VieNyxessa => P != null ? P.Etat.nyxessa.pv : 0f;
         public float VieMaxNyxessa => P != null ? Mathf.Max(1f, P.Etat.nyxessa.pvMax) : 1f;
-        public float Bouclier => 0f;       // pas de bouclier du sorcier dans la 0.1
-        public float BouclierMax => 0f;
-        /// Caisse commune : l'or ne vient que du donjon (wiki : deroule), 0 tant qu'il n'y a pas de donjon.
+        /// Bouclier du sorcier (levé la nuit) : solidité restante et encaissement du palier.
+        public float Bouclier => BouclierNyxessa.Instance != null ? BouclierNyxessa.Instance.Vie : 0f;
+        public float BouclierMax => BouclierNyxessa.Instance != null ? BouclierNyxessa.Instance.VieMax : 0f;
+        /// Caisse commune : or des vagues (règle provisoire sans donjon, wiki : deroule).
         public int OrEquipe => P != null ? P.Etat.orEquipe : 0;
         public bool VoteActif => P != null && P.EnCours && P.Etat.phase == Jeu.Phase.Jour;
         public int JoueursPrets => P != null ? P.JoueursPrets : 0;

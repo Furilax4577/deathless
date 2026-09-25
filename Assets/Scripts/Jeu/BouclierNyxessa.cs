@@ -1,0 +1,102 @@
+using UnityEngine;
+
+namespace Deathless.Jeu
+{
+    /// Bouclier de Nyxessa (wiki : nyxessa, Bouclier) : levé par le sorcier au début de la nuit (incantation), jamais le
+    /// jour. Il encaisse les coups portés à Nyxessa (et au sorcier) à sa place et renvoie des dégâts à chaque attaquant ;
+    /// sa couleur suit sa solidité (bleu, orange, rouge : effet validé `BouclierRelique`, RelicShieldEtat + Visual). Il
+    /// tient jusqu'à être brisé ; brisé, le sorcier meurt. À l'aube, il redescend. Encaissement et renvoi : GameBalance,
+    /// par palier (1 à 5). Autorité : l'hôte (solo : ce poste).
+    public class BouclierNyxessa : MonoBehaviour
+    {
+        public static BouclierNyxessa Instance { get; private set; }
+
+        [Tooltip("Instance du prefab Assets/VFX/BouclierRelique (RelicShieldEtat + RelicShieldVisual), centrée sur Nyxessa.")]
+        public RelicShieldEtat effet;
+
+        public bool Leve => effet != null && effet.IsUp;
+        public bool Incantation => effet != null && effet.IsCasting;
+        public float Vie => Leve ? effet.Health : 0f;
+        public float VieMax => effet != null ? effet.MaxHealth : 0f;
+        public Vector3 Centre => transform.position;   // base du cylindre, au centre de Nyxessa
+        public float Rayon => effet != null ? effet.Radius : GameBalance.Courant.bouclierRayon;
+
+        /// Le bouclier vient d'être brisé (le sorcier meurt).
+        public event System.Action Brise;
+
+        GameBalance B => GameBalance.Courant;
+        float m_DernierSon;
+
+        void Awake()
+        {
+            Instance = this;
+            if (effet == null) effet = GetComponentInChildren<RelicShieldEtat>(true);
+        }
+
+        void OnDestroy() { if (Instance == this) Instance = null; }
+
+        void Start()
+        {
+            var p = Partie.Instance;
+            if (p != null && p.nyxessa != null) p.nyxessa.absorbeur = Absorber;
+            if (effet != null)
+            {
+                effet.radius = B.bouclierRayon;
+                effet.height = B.bouclierHauteur;
+                effet.castSeconds = B.bouclierIncantation;
+            }
+        }
+
+        /// Le sorcier lève le bouclier (incantation, puis pleine solidité du palier).
+        public void Lever()
+        {
+            if (effet == null || effet.IsUp || effet.IsCasting) return;
+            effet.maxHealth = B.Palier(B.bouclierEncaissement);
+            effet.Lever();
+            AudioBank.Jouer(SonsDuJeu.BouclierLeve, transform.position + Vector3.up * 2f, 0.9f);
+            Partie.Instance?.Journal("Bouclier levé par le sorcier (palier " + B.bouclierPalier + ", " + effet.maxHealth + " d'encaissement)");
+        }
+
+        /// L'aube, ou la fin de partie : le bouclier redescend dans le sol.
+        public void Baisser()
+        {
+            if (effet == null) return;
+            effet.Baisser();
+        }
+
+        /// Coup porté à Nyxessa ou au sorcier : le bouclier levé l'encaisse et renvoie des dégâts à l'attaquant ; renvoie
+        /// la part qui passe (0 tant qu'il tient ; le reste du coup qui le brise).
+        public float Absorber(InfoDegats info)
+        {
+            if (!Leve || info.montant <= 0f) return info.montant;
+            float pris = Mathf.Min(effet.Health, info.montant);
+            Vector3 point = PointSurParoi(info);
+            effet.Frapper(pris, point);
+            if (Time.time - m_DernierSon > 0.12f)
+            {
+                m_DernierSon = Time.time;
+                AudioBank.Jouer(SonsDuJeu.BouclierTouche, point, 0.7f, 0.1f);
+            }
+            // Riposte : dégâts renvoyés à l'attaquant (Nyxessa n'est créditée d'aucun score).
+            var attaquant = info.source != null ? info.source.GetComponentInParent<Sante>() : null;
+            float renvoi = B.Palier(B.bouclierRenvoi);
+            if (attaquant != null && !attaquant.Mort && renvoi > 0f)
+                attaquant.Encaisser(new InfoDegats { montant = renvoi, equipeSource = Equipe.Relique, source = gameObject, point = attaquant.transform.position + Vector3.up, direction = (attaquant.transform.position - transform.position).normalized });
+            if (!effet.IsUp)
+            {
+                AudioBank.Jouer(SonsDuJeu.BouclierBrise, transform.position + Vector3.up * 2f, 1f);
+                Partie.Instance?.Journal("Bouclier brisé");
+                Brise?.Invoke();
+            }
+            return info.montant - pris;
+        }
+
+        Vector3 PointSurParoi(InfoDegats info)
+        {
+            Vector3 d = info.point - transform.position; d.y = 0f;
+            if (d.sqrMagnitude < 0.01f && info.source != null) { d = info.source.transform.position - transform.position; d.y = 0f; }
+            if (d.sqrMagnitude < 0.01f) d = Vector3.forward;
+            return transform.position + d.normalized * Rayon + Vector3.up * Mathf.Clamp(info.point.y - transform.position.y, 0.5f, 3f);
+        }
+    }
+}

@@ -88,6 +88,7 @@ namespace Deathless.EditorTools
         {
             GameObject P(string p) => AssetDatabase.LoadAssetAtPath<GameObject>(p);
             fx.modeleFleche = P("Assets/Art/KayKit/KayKit_Adventurers_2.0_FREE/Assets/fbx(unity)/arrow_bow.fbx");
+            fx.modelePiece = P("Assets/Art/KayKit/KayKit_Dungeon_Pack_1.1_FREE/Assets/fbx(unity)/coin.fbx");
             fx.prefabArcBande = P("Assets/VFX/ArcBande/ArcBande.prefab");
             fx.prefabNuee = P("Assets/VFX/NueeDeFleches/NueeDeFleches.prefab");
             fx.prefabCone = P("Assets/VFX/ConeDeFlammes/ConeDeFlammes.prefab");
@@ -153,6 +154,189 @@ namespace Deathless.EditorTools
             AjouterReseau(racine);
             PrefabUtility.SaveAsPrefabAsset(racine, PrefabDir + "/Heros_" + Capitale(id) + ".prefab");
             Object.DestroyImmediate(racine);
+        }
+
+        // ================================================================= Sorcier et bouclier (wiki : village, nyxessa)
+
+        const string SorcierPath = "Assets/Jeu/Prefabs/Sorcier.prefab";
+        const string SorcierMat = "Assets/Jeu/Materiaux/KayKit_Mage_Sorcier.mat";
+        const string BatonSorcier = "Assets/Art/KayKit/KayKit_FantasyWeaponsBits_1.0_FREE/Assets/fbx(unity)/staff_B.fbx";
+        const string BatonTexture = "Assets/Art/KayKit/KayKit_FantasyWeaponsBits_1.0_FREE/Assets/fbx(unity)/weapons_bits_texture.png";
+
+        /// Contrôleur du sorcier : socle commun (marche, mort vers l'arrière Death_A) et, sur le haut du corps, l'invocation
+        /// (Ranged_Magic_Summon, bâton levé, calée sur la durée de l'incantation) puis le sort en boucle (Spellcasting).
+        static RuntimeAnimatorController ControleurSorcier()
+        {
+            var style = Style("Staff");
+            var c = Socle("Sorcier_Jeu", style, out var loco, out var haut, out var vide);
+            c.AddParameter("Invoque", AnimatorControllerParameterType.Trigger);
+            Booleen(c, "Cone");
+            var invClip = Clip(Ranged, "Ranged_Magic_Summon");
+            float vitesse = invClip != null ? invClip.length / Mathf.Max(0.5f, GameBalance.Courant.bouclierIncantation) : 1f;
+            var inv = Etat(haut, "Invoque", invClip, new Vector3(450, -120), vitesse);
+            var cone = Etat(haut, "Cone", Boucle(Clip(Ranged, "Ranged_Magic_Spellcasting"), "Ranged_Magic_Spellcasting_Loop"), new Vector3(450, 120));
+            var ti = vide.AddTransition(inv); ti.hasExitTime = false; ti.duration = 0.15f; ti.AddCondition(AnimatorConditionMode.If, 0, "Invoque");
+            Sortie(inv, cone, 0.95f, 0.2f);
+            var ti2 = inv.AddTransition(vide); ti2.hasExitTime = false; ti2.duration = 0.15f; ti2.AddCondition(AnimatorConditionMode.IfNot, 0, "Cone");
+            Si(vide, cone, "Cone", true, 0.12f);
+            Si(cone, vide, "Cone", false, 0.15f);
+            EditorUtility.SetDirty(c);
+            AssetDatabase.SaveAssets();
+            return c;
+        }
+
+        /// Matériau du bâton du sorcier : atlas du pack Fantasy Weapons Bits dont seuls les pixels bleus (le cristal) passent au
+        /// vert Nyxessa, avec une légère émission limitée à ces pixels ; bois, ivoire et or inchangés. L'atlas d'origine
+        /// n'est pas modifié (même méthode que les yeux du Nécromancien).
+        static Material MateriauBatonSorcier()
+        {
+            Dossier("Assets/Jeu/Materiaux");
+            string path = "Assets/Jeu/Materiaux/Baton_Sorcier.mat";
+            var fbxMat = AssetDatabase.LoadAssetAtPath<GameObject>(BatonSorcier).GetComponentInChildren<Renderer>().sharedMaterial;
+            var m = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (m == null) { m = new Material(fbxMat); AssetDatabase.CreateAsset(m, path); }
+            else m.CopyPropertiesFromMaterial(fbxMat);
+            var imp = (TextureImporter)AssetImporter.GetAtPath(BatonTexture);
+            bool lisible = imp.isReadable;
+            if (!lisible) { imp.isReadable = true; imp.SaveAndReimport(); }
+            var src = AssetDatabase.LoadAssetAtPath<Texture2D>(BatonTexture);
+            var px = src.GetPixels();
+            var emis = new Color[px.Length];
+            Color vert = VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Coeur, new Color(0.62f, 0.91f, 0.44f));
+            Color vif = VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Vif, new Color(0.25f, 0.68f, 0.35f));
+            Color ombre = VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Ombre, new Color(0.10f, 0.35f, 0.22f));
+            int n = 0;
+            for (int i = 0; i < px.Length; i++)
+            {
+                Color.RGBToHSV(px[i], out float h, out float sat, out float v);
+                bool bleu = h > 0.52f && h < 0.70f && sat > 0.35f && v > 0.25f;
+                if (bleu)
+                {
+                    px[i] = v < 0.55f ? Color.Lerp(ombre, vif, v / 0.55f) : Color.Lerp(vif, vert, (v - 0.55f) / 0.45f);
+                    emis[i] = Color.Lerp(vif, vert, v) * 0.6f;
+                    n++;
+                }
+                else emis[i] = Color.black;
+            }
+            if (!lisible) { imp.isReadable = false; imp.SaveAndReimport(); }
+            var tex = new Texture2D(src.width, src.height, TextureFormat.RGBA32, false); tex.SetPixels(px); tex.Apply();
+            var tEm = new Texture2D(src.width, src.height, TextureFormat.RGBA32, false); tEm.SetPixels(emis); tEm.Apply();
+            string pb = "Assets/Jeu/Materiaux/Baton_Sorcier_Base.png", pe = "Assets/Jeu/Materiaux/Baton_Sorcier_Emission.png";
+            System.IO.File.WriteAllBytes(pb, tex.EncodeToPNG());
+            System.IO.File.WriteAllBytes(pe, tEm.EncodeToPNG());
+            foreach (var p in new[] { pb, pe })
+            {
+                AssetDatabase.ImportAsset(p);
+                var ti = (TextureImporter)AssetImporter.GetAtPath(p);
+                ti.mipmapEnabled = false; ti.filterMode = src.filterMode; ti.textureCompression = TextureImporterCompression.Uncompressed;
+                ti.SaveAndReimport();
+            }
+            var b = AssetDatabase.LoadAssetAtPath<Texture2D>(pb);
+            if (m.HasProperty("_BaseMap")) m.SetTexture("_BaseMap", b);
+            if (m.HasProperty("_MainTex")) m.SetTexture("_MainTex", b);
+            m.EnableKeyword("_EMISSION");
+            m.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
+            m.SetTexture("_EmissionMap", AssetDatabase.LoadAssetAtPath<Texture2D>(pe));
+            m.SetColor("_EmissionColor", Color.white * 1.2f);
+            EditorUtility.SetDirty(m);
+            Debug.Log("Bâton du sorcier : " + n + " pixels du cristal passés au vert Nyxessa");
+            return m;
+        }
+
+
+        /// Sorcier (modèle Mage du pack Adventurers, texture alternative A bleu-gris, bâton du style Staff, contrôleur du
+        /// Mage) et bouclier de Nyxessa (BouclierRelique) posés dans la scène ouverte (Village) ; pièce d'or des vagues.
+        [MenuItem("Deathless/Jeu/9. Sorcier et bouclier")]
+        public static string SorcierEtBouclier()
+        {
+            var b = GameBalance.Courant;
+            // Matériau : copie de KayKit_Mage avec la texture alternative A (le Mage joueur garde la sienne).
+            Dossier("Assets/Jeu/Materiaux");
+            var source = AssetDatabase.LoadAssetAtPath<Material>("Assets/Art/Materials/KayKit_Mage.mat");
+            var mat = AssetDatabase.LoadAssetAtPath<Material>(SorcierMat);
+            if (mat == null) { mat = new Material(source); AssetDatabase.CreateAsset(mat, SorcierMat); }
+            else mat.CopyPropertiesFromMaterial(source);
+            var tex = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Art/KayKit/KayKit_Adventurers_2.0_EXTRA/Textures/mage_texture_alt_A.png");
+            if (tex != null) { mat.SetTexture("_BaseMap", tex); if (mat.HasProperty("_MainTex")) mat.SetTexture("_MainTex", tex); }
+            EditorUtility.SetDirty(mat);
+
+            // Prefab.
+            var racine = new GameObject("Sorcier");
+            var modele = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(Aventuriers + "Mage.fbx"));
+            PrefabUtility.UnpackPrefabInstance(modele, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
+            modele.name = "Modele";
+            modele.transform.SetParent(racine.transform, false);
+            modele.transform.localScale = Vector3.one * b.echellePersonnages;
+            MannequinEquip.Equiper(modele, Style("Staff"));
+            foreach (var t in modele.GetComponentsInChildren<Transform>(true))
+                if (PrefabUtility.IsPartOfPrefabInstance(t.gameObject) && PrefabUtility.IsOutermostPrefabInstanceRoot(t.gameObject))
+                    PrefabUtility.UnpackPrefabInstance(t.gameObject, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
+            foreach (var rendu in modele.GetComponentsInChildren<Renderer>(true))
+            {
+                var mats = rendu.sharedMaterials;
+                for (int i = 0; i < mats.Length; i++) if (mats[i] == source) mats[i] = mat;
+                rendu.sharedMaterials = mats;
+            }
+            // Bâton du sorcier (Quentin) : staff_B du pack Fantasy Weapons Bits (hampe, bague ivoire, cornes dorées, cristal
+            // en goutte), cristal passé au vert Nyxessa ; à la place du bâton d'Adventurers (celui du Mage joueur).
+            Transform main = null;
+            foreach (var t in modele.GetComponentsInChildren<Transform>(true)) if (t.name == "handslot.r") main = t;
+            foreach (var t in modele.GetComponentsInChildren<Transform>(true)) if (t.name == "staff" && t.parent == main) Object.DestroyImmediate(t.gameObject);
+            if (main != null)
+            {
+                var baton = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(BatonSorcier), main);
+                PrefabUtility.UnpackPrefabInstance(baton, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
+                baton.name = "baton_sorcier";
+                baton.transform.localPosition = Vector3.zero;
+                baton.transform.localRotation = Quaternion.identity;
+                baton.transform.localScale = Vector3.one;
+                var matBaton = MateriauBatonSorcier();
+                foreach (var rendu in baton.GetComponentsInChildren<Renderer>(true)) rendu.sharedMaterial = matBaton;
+            }
+            var anim = modele.GetComponent<Animator>(); if (anim == null) anim = modele.AddComponent<Animator>();
+            anim.runtimeAnimatorController = ControleurSorcier();
+            anim.applyRootMotion = false;
+            var agent = racine.AddComponent<UnityEngine.AI.NavMeshAgent>();
+            agent.radius = 0.35f; agent.height = 1.9f; agent.speed = b.sorcierVitesse; agent.angularSpeed = 540f; agent.acceleration = 12f;
+            agent.obstacleAvoidanceType = UnityEngine.AI.ObstacleAvoidanceType.LowQualityObstacleAvoidance;
+            racine.AddComponent<Sante>().equipe = Equipe.Relique;
+            racine.AddComponent<Sorcier>().animator = anim;
+            PrefabUtility.SaveAsPrefabAsset(racine, SorcierPath);
+            Object.DestroyImmediate(racine);
+            AssetDatabase.SaveAssets();
+
+            string r = "Sorcier : prefab " + SorcierPath;
+            var partie = Object.FindAnyObjectByType<Partie>();
+            if (partie != null && partie.nyxessa != null)
+            {
+                var scene = partie.gameObject.scene;
+                Vector3 nyx = partie.nyxessa.transform.position;
+                float sol = partie.pointDepart != null ? partie.pointDepart.position.y : 0f;
+                // Sorcier (une seule instance).
+                var ancien = Object.FindAnyObjectByType<Sorcier>(FindObjectsInactive.Include);
+                if (ancien != null) Object.DestroyImmediate(ancien.gameObject);
+                var so = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(SorcierPath), scene);
+                so.transform.position = new Vector3(nyx.x - 3f, sol, nyx.z);
+                // Bouclier : objet au sol sous Nyxessa, effet validé BouclierRelique (racine à +0,8 m).
+                var ab = Object.FindAnyObjectByType<BouclierNyxessa>(FindObjectsInactive.Include);
+                if (ab != null) Object.DestroyImmediate(ab.gameObject);
+                var bo = new GameObject("BouclierNyxessa");
+                UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(bo, scene);
+                bo.transform.position = new Vector3(nyx.x, sol + b.bouclierBase, nyx.z);   // sur la marche du bas du plateau
+                var effet = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/VFX/BouclierRelique/BouclierRelique.prefab"), bo.transform);
+                effet.transform.localPosition = Vector3.up * 0.8f;
+                var etat = effet.GetComponent<RelicShieldEtat>();
+                etat.radius = b.bouclierRayon; etat.height = b.bouclierHauteur; etat.castSeconds = b.bouclierIncantation;
+                etat.maxHealth = b.Palier(b.bouclierEncaissement);
+                bo.AddComponent<BouclierNyxessa>().effet = etat;
+                var fx = Object.FindAnyObjectByType<EffetsJeu>();
+                if (fx != null) { RemplirEffetsClasses(fx); EditorUtility.SetDirty(fx); }
+                EditorSceneManager.MarkSceneDirty(scene);
+                EditorSceneManager.SaveScene(scene);
+                r += ", sorcier et bouclier posés dans " + scene.name;
+            }
+            Debug.Log(r);
+            return r;
         }
 
         // ================================================================= Réseau (Docs/reseau.md)

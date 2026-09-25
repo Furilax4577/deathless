@@ -120,6 +120,42 @@ namespace Deathless.Jeu
         [Tooltip("Délai entre la destruction de Nyxessa et l'écran de score (s).")]
         public float delaiScoreDefaite = 3f;
 
+        [Header("Bouclier du sorcier (wiki : nyxessa, Bouclier ; 5 paliers, achat à venir)")]
+        [Tooltip("Palier en jeu (1 à 5) ; les paliers s'achèteront à la relique quand l'or servira.")]
+        [Range(1, 5)] public int bouclierPalier = 1;
+        [Tooltip("Dégâts absorbés par palier (1 à 5).")]
+        public float[] bouclierEncaissement = { 150f, 260f, 370f, 480f, 600f };
+        [Tooltip("Dégâts renvoyés à l'attaquant, à chaque coup, par palier (1 à 5).")]
+        public float[] bouclierRenvoi = { 5f, 9f, 12f, 16f, 20f };
+        [Tooltip("Durée de l'incantation qui lève le bouclier (s).")]
+        public float bouclierIncantation = 3f;
+        [Tooltip("Rayon du cylindre (m) : il repose sur le giron de la marche du bas du plateau de Nyxessa (apothème 5,36 m).")]
+        public float bouclierRayon = 5.3f;
+        [Tooltip("Hauteur de la base du bouclier : dessus de la marche du bas du plateau (m).")]
+        public float bouclierBase = 0.25f;
+        public float bouclierHauteur = 6f;
+
+        [Header("Sorcier (villageois ; wiki : village)")]
+        [Tooltip("Nom de sa maison (objet sous Maisons) : il y passe le jour.")]
+        public string sorcierMaison = "Maison_5_A";
+        public float sorcierVitesse = 3.2f;
+        public float sorcierPV = 60f;
+        [Tooltip("Distance à Nyxessa de sa place d'incantation, du côté de sa maison (m) : sur le sommet du plateau, à l'intérieur du bouclier près de son bord, avec la place de tomber en arrière sans toucher le rocher.")]
+        public float sorcierDistanceNyxessa = 4.3f;
+        [Tooltip("Il fait face à l'extérieur, dos à Nyxessa ; il peut se tourner vers un ennemi devant lui de ce nombre de degrés au plus.")]
+        public float sorcierPivotMax = 20f;
+
+        [Header("Or des vagues (règle provisoire sans donjon ; wiki : ennemis, deroule)")]
+        public int orSbire = 5;
+        public int orGuerrier = 8;
+        public int orVoleur = 8;
+        public int orMage = 10;
+        public int orElite = 25;
+        public int orMorgrim = 150;
+        public int orNyxar = 300;
+
+        public float Palier(float[] valeurs) => valeurs == null || valeurs.Length == 0 ? 0f : valeurs[Mathf.Clamp(bouclierPalier, 1, valeurs.Length) - 1];
+
         [Header("Paladin")]
         public float herosPV = 150f;
         public float endurance = 100f;

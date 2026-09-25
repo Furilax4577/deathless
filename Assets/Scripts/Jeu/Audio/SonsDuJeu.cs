@@ -35,6 +35,12 @@ namespace Deathless.Jeu
         public static readonly string[] NyxessaAlerte = { "nyxessa_alerte" };
         public static readonly string[] NyxessaDestruction = { "nyxessa_destruction", "shield_break" };
 
+        public static readonly string[] BouclierLeve = { "shield_raise" };
+        public static readonly string[] BouclierTouche = { "shield_hit" };
+        public static readonly string[] BouclierBrise = { "shield_break" };
+        public static readonly string[] SorcierIncantation = { "sorcier_incantation" };
+        public static readonly string[] Or = { "kenney_rpg_handlecoins" };
+
         public static readonly string[] PortailOuverture = { "portal_open" };
         public static readonly string[] PortailFermeture = { "portal_close" };
         public static readonly string[] PortailBourdon = { "portal_hum_loop" };

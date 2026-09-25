@@ -59,19 +59,19 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 09f9842b1c9d3e64389770569d7b5c02, type: 3}
   - id: vote_pret
     nom: "Vote \xAB pr\xEAt \xBB \u2014 joueur pr\xEAt"
-    statut: a_ecouter
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 1946493675ddd2b408447fcd4b104c8e, type: 3}
   - id: vote_tous_prets
     nom: "Vote \xAB pr\xEAt \xBB \u2014 tout le monde est pr\xEAt"
-    statut: a_ecouter
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 9e300dc4a4051c34ea3b74038b8103fd, type: 3}
   - id: vote_annule
     nom: "Vote \xAB pr\xEAt \xBB \u2014 vote annul\xE9"
-    statut: a_ecouter
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 06e6a04c35b711e479fa28d3e82e7813, type: 3}
@@ -142,7 +142,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 73b6791f973dbd84caa81cf09654fb77, type: 3}
   - id: bow_shot_v3
     nom: "Arc \u2014 tir"
-    statut: a_ecouter
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 9610b4cbd27c77945abb159a63ba78ca, type: 3}
@@ -158,7 +158,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: c996b61ae3d891b4eb9ba936633592d3, type: 3}
   - id: bow_shot_v3_charged
     nom: "Arc \u2014 tir charg\xE9"
-    statut: a_ecouter
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: ede56ad1846612b498411883c059c238, type: 3}
@@ -171,7 +171,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 44c250347361d774d9da1c63eb0545f4, type: 3}
   - id: crossbow_shot_v3
     nom: "Arbal\xE8te \u2014 tir"
-    statut: a_ecouter
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: ef3522d9b58874c439a7b4eab2fd71e7, type: 3}
@@ -216,7 +216,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: f1f153d67c786ba48ab324453be2fa32, type: 3}
   - id: coup_critique
     nom: Coup critique
-    statut: a_ecouter
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 60cacaf38a04bb84bb15e775905b348b, type: 3}
@@ -224,13 +224,13 @@ MonoBehaviour:
     - {fileID: 8300000, guid: e680cb04bc593e240af88c330e3e652d, type: 3}
   - id: coup_critique_meilleur
     nom: "Coup critique \u2014 meilleur critique"
-    statut: a_ecouter
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: f80aa7d4d39a5f74e8a3f9a0e83ab96f, type: 3}
   - id: arbalete_recharge
     nom: "Arbal\xE8te \u2014 rechargement"
-    statut: a_ecouter
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 208e8927adec70a45954d8638384c402, type: 3}
@@ -272,7 +272,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 1f2b731b35e8b1d4e945a41e9528af12, type: 3}
   - id: brulure
     nom: "Br\xFBlure \u2014 cr\xE9pitement (boucle)"
-    statut: a_ecouter
+    statut: disponible
     boucle: 1
     clips:
     - {fileID: 8300000, guid: bf77e2745cabdfb49b212276609a3e5e, type: 3}
@@ -347,43 +347,43 @@ MonoBehaviour:
     - {fileID: 8300000, guid: c9e96707ef73d694c999c2b1ceed9f7e, type: 3}
   - id: arc_bander
     nom: "Arc \u2014 bander"
-    statut: a_ecouter
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 467075b2ddeb33f47aa1d85d643d5c78, type: 3}
   - id: arc_charge_complete
     nom: "Arc \u2014 charg\xE9 \xE0 fond"
-    statut: a_ecouter
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: b0d09bfe01f339a4894e2ce19ff05da7, type: 3}
   - id: nuee_marqueur
     nom: "Nu\xE9e de fl\xE8ches \u2014 marqueur au sol"
-    statut: a_ecouter
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: ea8dc8c863efe53419aa9fd2d7fa23ac, type: 3}
   - id: assassin_furtif
     nom: "Assassin \u2014 passage en mode furtif"
-    statut: a_ecouter
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 7230de2c0b3db05458cf38f99450b5c9, type: 3}
   - id: assassin_furtif_sortie
     nom: "Assassin \u2014 sortie du mode furtif"
-    statut: a_ecouter
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: ef6c5aa4451cd164bb51679f8188255a, type: 3}
   - id: assassin_repere
     nom: "Assassin \u2014 rep\xE9r\xE9"
-    statut: a_ecouter
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 4009718ac02a94b4ca6c14ece0ce2bd8, type: 3}
   - id: grenade_lancer
     nom: "Grenade fumig\xE8ne \u2014 lancer"
-    statut: a_ecouter
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 7dcb9eababce0ca47b233b459ee4e310, type: 3}
@@ -464,61 +464,61 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 63aecdff01648d34081fff6cf226cc48, type: 3}
   - id: nyxessa_charge_portail
     nom: "Nyxessa \u2014 charge vers le portail"
-    statut: a_ecouter
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: ed1cf2bc48b04704fbd1333e73751933, type: 3}
   - id: nyxessa_retour_energie
     nom: "Nyxessa \u2014 retour de l'\xE9nergie"
-    statut: a_ecouter
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: dabb40a27ba775a4eb3fec3739d6b32c, type: 3}
   - id: portail_goutte
     nom: "Portail \u2014 goutte d'eau, entr\xE9e"
-    statut: a_ecouter
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 1e68cf324b5fde34aac81699dd44e493, type: 3}
   - id: portail_goutte_sortie
     nom: "Portail \u2014 goutte d'eau, sortie"
-    statut: a_ecouter
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: eb0e6a11d4f5c6d4f898bb887f3bfb67, type: 3}
   - id: portail_arrivee
     nom: "Portail \u2014 arriv\xE9e d'un joueur"
-    statut: a_ecouter
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 93144651e8417b24aaea77498a877fc0, type: 3}
   - id: nyxessa_onde_passage
     nom: "Nyxessa \u2014 onde de la ceinture"
-    statut: a_ecouter
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: b6a65394c2393e04898c56cd005d3366, type: 3}
   - id: nyxessa_rappel
     nom: "Nyxessa \u2014 rappel forc\xE9"
-    statut: a_ecouter
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 3efc6bbc53b67534eaa8c5bc395e44be, type: 3}
   - id: nyxessa_palier
     nom: "Nyxessa \u2014 palier am\xE9lior\xE9"
-    statut: a_ecouter
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 7df062e27d2e5d044a4d52b72038e1fb, type: 3}
   - id: sorcier_incantation
     nom: "Sorcier \u2014 incantation du bouclier (boucle)"
-    statut: a_ecouter
+    statut: utilise
     boucle: 1
     clips:
     - {fileID: 8300000, guid: 615e084e724896b4cb3d52b4420c9407, type: 3}
   - id: nyxessa_destruction
     nom: "Nyxessa \u2014 destruction (d\xE9faite)"
-    statut: a_ecouter
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 58d0c85cfc817c7469f844234e5609b6, type: 3}
@@ -600,13 +600,13 @@ MonoBehaviour:
     - {fileID: 8300000, guid: f3f576bcdfc3eeb4a8bbf0a4e4713766, type: 3}
   - id: donjon_alerte_nuit
     nom: "Donjon \u2014 alerte avant la nuit"
-    statut: a_ecouter
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 72de0e1ce999b0d4996ccc6ca1d34382, type: 3}
   - id: partie_victoire
     nom: "Partie \u2014 victoire"
-    statut: a_ecouter
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 04f6606953f1037488f99f8bcfe57948, type: 3}

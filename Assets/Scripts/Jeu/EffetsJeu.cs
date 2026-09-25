@@ -20,6 +20,8 @@ namespace Deathless.Jeu
         [Header("Classes")]
         [Tooltip("Modèle KayKit arrow_bow (flèches et carreaux, non magiques).")]
         public GameObject modeleFleche;
+        [Tooltip("Pièce d'or KayKit (coin) : retour de l'or gagné sur un squelette tué.")]
+        public GameObject modelePiece;
         public GameObject prefabArcBande;
         public GameObject prefabNuee;
         public GameObject prefabCone;

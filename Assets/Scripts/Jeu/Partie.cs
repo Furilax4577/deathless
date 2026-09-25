@@ -51,6 +51,7 @@ namespace Deathless.Jeu
         public event Action<int, bool> PretChange;           // joueur, prêt
         public event Action<int> JoueurMort;
         public event Action<int> JoueurReapparu;
+        public event Action<int, Vector3> OrGagne;          // montant, point
 
         void Awake()
         {
@@ -486,6 +487,19 @@ namespace Deathless.Jeu
         {
             var j = Joueur(joueurId);
             if (j != null && montant > 0f) j.score.soinsProdigues += montant;
+        }
+
+        /// Or des vagues : versé à la caisse commune, compté dans « Or rapporté » du joueur qui a porté le coup fatal
+        /// (joueurId 0 : Nyxessa, bouclier… : caisse seulement). Petite pièce qui monte et son d'or discret.
+        public void GagnerOr(int montant, int joueurId, Vector3 point)
+        {
+            if (montant <= 0 || !EnCours) return;
+            Etat.orEquipe += montant;
+            var j = Joueur(joueurId);
+            if (j != null) j.score.orRapporte += montant;
+            PieceOr.Jouer(point);
+            AudioBank.Jouer(SonsDuJeu.Or, point, 0.3f, 0.1f);
+            OrGagne?.Invoke(montant, point);
         }
 
         public void Journal(string texte)
