@@ -1,6 +1,14 @@
 {
   "versions": [
     {
+      "version": "0.4.3",
+      "date": "2026-09-25",
+      "titre": "Lobby stable",
+      "notes": [
+        "Lobby : le compte à rebours « Tous prêts » et les messages ne décalent plus les cases des joueurs ni les boutons."
+      ]
+    },
+    {
       "version": "0.4.2",
       "date": "2026-09-25",
       "titre": "La caméra retrouve son héros",
