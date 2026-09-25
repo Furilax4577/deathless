@@ -698,7 +698,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -7848952084472943420, guid: c3c2cb2d2864b7549a6c28aa8b77bc00, type: 3}
+  - {fileID: 2100000, guid: 113c056cbcdc6e2468e14dc63f69bf51, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -899,6 +899,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Deathless.Jeu.Squelette
   type: 0
   elite: 0
+  yeuxElite: {fileID: 2100000, guid: 9a02664a1cdc3c347b75a2d6842b9ec9, type: 2}
   modele: {fileID: 4505416726138262116}
   animator: {fileID: 4758076981170559614}
   dureeSortie: 2.3777778

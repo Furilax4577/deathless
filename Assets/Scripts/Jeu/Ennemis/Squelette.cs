@@ -16,6 +16,8 @@ namespace Deathless.Jeu
         [Header("Réglages (posés par le directeur des vagues)")]
         public TypeEnnemi type;
         public bool elite;
+        [Tooltip("Yeux verts de l'élite (éclat de Nyx), posés à l'apparition sur les maillages « *_Eyes ».")]
+        public Material yeuxElite;
         [Tooltip("Modèle (enfant) : c'est lui qui sort de terre.")]
         public Transform modele;
         public Animator animator;
@@ -408,6 +410,15 @@ namespace Deathless.Jeu
         }
 
         public virtual bool Repoussable => true;
+
+        /// Élite : yeux verts (éclat de Nyx). Appelé à l'apparition, chez l'hôte comme chez les clients (purement visuel).
+        public void MarquerElite()
+        {
+            if (!elite) return;
+            if (yeuxElite == null) { if (GetComponent<AuraElite>() == null) gameObject.AddComponent<AuraElite>(); return; }
+            foreach (var r in GetComponentsInChildren<Renderer>(true)) if (r.name.EndsWith("_Eyes")) r.sharedMaterial = yeuxElite;
+            if (GetComponent<AuraElite>() == null) gameObject.AddComponent<AuraElite>();   // légère aura de gemmes vertes
+        }
 
         /// Or rapporté à sa mort (GameBalance, wiki : ennemis) ; rien s'il est désintégré à l'aube.
         public int OrRapporte

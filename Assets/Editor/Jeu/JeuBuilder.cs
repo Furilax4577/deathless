@@ -381,6 +381,51 @@ namespace Deathless.EditorTools
             AssetDatabase.SaveAssets();
         }
 
+        // ================================================================= Yeux des squelettes (wiki : ennemis, Yeux)
+
+        /// Yeux lumineux : jaune-orangé pour les squelettes ordinaires et Morgrim (comme les modèles KayKit), vert Nyxessa
+        /// pour les élites (éclat de Nyx ; posé à l'apparition par Squelette.MarquerElite). Matériaux Lit à émission HDR
+        /// sur les maillages « *_Eyes » seuls : la lueur de nuit (bloom) les fait briller un peu, sans éblouir.
+        [MenuItem("Deathless/Jeu/10. Yeux des squelettes")]
+        public static string YeuxSquelettes()
+        {
+            Dossier(MatDir);
+            var jaune = MateriauYeux("Yeux_Squelette", new Color32(0xff, 0xb3, 0x2e, 0xff), 1.05f);
+            var vert = MateriauYeux("Yeux_Elite", VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Coeur, new Color32(0x3f, 0xb5, 0x52, 0xff)), 1.25f);
+            int n = 0;
+            foreach (var nom in new[] { "Squelette_Sbire", "Squelette_Guerrier", "Squelette_Golem" })
+            {
+                string chemin = PrefabDir + "/" + nom + ".prefab";
+                var racine = PrefabUtility.LoadPrefabContents(chemin);
+                if (racine == null) continue;
+                foreach (var r in racine.GetComponentsInChildren<Renderer>(true)) if (r.name.EndsWith("_Eyes")) { r.sharedMaterial = jaune; n++; }
+                var sq = racine.GetComponent<Squelette>();
+                if (sq != null) sq.yeuxElite = vert;
+                PrefabUtility.SaveAsPrefabAsset(racine, chemin);
+                PrefabUtility.UnloadPrefabContents(racine);
+            }
+            AssetDatabase.SaveAssets();
+            string res = "Yeux : " + n + " maillages en jaune-orangé (sbire, guerrier, Morgrim) ; vert Nyxessa pour les élites (à l'apparition)";
+            Debug.Log(res);
+            return res;
+        }
+
+        static Material MateriauYeux(string nom, Color couleur, float intensite)
+        {
+            string path = MatDir + "/" + nom + ".mat";
+            var m = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (m == null) { m = new Material(Shader.Find("Universal Render Pipeline/Lit")); AssetDatabase.CreateAsset(m, path); }
+            // Base noire : toute la couleur vient de l'émission, gardée sous 1 par canal pour que la teinte reste lisible
+            // (au-delà, l'œil vire au blanc) ; le seuil de la lueur de nuit (0,9) la fait juste briller.
+            m.SetColor("_BaseColor", Color.black);
+            m.SetFloat("_Smoothness", 0.2f);
+            m.EnableKeyword("_EMISSION");
+            m.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
+            m.SetColor("_EmissionColor", couleur * intensite);
+            EditorUtility.SetDirty(m);
+            return m;
+        }
+
         static Material MateriauEnnemi()
         {
             string path = MatDir + "/Squelette_Ennemi.mat";

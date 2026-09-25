@@ -47,6 +47,7 @@ namespace Deathless.Reseau
             var sq = Squelette;
             sq.type = (TypeEnnemi)m_Type.Value;
             sq.elite = m_Elite.Value;
+            sq.MarquerElite();
             sq.enabled = false;                       // IA et animation pilotées chez l'hôte
             if (sq.Agent != null) sq.Agent.enabled = false;
             sq.Sante.relais = Relayer;

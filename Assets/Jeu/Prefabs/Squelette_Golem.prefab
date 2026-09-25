@@ -143,6 +143,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Deathless.Jeu.Golem
   type: 0
   elite: 0
+  yeuxElite: {fileID: 2100000, guid: 9a02664a1cdc3c347b75a2d6842b9ec9, type: 2}
   modele: {fileID: 3250865765452497674}
   animator: {fileID: 1046249191989388075}
   dureeSortie: 2.3777778
@@ -495,7 +496,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -7848952084472943420, guid: 9be1ded76ed0d6f418f50ea6c1b0728a, type: 3}
+  - {fileID: 2100000, guid: 113c056cbcdc6e2468e14dc63f69bf51, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

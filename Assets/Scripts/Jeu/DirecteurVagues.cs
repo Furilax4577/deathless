@@ -194,6 +194,7 @@ namespace Deathless.Jeu
             var sq = go.GetComponent<Squelette>();
             sq.type = type;
             sq.elite = elite;
+            sq.MarquerElite();
             if (elite)
             {
                 stats = new StatsSquelette { pv = stats.pv * 3f, vitesse = stats.vitesse, degatsJoueur = stats.degatsJoueur * 1.5f, degatsNyxessa = stats.degatsNyxessa * 1.5f, intervalle = stats.intervalle, preparation = stats.preparation, portee = stats.portee + 0.3f };
