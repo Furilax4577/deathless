@@ -121,7 +121,8 @@ namespace Deathless.Jeu
 
         // ----------------------------------------------------------------- IEtatJoueur
 
-        public string Nom => J != null ? J.nom : "Joueur";
+        /// Pseudo du joueur local (Options > Jeu, écran du premier lancement).
+        public string Nom => DonneesUI.Profil.PseudoDefini ? DonneesUI.Profil.Pseudo : J != null ? J.nom : "Joueur";
         public string Classe => J != null ? J.classe : "Paladin";
         public Color TeinteClasse => ClasseLocale != null ? ClasseLocale.Teinte : TeintePaladin;
         public float Vie => J != null ? J.pv : 0f;

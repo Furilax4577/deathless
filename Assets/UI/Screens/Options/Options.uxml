@@ -14,6 +14,11 @@
 
         <ui:VisualElement name="options-jeu" class="dl-panel options__page options__page--jeu">
             <ui:Label text="JEU" class="dl-section-label" />
+            <ui:Button name="options-pseudo" class="dl-field options__pseudo">
+                <ui:Label text="Pseudo" class="options__pseudo-libelle" />
+                <ui:Label name="options-pseudo-valeur" text="Joueur" class="options__pseudo-valeur" />
+                <ui:Label text="Modifier" class="options__pseudo-action" />
+            </ui:Button>
             <ui:Label text="Taille de l’interface" class="dl-text" />
             <ui:VisualElement class="options__tailles">
                 <ui:Button name="taille-1" class="options__taille">

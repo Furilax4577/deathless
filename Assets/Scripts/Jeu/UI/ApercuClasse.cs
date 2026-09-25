@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using Deathless.UI.Donnees;
 using UnityEngine;
+using UnityEngine.Animations;
+using UnityEngine.Playables;
 using UnityEngine.Rendering.Universal;
 
 namespace Deathless.Jeu
@@ -35,6 +37,9 @@ namespace Deathless.Jeu
         RenderTexture m_Rendu;
         Transform m_Plateau;
         readonly Dictionary<string, GameObject> m_Modeles = new Dictionary<string, GameObject>();
+        readonly List<PlayableGraph> m_Graphes = new List<PlayableGraph>();
+        [Tooltip("Classe à venir (verrouillée) : teinte multipliée sur ses matériaux (un peu assombrie et désaturée, sans alpha).")]
+        public Color teinteVerrouillee = new Color(0.62f, 0.62f, 0.68f);
         GameObject m_Actif;
         float m_Apparition = 1f;
         float m_Angle = 200f;
@@ -152,7 +157,7 @@ namespace Deathless.Jeu
             if (m_Modeles.TryGetValue(id, out var m) && m != null) return m;
             var def = ClassesJeu.Courant != null ? ClassesJeu.Courant.Trouver(id) : null;
             var source = def != null && def.prefab != null ? def.prefab.transform.Find("Modele") : null;
-            if (source == null) return null;
+            if (source == null) return ModeleVerrouille(id);
             m = Instantiate(source.gameObject, m_Plateau, false);
             m.name = "Apercu_" + id;
             m.transform.localPosition = new Vector3(0f, 0.1f, 0f);
@@ -165,6 +170,44 @@ namespace Deathless.Jeu
                 anim.applyRootMotion = false;
                 anim.cullingMode = AnimatorCullingMode.AlwaysAnimate;
                 if (anim.runtimeAnimatorController == null && def.controleur != null) anim.runtimeAnimatorController = def.controleur;
+            }
+            m.SetActive(false);
+            m_Modeles[id] = m;
+            return m;
+        }
+
+        /// Classe à venir : modèle KayKit, arme sous la main droite, pose de repos (Playables, sans contrôleur), matériaux
+        /// assombris par un MaterialPropertyBlock.
+        GameObject ModeleVerrouille(string id)
+        {
+            var e = ApercusVerrouilles.Courant != null ? ApercusVerrouilles.Courant.Trouver(id) : null;
+            if (e == null || e.modele == null) return null;
+            var m = Instantiate(e.modele, m_Plateau, false);
+            m.name = "Apercu_" + id;
+            m.transform.localPosition = new Vector3(0f, 0.1f, 0f);
+            m.transform.localRotation = Quaternion.identity;
+            if (e.arme != null)
+            {
+                var os = MannequinEquip.Trouver(m.transform, e.os);
+                if (os != null) Instantiate(e.arme, os, false);
+            }
+            foreach (var t in m.GetComponentsInChildren<Transform>(true)) t.gameObject.layer = Couche;
+            var bloc = new MaterialPropertyBlock();
+            foreach (var r in m.GetComponentsInChildren<Renderer>(true))
+            {
+                r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                r.GetPropertyBlock(bloc);
+                bloc.SetColor("_BaseColor", teinteVerrouillee);
+                r.SetPropertyBlock(bloc);
+            }
+            var anim = m.GetComponent<Animator>();
+            if (anim == null) anim = m.AddComponent<Animator>();
+            anim.applyRootMotion = false;
+            anim.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+            if (e.repos != null)
+            {
+                AnimationPlayableUtilities.PlayClip(anim, e.repos, out var graphe);
+                m_Graphes.Add(graphe);
             }
             m.SetActive(false);
             m_Modeles[id] = m;
@@ -211,6 +254,7 @@ namespace Deathless.Jeu
         {
             if (ReferenceEquals(DonneesUI.ApercuClasse, this)) DonneesUI.ApercuClasse = null;
             if (m_Rendu != null) m_Rendu.Release();
+            foreach (var g in m_Graphes) if (g.IsValid()) g.Destroy();
         }
     }
 }

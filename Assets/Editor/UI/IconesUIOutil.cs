@@ -37,7 +37,44 @@ namespace Deathless.EditorUI
             if (change) EditorApplication.delayCall += Reconstruire;
         }
 
+        /// Copie dans Assets/UI/Icones/ les SVG nouveaux ou modifiés de ArtSources/Icones/ (Classes : sauf les variantes
+        /// « classe_x_a.svg » ; Competences : sauf les icônes provisoires du druide « druide_* »). Faite au chargement de
+        /// l'éditeur et par le menu : un emblème qui arrive dans ArtSources (ex. classe_mecanicien) remplace le repli.
+        [InitializeOnLoadMethod]
+        static void SynchroniserAuChargement() => EditorApplication.delayCall += () => { if (Synchroniser() > 0) AssetDatabase.Refresh(); };
+
+        public static int Synchroniser()
+        {
+            var racine = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "ArtSources", "Icones"));
+            var copies = 0;
+            foreach (var sous in new[] { "Classes", "Competences" })
+            {
+                var source = Path.Combine(racine, sous);
+                if (!Directory.Exists(source)) continue;
+                var cible = Path.Combine(Application.dataPath, "UI", "Icones", sous);
+                Directory.CreateDirectory(cible);
+                foreach (var fichier in Directory.GetFiles(source, "*.svg"))
+                {
+                    var nom = Path.GetFileNameWithoutExtension(fichier);
+                    if (sous == "Classes" && System.Text.RegularExpressions.Regex.IsMatch(nom, "^classe_.+_[a-z]$")) continue;
+                    if (sous == "Competences" && nom.StartsWith("druide_")) continue;
+                    var dest = Path.Combine(cible, nom + ".svg");
+                    if (File.Exists(dest) && File.ReadAllText(dest) == File.ReadAllText(fichier)) continue;
+                    File.Copy(fichier, dest, true);
+                    copies++;
+                }
+            }
+            if (copies > 0) Debug.Log("[Icônes] " + copies + " SVG copiés depuis ArtSources/Icones.");
+            return copies;
+        }
+
         [MenuItem("Deathless/UI/6. Table des icônes (SVG)")]
+        public static void Menu()
+        {
+            if (Synchroniser() > 0) AssetDatabase.Refresh();
+            Reconstruire();
+        }
+
         public static void Reconstruire()
         {
             var table = AssetDatabase.LoadAssetAtPath<IconesUI>(CheminTable);

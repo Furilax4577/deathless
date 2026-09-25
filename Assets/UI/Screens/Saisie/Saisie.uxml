@@ -1,0 +1,22 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:dl="Deathless.UI" editor-extension-mode="False">
+    <Style src="../V01.uss" />
+    <!-- Saisie d'un texte (pseudo au premier lancement ou dans les options, code de salon) : champ + clavier virtuel -->
+    <ui:VisualElement class="v01-plein v01-voile--fort saisie">
+        <ui:VisualElement class="dl-panel saisie__panneau">
+            <ui:Label name="saisie-titre" text="Ton pseudo" class="dl-title saisie__titre" />
+            <ui:Label name="saisie-aide" text="" class="dl-text dl-text--muted saisie__aide" />
+            <ui:TextField name="saisie-champ" class="dl-field saisie__champ" />
+            <ui:Label name="saisie-erreur" text="" class="dl-text dl-text--small saisie__erreur" />
+            <ui:Label name="saisie-regle" text="" class="dl-text dl-text--small dl-text--muted saisie__regle" />
+            <ui:VisualElement name="saisie-clavier" class="clavier" />
+        </ui:VisualElement>
+        <ui:VisualElement class="dl-prompt-bar">
+            <ui:VisualElement class="dl-prompt-bar__group">
+                <dl:InputPrompt action="UI/Submit" label="Écrire" />
+                <dl:InputPrompt name="saisie-invite-retour" action="UI/Cancel" label="Effacer" />
+                <dl:InputPrompt action="UI/Reset" label="Valider" />
+            </ui:VisualElement>
+            <ui:Label text="Clavier et souris" class="dl-text dl-text--small dl-text--muted dl-device-name" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

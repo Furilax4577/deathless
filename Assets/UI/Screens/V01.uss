@@ -42,8 +42,18 @@
 .choix__aide { margin: 3px 0 0 0; }
 .choix__corps { flex-direction: row; flex-grow: 1; flex-shrink: 1; margin-bottom: 120px; }
 .choix__liste { width: 470px; flex-shrink: 0; }
-.choix-classe { flex-direction: row; align-items: center; justify-content: flex-start; min-height: 110px; margin: 0 0 12px 0; padding: 0 21px; border-radius: 18px; }
-.choix-classe__embleme { width: 72px; height: 72px; margin-right: 18px; }
+.choix-classe { flex-direction: row; align-items: center; justify-content: flex-start; min-height: 92px; margin: 0 0 10px 0; padding: 0 21px; border-radius: 18px; }
+.choix-classe__embleme { width: 60px; height: 60px; margin-right: 18px; }
+/* Classe à venir : carte plus sombre, emblème éteint, étiquette « Bientôt » ivoire bien visible. */
+.choix-classe--verrouillee { background-color: rgba(16, 19, 27, 0.9); }
+.choix-classe--verrouillee .choix-classe__embleme { -unity-background-image-tint-color: rgb(150, 146, 140); }
+.choix-classe--verrouillee .choix-classe__nom { color: var(--dl-color-text-muted); }
+.choix-classe__prise { display: none; font-size: var(--dl-text-caption); color: var(--dl-color-text-muted); margin: 0; padding: 3px 12px; border-radius: 15px; border-width: 2px; border-color: var(--dl-color-border-strong); }
+.choix-classe--prise .choix-classe__embleme { opacity: 0.45; }
+.choix-classe--prise .choix-classe__nom { color: var(--dl-color-text-muted); }
+.choix-classe--prise .choix-classe__derniere { display: none; }
+.choix__prise { color: #ff8a70; font-size: var(--dl-text-small); margin: 3px 0 0 0; display: none; }
+.choix-classe__bientot { font-size: var(--dl-text-caption); -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); color: var(--dl-color-ink); background-color: var(--dl-color-text); margin: 0; padding: 3px 12px; border-radius: 15px; letter-spacing: 1px; }
 .choix__apercu { width: 470px; flex-shrink: 0; margin-left: 30px; align-items: center; justify-content: flex-end; }
 .choix__apercu-image { width: 100%; flex-grow: 1; -unity-background-scale-mode: scale-to-fit; }
 .choix__apercu-aide { margin: 6px 0 0 0; }
@@ -67,6 +77,67 @@
 .choix-action--vide .choix-action__nom { color: var(--dl-color-text-disabled); }
 .choix-action--vide .choix-action__invite { opacity: 0.4; }
 .choix-action--vide .choix-action__icone { opacity: 0; }
+
+/* ---------- Saisie (pseudo, code de salon) et clavier virtuel ---------- */
+.saisie { align-items: center; }
+.saisie__panneau { position: absolute; top: 90px; left: 50%; translate: -50% 0; width: 1080px; padding: 36px 42px; background-color: rgba(35, 42, 58, 0.97); }
+.saisie__titre { margin: 0; }
+.saisie__aide { margin: 6px 0 18px 0; white-space: normal; }
+.saisie__champ { min-height: var(--dl-control-height); }
+.saisie__champ > .unity-base-field__input { font-size: var(--dl-text-large); }
+.saisie__erreur { color: #ff8a70; margin: 6px 0 0 0; min-height: 24px; }
+.saisie__regle { margin: 0 0 18px 0; }
+.clavier { align-items: center; }
+.clavier__rangee { flex-direction: row; justify-content: center; }
+.clavier__touche { width: 78px; height: 66px; margin: 5px; padding: 0; font-size: var(--dl-text-large); -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); }
+.clavier__touche--large { width: 190px; font-size: var(--dl-text-body); }
+.clavier__touche--valider { border-color: var(--dl-color-gold); color: var(--dl-color-gold); }
+
+/* ---------- Options : pseudo ---------- */
+.options__pseudo { flex-direction: row; align-items: center; min-height: var(--dl-control-height); margin: var(--dl-space-1) 0 var(--dl-space-3) 0; justify-content: flex-start; }
+.options__pseudo-libelle { font-size: var(--dl-text-body); margin: 0; padding: 0; width: 180px; -unity-text-align: middle-left; }
+.options__pseudo-valeur { font-size: var(--dl-text-large); -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); margin: 0; padding: 0; flex-grow: 1; -unity-text-align: middle-left; }
+.options__pseudo-action { font-size: var(--dl-text-small); color: var(--dl-color-gold); margin: 0; padding: 0; }
+
+/* ---------- Lobby multijoueur ---------- */
+.lobby { padding: 54px 102px 0 102px; }
+.lobby__entete { margin-bottom: var(--dl-space-4); }
+.lobby__aide { margin: 3px 0 0 0; }
+.lobby__entree { flex-direction: row; margin: 0 -15px; }
+.lobby__carte { flex-grow: 1; flex-basis: 0; margin: 0 15px; padding: 30px 36px; background-color: rgba(35, 42, 58, 0.97); }
+.lobby__texte { margin: 6px 0 21px 0; white-space: normal; }
+.lobby__bouton { min-height: 78px; font-size: var(--dl-text-large); margin: 6px 0; }
+.lobby__champ { min-height: var(--dl-control-height); justify-content: flex-start; flex-direction: row; align-items: center; background-color: var(--dl-color-ink); margin: 0 0 12px 0; padding: 0 18px; }
+.lobby__champ-texte { margin: 0; padding: 0; font-size: var(--dl-text-large); -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); letter-spacing: 2px; }
+.lobby__champ-texte--vide { color: var(--dl-color-text-disabled); -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Regular-SDF.asset"); font-size: var(--dl-text-body); letter-spacing: 0; }
+.lobby__lien { align-self: flex-start; min-height: 42px; padding: 0 12px; margin: 6px 0 0 -6px; border-width: 0; background-color: rgba(0, 0, 0, 0); color: var(--dl-color-text-muted); font-size: var(--dl-text-small); }
+.lobby__lien:hover:enabled, .lobby__lien:focus:enabled { color: var(--dl-color-gold); }
+.lobby__message { margin: var(--dl-space-3) 0 0 0; min-height: 30px; color: var(--dl-color-text-muted); }
+.lobby__message--erreur { color: #ff8a70; }
+.lobby__salon { flex-grow: 1; }
+.lobby__code-ligne { flex-direction: row; align-items: center; margin-bottom: var(--dl-space-3); }
+.lobby__code-titre { margin: 0 18px 0 0; }
+.lobby__code-valeur { font-size: 45px; -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Bold-SDF.asset"); letter-spacing: 6px; margin: 0 24px 0 0; padding: 0; color: var(--dl-color-text); }
+.lobby__petit-bouton { min-height: 48px; padding: 0 18px; margin: 0 9px 0 0; font-size: var(--dl-text-small); }
+.lobby__copie { color: var(--dl-color-gold); margin: 0 0 0 6px; }
+.lobby__emplacements { flex-direction: row; margin: 0 -10px; }
+.lobby-place { flex-grow: 1; flex-basis: 0; min-height: 300px; margin: 0 10px; padding: 24px 18px; border-radius: 21px; border-width: 3px; border-color: var(--dl-color-border); background-color: rgba(35, 42, 58, 0.97); align-items: center; }
+.lobby-place--local { border-color: var(--dl-color-border-strong); background-color: var(--dl-color-panel-active); }
+.lobby-place--pret { border-color: var(--dl-color-gold); }
+.lobby-place--libre { background-color: rgba(16, 19, 27, 0.6); border-color: var(--dl-color-line); }
+.lobby-place--libre .lobby-place__embleme { opacity: 0.35; }
+.lobby-place__hote { position: absolute; top: 12px; right: 12px; font-size: var(--dl-text-caption); color: var(--dl-color-gold); border-width: 2px; border-color: var(--dl-color-gold); border-radius: 15px; padding: 2px 10px; margin: 0; }
+.lobby-place__embleme { width: 96px; height: 96px; margin: 12px 0; }
+.lobby-place__pseudo { font-size: var(--dl-text-large); -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); margin: 0; padding: 0; -unity-text-align: middle-center; white-space: normal; }
+.lobby-place--libre .lobby-place__pseudo { color: var(--dl-color-text-disabled); font-size: var(--dl-text-body); }
+.lobby-place__classe { font-size: var(--dl-text-small); color: var(--dl-color-text-muted); margin: 3px 0 15px 0; padding: 0; }
+.lobby-place__etat { font-size: var(--dl-text-small); -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); margin: 0; padding: 4px 16px; border-radius: 16px; border-width: 2px; border-color: var(--dl-color-border-strong); color: var(--dl-color-text-muted); }
+.lobby-place--pret .lobby-place__etat { color: var(--dl-color-ink); background-color: var(--dl-color-gold); border-color: var(--dl-color-gold); }
+.lobby-place--libre .lobby-place__etat { display: none; }
+.lobby__compte { margin: var(--dl-space-3) 0 0 0; -unity-text-align: middle-center; font-size: var(--dl-text-heading); -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); color: var(--dl-color-gold); }
+.lobby__actions { flex-direction: row; margin: var(--dl-space-3) -9px 0 -9px; }
+.lobby__actions > .lobby__bouton { flex-grow: 1; flex-basis: 0; margin: 0 9px; }
+.lobby__bouton--actif { border-color: var(--dl-color-gold); color: var(--dl-color-gold); }
 
 /* ---------- Pause ---------- */
 .pause {
@@ -228,8 +299,17 @@
 .dl-scale-3 .choix__aide { display: none; }
 .dl-scale-3 .choix__corps { margin-bottom: 100px; }
 .dl-scale-3 .choix__liste { width: 360px; }
-.dl-scale-3 .choix-classe { min-height: 84px; margin-bottom: 8px; padding: 0 14px; }
-.dl-scale-3 .choix-classe__embleme { width: 54px; height: 54px; margin-right: 12px; }
+.dl-scale-3 .choix-classe { min-height: 74px; margin-bottom: 8px; padding: 0 14px; }
+.dl-scale-3 .choix-classe__embleme { width: 46px; height: 46px; margin-right: 12px; }
+.dl-scale-3 .choix-classe__role { display: none; }
+.dl-scale-3 .saisie__panneau { top: 24px; width: 1000px; padding: 24px 30px; }
+.dl-scale-3 .clavier__touche { width: 62px; height: 52px; }
+.dl-scale-3 .clavier__touche--large { width: 150px; }
+.dl-scale-3 .lobby { padding: 30px 48px 0 48px; }
+.dl-scale-3 .lobby__carte { padding: 21px 24px; }
+.dl-scale-3 .lobby-place { min-height: 250px; padding: 15px; }
+.dl-scale-3 .lobby-place__embleme { width: 72px; height: 72px; }
+.dl-scale-3 .lobby__code-valeur { font-size: 36px; }
 .choix-classe--derniere .choix-classe__derniere { display: flex; }
 .dl-scale-3 .choix-classe--derniere .choix-classe__derniere { display: none; }
 .dl-scale-3 .choix__apercu { width: 300px; margin-left: 18px; }

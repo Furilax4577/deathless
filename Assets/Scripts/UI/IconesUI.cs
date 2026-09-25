@@ -19,6 +19,8 @@ namespace Deathless.UI
         public const string Potion = "commun_potion_soin";
         public const string Esquive = "commun_esquive";
         public const string CoupCritique = "commun_coup_critique";
+        /// Emblème de repli d'une classe dont le SVG n'est pas encore là (hexagone vide, Assets/UI/Icones/Repli/).
+        public const string RepliClasse = "repli_classe";
 
         [Serializable]
         public class Entree
@@ -34,8 +36,16 @@ namespace Deathless.UI
         static IconesUI s_Defaut;
         public static IconesUI Defaut => s_Defaut != null ? s_Defaut : (s_Defaut = Resources.Load<IconesUI>("DeathlessIcones"));
 
-        /// Icône par identifiant (null si absente ou identifiant vide).
+        /// Icône par identifiant (null si absente ou identifiant vide). Un emblème de classe manquant (« classe_… »)
+        /// prend l'hexagone vide RepliClasse, jusqu'à l'arrivée de son SVG.
         public static VectorImage Trouver(string id)
+        {
+            var v = TrouverExact(id);
+            if (v == null && id != null && id.StartsWith("classe_")) v = TrouverExact(RepliClasse);
+            return v;
+        }
+
+        static VectorImage TrouverExact(string id)
         {
             var t = Defaut;
             if (t == null || string.IsNullOrEmpty(id)) return null;

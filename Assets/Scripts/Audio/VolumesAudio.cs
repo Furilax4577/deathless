@@ -6,7 +6,7 @@ namespace Deathless.Audio
 {
     public enum CanalAudio { Principal, Musique, Effets, Interface }
 
-    public enum SonInterface { Survol, Clic, Retour }
+    public enum SonInterface { Survol, Clic, Retour, Refus }
 
     /// Volumes du jeu (options, onglet Audio) : quatre réglages de 0 à 1, enregistrés dans les PlayerPrefs et appliqués au
     /// mixer Deathless (paramètres exposés en dB, 0 = coupé). Chargés au lancement, avant la première scène, donc avant le
@@ -116,7 +116,7 @@ namespace Deathless.Audio
         {
             var r = Reglages;
             if (r == null) return;
-            var clip = son == SonInterface.Survol ? r.survol : son == SonInterface.Clic ? r.clic : r.retour;
+            var clip = son == SonInterface.Survol ? r.survol : son == SonInterface.Clic ? r.clic : son == SonInterface.Refus ? r.refus : r.retour;
             LecteurAudio.Jouer(CanalAudio.Interface, clip, volume);
         }
 

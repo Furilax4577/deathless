@@ -107,6 +107,32 @@ Cinq classes jouables (Wiki `classes.md`, `commandes.md`). Tout est **facultatif
 | `IActionClasse` | `Action` (« Gameplay/AttackPrimary »…), `Nom` (null ou vide : emplacement vide, affiché grisé « Vide pour l'instant »), `Icone` (identifiant de l'icône, ex. « paladin_charge_belier ») | Cinq actions dans l'ordre : attaque principale (RT), attaque secondaire (LT), compétences 1 (LB), 2 (RB), 3 (LB + RB). |
 | `IEtatJoueurPotions` | `Potions`, `PotionsMax` | Facultatif, sur l'objet enregistré comme `IEtatJoueur` : le HUD affiche l'emplacement de potion (icône `commun_potion_soin`, nombre restant, invite de `Gameplay/DrinkPotion`) à droite des jauges ; grisé à 0. Le jeu ne l'implémente pas encore (pas de potions en 0.1) ; `EtatFactice` oui (2 sur 3). |
 | `IApercuClasse` | `Rendu` (RenderTexture), `Montrer(classeId)`, `Cacher()`, `Tourner(degres)` | Facultatif, posé par le jeu dans `DonneesUI.ApercuClasse` : personnage de la classe en 3D dans l'écran de choix (voir « Choix de classe en 3D »). Absent (banc UIv01) : la colonne est masquée. |
+| `IClasseJouable.Verrouillee` | bool | Classe à venir (**Druide**, **Mécanicien**, au catalogue depuis la 0.3) : visible dans le choix de classe avec l'étiquette « Bientôt » (pastille ivoire), carte assombrie, fiche réduite (nom, « Bientôt », « Arme, rôle et compétences à venir »), invite Valider grisée ; Valider joue le son de refus doux (`SonInterface.Refus`, Kenney `error_004`) et ne lance rien. `ClassesJouables.Jouable(id)` ; `Lancer` refuse une classe verrouillée ; `Derniere` ne renvoie jamais une classe verrouillée. |
+
+### Pseudo : `IProfilJoueur`, `ProfilJoueur` (`Donnees/IProfil.cs`, 25/09/2026)
+
+| Membre | Rôle |
+|---|---|
+| `DonneesUI.Profil` (`IProfilJoueur`) | `Pseudo` (« Joueur » tant qu'aucun n'est choisi), `PseudoDefini`, `event PseudoChange`. Pour le jeu et le futur réseau (`HudPresenter.Nom` et `EtatFactice.Nom` le renvoient). |
+| `ProfilJoueur` (statique) | `Valider(saisie, out raison)`, `Normaliser` (espaces rognés, espaces multiples réduits), `Definir(saisie)` : enregistré dans les PlayerPrefs (`Deathless.Pseudo`). Règle : 3 à 16 caractères ; lettres (accents compris), chiffres, tirets et espaces. |
+
+**Premier lancement** : sans pseudo enregistré, le navigateur ouvre l'écran de saisie (`EcranSaisie`, obligatoire : B efface un caractère au lieu de revenir) avant le menu principal ; le menu s'affiche dès que le pseudo est valide. **Options > Jeu** : ligne « Pseudo … Modifier » qui rouvre le même écran (B : retour). Capture : `UI01_pseudo.png`.
+
+### Lobby multijoueur : `ILobby` (`Donnees/ILobby.cs`, 25/09/2026)
+
+Transport retenu par Quentin : **Unity Relay et Lobby** (Unity Gaming Services), code court de salon ; l'adresse IP directe reste un secours. **Aucun code réseau pour l'instant** : l'écran lit `DonneesUI.Lobby` ; à défaut, le menu crée un `LobbyFactice` (`Deathless.UI.Dev`), comme `EtatFactice` sur le banc.
+
+| Membre | Rôle |
+|---|---|
+| `Etat` (`EtatLobby`) | `Aucun` (écran d'entrée), `Connexion`, `Salon`, `CompteARebours`, `Lancement`, `Erreur` (voir `Message`). |
+| `CodeSalon`, `EstHote` | Code court (6 caractères) affiché (masqué par défaut, bouton Afficher) et copiable par l'hôte. |
+| `Joueurs` (`IJoueurLobby` : `Pseudo`, `ClasseId`, `Pret`, `EstLocal`, `EstHote`), `JoueursMax` (4) | Emplacements du salon. |
+| `CompteARebours`, `Message` | Secondes avant le lancement quand tous sont prêts ; information ou erreur. |
+| `CreerSalon()`, `Rejoindre(code)`, `RejoindreParAdresse(adresse)` | Entrée ; l'adresse IP (« 192.168.1.20:7777 ») est un lien secondaire « Rejoindre par adresse IP ». |
+| `bool ChoisirClasse(id)` | **Chaque classe est unique dans un salon** (décision de Quentin) : faux si un autre joueur l'a déjà ; en cas de demandes simultanées, le premier arrivé l'obtient (arbitré par l'hôte ou le service). `LobbyOutils.PrisePar(lobby, id)` : pseudo de l'autre joueur qui l'a. |
+| `BasculerPret()`, `LancerMaintenant()` (hôte, tous prêts), `Quitter()` | Salon. |
+
+`LobbyFactice` : 1 à 3 autres joueurs simulés (Morgane, Tibo, Lysa, Kael) arrivent l'un après l'autre avec une classe libre et passent prêts au bout de 2 à 6 s ; tous prêts : compte à rebours de 3 s, puis **partie solo avec la classe du joueur local** (`ClassesJouables.Lancer`). Rejoindre : l'hôte simulé est déjà là. Tests : `ForcerAutresPrets()`, `SimulerPrise(id)` ; `EtatFactice.ForcerClassePrise(id)` (un faux joueur prend la classe : affichage « prise »).
 | `IClassesJouables` | `Classes`, `LancerSolo(string classeId)` | À implémenter par l'objet enregistré comme `ICommandesPartie` (trouvé par `DonneesUI.Commandes as IClassesJouables`). Sans lui, l'écran affiche `ClassesJouables.Catalogue` et appelle `LancerSolo()`. |
 | `IEtatJoueurClasse` | `Jauge`, `ValeurJauge`, `JaugeMax`, `Furtif` | À implémenter par l'objet enregistré comme `IEtatJoueur` (trouvé par `DonneesUI.Joueur as IEtatJoueurClasse`). Le HUD affiche alors la jauge de classe (Mana bleue, Rage orange) sous l'endurance et, si `Furtif`, l'icône `assassin_furtif` dans une pastille violet nuit (thème Ombre) sur le portrait. La jauge porte son icône (`jauge_mana` : goutte bleue ; `jauge_rage` : poing). |
 | `ClassesJouables` (statique) | `Catalogue`, `Proposees`, `Trouver(id)`, `DerniereJouee` (PlayerPrefs `Deathless.DerniereClasse`, défaut « paladin »), `Derniere`, `Lancer(id)` | Données des cinq classes tirées du wiki, et mémoire de la dernière classe jouée. |
@@ -146,7 +172,9 @@ public class PartieUI : MonoBehaviour, IEtatPartie, IEtatJoueur, IScoreFin, ICom
 
 | Écran | UXML / USS | Contrôleur | Contenu |
 |---|---|---|---|
-| Menu principal | `MenuPrincipal/MenuPrincipal.uxml`, `V01.uss` | `EcranMenuPrincipal` | Solo (« Défendre Nyxessa seul, choisir sa classe » : ouvre le choix de classe), Options, Crédits, Quitter ; carte « Dernière classe jouée » (emblème hexagonal, nom, arme, icônes des actions, résumé) ; capture `UI01_menu_classe_icones.png` ; « Version 0.1 ». |
+| Menu principal | `MenuPrincipal/MenuPrincipal.uxml`, `V01.uss` | `EcranMenuPrincipal` | Solo (ouvre le choix de classe), Multijoueur (ouvre le lobby), Options, Crédits, Quitter ; « Version 0.1 ». Plus de carte de classe (la classe se choisit juste avant de lancer ; la dernière jouée reste mémorisée pour présélectionner le choix). Capture `UI01_menu_sans_carte.png`. |
+| Saisie | `Saisie/Saisie.uxml`, `V01.uss` | `EcranSaisie` | Saisie d'un texte : champ (clavier physique) et clavier virtuel `ClavierVirtuel` (grille de touches pour la manette et la souris : lettres avec accents courants, chiffres, tiret, Maj, Espace, Effacer, Valider ; majuscule automatique au début du pseudo). A : touche, B : effacer (saisie obligatoire) ou retour, Y : valider. Trois usages : pseudo (premier lancement, options), code de salon (6 caractères), adresse IP (secours). |
+| Lobby | `Lobby/Lobby.uxml`, `V01.uss` | `EcranLobby` | Entrée : « Créer un salon » ; « Rejoindre un salon » (champ du code, ouvre la saisie ; bouton Rejoindre ; lien « Rejoindre par adresse IP »). Salon : code (Afficher, Copier), quatre emplacements (emblème de la classe, pseudo, classe, Prêt / Pas prêt, étiquette Hôte ; emplacement libre grisé), « Choisir sa classe » (écran de choix en mode lobby, avec l'aperçu 3D), « Je suis prêt » (Y), « Lancer » (hôte, actif quand tous sont prêts), « Quitter le salon » (B) ; bandeau du compte à rebours. Captures : `UI01_lobby_entree.png`, `UI01_lobby_salon.png`, `UI01_lobby_prets.png`, `UI01_lobby_classe_prise.png`. |
 | Choix de classe | `ChoixClasse/ChoixClasse.uxml`, `V01.uss` | `EcranChoixClasse` | Trois colonnes : les cinq classes à gauche (emblème, nom, rôle, étiquette « Dernière »), le personnage en 3D au centre, la fiche à droite (emblème, nom, rôle, arme, description, jauge, cinq actions : icône de l'action, invite du bouton de l'appareil actif, nom ; emplacement vide grisé). À ×3 : colonnes resserrées, étiquette « Dernière » et aide masquées. Dernière classe jouée présélectionnée ; la fiche suit le focus (manette, clavier) et le survol (souris). Valider (A, Entrée, clic) : retient la classe et lance la partie ; Retour (B, Échap) : menu principal. Captures : `UI01_choix_classe_3d_<id>.png` (une par classe, Village) ; avant les icônes et la 3D : `UI01_choix_classe*.png`. |
 | Options | `Options/Options.uxml` | `EcranOptions` | Onglets Jeu / Commandes / Audio (LB, RB). Jeu : taille ×1 (80 %), ×2 (100 %), ×3 (135 %). Commandes : table en lecture seule (clavier et manette, la colonne manette suit la dernière manette), lignes focusables et défilantes. Audio : volumes principal, musique, effets spéciaux, interface (voir « Audio »). Réinitialiser (Y) : réglages de l'onglet affiché (taille ×2, ou volumes par défaut). |
 | Crédits | `Credits/Credits.uxml` | `EcranCredits` | Contenu de `Wiki/pages/credits.md`. |
@@ -185,6 +213,12 @@ Le menu principal s'affiche par-dessus le village **de nuit**, sur un plan fixe 
 - Pour changer de cadrage : Play dans Village, régler les champs `menu*` de la caméra en direct, puis reporter les valeurs hors Play.
 - **Boucle vidéo pour le launcher** : `Assets/Screenshots/menu_nuit_boucle.mp4` (H.264, 1920 × 1080, 30 images/s, 12 s, muette, 7,5 Mbit/s, 11,2 Mo), même cadrage et même ambiance que `menu_nuit_fond.png`, sans interface. Outil : `Assets/Scripts/Dev/EnregistreurBoucle.cs` (en Play, `UnityEditor.Media.MediaEncoder`, `Time.captureFramerate = 30`, rendu de la caméra seule dans une RenderTexture). Pour l'enregistrement seulement (valeurs de la scène inchangées) : période du balancement de la caméra 12 s (un aller-retour), rotation du cristal 30°/s au lieu de 40 (un tour ; balancement vertical de 3 s : 4 cycles), anneaux du portail 60 et -60°/s au lieu de 70 et -45 (2 tours), vitesse de chaque gemme de la ceinture arrondie à un nombre entier de tours (au moins un). Le reste (brume, lucioles, voxels du portail, oscillations de la ceinture, flammes) : 13 s capturées, la dernière seconde fondue pixel par pixel dans la première. Raccord mesuré : écart moyen entre la dernière et la première image de 0,65 (sur 255, par canal), contre 0,55 entre deux images consécutives ; côte à côte : `menu_nuit_boucle_raccord.png`. Écrire la vidéo hors de `Assets` (Temp) puis la copier : sinon Unity importe le fichier encore incomplet.
 
+### Choix de classe : classes à venir et mode lobby (25/09/2026)
+
+- Liste de sept cartes (cartes resserrées, à ×3 le rôle est masqué) : les cinq classes, puis Druide et Mécanicien verrouillés (étiquette « Bientôt », sous-titre « Prochaine version »). Capture : `UI01_choix_classe_bientot.png`.
+- Aperçu 3D des classes à venir : `Assets/Jeu/Resources/ApercusVerrouilles.asset` (`Deathless.Jeu.ApercusVerrouilles` : Druide = `Druid.fbx` + `druid_staff`, Mécanicien = `Engineer.fbx` + `engineer_Wrench`, sous `handslot.r`, pose de repos `Idle_A` jouée par Playables), matériaux un peu assombris et désaturés par un MaterialPropertyBlock (`ApercuClasse.teinteVerrouillee`), sans alpha. Emblèmes : `classe_druide`, `classe_mecanicien` (variante A retenue).
+- **Mode lobby** (`EcranChoixClasse.OuvrirPourLobby(surChoix, classeActuelle, prisePar)`) : invite « Choisir » au lieu de « Jouer », sous-titre du salon ; une classe déjà prise par un autre joueur porte l'étiquette « Prise · pseudo », la fiche dit « Déjà prise par … dans ce salon », Valider est inactif (son de refus) ; elle se libère si ce joueur change de classe ou quitte le salon (rafraîchi à chaque image). Solo : `OuvrirSolo()`, rien ne change.
+
 ### Choix de classe en 3D (25/09/2026)
 
 - **Jeu** : `Deathless.Jeu.ApercuClasse` (`Assets/Scripts/Jeu/UI/ApercuClasse.cs`), créé par `HudPresenter` au lancement de la scène et enregistré dans `DonneesUI.ApercuClasse`. Petite scène de présentation à (0, -300, 0), sur la couche 30 (retirée du masque de la caméra de jeu) : socle hexagonal bas en ardoise (maillage à facettes créé par le script), trois lumières ponctuelles proches limitées à la couche 30 (clé blanc chaud, contre-jour bleu-violet de la nuit, rappel vert de Nyxessa ; pas de directionnelle, qui pourrait devenir la lumière principale du village), et une seule caméra (champ 26°, pas de post-traitement pour garder l'alpha, pas d'ombres) qui rend dans une RenderTexture 720 × 920 à fond transparent. La caméra n'est active que pendant `Montrer` … `Cacher` (écran de choix ouvert).
@@ -217,7 +251,7 @@ Menu → A sur Solo → HUD (carte Gameplay seule, pas de focus) ; Start → pau
 
 ## Hors 0.1 (non construit)
 
-Multijoueur (vie des autres joueurs à gauche, « Prêts 2 / 3 »), potions, donjon et portail (rappel, butin), options Affichage / Audio / manette, personnalisation des touches.
+Multijoueur en jeu (réseau Unity Relay et Lobby, vie des autres joueurs à gauche, « Prêts 2 / 3 »), potions, donjon et portail (rappel, butin), options Affichage / Audio / manette, personnalisation des touches.
 
 ## Report dans main
 

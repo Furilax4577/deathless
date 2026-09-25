@@ -15,10 +15,12 @@ namespace Deathless.Audio
         public AudioMixerGroup groupeEffets;
         public AudioMixerGroup groupeInterface;
 
-        [Header("Sons de l'interface (catalogue : ui_survol, ui_clic, ui_retour)")]
+        [Header("Sons de l'interface (catalogue : ui_survol, ui_clic, ui_retour, ui_refus)")]
         public AudioClip survol;
         public AudioClip clic;
         public AudioClip retour;
+        [Tooltip("Action refusée (classe verrouillée…), joué doucement.")]
+        public AudioClip refus;
 
         [Header("Aperçu du réglage Effets (son de combat court)")]
         public AudioClip apercuEffets;

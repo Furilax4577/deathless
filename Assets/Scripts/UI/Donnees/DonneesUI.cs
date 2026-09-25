@@ -15,6 +15,12 @@ namespace Deathless.UI.Donnees
         /// Aperçu 3D des classes pour l'écran de choix (facultatif, posé par le jeu ; null : pas d'aperçu).
         public static IApercuClasse ApercuClasse { get; set; }
 
+        /// Lobby multijoueur (posé par le jeu ou le futur module réseau ; à défaut, le menu crée un LobbyFactice).
+        public static ILobby Lobby { get; set; }
+
+        /// Profil du joueur local (pseudo), toujours présent.
+        public static IProfilJoueur Profil => ProfilJoueur.Local;
+
         /// Appelé à chaque enregistrement ou retrait (les écrans se réabonnent aux événements de IEtatPartie).
         public static event Action Changees;
 
@@ -43,6 +49,7 @@ namespace Deathless.UI.Donnees
             Score = null;
             Commandes = null;
             ApercuClasse = null;
+            Lobby = null;
             Changees = null;
         }
     }

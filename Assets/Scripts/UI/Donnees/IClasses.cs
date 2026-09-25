@@ -45,6 +45,9 @@ namespace Deathless.UI.Donnees
         JaugeClasse Jauge { get; }
         /// Attaque principale, attaque secondaire, compétences 1, 2, 3 (dans cet ordre).
         IReadOnlyList<IActionClasse> Actions { get; }
+        /// Classe à venir (Druide, Mécanicien) : visible dans le choix de classe avec l'étiquette « Bientôt », mais on ne
+        /// peut pas la jouer (Valider inactif, son de refus).
+        bool Verrouillee { get; }
     }
 
     /// Classes proposées par le jeu (sens jeu → UI) et lancement d'une partie avec la classe choisie (UI → jeu).
@@ -123,6 +126,7 @@ namespace Deathless.UI.Donnees
             public Color Teinte { get; set; }
             public string Embleme { get; set; }
             public JaugeClasse Jauge { get; set; }
+            public bool Verrouillee { get; set; }
             public IReadOnlyList<IActionClasse> Actions { get; set; }
         }
 
@@ -188,6 +192,21 @@ namespace Deathless.UI.Donnees
                 Actions = Actions(("Hache", "viking_hache"), ("Attaque tournante (maintenue)", "viking_attaque_tournante"),
                     ("Rugissement", "viking_rugissement"), ("Saut percutant", "viking_saut_percutant")),
             },
+            // Classes à venir (Wiki : interface.md, classes.md) : verrouillées, étiquette « Bientôt ».
+            new Classe
+            {
+                Id = "druide", Nom = "Druide", Role = "Bientôt", Arme = "À venir", Verrouillee = true,
+                Description = "Arme, rôle et compétences à venir.",
+                Teinte = Hex("#8a6a48"), Embleme = "classe_druide", Jauge = JaugeClasse.Aucune,
+                Actions = Actions(Vide, Vide, Vide, Vide),
+            },
+            new Classe
+            {
+                Id = "mecanicien", Nom = "Mécanicien", Role = "Bientôt", Arme = "À venir", Verrouillee = true,
+                Description = "Arme, rôle et compétences à venir.",
+                Teinte = Hex("#7a8088"), Embleme = "classe_mecanicien", Jauge = JaugeClasse.Aucune,
+                Actions = Actions(Vide, Vide, Vide, Vide),
+            },
         };
 
         /// Classes proposées : celles du jeu s'il les fournit, sinon le catalogue.
@@ -225,11 +244,19 @@ namespace Deathless.UI.Donnees
             set { PlayerPrefs.SetString(ClePrefs, value); PlayerPrefs.Save(); }
         }
 
-        public static IClasseJouable Derniere => Trouver(DerniereJouee) ?? Trouver(ParDefaut);
+        public static IClasseJouable Derniere => Jouable(DerniereJouee) ? Trouver(DerniereJouee) : Trouver(ParDefaut);
 
         /// Valider le choix : retient la classe et lance la partie solo.
+        /// Vrai si la classe peut être jouée (connue et non verrouillée).
+        public static bool Jouable(string classeId)
+        {
+            var c = Trouver(classeId);
+            return c != null && !c.Verrouillee;
+        }
+
         public static void Lancer(string classeId)
         {
+            if (!Jouable(classeId)) return;
             DerniereJouee = classeId;
             if (DonneesUI.Commandes is IClassesJouables classes) classes.LancerSolo(classeId);
             else DonneesUI.Commandes?.LancerSolo();

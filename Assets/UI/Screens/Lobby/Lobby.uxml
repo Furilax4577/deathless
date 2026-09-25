@@ -1,0 +1,58 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:dl="Deathless.UI" editor-extension-mode="False">
+    <Style src="../V01.uss" />
+    <ui:VisualElement class="v01-plein v01-voile lobby">
+        <ui:VisualElement class="lobby__entete">
+            <ui:Label text="Multijoueur" class="dl-title" />
+            <ui:Label name="lobby-sous-titre" text="Jusqu’à quatre joueurs. Chacun choisit sa classe, puis se déclare prêt." class="dl-text dl-text--muted lobby__aide" />
+        </ui:VisualElement>
+
+        <!-- Entrée : créer ou rejoindre -->
+        <ui:VisualElement name="lobby-entree" class="lobby__entree">
+            <ui:VisualElement class="dl-panel lobby__carte">
+                <ui:Label text="HÉBERGER" class="dl-section-label" />
+                <ui:Label text="Créer un salon" class="dl-heading" />
+                <ui:Label text="Tu es l’hôte : partage le code du salon avec tes amis." class="dl-text dl-text--muted lobby__texte" />
+                <ui:Button name="lobby-creer" text="Créer un salon" class="lobby__bouton" />
+            </ui:VisualElement>
+            <ui:VisualElement class="dl-panel lobby__carte">
+                <ui:Label text="REJOINDRE" class="dl-section-label" />
+                <ui:Label text="Rejoindre un salon" class="dl-heading" />
+                <ui:Label text="Saisis le code du salon que l’hôte te donne." class="dl-text dl-text--muted lobby__texte" />
+                <ui:Button name="lobby-code" class="lobby__champ">
+                    <ui:Label name="lobby-code-texte" text="Saisir le code (6 caractères)" class="lobby__champ-texte lobby__champ-texte--vide" />
+                </ui:Button>
+                <ui:Button name="lobby-rejoindre" text="Rejoindre" class="lobby__bouton" />
+                <ui:Button name="lobby-par-ip" text="Rejoindre par adresse IP" class="lobby__lien" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Label name="lobby-message" text="" class="dl-text lobby__message" />
+
+        <!-- Salon -->
+        <ui:VisualElement name="lobby-salon" class="lobby__salon">
+            <ui:VisualElement class="lobby__code-ligne">
+                <ui:Label name="lobby-code-titre" text="CODE DU SALON" class="dl-section-label lobby__code-titre" />
+                <ui:Label name="lobby-code-valeur" text="••••••" class="lobby__code-valeur" />
+                <ui:Button name="lobby-afficher" text="Afficher" class="lobby__petit-bouton" />
+                <ui:Button name="lobby-copier" text="Copier" class="lobby__petit-bouton" />
+                <ui:Label name="lobby-copie" text="Copié" class="dl-text dl-text--small lobby__copie" />
+            </ui:VisualElement>
+            <ui:VisualElement name="lobby-emplacements" class="lobby__emplacements" />
+            <ui:Label name="lobby-compte" text="La partie commence dans 3" class="lobby__compte" />
+            <ui:VisualElement class="lobby__actions">
+                <ui:Button name="lobby-classe" text="Choisir sa classe" class="lobby__bouton" />
+                <ui:Button name="lobby-pret" text="Je suis prêt" class="lobby__bouton lobby__bouton--pret" />
+                <ui:Button name="lobby-lancer" text="Lancer" class="lobby__bouton" />
+                <ui:Button name="lobby-quitter" text="Quitter le salon" class="lobby__bouton" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement class="dl-prompt-bar">
+            <ui:VisualElement class="dl-prompt-bar__group">
+                <dl:InputPrompt action="UI/Submit" label="Valider" />
+                <dl:InputPrompt name="lobby-invite-retour" action="UI/Cancel" label="Retour" />
+                <dl:InputPrompt name="lobby-invite-pret" action="UI/Reset" label="Prêt" />
+            </ui:VisualElement>
+            <ui:Label text="Clavier et souris" class="dl-text dl-text--small dl-text--muted dl-device-name" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

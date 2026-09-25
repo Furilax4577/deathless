@@ -543,6 +543,7 @@
     padding: 0;
 }
 
+.dl-prompt--inactive { opacity: 0.35; }
 .dl-prompt--missing .dl-prompt__key { background-color: var(--dl-color-life); color: #ffffff; border-color: #8a2a24; }
 .dl-prompt--small { --dl-prompt-size: 40px; --dl-key-height: 28px; --dl-key-text: 15px; }
 .dl-prompt--small .dl-prompt__label { font-size: var(--dl-text-small); }

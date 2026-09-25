@@ -92,6 +92,7 @@ namespace Deathless.UI.Dev
                 m_Accords = InputChordResolver.ForGameplay(actions);
                 m_Accords.Triggered += OnAction;
             }
+            if (DonneesUI.Lobby == null) DonneesUI.Lobby = gameObject.AddComponent<LobbyFactice>();   // lobby factice du banc
             DonneesUI.Enregistrer(null, null, null, this);
         }
 
@@ -514,7 +515,7 @@ namespace Deathless.UI.Dev
 
         // ================================================================== IEtatJoueur
 
-        public string Nom => "Quentin";
+        public string Nom => DonneesUI.Profil.Pseudo;
         public string Classe => m_Classe != null ? m_Classe.Nom : "Paladin";
         public Color TeinteClasse => m_Classe != null ? m_Classe.Teinte : (Color)new Color32(0xd9, 0xb2, 0x64, 0xff);
         public float Vie => m_Vie;
@@ -539,6 +540,11 @@ namespace Deathless.UI.Dev
         int m_Potions = 2;
         public int Potions => m_Potions;
         public int PotionsMax => 3;
+
+        /// Tests (lobby) : un faux joueur du salon prend la classe `classeId` (affichée « prise » dans le choix de classe
+        /// ouvert depuis le lobby).
+        public bool ForcerClassePrise(string classeId) =>
+            DonneesUI.Lobby is LobbyFactice l && l.SimulerPrise(classeId);
 
         /// Tests : nombre de potions.
         public void ForcerPotions(int n) => m_Potions = Mathf.Clamp(n, 0, PotionsMax);

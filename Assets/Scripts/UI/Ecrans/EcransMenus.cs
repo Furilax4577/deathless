@@ -13,18 +13,17 @@ namespace Deathless.UI.Ecrans
     {
         public override bool Opaque => true;
         Button m_Solo;
-        VisualElement m_Embleme, m_Icones;
-        Label m_Nom, m_Arme, m_Actions;
 
         protected override void Construire()
         {
             m_Solo = Racine.Q<Button>("menu-solo");
-            m_Solo.clicked += () => Navigateur.Ouvrir(Navigateur.ChoixClasse);
-            m_Embleme = Racine.Q("menu-classe-embleme");
-            m_Icones = Racine.Q("menu-classe-icones");
-            m_Nom = Racine.Q<Label>("menu-classe-nom");
-            m_Arme = Racine.Q<Label>("menu-classe-arme");
-            m_Actions = Racine.Q<Label>("menu-classe-actions");
+            m_Solo.clicked += () => Navigateur.ChoixClasse.OuvrirSolo();
+            Racine.Q<Button>("menu-multijoueur").clicked += () =>
+            {
+                // Pas encore de réseau : à défaut d'un lobby posé par le jeu, un lobby factice (Deathless.UI.Dev).
+                if (DonneesUI.Lobby == null) Dev.LobbyFactice.Creer();
+                Navigateur.Ouvrir(Navigateur.Lobby);
+            };
             Racine.Q<Button>("menu-options").clicked += () => Navigateur.Ouvrir(Navigateur.Options);
             Racine.Q<Button>("menu-credits").clicked += () => Navigateur.Ouvrir(Navigateur.Credits);
             Racine.Q<Button>("menu-quitter").clicked += () => DonneesUI.Commandes?.QuitterJeu();
@@ -34,29 +33,12 @@ namespace Deathless.UI.Ecrans
 
         /// Retour au menu principal : rien à fermer.
         public override bool Retour() => true;
-
-        public override void AuSommet()
-        {
-            var c = ClassesJouables.Derniere;
-            if (c == null || m_Nom == null) return;
-            IconesUI.Poser(m_Embleme, c.Embleme);
-            m_Icones.Clear();
-            foreach (var a in c.Actions)
-            {
-                if (string.IsNullOrEmpty(a.Nom) || IconesUI.Trouver(a.Icone) == null) continue;
-                var cadre = new VisualElement { tooltip = a.Nom };
-                cadre.AddToClassList("menu__classe-icone");
-                cadre.Add(IconesUI.Creer(a.Icone));
-                m_Icones.Add(cadre);
-            }
-            m_Nom.text = c.Nom;
-            m_Arme.text = c.Arme;
-            m_Actions.text = EcranChoixClasse.ResumeActions(c);
-        }
     }
 
-    /// Choix de classe (Solo) : les cinq classes, leur arme et leurs actions (Wiki : classes.md, commandes.md).
-    /// La dernière classe jouée est présélectionnée ; Valider lance la partie, Retour revient au menu.
+    /// Choix de classe : les cinq classes, leur arme et leurs actions (Wiki : classes.md, commandes.md), plus les classes à
+    /// venir (Druide, Mécanicien) verrouillées avec l'étiquette « Bientôt » (Valider inactif, son de refus). Deux usages :
+    /// Solo (Valider lance la partie ; la dernière classe jouée est présélectionnée) et lobby (Valider rend la classe au
+    /// salon ; la classe du joueur dans le salon est présélectionnée). Retour revient à l'écran précédent.
     public class EcranChoixClasse : Ecran
     {
         public override bool Opaque => true;
@@ -74,6 +56,46 @@ namespace Deathless.UI.Ecrans
         public static float RotationSouris = 0.45f, RotationStick = 160f;
         IReadOnlyList<IClasseJouable> m_Source;
         IClasseJouable m_Affichee;
+        System.Action<string> m_SurChoix;
+        System.Func<string, string> m_PrisePar;
+        string m_Preselection;
+        Label m_Prise;
+        InputPrompt m_InviteValider;
+        VisualElement m_TitreArme, m_TitreActions;
+
+        /// Solo : Valider lance la partie avec la classe.
+        public void OuvrirSolo()
+        {
+            m_SurChoix = null;
+            m_PrisePar = null;
+            m_Preselection = null;
+            Navigateur.Ouvrir(this);
+        }
+
+        /// Lobby : Valider appelle `surChoix(id)` (le lobby ferme l'écran) ; `classeActuelle` est présélectionnée ;
+        /// `prisePar(id)` donne le pseudo d'un autre joueur qui a déjà la classe (null : libre) : chaque classe est unique.
+        public void OuvrirPourLobby(System.Action<string> surChoix, string classeActuelle, System.Func<string, string> prisePar = null)
+        {
+            m_SurChoix = surChoix;
+            m_PrisePar = prisePar;
+            m_Preselection = classeActuelle;
+            Navigateur.Ouvrir(this);
+        }
+
+        void Valider(IClasseJouable c)
+        {
+            if (c == null) return;
+            if (c.Verrouillee || PrisePar(c) != null)
+            {
+                // Classe à venir, ou déjà prise par un autre joueur du salon : Valider inactif, son d'erreur doux.
+                VolumesAudio.JouerInterface(SonInterface.Refus, 0.55f);
+                return;
+            }
+            VolumesAudio.JouerInterface(SonInterface.Clic);
+            Navigateur.SilencerSurvol();
+            if (m_SurChoix != null) m_SurChoix(c.Id);
+            else ClassesJouables.Lancer(c.Id);
+        }
 
         static readonly string[] s_Emplacements =
             { "Gameplay/AttackPrimary", "Gameplay/AttackSecondary", "Gameplay/Skill1", "Gameplay/Skill2", "Gameplay/Skill3" };
@@ -99,6 +121,12 @@ namespace Deathless.UI.Ecrans
             m_Description = Racine.Q<Label>("fiche-description");
             m_Jauge = Racine.Q<Label>("fiche-jauge");
             m_Actions = Racine.Q("fiche-actions");
+            m_InviteValider = Racine.Q<InputPrompt>("choix-invite-valider");
+            m_TitreArme = Racine.Q("fiche-titre-arme");
+            m_TitreActions = Racine.Q("fiche-titre-actions");
+            m_Prise = new Label { name = "fiche-prise" };
+            m_Prise.AddToClassList("choix__prise");
+            m_Role.parent.Add(m_Prise);
             // Cinq lignes fixes (attaque, attaque secondaire, compétences 1 à 3) : l'invite suit l'appareil.
             foreach (var action in s_Emplacements)
             {
@@ -136,7 +164,7 @@ namespace Deathless.UI.Ecrans
                 textes.AddToClassList("choix-classe__textes");
                 var nom = new Label(c.Nom);
                 nom.AddToClassList("choix-classe__nom");
-                var role = new Label(c.Role);
+                var role = new Label(c.Verrouillee ? "Prochaine version" : c.Role);
                 role.AddToClassList("choix-classe__role");
                 textes.Add(nom);
                 textes.Add(role);
@@ -145,10 +173,19 @@ namespace Deathless.UI.Ecrans
                 b.Add(embleme);
                 b.Add(textes);
                 b.Add(derniere);
+                if (c.Verrouillee)
+                {
+                    b.AddToClassList("choix-classe--verrouillee");
+                    var bientot = new Label("Bientôt");
+                    bientot.AddToClassList("choix-classe__bientot");
+                    b.Add(bientot);
+                }
+                var prise = new Label { name = "prise" };
+                prise.AddToClassList("choix-classe__prise");
+                b.Add(prise);
                 b.RegisterCallback<FocusInEvent>(_ => Afficher(classe));
                 b.RegisterCallback<PointerEnterEvent>(_ => Afficher(classe));
-                b.clicked += () => ClassesJouables.Lancer(classe.Id);
-                SonDeClic(b);
+                b.clicked += () => Valider(classe);
                 m_Liste.Add(b);
                 m_Boutons.Add(b);
                 m_Classes.Add(c);
@@ -166,7 +203,7 @@ namespace Deathless.UI.Ecrans
 
         int IndexDerniere()
         {
-            var id = ClassesJouables.DerniereJouee;
+            var id = !string.IsNullOrEmpty(m_Preselection) ? m_Preselection : ClassesJouables.DerniereJouee;
             for (var i = 0; i < m_Classes.Count; i++) if (m_Classes[i].Id == id) return i;
             return 0;
         }
@@ -179,6 +216,11 @@ namespace Deathless.UI.Ecrans
             m_Apercu.style.display = m_ApercuActif != null ? DisplayStyle.Flex : DisplayStyle.None;
             if (m_ApercuActif != null && m_ApercuActif.Rendu is RenderTexture rt)
                 m_ApercuImage.style.backgroundImage = new StyleBackground(Background.FromRenderTexture(rt));
+            if (m_InviteValider != null) m_InviteValider.text = m_SurChoix != null ? "Choisir" : "Jouer";
+            var aide = Racine.Q<Label>("choix-aide");
+            if (aide != null) aide.text = m_SurChoix != null
+                ? "Ta classe pour ce salon. Chaque classe est unique : une classe prise par un autre joueur n’est pas disponible."
+                : "Défendre Nyxessa seul. Les cinq classes, avec leur arme et leurs actions.";
             if (m_Classes.Count > 0) Afficher(m_Classes[IndexDerniere()]);
         }
 
@@ -189,8 +231,31 @@ namespace Deathless.UI.Ecrans
             m_Glisse = false;
         }
 
+        string PrisePar(IClasseJouable c) => m_PrisePar != null && c != null ? m_PrisePar(c.Id) : null;
+
+        /// Lobby : classes déjà prises par un autre joueur (étiquette « Prise · pseudo », Valider inactif).
+        void MajPrises()
+        {
+            for (var i = 0; i < m_Boutons.Count; i++)
+            {
+                var p = PrisePar(m_Classes[i]);
+                m_Boutons[i].EnableInClassList("choix-classe--prise", p != null);
+                var l = m_Boutons[i].Q<Label>("prise");
+                l.text = p != null ? "Prise · " + p : "";
+                l.style.display = p != null ? DisplayStyle.Flex : DisplayStyle.None;
+            }
+            if (m_Affichee != null)
+            {
+                var p = PrisePar(m_Affichee);
+                m_Prise.text = p != null ? "Déjà prise par " + p + " dans ce salon" : "";
+                m_Prise.style.display = p != null ? DisplayStyle.Flex : DisplayStyle.None;
+                m_InviteValider?.EnableInClassList("dl-prompt--inactive", m_Affichee.Verrouillee || p != null);
+            }
+        }
+
         public override void MiseAJour(float dt)
         {
+            MajPrises();
             // Stick droit : tourne le personnage (affichage seulement ; la carte UI n'a pas d'action pour ce stick).
             var pad = Gamepad.current;
             if (m_ApercuActif == null || pad == null) return;
@@ -211,6 +276,13 @@ namespace Deathless.UI.Ecrans
             m_Role.text = c.Role;
             m_Arme.text = c.Arme;
             m_Description.text = c.Description;
+            // Classe à venir : nom, « Bientôt », « Arme, rôle et compétences à venir » ; ni arme ni actions ; Valider grisé.
+            var ouverte = c.Verrouillee ? DisplayStyle.None : DisplayStyle.Flex;
+            m_TitreArme.style.display = ouverte;
+            m_Arme.style.display = ouverte;
+            m_TitreActions.style.display = ouverte;
+            m_Actions.style.display = ouverte;
+            m_InviteValider?.EnableInClassList("dl-prompt--inactive", c.Verrouillee);
             m_Jauge.text = c.Jauge == JaugeClasse.Mana ? "Jauge de mana : les sorts en consomment."
                 : c.Jauge == JaugeClasse.Rage ? "Jauge de rage : elle monte quand il frappe." : "";
             m_Jauge.style.display = c.Jauge == JaugeClasse.Aucune ? DisplayStyle.None : DisplayStyle.Flex;
@@ -313,8 +385,20 @@ namespace Deathless.UI.Ecrans
         Label m_EnteteManette;
         int m_Onglet;
 
+        Label m_PseudoValeur;
+
+        public override void AuSommet() { if (m_PseudoValeur != null) m_PseudoValeur.text = DonneesUI.Profil.Pseudo; }
+
         protected override void Construire()
         {
+            m_PseudoValeur = Racine.Q<Label>("options-pseudo-valeur");
+            m_PseudoValeur.text = DonneesUI.Profil.Pseudo;
+            DonneesUI.Profil.PseudoChange += p => m_PseudoValeur.text = p;
+            Racine.Q<Button>("options-pseudo").clicked += () =>
+            {
+                Navigateur.Saisie.ConfigurerPseudo(false, () => Navigateur.Fermer());
+                Navigateur.Ouvrir(Navigateur.Saisie);
+            };
             m_PageJeu = Racine.Q("options-jeu");
             m_PageCommandes = Racine.Q("options-commandes");
             m_PageAudio = Racine.Q("options-audio");

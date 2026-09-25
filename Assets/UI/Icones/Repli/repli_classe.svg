@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+<!-- Deathless : repli_classe (emblème de classe manquant : hexagone vide). Écrit à la main pour l'interface (IconesUI), pas par generer_icones.py. -->
+<polygon fill="#8a8578" points="64,2 117.7,33 117.7,95 64,126 10.3,95 10.3,33"/>
+<polygon fill="#c3bca9" points="64,2 117.7,33 10.3,95 10.3,33"/>
+<polygon fill="#3d4660" points="64,12 109,38 19,90 19,38"/>
+<polygon fill="#232a3a" points="109,38 109,90 64,116 19,90"/>
+</svg>

@@ -28,6 +28,8 @@ namespace Deathless.UI.Ecrans
         public VisualTreeAsset pause;
         public VisualTreeAsset score;
         public VisualTreeAsset choixClasse;
+        public VisualTreeAsset saisie;
+        public VisualTreeAsset lobby;
 
         public EcranMenuPrincipal MenuPrincipal { get; private set; }
         public EcranOptions Options { get; private set; }
@@ -36,6 +38,8 @@ namespace Deathless.UI.Ecrans
         public EcranPause Pause { get; private set; }
         public EcranScore Score { get; private set; }
         public EcranChoixClasse ChoixClasse { get; private set; }
+        public EcranSaisie Saisie { get; private set; }
+        public EcranLobby Lobby { get; private set; }
 
         readonly List<Ecran> m_Pile = new List<Ecran>();
         readonly List<Ecran> m_Tous = new List<Ecran>();
@@ -67,6 +71,8 @@ namespace Deathless.UI.Ecrans
             Options = Creer(new EcranOptions(), options, conteneur);
             Credits = Creer(new EcranCredits(), credits, conteneur);
             ChoixClasse = Creer(new EcranChoixClasse(), choixClasse, conteneur);
+            Lobby = Creer(new EcranLobby(), lobby, conteneur);
+            Saisie = Creer(new EcranSaisie(), saisie, conteneur);
 
             UINavigation.SetupScreen(m_Racine);
             UIScale.TagRoot(m_Racine);
@@ -209,10 +215,23 @@ namespace Deathless.UI.Ecrans
 
         // ------------------------------------------------------------------ Données
 
+        /// Réévalue l'écran de base (après le choix du pseudo, par exemple).
+        public void Reevaluer() => EvaluerEcranDeBase();
+
         void EvaluerEcranDeBase()
         {
             var partie = DonneesUI.Partie;
             Suivre(partie);
+            // Premier lancement : pas de pseudo enregistré → écran de saisie du pseudo avant le menu principal.
+            if (partie == null && !DonneesUI.Profil.PseudoDefini && saisie != null)
+            {
+                if (m_Pile.Count == 0 || m_Pile[0] != Saisie || !Saisie.Obligatoire)
+                {
+                    Saisie.ConfigurerPseudo(true, Reevaluer);
+                    Base(Saisie);
+                }
+                return;
+            }
             Ecran voulu = partie == null ? MenuPrincipal : partie.Phase == PhasePartie.Terminee ? (Ecran)Score : Hud;
             if (m_Pile.Count == 0 || m_Pile[0] != voulu) Base(voulu);
         }

@@ -162,6 +162,7 @@ namespace Deathless.UI
             foreach (var control in device.allControls)
             {
                 if (control.noisy || control.synthetic) continue;
+                if (device is Keyboard && !(control is KeyControl)) continue;   // touches seulement (pas imeSelected…)
                 if (control is ButtonControl bouton)
                 {
                     if (bouton.ReadValueFromEvent(eventPtr, out var v) && v >= bouton.pressPointOrDefault) return true;

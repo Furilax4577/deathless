@@ -14,10 +14,17 @@
                 </ui:VisualElement>
                 <dl:InputPrompt action="UI/Submit" class="dl-menu-item__prompt" />
             </ui:Button>
+            <ui:Button name="menu-multijoueur" class="dl-menu-item">
+                <ui:VisualElement class="dl-menu-item__texts">
+                    <ui:Label text="Multijoueur" class="dl-menu-item__label" />
+                    <ui:Label text="Créer ou rejoindre un salon, jusqu’à quatre" class="dl-menu-item__desc" />
+                </ui:VisualElement>
+                <dl:InputPrompt action="UI/Submit" class="dl-menu-item__prompt" />
+            </ui:Button>
             <ui:Button name="menu-options" class="dl-menu-item">
                 <ui:VisualElement class="dl-menu-item__texts">
                     <ui:Label text="Options" class="dl-menu-item__label" />
-                    <ui:Label text="Taille de l’interface, commandes, audio" class="dl-menu-item__desc" />
+                    <ui:Label text="Pseudo, taille de l’interface, commandes, audio" class="dl-menu-item__desc" />
                 </ui:VisualElement>
                 <dl:InputPrompt action="UI/Submit" class="dl-menu-item__prompt" />
             </ui:Button>
@@ -35,18 +42,6 @@
                 </ui:VisualElement>
                 <dl:InputPrompt action="UI/Submit" class="dl-menu-item__prompt" />
             </ui:Button>
-        </ui:VisualElement>
-        <ui:VisualElement class="dl-panel menu__classe">
-            <ui:Label text="DERNIÈRE CLASSE JOUÉE" class="dl-section-label" />
-            <ui:VisualElement class="menu__classe-entete">
-                <ui:VisualElement name="menu-classe-embleme" class="dl-icone menu__classe-embleme" />
-                <ui:VisualElement>
-                    <ui:Label name="menu-classe-nom" text="Paladin" class="dl-heading menu__classe-nom" />
-                    <ui:Label name="menu-classe-arme" text="Épée et bouclier" class="dl-text menu__classe-arme" />
-                </ui:VisualElement>
-            </ui:VisualElement>
-            <ui:VisualElement name="menu-classe-icones" class="menu__classe-icones" />
-            <ui:Label name="menu-classe-actions" text="Frappe à l’épée, garde et parade, charge bélier, soin sur soi." class="dl-text dl-text--muted menu__note" />
         </ui:VisualElement>
         <ui:Label text="Version 0.1" class="menu__version" />
         <ui:VisualElement class="dl-prompt-bar">

@@ -238,6 +238,8 @@ MonoBehaviour:
   pause: {fileID: 9197481963319205126, guid: 3e9ee49c74b5807499de507fece58e8e, type: 3}
   score: {fileID: 9197481963319205126, guid: 0e4c91561b4b96e4a99a80441b190237, type: 3}
   choixClasse: {fileID: 9197481963319205126, guid: a2296fe7ea520de468909b9646944035, type: 3}
+  saisie: {fileID: 9197481963319205126, guid: f04995d8bf6b2de47b2f0b01d413cdff, type: 3}
+  lobby: {fileID: 9197481963319205126, guid: 4cb2743db4b176044b246d1f903716f0, type: 3}
 --- !u!114 &431349937
 MonoBehaviour:
   m_ObjectHideFlags: 0
