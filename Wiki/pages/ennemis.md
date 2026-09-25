@@ -65,6 +65,15 @@ Invocateur qui combat à distance :
   - Il ne peut être **tué qu'une fois ses deux éclats brisés** {décidé}.
   - Vie des éclats et effet précis de la perte de puissance : {à équilibrer}. {{dev: Pas encore dans la version 0.1.}}
 
+**Trois phases**, selon les éclats brisés {décidé} :
+
+| Phase | Éclats | Combat |
+|---|---|---|
+| 1 | Les deux intacts | Kit complet : distance, téléportation, salves de crânes, squelettes relevés, faux de près |
+| 2 | Couronne brisée | Plus de téléportation ni de squelettes relevés |
+| 2 | Grimoire brisé | Plus de salves de crânes |
+| 3 | Les deux brisés | Enragé, il se bat au corps à corps à la faux ; il devient tuable |
+
 Points de vie, dégâts et cadence : {à équilibrer}.
 
 ## Mage
