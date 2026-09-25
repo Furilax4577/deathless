@@ -28,8 +28,11 @@ PUBLIC = os.path.join(ICI, "public")
 DATA = os.path.join(ICI, "data")
 AUDIO = os.path.normpath(os.path.join(ICI, "..", "Assets", "Audio"))
 SITE_SONS = os.path.join(SITE, "sons")
+ICONES = os.path.normpath(os.path.join(ICI, "..", "ArtSources", "Icones"))
+ICONES_COPIEES = set()  # icônes SVG référencées par {icone nom}, copiées dans <version>/icones/
 
-# Ordre du menu : (fichier sans extension, libellé court[, "dev" si la page est réservée à la version développeur]).
+# Ordre du menu : (fichier sans extension, libellé court[, options]). Options, séparées par des espaces : "dev" si la page
+# est réservée à la version développeur, "sous" pour une sous-page (affichée en retrait sous la page qui la précède).
 MENU = [
     ("index", "Accueil"),
     ("univers", "L'univers"),
@@ -39,6 +42,11 @@ MENU = [
     ("nyxessa", "Nyxessa, la relique"),
     ("portail", "Le portail"),
     ("classes", "Classes"),
+    ("classe-paladin", "Paladin", "sous"),
+    ("classe-mage", "Mage de feu", "sous"),
+    ("classe-rodeur", "Rôdeur", "sous"),
+    ("classe-assassin", "Assassin", "sous"),
+    ("classe-viking", "Viking", "sous"),
     ("ennemis", "Ennemis"),
     ("commandes", "Commandes"),
     ("interface", "Interface"),
@@ -66,8 +74,31 @@ def inline(txt):
                else '<a href="%s.html%s">%s</a>' % (m.group(2), m.group(3) or "", m.group(1)), t)
     t = re.sub(r"\[([^\]]+)\]\((https?://[^)]+)\)", r'<a href="\2">\1</a>', t)
     t = re.sub(r"\{(décidé|à confirmer|effet validé|à équilibrer|provisoire)\}", lambda m: BADGES[m.group(1)], t)
+    t = re.sub(r"\{icone(-grande)? ([a-z0-9_]+)\}", icone, t)
     t = re.sub(r"\{couleur (#[0-9a-fA-F]{6})\}", r'<span class="swatch" style="background:\1"></span><code>\1</code>', t)
     return t
+
+
+def icone(m):
+    """{icone nom} : petite icône en ligne ; {icone-grande nom} : grande icône (en-tête d'une page de classe).
+    Le SVG est pris dans ArtSources/Icones/Classes ou ArtSources/Icones/Competences, puis copié dans <version>/icones/."""
+    nom = m.group(2)
+    for sous in ("Classes", "Competences"):
+        if os.path.exists(os.path.join(ICONES, sous, nom + ".svg")):
+            ICONES_COPIEES.add((sous, nom))
+            return '<img class="icone%s" src="icones/%s.svg" alt="">' % (" grande" if m.group(1) else "", nom)
+    return '<span class="manque">[icône %s introuvable]</span>' % nom
+
+
+def copier_icones(dossier):
+    cible = os.path.join(dossier, "icones")
+    os.makedirs(cible, exist_ok=True)
+    for sous, nom in ICONES_COPIEES:
+        shutil.copyfile(os.path.join(ICONES, sous, nom + ".svg"), os.path.join(cible, nom + ".svg"))
+
+
+def options(e):
+    return e[2].split() if len(e) > 2 else []
 
 
 def slug(txt):
@@ -411,6 +442,9 @@ th{font-size:13px;letter-spacing:.5px;text-transform:uppercase;color:var(--doux)
 .badge.ok{background:var(--ok-fond);color:var(--ok)}.badge.fx{background:var(--fx-fond);color:var(--fx)}.badge.tune{background:var(--tune-fond);color:var(--tune)}.badge.wait{background:var(--wait-fond);color:var(--wait)}
 .note{border:1px solid var(--ligne);background:var(--surface);border-radius:10px;padding:12px 16px;margin:16px 0;color:var(--doux)}
 .swatch{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px;border:1px solid var(--ligne)}
+nav li.sous-page a{padding:3px 10px 3px 26px;font-size:14px;color:var(--doux)}nav li.sous-page a.ici{color:var(--accent)}
+img.icone{width:28px;height:28px;vertical-align:-8px;margin-right:4px}img.icone.grande{width:112px;height:112px;display:block;margin:4px 0 8px}
+td img.icone{width:44px;height:44px;vertical-align:middle;background:#1b2130;border-radius:10px;padding:5px}
 .maj{margin-top:48px;color:var(--doux);font-size:13px}
 .badge.dispo{background:var(--code);color:var(--doux)}.badge.ecoute{background:var(--accent);color:var(--surface)}
 .encart-ecoute{color:var(--encre);border-color:var(--accent)}.encart-ecoute p{margin:0 0 6px}.encart-ecoute ul{margin:0;font-size:14px}
@@ -447,15 +481,16 @@ def generer(public):
     dossier = PUBLIC if public else SITE
     SITE_SONS = os.path.join(dossier, "sons")
     SONS_COPIES.clear()
+    ICONES_COPIEES.clear()
     os.makedirs(dossier, exist_ok=True)
-    menu_ok = [e for e in MENU if not (public and len(e) > 2 and e[2] == "dev") and os.path.exists(os.path.join(PAGES, e[0] + ".md"))]
+    menu_ok = [e for e in MENU if not (public and "dev" in options(e)) and os.path.exists(os.path.join(PAGES, e[0] + ".md"))]
     PAGES_PRESENTES = {e[0] for e in menu_ok}
     pages, index = [], []
     for e in menu_ok:
         nom, court = e[0], e[1]
         md = filtrer(io.open(os.path.join(PAGES, nom + ".md"), encoding="utf-8").read(), public)
         titre, titres, corps = convertir(md)
-        pages.append((nom, court, titre, corps))
+        pages.append((nom, court, titre, corps, "sous" in options(e)))
         index.append({"p": court, "t": titre, "u": nom + ".html"})
         index.extend({"p": court, "t": t, "u": "%s.html#%s" % (nom, ident)} for _, t, ident in titres)
     for f in os.listdir(dossier):  # pages qui ne font plus partie de cette version
@@ -463,9 +498,10 @@ def generer(public):
             os.remove(os.path.join(dossier, f))
     maj = datetime.date.today().strftime("%d/%m/%Y")
     sous_titre = "Wiki du joueur" if public else "Wiki des règles · développeur"
-    for nom, court, titre, corps in pages:
-        menu = "".join('<li><a href="%s.html"%s>%s</a></li>' % (n, ' class="ici" aria-current="page"' if n == nom else "", html.escape(c))
-                       for n, c, _, _ in pages)
+    for nom, court, titre, corps, _ in pages:
+        menu = "".join('<li%s><a href="%s.html"%s>%s</a></li>' % (' class="sous-page"' if sp else "", n,
+                       ' class="ici" aria-current="page"' if n == nom else "", html.escape(c))
+                       for n, c, _, _, sp in pages)
         pied = ("Mis à jour le %s." % maj) if public else ("Généré le %s depuis <code>Wiki/pages/%s.md</code>." % (maj, nom))
         doc = ('<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
                '<title>%s · Wiki Deathless</title>'
@@ -480,6 +516,7 @@ def generer(public):
                % (html.escape(titre), CSS, sous_titre, menu, corps, pied, json.dumps(index, ensure_ascii=False), JS))
         io.open(os.path.join(dossier, nom + ".html"), "w", encoding="utf-8", newline="\n").write(doc)
     copier_sons()
+    copier_icones(dossier)
     print("Wiki %s : %d pages dans %s" % ("joueur" if public else "développeur", len(pages), dossier))
 
 
