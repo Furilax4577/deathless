@@ -25,6 +25,10 @@ Ordre d'apparition dans la partie : sbires dès la nuit 1, guerriers nuit 2, vol
 
 {dev} Le casque du squelette guerrier sert aussi de modèle au heaume du rugissement du viking.
 
+## Yeux {décidé}
+
+Les squelettes ordinaires ont les **yeux jaune-orangé lumineux**, comme les modèles KayKit. Les **élites** et **Nyxar** ont les **yeux verts** : ils portent un éclat de Nyx.
+
 ## Élites {décidé}
 
 Un élite est un squelette ordinaire qui porte un **éclat de Nyx** (voir [L'univers](univers.md)) :
