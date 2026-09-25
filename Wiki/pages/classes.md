@@ -51,7 +51,8 @@ Les rôles sont {à confirmer}. Les armes et leurs animations sont {décidé}.
 | Furtif et dans le dos | Meilleur critique |
 
 - Multiplicateurs : {à confirmer}. Pour mémoire, Relic utilisait ×3 dans le dos et ×2 en furtivité, cumulables.
-- Déclenchement du mode furtif et conditions de détection : {à confirmer}.
+- **Déclenchement** {décidé} : automatique. Hors combat, dès que l'assassin marche sans courir ni sprinter, il passe en marche discrète et devient furtif. Courir, attaquer ou être repéré le fait sortir du mode furtif.
+- Portée de détection des ennemis : {à confirmer}.
 - Compétences actives : {à confirmer}.
 
 ## Viking
