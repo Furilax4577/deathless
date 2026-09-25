@@ -6,6 +6,10 @@
 
 Les héros utilisent eux aussi cette force. C'est ce qui leur vaut la **fureur de ceux qui tentent de la récupérer** : chaque nuit, les squelettes sortent de terre pour reprendre ce que les héros leur ont pris.
 
+## Le Nécromancien {décidé}
+
+Le **Nécromancien** est l'**ancien possesseur de Nyxessa**. Il l'utilisait **seul, pour son propre pouvoir**. Il tente aujourd'hui de la récupérer, et c'est lui qui mène les squelettes contre le village.
+
 La relique au cœur du village est la forme visible de Nyxessa. Tant qu'elle tient, les héros tiennent aussi.
 
 ## Ce que ça change dans le jeu {dev}
@@ -16,5 +20,5 @@ La relique au cœur du village est la forme visible de Nyxessa. Tant qu'elle tie
 ## À écrire {à confirmer}
 
 - L'origine de Nyxessa, et comment les héros ont commencé à utiliser sa force.
-- Qui mène les squelettes, et ce qu'ils feraient de Nyxessa s'ils la reprenaient.
+- Comment Nyxessa a échappé au Nécromancien et comment elle est arrivée aux héros.
 - Le donjon : ce qu'il est par rapport à Nyxessa.

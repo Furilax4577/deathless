@@ -16,5 +16,5 @@ Ce qui reste ouvert. Une ligne quitte cette page quand la règle est tranchée e
 | Interface | Contenu final des menus et du HUD | [Interface](interface.md) |
 | Village | Rôle de jeu des maisons, autres villageois | [Le village](village.md) |
 | Ennemis | Rôle de chaque type de squelette, différence entre mage et mage lanceur de crâne, comportements, détection, vie et dégâts | [Ennemis](ennemis.md) |
-| Univers | Origine de Nyxessa, chef des squelettes, rôle du donjon | [L'univers](univers.md) |
+| Univers | Origine de Nyxessa, comment elle a échappé au Nécromancien, rôle du donjon | [L'univers](univers.md) |
 | Progression | Améliorations, points de compétence, économie | à créer |
