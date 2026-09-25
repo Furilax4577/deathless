@@ -146,7 +146,7 @@ Transform:
   m_GameObject: {fileID: 25031609}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 2.5, y: 0.05, z: -4}
+  m_LocalPosition: {x: 3.5, y: 0.05, z: -5.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -425,7 +425,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1461097847516486182, guid: 8738e0330059a5e40a8126ea2797a3da, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.5
+      value: 1.75
       objectReference: {fileID: 0}
     - target: {fileID: 1461097847516486182, guid: 8738e0330059a5e40a8126ea2797a3da, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2215,6 +2215,7 @@ MonoBehaviour:
   cristal: {fileID: 1820227888}
   formeCrane: {fileID: 11400000, guid: 915dfd514a62aec41a26ecb80cccff94, type: 2}
   cibleMissile: {fileID: 1939919783}
+  echelleMissile: 1.5
   intervalleMissile: 4
   portail: {fileID: 68394725}
   portailFerme: 2.5
@@ -2260,6 +2261,7 @@ MonoBehaviour:
   vitesseClipSortie: 1.5
   profondeurSortie: 1.9
   intervalleSquelettes: 6
+  ralentiCapture: 0.25
 --- !u!4 &822735163
 Transform:
   m_ObjectHideFlags: 0

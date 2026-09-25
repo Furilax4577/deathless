@@ -15,6 +15,9 @@ public class SkullMissileVisual : MonoBehaviour
     private static Color Pale => VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Coeur, new Color(0.5f, 0.95f, 0.38f));   // sous 1 : le Bloom ne le délave pas en blanc
 
     private const float GemSize = 0.021f;
+    private float echelle = 1f;
+    private float gemSize = GemSize;
+    private VfxLumiere lumiere;
 
     private Transform skull;
     private Mesh mesh;
@@ -34,7 +37,9 @@ public class SkullMissileVisual : MonoBehaviour
 
     // `shape` : forme en gemmes du crâne ; `euler` : rotation qui tourne le visage vers l'avant (+z) ; `size` : taille du
     // crâne (m) ; `gemMaterial` : matériau à couleurs par sommet (PortalVoxel).
-    public static SkullMissileVisual Attach(Transform parent, GemShape shape, Vector3 euler, float size, Material gemMaterial)
+    // `echelle` (défaut 1) : échelle d'ensemble du missile (crâne, gemmes, traînée, éclats) ; 1,5 pour le missile tiré
+    // par la relique (Nyxessa.TirerMissile), 1 pour le missile du nécromancien (inchangé).
+    public static SkullMissileVisual Attach(Transform parent, GemShape shape, Vector3 euler, float size, Material gemMaterial, float echelle = 1f)
     {
         if (shape == null || gemMaterial == null || shape.points.Length == 0)
             return null;
@@ -43,8 +48,10 @@ public class SkullMissileVisual : MonoBehaviour
         SkullMissileVisual visual = root.AddComponent<SkullMissileVisual>();
         visual.material = gemMaterial;
         visual.seed = Random.value * 100f;
-        visual.Build(shape, euler, size);
-        visual.trail = GemTrail.Follow(root.transform, gemMaterial, 0.07f);
+        visual.echelle = Mathf.Max(0.1f, echelle);
+        visual.gemSize = GemSize * visual.echelle;
+        visual.Build(shape, euler, size * visual.echelle);
+        visual.trail = GemTrail.Follow(root.transform, gemMaterial, 0.07f * visual.echelle);
         visual.lastPosition = root.transform.position;
         return visual;
     }
@@ -96,13 +103,8 @@ public class SkullMissileVisual : MonoBehaviour
         renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         renderer.receiveShadows = false;
 
-        Light glow = new GameObject("Light").AddComponent<Light>();
-        glow.transform.SetParent(transform, false);
-        glow.type = LightType.Point;
-        glow.color = VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Coeur, new Color(0.4f, 1f, 0.45f));
-        glow.intensity = 2.5f;
-        glow.range = 5f;
-        glow.shadows = LightShadows.None;
+        // Lumière commune des effets (thème Nyxessa ; petite, moyenne pour un gros missile).
+        lumiere = VfxLumiere.Creer(transform, Vector3.zero, VfxTheme.Nyxessa, echelle >= 1.25f ? VfxTailleLumiere.Moyenne : VfxTailleLumiere.Petite);
         Refresh(0f);
     }
 
@@ -126,11 +128,10 @@ public class SkullMissileVisual : MonoBehaviour
         Vector3[] world = new Vector3[points.Length];
         for (int i = 0; i < points.Length; i++)
             world[i] = skull.TransformPoint(Jittered(i, Time.time));
-        GemBurst.Shatter(skull.position, world, tints, GemSize, 3.5f, velocity * 0.15f, material);
+        GemBurst.Shatter(skull.position, world, tints, gemSize, 3.5f * Mathf.Sqrt(echelle), velocity * 0.15f, material);
         skull.gameObject.SetActive(false);
-        Light glow = GetComponentInChildren<Light>();
-        if (glow != null)
-            glow.enabled = false;
+        if (lumiere != null)
+            lumiere.Eteindre();
     }
 
     private void Update()
@@ -153,7 +154,7 @@ public class SkullMissileVisual : MonoBehaviour
     private Vector3 Jittered(int i, float time)
     {
         float p = phases[i];
-        return points[i] + new Vector3(Mathf.Sin(time * 9f + p), Mathf.Sin(time * 11f + p * 1.7f), Mathf.Sin(time * 7f + p * 2.3f)) * 0.005f;
+        return points[i] + new Vector3(Mathf.Sin(time * 9f + p), Mathf.Sin(time * 11f + p * 1.7f), Mathf.Sin(time * 7f + p * 2.3f)) * 0.005f * echelle;
     }
 
     private void Refresh(float time)
@@ -166,7 +167,7 @@ public class SkullMissileVisual : MonoBehaviour
             Quaternion spin = Quaternion.AngleAxis(Mathf.Sin(time * 8f + phases[i] * 5f) * 12f, spinAxes[i]) * rotations[i];
             // Scintillement : chaque gemme s'éclaire un peu à son rythme.
             float flicker = 0.85f + 0.25f * Mathf.Sin(time * 6f + phases[i] * 3f);
-            LowPolyGem.Write(vertices, colors, i, Jittered(i, time), GemSize, new Vector3(1.25f, 1.25f, 0.45f), spin, tints[i] * flicker, LowPolyGem.DefaultLight);
+            LowPolyGem.Write(vertices, colors, i, Jittered(i, time), gemSize, new Vector3(1.25f, 1.25f, 0.45f), spin, tints[i] * flicker, LowPolyGem.DefaultLight);
         }
         mesh.vertices = vertices;
         mesh.colors = colors;

@@ -52,6 +52,10 @@ MonoBehaviour:
   angleMachoire: 28
   reculMachoire: 0.02
   angleBascule: 13
+  heaume: {fileID: 11400000, guid: 46aeba275153e4e42bfb30829a28d6db, type: 2}
+  heaumeEchelle: 1.67
+  heaumeDecalage: {x: 0, y: 0.32, z: -0.03}
+  heaumeTailleGemme: 1.3
 --- !u!1 &5911027638664053418
 GameObject:
   m_ObjectHideFlags: 0

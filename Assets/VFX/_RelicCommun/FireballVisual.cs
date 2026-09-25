@@ -45,13 +45,8 @@ public class FireballVisual : MonoBehaviour
         body = Part("Body", bodyMesh, transform, Vector3.zero, Quaternion.identity, Vector3.one * 0.44f, Orange, OrangeGlow).transform;
         Part("Core", coreMesh, body, new Vector3(0f, 0f, 0.22f), Quaternion.identity, Vector3.one * 0.62f, Yellow, YellowGlow);
 
-        Light glow = new GameObject("Light").AddComponent<Light>();
-        glow.transform.SetParent(transform, false);
-        glow.type = LightType.Point;
-        glow.color = Color.Lerp(Orange, Yellow, 0.3f);
-        glow.intensity = 3f;
-        glow.range = 6f;
-        glow.shadows = LightShadows.None;
+        // Lumière commune des effets (thème Feu, classe moyenne, scintillement du feu).
+        VfxLumiere.Creer(transform, Vector3.zero, VfxTheme.Feu, VfxTailleLumiere.Moyenne);
     }
 
     private GameObject Part(string name, Mesh mesh, Transform parent, Vector3 position, Quaternion rotation, Vector3 scale, Color color, Color emission)

@@ -35,6 +35,8 @@ public class OndeDeChoc : MonoBehaviour
 
     public void Jouer()
     {
+        // Petit éclat à l'impact (lumière commune des effets, thème Terre).
+        VfxLumiere.Eclat(transform.position + Vector3.up * 0.4f, VfxTheme.Terre, VfxTailleLumiere.Petite, 0.05f);
         Configurer();
         if (gemmes != null) gemmes.Jouer();
     }

@@ -32,8 +32,12 @@ public class PortalVisual : MonoBehaviour
     [SerializeField] private Material lumpMaterial;   // plus utilisé (ancienne gerbe), gardé pour la scène
     [SerializeField] private Material glowMaterial;   // plus utilisé (ancienne version), gardé pour la scène
     [SerializeField] private Material depthMaterial;  // plus utilisé (ancienne version), gardé pour la scène
-    [Tooltip("Rayon du disque (m).")]
-    [SerializeField] private float radius = 1.35f;
+    [Tooltip("Rayon du disque (m). 1,35 dans Relic ; 1,6 depuis le 25/09/2026 (portail plus grand).")]
+    [SerializeField] private float radius = 1.6f;
+    [Tooltip("Profondeur visible au centre, en fraction du diamètre (disque épais à faces plates, bord arrondi).")]
+    [Range(0.1f, 0.6f)] [SerializeField] private float epaisseur = 0.35f;
+    [Tooltip("Prévenir la relique (Nyxessa) à l'ouverture et à la fermeture.")]
+    [SerializeField] private bool reagirRelique = true;
     [Tooltip("Taille moyenne d'un cube de la soupe (m).")]
     [SerializeField] private float cell = 0.1f;
     [Tooltip("Nombre de cubes de la soupe.")]
@@ -69,17 +73,36 @@ public class PortalVisual : MonoBehaviour
     private float flowTime;
     private float twist;
     private float meanRotation;
-    // Onde concentrique (passage d'un joueur, étape 72) : instant de départ, -100 = aucune.
-    private float rippleStart = -100f;
-    private const float RippleSeconds = 1.1f;
+    // Goutte d'eau (passage d'un joueur, 25/09/2026) : instant de départ (-100 = aucune) et sens (entrée : anneaux
+    // du centre vers le bord ; sortie : du bord vers le centre).
+    private float goutteStart = -100f;
+    private bool goutteSortie;
+    private const float GoutteSecondes = 1.5f;
+    private VfxLumiere lumiere;
 
     // Centre de la soupe dans le monde (où convergent les gemmes d'un joueur qui entre).
     public Vector3 Center => root != null ? root.position : transform.position;
 
-    // Onde concentrique du centre vers le bord : la soupe se soulève et s'éclaire au passage d'un joueur.
+    // Entrée d'un joueur : goutte d'eau, des anneaux partent du centre vers le bord et s'amortissent, avec un creux
+    // qui rebondit au centre.
+    public void Entrer()
+    {
+        goutteStart = Time.time;
+        goutteSortie = false;
+    }
+
+    // Sortie d'un joueur : l'inverse, les anneaux partent du bord, convergent vers le centre et s'y résorbent (petite
+    // bosse au centre à la fin).
+    public void Sortir()
+    {
+        goutteStart = Time.time;
+        goutteSortie = true;
+    }
+
+    // Ancienne onde de Relic : remplacée par la goutte d'eau d'entrée.
     public void Ripple()
     {
-        rippleStart = Time.time;
+        Entrer();
     }
 
     private static Color Dark => VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Base, new Color(0.07f, 0.38f, 0.05f));
@@ -96,8 +119,14 @@ public class PortalVisual : MonoBehaviour
             if (old != null)
                 foreach (Renderer r in old.GetComponentsInChildren<Renderer>())
                     r.enabled = false;
+        // Lumière commune des effets (thème Nyxessa, grande classe) sur la lumière du prefab.
         if (portalLight != null)
-            portalLight.color = VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Coeur, new Color(0.45f, 1f, 0.3f));
+        {
+            lumiere = portalLight.GetComponent<VfxLumiere>();
+            if (lumiere == null) lumiere = portalLight.gameObject.AddComponent<VfxLumiere>();
+            lumiere.theme = VfxTheme.Nyxessa;
+            lumiere.taille = VfxTailleLumiere.Grande;
+        }
 
         // Racine d'échelle 1 dans le monde, dans le plan de l'ancien tourbillon (un quad : face selon son z local).
         Transform parent = swirlFront != null ? swirlFront.parent : transform;
@@ -114,7 +143,10 @@ public class PortalVisual : MonoBehaviour
         bool open = ouvert;
         SetState(open ? State.Open : State.Closed);
         if (open)
+        {
             UpdateVoxels(1f, 1f);
+            if (lumiere != null) lumiere.Allumer();
+        }
         else
             ApplyClosed();
     }
@@ -165,7 +197,7 @@ public class PortalVisual : MonoBehaviour
         mesh.vertices = vertices;
         mesh.colors = colors;
         mesh.triangles = triangles;
-        mesh.bounds = new Bounds(Vector3.zero, new Vector3(radius * 2.4f, radius * 2.4f, 1.5f));
+        mesh.bounds = new Bounds(Vector3.zero, new Vector3(radius * 2.4f, radius * 2.4f, radius * 2f));
         root.gameObject.AddComponent<MeshFilter>().sharedMesh = mesh;
         meshRenderer = root.gameObject.AddComponent<MeshRenderer>();
         meshRenderer.sharedMaterial = voxelMaterial;
@@ -188,7 +220,9 @@ public class PortalVisual : MonoBehaviour
     private void ApplyClosed()
     {
         root.gameObject.SetActive(false);
-        if (portalLight != null)
+        if (lumiere != null)
+            lumiere.Eteindre();
+        else if (portalLight != null)
             portalLight.enabled = false;
     }
 
@@ -229,13 +263,16 @@ public class PortalVisual : MonoBehaviour
         {
             SetState(State.Opening);
             root.gameObject.SetActive(true);
-            if (portalLight != null) portalLight.enabled = true;
+            if (lumiere != null) lumiere.Allumer();
+            else if (portalLight != null) portalLight.enabled = true;
             Pop(1f, false);
+            if (reagirRelique) Nyxessa.Signaler(ReactionNyxessa.OuverturePortail);
         }
         else if (!wantOpen && (state == State.Open || state == State.Opening))
         {
             SetState(State.Closing);
             Pop(1.3f, true);
+            if (reagirRelique) Nyxessa.Signaler(ReactionNyxessa.FermeturePortail);
         }
         if (state == State.Closed)
             return;
@@ -266,7 +303,9 @@ public class PortalVisual : MonoBehaviour
                 return;
             }
         }
-        if (portalLight != null)
+        if (lumiere != null)
+            lumiere.facteur = light;
+        else if (portalLight != null)
             portalLight.intensity = baseIntensity * light * (1f + 0.15f * Mathf.Sin(t * 5.3f) + 0.08f * Mathf.Sin(t * 13.1f));
 
         flowTime += Time.deltaTime * speed;
@@ -321,20 +360,45 @@ public class PortalVisual : MonoBehaviour
                 WriteGem(i, Vector3.zero, 0f, Vector3.one, Quaternion.identity, color);
                 continue;
             }
-            // Profondeur : lentille plus épaisse au centre ; chaque cube ondule d'avant en arrière à son rythme, et une
-            // houle partie du centre soulève la soupe.
-            float thickness = 0.06f + 0.34f * (1f - r * r);
+            // Profondeur : disque épais à faces presque plates et bord arrondi (profil (1 - r^4)^0,5), demi-épaisseur
+            // calculée pour que la profondeur visible au centre (gemmes et houle comprises) fasse `epaisseur` × diamètre ;
+            // chaque cube ondule d'avant en arrière à son rythme, et une houle partie du centre soulève la soupe.
+            float demi = Mathf.Max(0.05f, (epaisseur * 2f * radius - 0.2f) / 2.3f);
+            float thickness = demi * Mathf.Sqrt(Mathf.Max(0f, 1f - r * r * r * r)) + 0.03f;
             float wave = 0.25f * Mathf.Sin(t * 1.7f + pPhase[i]) + 0.2f * Mathf.Sin(r * 8f - t * 3f);
-            float z = (pDepth[i] + wave * 0.5f) * thickness;
-            // Onde concentrique : un anneau part du centre, soulève les gemmes qu'il traverse et les éclaircit.
-            float rippleAge = Time.time - rippleStart;
-            if (rippleAge >= 0f && rippleAge < RippleSeconds)
+            float z = (pDepth[i] + wave * 0.3f) * thickness;
+            // Goutte d'eau : trois anneaux (0,16 s d'écart) qui parcourent la surface, crête suivie d'un creux, amortis ;
+            // entrée : du centre vers le bord, creux au centre qui rebondit ; sortie : du bord vers le centre, petite
+            // bosse au centre quand ils s'y résorbent. Les crêtes s'éclaircissent.
+            float goutte = Time.time - goutteStart;
+            if (goutte >= 0f && goutte < GoutteSecondes)
             {
-                float ring = rippleAge / RippleSeconds * 1.15f;
-                float hit = Mathf.Clamp01(1f - Mathf.Abs(r - ring) / 0.16f) * (1f - rippleAge / RippleSeconds * 0.5f);
-                z += hit * 0.35f;
-                if (hit > 0.35f)
-                    color = Pale;
+                float amort = 1f - goutte / GoutteSecondes;
+                // Pendant la goutte, le cœur clair de la soupe est atténué pour que les crêtes se détachent.
+                if (color == Pale && amort > 0.25f)
+                    color = Light;
+                for (int k = 0; k < 3; k++)
+                {
+                    float ak = goutte - k * 0.16f;
+                    if (ak < 0f) continue;
+                    float ring = goutteSortie ? 1.1f - ak * 1.2f : ak * 1.2f;
+                    if (ring < -0.1f || ring > 1.2f) continue;
+                    float amp = 0.34f * (1f - k * 0.25f) * amort * (goutteSortie ? Mathf.Clamp01(ak / 0.25f) : Mathf.Exp(-ak * 1.2f));
+                    float d1 = (r - ring) / 0.09f;
+                    float creux = Mathf.Exp(-((r - ring + (goutteSortie ? -0.16f : 0.16f)) / 0.09f) * ((r - ring + (goutteSortie ? -0.16f : 0.16f)) / 0.09f));
+                    float crete = Mathf.Exp(-d1 * d1);
+                    z += amp * (crete - 0.55f * creux);
+                    // Crête claire, creux sombre : les anneaux se lisent aussi de face.
+                    if (crete * amp > 0.1f)
+                        color = Pale;
+                    else if (creux * amp > 0.12f)
+                        color = Dark;
+                }
+                float centre = Mathf.Exp(-r * r / 0.02f);
+                if (!goutteSortie)
+                    z -= 0.28f * centre * Mathf.Cos(goutte * 14f) * Mathf.Exp(-goutte * 3.5f);
+                else
+                    z += 0.22f * centre * Mathf.Sin(Mathf.PI * Mathf.Clamp01((goutte - 0.8f) / 0.5f));
             }
             float size = cell * pSize[i] * presence * (0.85f + 0.15f * Mathf.Sin(t * 3.1f + pPhase[i] * 2f));
             // Chaque gemme tourne lentement sur elle-même : ses facettes changent de teinte, la soupe scintille.

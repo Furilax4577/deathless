@@ -36,6 +36,26 @@ public class PortalTransit : MonoBehaviour
         return Spawn(body, portalCenter, material, seconds, false);
     }
 
+    // Entrée dans `portail` : départ vers son centre, onde « goutte d'eau » du centre vers le bord (PortalVisual.Entrer)
+    // et réaction de la relique (Nyxessa, PassageJoueur).
+    public static PortalTransit Depart(Bounds body, PortalVisual portail, Material material, float seconds)
+    {
+        if (portail == null) return null;
+        portail.Entrer();
+        Nyxessa.Signaler(ReactionNyxessa.PassageJoueur);
+        return Spawn(body, portail.Center, material, seconds, false);
+    }
+
+    // Sortie de `portail` : arrivée depuis son centre, onde inverse (les anneaux convergent vers le centre,
+    // PortalVisual.Sortir) et réaction de la relique.
+    public static PortalTransit Arrive(Bounds body, PortalVisual portail, Material material, float seconds)
+    {
+        if (portail == null) return null;
+        portail.Sortir();
+        Nyxessa.Signaler(ReactionNyxessa.PassageJoueur);
+        return Spawn(body, portail.Center, material, seconds, true);
+    }
+
     // Arrivée : les gemmes jaillissent de `portalCenter` et se posent dans le corps en `seconds` s.
     public static PortalTransit Arrive(Bounds body, Vector3 portalCenter, Material material, float seconds)
     {
@@ -93,13 +113,11 @@ public class PortalTransit : MonoBehaviour
         meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         meshRenderer.receiveShadows = false;
 
-        flash = new GameObject("Flash").AddComponent<Light>();
-        flash.transform.SetParent(transform, false);
-        flash.transform.position = center;
-        flash.type = LightType.Point;
-        flash.color = VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Coeur, new Color(0.45f, 1f, 0.35f));
-        flash.range = 5f;
-        flash.shadows = LightShadows.None;
+        // Lumière commune des effets (thème Nyxessa, classe moyenne), tenue pendant le passage.
+        VfxLumiere lumiere = VfxLumiere.Creer(transform, Vector3.zero, VfxTheme.Nyxessa, VfxTailleLumiere.Moyenne,
+            Mathf.Max(0f, seconds - VfxLumiere.Montee - VfxLumiere.Extinction));
+        lumiere.transform.position = center;
+        flash = lumiere.Lumiere;
         Step(0f);
     }
 

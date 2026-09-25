@@ -41,6 +41,8 @@ public class VfxBench : MonoBehaviour
     public Transform cristal;
     public GemShape formeCrane;
     public GameObject cibleMissile;
+    [Tooltip("Échelle du missile tiré par la relique (1 = missile du nécromancien).")]
+    public float echelleMissile = 1.5f;
     public float intervalleMissile = 4f;
 
     [Header("Portail de donjon")]
@@ -170,7 +172,7 @@ public class VfxBench : MonoBehaviour
         StopAllCoroutines();
         foreach (GameObject p in projectiles) if (p != null) Destroy(p);
         projectiles.Clear();
-        Boucle(intervalleAnneau, () => { if (anneau != null) anneau.Pulse(); });
+        // La ceinture de la relique n'est plus pulsée à la main : elle réagit aux événements (Nyxessa).
         Boucle(intervalleMissile, () => StartCoroutine(Missile()));
         Boucle(intervallePortail, () => StartCoroutine(CyclePortail()));
         Boucle(intervalleBouclier, () => StartCoroutine(CycleBouclier()));
@@ -559,16 +561,14 @@ public class VfxBench : MonoBehaviour
                 yield return null;
             }
             Visible(t0, false);
-            PortalTransit.Depart(Corps(t0.position), centre, gemmes, depart);
-            portailTransit.Ripple();
+            PortalTransit.Depart(Corps(t0.position), portailTransit, gemmes, depart);   // goutte d'entrée + réaction de la relique
             yield return new WaitForSeconds(depart);
             Vector3 cible = voyageurOrigine + (versB ? pointB : pointA);
             t0.position = cible;
             t0.rotation = Quaternion.LookRotation(new Vector3(cible.x - centre.x, 0f, cible.z - centre.z).normalized);
             a.Poser(clipIdle, 0f);
             yield return null;
-            PortalTransit.Arrive(Corps(cible), centre, gemmes, arrivee);
-            portailTransit.Ripple();
+            PortalTransit.Arrive(Corps(cible), portailTransit, gemmes, arrivee);   // goutte de sortie + réaction de la relique
             yield return new WaitForSeconds(arrivee);
             Visible(t0, true);
             versB = !versB;
@@ -624,13 +624,15 @@ public class VfxBench : MonoBehaviour
         if (cristal == null || formeCrane == null || gemmes == null || cibleMissile == null) yield break;
         Vector3 cible = Poitrine(cibleMissile);
         Vector3 dir = (cible - cristal.position).normalized;
-        Vector3 depart = cristal.position + dir * 0.9f;
-        GemBurst.Explode(depart, 0.5f, gemmes);
+        Vector3 depart = cristal.position + dir * 1.1f;
         GameObject projectile = new GameObject("VfxBench_Missile");
         projectiles.Add(projectile);
         projectile.transform.position = depart;
         projectile.transform.rotation = Quaternion.LookRotation(dir);
-        SkullMissileVisual crane = SkullMissileVisual.Attach(projectile.transform, formeCrane, Vector3.zero, 0.55f, gemmes);
+        // Tir par la relique : éclat au départ, réaction de Nyxessa (pulsation et recul du cristal), crâne à l'échelle 1,5.
+        SkullMissileVisual crane = Nyxessa.Instance != null
+            ? Nyxessa.Instance.TirerMissile(projectile.transform, formeCrane, gemmes, echelleMissile)
+            : SkullMissileVisual.Attach(projectile.transform, formeCrane, Vector3.zero, 0.55f, gemmes, echelleMissile);
         float duree = Vector3.Distance(depart, cible) / 12f;
         for (float t = 0f; t < duree && projectile != null; t += Time.deltaTime)
         {
@@ -744,9 +746,15 @@ public class VfxBench : MonoBehaviour
         StartCoroutine(CaptureRoutine(chemin, delai, position, visee, fov));
     }
 
+    [Tooltip("Captures : le temps est ralenti pendant l'attente (les à-coups de l'éditeur décalent moins l'instant).")]
+    public float ralentiCapture = 0.25f;
+
     private IEnumerator CaptureRoutine(string chemin, float delai, Vector3 position, Vector3 visee, float fov)
     {
+        float echelleTemps = Time.timeScale;
+        Time.timeScale = Mathf.Clamp(ralentiCapture, 0.05f, 1f);
         yield return new WaitForSeconds(delai);
+        Time.timeScale = echelleTemps;
         yield return new WaitForEndOfFrame();
         Camera cam = Camera.main;
         GameObject temporaire = null;

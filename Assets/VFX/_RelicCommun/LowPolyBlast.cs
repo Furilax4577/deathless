@@ -79,14 +79,10 @@ public class LowPolyBlast : MonoBehaviour
             blast.spins.Add(Random.insideUnitSphere * 600f);
         }
 
-        blast.flash = new GameObject("Flash").AddComponent<Light>();
-        blast.flash.transform.SetParent(root.transform, false);
-        blast.flash.type = LightType.Point;
-        blast.flash.color = lightColor;
-        blast.lightIntensity = 6f;
-        blast.flash.intensity = blast.lightIntensity;
-        blast.flash.range = radius * 4f + 3f;
-        blast.flash.shadows = LightShadows.None;
+        // Éclat d'impact : lumière commune des effets (thème Feu, grande classe) ; `lightColor` n'est plus utilisé
+        // (la couleur vient du thème).
+        VfxLumiere eclat = VfxLumiere.Creer(root.transform, Vector3.zero, VfxTheme.Feu, VfxTailleLumiere.Grande, GrowTime + HoldTime);
+        blast.flash = eclat.Lumiere;
         return blast;
     }
 
@@ -150,6 +146,5 @@ public class LowPolyBlast : MonoBehaviour
             shards[i].localScale = Vector3.one * shardScales[i] * (1f - shardK);
         }
 
-        flash.intensity = lightIntensity * Mathf.Clamp01(1f - age / (GrowTime + HoldTime + ShrinkTime));
     }
 }

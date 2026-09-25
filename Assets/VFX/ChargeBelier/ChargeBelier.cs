@@ -80,6 +80,7 @@ public class ChargeBelier : MonoBehaviour
     private float debut = -1f;
     private float parcouruEmis;
     private bool actif;
+    private VfxLumiere lumiere;
 
     public bool EnCours { get { return actif; } }
 
@@ -111,6 +112,9 @@ public class ChargeBelier : MonoBehaviour
         Suivre();
         rendu.enabled = true;
         Dessiner(0f);
+        // Lumière commune des effets (thème Sacre, classe moyenne) portée par la bulle pendant la ruée.
+        if (lumiere == null) lumiere = VfxLumiere.Creer(transform, new Vector3(0f, hauteur * 0.5f, 0f), VfxTheme.Sacre, VfxTailleLumiere.Moyenne, -1f);
+        lumiere.Allumer();
     }
 
     // Impact immédiat (charge interrompue par un obstacle, par exemple).
@@ -128,10 +132,10 @@ public class ChargeBelier : MonoBehaviour
         }
         Vector3 centre = bulle.TransformPoint(new Vector3(0f, hauteur * 0.5f, -longueur * 0.15f));
         GemBurst eclat = GemBurst.Shatter(centre, positions, couleurs, tailleGemme, vitesseEclat, direction * elanEclat, materiau);
-        // L'éclair de GemBurst est vert (Nyxessa) : le repeindre à la couleur du thème.
-        if (eclat != null)
-            foreach (Light l in eclat.GetComponentsInChildren<Light>())
-                l.color = Or;
+        // Éclat de la gerbe au thème Sacre (GemBurst est Nyxessa par défaut).
+        if (eclat != null && eclat.Lumiere != null)
+            eclat.Lumiere.theme = VfxTheme.Sacre;
+        if (lumiere != null) lumiere.Eteindre();
         rendu.enabled = false;
         if (onde != null)
         {

@@ -23,8 +23,13 @@ public class Rugissement : MonoBehaviour
         if (crane != null) crane.transform.localScale = Vector3.zero;
     }
 
+    private VfxLumiere lumiere;
+
     public void Jouer()
     {
+        // Lumière commune des effets (thème Rage, classe moyenne) sur le crâne, le temps de la séquence.
+        if (lumiere == null && crane != null) lumiere = VfxLumiere.Creer(crane.transform.parent, crane.transform.localPosition, VfxTheme.Rage, VfxTailleLumiere.Moyenne, -1f);
+        if (lumiere != null) lumiere.Allumer(Mathf.Max(0f, DureeTotale - VfxLumiere.Montee - VfxLumiere.Extinction));
         temps = 0f;
         ondeLancee = false;
         Appliquer(0f);

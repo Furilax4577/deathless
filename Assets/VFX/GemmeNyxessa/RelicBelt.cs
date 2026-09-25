@@ -53,6 +53,13 @@ public class RelicBelt : MonoBehaviour
     private Vector3[] spinAxis;
     private GameObject holder;
     private float pulseStart = -100f;
+    private float pulseSigne = 1f;          // +1 : élargissement (Pulse) ; -1 : resserrement (Resserrer)
+    private float parcoursStart = -100f;    // onde qui fait le tour de la ceinture (Parcourir)
+    private float parcoursAngle;
+    private float tempsRotation;            // temps de rotation accumulé (la vitesse peut varier)
+    [Tooltip("Multiplicateur de la vitesse de rotation (réactions de la relique : Nyxessa).")]
+    public float multiplicateurVitesse = 1f;
+    private const float ParcoursSecondes = 1.2f;
     private bool wasOpen = true;
 
     private void Start()
@@ -120,6 +127,22 @@ public class RelicBelt : MonoBehaviour
     public void Pulse()
     {
         pulseStart = Time.time;
+        pulseSigne = 1f;
+    }
+
+    // Resserrement (fermeture du portail) : même onde que Pulse, vers l'intérieur et moins ample.
+    public void Resserrer()
+    {
+        pulseStart = Time.time;
+        pulseSigne = -1f;
+    }
+
+    // Petite onde qui fait le tour de la ceinture en 1,2 s (soulève et éclaire les gemmes au passage), avec un
+    // scintillement (passage d'un joueur dans le portail).
+    public void Parcourir()
+    {
+        parcoursStart = Time.time;
+        parcoursAngle = Random.Range(0f, Mathf.PI * 2f);
     }
 
     private void LateUpdate()
@@ -131,6 +154,7 @@ public class RelicBelt : MonoBehaviour
         if (open && !wasOpen)
             Pulse();
         wasOpen = open;
+        tempsRotation += Time.deltaTime * multiplicateurVitesse;
         Draw(Time.time, Time.time - pulseStart);
     }
 
@@ -142,6 +166,7 @@ public class RelicBelt : MonoBehaviour
             DestroyImmediate(holder);
         mesh = null;
         Start();
+        tempsRotation = time;
         if (mesh != null)
             Draw(time, pulseAge);
         return holder;
@@ -153,7 +178,7 @@ public class RelicBelt : MonoBehaviour
         float innerEdge = ringRadius - bandWidth;
         for (int i = 0; i < gems; i++)
         {
-            float a = angle0[i] + t * speed[i];
+            float a = angle0[i] + tempsRotation * speed[i];
             float p = phase[i];
             float r = radius0[i] + Mathf.Sin(t * 0.9f + p) * 0.04f;
             float h = height0[i] + Mathf.Sin(t * 1.3f + p * 1.7f) * 0.035f;
@@ -168,10 +193,24 @@ public class RelicBelt : MonoBehaviour
                 if (pulseAge > delay)
                 {
                     float wave = Mathf.Exp(-4f * local) * Mathf.Sin(local * Mathf.PI * 3f);
-                    r += pulseDistance * Mathf.Max(wave, -0.3f);
+                    r += pulseDistance * pulseSigne * (pulseSigne < 0f ? 0.55f : 1f) * Mathf.Max(wave, -0.3f);
                     h *= 1f + 2.5f * Mathf.Abs(wave);
                     bright = Mathf.Exp(-3f * local);
                 }
+            }
+
+            // Onde qui fait le tour de l'anneau (Parcourir) et scintillement pendant son passage.
+            float parcoursAge = t - parcoursStart;
+            if (parcoursAge >= 0f && parcoursAge < ParcoursSecondes)
+            {
+                float fin = 1f - parcoursAge / ParcoursSecondes;
+                float front = parcoursAngle + parcoursAge / ParcoursSecondes * Mathf.PI * 2f;
+                float ecart = Mathf.Abs(Mathf.DeltaAngle(a * Mathf.Rad2Deg, front * Mathf.Rad2Deg)) * Mathf.Deg2Rad;
+                float bosse = Mathf.Exp(-(ecart / 0.35f) * (ecart / 0.35f)) * fin;
+                h += 0.12f * bosse;
+                bright += bosse;
+                if (Mathf.Repeat(Mathf.Sin(i * 12.9898f + Mathf.Floor(t * 14f) * 78.233f) * 43758.55f, 1f) > 0.93f)
+                    bright += 0.7f * fin;
             }
 
             // Taches de couleur qui dérivent le long de l'anneau (même idée que le masque du portail).

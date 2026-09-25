@@ -37,6 +37,50 @@ Source unique : `Assets/VFX/_Palettes/` — `VfxPalette.cs` (ScriptableObject : 
 
 Hors thèmes (inchangés) : fumée grise de `FireEffect`, éclair chaud de l'aube de `GemBurst.Rise`, émission de `RelicGlow` (champs du composant), ambiance jour/nuit (`Ambiance`).
 
+## Lumière des effets (VfxLumiere, 25/09/2026)
+
+Tous les sorts émettent de la lumière de la même façon : composant commun `Assets/VFX/_RelicCommun/VfxLumiere.cs` (lumière ponctuelle **sans ombre**). Couleur : thème de l'effet, **mi-chemin entre les rôles vif et cœur** (cœur seul si le thème n'a pas de vif, couleur imposée pour les états du bouclier). Enveloppe commune : **montée 0,08 s** (lissée), maintien, **extinction 0,4 s** (lissée) ; **scintillement léger pour le thème Feu seulement** (± 12 %, bruit de Perlin). `facteur` module l'intensité de l'extérieur (ouverture du portail, réactions de la relique, coups sur le bouclier). API : `VfxLumiere.Creer(parent, position, thème, taille, maintien)` (maintien < 0 : tenue jusqu'à `Eteindre()`), `VfxLumiere.Eclat(position, thème, taille, maintien)` (éclat d'impact, détruit après), `Allumer(maintien)`, `Eteindre()`, composant sur prefab avec `allumerAuDemarrage` ou `suivreParticules` (allumée tant que les ParticleSystem enfants émettent). Les anciennes lumières ad hoc (boule, explosion, gerbes, téléportation, missile, crâne du rugissement, portail, cristal, bouclier, feux de `FireEffect.Create`) sont remplacées ; seule la lanterne décorative `FireEffect.CreateLantern` garde sa lumière propre.
+
+| Classe | Intensité | Portée |
+|---|---|---|
+| Petite | 1,5 | 3,5 m |
+| Moyenne | 3 | 6 m |
+| Grande | 6 | 11 m |
+
+| Effet | Thème | Classe | Enveloppe |
+|---|---|---|---|
+| Boule de feu (en vol) | Feu | moyenne | tenue tant que le projectile existe |
+| Explosion de la boule (`LowPolyBlast.Fire`) | Feu | grande | maintien 0,26 s |
+| Cône de flammes | Feu | moyenne | suit les particules (`suivreParticules`) |
+| Flammèches du burn | Feu | petite | suit les particules |
+| Feux `FireEffect.Create` | Feu | petite / moyenne / grande selon l'échelle | tenue, `SetEmitting(false)` éteint |
+| Missile magique | Nyxessa | petite (moyenne à l'échelle ≥ 1,25 : missile de la relique) | tenue, éteinte à l'éclatement |
+| Gerbes `GemBurst` (explosion, implosion, éclatement, montée) | Nyxessa par défaut ; Os (désintégration), Sacre (charge), BouclierCritique (rupture du bouclier) | selon l'étendue (< 3 m petite, < 8 m moyenne, sinon grande) | maintien 0,1 s |
+| Aura de soin | Soin | moyenne | maintien 0,6 s |
+| Rugissement | Rage | moyenne | la durée de la séquence |
+| Ondes de choc (impact) | Terre | petite | maintien 0,05 s |
+| Sortie de terre (`DirtBurst`) | Terre | petite | maintien 0,08 s × force |
+| Charge bélier (bulle) | Sacre | moyenne | tenue pendant la ruée, éteinte à l'impact |
+| Téléportation (`PortalTransit`) | Nyxessa | moyenne | la durée du passage |
+| Portail | Nyxessa | grande | tenue, `facteur` = ouverture / fermeture |
+| Relique (cristal) | Nyxessa | grande | tenue, `facteur` = réactions (Nyxessa) |
+| Bouclier de la relique | BouclierPlein / Entame / Critique (couleur imposée par la vie) | grande | tenue, `facteur` = présence du mur + éclat aux coups |
+
+Capture de nuit : `Assets/Screenshots/VfxBench_lumieres.png`.
+
+## Réactions de la relique Nyxessa (25/09/2026)
+
+Composant `Nyxessa` (`Assets/VFX/GemmeNyxessa/Nyxessa.cs`) sur la racine du prefab `GemmeNyxessa` ; singleton léger `Nyxessa.Instance`, et `Nyxessa.Signaler(ReactionNyxessa type, Vector3 point)` qui ne fait rien s'il n'y a pas de relique (aucune dépendance dure). API : `Reagir(type, point)`, `TirerMissile(projectile, forme, matériau, échelle = 1,5)`.
+
+| Événement (`ReactionNyxessa`) | Qui le signale | Réponse |
+|---|---|---|
+| `OuverturePortail` | `PortalVisual` à l'ouverture (`reagirRelique`) | ceinture qui s'élargit (`RelicBelt.Pulse`) et accélère (× 3, retour en 1,5 s), rotation du cristal accélérée, éclat de lumière (× 2,5), gerbe de gemmes au cristal (rayon 1,3 m) |
+| `FermeturePortail` | `PortalVisual` à la fermeture | ceinture qui se resserre (`RelicBelt.Resserrer`) et ralentit (× 0,25, retour en 2 s), lumière qui baisse (jusqu'à × 0,35) puis revient, implosion de gemmes au cristal |
+| `TirMissile` | `Nyxessa.TirerMissile` (au départ du missile) | cristal qui pulse (× 1,15) et recule de 18 cm à l'opposé du tir (0,3 s), éclat de lumière au point de départ, gerbe au départ |
+| `PassageJoueur` | `PortalTransit.Depart` / `Arrive` (surcharges avec le portail) | petite onde qui fait le tour de la ceinture en 1,2 s (`RelicBelt.Parcourir` : gemmes soulevées de 12 cm et éclairées) avec un scintillement |
+
+Ajouts : `RelicBelt.multiplicateurVitesse`, `Resserrer()`, `Parcourir()` ; `CrystalSpin.multiplicateur`, `decalage`. Captures : `VfxBench_nyxessa_ouverture.png`, `VfxBench_nyxessa_missile.png`.
+
 ## Dossiers communs
 
 - `Assets/VFX/_RelicCommun/` : `LowPolyGem` (écriture d'une gemme dans un maillage partagé), `GemShape` (ScriptableObject : nuage de points cuit), `GemBurst` (`Explode`, `Implode`, `Shatter`, `Rise`), `GemTrail` (`Follow`), `FireballVisual` (`Attach`, `SpawnEmber`), `FireballEmber`, `LowPolyBlast` (`Fire`, `Spawn`), `DirtBurst` (`Spawn`), `AreaBurst` (`Spawn`), `FireEffect` (`Create`, `SetEmitting`), `WavyTrail` (copié, plus utilisé par la boule actuelle), `Ambiance` (presets jour/crépuscule), shader `VertexColorUnlit`, `PortalVoxel.mat`, `FireBurst.mat`.
@@ -52,16 +96,16 @@ Hors thèmes (inchangés) : fumée grise de `FireEffect`, éclair chaud de l'aub
 - **Palette** : thème **Nyxessa** (matériau `RelicMaterial` = ombre ; ceinture : ombre → base → vif → cœur → éclat × 1,15).
 
 ### Portail de donjon (Relic)
-- **Prefab** : `Assets/VFX/PortailDonjon/PortailDonjon.prefab` (racine à y = 1,5, tournée de 90° ; anciens quads `Glow` / `SwirlBack` / `SwirlFront` masqués au démarrage, gardés pour la fidélité).
-- **Script** : `PortalVisual` (Visual only) : disque de 1 700 gemmes, rayon 1,35 m, cellule 0,1 m ; ouverture 1,3 s (gerbe), fermeture 0,9 s (implosion).
-- **API** : `PortalVisual.ouvert` (remplace `Portal.IsOpen`), `Ripple()` (onde concentrique au passage d'un joueur), `Center` (centre de la soupe).
+- **Prefab** : `Assets/VFX/PortailDonjon/PortailDonjon.prefab` (racine à **y = 1,75** depuis le 25/09/2026, tournée de 90° ; `BoxCollider` agrandi à 1 × 1,185 × 1,185 (× 1,185 comme le rayon) ; anciens quads `Glow` / `SwirlBack` / `SwirlFront` masqués au démarrage, gardés pour la fidélité).
+- **Script** : `PortalVisual` (Visual only) : disque de 2 400 gemmes, cellule 0,1 m ; ouverture 1,3 s (gerbe), fermeture 0,9 s (implosion). **Paramètres exposés** (25/09/2026) : `radius` = **1,6 m** (1,35 dans Relic, + 18 %) ; `epaisseur` = **0,35** (profondeur visible au centre en fraction du diamètre, gemmes et houle comprises ; profil de disque épais à faces presque plates et bord arrondi, `(1 − r⁴)^0,5`, au lieu de la lentille `1 − r²` de Relic). Mesuré sur le maillage : avant ≈ 1,15 m de profondeur pour 2,7 m de diamètre (≈ 43 %) ; après **1,10 m pour 3,1 m (35 %)**. `reagirRelique` : prévenir Nyxessa à l'ouverture / fermeture.
+- **API** : `PortalVisual.ouvert` (remplace `Portal.IsOpen`), **`Entrer()`** (goutte d'eau : trois anneaux à 0,16 s d'écart partent du centre vers le bord sur la surface du disque, crête claire suivie d'un creux sombre, amortis en 1,5 s ; creux au centre qui rebondit), **`Sortir()`** (l'inverse : les anneaux partent du bord, convergent vers le centre et s'y résorbent, petite bosse au centre à la fin), `Ripple()` (alias d'`Entrer()`, compatibilité Relic), `Center` (centre de la soupe). Captures : `VfxBench_portail.png` (3/4), `VfxBench_portail_entree.png`, `VfxBench_portail_sortie.png`.
 - **Dépendances** : `LowPolyGem`, `GemBurst`, `PortalVoxel.mat` (+ `FireBurst`, `TrailGlow`, `TrailSmoke` référencés mais plus utilisés).
 - **Palette** : thème **Nyxessa** (base, vif, cœur, éclat × 1,25 ; lumière = cœur).
 
 ### Téléportation par le portail (Relic)
 - **Prefab** : `Assets/VFX/Teleportation/Teleportation.prefab` (contient un `PortailDonjon` imbriqué ; le corps factice du labo a été retiré).
 - **Script** : `PortalTransit` (copie telle quelle).
-- **API** : `PortalTransit.Depart(Bounds corps, Vector3 centrePortail, Material gemmes, 1.1f)` puis, à l'arrivée, `PortalTransit.Arrive(corps, centrePortailSortie, gemmes, 1.0f)` ; `PortalVisual.Ripple()` sur chaque portail ; masquer le corps pendant le transit (séquence de `PlayerZone.Transit` dans Relic). Volume du joueur : 0,8 × 1,9 × 0,8.
+- **API** : **`PortalTransit.Depart(Bounds corps, PortalVisual portail, Material gemmes, 1.1f)`** (déclenche `portail.Entrer()` et `Nyxessa.Signaler(PassageJoueur)`) puis, à l'arrivée, **`PortalTransit.Arrive(corps, portailSortie, gemmes, 1.0f)`** (`portail.Sortir()` + réaction) ; les anciennes surcharges avec un `Vector3` centre restent (sans goutte ni réaction) ; masquer le corps pendant le transit (séquence de `PlayerZone.Transit` dans Relic). Volume du joueur : 0,8 × 1,9 × 0,8.
 - **Dépendances** : `LowPolyGem`, `PortalVisual`, `PortalVoxel.mat`.
 
 ### Boule de feu (Relic)
@@ -75,7 +119,8 @@ Hors thèmes (inchangés) : fumée grise de `FireEffect`, éclair chaud de l'aub
 ### Missile magique, crâne en gemmes (Relic)
 - **Prefab** : `Assets/VFX/MissileMagique/MissileMagique.prefab` : racine vide (idem boule de feu).
 - **Script** : `SkullMissileVisual` (Visual only, sans `GameAudio`).
-- **API** : au tir, `GemBurst.Explode(bouche + dir * 0.3f, 0.5f, PortalVoxel)` (éclat de `RelicTurret.FireRpc`) ; `SkullMissileVisual.Attach(projectile, SkullGemShape, Vector3.zero, 0.55f, PortalVoxel)` ; à l'arrivée, `Shatter()`.
+- **API** : tir par la relique : **`Nyxessa.Instance.TirerMissile(projectile, SkullGemShape, PortalVoxel, 1.5f)`** (éclat au départ, réaction de la relique, crâne à l'échelle 1,5) ; bas niveau : `GemBurst.Explode(bouche + dir * 0.3f, 0.5f, PortalVoxel)` puis `SkullMissileVisual.Attach(projectile, SkullGemShape, Vector3.zero, 0.55f, PortalVoxel, echelle)` ; à l'arrivée, `Shatter()`.
+- **Paramètre `echelle`** (dernier argument d'`Attach`, défaut **1**) : échelle d'ensemble du missile — taille du crâne, taille des gemmes, frémissement, taille de la traînée `GemTrail`, vitesse d'éclatement (× √échelle), classe de lumière (moyenne à partir de 1,25). **1,5** pour le missile tiré par la relique (banc : `VfxBench.echelleMissile`), **1** pour le missile du nécromancien (inchangé s'il est repris).
 - **Paramètres** : 12 m/s, 1,6 s ; forme cuite `SkullGemShape.asset` (1 100 points).
 - **Dépendances** : `GemShape`, `GemTrail`, `GemBurst`, `LowPolyGem`, `PortalVoxel.mat` (`GhostSkull.mat` copié pour mémoire).
 
@@ -121,6 +166,7 @@ Hors thèmes (inchangés) : fumée grise de `FireEffect`, éclair chaud de l'aub
 - **API** : `Rugissement.Jouer()` ; `Appliquer(t)` pose un instant donné ; `DureeTotale` ≈ 1,52 s. Bas niveau : `RugissementCrane.Ouverture` (0..1), `Bascule` (0..1), `RugissementOnde.Jouer()`.
 - **Paramètres** : pop 0,12 s, ouverture 0,2 s (28°, tremblement 0,3 s, tête rejetée de 13°), onde 0,9 s jusqu'à 4,5 m puis retour, fermeture 0,15 s, rétraction 0,15 s.
 - **Dépendances** : `SkullGemShape.asset` (dossier `MissileMagique`), `GemShape`, `LowPolyGem`, `Rugissement_Gemmes.mat`.
+- **Heaume (25/09/2026)** : la référence est le **casque du `Skeleton_Warrior` KayKit** (`Assets/VFX/SortieDeTerre/Skeleton_Warrior.fbx`, sous-objet `Skeleton_Warrior_Helmet`, maillage séparé sous l'os `head`). Comparés dans le pack `KayKit_Skeletons_1.1_FREE` de Relic : Mage (chapeau pointu), Rogue (capuche), Minion (pas de casque) : seul le Warrior a un heaume (calotte, bandeau, crête d'épines, cornes courtes), retenu. Sa surface est cuite en **1 800 positions de gemmes** (`HeaumeGemShape.asset`, outil `Assets/VFX/_RelicCommun/Editor/GemShapeBaker.cs`, copie de l'outil de Relic avec filtre par sous-objet, menu **Deathless > VFX > Heaume du rugissement en gemmes** ; luminosité de la texture et occlusion comme pour `SkullGemShape`). `RugissementCrane` pose ce heaume à la place du heaume procédural (calotte en écailles, nasal) et **des cornes Bézier** (le casque KayKit a ses propres cornes, plus courtes) : champs `heaume`, `heaumeEchelle` (1,35), `heaumeDecalage` (0 ; 0,24 ; −0,03 dans le repère normalisé du crâne), `heaumeTailleGemme` (1,3) ; les gemmes du crâne qu'il recouvre (dessus, côtés, nuque, hors visage) sont retirées. Couleurs par la texture : fer sombre / fer / fer clair pour la calotte et le bandeau, ivoire / ivoire clair pour les cornes et les pointes (palette Rage). Crâne, mâchoire, attitude et onde inchangés ; sans `heaume`, le rendu procédural d'origine revient. Captures : `Rugissement_casque_reference.png` (casque KayKit source : face, profil, 3/4), `VfxBench_rugissement.png`, `VfxBench_rugissement_profil.png`.
 - **Palette** : thème **Rage** (rouge vif `#b3261e`, rouge sombre `#6e1410`, rouge noir `#3a0a08`, accents ivoire `#e8dcc0` et fer `#5a5f66` / `#3f444a` / `#7a8088`).
 
 ### Ondes de choc (bac à sable)
@@ -154,12 +200,13 @@ Scène `Assets/Scenes/VfxBench.unity` : sol (`RigTest_Ground.mat`), lumière dir
 | Aura de soin | paladin mannequin, épée + bouclier (`SwordShield`) ; allié mannequin sans arme à 1,7 m | `Ranged_Magic_Raise` (2,1 s, épée levée) | `AuraSoin.Jouer()` sous l'allié quand l'épée atteint le haut : **t = 0,60 s** |
 | Cône de flammes + burn | mage mannequin, bâton (`Staff`) ; cible squelette à 4,5 m | `Ranged_Magic_Spellcasting_Long` (2,53 s) jusqu'à la poussée du bâton, pose tenue 3 s (léger balancement), fin du clip | cône à la pointe du bâton (0, 1,2, 0 dans `staff`), visant la poitrine de la cible, de la poussée (**t = 1,57 s**, pointe au plus en avant) pendant 3 s ; `BurnFlammeches` sur la cible 0,3 s après le début, arrêt 1,5 s après la fin du cône |
 | Boule de feu | mage mannequin, bâton (`Staff`) ; cible squelette à 8 m | `Ranged_Magic_Shoot` (0,93 s) | boule créée à la pointe du bâton quand elle est au plus en avant, **t = 0,31 s**, vol droit à 18 m/s vers la poitrine de la cible, puis `LowPolyBlast.Fire` + fumée |
-| Téléportation | mannequin sans arme | `Idle_A`, `Walking_A` (1,2 s vers le portail) | `PortalTransit.Depart` en fin de marche, `Arrive` 1,1 s après de l'autre côté du portail |
-| Missile magique | la relique (cristal de la gemme) ; cible squelette | — | éclat au cristal, crâne à 12 m/s vers la poitrine du squelette, `Shatter` à l'arrivée |
+| Téléportation | mannequin sans arme | `Idle_A`, `Walking_A` (1,2 s vers le portail) | `PortalTransit.Depart(…, portail, …)` en fin de marche (goutte d'entrée, réaction de la relique), `Arrive(…, portail, …)` 1,1 s après de l'autre côté (goutte de sortie) |
+| Missile magique | la relique (cristal de la gemme) ; cible squelette | — | `Nyxessa.TirerMissile` (échelle 1,5 : éclat, pulsation et recul du cristal), crâne à 12 m/s vers la poitrine du squelette, `Shatter` à l'arrivée |
+| Portail | — | — | cycle : ouvert, fermeture à 5 s, réouverture à 7,5 s (réactions de la relique) |
 | Gemme, portail, bouclier | — | — | inchangés (voir fiches) |
 | Désintégration, sortie de terre | squelettes | `Skeletons_Spawn_Ground` (sortie) | inchangés |
 
-Captures (Play, `Assets/Screenshots/`) : `VfxBench.png` (vue d'ensemble), `VfxBench_saut_percutant_vol.png` (sommet du bond), `VfxBench_saut_percutant.png` (à l'impact), `VfxBench_rugissement.png`, `VfxBench_charge_elan.png` (milieu de la ruée : bulle + traînée), `VfxBench_charge_impact.png` (éclatement + onde), `VfxBench_cone.png`, `VfxBench_burn.png`, `VfxBench_boule.png`, `VfxBench_nyxessa.png` (gemme, portail, téléportation), `VfxBench_missile.png` ; planche des palettes `VfxPalettes.png`.
+Captures (Play, `Assets/Screenshots/`) : `VfxBench.png` (vue d'ensemble), `VfxBench_saut_percutant_vol.png` (sommet du bond), `VfxBench_saut_percutant.png` (à l'impact), `VfxBench_rugissement.png`, `VfxBench_charge_elan.png` (milieu de la ruée : bulle + traînée), `VfxBench_charge_impact.png` (éclatement + onde), `VfxBench_cone.png`, `VfxBench_burn.png`, `VfxBench_boule.png`, `VfxBench_nyxessa.png` (gemme, portail, téléportation), `VfxBench_missile.png`, `VfxBench_nyxessa_ouverture.png`, `VfxBench_nyxessa_missile.png`, `VfxBench_portail.png`, `VfxBench_portail_entree.png`, `VfxBench_portail_sortie.png`, `VfxBench_rugissement_profil.png`, `VfxBench_lumieres.png` (pénombre) ; planche des palettes `VfxPalettes.png` ; casque de référence `Rugissement_casque_reference.png`. Le banc ralentit le temps (× 0,25) pendant l'attente d'une capture (`ralentiCapture`) pour que les à-coups de l'éditeur ne décalent pas l'instant.
 
 Écarts assumés : pas de clip de saut frappé à deux mains dans le pack (le saut percutant utilise le seul saut frappé, `Melee_1H_Attack_Jump_Chop` : la hache 2H y est tenue de la main droite, la gauche ne tient pas le manche) ; pas de clip de cri/rugissement dans les packs Adventurers/Animations (le rugissement emprunte `Skeletons_Taunt_Longer` du pack Skeletons, même squelette Rig_Medium) ; pas de clip de charge ni de sprint (course accélérée + garde en couches, puis coup de bouclier) ; aucun clip de saut n'a de root motion (bond et ruée translatés par script).
 

@@ -56,6 +56,7 @@ public class RelicShieldVisual : MonoBehaviour
     private Vector3[] spinAxis;
     private GameObject holder;
     private Light glow;
+    private VfxLumiere lumiere;
     private float presence;         // 0 absent, 1 levé (lissé)
     private bool wasUp;
     private readonly Color[] palette = new Color[4];   // palette du moment, fondue selon la vie
@@ -110,14 +111,12 @@ public class RelicShieldVisual : MonoBehaviour
         meshRenderer.sharedMaterial = gemMaterial;
         meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         meshRenderer.receiveShadows = false;
-        glow = new GameObject("Glow").AddComponent<Light>();
-        glow.transform.SetParent(holder.transform, false);
-        glow.transform.localPosition = shield.BasePosition + Vector3.up * (wallHeight * 0.5f);
-        glow.type = LightType.Point;
-        glow.color = BlueGlow;
-        glow.range = 12f;
-        glow.intensity = 0f;
-        glow.shadows = LightShadows.None;
+        // Lumière commune des effets (grande classe), couleur imposée par l'état de vie (thèmes Bouclier*).
+        lumiere = VfxLumiere.Creer(holder.transform, shield.BasePosition + Vector3.up * (wallHeight * 0.5f), VfxTheme.BouclierPlein, VfxTailleLumiere.Grande);
+        lumiere.couleurImposee = true;
+        lumiere.couleur = BlueGlow;
+        lumiere.facteur = 0f;
+        glow = lumiere.Lumiere;
         holder.SetActive(false);
     }
 
@@ -153,7 +152,9 @@ public class RelicShieldVisual : MonoBehaviour
             tints[i] = palette[1 + i % 3];
         }
         Vector3 center = basePosition + Vector3.up * (shield.Height * 0.5f);
-        GemBurst.Shatter(center, world, tints, 0.06f, 2.5f, Vector3.down * 2f, gemMaterial);
+        GemBurst eclat = GemBurst.Shatter(center, world, tints, 0.06f, 2.5f, Vector3.down * 2f, gemMaterial);
+        if (eclat != null && eclat.Lumiere != null)
+            eclat.Lumiere.theme = VfxTheme.BouclierCritique;
         presence = 0f;
         holder.SetActive(false);
     }
@@ -235,10 +236,11 @@ public class RelicShieldVisual : MonoBehaviour
         mesh.vertices = vertices;
         mesh.colors = colors;
         mesh.bounds = new Bounds(basePosition + Vector3.up * (wallHeight * 0.5f), new Vector3((radius + 1f) * 2f, wallHeight + 3f, (radius + 1f) * 2f));
-        if (glow != null)
+        if (lumiere != null)
         {
-            glow.color = shield.LifeTint(BlueGlow, OrangeGlow, RedGlow);
-            glow.intensity = presence * (1.2f + 0.3f * Mathf.Sin(t * 3f)) + (hitAge < 0.3f ? 2f : 0f);
+            // Présence du mur, plus un éclat bref à chaque coup (pas de scintillement : réservé au feu).
+            lumiere.couleur = shield.LifeTint(BlueGlow, OrangeGlow, RedGlow);
+            lumiere.facteur = presence * 0.6f + (hitAge < 0.3f ? 0.6f * (1f - hitAge / 0.3f) : 0f);
         }
     }
 }

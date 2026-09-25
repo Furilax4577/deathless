@@ -55,6 +55,8 @@ public class DirtBurst : MonoBehaviour
             burst.velocities.Add(outward * Random.Range(0.8f, 2.2f) + Vector3.up * Random.Range(2.5f, 4.5f) * Mathf.Lerp(0.7f, 1f, strength));
             burst.spins.Add(Random.insideUnitSphere * 500f);
         }
+        // Petit éclat au sol (lumière commune des effets, thème Terre).
+        VfxLumiere.Eclat(center + Vector3.up * 0.3f, VfxTheme.Terre, VfxTailleLumiere.Petite, 0.08f * strength);
         return burst;
     }
 

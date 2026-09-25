@@ -11,6 +11,7 @@ public class FireEffect : MonoBehaviour
     [SerializeField] private ParticleSystem embers;
     [SerializeField] private ParticleSystem smoke;
     [SerializeField] private Light fireLight;
+    private VfxLumiere lumiere;   // sorts (Create avec lumière) : lumière commune ; lanternes : lumière propre
     [SerializeField] private float lightIntensity = 2.5f;
 
     private bool emitting = true;
@@ -51,16 +52,10 @@ public class FireEffect : MonoBehaviour
         }
         if (withLight)
         {
-            GameObject lightGo = new GameObject("Light");
-            lightGo.transform.SetParent(root.transform, false);
-            lightGo.transform.localPosition = new Vector3(0f, 0f, 0.6f * scale);
-            fire.fireLight = lightGo.AddComponent<Light>();
-            fire.fireLight.type = LightType.Point;
-            fire.fireLight.color = Color.Lerp(Feu(VfxRole.Vif), Feu(VfxRole.Coeur), 0.4f);
-            fire.lightIntensity = 2.5f * scale;
-            fire.fireLight.intensity = fire.lightIntensity;
-            fire.fireLight.range = 5f + 5f * scale;
-            fire.fireLight.shadows = LightShadows.None;
+            // Lumière commune des effets (thème Feu ; classe selon l'échelle du feu).
+            fire.lumiere = VfxLumiere.Creer(root.transform, new Vector3(0f, 0f, 0.6f * scale), VfxTheme.Feu,
+                scale < 0.6f ? VfxTailleLumiere.Petite : scale < 1.5f ? VfxTailleLumiere.Moyenne : VfxTailleLumiere.Grande);
+            fire.fireLight = fire.lumiere.Lumiere;
         }
         return fire;
     }
@@ -194,13 +189,17 @@ public class FireEffect : MonoBehaviour
             var emission = system.emission;
             emission.enabled = on;
         }
-        if (fireLight != null)
+        if (lumiere != null)
+        {
+            if (on) lumiere.Allumer(); else lumiere.Eteindre();
+        }
+        else if (fireLight != null)
             fireLight.enabled = on;
     }
 
     private void Update()
     {
-        if (fireLight != null && emitting)
+        if (lumiere == null && fireLight != null && emitting)
             fireLight.intensity = lightIntensity * (0.85f + 0.15f * Mathf.PerlinNoise(Time.time * 9f, transform.position.x));
     }
 }

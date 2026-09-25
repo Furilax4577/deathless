@@ -27,6 +27,13 @@ public class RugissementCrane : MonoBehaviour
     [SerializeField] private float reculMachoire = 0.02f;
     [Tooltip("Tête rejetée en arrière pendant le cri (degrés), pilotée par Bascule.")]
     [SerializeField] private float angleBascule = 13f;
+    [Header("Heaume cuit (casque du Skeleton_Warrior KayKit)")]
+    [Tooltip("Forme en gemmes du casque (GemShapeBaker, menu Deathless > VFX > Heaume du rugissement en gemmes). Vide : heaume et cornes procéduraux d'origine.")]
+    [SerializeField] private GemShape heaume;
+    [Tooltip("Échelle et décalage du heaume dans le repère du crâne (forme normalisée, visage vers +Z). Calés sur la tête du Skeleton_Warrior : échelle = côté du casque (1,52 m) × 1,1 (largeur / profondeur de la tête KayKit ramenées au crâne), hauteur entre le calage sur les orbites et sur le sommet du crâne.")]
+    [SerializeField] private float heaumeEchelle = 1.67f;
+    [SerializeField] private Vector3 heaumeDecalage = new Vector3(0f, 0.32f, -0.03f);
+    [SerializeField] private float heaumeTailleGemme = 1.3f;
 
     // Rouges du crâne (creux → os), fond d'orbite presque noir, ivoire (dents, cornes), gris fer (casque).
     private static Color Dark => Color.Lerp(VfxPalette.Couleur(VfxTheme.Rage, VfxRole.Ombre, new Color(0.227f, 0.039f, 0.031f)), VfxPalette.Couleur(VfxTheme.Rage, VfxRole.Base, new Color(0.43f, 0.08f, 0.06f)), 0.12f);
@@ -154,6 +161,7 @@ public class RugissementCrane : MonoBehaviour
             return q.y < coupe && q.z > zCondyle - 0.03f;
         };
         crane = new Partie { pivot = Vector3.zero };
+        bool heaumeCuit = heaume != null && heaume.points.Length > 0;
         machoire = new Partie { pivot = new Vector3(0f, yCondyle, zCondyle) * taille };
 
         // Gemmes de la forme cuite : rouge sombre dans les creux, rouge vif sur l'os ; orbites creusées et assombries ;
@@ -170,13 +178,17 @@ public class RugissementCrane : MonoBehaviour
             }
             bool bas = mandibule(pts[i]);
             Partie partie = bas ? machoire : crane;
-            partie.Ajouter(p * taille, nrm[i], c, 1f, Ecaille);
+            // Avec le heaume cuit, les gemmes du crâne qu'il recouvre (dessus, côtés et nuque, hors visage) sont retirées :
+            // le casque se lit net au lieu d'un mélange de fer et d'os.
+            bool couvert = heaumeCuit && !bas && (pts[i].y > yOeil + 0.12f || (pts[i].z < 0.12f && pts[i].y > planMachoire + 0.05f));
+            if (!couvert)
+                partie.Ajouter(p * taille, nrm[i], c, 1f, Ecaille);
             // Heaume : calotte jusqu'au-dessus des orbites devant, jusqu'à la nuque derrière, couvre-joues courts sur les
             // côtés ; gemmes plus grosses, décollées de 0,055 m, arêtes (bord bas) en fer clair.
             bool visage = pts[i].z > 0.2f && pts[i].y < yOeil + 0.17f;
             bool calotte = pts[i].y > yOeil + 0.08f || (pts[i].z < 0.05f && pts[i].y > yOeil - 0.15f);
             bool joue = Mathf.Abs(pts[i].x) > 0.24f && pts[i].y > yOeil - 0.28f && pts[i].y <= yOeil + 0.08f && pts[i].z > -0.05f && pts[i].z < 0.18f;
-            if (!bas && !visage && (calotte || joue) && nrm[i].sqrMagnitude > 0.5f)
+            if (!heaumeCuit && !bas && !visage && (calotte || joue) && nrm[i].sqrMagnitude > 0.5f)
             {
                 bool arete = pts[i].y < yOeil + 0.13f || joue && pts[i].y < yOeil - 0.2f;
                 Color fer = arete ? FerClair : Random.value < 0.35f ? FerSombre : Fer;
@@ -224,58 +236,70 @@ public class RugissementCrane : MonoBehaviour
             machoire.Ajouter(new Vector3(x, planMachoire - 0.03f, zz) * taille, Vector3.forward, Ivoire, 1.25f, Dent);
         }
 
-        // Casque : nasal (bande de fer sur l'arête du nez) et cornes courbes ivoire depuis les tempes.
-        for (int j = 0; j < 8; j++)
+        // Heaume procédural d'origine (nasal, cornes Bézier) : seulement sans heaume cuit.
+        if (!heaumeCuit)
         {
-            float u = j / 7f;
-            Vector3 p = new Vector3(0f, Mathf.Lerp(yOeil + 0.16f, yOeil - 0.16f, u), zAvant + 0.06f + 0.04f * u);
-            crane.Ajouter(p * taille, Vector3.forward, j % 2 == 0 ? FerClair : Fer, 1.7f, Ronde);
-            crane.Ajouter((p + new Vector3(0.045f, 0f, -0.01f)) * taille, Vector3.forward, Fer, 1.3f, Ronde);
-            crane.Ajouter((p + new Vector3(-0.045f, 0f, -0.01f)) * taille, Vector3.forward, Fer, 1.3f, Ronde);
-        }
-        foreach (int cote in new[] { -1, 1 })
-        {
-            // Départ au-dessus des oreilles (latéral), vers l'extérieur et le bas, puis remontée en C ouvert vers le
-            // haut et légèrement l'avant (Bézier cubique, ≈ 0,75 m pour un crâne de 0,8 m).
-            Vector3 b0 = new Vector3(cote * 0.42f, yOeil + 0.05f, -0.05f);
-            Vector3 b1 = b0 + new Vector3(cote * 0.38f, -0.22f, 0.0f);
-            Vector3 b2 = b0 + new Vector3(cote * 0.62f, 0.3f, 0.15f);
-            Vector3 b3 = b0 + new Vector3(cote * 0.5f, 0.8f, 0.38f);
-            // Gemmes semées le long de la courbe (8 anneaux de 8 gemmes, section qui s'affine, écailles couchées) :
-            // assez serrées pour lire une corne pleine.
-            const int segments = 14;
-            for (int s = 0; s <= segments; s++)
+            // Casque : nasal (bande de fer sur l'arête du nez) et cornes courbes ivoire depuis les tempes.
+            for (int j = 0; j < 8; j++)
             {
-                float u = s / (float)segments;
-                float w = 1f - u;
-                Vector3 c = w * w * w * b0 + 3f * w * w * u * b1 + 3f * w * u * u * b2 + u * u * u * b3;
-                Vector3 tangente = (3f * w * w * (b1 - b0) + 6f * w * u * (b2 - b1) + 3f * u * u * (b3 - b2)).normalized;
-                Vector3 a1 = Vector3.Cross(tangente, Vector3.forward).normalized;
-                if (a1.sqrMagnitude < 0.5f) a1 = Vector3.Cross(tangente, Vector3.up).normalized;
-                Vector3 a2 = Vector3.Cross(tangente, a1);
-                float rayon = Mathf.Lerp(0.1f, 0.019f, u);
-                int autour = s == segments ? 1 : 8;
-                for (int q = 0; q < autour; q++)
+                float u = j / 7f;
+                Vector3 p = new Vector3(0f, Mathf.Lerp(yOeil + 0.16f, yOeil - 0.16f, u), zAvant + 0.06f + 0.04f * u);
+                crane.Ajouter(p * taille, Vector3.forward, j % 2 == 0 ? FerClair : Fer, 1.7f, Ronde);
+                crane.Ajouter((p + new Vector3(0.045f, 0f, -0.01f)) * taille, Vector3.forward, Fer, 1.3f, Ronde);
+                crane.Ajouter((p + new Vector3(-0.045f, 0f, -0.01f)) * taille, Vector3.forward, Fer, 1.3f, Ronde);
+            }
+            foreach (int cote in new[] { -1, 1 })
+            {
+                // Départ au-dessus des oreilles (latéral), vers l'extérieur et le bas, puis remontée en C ouvert vers le
+                // haut et légèrement l'avant (Bézier cubique, ≈ 0,75 m pour un crâne de 0,8 m).
+                Vector3 b0 = new Vector3(cote * 0.42f, yOeil + 0.05f, -0.05f);
+                Vector3 b1 = b0 + new Vector3(cote * 0.38f, -0.22f, 0.0f);
+                Vector3 b2 = b0 + new Vector3(cote * 0.62f, 0.3f, 0.15f);
+                Vector3 b3 = b0 + new Vector3(cote * 0.5f, 0.8f, 0.38f);
+                // Gemmes semées le long de la courbe (8 anneaux de 8 gemmes, section qui s'affine, écailles couchées) :
+                // assez serrées pour lire une corne pleine.
+                const int segments = 14;
+                for (int s = 0; s <= segments; s++)
                 {
-                    float ang = (q + 0.5f * (s % 2)) * Mathf.PI * 2f / autour;
-                    Vector3 n = (a1 * Mathf.Cos(ang) + a2 * Mathf.Sin(ang)).normalized;
-                    Vector3 p = s == segments ? c + tangente * 0.03f : c + n * rayon;
-                    Color iv = Color.Lerp(q % 4 == 0 ? Ivoire * 0.85f : Ivoire, IvoireClair, Mathf.Clamp01((u - 0.6f) / 0.4f));
-                    crane.Ajouter(p * taille, s == segments ? tangente : n, iv, Mathf.Lerp(2.4f, 1.2f, u), Ecaille);
+                    float u = s / (float)segments;
+                    float w = 1f - u;
+                    Vector3 c = w * w * w * b0 + 3f * w * w * u * b1 + 3f * w * u * u * b2 + u * u * u * b3;
+                    Vector3 tangente = (3f * w * w * (b1 - b0) + 6f * w * u * (b2 - b1) + 3f * u * u * (b3 - b2)).normalized;
+                    Vector3 a1 = Vector3.Cross(tangente, Vector3.forward).normalized;
+                    if (a1.sqrMagnitude < 0.5f) a1 = Vector3.Cross(tangente, Vector3.up).normalized;
+                    Vector3 a2 = Vector3.Cross(tangente, a1);
+                    float rayon = Mathf.Lerp(0.1f, 0.019f, u);
+                    int autour = s == segments ? 1 : 8;
+                    for (int q = 0; q < autour; q++)
+                    {
+                        float ang = (q + 0.5f * (s % 2)) * Mathf.PI * 2f / autour;
+                        Vector3 n = (a1 * Mathf.Cos(ang) + a2 * Mathf.Sin(ang)).normalized;
+                        Vector3 p = s == segments ? c + tangente * 0.03f : c + n * rayon;
+                        Color iv = Color.Lerp(q % 4 == 0 ? Ivoire * 0.85f : Ivoire, IvoireClair, Mathf.Clamp01((u - 0.6f) / 0.4f));
+                        crane.Ajouter(p * taille, s == segments ? tangente : n, iv, Mathf.Lerp(2.4f, 1.2f, u), Ecaille);
+                    }
                 }
+            }
+        }
+        // Heaume cuit : le casque du Skeleton_Warrior KayKit (calotte, bandeau, crête d'épines, cornes courtes) en
+        // gemmes couchées sur sa surface, calé sur le crâne ; fer (clair / sombre selon la texture et l'occlusion)
+        // et ivoire pour les cornes et les pointes (parties claires de la texture).
+        if (heaumeCuit)
+        {
+            for (int i = 0; i < heaume.points.Length; i++)
+            {
+                Vector3 p = heaumeDecalage + heaume.points[i] * heaumeEchelle;
+                Vector3 n = i < heaume.normals.Length ? heaume.normals[i] : Vector3.zero;
+                float b = i < heaume.brightness.Length ? heaume.brightness[i] : 0.3f;
+                Color c = b > 0.62f ? IvoireClair : b > 0.45f ? Ivoire : b > 0.36f ? FerClair : b < 0.2f ? FerSombre : Fer;
+                crane.Ajouter((p + n * 0.02f) * taille, n, c, b > 0.45f ? heaumeTailleGemme * 0.9f : heaumeTailleGemme, Ecaille);
             }
         }
 
         Materialiser(crane, "Crane");
         Materialiser(machoire, "Machoire");
 
-        Light glow = new GameObject("Light").AddComponent<Light>();
-        glow.transform.SetParent(transform, false);
-        glow.type = LightType.Point;
-        glow.color = new Color(1f, 0.3f, 0.25f);
-        glow.intensity = 2.5f;
-        glow.range = 5f;
-        glow.shadows = LightShadows.None;
+        // Lumière : VfxLumiere (thème Rage), allumée par Rugissement.Jouer() pendant la séquence.
         Refresh(0f);
     }
 

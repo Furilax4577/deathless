@@ -33,6 +33,8 @@ public class GemBurst : MonoBehaviour
     private float age;
     private bool implode;
     private Light flash;
+    // Lumière de l'éclat (VfxLumiere) : l'appelant peut en changer le thème (charge bélier : Sacre, bouclier...).
+    public VfxLumiere Lumiere { get; private set; }
     private float flashIntensity;
 
     // Explosion de `radius` m (portée des gemmes) au point `center`.
@@ -120,9 +122,9 @@ public class GemBurst : MonoBehaviour
             burst.color[i] = BonePalette[Random.value < 0.12f ? 3 : Random.Range(0, 3)];
         }
         burst.Finish(material, bounds.size.y * 3f + 3f, 0.9f);
-        // Eclair couleur soleil levant (l'aube), pas le vert de la magie.
-        if (burst.flash != null)
-            burst.flash.color = new Color(1f, 0.85f, 0.6f);
+        // Éclat du thème Os (poussière d'os à l'aube), pas le vert de la magie.
+        if (burst.Lumiere != null)
+            burst.Lumiere.theme = VfxTheme.Os;
         return burst;
     }
 
@@ -197,13 +199,12 @@ public class GemBurst : MonoBehaviour
         renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         renderer.receiveShadows = false;
 
-        flash = new GameObject("Flash").AddComponent<Light>();
-        flash.transform.SetParent(transform, false);
-        flash.type = LightType.Point;
-        flash.color = VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Coeur, new Color(0.45f, 1f, 0.35f));
+        // Éclat : lumière commune des effets (thème Nyxessa par défaut ; l'appelant peut changer Lumiere.theme),
+        // classe selon l'étendue de la gerbe.
         flashIntensity = flashPower;
-        flash.range = extent * 0.75f + 2f;
-        flash.shadows = LightShadows.None;
+        Lumiere = VfxLumiere.Creer(transform, Vector3.zero, VfxTheme.Nyxessa,
+            extent < 3f ? VfxTailleLumiere.Petite : extent < 8f ? VfxTailleLumiere.Moyenne : VfxTailleLumiere.Grande, 0.1f);
+        flash = Lumiere.Lumiere;
         Step(0f);
     }
 
@@ -258,7 +259,5 @@ public class GemBurst : MonoBehaviour
         }
         mesh.vertices = vertices;
         mesh.colors = colors;
-        if (flash != null)
-            flash.intensity = flashIntensity * (implode ? k : 1f - k);
     }
 }

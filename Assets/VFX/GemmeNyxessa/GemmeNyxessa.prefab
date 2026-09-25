@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 242639894842352778}
   - component: {fileID: 1048922702175257728}
   - component: {fileID: 6129213559967213631}
+  - component: {fileID: 7105692691572384207}
   m_Layer: 0
   m_Name: Crystal
   m_TagString: Untagged
@@ -109,6 +110,8 @@ MonoBehaviour:
   degreesPerSecond: 40
   bobAmplitude: 0.15
   bobPeriod: 3
+  multiplicateur: 1
+  decalage: {x: 0, y: 0, z: 0}
 --- !u!108 &242639894842352778
 Light:
   m_ObjectHideFlags: 0
@@ -204,6 +207,25 @@ MonoBehaviour:
   gemMaterial: {fileID: 2100000, guid: b64a388394535a64caff0d3f19ebace2, type: 2}
   sides: 7
   nightBoost: 0.3
+--- !u!114 &7105692691572384207
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5375311889218845089}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f82bf88c9b1ea9a4e8b0c134eb096d2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VfxLumiere
+  theme: 1
+  taille: 2
+  allumerAuDemarrage: 1
+  suivreParticules: 0
+  facteur: 1
+  couleurImposee: 0
+  couleur: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &7811834244543653917
 GameObject:
   m_ObjectHideFlags: 0
@@ -214,6 +236,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8832386294454339174}
   - component: {fileID: 7819812566040685614}
+  - component: {fileID: 1955766528465783256}
   m_Layer: 0
   m_Name: GemmeNyxessa
   m_TagString: Untagged
@@ -261,6 +284,24 @@ MonoBehaviour:
   pulseDistance: 1.1
   pulseSeconds: 2.2
   portailOuvert: 1
+  multiplicateurVitesse: 1
+--- !u!114 &1955766528465783256
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7811834244543653917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: edcede0fcd9c67d4584c9c4d19312ffd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Nyxessa
+  ceinture: {fileID: 7819812566040685614}
+  cristal: {fileID: 7793786652641015231}
+  rotation: {fileID: 2386658422712476911}
+  lumiere: {fileID: 7105692691572384207}
+  gemmes: {fileID: 2100000, guid: b64a388394535a64caff0d3f19ebace2, type: 2}
 --- !u!1001 &2916621459232886110
 PrefabInstance:
   m_ObjectHideFlags: 0

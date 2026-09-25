@@ -14544,6 +14544,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7406990036005787060}
+  - component: {fileID: 4580368458651769186}
   m_Layer: 0
   m_Name: BurnFlammeches
   m_TagString: Untagged
@@ -14569,3 +14570,22 @@ Transform:
   - {fileID: 2219336825992462592}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4580368458651769186
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4445466942479569546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f82bf88c9b1ea9a4e8b0c134eb096d2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VfxLumiere
+  theme: 0
+  taille: 0
+  allumerAuDemarrage: 0
+  suivreParticules: 1
+  facteur: 1
+  couleurImposee: 0
+  couleur: {r: 1, g: 1, b: 1, a: 1}
