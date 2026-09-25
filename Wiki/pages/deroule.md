@@ -61,7 +61,9 @@ Un cycle complet dure **4 min 10 s**. Les 5 s de crépuscule et d'aube laissent 
 
 Le donjon est **régénéré chaque nuit** : chaque jour, le portail mène à un donjon nouveau.
 
-**Taille unique** {décidé} : tous les donjons ont la même taille. Elle respecte une consigne : un aller-retour complet, de l'arrivée par le portail au retour au village, est **faisable en 90 secondes** (le jour dure 120 s). **Forme** {décidé} : plutôt **ouvert**, sur **2 à 3 étages** reliés par des escaliers. Quand on entre dans une pièce sous un étage, **l'étage du dessus disparaît** pour qu'on voie bien dedans (chaque joueur pour lui-même). Mesure exacte et contenu du donjon : {à confirmer}.
+**Taille unique** {décidé} : tous les donjons ont la même taille. Elle respecte une consigne : un aller-retour complet, de l'arrivée par le portail au retour au village, est **faisable en 90 secondes** (le jour dure 120 s). **Forme** {décidé} : plutôt **ouvert**, sur **2 à 3 étages** reliés par des escaliers. Quand on entre dans une pièce sous un étage, **l'étage du dessus disparaît** pour qu'on voie bien dedans (chaque joueur pour lui-même). Peu de couloirs : de **grandes salles ouvertes et lisibles**, pas un labyrinthe.
+
+**Pas de faux butin** {décidé} : dans le décor, rien ne ressemble à du butin (tas d'or, pièces, coffres, sacs) s'il ne rapporte rien. Seul le vrai butin en a l'allure, pour ne pas tromper le jugement des joueurs. Mesure exacte et contenu du donjon : {à confirmer}.
 
 **Butin** {décidé} : on ne rapporte du donjon que de l'**or**, versé à la caisse commune au retour par le portail.
 
