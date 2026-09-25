@@ -79,7 +79,10 @@ namespace Deathless.Jeu
 
         /// Effets communs à toutes les classes (numéros 200 et plus ; ceux des classes sont en dessous).
         protected const int EffetCritique = 200;
-        public const int EffetEsquive = 201, EffetSaut = 202;
+        public const int EffetEsquive = 201, EffetSaut = 202, EffetTransitDepart = 203, EffetTransitArrivee = 204;
+
+        /// DonjonJeu : passage d'un portail (départ, arrivée) à rejouer chez les autres, à la position donnée.
+        public void DiffuserTransit(int effet, Vector3 position) => Diffuser(effet, position);
 
         /// Heros : effet commun (esquive, saut) à rejouer chez les autres.
         public void DiffuserCommun(int effet) => Diffuser(effet);
@@ -106,6 +109,8 @@ namespace Deathless.Jeu
             if (effet == EffetCritique) Combat.Critique(a, b, v > 0.5f);
             else if (effet == EffetEsquive) AudioBank.Jouer(SonsDuJeu.Esquive, transform.position + Vector3.up, 0.8f);
             else if (effet == EffetSaut) AudioBank.Jouer(SonsDuJeu.Saut, transform.position, 0.5f);
+            else if (effet == EffetTransitDepart) DonjonJeu.TransitDistant(H, a, false);
+            else if (effet == EffetTransitArrivee) DonjonJeu.TransitDistant(H, a, true);
         }
 
         // ----------------------------------------------------------------- HUD

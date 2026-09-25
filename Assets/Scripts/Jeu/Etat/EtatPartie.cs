@@ -41,6 +41,7 @@ namespace Deathless.Jeu
         public float jauge, jaugeMax;    // mana du mage, rage du viking (0 : pas de jauge)
         public bool furtif;              // assassin en mode furtif
         public int nuitsSurvecues;
+        public int orPorte;              // or ramassé au donjon, versé à la caisse au retour par le portail
         public int pointsCompetence;     // 1 par jour survécu (crédité à l'aube), dépensés dans le menu du personnage
         public int[] rangs = new int[4]; // rangs des améliorations de compétence (ArbreCompetences), par index
         public ScoreJoueur score = new ScoreJoueur();

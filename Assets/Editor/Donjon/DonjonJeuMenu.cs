@@ -24,6 +24,8 @@ public static class DonjonJeuMenu
         g.construireNavMesh = true;
         if (jeu == null) jeu = go.AddComponent<DonjonJeu>();
         jeu.generateur = g;
+        jeu.cadenasGrandCoffre = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Cadenas/Prefabs/Cadenas_Or.prefab");
+        jeu.cadenasCoffre = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Cadenas/Prefabs/Cadenas_Acier.prefab");
         Vider(go);
         EditorUtility.SetDirty(go);
         EditorSceneManager.MarkSceneDirty(go.scene);

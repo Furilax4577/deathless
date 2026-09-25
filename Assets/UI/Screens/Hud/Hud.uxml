@@ -68,6 +68,20 @@
         <!-- Gauche, à mi-hauteur : vie des autres joueurs (multijoueur, jusqu'à 3 ; vide en solo ; construite par EcranHud) -->
         <ui:VisualElement name="allies" class="hud-allies" picking-mode="Ignore" />
 
+        <!-- Haut, à droite, sous la caisse : or porté (ramassé au donjon, versé à la caisse au retour) -->
+        <ui:VisualElement name="or-porte" class="hud-pastille hud-or-porte" picking-mode="Ignore">
+            <dl:PieceOr class="hud-or__piece" />
+            <ui:Label name="or-porte-valeur" text="0" class="hud-or__valeur" />
+            <ui:Label name="or-porte-legende" text="or porté" class="hud-or__legende" />
+        </ui:VisualElement>
+        <!-- Haut, au centre : alerte du donjon (rappel par Nyxessa) et message (rappel, dépôt) -->
+        <ui:VisualElement name="donjon-alerte" class="hud-pastille hud-donjon-alerte" picking-mode="Ignore">
+            <ui:Label name="donjon-alerte-texte" text="Le portail se ferme dans 15 s : rentrez !" class="hud-donjon-alerte__texte" />
+        </ui:VisualElement>
+        <ui:VisualElement name="donjon-message" class="hud-pastille hud-donjon-message" picking-mode="Ignore">
+            <ui:Label name="donjon-message-texte" text="Message" class="hud-donjon-message__texte" />
+        </ui:VisualElement>
+
         <!-- Bas, à gauche, au-dessus du joueur : points de compétence à dépenser (menu du personnage) -->
         <ui:VisualElement name="points-competence" class="hud-pastille hud-points" picking-mode="Ignore">
             <ui:Label name="points-texte" text="1 point de compétence" class="hud-points__texte" />

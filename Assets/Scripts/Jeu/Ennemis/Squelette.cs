@@ -61,6 +61,11 @@ namespace Deathless.Jeu
         protected GameBalance B => GameBalance.Courant;
         protected Transform Nyxessa => P != null && P.nyxessa != null ? P.nyxessa.transform : null;
 
+        /// Gardien du butin au donjon : il reste à son poste, poursuit les joueurs qui approchent, n'attaque jamais
+        /// Nyxessa et ne rapporte pas d'or (le butin du donjon est dans les coffres).
+        public bool Gardien { get; private set; }
+        public void Garder(Vector3 poste) { Gardien = true; m_Place = poste; }
+
         protected virtual void Awake()
         {
             Id = ++s_Ids;
@@ -169,6 +174,8 @@ namespace Deathless.Jeu
                 Agent.Move(m_Pousse * (k / 0.2f));
                 m_PousseReste -= k;
             }
+            // Eau du donjon (bassin) : ralentit (le NavMesh la contourne déjà quand c'est plus court en temps).
+            if (Agent.enabled && m_Stats.vitesse > 0f) Agent.speed = m_Stats.vitesse * Deathless.Donjon.ZoneEau.FacteurEn(transform.position + Vector3.up * 0.2f);
             if (animator != null) animator.SetFloat(P_Speed, Agent.enabled && !Agent.isStopped ? Mathf.Clamp01(Agent.velocity.magnitude / Mathf.Max(0.1f, m_Stats.vitesse)) * 0.5f : 0f);
             if (P != null && (P.Etat.phase == Phase.Terminee || P.Etat.nyxessa.detruite) && m_Etat != Etat.Mort)
             {
@@ -243,7 +250,7 @@ namespace Deathless.Jeu
         protected float DistanceNyxessa()
         {
             var n = Nyxessa;
-            if (n == null) return 999f;
+            if (n == null || Gardien) return 999f;
             Vector3 d = n.position - transform.position; d.y = 0f;
             return d.magnitude;
         }
@@ -426,6 +433,7 @@ namespace Deathless.Jeu
             get
             {
                 var b = B;
+                if (Gardien) return 0;
                 if (type == TypeEnnemi.Golem) return b.orMorgrim;
                 if (type == TypeEnnemi.Necromancien) return b.orNyxar;
                 if (elite) return b.orElite;

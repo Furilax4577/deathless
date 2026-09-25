@@ -57743,6 +57743,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Deathless.Jeu.DonjonJeu
   generateur: {fileID: 653437222}
+  cadenasGrandCoffre: {fileID: 698052253809694910, guid: 7fb122e6958e0d549b0f08842a4672ba, type: 3}
+  cadenasCoffre: {fileID: 1904933649561920097, guid: 54cfae9e786acf54195419a5082231d3, type: 3}
+  ambiance: {r: 0.3, g: 0.26, b: 0.25, a: 1}
+  brouillard: {r: 0.07, g: 0.055, b: 0.06, a: 1}
+  brouillardDebut: 12
+  brouillardFin: 70
 --- !u!114 &653437222
 MonoBehaviour:
   m_ObjectHideFlags: 0

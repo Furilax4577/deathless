@@ -26,6 +26,9 @@ namespace Deathless.UI.Donnees
         public static event Action<IMenuAchat> MenuAchatDemande;
         public static void OuvrirMenuAchat(IMenuAchat menu) => MenuAchatDemande?.Invoke(menu);
 
+        /// Donjon du joueur local (or porté, alerte, rappel) ; null sans donjon.
+        public static IEtatDonjon Donjon { get; set; }
+
         /// Menu du personnage (posé par le jeu en partie ; null sinon).
         public static IMenuPersonnage Personnage { get; set; }
 

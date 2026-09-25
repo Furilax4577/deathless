@@ -14,6 +14,24 @@ namespace Deathless.Donjon
         [Tooltip("Hauteur d'eau au-dessus du fond (m).")]
         public float profondeur = DonjonPlan.ProfondeurEau;
 
+        static readonly System.Collections.Generic.List<ZoneEau> s_Toutes = new System.Collections.Generic.List<ZoneEau>();
+        BoxCollider m_Boite;
+
+        void OnEnable() { m_Boite = GetComponent<BoxCollider>(); s_Toutes.Add(this); }
+        void OnDisable() { s_Toutes.Remove(this); }
+
+        /// Facteur de vitesse au point `p` (pieds d'un personnage) : celui du bassin qui le contient, 1 hors de l'eau.
+        /// Sans déclencheur (héros et squelettes l'interrogent à chaque image ; un ou deux bassins au plus).
+        public static float FacteurEn(Vector3 p)
+        {
+            for (int i = 0; i < s_Toutes.Count; i++)
+            {
+                var z = s_Toutes[i];
+                if (z.m_Boite != null && z.m_Boite.enabled && z.m_Boite.bounds.Contains(p)) return z.facteurVitesse;
+            }
+            return 1f;
+        }
+
         /// Facteur de vitesse d'un collider qui entre dans ce volume (1 hors de l'eau).
         public static float Facteur(Collider c)
         {

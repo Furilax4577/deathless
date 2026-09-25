@@ -50,6 +50,10 @@ namespace Deathless.Jeu
         public static readonly string[] PortailOuverture = { "portal_open" };
         public static readonly string[] PortailFermeture = { "portal_close" };
         public static readonly string[] PortailBourdon = { "portal_hum_loop" };
+        public static readonly string[] PortailPassage = { "portal_pass", "portail_goutte" };
+        public static readonly string[] CoffreCadenas = { "kenney_rpg_metallatch", "kenney_rpg_metalclick" };
+        public static readonly string[] CoffreOuvert = { "chest_open", "kenney_rpg_dooropen" };
+        public static readonly string[] NyxessaRappel = { "nyxessa_rappel", "nyxessa_onde_passage" };
 
         public static readonly string[] AlerteNuit = { "donjon_alerte_nuit", "ui_decompte" };
         public static readonly string[] TombeeNuit = { "nightfall" };

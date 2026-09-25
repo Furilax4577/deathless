@@ -263,9 +263,22 @@ namespace Deathless.Jeu
                 return;
             }
             if (Etat.phase != Phase.Jour) return;
+            if (!j.pret && DonjonJeu.QuelquunAuDonjon)
+            {
+                AudioBank.Jouer2D(SonsDuJeu.PretAnnule);
+                Journal("Vote refusé : un joueur est au donjon");
+                return;
+            }
             j.pret = !j.pret;
             AudioBank.Jouer2D(j.pret ? SonsDuJeu.Pret : SonsDuJeu.PretAnnule);
             PretChange?.Invoke(joueurId, j.pret);
+            EvaluerPrets();
+        }
+
+        /// Tous prêts (et toute l'équipe rentrée) : le jour est écourté ; sinon le compte à rebours est annulé.
+        public void EvaluerPrets()
+        {
+            if (Etat.phase != Phase.Jour || ClientReseau) return;
             if (TousPrets() && !Etat.comptePret)
             {
                 Etat.comptePret = true;
@@ -306,6 +319,8 @@ namespace Deathless.Jeu
         bool TousPrets()
         {
             if (Etat.joueurs.Count == 0) return false;
+            // Wiki : le vote n'est possible que quand toute l'équipe est rentrée du donjon.
+            if (Etat.phase == Phase.Jour && DonjonJeu.QuelquunAuDonjon) return false;
             foreach (var j in Etat.joueurs) if (!j.pret) return false;
             return true;
         }
@@ -429,6 +444,7 @@ namespace Deathless.Jeu
             else if (j.mort && Time.time - m_MortSignalee > 1.5f) { j.mort = false; j.reapparitionRestante = 0f; }
             j.score.orRapporte = s.or; j.score.degatsInfliges = s.degats; j.score.ennemisTues = s.tues; j.score.morts = s.morts;
             j.score.coupsCritiques = s.critiques; j.score.degatsEvitesNyxessa = s.evites; j.score.soinsProdigues = s.soins;
+            j.orPorte = s.orPorte;
         }
 
         /// Client : l'hôte fait réapparaître le héros de ce poste (délai écoulé ou aube).

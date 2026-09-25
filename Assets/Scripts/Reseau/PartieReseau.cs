@@ -14,19 +14,19 @@ namespace Deathless.Reseau
         public FixedString32Bytes classeId;
         public bool pret, mort;
         public float reapparition;
-        public int or, degats, tues, morts, critiques, evites, soins;
+        public int or, degats, tues, morts, critiques, evites, soins, orPorte;
 
         public void NetworkSerialize<T>(BufferSerializer<T> s) where T : IReaderWriter
         {
             s.SerializeValue(ref clientId); s.SerializeValue(ref pseudo); s.SerializeValue(ref classeId);
             s.SerializeValue(ref pret); s.SerializeValue(ref mort); s.SerializeValue(ref reapparition);
             s.SerializeValue(ref or); s.SerializeValue(ref degats); s.SerializeValue(ref tues); s.SerializeValue(ref morts);
-            s.SerializeValue(ref critiques); s.SerializeValue(ref evites); s.SerializeValue(ref soins);
+            s.SerializeValue(ref critiques); s.SerializeValue(ref evites); s.SerializeValue(ref soins); s.SerializeValue(ref orPorte);
         }
 
         public bool Equals(ScoreReseau o) => clientId == o.clientId && pseudo.Equals(o.pseudo) && classeId.Equals(o.classeId) && pret == o.pret
             && mort == o.mort && Mathf.Approximately(reapparition, o.reapparition) && or == o.or && degats == o.degats && tues == o.tues
-            && morts == o.morts && critiques == o.critiques && evites == o.evites && soins == o.soins;
+            && morts == o.morts && critiques == o.critiques && evites == o.evites && soins == o.soins && orPorte == o.orPorte;
     }
 
     /// Monde de la partie réseau (Docs/reseau.md, étape 2), possédé par l'hôte qui fait foi : horloge (phase, nuit, temps),
@@ -47,6 +47,9 @@ namespace Deathless.Reseau
         public readonly NetworkVariable<int> NuitAtteinte = new NetworkVariable<int>();
         public readonly NetworkVariable<int> OrEquipe = new NetworkVariable<int>();
         public readonly NetworkVariable<int> PalierMissiles = new NetworkVariable<int>(1);
+        // Donjon : graine du jour (tirée par l'hôte, 0 = aucun) et butins déjà pris (un bit par emplacement).
+        public readonly NetworkVariable<int> GraineDonjon = new NetworkVariable<int>();
+        public readonly NetworkVariable<int> ButinsPris = new NetworkVariable<int>();
         public readonly NetworkVariable<int> PalierBouclier = new NetworkVariable<int>(1);
         public readonly NetworkVariable<float> NyxPv = new NetworkVariable<float>(1f);
         public readonly NetworkVariable<float> NyxPvMax = new NetworkVariable<float>(1f);
@@ -90,6 +93,8 @@ namespace Deathless.Reseau
             Ecrire(NuitAtteinte, e.nuitAtteinte);
             Ecrire(OrEquipe, e.orEquipe);
             Ecrire(PalierMissiles, e.nyxessa.palierMissiles);
+            var dj = DonjonJeu.Instance;
+            if (dj != null) { Ecrire(GraineDonjon, dj.GraineCourante); Ecrire(ButinsPris, dj.Pris); }
             Ecrire(PalierBouclier, e.nyxessa.palierBouclier);
             Ecrire(Joueurs, Mathf.Max(1, e.joueurs.Count));
             Ecrire(Prets, p.JoueursPrets);
@@ -116,7 +121,8 @@ namespace Deathless.Reseau
                     clientId = (ulong)Mathf.Max(0, j.id - 1), pseudo = new FixedString64Bytes(j.nom ?? ""), classeId = new FixedString32Bytes(j.classeId ?? ""),
                     pret = j.pret, mort = j.mort, reapparition = Mathf.Ceil(j.reapparitionRestante),
                     or = j.score.orRapporte, degats = Mathf.RoundToInt(j.score.degatsInfliges), tues = j.score.ennemisTues, morts = j.score.morts,
-                    critiques = j.score.coupsCritiques, evites = Mathf.RoundToInt(j.score.degatsEvitesNyxessa), soins = Mathf.RoundToInt(j.score.soinsProdigues)
+                    critiques = j.score.coupsCritiques, evites = Mathf.RoundToInt(j.score.degatsEvitesNyxessa), soins = Mathf.RoundToInt(j.score.soinsProdigues),
+                    orPorte = j.orPorte
                 };
                 if (i < Scores.Count) { if (!Scores[i].Equals(s)) Scores[i] = s; }
                 else Scores.Add(s);
@@ -139,6 +145,18 @@ namespace Deathless.Reseau
         {
             if (Partie.Instance != null) Partie.Instance.BasculerPret(Partie.IdJoueur(p.Receive.SenderClientId));
         }
+
+        /// Donjon : un client demande un butin (coffre ouvert, tas d'or ramassé) ; l'hôte décide.
+        public void DemanderButin(int index) => ButinRpc((byte)index);
+
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        void ButinRpc(byte index, RpcParams p = default) => DonjonJeu.Instance?.Accorder(index, Partie.IdJoueur(p.Receive.SenderClientId));
+
+        /// Donjon : un client revient par le portail de retour ; l'hôte verse son or porté à la caisse.
+        public void DeposerOr() => DeposerRpc();
+
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        void DeposerRpc(RpcParams p = default) => DonjonJeu.Instance?.Deposer(Partie.IdJoueur(p.Receive.SenderClientId));
 
         /// Achat d'un palier à la relique par un client : l'hôte décide (caisse commune) et lui répond.
         public void DemanderAchat(byte amelioration) => AchatRpc(amelioration);

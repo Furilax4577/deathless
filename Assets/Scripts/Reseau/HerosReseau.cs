@@ -183,6 +183,12 @@ namespace Deathless.Reseau
         public int EffetsRecus { get; private set; }
         public readonly List<byte> EffetsVus = new List<byte>();
 
+        /// Hôte : Nyxessa rappelle ce joueur du donjon (crépuscule) ; son propriétaire le ramène au village.
+        public void Rappeler(int garde, int perdu) => RappelRpc(garde, perdu);
+
+        [Rpc(SendTo.Owner)]
+        void RappelRpc(int garde, int perdu) => DonjonJeu.Instance?.RappelLocal(garde, perdu);
+
         /// Hôte : un squelette a repéré cet assassin (marionnette) ; son propriétaire sort du mode furtif.
         public void SignalerRepere() => RepereRpc();
 

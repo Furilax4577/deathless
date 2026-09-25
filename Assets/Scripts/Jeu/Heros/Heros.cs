@@ -33,7 +33,9 @@ namespace Deathless.Jeu
         public float Endurance => m_Endurance;
         public bool EnJeu => Partie != null && Partie.EnCours;
         /// Libre de lancer une action (vivant, en jeu, ni esquive ni étourdissement, pas d'action de classe en cours).
-        public bool PeutAgir => m_EtatCourant == Etat.Libre && Vivant && EnJeu && (Classe == null || !Classe.Occupe);
+        public bool PeutAgir => m_EtatCourant == Etat.Libre && Vivant && EnJeu && !EnTransit && (Classe == null || !Classe.Occupe);
+        /// Passage d'un portail (donjon) : immobile, invisible, sans action.
+        public bool EnTransit { get; set; }
 
         CameraEpaule m_Camera;
         EtatJoueur m_Etat;
@@ -267,6 +269,7 @@ namespace Deathless.Jeu
         {
             if (Partie == null) return;
             if (action == "Ready") { Partie.BasculerPret(Id); return; }
+            if (EnTransit) return;
             if (action == "CharacterMenu") { if (Partie.EnCours) (Deathless.UI.Donnees.DonneesUI.Personnage as MenuPersonnage)?.Ouvrir(); return; }
             if (!Vivant || !Partie.EnCours) return;
             switch (action)
@@ -406,13 +409,15 @@ namespace Deathless.Jeu
             {
                 case Etat.Libre:
                 {
+                    if (EnTransit) { deplacement = Vector3.zero; break; }
                     if (Classe != null && Classe.DeplacementImpose(dt, out Vector3 v)) { deplacement = v; impose = true; break; }
                     // Ivresse (taverne) : démarche hésitante, la direction de marche ondule (pas pendant une action de classe).
                     if (Ivresse.Active && !Distant && dir.sqrMagnitude > 0.01f && (Classe == null || !Classe.Occupe)) dir = Quaternion.Euler(0f, Ivresse.Deviation, 0f) * dir;
                     float facteur = Classe != null ? Classe.FacteurVitesse : 1f;
                     bool occupe = Classe != null && Classe.Occupe;
                     m_Sprint = Entrees.SprintMaintenu && dir.sqrMagnitude > 0.01f && m_Endurance > 0f && !occupe && facteur >= 0.99f && (Classe == null || !Classe.BloqueSprint);
-                    float vitesse = (Classe != null ? Classe.Vitesse : b.vitesse) * (m_Sprint ? b.sprintMultiplicateur : 1f) * facteur;
+                    float vitesse = (Classe != null ? Classe.Vitesse : b.vitesse) * (m_Sprint ? b.sprintMultiplicateur : 1f) * facteur
+                        * Deathless.Donjon.ZoneEau.FacteurEn(transform.position + Vector3.up * 0.2f);   // eau du donjon : × 0,6
                     if (m_Sprint) { m_Endurance = Mathf.Max(0f, m_Endurance - b.sprintCout * dt); m_EnduranceUtilisee = Time.time; }
                     deplacement = dir * vitesse;
                     Vector3 face = Classe != null && Classe.FaceVisee ? FaceDeVisee() : dir;

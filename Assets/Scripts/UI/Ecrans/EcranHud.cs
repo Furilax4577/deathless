@@ -39,7 +39,8 @@ namespace Deathless.UI.Ecrans
         string m_ClasseBarre;
         JaugeClasse m_JaugeAffichee = (JaugeClasse)(-1);
         VisualElement m_Barre;
-        VisualElement m_Interaction, m_PointsCompetence;
+        VisualElement m_Interaction, m_PointsCompetence, m_OrPorte, m_DonjonAlerte, m_DonjonMessage;
+        Label m_OrPorteValeur, m_OrPorteLegende, m_DonjonAlerteTexte, m_DonjonMessageTexte;
         Label m_PointsTexte;
         Label m_InteractionTexte;
         VisualElement m_Reticule;
@@ -110,6 +111,13 @@ namespace Deathless.UI.Ecrans
             m_Barre = Racine.Q("competences");
             m_Interaction = Racine.Q("interaction");
             m_PointsCompetence = Racine.Q("points-competence");
+            m_OrPorte = Racine.Q("or-porte");
+            m_OrPorteValeur = Racine.Q<Label>("or-porte-valeur");
+            m_OrPorteLegende = Racine.Q<Label>("or-porte-legende");
+            m_DonjonAlerte = Racine.Q("donjon-alerte");
+            m_DonjonAlerteTexte = Racine.Q<Label>("donjon-alerte-texte");
+            m_DonjonMessage = Racine.Q("donjon-message");
+            m_DonjonMessageTexte = Racine.Q<Label>("donjon-message-texte");
             m_PointsTexte = Racine.Q<Label>("points-texte");
             m_InteractionTexte = Racine.Q<Label>("interaction-texte");
             m_Reticule = Racine.Q("reticule");
@@ -279,7 +287,9 @@ namespace Deathless.UI.Ecrans
             if (vote) m_Prets.text = "Prêts " + partie.JoueursPrets + " / " + partie.JoueursTotal;
 
             // Alerte avant la nuit (clignote).
-            var alerte = partie.Phase == PhasePartie.Jour && partie.TempsRestantPhase <= DelaiAlerteNuit;
+            // Au donjon, l'alerte du rappel par Nyxessa (même place, plus précise) remplace celle de la nuit.
+            var alerte = partie.Phase == PhasePartie.Jour && partie.TempsRestantPhase <= DelaiAlerteNuit
+                && !(DonneesUI.Donjon != null && DonneesUI.Donjon.AuDonjon);
             m_BlocAlerteNuit.style.display = alerte ? DisplayStyle.Flex : DisplayStyle.None;
             if (alerte)
             {
@@ -364,6 +374,27 @@ namespace Deathless.UI.Ecrans
             var mort = joueur.EstMort;
             m_Mort.style.display = mort ? DisplayStyle.Flex : DisplayStyle.None;
             if (mort) m_MortTexte.text = "Réapparition dans " + Mathf.CeilToInt(joueur.TempsAvantReapparition) + " s";
+
+            // Donjon : or porté (sous la caisse), alerte avant le rappel par Nyxessa, message (rappel, dépôt).
+            var donjon = DonneesUI.Donjon;
+            if (m_OrPorte != null)
+            {
+                int porte = donjon != null ? donjon.OrPorte : 0;
+                bool dedans = donjon != null && donjon.AuDonjon;
+                m_OrPorte.style.display = porte > 0 || dedans ? DisplayStyle.Flex : DisplayStyle.None;
+                m_OrPorteValeur.text = porte.ToString();
+                m_OrPorteLegende.text = dedans ? "or porté · au donjon" : "or porté";
+                float avant = donjon != null && dedans ? donjon.AvantRappel : -1f;
+                m_DonjonAlerte.style.display = avant >= 0f ? DisplayStyle.Flex : DisplayStyle.None;
+                if (avant >= 0f)
+                {
+                    m_DonjonAlerteTexte.text = "Le portail se ferme dans " + Mathf.CeilToInt(avant) + " s : rentrez au village !";
+                    m_DonjonAlerte.style.opacity = 0.75f + 0.25f * Mathf.Abs(Mathf.Sin(Time.unscaledTime * 4f));
+                }
+                string msg = donjon != null ? donjon.Message : null;
+                m_DonjonMessage.style.display = string.IsNullOrEmpty(msg) ? DisplayStyle.None : DisplayStyle.Flex;
+                if (!string.IsNullOrEmpty(msg)) m_DonjonMessageTexte.text = msg;
+            }
 
             // Points de compétence à dépenser : pastille et invite du menu du personnage (Tab / Y).
             int points = DonneesUI.Personnage != null ? DonneesUI.Personnage.Points : 0;

@@ -164,6 +164,28 @@ namespace Deathless.Jeu
 
         public const int PalierMax = 5;
 
+        [Header("Donjon (wiki : deroule.md, Le donjon ; 26/09/2026, à équilibrer)")]
+        [Tooltip("Or du grand coffre du 2e étage.")]
+        public int orGrandCoffre = 120;
+        [Tooltip("Or d'un coffre (deux par donjon).")]
+        public int orCoffre = 50;
+        [Tooltip("Or d'un tas d'or (quatre par donjon).")]
+        public int orTasOr = 20;
+        [Tooltip("Hausse de l'or du donjon par nuit déjà passée (0,1 : +10 % par nuit).")]
+        public float orDonjonParNuit = 0.1f;
+        [Tooltip("Part du butin porté gardée quand Nyxessa rappelle le joueur (ou s'il meurt au donjon), par palier de Nyxessa (1 à 5).")]
+        public float[] partGardeeRappel = { 0f, 0.2f, 0.4f, 0.6f, 0.75f };
+        [Tooltip("Squelettes qui gardent le butin (sbires et guerriers), posés chaque jour sur les points d'apparition du donjon.")]
+        public int gardiensDonjon = 6;
+        [Tooltip("Part de guerriers parmi les gardiens.")]
+        public float partGuerriersDonjon = 0.35f;
+        [Tooltip("Distance horizontale au centre d'un portail pour le passer (m).")]
+        public float rayonPortail = 1.5f;
+        [Tooltip("Distance pour ramasser un tas d'or en passant dessus (m).")]
+        public float rayonTasOr = 1.4f;
+        [Tooltip("Distance pour ouvrir un coffre (touche Interagir, m).")]
+        public float distanceCoffre = 2.4f;
+
         [Header("Taverne (Maison_1_A ; décision du 26/09/2026) : de jour seulement, payée par la caisse commune")]
         public int tavernePrixRepas = 15;
         [Tooltip("Vie rendue par le repas.")]

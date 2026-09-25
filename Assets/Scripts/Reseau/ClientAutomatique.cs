@@ -15,6 +15,8 @@ namespace Deathless.Reseau
     ///   -deathless-or=250 : hôte ou solo, caisse commune remplie au lancement (test des achats)
     ///   -deathless-taverne : paie une tournée à la taverne (l'hôte décide, tous ivres)
     ///   -deathless-achat : achète le palier 2 des missiles à la relique (l'hôte décide)
+    ///   -deathless-donjon=retour|rester : entre au donjon par le portail, prend un tas d'or et un coffre, puis revient
+    ///     par le portail de retour (or versé à la caisse) ou reste (rappel par Nyxessa au crépuscule)
     ///   -deathless-competences : le héros enchaîne toutes ses compétences (effets vus par les autres postes)
     ///   -deathless-solo : partie solo lancée aussitôt avec la classe donnée (vérification du build : caméra, héros)
     ///   [-deathless-quitter-salon=5] : quitte le salon 5 s après y être entré (test de la classe libérée), sans se déclarer prêt
@@ -56,6 +58,7 @@ namespace Deathless.Reseau
             c.m_Competences = Drapeau("deathless-competences");
             c.m_Achat = Drapeau("deathless-achat") || Drapeau("deathless-taverne");
             c.m_Taverne = Drapeau("deathless-taverne");
+            c.m_Donjon = Arg("deathless-donjon");
             if (int.TryParse(Arg("deathless-or"), out var or)) c.m_Or = or;
             if (int.TryParse(Arg("deathless-attendre"), out var att)) c.m_Attendre = att;
             c.m_Classe = Arg("deathless-classe") ?? "mage";
@@ -132,7 +135,8 @@ namespace Deathless.Reseau
                     if (m_Or > 0 && ReseauJeu.Autorite) { p.Etat.orEquipe = m_Or; ReseauJeu.Journal("[auto] caisse commune : " + m_Or + " or (test)"); }
                 }
                 m_EnPartieDepuis += dt;
-                if (m_Achat && Achat(p, m_EnPartieDepuis)) { }
+                if (m_Donjon != null && Donjon(p, p.HerosLocal, m_EnPartieDepuis)) { }
+                else if (m_Achat && Achat(p, m_EnPartieDepuis)) { }
                 else Piloter(p.HerosLocal, m_EnPartieDepuis);
                 if (m_EnPartieDepuis >= m_Duree)
                 {
@@ -266,6 +270,74 @@ namespace Deathless.Reseau
         }
         int m_Or;
         int m_EtapeAchat;
+
+        // ------------------------------------------------------------ Donjon
+        string m_Donjon, m_DonjonMessage = "";
+        int m_EtapeDonjon;
+
+        /// Test du donjon (-deathless-donjon) : entrée par le portail du village, un tas d'or, un coffre (l'hôte décide),
+        /// puis retour par le portail (dépôt) ou attente du rappel. Le journal donne l'état vu par ce poste.
+        bool Donjon(Partie p, Heros h, float t)
+        {
+            var dj = DonjonJeu.Instance;
+            if (dj == null) { if (m_EtapeDonjon == 0) { m_EtapeDonjon = 99; ReseauJeu.Journal("[auto] donjon : absent"); } return false; }
+            h.Entrees.DeplacementTest = Vector2.zero;
+            h.Entrees.SprintTest = false;
+            var g = dj.generateur;
+            string etat = "graine " + dj.GraineCourante + ", pris " + dj.Pris + ", or porté " + (p.JoueurLocal != null ? p.JoueurLocal.orPorte : -1) + ", caisse " + p.Etat.orEquipe + ", au donjon " + DonjonJeu.AuDonjon(h) + ", phase " + p.Etat.phase;
+            if (dj.Message != m_DonjonMessage) { m_DonjonMessage = dj.Message; if (m_DonjonMessage != "") ReseauJeu.Journal("[auto] donjon, message : " + m_DonjonMessage + " (" + etat + ")"); }
+            if (m_EtapeDonjon == 0 && t > 5f && dj.Pret && p.Etat.phase == Phase.Jour)
+            {
+                m_EtapeDonjon = 1;
+                var pv = FindAnyObjectByType<VueCycle>().portail;
+                Vector3 n = p.nyxessa.transform.position - pv.Center; n.y = 0f;
+                h.Teleporter(new Vector3(pv.Center.x, 0.1f, pv.Center.z) + n.normalized * 0.8f);
+                ReseauJeu.Journal("[auto] donjon : vers le portail du village (" + etat + ")");
+            }
+            else if (m_EtapeDonjon == 1 && t > 8f)
+            {
+                m_EtapeDonjon = 2;
+                ReseauJeu.Journal("[auto] donjon : après le portail, position " + h.transform.position.ToString("F1") + " (" + etat + ")");
+                for (int i = 0; i < g.Butins.Length; i++)
+                    if (g.Butins[i].butin == Deathless.Donjon.TypeButin.TasOr && !dj.ButinPris(i)) { h.Teleporter(g.Butins[i].transform.position + Vector3.up * 0.1f); ReseauJeu.Journal("[auto] donjon : sur le tas d'or " + i); break; }
+            }
+            else if (m_EtapeDonjon == 2 && t > 10f)
+            {
+                m_EtapeDonjon = 3;
+                for (int i = 0; i < g.Butins.Length; i++)
+                    if (g.Butins[i].butin != Deathless.Donjon.TypeButin.TasOr && !dj.ButinPris(i))
+                    {
+                        var r = g.Butins[i].transform;
+                        h.Teleporter(r.position + r.forward * 1.4f + Vector3.up * 0.1f);
+                        ReseauJeu.Journal("[auto] donjon : devant le coffre " + i + " (" + etat + ")");
+                        break;
+                    }
+            }
+            else if (m_EtapeDonjon == 3 && t > 11f)
+            {
+                m_EtapeDonjon = 4;
+                PointInteraction.Courant(h, out string invite);
+                bool ok = PointInteraction.InteragirIci(h);
+                ReseauJeu.Journal("[auto] donjon : invite « " + invite + " », interaction " + ok);
+            }
+            else if (m_EtapeDonjon == 4 && t > 14f)
+            {
+                m_EtapeDonjon = 5;
+                ReseauJeu.Journal("[auto] donjon : butin (" + etat + ")");
+                if (m_Donjon == "retour") { h.Teleporter(g.PortailRetour.transform.position + Vector3.up * 0.1f); ReseauJeu.Journal("[auto] donjon : vers le portail de retour"); }
+            }
+            else if (m_EtapeDonjon == 5 && t > 18f)
+            {
+                m_EtapeDonjon = 6;
+                ReseauJeu.Journal("[auto] donjon : " + (m_Donjon == "retour" ? "après le retour" : "on attend le rappel") + " (" + etat + ")");
+            }
+            else if (m_EtapeDonjon == 6 && p.Etat.phase != Phase.Jour)
+            {
+                m_EtapeDonjon = 7;
+                ReseauJeu.Journal("[auto] donjon : phase " + p.Etat.phase + ", position " + h.transform.position.ToString("F1") + " (" + etat + ")");
+            }
+            return m_EtapeDonjon < 7;
+        }
 
         /// Test des achats à la relique (-deathless-achat) : vers 6 s, le héros va près de Nyxessa, ouvre le menu (touche
         /// Interagir) et achète le palier 2 des missiles ; l'hôte décide, le journal donne sa réponse et les paliers.
