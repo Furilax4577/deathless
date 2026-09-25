@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+<!-- Deathless : mage_boule_de_feu (Boule de feu). Généré par ArtSources/Icones/generer_icones.py -->
+<polygon fill="#cc1f08" points="67.7,35.1 35.6,61.7 12,84 12,84 44.4,78.3 84.3,64.9"/>
+<polygon fill="#ff610a" points="76,50 40,70 35.6,61.7 67.7,35.1"/>
+<polygon fill="#cc1f08" points="76,50 40,70 44.4,78.3 84.3,64.9"/>
+<polygon fill="#ff610a" points="40,70 12,84 12,84 35.6,61.7"/>
+<polygon fill="#cc1f08" points="40,70 12,84 12,84 44.4,78.3"/>
+<polygon fill="#cc1f08" points="61,42 49.6,79.9 44,116 44,116 66.4,88.1 91,58"/>
+<polygon fill="#ff610a" points="76,50 58,84 49.6,79.9 61,42"/>
+<polygon fill="#cc1f08" points="76,50 58,84 66.4,88.1 91,58"/>
+<polygon fill="#ff610a" points="58,84 44,116 44,116 49.6,79.9"/>
+<polygon fill="#cc1f08" points="58,84 44,116 44,116 66.4,88.1"/>
+<polygon fill="#cc1f08" points="60.2,33.3 32.9,73.2 14,114 14,114 51.1,90.8 91.8,66.7"/>
+<polygon fill="#ff610a" points="76,50 42,82 32.9,73.2 60.2,33.3"/>
+<polygon fill="#cc1f08" points="76,50 42,82 51.1,90.8 91.8,66.7"/>
+<polygon fill="#ff610a" points="42,82 14,114 14,114 32.9,73.2"/>
+<polygon fill="#cc1f08" points="42,82 14,114 14,114 51.1,90.8"/>
+<polygon fill="#ff610a" points="65.4,39.4 40.9,75.2 24,104 24,104 51.1,84.8 86.6,60.6"/>
+<polygon fill="#ffe666" points="76,50 46,80 40.9,75.2 65.4,39.4"/>
+<polygon fill="#ff610a" points="76,50 46,80 51.1,84.8 86.6,60.6"/>
+<polygon fill="#ffe666" points="46,80 24,104 24,104 40.9,75.2"/>
+<polygon fill="#ff610a" points="46,80 24,104 24,104 51.1,84.8"/>
+<polygon fill="#cc1f08" points="85.9,19.6 101.9,31.2 108,50 101.9,68.8 85.9,80.4 66.1,80.4 50.1,68.8 44,50 50.1,31.2 66.1,19.6"/>
+<polygon fill="#ff610a" points="85.9,19.6 101.9,31.2 108,50 90.7,47.4 87.5,37.7 79.2,31.6"/>
+<polygon fill="#cc1f08" points="108,50 101.9,68.8 85.9,80.4 66.1,80.4 68.9,63.3 79.2,63.3 87.5,57.2 90.7,47.4"/>
+<polygon fill="#ff610a" points="66.1,80.4 50.1,68.8 44,50 57.4,47.4 60.6,57.2 68.9,63.3"/>
+<polygon fill="#ffe666" points="44,50 50.1,31.2 66.1,19.6 85.9,19.6 79.2,31.6 68.9,31.6 60.6,37.7 57.4,47.4"/>
+<polygon fill="#ffe666" points="79.2,31.6 87.5,37.7 90.7,47.4 87.5,57.2 79.2,63.3 68.9,63.3 60.6,57.2 57.4,47.4 60.6,37.7 68.9,31.6"/>
+<polygon fill="#ffe666" points="70,34 78.6,40.2 75.3,50.3 64.7,50.3 61.4,40.2"/>
+<polygon fill="#ffe666" points="70,43 78.6,40.2 75.3,50.3 64.7,50.3"/>
+<polygon fill="#fff4d6" points="70,43 64.7,50.3 61.4,40.2 70,34 78.6,40.2"/>
+</svg>

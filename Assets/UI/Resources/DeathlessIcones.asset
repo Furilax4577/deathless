@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f99e4374da39e3e42a899959d7f36b95, type: 3}
+  m_Name: DeathlessIcones
+  m_EditorClassIdentifier: Assembly-CSharp::Deathless.UI.IconesUI
+  icones:
+  - id: assassin_arbalete
+    image: {fileID: 7388822144124034973, guid: 6be6f5eba0bf2ab4eaa895955644d83d, type: 3}
+  - id: assassin_dague
+    image: {fileID: 7388822144124034973, guid: 040e1980631b79141b47ae86a6069f77, type: 3}
+  - id: assassin_fumigene
+    image: {fileID: 7388822144124034973, guid: 0f1b851836a5f564590bd3e0a15b3524, type: 3}
+  - id: assassin_furtif
+    image: {fileID: 7388822144124034973, guid: 2e8156b248d993743b585ed687bc12a9, type: 3}
+  - id: classe_assassin
+    image: {fileID: 7388822144124034973, guid: ae1a5055bb37e8c499440834fbc6116e, type: 3}
+  - id: classe_druide
+    image: {fileID: 7388822144124034973, guid: b9e21ac8faa78a748a865da71b7a80a7, type: 3}
+  - id: classe_mage_feu
+    image: {fileID: 7388822144124034973, guid: d3e8d361ec307804c8aabc2bfa55d7bc, type: 3}
+  - id: classe_paladin
+    image: {fileID: 7388822144124034973, guid: 40ef2bc87c2ca5b4cae89c3606010b91, type: 3}
+  - id: classe_rodeur
+    image: {fileID: 7388822144124034973, guid: 10a3850a36590f144aa38bbbdf6398f6, type: 3}
+  - id: classe_viking
+    image: {fileID: 7388822144124034973, guid: 95fac20e118d38d4792d3dfa00fdc6b0, type: 3}
+  - id: commun_coup_critique
+    image: {fileID: 7388822144124034973, guid: 1c48d69886e9c76478c9f824937cc9b0, type: 3}
+  - id: commun_esquive
+    image: {fileID: 7388822144124034973, guid: 620acf40a9c0d6040a57f674168025f4, type: 3}
+  - id: commun_potion_soin
+    image: {fileID: 7388822144124034973, guid: 726cd297b1f252242a52b4e26bb1af57, type: 3}
+  - id: jauge_mana
+    image: {fileID: 7388822144124034973, guid: cd845de949da36c48b8d4d0e76f3eb9c, type: 3}
+  - id: jauge_rage
+    image: {fileID: 7388822144124034973, guid: c90b51c41b07d8d43bd08cd3cd9515d2, type: 3}
+  - id: mage_boule_de_feu
+    image: {fileID: 7388822144124034973, guid: 2cd51e5b798a01c4facf08282ba9b809, type: 3}
+  - id: mage_brulure
+    image: {fileID: 7388822144124034973, guid: 39cf60dd4dac8b14f9a9e4f811e574ca, type: 3}
+  - id: mage_cone_de_flammes
+    image: {fileID: 7388822144124034973, guid: d955bb1540ef3704fb7bdfa9efc73d27, type: 3}
+  - id: paladin_charge_belier
+    image: {fileID: 7388822144124034973, guid: 26548fc9380bdca4fb9bd11c9c9b23cf, type: 3}
+  - id: paladin_epee
+    image: {fileID: 7388822144124034973, guid: 51a8f2982011d1a48a048e332c9bcfe9, type: 3}
+  - id: paladin_garde
+    image: {fileID: 7388822144124034973, guid: cce95de9209dd4341b0251f1698f1ed3, type: 3}
+  - id: paladin_soin
+    image: {fileID: 7388822144124034973, guid: 245e643dc49b6f14e88cabd3d0f33c11, type: 3}
+  - id: rodeur_nuee_de_fleches
+    image: {fileID: 7388822144124034973, guid: 24607ad8457307c49acfcada19e1e5b6, type: 3}
+  - id: rodeur_roulade_salve
+    image: {fileID: 7388822144124034973, guid: 8e1e0019fff5f8240b76e9b0243f4a75, type: 3}
+  - id: rodeur_tir
+    image: {fileID: 7388822144124034973, guid: 24d831211db7c5643ba45418debbb41d, type: 3}
+  - id: rodeur_visee
+    image: {fileID: 7388822144124034973, guid: f497effde1d5451429a3d0abea25b18b, type: 3}
+  - id: viking_attaque_tournante
+    image: {fileID: 7388822144124034973, guid: 0966b98e095ddcf4bb96f01681947083, type: 3}
+  - id: viking_hache
+    image: {fileID: 7388822144124034973, guid: 96c9725ffa0292545958651f0c06af51, type: 3}
+  - id: viking_rugissement
+    image: {fileID: 7388822144124034973, guid: e0983b0c29823674794186ef56d966c5, type: 3}
+  - id: viking_saut_percutant
+    image: {fileID: 7388822144124034973, guid: 6f604fcea6cf7454f89c3221eeb4597e, type: 3}

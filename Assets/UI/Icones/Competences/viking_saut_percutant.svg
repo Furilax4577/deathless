@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+<!-- Deathless : viking_saut_percutant (Saut percutant). Généré par ArtSources/Icones/generer_icones.py -->
+<polygon fill="#b8966c" points="118,100 114.7,104.8 101.6,102.7 104,100"/>
+<polygon fill="#b8966c" points="114.7,104.8 105.4,109 94.6,105.1 101.6,102.7"/>
+<polygon fill="#b8966c" points="105.4,109 91,112.1 84,106.9 94.6,105.1"/>
+<polygon fill="#b8966c" points="91,112.1 73.4,113.8 70.9,107.9 84,106.9"/>
+<polygon fill="#b8966c" points="73.4,113.8 54.6,113.8 57.1,107.9 70.9,107.9"/>
+<polygon fill="#8a6a48" points="54.6,113.8 37,112.1 44,106.9 57.1,107.9"/>
+<polygon fill="#8a6a48" points="37,112.1 22.6,109 33.4,105.1 44,106.9"/>
+<polygon fill="#8a6a48" points="22.6,109 13.3,104.8 26.4,102.7 33.4,105.1"/>
+<polygon fill="#5b3f2a" points="13.3,104.8 10,100 24,100 26.4,102.7"/>
+<polygon fill="#5b3f2a" points="10,100 13.3,95.2 26.4,97.3 24,100"/>
+<polygon fill="#5b3f2a" points="13.3,95.2 22.6,91 33.4,94.9 26.4,97.3"/>
+<polygon fill="#5b3f2a" points="22.6,91 37,87.9 44,93.1 33.4,94.9"/>
+<polygon fill="#5b3f2a" points="37,87.9 54.6,86.2 57.1,92.1 44,93.1"/>
+<polygon fill="#5b3f2a" points="54.6,86.2 73.4,86.2 70.9,92.1 57.1,92.1"/>
+<polygon fill="#8a6a48" points="73.4,86.2 91,87.9 84,93.1 70.9,92.1"/>
+<polygon fill="#8a6a48" points="91,87.9 105.4,91 94.6,94.9 84,93.1"/>
+<polygon fill="#8a6a48" points="105.4,91 114.7,95.2 101.6,97.3 94.6,94.9"/>
+<polygon fill="#b8966c" points="114.7,95.2 118,100 104,100 101.6,97.3"/>
+<polygon fill="#5b3f2a" points="58,87 28.3,81 28.3,81 54.9,95.5"/>
+<polygon fill="#b8966c" points="56.5,91.3 28.3,81 28.3,81 58,87"/>
+<polygon fill="#8a6a48" points="56.5,91.3 28.3,81 28.3,81 54.9,95.5"/>
+<polygon fill="#5b3f2a" points="73.1,95.5 99.7,81 99.7,81 70,87"/>
+<polygon fill="#5b3f2a" points="71.5,91.3 99.7,81 99.7,81 73.1,95.5"/>
+<polygon fill="#b8966c" points="71.5,91.3 99.7,81 99.7,81 70,87"/>
+<polygon fill="#5b3f2a" points="61.9,84.8 34.3,64.3 34.3,64.3 54.8,91.9"/>
+<polygon fill="#8a6a48" points="58.3,88.3 34.3,64.3 34.3,64.3 61.9,84.8"/>
+<polygon fill="#8a6a48" points="58.3,88.3 34.3,64.3 34.3,64.3 54.8,91.9"/>
+<polygon fill="#5b3f2a" points="73.2,91.9 93.7,64.3 93.7,64.3 66.1,84.8"/>
+<polygon fill="#5b3f2a" points="69.7,88.3 93.7,64.3 93.7,64.3 73.2,91.9"/>
+<polygon fill="#b8966c" points="69.7,88.3 93.7,64.3 93.7,64.3 66.1,84.8"/>
+<polygon fill="#5b3f2a" points="64.7,85.1 52,64.3 52,64.3 57.3,88.1"/>
+<polygon fill="#8a6a48" points="61,86.6 52,64.3 52,64.3 64.7,85.1"/>
+<polygon fill="#8a6a48" points="61,86.6 52,64.3 52,64.3 57.3,88.1"/>
+<polygon fill="#5b3f2a" points="70.7,88.1 76,64.3 76,64.3 63.3,85.1"/>
+<polygon fill="#5b3f2a" points="67,86.6 76,64.3 76,64.3 70.7,88.1"/>
+<polygon fill="#b8966c" points="67,86.6 76,64.3 76,64.3 63.3,85.1"/>
+<polygon fill="#6e1410" points="34,12 64,34 94,12 94,26 64,48 34,26"/>
+<polygon fill="#b3261e" points="64,30 34,12 64,34"/>
+<polygon fill="#6e1410" points="64,30 64,34 94,12 94,26 64,48"/>
+<polygon fill="#b3261e" points="64,30 64,48 34,26"/>
+<polygon fill="#ff7359" points="64,30 34,26 34,12"/>
+<polygon fill="#6e1410" points="34,42 64,64 94,42 94,56 64,78 34,56"/>
+<polygon fill="#b3261e" points="64,60 34,42 64,64"/>
+<polygon fill="#6e1410" points="64,60 64,64 94,42 94,56 64,78"/>
+<polygon fill="#b3261e" points="64,60 64,78 34,56"/>
+<polygon fill="#ff7359" points="64,60 34,56 34,42"/>
+</svg>

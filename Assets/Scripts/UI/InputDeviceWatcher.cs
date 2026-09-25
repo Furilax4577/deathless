@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem.DualShock;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.XInput;
@@ -141,6 +142,10 @@ namespace Deathless.UI
                     break;
                 }
             }
+            // EnumerateChangedControls compare l'événement à l'état courant de l'appareil ; quand cet état a déjà été
+            // mis à jour (manette XInput, manette simulée), un appui ne s'y voit plus : après la souris, le premier A ne
+            // ramenait pas la manette. On lit donc aussi les boutons et les sticks directement dans l'événement.
+            if (!moved && !(device is Pointer)) moved = GesteDansEvenement(eventPtr, device);
             if (!moved) return;
 
             CurrentDevice = device;
@@ -149,6 +154,24 @@ namespace Deathless.UI
                 Current = family;
                 Changed?.Invoke(family);
             }
+        }
+
+        /// Un bouton enfoncé (au-delà de son point d'appui) ou un stick poussé au-delà du seuil, lu dans l'événement.
+        static bool GesteDansEvenement(InputEventPtr eventPtr, InputDevice device)
+        {
+            foreach (var control in device.allControls)
+            {
+                if (control.noisy || control.synthetic) continue;
+                if (control is ButtonControl bouton)
+                {
+                    if (bouton.ReadValueFromEvent(eventPtr, out var v) && v >= bouton.pressPointOrDefault) return true;
+                }
+                else if (control is StickControl stick)
+                {
+                    if (stick.ReadValueFromEvent(eventPtr, out var v) && v.magnitude >= MagnitudeThreshold) return true;
+                }
+            }
+            return false;
         }
     }
 }

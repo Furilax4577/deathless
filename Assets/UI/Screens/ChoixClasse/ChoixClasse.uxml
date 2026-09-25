@@ -10,12 +10,16 @@
             <!-- Liste des classes (boutons construits par EcranChoixClasse) -->
             <ui:VisualElement name="choix-liste" class="choix__liste" />
 
+            <!-- Personnage de la classe en 3D (IApercuClasse : RenderTexture d'une caméra dédiée) -->
+            <ui:VisualElement name="choix-apercu" class="choix__apercu">
+                <ui:VisualElement name="apercu-image" class="choix__apercu-image" />
+                <ui:Label text="Glisser ou stick droit : tourner" class="dl-text dl-text--small dl-text--muted choix__apercu-aide" />
+            </ui:VisualElement>
+
             <!-- Fiche de la classe sélectionnée -->
             <ui:VisualElement class="dl-panel choix__fiche">
                 <ui:VisualElement class="choix__fiche-entete">
-                    <ui:VisualElement name="fiche-portrait" class="choix__portrait">
-                        <ui:Label name="fiche-initiale" text="P" class="choix__portrait-initiale" />
-                    </ui:VisualElement>
+                    <ui:VisualElement name="fiche-embleme" class="dl-icone choix__embleme" />
                     <ui:VisualElement class="choix__fiche-titres">
                         <ui:Label name="fiche-nom" text="Paladin" class="dl-title choix__nom" />
                         <ui:Label name="fiche-role" text="Tank, une cible à la fois" class="dl-subtitle choix__role" />

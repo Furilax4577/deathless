@@ -27,6 +27,7 @@ namespace Deathless.Jeu
         void Start()
         {
             m_Camera = Camera.main;
+            if (DonneesUI.ApercuClasse == null) ApercuClasse.Creer();   // aperçu 3D de l'écran de choix de classe
             if (P == null) return;
             P.PartieLancee += () => { ConstruireEmplacements(); DonneesUI.Enregistrer(this, this, this, this); };
             P.NuitCommencee += n => NuitCommencee?.Invoke(n);

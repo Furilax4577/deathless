@@ -29,8 +29,10 @@
 .menu__version { position: absolute; right: 60px; top: 36px; font-size: var(--dl-text-small); color: #e9eef5; margin: 0; padding: 0; }
 
 .menu__classe-entete { flex-direction: row; align-items: center; margin-top: 6px; }
-.menu__classe-pastille { width: 60px; height: 60px; border-radius: 30px; border-width: 3px; border-color: var(--dl-color-text); align-items: center; justify-content: center; margin-right: 18px; }
-.menu__classe-initiale { -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Bold-SDF.asset"); font-size: 27px; color: var(--dl-color-ink); margin: 0; padding: 0; }
+.menu__classe-embleme { width: 72px; height: 72px; margin-right: 18px; }
+.menu__classe-icones { flex-direction: row; margin-top: var(--dl-space-2); }
+.menu__classe-icone { width: 48px; height: 48px; margin-right: 12px; padding: 6px; border-radius: 12px; background-color: var(--dl-color-panel); border-width: 2px; border-color: var(--dl-color-border); }
+.menu__classe-icone > .dl-icone { flex-grow: 1; }
 .menu__classe-nom { margin: 0; }
 .menu__classe-arme { margin: 0; color: var(--dl-color-text-muted); }
 
@@ -39,18 +41,19 @@
 .choix__entete { margin-bottom: var(--dl-space-4); }
 .choix__aide { margin: 3px 0 0 0; }
 .choix__corps { flex-direction: row; flex-grow: 1; flex-shrink: 1; margin-bottom: 120px; }
-.choix__liste { width: 600px; flex-shrink: 0; }
-.choix-classe { flex-direction: row; align-items: center; justify-content: flex-start; min-height: 114px; margin: 0 0 12px 0; padding: 0 24px; border-radius: 18px; }
-.choix-classe__pastille { width: 72px; height: 72px; border-radius: 36px; border-width: 3px; border-color: var(--dl-color-text); align-items: center; justify-content: center; margin-right: 21px; flex-shrink: 0; }
-.choix-classe__initiale { -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Bold-SDF.asset"); font-size: 33px; color: var(--dl-color-ink); margin: 0; padding: 0; }
+.choix__liste { width: 470px; flex-shrink: 0; }
+.choix-classe { flex-direction: row; align-items: center; justify-content: flex-start; min-height: 110px; margin: 0 0 12px 0; padding: 0 21px; border-radius: 18px; }
+.choix-classe__embleme { width: 72px; height: 72px; margin-right: 18px; }
+.choix__apercu { width: 470px; flex-shrink: 0; margin-left: 30px; align-items: center; justify-content: flex-end; }
+.choix__apercu-image { width: 100%; flex-grow: 1; -unity-background-scale-mode: scale-to-fit; }
+.choix__apercu-aide { margin: 6px 0 0 0; }
 .choix-classe__textes { flex-grow: 1; align-items: flex-start; }
 .choix-classe__nom { -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); font-size: var(--dl-text-large); margin: 0; padding: 0; }
 .choix-classe__role { font-size: var(--dl-text-small); color: var(--dl-color-text-muted); margin: 0; padding: 0; }
-.choix-classe__derniere { font-size: var(--dl-text-caption); color: var(--dl-color-gold); margin: 0; padding: 3px 12px; border-radius: 15px; border-width: 2px; border-color: var(--dl-color-gold); }
-.choix__fiche { flex-grow: 1; margin-left: 36px; padding: 30px 39px; background-color: rgba(35, 42, 58, 0.97); }
+.choix-classe__derniere { display: none; font-size: var(--dl-text-caption); color: var(--dl-color-gold); margin: 0; padding: 3px 12px; border-radius: 15px; border-width: 2px; border-color: var(--dl-color-gold); }
+.choix__fiche { flex-grow: 1; flex-basis: 0; margin-left: 30px; padding: 30px 36px; background-color: rgba(35, 42, 58, 0.97); }
+.choix__embleme { width: 108px; height: 108px; margin-right: 24px; }
 .choix__fiche-entete { flex-direction: row; align-items: center; margin-bottom: var(--dl-space-3); }
-.choix__portrait { width: 108px; height: 108px; border-radius: 54px; border-width: 4px; border-color: var(--dl-color-text); align-items: center; justify-content: center; margin-right: 27px; }
-.choix__portrait-initiale { -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Bold-SDF.asset"); font-size: 48px; color: var(--dl-color-ink); margin: 0; padding: 0; }
 .choix__nom { margin: 0; }
 .choix__role { margin: 0; }
 .choix__arme { margin: 0 0 var(--dl-space-2) 0; }
@@ -58,10 +61,12 @@
 .choix__jauge { margin: 0; color: var(--dl-color-gold); }
 .choix__titre-actions { margin-top: var(--dl-space-3); }
 .choix-action { flex-direction: row; align-items: center; min-height: 60px; border-top-width: 1px; border-color: var(--dl-color-line); }
-.choix-action__invite { width: 180px; flex-shrink: 0; --dl-prompt-size: 42px; --dl-key-height: 30px; --dl-key-text: 16px; }
+.choix-action__icone { width: 44px; height: 44px; margin-right: 15px; }
+.choix-action__invite { width: 150px; flex-shrink: 0; --dl-prompt-size: 42px; --dl-key-height: 30px; --dl-key-text: 16px; }
 .choix-action__nom { font-size: var(--dl-text-body); margin: 0; padding: 0; }
 .choix-action--vide .choix-action__nom { color: var(--dl-color-text-disabled); }
 .choix-action--vide .choix-action__invite { opacity: 0.4; }
+.choix-action--vide .choix-action__icone { opacity: 0; }
 
 /* ---------- Pause ---------- */
 .pause {
@@ -222,14 +227,18 @@
 .dl-scale-3 .choix__entete > .dl-title { font-size: 40px; }
 .dl-scale-3 .choix__aide { display: none; }
 .dl-scale-3 .choix__corps { margin-bottom: 100px; }
-.dl-scale-3 .choix__liste { width: 430px; }
-.dl-scale-3 .choix-classe { min-height: 84px; margin-bottom: 8px; padding: 0 16px; }
-.dl-scale-3 .choix-classe__pastille { width: 54px; height: 54px; border-radius: 27px; margin-right: 14px; }
-.dl-scale-3 .choix-classe__initiale { font-size: 26px; }
-.dl-scale-3 .choix__fiche { margin-left: 24px; padding: 18px 24px; }
+.dl-scale-3 .choix__liste { width: 360px; }
+.dl-scale-3 .choix-classe { min-height: 84px; margin-bottom: 8px; padding: 0 14px; }
+.dl-scale-3 .choix-classe__embleme { width: 54px; height: 54px; margin-right: 12px; }
+.choix-classe--derniere .choix-classe__derniere { display: flex; }
+.dl-scale-3 .choix-classe--derniere .choix-classe__derniere { display: none; }
+.dl-scale-3 .choix__apercu { width: 300px; margin-left: 18px; }
+.dl-scale-3 .choix__apercu-aide { display: none; }
+.dl-scale-3 .choix__fiche { margin-left: 18px; padding: 18px 22px; }
 .dl-scale-3 .choix__fiche-entete { margin-bottom: var(--dl-space-1); }
-.dl-scale-3 .choix__portrait { width: 72px; height: 72px; border-radius: 36px; margin-right: 18px; }
-.dl-scale-3 .choix__portrait-initiale { font-size: 33px; }
+.dl-scale-3 .choix__embleme { width: 72px; height: 72px; margin-right: 16px; }
+.dl-scale-3 .choix-action__icone { width: 36px; height: 36px; margin-right: 10px; }
+.dl-scale-3 .choix-action__invite { width: 110px; }
 .dl-scale-3 .choix__nom { font-size: 40px; }
 .dl-scale-3 .choix__titre-actions { margin-top: var(--dl-space-1); }
 .dl-scale-3 .choix-action { min-height: 46px; }

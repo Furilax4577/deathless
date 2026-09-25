@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+<!-- Deathless : classe_paladin (Paladin). Généré par ArtSources/Icones/generer_icones.py -->
+<polygon fill="#b8903a" points="64,2 117.7,33 117.7,95 64,126 10.3,95 10.3,33"/>
+<polygon fill="#e8c872" points="64,2 117.7,33 108.2,38.5 64,13"/>
+<polygon fill="#e8c872" points="117.7,33 117.7,95 108.2,89.5 108.2,38.5"/>
+<polygon fill="#b8903a" points="117.7,95 64,126 64,115 108.2,89.5"/>
+<polygon fill="#e8c872" points="64,126 10.3,95 19.8,89.5 64,115"/>
+<polygon fill="#e8c872" points="10.3,95 10.3,33 19.8,38.5 19.8,89.5"/>
+<polygon fill="#f4e2a8" points="10.3,33 64,2 64,13 19.8,38.5"/>
+<polygon fill="#5a7aa0" points="19.8,89.5 19.8,38.5 64,13 108.2,38.5"/>
+<polygon fill="#1e2a3a" points="108.2,38.5 108.2,89.5 64,115 19.8,89.5"/>
+<polygon fill="#5a7aa0" points="60,23 60,36 68,36 68,23"/>
+<polygon fill="#b8903a" points="64,23 64,36 60,36 60,23"/>
+<polygon fill="#5a7aa0" points="64,23 64,36 68,36 68,23"/>
+<polygon fill="#b8903a" points="64,13 70.5,20 64,27 57.5,20"/>
+<polygon fill="#e8c872" points="64,20 64,13 70.5,20"/>
+<polygon fill="#b8903a" points="64,20 70.5,20 64,27"/>
+<polygon fill="#e8c872" points="64,20 64,27 57.5,20"/>
+<polygon fill="#f4e2a8" points="64,20 57.5,20 64,13"/>
+<polygon fill="#5a7aa0" points="58,38 58.9,96.8 64,110 64,110 69.1,96.8 70,38"/>
+<polygon fill="#f4e2a8" points="64,38 64,96.8 58.9,96.8 58,38"/>
+<polygon fill="#5a7aa0" points="64,38 64,96.8 69.1,96.8 70,38"/>
+<polygon fill="#f4e2a8" points="64,96.8 64,110 64,110 58.9,96.8"/>
+<polygon fill="#5a7aa0" points="64,96.8 64,110 64,110 69.1,96.8"/>
+<polygon fill="#b8903a" points="81,33.5 64,32 47,33.5 47,38.5 64,40 81,38.5"/>
+<polygon fill="#f4e2a8" points="81,36 64,36 64,32 81,33.5"/>
+<polygon fill="#b8903a" points="81,36 64,36 64,40 81,38.5"/>
+<polygon fill="#f4e2a8" points="64,36 47,36 47,33.5 64,32"/>
+<polygon fill="#b8903a" points="64,36 47,36 47,38.5 64,40"/>
+<polygon fill="#b8903a" points="40,42 88,42 88,64 84,80 76,92 64,102 52,92 44,80 40,64"/>
+<polygon fill="#b8903a" points="88,42 88,64 84,80 76,92 64,102 62.6,92 71.2,84.8 77,76.2 79.9,64.7 79.9,48.8"/>
+<polygon fill="#e8c872" points="64,102 52,92 44,80 40,64 45.3,64.7 48.2,76.2 53.9,84.8 62.6,92"/>
+<polygon fill="#f4e2a8" points="40,64 40,42 88,42 79.9,48.8 45.3,48.8 45.3,64.7"/>
+<polygon fill="#e8c872" points="45.3,48.8 79.9,48.8 79.9,64.7 77,76.2 71.2,84.8 62.6,92 53.9,84.8 48.2,76.2 45.3,64.7"/>
+<polygon fill="#1e2a3a" points="60,50 68,50 68,62 80,62 80,70 68,70 68,92 64,96 60,92 60,70 48,70 48,62 60,62"/>
+</svg>

@@ -18,7 +18,8 @@ Démo : scène `Assets/Scenes/UISocle.unity`. Captures : `Assets/Screenshots/UIS
 | `Assets/UI/Resources/DeathlessInputGlyphs.asset` | Table des icônes (`InputGlyphs`), chargée par `Resources`. Référence `DeathlessControls`. |
 | `Assets/UI/Screens/<Écran>/` | Un dossier par écran : `.uxml` et `.uss` propres à l'écran (ex. `UISocle/`). |
 | `Assets/Input/DeathlessControls.inputactions` | Actions (cartes Gameplay et UI, schémas Gamepad et KeyboardMouse) et classe générée `DeathlessControls.cs`. |
-| `Assets/Scripts/UI/` | `InputDeviceWatcher`, `InputGlyphs`, `InputPrompt`, `Gauge`, `UIScale`, `UINavigation` (espace de noms `Deathless.UI`). |
+| `Assets/Scripts/UI/` | `InputDeviceWatcher`, `InputGlyphs`, `InputPrompt`, `Gauge`, `UIScale`, `UINavigation`, `IconesUI` (espace de noms `Deathless.UI`). |
+| `Assets/UI/Icones/`, `Assets/UI/Resources/DeathlessIcones.asset` | Icônes vectorielles (SVG → VectorImage) et leur table : voir « Icônes vectorielles ». |
 | `Assets/Scripts/Input/InputChordResolver.cs` | Résolveur de l'accord de la manette (LB + RB), espace de noms `Deathless.Controls`. |
 | `Assets/Scripts/UI/Dev/UISocleDemo.cs` | Script de la scène de démonstration. |
 | `Assets/Editor/UI/DeathlessUISetup.cs` | Menu **Deathless > UI** : régénère polices, PanelSettings, table d'icônes et scène de démo (rejouable, garde les GUID). |
@@ -149,11 +150,20 @@ Vérifié en Play (événements simulés et horodatés sur une manette XInput ; 
 
 ### Appareil actif
 
-`InputDeviceWatcher` (statique, installé au lancement par `RuntimeInitializeOnLoadMethod`) écoute `InputSystem.onEvent` ; un événement d'état ne compte que si un contrôle change d'au moins 0,35 (pas de bascule sur la dérive d'un stick). Classement : `Keyboard`/`Mouse` → KeyboardMouse ; `DualShockGamepad` (DualShock 4, DualSense) ou fabricant Sony → PlayStation ; `XInputController` et **toute autre manette** → Xbox. `Current`, `CurrentDevice`, `CurrentControlScheme`, `Changed`, `SetCurrent()` (forçage).
+`InputDeviceWatcher` (statique, installé au lancement par `RuntimeInitializeOnLoadMethod`) écoute `InputSystem.onEvent` ; un événement d'état ne compte que si un contrôle change d'au moins 0,35 (pas de bascule sur la dérive d'un stick), **ou**, pour une manette ou le clavier, si l'événement porte un bouton enfoncé (au-delà de son point d'appui) ou un stick poussé au-delà de 0,35 (correctif du 25/09/2026 : la comparaison avec l'état courant ne voyait plus l'appui quand cet état était déjà à jour, et le premier A après la souris ne ramenait pas la manette ni ses invites ; vérifié : trois fois de suite, un seul appui A après la souris repasse sur Xbox et valide le bouton sous le focus). Classement : `Keyboard`/`Mouse` → KeyboardMouse ; `DualShockGamepad` (DualShock 4, DualSense) ou fabricant Sony → PlayStation ; `XInputController` et **toute autre manette** → Xbox. `Current`, `CurrentDevice`, `CurrentControlScheme`, `Changed`, `SetCurrent()` (forçage).
 
-### Icônes
+### Icônes de boutons
 
 `InputGlyphs` (ScriptableObject) : trois listes `contrôle → Texture2D` (chemin sans appareil, en minuscules : `buttonsouth`, `dpad/up`, `leftshoulder`, `space`, `f1`, `leftbutton`…) et une icône d'appareil par famille. Remplie par **Deathless > UI > 3. Table des icônes** depuis `Assets/Art/UI/KenneyInputPrompts/*/Double/`. Choix : boutons de façade en couleur (`xbox_button_color_*`, `playstation_button_color_*`), gâchettes et épaules blanches, PlayStation en icônes PS5 (`playstation5_button_options`, `playstation5_touchpad_press`), clavier en icônes pleines (`keyboard_*`, variantes à symbole pour Espace, Tab, Maj, Retour arrière), souris `mouse_left`, `mouse_right`, `mouse_move`.
+
+## Icônes vectorielles (classes, compétences, HUD)
+
+Sources : `ArtSources/Icones/` (SVG générés par `generer_icones.py`, conventions et table icône → bouton dans `LISEZMOI.md`, planche `Docs/icones/planche.html`). Copies dans le projet : `Assets/UI/Icones/Classes/` (emblèmes hexagonaux `classe_*`, sans les variantes `classe_druide_a/b/c`) et `Assets/UI/Icones/Competences/` (actions, jauges, `commun_*` ; pas les icônes provisoires du druide).
+
+- **Import** : module Vector Graphics intégré à Unity 6 (`com.unity.modules.vectorgraphics`), type **VectorImage** (UI Toolkit), **PreserveViewport** : chaque icône garde le cadre 128 × 128 de son SVG, donc toutes ont la même échelle et restent nettes à ×1, ×2 et ×3. Réglages posés automatiquement à l'import de tout SVG du dossier (`Assets/Editor/UI/IconesUIOutil.cs`, `OnPreprocessAsset`). Rendu vérifié de 33 à 74 px à l’écran (liste des actions, HUD ×1 à ×3) : facettes nettes, pas de flou. Pas besoin de PNG rastérisés.
+- **Table** : `Assets/UI/Resources/DeathlessIcones.asset` (`Deathless.UI.IconesUI`) : identifiant (nom du SVG sans extension) → VectorImage. Reconstruite toute seule quand un SVG est ajouté, supprimé ou déplacé dans `Assets/UI/Icones/`, ou par **Deathless > UI > 6. Table des icônes (SVG)**. API : `IconesUI.Trouver(id)`, `IconesUI.Poser(element, id)` (fond de l'élément, masqué si l'icône manque), `IconesUI.Creer(id, classeUss)` ; classe USS `dl-icone` (image ajustée à la boîte, sans déformation). Constantes des icônes du HUD : `IconesUI.Mana`, `Rage`, `Furtif`, `Potion`, `Esquive`, `CoupCritique`.
+- **Liens action → icône** : dans les données, jamais dans le code des écrans. Actions des classes : `IActionClasse.Icone` et emblème `IClasseJouable.Embleme` (catalogue `ClassesJouables.Catalogue`, `Donnees/IClasses.cs`), lus par le HUD (`ClassesJouables.IconeAction(classe, action)`), l'écran de choix et la carte du menu principal.
+- **Ajouter une icône** : générer le SVG dans `ArtSources/Icones/`, le copier dans `Assets/UI/Icones/Classes/` ou `Competences/` (le nom devient l'identifiant), puis renseigner cet identifiant dans la donnée qui l'utilise (`ClassesJouables.Catalogue` pour une action ou un emblème, constante `IconesUI` pour un élément du HUD). Rien d'autre à régler.
 
 ## Actions et liaisons
 

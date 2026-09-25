@@ -21,6 +21,9 @@ namespace Deathless.UI.Donnees
 
         /// Nom affiché (« Charge bélier »). Null ou vide : emplacement vide (affiché grisé).
         string Nom { get; }
+
+        /// Identifiant de l'icône (nom du SVG sans extension, table IconesUI) : « paladin_charge_belier ». Null : aucune.
+        string Icone { get; }
     }
 
     /// Une classe jouable (écran de choix de classe, carte du menu principal).
@@ -37,6 +40,8 @@ namespace Deathless.UI.Donnees
         string Description { get; }
         /// Teinte du portrait.
         Color Teinte { get; }
+        /// Identifiant de l'emblème hexagonal (table IconesUI) : « classe_paladin ».
+        string Embleme { get; }
         JaugeClasse Jauge { get; }
         /// Attaque principale, attaque secondaire, compétences 1, 2, 3 (dans cet ordre).
         IReadOnlyList<IActionClasse> Actions { get; }
@@ -67,6 +72,33 @@ namespace Deathless.UI.Donnees
         bool Furtif { get; }
     }
 
+    /// Aperçu 3D de la classe dans l'écran de choix (facultatif, fourni par le jeu : DonneesUI.ApercuClasse). Une caméra
+    /// dédiée rend le héros de la classe (modèle, arme, pose de repos) sur un socle, dans une RenderTexture que l'écran
+    /// affiche. La caméra n'est active que pendant Montrer … Cacher.
+    public interface IApercuClasse
+    {
+        /// Image rendue (RenderTexture, fond transparent).
+        Texture Rendu { get; }
+
+        /// Affiche la classe (changement immédiat, apparition par la taille) et active la caméra.
+        void Montrer(string classeId);
+
+        /// Désactive la caméra (écran de choix fermé).
+        void Cacher();
+
+        /// Rotation manuelle en degrés (souris glissée, stick droit), en plus de la rotation lente continue.
+        void Tourner(float degres);
+    }
+
+    /// Potions du joueur local (facultatif, rétrocompatible) : l'objet enregistré comme IEtatJoueur l'implémente s'il gère
+    /// des potions ; le HUD affiche alors, à droite des jauges, l'icône de la potion, le nombre restant et l'invite de
+    /// Gameplay/DrinkPotion (croix haut, 1).
+    public interface IEtatJoueurPotions
+    {
+        int Potions { get; }
+        int PotionsMax { get; }
+    }
+
     /// Catalogue des cinq classes (Wiki/pages/classes.md et commandes.md) et mémoire de la dernière classe jouée.
     public static class ClassesJouables
     {
@@ -75,9 +107,10 @@ namespace Deathless.UI.Donnees
 
         sealed class ActionClasse : IActionClasse
         {
-            public ActionClasse(string action, string nom) { Action = action; Nom = nom; }
+            public ActionClasse(string action, (string nom, string icone) a) { Action = action; Nom = a.nom; Icone = a.icone; }
             public string Action { get; }
             public string Nom { get; }
+            public string Icone { get; }
         }
 
         sealed class Classe : IClasseJouable
@@ -88,11 +121,19 @@ namespace Deathless.UI.Donnees
             public string Arme { get; set; }
             public string Description { get; set; }
             public Color Teinte { get; set; }
+            public string Embleme { get; set; }
             public JaugeClasse Jauge { get; set; }
             public IReadOnlyList<IActionClasse> Actions { get; set; }
         }
 
-        static IActionClasse[] Actions(string rt, string lt, string lb, string rb, string lbrb = null) => new IActionClasse[]
+        static readonly (string, string) Vide = (null, null);
+
+        /// Actions RT, LT, LB, RB, LB + RB : (nom affiché, identifiant de l'icône). Table icône → bouton :
+        /// ArtSources/Icones/LISEZMOI.md.
+        static IActionClasse[] Actions((string, string) rt, (string, string) lt, (string, string) lb, (string, string) rb) =>
+            Actions(rt, lt, lb, rb, Vide);
+
+        static IActionClasse[] Actions((string, string) rt, (string, string) lt, (string, string) lb, (string, string) rb, (string, string) lbrb) => new IActionClasse[]
         {
             new ActionClasse("Gameplay/AttackPrimary", rt),
             new ActionClasse("Gameplay/AttackSecondary", lt),
@@ -112,42 +153,63 @@ namespace Deathless.UI.Donnees
             {
                 Id = "paladin", Nom = "Paladin", Role = "Tank, une cible à la fois", Arme = "Épée et bouclier",
                 Description = "Il tient la ligne : la garde bloque les coups et devient une parade au bon moment.",
-                Teinte = Hex("#d9b264"), Jauge = JaugeClasse.Aucune,
-                Actions = Actions("Frappe à l’épée", "Garde et parade", "Charge bélier", "Soin sur soi"),
+                Teinte = Hex("#d9b264"), Embleme = "classe_paladin", Jauge = JaugeClasse.Aucune,
+                Actions = Actions(("Frappe à l’épée", "paladin_epee"), ("Garde et parade", "paladin_garde"),
+                    ("Charge bélier", "paladin_charge_belier"), ("Soin sur soi", "paladin_soin")),
             },
             new Classe
             {
                 Id = "mage", Nom = "Mage", Role = "Distance, zone", Arme = "Bâton",
                 Description = "Boules de feu et flammes : les ennemis touchés brûlent. Ses sorts coûtent du mana.",
-                Teinte = Hex("#ff610a"), Jauge = JaugeClasse.Mana,
-                Actions = Actions("Boule de feu", "Cône de flammes (maintenu)", null, null),
+                Teinte = Hex("#ff610a"), Embleme = "classe_mage_feu", Jauge = JaugeClasse.Mana,
+                Actions = Actions(("Boule de feu", "mage_boule_de_feu"), ("Cône de flammes (maintenu)", "mage_cone_de_flammes"), Vide, Vide),
             },
             new Classe
             {
                 Id = "rodeur", Nom = "Rôdeur", Role = "Distance, précision", Arme = "Arc et carquois",
                 Description = "Plus l’arc est bandé, plus le tir fait mal. Une flèche dans la tête est un coup critique.",
-                Teinte = Hex("#a8742f"), Jauge = JaugeClasse.Aucune,
-                Actions = Actions("Bander et tirer", "Viser", "Nuée de flèches", "Roulade arrière et salve"),
+                Teinte = Hex("#a8742f"), Embleme = "classe_rodeur", Jauge = JaugeClasse.Aucune,
+                Actions = Actions(("Bander et tirer", "rodeur_tir"), ("Viser", "rodeur_visee"),
+                    ("Nuée de flèches", "rodeur_nuee_de_fleches"), ("Roulade arrière et salve", "rodeur_roulade_salve")),
             },
             new Classe
             {
                 Id = "assassin", Nom = "Assassin", Role = "Furtif, coups critiques", Arme = "Dague, arbalète dans le dos",
                 Description = "En marchant, il devient furtif. Un coup non détecté ou porté dans le dos est un coup critique.",
-                Teinte = Hex("#a58ad6"), Jauge = JaugeClasse.Aucune,
-                Actions = Actions("Dague", "Arbalète en main, visée", "Grenade fumigène", null),
+                Teinte = Hex("#a58ad6"), Embleme = "classe_assassin", Jauge = JaugeClasse.Aucune,
+                Actions = Actions(("Dague", "assassin_dague"), ("Arbalète en main, visée", "assassin_arbalete"),
+                    ("Grenade fumigène", "assassin_fumigene"), Vide),
             },
             new Classe
             {
                 Id = "viking", Nom = "Viking", Role = "Mêlée, zone", Arme = "Hache à deux mains",
                 Description = "Chaque coup fait monter sa rage, que ses compétences consomment.",
-                Teinte = Hex("#b3261e"), Jauge = JaugeClasse.Rage,
-                Actions = Actions("Hache", "Attaque tournante (maintenue)", "Rugissement", "Saut percutant"),
+                Teinte = Hex("#b3261e"), Embleme = "classe_viking", Jauge = JaugeClasse.Rage,
+                Actions = Actions(("Hache", "viking_hache"), ("Attaque tournante (maintenue)", "viking_attaque_tournante"),
+                    ("Rugissement", "viking_rugissement"), ("Saut percutant", "viking_saut_percutant")),
             },
         };
 
         /// Classes proposées : celles du jeu s'il les fournit, sinon le catalogue.
         public static IReadOnlyList<IClasseJouable> Proposees =>
             (DonneesUI.Commandes as IClassesJouables)?.Classes ?? Catalogue;
+
+        /// Classe par identifiant ou par nom affiché (IEtatJoueur.Classe donne le nom).
+        public static IClasseJouable TrouverParNom(string nom)
+        {
+            if (string.IsNullOrEmpty(nom)) return null;
+            foreach (var c in Proposees) if (c.Nom == nom || c.Id == nom) return c;
+            foreach (var c in Catalogue) if (c.Nom == nom || c.Id == nom) return c;
+            return null;
+        }
+
+        /// Icône de l'action `action` (« Gameplay/Skill1 ») de la classe, ou null.
+        public static string IconeAction(IClasseJouable classe, string action)
+        {
+            if (classe == null || string.IsNullOrEmpty(action)) return null;
+            foreach (var a in classe.Actions) if (a.Action == action) return string.IsNullOrEmpty(a.Nom) ? null : a.Icone;
+            return null;
+        }
 
         public static IClasseJouable Trouver(string id)
         {

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Deathless.Audio;
 using Deathless.UI.Donnees;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 namespace Deathless.UI.Ecrans
@@ -12,15 +13,15 @@ namespace Deathless.UI.Ecrans
     {
         public override bool Opaque => true;
         Button m_Solo;
-        VisualElement m_Pastille;
-        Label m_Initiale, m_Nom, m_Arme, m_Actions;
+        VisualElement m_Embleme, m_Icones;
+        Label m_Nom, m_Arme, m_Actions;
 
         protected override void Construire()
         {
             m_Solo = Racine.Q<Button>("menu-solo");
             m_Solo.clicked += () => Navigateur.Ouvrir(Navigateur.ChoixClasse);
-            m_Pastille = Racine.Q("menu-classe-pastille");
-            m_Initiale = Racine.Q<Label>("menu-classe-initiale");
+            m_Embleme = Racine.Q("menu-classe-embleme");
+            m_Icones = Racine.Q("menu-classe-icones");
             m_Nom = Racine.Q<Label>("menu-classe-nom");
             m_Arme = Racine.Q<Label>("menu-classe-arme");
             m_Actions = Racine.Q<Label>("menu-classe-actions");
@@ -38,8 +39,16 @@ namespace Deathless.UI.Ecrans
         {
             var c = ClassesJouables.Derniere;
             if (c == null || m_Nom == null) return;
-            m_Pastille.style.backgroundColor = c.Teinte;
-            m_Initiale.text = c.Nom.Substring(0, 1);
+            IconesUI.Poser(m_Embleme, c.Embleme);
+            m_Icones.Clear();
+            foreach (var a in c.Actions)
+            {
+                if (string.IsNullOrEmpty(a.Nom) || IconesUI.Trouver(a.Icone) == null) continue;
+                var cadre = new VisualElement { tooltip = a.Nom };
+                cadre.AddToClassList("menu__classe-icone");
+                cadre.Add(IconesUI.Creer(a.Icone));
+                m_Icones.Add(cadre);
+            }
             m_Nom.text = c.Nom;
             m_Arme.text = c.Arme;
             m_Actions.text = EcranChoixClasse.ResumeActions(c);
@@ -54,9 +63,15 @@ namespace Deathless.UI.Ecrans
 
         readonly List<Button> m_Boutons = new List<Button>();
         readonly List<IClasseJouable> m_Classes = new List<IClasseJouable>();
-        readonly List<(VisualElement ligne, Label nom)> m_LignesActions = new List<(VisualElement, Label)>();
-        VisualElement m_Liste, m_Portrait, m_Actions;
-        Label m_Initiale, m_Nom, m_Role, m_Arme, m_Description, m_Jauge;
+        readonly List<(VisualElement ligne, VisualElement icone, Label nom)> m_LignesActions = new List<(VisualElement, VisualElement, Label)>();
+        VisualElement m_Liste, m_Embleme, m_Actions, m_Apercu, m_ApercuImage;
+        Label m_Nom, m_Role, m_Arme, m_Description, m_Jauge;
+        IApercuClasse m_ApercuActif;
+        bool m_Glisse;
+        float m_GlisseX;
+
+        /// Rotation du personnage : degrés par pixel glissé, et par seconde au stick droit poussé à fond.
+        public static float RotationSouris = 0.45f, RotationStick = 160f;
         IReadOnlyList<IClasseJouable> m_Source;
         IClasseJouable m_Affichee;
 
@@ -66,8 +81,18 @@ namespace Deathless.UI.Ecrans
         protected override void Construire()
         {
             m_Liste = Racine.Q("choix-liste");
-            m_Portrait = Racine.Q("fiche-portrait");
-            m_Initiale = Racine.Q<Label>("fiche-initiale");
+            m_Embleme = Racine.Q("fiche-embleme");
+            m_Apercu = Racine.Q("choix-apercu");
+            m_ApercuImage = Racine.Q("apercu-image");
+            // Souris : glisser sur le personnage le fait tourner.
+            m_ApercuImage.RegisterCallback<PointerDownEvent>(e => { m_Glisse = true; m_GlisseX = e.position.x; m_ApercuImage.CapturePointer(e.pointerId); });
+            m_ApercuImage.RegisterCallback<PointerMoveEvent>(e =>
+            {
+                if (!m_Glisse) return;
+                m_ApercuActif?.Tourner((e.position.x - m_GlisseX) * RotationSouris);
+                m_GlisseX = e.position.x;
+            });
+            m_ApercuImage.RegisterCallback<PointerUpEvent>(e => { m_Glisse = false; m_ApercuImage.ReleasePointer(e.pointerId); });
             m_Nom = Racine.Q<Label>("fiche-nom");
             m_Role = Racine.Q<Label>("fiche-role");
             m_Arme = Racine.Q<Label>("fiche-arme");
@@ -79,14 +104,16 @@ namespace Deathless.UI.Ecrans
             {
                 var ligne = new VisualElement();
                 ligne.AddToClassList("choix-action");
+                var icone = IconesUI.Creer(null, "choix-action__icone");
                 var invite = new InputPrompt(action);
                 invite.AddToClassList("choix-action__invite");
                 var nom = new Label();
                 nom.AddToClassList("choix-action__nom");
+                ligne.Add(icone);
                 ligne.Add(invite);
                 ligne.Add(nom);
                 m_Actions.Add(ligne);
-                m_LignesActions.Add((ligne, nom));
+                m_LignesActions.Add((ligne, icone, nom));
             }
         }
 
@@ -104,12 +131,7 @@ namespace Deathless.UI.Ecrans
                 var classe = c;
                 var b = new Button { name = "classe-" + c.Id };
                 b.AddToClassList("choix-classe");
-                var pastille = new VisualElement();
-                pastille.AddToClassList("choix-classe__pastille");
-                pastille.style.backgroundColor = c.Teinte;
-                var initiale = new Label(c.Nom.Substring(0, 1));
-                initiale.AddToClassList("choix-classe__initiale");
-                pastille.Add(initiale);
+                var embleme = IconesUI.Creer(c.Embleme, "choix-classe__embleme");
                 var textes = new VisualElement();
                 textes.AddToClassList("choix-classe__textes");
                 var nom = new Label(c.Nom);
@@ -120,7 +142,7 @@ namespace Deathless.UI.Ecrans
                 textes.Add(role);
                 var derniere = new Label("Dernière") { name = "derniere" };
                 derniere.AddToClassList("choix-classe__derniere");
-                b.Add(pastille);
+                b.Add(embleme);
                 b.Add(textes);
                 b.Add(derniere);
                 b.RegisterCallback<FocusInEvent>(_ => Afficher(classe));
@@ -139,7 +161,7 @@ namespace Deathless.UI.Ecrans
         {
             var id = ClassesJouables.DerniereJouee;
             for (var i = 0; i < m_Boutons.Count; i++)
-                m_Boutons[i].Q("derniere").style.display = m_Classes[i].Id == id ? DisplayStyle.Flex : DisplayStyle.None;
+                m_Boutons[i].EnableInClassList("choix-classe--derniere", m_Classes[i].Id == id);
         }
 
         int IndexDerniere()
@@ -152,7 +174,28 @@ namespace Deathless.UI.Ecrans
         public override void AuSommet()
         {
             Remplir();
+            // Aperçu 3D fourni par le jeu (sinon la colonne est masquée : banc UIv01).
+            m_ApercuActif = DonneesUI.ApercuClasse;
+            m_Apercu.style.display = m_ApercuActif != null ? DisplayStyle.Flex : DisplayStyle.None;
+            if (m_ApercuActif != null && m_ApercuActif.Rendu is RenderTexture rt)
+                m_ApercuImage.style.backgroundImage = new StyleBackground(Background.FromRenderTexture(rt));
             if (m_Classes.Count > 0) Afficher(m_Classes[IndexDerniere()]);
+        }
+
+        public override void Cacher()
+        {
+            base.Cacher();
+            m_ApercuActif?.Cacher();
+            m_Glisse = false;
+        }
+
+        public override void MiseAJour(float dt)
+        {
+            // Stick droit : tourne le personnage (affichage seulement ; la carte UI n'a pas d'action pour ce stick).
+            var pad = Gamepad.current;
+            if (m_ApercuActif == null || pad == null) return;
+            var x = pad.rightStick.ReadValue().x;
+            if (Mathf.Abs(x) > 0.2f) m_ApercuActif.Tourner(x * RotationStick * dt);
         }
 
         protected override VisualElement PremierFocus => m_Boutons.Count > 0 ? m_Boutons[IndexDerniere()] : null;
@@ -162,8 +205,8 @@ namespace Deathless.UI.Ecrans
         {
             if (c == null) return;
             m_Affichee = c;
-            m_Portrait.style.backgroundColor = c.Teinte;
-            m_Initiale.text = c.Nom.Substring(0, 1);
+            IconesUI.Poser(m_Embleme, c.Embleme);
+            m_ApercuActif?.Montrer(c.Id);
             m_Nom.text = c.Nom;
             m_Role.text = c.Role;
             m_Arme.text = c.Arme;
@@ -176,6 +219,8 @@ namespace Deathless.UI.Ecrans
                 var nom = i < c.Actions.Count ? c.Actions[i].Nom : null;
                 var vide = string.IsNullOrEmpty(nom);
                 m_LignesActions[i].nom.text = vide ? "Vide pour l’instant" : nom;
+                IconesUI.Poser(m_LignesActions[i].icone, vide ? null : c.Actions[i].Icone);
+                m_LignesActions[i].icone.style.display = DisplayStyle.Flex;   // garde la colonne alignée
                 m_LignesActions[i].ligne.EnableInClassList("choix-action--vide", vide);
             }
         }

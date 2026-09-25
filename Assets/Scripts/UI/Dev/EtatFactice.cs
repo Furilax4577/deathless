@@ -14,7 +14,7 @@ namespace Deathless.UI.Dev
     /// réapparition ; fin de partie. Les entrées de jeu (carte Gameplay, via InputChordResolver) déclenchent
     /// les compétences et le vote prêt, comme le ferait le vrai jeu.
     /// Les méthodes Forcer… servent aux tests et aux captures.
-    public class EtatFactice : MonoBehaviour, IEtatPartie, IEtatJoueur, IScoreFin, ICommandesPartie, IClassesJouables, IEtatJoueurClasse
+    public class EtatFactice : MonoBehaviour, IEtatPartie, IEtatJoueur, IScoreFin, ICommandesPartie, IClassesJouables, IEtatJoueurClasse, IEtatJoueurPotions
     {
         public InputActionAsset actions;
 
@@ -271,6 +271,12 @@ namespace Deathless.UI.Dev
         void OnAction(InputAction action)
         {
             if (!m_EnCours || m_Phase == PhasePartie.Terminee) return;
+            if (action.name == "DrinkPotion" && m_Potions > 0 && !EstMort)
+            {
+                m_Potions--;
+                m_Vie = Mathf.Min(100f, m_Vie + 40f);
+                return;
+            }
             if (!EstPaladin)
             {
                 ActionClasse(action.name);
@@ -527,6 +533,15 @@ namespace Deathless.UI.Dev
         /// Assassin : furtif hors combat (pas d'attaque depuis 2 s, pas la nuit), ou forcé par ForcerFurtif.
         public bool Furtif => m_Classe != null && m_Classe.Id == "assassin" && !EstMort
             && (m_FurtifForce ?? (m_Duree - m_DerniereAttaque > 2f * acceleration && m_Phase != PhasePartie.Nuit));
+
+        // ================================================================== IEtatJoueurPotions (banc : 2 potions sur 3)
+
+        int m_Potions = 2;
+        public int Potions => m_Potions;
+        public int PotionsMax => 3;
+
+        /// Tests : nombre de potions.
+        public void ForcerPotions(int n) => m_Potions = Mathf.Clamp(n, 0, PotionsMax);
 
         /// Tests : force le mode furtif (null : simulation).
         public void ForcerFurtif(bool? furtif) => m_FurtifForce = furtif;

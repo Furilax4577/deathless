@@ -173,7 +173,15 @@
     padding: 0;
 }
 
-.hud-joueur__furtif { position: absolute; right: -12px; top: -12px; width: 48px; height: 48px; display: none; }
+.hud-joueur__furtif { position: absolute; right: -15px; top: -15px; width: 54px; height: 54px; border-radius: 27px; background-color: #2b1840; border-width: 2px; border-color: #5b3a8a; display: none; align-items: center; justify-content: center; }
+.hud-joueur__furtif-icone { width: 40px; height: 40px; }
+.hud-joueur__jauge-icone { width: 36px; height: 36px; margin: -9px 6px -9px -6px; }
+.hud-joueur__jauge-classe .dl-gauge__label { flex-grow: 1; }
+.hud-potion { align-items: center; margin-left: 15px; display: none; }
+.hud-potion__case { width: 72px; height: 72px; border-radius: 15px; border-width: 3px; border-color: var(--dl-color-border-strong); background-color: var(--dl-color-panel); align-items: center; justify-content: center; margin-bottom: 9px; }
+.hud-potion__icone { position: absolute; left: 9px; top: 9px; right: 9px; bottom: 9px; }
+.hud-potion__nombre { position: absolute; right: 3px; bottom: 0; margin: 0; padding: 0 3px; -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Bold-SDF.asset"); font-size: 24px; color: #ffffff; -unity-text-outline-width: 1px; -unity-text-outline-color: var(--dl-color-ink); }
+.hud-potion--vide .hud-potion__icone { opacity: 0.35; }
 .hud-joueur__jauge-classe { display: none; }
 .hud-emplacement--vide .hud-emplacement__case { border-color: var(--dl-color-line); background-color: rgba(16, 19, 27, 0.5); }
 .hud-emplacement--vide .hud-emplacement__abrev { color: var(--dl-color-text-disabled); }
@@ -209,6 +217,7 @@
 .hud-emplacement__case--prete { border-color: var(--dl-color-border-strong); }
 .hud-emplacement__case--active { border-color: var(--dl-color-gold); background-color: #3a3420; }
 .hud-emplacement__case--indisponible .hud-emplacement__abrev { color: var(--dl-color-text-disabled); }
+.hud-emplacement__case--indisponible .hud-emplacement__icone { opacity: 0.45; }
 
 .hud-emplacement__icone { position: absolute; left: 12px; top: 12px; right: 12px; bottom: 12px; -unity-background-scale-mode: scale-to-fit; }
 

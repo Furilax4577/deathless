@@ -439,6 +439,9 @@
 /* ---------- Jauges (Deathless.UI.Gauge) ---------- */
 .dl-gauge { margin-bottom: var(--dl-space-2); }
 
+/* Icône vectorielle (IconesUI, SVG importés en VectorImage) : ajustée à sa boîte, sans déformation. */
+.dl-icone { -unity-background-scale-mode: scale-to-fit; flex-shrink: 0; }
+
 .dl-gauge__header {
     flex-direction: row;
     justify-content: space-between;

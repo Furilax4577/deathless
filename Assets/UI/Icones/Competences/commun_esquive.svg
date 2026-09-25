@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+<!-- Deathless : commun_esquive (Esquive, roulade). Généré par ArtSources/Icones/generer_icones.py -->
+<polygon fill="#999485" points="10,44 34,47.5 34,40.5 10,44"/>
+<polygon fill="#999485" points="10,44 34,44 34,47.5 10,44"/>
+<polygon fill="#ebe6cc" points="10,44 34,44 34,40.5 10,44"/>
+<polygon fill="#999485" points="4,64 36,67.5 36,60.5 4,64"/>
+<polygon fill="#999485" points="4,64 36,64 36,67.5 4,64"/>
+<polygon fill="#ebe6cc" points="4,64 36,64 36,60.5 4,64"/>
+<polygon fill="#999485" points="10,84 34,87.5 34,80.5 10,84"/>
+<polygon fill="#999485" points="10,84 34,84 34,87.5 10,84"/>
+<polygon fill="#ebe6cc" points="10,84 34,84 34,80.5 10,84"/>
+<polygon fill="#999485" points="40,26 60,26 92,64 60,102 40,102 72,64"/>
+<polygon fill="#ebe6cc" points="66,64 40,26 60,26"/>
+<polygon fill="#c7bfa8" points="66,64 60,26 92,64"/>
+<polygon fill="#999485" points="66,64 92,64 60,102 40,102 72,64"/>
+<polygon fill="#c7bfa8" points="66,64 72,64 40,26"/>
+<polygon fill="#999485" points="70,26 90,26 122,64 90,102 70,102 102,64"/>
+<polygon fill="#ebe6cc" points="96,64 70,26 90,26"/>
+<polygon fill="#c7bfa8" points="96,64 90,26 122,64"/>
+<polygon fill="#999485" points="96,64 122,64 90,102 70,102 102,64"/>
+<polygon fill="#c7bfa8" points="96,64 102,64 70,26"/>
+</svg>

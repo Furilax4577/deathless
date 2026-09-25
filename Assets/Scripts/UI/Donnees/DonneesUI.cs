@@ -12,6 +12,9 @@ namespace Deathless.UI.Donnees
         public static IScoreFin Score { get; private set; }
         public static ICommandesPartie Commandes { get; private set; }
 
+        /// Aperçu 3D des classes pour l'écran de choix (facultatif, posé par le jeu ; null : pas d'aperçu).
+        public static IApercuClasse ApercuClasse { get; set; }
+
         /// Appelé à chaque enregistrement ou retrait (les écrans se réabonnent aux événements de IEtatPartie).
         public static event Action Changees;
 
@@ -39,6 +42,7 @@ namespace Deathless.UI.Donnees
             Joueur = null;
             Score = null;
             Commandes = null;
+            ApercuClasse = null;
             Changees = null;
         }
     }

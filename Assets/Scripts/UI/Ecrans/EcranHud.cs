@@ -33,7 +33,9 @@ namespace Deathless.UI.Ecrans
         VisualElement m_Portrait;
         Label m_Initiale;
         Gauge m_Vie, m_Endurance, m_JaugeClasse;
-        VisualElement m_Furtif;
+        VisualElement m_Furtif, m_JaugeIcone, m_Potion;
+        Label m_PotionNombre;
+        string m_ClasseBarre;
         JaugeClasse m_JaugeAffichee = (JaugeClasse)(-1);
         VisualElement m_Barre;
         VisualElement m_Interaction;
@@ -54,6 +56,8 @@ namespace Deathless.UI.Ecrans
             public VisualElement racine, case_, voile, icone;
             public Label abreviation, recharge;
             public InputPrompt invite;
+            public VectorImage vecteur;
+            public object imageAffichee;
         }
 
         protected override void Construire()
@@ -78,7 +82,13 @@ namespace Deathless.UI.Ecrans
             m_Vie = Racine.Q<Gauge>("joueur-vie");
             m_Endurance = Racine.Q<Gauge>("joueur-endurance");
             m_JaugeClasse = Racine.Q<Gauge>("joueur-jauge");
+            m_JaugeIcone = IconesUI.Creer(IconesUI.Mana, "hud-joueur__jauge-icone");
+            m_JaugeClasse.Q(className: Gauge.HeaderUssClass)?.Insert(0, m_JaugeIcone);
             m_Furtif = Racine.Q("furtif");
+            IconesUI.Poser(Racine.Q("furtif-icone"), IconesUI.Furtif);
+            m_Potion = Racine.Q("potion");
+            m_PotionNombre = Racine.Q<Label>("potion-nombre");
+            IconesUI.Poser(Racine.Q("potion-icone"), IconesUI.Potion);
             m_Barre = Racine.Q("competences");
             m_Interaction = Racine.Q("interaction");
             m_InteractionTexte = Racine.Q<Label>("interaction-texte");
@@ -235,8 +245,10 @@ namespace Deathless.UI.Ecrans
             m_Vie.SetValue(joueur.Vie, joueur.VieMax);
             m_Endurance.SetValue(joueur.Endurance, joueur.EnduranceMax);
             MajClasse(joueur as IEtatJoueurClasse);
+            MajPotions(joueur as IEtatJoueurPotions);
 
-            if (!ReferenceEquals(m_CompetencesAffichees, joueur.Competences)) ConstruireBarre(joueur.Competences);
+            if (!ReferenceEquals(m_CompetencesAffichees, joueur.Competences) || m_ClasseBarre != joueur.Classe)
+                ConstruireBarre(joueur.Competences, joueur.Classe);
             for (var i = 0; i < m_Emplacements.Count && i < joueur.Competences.Count; i++)
                 MajEmplacement(m_Emplacements[i], joueur.Competences[i], joueur.EstMort);
 
@@ -263,17 +275,30 @@ namespace Deathless.UI.Ecrans
                 m_JaugeClasse.label = jauge == JaugeClasse.Rage ? "Rage" : "Mana";
                 m_JaugeClasse.EnableInClassList("dl-gauge--mana", jauge == JaugeClasse.Mana);
                 m_JaugeClasse.EnableInClassList("dl-gauge--rage", jauge == JaugeClasse.Rage);
+                IconesUI.Poser(m_JaugeIcone, jauge == JaugeClasse.Rage ? IconesUI.Rage : IconesUI.Mana);
             }
             if (jauge != JaugeClasse.Aucune) m_JaugeClasse.SetValue(classe.ValeurJauge, Mathf.Max(1f, classe.JaugeMax));
             m_Furtif.style.display = classe != null && classe.Furtif ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
-        void ConstruireBarre(IReadOnlyList<ICompetenceHud> competences)
+        /// Potion (croix haut) : seulement si la source du joueur implémente IEtatJoueurPotions.
+        void MajPotions(IEtatJoueurPotions potions)
+        {
+            m_Potion.style.display = potions != null && potions.PotionsMax > 0 ? DisplayStyle.Flex : DisplayStyle.None;
+            if (potions == null) return;
+            m_PotionNombre.text = potions.Potions.ToString();
+            m_Potion.EnableInClassList("hud-potion--vide", potions.Potions <= 0);
+        }
+
+        void ConstruireBarre(IReadOnlyList<ICompetenceHud> competences, string nomClasse)
         {
             m_Barre.Clear();
             m_Emplacements.Clear();
             m_CompetencesAffichees = competences;
+            m_ClasseBarre = nomClasse;
             if (competences == null) return;
+            // Icônes : celles de la classe (ClassesJouables.Catalogue → IconesUI), à la place des abréviations du jeu.
+            var classe = ClassesJouables.TrouverParNom(nomClasse);
             foreach (var c in competences)
             {
                 var e = new Emplacement { racine = new VisualElement(), case_ = new VisualElement(), voile = new VisualElement(), icone = new VisualElement() };
@@ -289,6 +314,7 @@ namespace Deathless.UI.Ecrans
                 e.case_.Add(e.abreviation);
                 e.case_.Add(e.voile);
                 e.case_.Add(e.recharge);
+                e.vecteur = IconesUI.Trouver(ClassesJouables.IconeAction(classe, c.Action));
                 e.invite = new InputPrompt(c.Action);
                 e.invite.AddToClassList("hud-emplacement__invite");
                 e.racine.Add(e.case_);
@@ -301,13 +327,20 @@ namespace Deathless.UI.Ecrans
 
         static void MajEmplacement(Emplacement e, ICompetenceHud c, bool mort)
         {
-            var icone = c.Icone;
-            e.icone.style.display = icone != null ? DisplayStyle.Flex : DisplayStyle.None;
-            if (icone != null) e.icone.style.backgroundImage = new StyleBackground(icone);
+            // Emplacement vide (pas de compétence : Nom vide) : case grisée, sans icône, abréviation ni recharge.
+            var vide = string.IsNullOrEmpty(c.Nom);
+            // Icône : texture fournie par le jeu, sinon icône vectorielle de la classe, sinon abréviation.
+            object image = vide ? null : c.Icone != null ? c.Icone : (object)e.vecteur;
+            var icone = image;
+            if (!ReferenceEquals(image, e.imageAffichee))
+            {
+                e.imageAffichee = image;
+                e.icone.style.display = image != null ? DisplayStyle.Flex : DisplayStyle.None;
+                if (image is Texture2D t) e.icone.style.backgroundImage = new StyleBackground(t);
+                else if (image is VectorImage v) e.icone.style.backgroundImage = new StyleBackground(v);
+            }
             e.abreviation.text = c.Abreviation;
 
-            // Emplacement vide (pas de compétence : Nom vide) : case grisée, sans abréviation ni recharge.
-            var vide = string.IsNullOrEmpty(c.Nom);
             e.racine.EnableInClassList("hud-emplacement--vide", vide);
             if (vide) e.abreviation.text = "";
             var etat = mort || vide ? EtatCompetence.Indisponible : c.Etat;

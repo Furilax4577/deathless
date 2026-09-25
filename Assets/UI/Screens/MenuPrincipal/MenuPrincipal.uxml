@@ -39,14 +39,13 @@
         <ui:VisualElement class="dl-panel menu__classe">
             <ui:Label text="DERNIÈRE CLASSE JOUÉE" class="dl-section-label" />
             <ui:VisualElement class="menu__classe-entete">
-                <ui:VisualElement name="menu-classe-pastille" class="menu__classe-pastille">
-                    <ui:Label name="menu-classe-initiale" text="P" class="menu__classe-initiale" />
-                </ui:VisualElement>
+                <ui:VisualElement name="menu-classe-embleme" class="dl-icone menu__classe-embleme" />
                 <ui:VisualElement>
                     <ui:Label name="menu-classe-nom" text="Paladin" class="dl-heading menu__classe-nom" />
                     <ui:Label name="menu-classe-arme" text="Épée et bouclier" class="dl-text menu__classe-arme" />
                 </ui:VisualElement>
             </ui:VisualElement>
+            <ui:VisualElement name="menu-classe-icones" class="menu__classe-icones" />
             <ui:Label name="menu-classe-actions" text="Frappe à l’épée, garde et parade, charge bélier, soin sur soi." class="dl-text dl-text--muted menu__note" />
         </ui:VisualElement>
         <ui:Label text="Version 0.1" class="menu__version" />
