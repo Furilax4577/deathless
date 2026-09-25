@@ -2,7 +2,7 @@
 
 ## Nyxessa {décidé}
 
-**Nyxessa est une force mystérieuse.** C'est d'elle que sont issus les squelettes.
+**Nyxessa est une force mystérieuse.** On l'appelle aussi **Nyx**, son diminutif {décidé}. C'est d'elle que sont issus les squelettes.
 
 Les héros utilisent eux aussi cette force. C'est ce qui leur vaut la **fureur de ceux qui tentent de la récupérer** : chaque nuit, les squelettes sortent de terre pour reprendre ce que les héros leur ont pris.
 
@@ -12,7 +12,15 @@ La relique au cœur du village est la forme visible de Nyxessa. Tant qu'elle tie
 
 **Nyxar, le Nécromancien**, est l'**ancien possesseur de Nyxessa**. Il l'utilisait **seul, pour son propre pouvoir**. Il tente aujourd'hui de la récupérer, et c'est lui qui mène les squelettes contre le village. Son bras armé est **Morgrim, le Roi des os**, un colosse d'ossements à la hache géante.
 
-Il possède encore un **fragment de Nyxessa** : c'est de là que viennent ses **pouvoirs résiduels**, et la lueur verte de ses yeux.
+Il possède encore un **éclat de Nyx** : c'est de là que viennent ses **pouvoirs résiduels**, et la lueur verte de ses yeux.
+
+## Les éclats de Nyx {décidé}
+
+Un **éclat de Nyx** est un morceau de la force de Nyxessa. Celui qui en porte un voit sa **puissance augmentée**. C'est le cas de Nyxar, dont l'éclat nourrit ses pouvoirs, mais le principe vaut pour tous, squelettes comme héros.
+
+- Les **élites** portent un éclat : d'où leurs yeux verts, leur aura de gemmes vertes et leur force accrue.
+- Sur Nyxar, l'éclat brille et c'est son **point faible**.
+- Les éclats sont-ils aussi une ressource que les héros ramassent et utilisent ? {à confirmer}
 
 ## Ce que ça change dans le jeu {dev}
 

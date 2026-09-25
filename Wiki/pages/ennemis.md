@@ -27,7 +27,7 @@ Ordre d'apparition dans la partie : sbires dès la nuit 1, guerriers nuit 2, vol
 
 ## Élites {décidé}
 
-Un élite est un squelette ordinaire qui porte un peu de la force de Nyxessa :
+Un élite est un squelette ordinaire qui porte un **éclat de Nyx** (voir [L'univers](univers.md)) :
 
 - environ **1,3 fois plus grand** ;
 - **trois fois plus de points de vie** et des dégâts plus forts ;
@@ -60,7 +60,7 @@ Invocateur qui combat à distance :
 - il tire des **salves de crânes** ;
 - il **relève des squelettes** du sol autour de lui ;
 - il **fauche à la faux** ceux qui le serrent de près ;
-- son **fragment de Nyxessa brille** : c'est son **point faible**.
+- son **éclat de Nyx brille** : c'est son **point faible**.
 
 Points de vie, dégâts et cadence : {à équilibrer}.
 
