@@ -14,6 +14,10 @@ Cinq classes jouables, et bientôt le **druide** et le **mécanicien**. Chaque c
 
 Chaque classe a sa page : présentation, actions et touches, règles détaillées.
 
+## Projectiles {décidé}
+
+Flèches et carreaux ont une **vitesse** et subissent la **pesanteur** : plus un projectile part vite, plus il va loin. La vitesse de l'arc dépend de la charge ; celle de l'arbalète est fixe. Voir [Rôdeur](classe-rodeur.md) et [Assassin](classe-assassin.md).
+
 ## Actions communes
 
 | | Touche | Action |

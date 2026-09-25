@@ -62,6 +62,7 @@ L'assassin joue **principalement à la dague**. L'arbalète et la grenade sont d
 
 - Un carreau dans la **tête** est un **coup critique**. C'est le **seul** critique possible à l'arbalète : les passifs de furtivité et de coup dans le dos ne s'appliquent pas aux carreaux.
 - **Gros temps de recharge** : l'arbalète ne remplace pas la dague.
+- **Vitesse fixe** {décidé} : le carreau vole en cloche comme une flèche, mais sa vitesse est **toujours la même**, rapide : pas de charge. Vitesse {à équilibrer}.
 - Temps de recharge : **6 secondes** entre deux carreaux {à équilibrer}.
 
 ## Grenade fumigène {décidé}

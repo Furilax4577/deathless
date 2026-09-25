@@ -33,6 +33,8 @@ Actions communes à toutes les classes : voir [Classes](classes.md#actions-commu
   - **Coup prêt** : quand le cercle atteint sa taille minimale, il se verrouille sur la pointe et la flèche brille brièvement : le tir est chargé à fond.
   - **Traînée** : en vol, la flèche laisse une traînée d'air fine, sans lueur, non magique.
 - **Flèches non magiques** {décidé} : les flèches, du rôdeur comme toutes les autres, ne brillent pas. Elles laissent une traînée d'air, jamais lumineuse. Seule exception, le bref éclat de la charge complète.
+- **Vitesse et portée** {décidé} : les flèches volent en **cloche**, tirées par la pesanteur. Plus une flèche part vite, plus elle va loin et droit. La vitesse dépend de **la force avec laquelle le rôdeur bande son arc** : un tir rapide retombe vite, un tir chargé à fond file loin. Vitesses {à équilibrer}.
+- **Face à la visée** {décidé} : quand il bande son arc, le rôdeur se tourne vers le point visé, le corps de profil comme un archer, et la flèche part vers le réticule.
 - Valeurs de départ : charge complète en **1,2 s** ; **10 dégâts** sans charge, **40** chargé à fond ; tir à la tête **×2** {à équilibrer}.
 - **Valeurs de départ** des compétences, version 0.2 {à équilibrer} {{dev: (réglées dans `Assets/Jeu/Resources/GameBalance.asset`)}} :
 
