@@ -15,12 +15,17 @@ logique, et l'habille comme le menu principal du jeu.
    rien à installer et aucun droit administrateur n'est demandé.
    .NET Framework 4.8 est déjà présent sur Windows 10 et 11.
 2. Lancer `DeathlessLauncher.exe`. Il lit `version.json` et `changelog.json` sur le serveur. Si la version installée
-   diffère, il télécharge `deathless-v<N>.zip` dans `%TEMP%\DeathlessLauncher\`, vérifie son empreinte SHA-256,
-   l'extrait dans `Game\` à côté de lui, puis active « Jouer ».
+   diffère, il ne télécharge que les fichiers nouveaux ou modifiés, vérifiés un par un par leur SHA-256 (voir « Mise à
+   jour incrémentielle »). À la première installation, ou si presque tout a changé, il prend le zip complet
+   `deathless-v<N>.zip`. Tout est préparé à côté, dans `Game.nouveau\`, puis échangé d'un coup avec `Game\`, et
+   « Jouer » s'active.
 3. « Jouer » lance `Game\Deathless.exe` et ferme le launcher.
 4. Sans réseau, le launcher propose de lancer la version déjà installée. Il affiche alors les notes de version lues
    lors de la dernière connexion (copie locale `changelog.cache.json`).
-5. Si le téléchargement est coupé, « Réessayer » le reprend là où il s'était arrêté.
+5. Si le téléchargement est coupé, le launcher réessaie de lui-même, en attendant de plus en plus longtemps. Chaque
+   fichier reprend là où il s'était arrêté, y compris après « Réessayer » ou une relance du launcher.
+6. Quand le jeu est à jour, « Rafraîchir » (le petit bouton rond à droite de la jauge, F5 ou X) revérifie la version en
+   ligne. Le launcher le fait aussi seul, discrètement, toutes les 10 minutes.
 
 ### Écran
 
@@ -38,6 +43,23 @@ logique, et l'habille comme le menu principal du jeu.
   (13 % de la piste), du rouge de la barre de vie, arrondi comme la piste, sans dégradé ni fondu. Il glisse de gauche
   à droite à vitesse constante, sort à droite et repart de la gauche, un passage toutes les 1,2 s. Les erreurs
   s'affichent sous la jauge, en rouge clair. Le bouton de la barre des tâches montre aussi l'avancement.
+  - En mise à jour incrémentielle, le libellé devient « Mise à jour · 2 / 3 fichiers ». La valeur donne les Mo
+    réellement à télécharger (par exemple « 0,2 / 0,3 Mo »), le débit moyen des 5 dernières secondes, et la
+    description de « Jouer » le temps restant. Avant le téléchargement, « Comparaison des fichiers installés »
+    s'affiche avec le scan.
+  - **Rafraîchir** : un petit bouton rond à droite de la jauge (flèche circulaire ivoire, bords nets), montré
+    quand le jeu est à jour, avec l'invite « Rafraîchir » (F5 ou X) dans la barre du bas. Il relit `version.json`
+    et `changelog.json` sans cache. Pendant la vérification, la jauge montre le scan et « Jouer » reste utilisable.
+    - Rien de nouveau : « Déjà à jour · version x.y.z » pendant 3 s.
+    - Une nouvelle version : la mise à jour se lance comme au démarrage.
+    - Serveur injoignable : un message l'explique, et la version installée reste jouable.
+    - Le bouton est inactif pendant une vérification, un téléchargement ou une installation.
+  - **Revérification automatique** : toutes les 10 minutes, quand le jeu est à jour, le launcher relit la version en
+    ligne sans rien montrer. S'il en trouve une nouvelle, il ne télécharge rien tout seul. « Jouer » affiche alors
+    « Nouvelle version disponible · x.y.z », la pastille « Nouvelle » apparaît dans les notes, et le bouton
+    Rafraîchir passe en or (le presser lance la mise à jour).
+- **Version du launcher** : « Launcher 1.1.0 », en petit, à droite de la barre du bas, avant l'appareil actif.
+  C'est la version du launcher lui-même, pas celle du jeu.
 - **Notes de version** : panneau `dl-panel` à droite.
   - **Replié, par défaut** : une petite carte en haut à droite, posée sur les arbres, qui laisse voir Nyxessa et le
     portail. Elle montre « NOTES DE VERSION », la dernière version, son étiquette et son titre (par exemple
@@ -54,6 +76,8 @@ logique, et l'habille comme le menu principal du jeu.
 
 ![Notes dépliées](../Launcher/captures/launcher_accueil_notes.png)
 
+![Rafraîchir en cours](../Launcher/captures/launcher_rafraichir.png)
+
 ### Commandes
 
 | Action | Clavier et souris | Manette Xbox |
@@ -61,6 +85,7 @@ logique, et l'habille comme le menu principal du jeu.
 | Valider l'entrée sélectionnée | Entrée, Espace, clic | A |
 | Entrée précédente ou suivante | Flèches haut et bas, Tab, survol | Croix, stick gauche |
 | Déplier ou replier les notes | N, clic sur la carte (Échap replie) | Y (B replie) |
+| Rafraîchir (revérifier la version en ligne, jeu à jour) | F5, clic sur le bouton rond | X |
 | Défiler les notes dépliées | Molette, Page préc. et Page suiv., Début et Fin | Stick droit, LB et RB |
 
 La manette est lue par XInput (`xinput1_4.dll`, avec repli sur `xinput9_1_0.dll`, sans rien installer), seulement
@@ -114,8 +139,13 @@ Contenu du dossier publié :
 
 - `version.json` : la version à installer (format ci-dessous).
 - `changelog.json` : les notes de toutes les versions (format ci-dessous).
-- `deathless-v<N>.zip` : le build Windows, avec son contenu à la racine (`Deathless.exe`, `Deathless_Data\…`). Les
-  anciens zips peuvent rester ou être supprimés : seul celui de `version.json` compte.
+- `deathless-v<N>.zip` : le build Windows, avec son contenu à la racine (`Deathless.exe`, `Deathless_Data\…`) : première
+  installation et secours.
+- `v<N>/` : les fichiers du build, un par un, compressés en gzip quand c'est utile (`<chemin>.gz`), et
+  `v<N>/fichiers.json`, pour la mise à jour incrémentielle.
+- Ménage : après chaque publication réussie, `make_release.py` ne garde que la version publiée et la précédente
+  (celle de l'ancien `version.json`), zip et dossier. Les autres sont supprimés, et rien d'autre n'est touché (`wiki`,
+  `wiki-dev`, `DeathlessLauncher.zip`, `/relic/`).
 - `DeathlessLauncher.zip` : le launcher à distribuer.
 - `wiki/` : la version joueur du wiki (`Wiki/public`), envoyée par `publish.ps1 -AvecWiki`.
 
@@ -124,7 +154,8 @@ Le launcher relit `version.json` et `changelog.json` à chaque démarrage, avec 
 ### version.json
 
 ```json
-{ "version": "1", "nom": "0.1", "zip": "deathless-v1.zip", "sha256": "…", "size": 123456789, "notes": "…" }
+{ "version": "6", "nom": "0.4.2", "zip": "deathless-v6.zip", "sha256": "…", "size": 73435395, "notes": "",
+  "dossier": "v6/" }
 ```
 
 - `version` : numéro de publication (1, 2, 3…). Il nomme le zip et décide de la mise à jour : le jeu est retéléchargé
@@ -134,6 +165,79 @@ Le launcher relit `version.json` et `changelog.json` à chaque démarrage, avec 
   obligatoire : un téléchargement coupé ou abîmé n'est jamais installé.
 - `notes` (facultatif) : texte libre, une puce par ligne. Il sert de repli quand `changelog.json` manque, ou quand
   la version publiée n'y a pas d'entrée. C'est le seul format que connaissait le launcher de Relic.
+- `dossier` (facultatif) : le dossier des fichiers de la version, avec son `fichiers.json`. Sans lui (publication
+  faite avant la version 1.1.0 du launcher), seul le zip est utilisé. Un launcher 1.0.0 ignore ce champ et prend le
+  zip : les deux cohabitent.
+
+### Mise à jour incrémentielle (launcher 1.1.0)
+
+`v<N>/fichiers.json`, écrit par `make_release.py` :
+
+```json
+{ "version": "6", "nom": "0.4.2", "fichiers": [
+  { "chemin": "Deathless_Data/Managed/Assembly-CSharp.dll", "taille": 730112, "sha256": "…", "gz": 273151 },
+  { "chemin": "Deathless_Data/boot.config", "taille": 176, "sha256": "…" } ] }
+```
+
+`taille` et `sha256` sont ceux du fichier installé. `gz`, s'il est présent, est la taille du fichier compressé : on
+télécharge alors `v6/<chemin>.gz`, sinon `v6/<chemin>` tel quel. Un fichier n'est compressé que s'il y gagne au moins
+5 %. Pour la 0.4.1 (201 fichiers, 219,8 Mo bruts), cela fait 69,8 Mo servis, contre 70,0 Mo pour le zip.
+
+Déroulé côté launcher (`Launcher/Incrementiel.cs`) :
+
+1. **Comparaison** : chaque fichier installé est repris s'il a la bonne taille et la bonne empreinte. L'empreinte est
+   recalculée sur place (environ 1 s pour le jeu entier), si bien qu'un fichier abîmé est retéléchargé. Le manifeste
+   local n'est pas nécessaire : une installation faite par le launcher 1.0.0, ou par le zip, passe telle quelle en
+   incrémentiel.
+2. **Choix** : s'il faut télécharger au moins 90 % de la taille du zip (première installation, tout a changé), le zip
+   est pris, en un seul fichier.
+3. **Préparation dans `Game.nouveau\`** : les fichiers inchangés y sont copiés depuis `Game\`. Les autres sont
+   téléchargés, trois à la fois, décompressés et vérifiés un par un par leur SHA-256. Une empreinte fausse fait
+   retélécharger le fichier, trois fois au plus. Les fichiers retirés de la nouvelle version ne sont simplement pas
+   recopiés.
+4. **Échange** : `Game` devient `Game.ancien`, `Game.nouveau` devient `Game`, puis `Game.ancien` est supprimé. En
+   cas d'échec, par exemple si le jeu est ouvert, l'ancien dossier est remis en place.
+5. **Secours** : si quoi que ce soit échoue (fichier absent du serveur, `fichiers.json` illisible, empreinte fausse
+   trois fois), la version jouable n'a pas été touchée et le zip complet prend le relais.
+
+Connexions lentes et instables (`Telechargement` dans `Incrementiel.cs`, aussi utilisé pour le zip) :
+
+- chaque fichier coupé reprend là où il s'était arrêté (requête `Range`) ;
+- jusqu'à 8 nouvelles tentatives de suite sans progrès, avec une attente croissante (2, 4, 8, 16, 32, puis 60 s) ;
+  le compte repart dès qu'un octet arrive ;
+- un transfert est jugé bloqué après 60 s sans aucun octet, puis repris ;
+- aucun délai global, car un gros fichier peut durer longtemps sur une connexion lente ;
+- un fichier raté n'abandonne pas toute la mise à jour avant ses tentatives ;
+- une erreur définitive (404, 403, 410) passe tout de suite au zip.
+
+Ménage côté joueur :
+
+- après une installation réussie, `%TEMP%\DeathlessLauncher\` est vidé, et `Game.nouveau` comme `Game.ancien`
+  n'existent plus ;
+- avant une installation, tout ce qui ne sert pas à la version visée est supprimé ;
+- au démarrage, les restes d'une session interrompue sont supprimés, et une installation coupée pendant l'échange est
+  remise en place ;
+- seule exception, voulue pour les connexions lentes : les fichiers partiels de la version en cours de
+  téléchargement restent après un échec réseau, pour que « Réessayer » ou le lancement suivant reprenne sans tout
+  retélécharger ;
+- un zip complet vérifié n'est jamais gardé.
+
+Mesures du 25/09/2026, sur le vrai build 0.4.1, avec une 0.4.2 de test (code du jeu et un réglage modifiés, un
+fichier ajouté, un retiré) :
+
+| Cas | Voie | Octets reçus |
+|---|---|---|
+| Première installation | zip | 73 444 149 (70,0 Mo) |
+| 0.4.1 → 0.4.2 | incrémentielle, 3 fichiers téléchargés, 198 repris | **273 334** (0,3 Mo) |
+| Même mise à jour, chaque fichier coupé net à 60 Ko | incrémentielle, reprises | 273 334 (aucun octet perdu) |
+| Fichier installé abîmé (un octet changé), passage à une autre version | incrémentielle, 4 fichiers | 2 438 379 |
+| Fichier absent du serveur (404) | zip, aussitôt | 70,1 Mo |
+| Version identique republiée | incrémentielle, 0 fichier | 0 |
+
+Sur le vrai serveur, dans un dossier de test depuis supprimé, la même mise à jour a reçu 273 334 octets en 1,4 s. Le
+ménage automatique y a gardé les versions 6 et 7 et supprimé la 5. Une installation 0.4.1 faite par le launcher 1.0.0
+est vue à jour par le 1.1.0 face au serveur actuel (0 octet), et passe en incrémentiel à la version suivante publiée
+avec `v<N>/`.
 
 ### changelog.json
 
@@ -212,26 +316,46 @@ Prérequis, une seule fois : une clé SSH (`ssh-keygen -t ed25519`) dont la clé
     -Remote "root@srv617344.hstgr.cloud:/var/www/deathless/" -BaseUrl "http://srv617344.hstgr.cloud/deathless/"
 ```
 
-Le script zippe le build (sans les `.log` ni le dossier `*_DoNotShip`), calcule l'empreinte, écrit `version.json`,
-vérifie et copie `changelog.json`. Avec `-AvecLauncher`, il zippe le launcher construit, avec `fond.mp4` et son
+Le script zippe le build (sans les `.log` ni le dossier `*_DoNotShip`), calcule l'empreinte et vérifie
+`changelog.json`. Avec `-AvecLauncher`, il zippe le launcher construit, avec `fond.mp4` et son
 image 0 (`fond0.png`, extraite par le launcher lui-même). Avec `-AvecWiki`, il régénère le wiki
 (`python Wiki\build.py`) et zippe sa version joueur (`Wiki\public`).
 
-Il envoie ensuite le tout par `scp`, `version.json` en dernier. Le wiki est décompressé sur le serveur dans
-`wiki.nouveau` (par le module `zipfile` de python3, rien à installer), puis échangé d'un coup avec `wiki/`. Enfin,
-le script relit en ligne `version.json`, `changelog.json` et le wiki pour confirmer. Sans `-Remote`, rien ne part :
-les fichiers restent dans `Builds\publish\` pour contrôle.
+Il envoie ensuite par `scp` le zip du jeu, celui du launcher et celui du wiki, puis `make_release.py` et
+`changelog.json` dans `/root/`. Le wiki est décompressé sur le serveur dans `wiki.nouveau` (par le module `zipfile`
+de python3, rien à installer), puis échangé d'un coup avec `wiki/`.
+
+Sur le serveur, `make_release.py --zip` part du zip envoyé : le jeu ne voyage qu'une fois. Il fabrique `v<N>/` et
+`fichiers.json`, écrit `changelog.json` puis `version.json` en dernier, et fait le ménage (version publiée et
+précédente). Enfin, le script relit en ligne `version.json`, `fichiers.json`, `changelog.json` et le wiki.
+
+Sans `-Remote`, rien ne part. `make_release.py` tourne alors en local et fait de `Builds\publish\` un dossier web
+complet, qu'on peut servir en local pour tester (`python -m http.server`).
+
+**Launcher seul** : `-LauncherSeul` ne refait et n'envoie que `DeathlessLauncher.zip`. `version.json`, le zip du jeu,
+`v<N>/` et `changelog.json` en ligne ne changent pas, et les joueurs à jour n'ont rien à retélécharger. C'est ainsi
+que le launcher 1.1.0 a été publié le 25/09/2026 à 21 h 32 (14 138 699 octets ; l'ancien est sauvegardé dans
+`/root/DeathlessLauncher-1.0.0.zip.bak`).
+
+```powershell
+.\Launcher\publish.ps1 -LauncherSeul -Remote "root@srv617344.hstgr.cloud:/var/www/deathless/" `
+    -BaseUrl "http://srv617344.hstgr.cloud/deathless/"
+```
+
+Les scripts se lancent depuis une console PowerShell : appelés par `powershell -Command` depuis bash, ils sont
+bloqués par la politique d'exécution de Windows.
 
 **Connexion lente** : `publish-diff.ps1` n'envoie que les différences, par rsync lancé dans WSL, vers
-`/root/deathless-staging/current/`. Le serveur refait ensuite le zip, `changelog.json` et `version.json` avec
-`Launcher/make_release.py`. Le launcher ne voit aucune différence.
+`/root/deathless-staging/current/`. Le serveur refait ensuite le zip, `v<N>/`, `changelog.json` et `version.json`
+avec `Launcher/make_release.py`, puis fait le même ménage. Le launcher ne voit aucune différence.
 
 ```powershell
 .\Launcher\publish-diff.ps1 -BuildDir "Builds\Deathless-v2-2026-10-02" -Version 2 -Nom "0.2"
 ```
 
 `make_release.py` peut aussi servir en local pour fabriquer une publication de test :
-`python Launcher/make_release.py <build> <dossier_web> <version> <notes> --nom 0.1 --changelog Launcher/changelog.json`.
+`python Launcher/make_release.py <build> <dossier_web> <version> <notes> --nom 0.1 --changelog Launcher/changelog.json`,
+ou `--zip <deathless-vN.zip>` à la place du dossier de build.
 
 ## Construire le launcher
 
@@ -259,8 +383,13 @@ Tout est compilé dans l'exe (environ 1,6 Mo) :
   `ArtSources/Icones/generer_icones.py` et `raster.py`). Tant que le script n'a pas été relancé, le fichier reste
   l'ancienne gemme du HUD.
 
+**Version du launcher** : `<Version>` dans `DeathlessLauncher.csproj`, au format majeur.mineur.correctif, comme le
+jeu. 1.0.0 était le launcher du 25/09/2026 avant l'incrémentiel ; 1.1.0 ajoute la mise à jour incrémentielle, le
+bouton Rafraîchir et l'affichage de sa propre version. L'exe la lit dans son assemblage, l'affiche en bas à droite
+(« Launcher 1.1.0 ») et l'envoie dans son User-Agent (`DeathlessLauncher/1.1.0`).
+
 Le launcher ne se met pas à jour lui-même : une nouvelle version se distribue à la main, en republiant
-`DeathlessLauncher.zip`.
+`DeathlessLauncher.zip` (`publish.ps1 -LauncherSeul`).
 
 ## Changer le fond
 
@@ -316,23 +445,32 @@ repliées (en haut à droite, sur 20 % de la hauteur). Le format conseillé est 
 
 ## Outils de développement (options cachées, sans fenêtre)
 
-- `DeathlessLauncher.exe --capture <fichier.png> [--etat accueil|telechargement|verification|pret|horsligne|erreur]
+- `DeathlessLauncher.exe --capture <fichier.png> [--etat accueil|telechargement|verification|pret|rafraichir|dejaajour|nouvelle|horsligne|erreur]
   [--notes deplie] [--manette] [--changelog Launcher\changelog.json] [--largeur 1280 --hauteur 720]` rend l'écran
   hors écran (`RenderTargetBitmap`, aucune fenêtre créée) avec des données d'exemple, puis quitte. Les notes sont
   repliées, sauf avec `--notes deplie`. Les captures sont dans `Launcher/captures/` :
   - `launcher_accueil.png` et `launcher_accueil_notes.png` (notes dépliées) ;
   - `launcher_telechargement.png`, `launcher_verification.png`, `launcher_pret.png`, `launcher_horsligne.png`,
     `launcher_erreur.png` ;
+  - `launcher_rafraichir.png` (Rafraîchir en cours) et `launcher_nouvelle_version.png` (revérification automatique :
+    nouvelle version signalée) ;
   - `launcher_pret_manette.png` (invites Xbox) et `launcher_petite_fenetre.png` (960 × 600).
+  La version d'exemple est la plus récente de `changelog.json`.
 - `DeathlessLauncher.exe --image0 <vidéo.mp4> <image.png>` extrait la première image de la vidéo, à sa taille
   native (c'est ainsi que `fond0.png` est produite).
 - `DeathlessLauncher.exe --test-demarrage [--visuel] [--plein]` est le banc du passage de l'image fixe à la vidéo,
   avec le `fond.mp4` posé à côté de l'exe. Il mesure la durée de chaque opération du fil de l'interface
   (`Dispatcher.Hooks`), hors passes de rendu. Avec `--visuel`, il mesure aussi l'écart entre le fond affiché et
   l'image de départ. Avec `--plein`, ce rendu se fait en 1920 × 1080, où la vidéo n'est pas mise à l'échelle.
-- `DeathlessLauncher.exe --test-maj [--racine <dossier>]` déroule toute la mise à jour sans fenêtre, avec le
-  `launcher.json` de la racine, et écrit un compte rendu sur la sortie standard. Le code de sortie vaut 0 si le jeu
-  est à jour ou installé, 2 s'il est hors ligne avec une version jouable, 1 en cas d'échec.
+- `DeathlessLauncher.exe --test-maj [--racine <dossier>] [--attente-ms 300]` déroule toute la mise à jour sans
+  fenêtre, avec le `launcher.json` de la racine, et écrit un compte rendu sur la sortie standard : voie prise
+  (incrémentielle ou zip, et pourquoi), fichiers téléchargés et repris, octets réellement reçus, restes dans le
+  dossier temporaire. `--attente-ms` raccourcit l'attente entre deux tentatives, pour les bancs. Le code de sortie
+  vaut 0 si le jeu est à jour ou installé, 2 s'il est hors ligne avec une version jouable, 1 en cas d'échec.
+- `DeathlessLauncher.exe --test-rafraichir [--racine <dossier>]` fait la vérification de Rafraîchir (et de la
+  revérification automatique) : 0 déjà à jour, 3 nouvelle version publiée, 2 serveur injoignable, 1 non configuré.
+  Vérifié le 25/09/2026 sur un serveur local : déjà à jour (43 ms), nouvelle version (détectée, puis installée par
+  le déroulé normal), serveur injoignable (message clair).
 - `DeathlessLauncher.exe --test-video <vidéo.mp4> [--images 60] [--pas 1] [--secondes 12] [--naif]` est le banc du
   fond animé, sans fenêtre. Il joue la vidéo avec `FondVideo` et rend le fond hors écran environ 60 fois par seconde.
   Il relit le numéro de l'image réellement affichée, et celui que montre le lecteur caché juste avant chaque
@@ -426,6 +564,9 @@ Banc vérifié le 25/09/2026 avec `python -m http.server` en local et un faux bu
   bibliothèque à ajouter. La boucle utilise deux lecteurs en alternance (voir « Changer le fond »).
 - **Indicateur d'attente** : un petit scan rouge à bords francs, choisi par Quentin après une lueur floue puis une
   vague de gemmes or, toutes deux refusées.
+- **Incrémentiel côté serveur** : le serveur fabrique lui-même `v<N>/` à partir du zip envoyé, si bien que le jeu ne
+  voyage qu'une fois sur la connexion de Quentin. Les fichiers sont servis tels quels (`.gz` en
+  `application/octet-stream`, décompressés par le launcher), sans `gzip_static` ni réglage Nginx.
 - **Sons d'interface** : aucun. Le jeu n'a pas encore de sons de survol ni de validation en `.wav` (seulement les
   `.ogg` Kenney, que `System.Media.SoundPlayer` ne lit pas).
 
@@ -449,3 +590,7 @@ Ce qui est ajouté :
 - la progression dans la barre des tâches ;
 - les modes capture et test ;
 - `publish.ps1 -AvecLauncher` et `-AvecWiki`, qui publient aussi le launcher et le wiki.
+- la mise à jour incrémentielle (fichier par fichier, gzip, zip en secours), les nouvelles tentatives et la reprise
+  de chaque fichier pour les connexions lentes, le ménage côté joueur et côté serveur ;
+- Rafraîchir et la revérification automatique toutes les 10 minutes ;
+- la version du launcher affichée, et `publish.ps1 -LauncherSeul`.

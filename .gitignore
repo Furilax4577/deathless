@@ -114,4 +114,5 @@ InitTestScene*.unity*
 !/Launcher/DeathlessLauncher.csproj
 /Launcher/Outils/*/bin/
 /Launcher/Outils/*/obj/
+/Launcher/__pycache__/
 !/Launcher/Outils/FabVideo/FabVideo.csproj
