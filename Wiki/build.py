@@ -47,6 +47,7 @@ MENU = [
     ("classe-rodeur", "Rôdeur", "sous"),
     ("classe-assassin", "Assassin", "sous"),
     ("classe-viking", "Viking", "sous"),
+    ("classe-druide", "Druide (bientôt)", "sous"),
     ("ennemis", "Ennemis"),
     ("commandes", "Commandes"),
     ("interface", "Interface"),
