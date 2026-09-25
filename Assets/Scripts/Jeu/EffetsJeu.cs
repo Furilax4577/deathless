@@ -17,6 +17,17 @@ namespace Deathless.Jeu
         public GameObject prefabChargeBelier;
         public GameObject prefabAuraSoin;
         public GameObject prefabOndeGolem;
+        [Header("Classes")]
+        [Tooltip("Modèle KayKit arrow_bow (flèches et carreaux, non magiques).")]
+        public GameObject modeleFleche;
+        public GameObject prefabArcBande;
+        public GameObject prefabNuee;
+        public GameObject prefabCone;
+        public GameObject prefabBrulure;
+        public GameObject prefabFumigene;
+        public GameObject prefabTournante;
+        public GameObject prefabRugissement;
+        public GameObject prefabOndeSaut;
 
         void Awake() { Instance = this; }
         void OnDestroy() { if (Instance == this) Instance = null; }

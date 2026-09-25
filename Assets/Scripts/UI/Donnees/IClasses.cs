@@ -7,7 +7,7 @@ namespace Deathless.UI.Donnees
     public enum JaugeClasse
     {
         Aucune,
-        /// Mage de feu : bleue.
+        /// Mage : bleue.
         Mana,
         /// Viking : orange.
         Rage,
@@ -117,7 +117,7 @@ namespace Deathless.UI.Donnees
             },
             new Classe
             {
-                Id = "mage", Nom = "Mage de feu", Role = "Distance, zone", Arme = "Bâton",
+                Id = "mage", Nom = "Mage", Role = "Distance, zone", Arme = "Bâton",
                 Description = "Boules de feu et flammes : les ennemis touchés brûlent. Ses sorts coûtent du mana.",
                 Teinte = Hex("#ff610a"), Jauge = JaugeClasse.Mana,
                 Actions = Actions("Boule de feu", "Cône de flammes (maintenu)", null, null),

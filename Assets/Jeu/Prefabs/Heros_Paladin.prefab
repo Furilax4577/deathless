@@ -999,6 +999,7 @@ GameObject:
   - component: {fileID: 2494053749213285571}
   - component: {fileID: 1808649299833791858}
   - component: {fileID: 6396272358956347613}
+  - component: {fileID: 1174372150299507364}
   - component: {fileID: 510587167230831735}
   m_Layer: 0
   m_Name: Heros_Paladin
@@ -1078,6 +1079,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Deathless.Jeu.HerosEntrees
   actions: {fileID: 0}
+--- !u!114 &1174372150299507364
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3912913806127434959}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3f4a19ee71b456478469dbedafe6ce5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Deathless.Jeu.ClassePaladin
+  aura: {fileID: 5513775201467200930}
 --- !u!114 &510587167230831735
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1092,7 +1106,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Deathless.Jeu.Heros
   animator: {fileID: 6287048503999534028}
   visiere: {fileID: 180581100764878501}
-  aura: {fileID: 5513775201467200930}
 --- !u!1 &4287668816148934109
 GameObject:
   m_ObjectHideFlags: 0

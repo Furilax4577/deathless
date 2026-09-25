@@ -168,6 +168,111 @@ namespace Deathless.Jeu
         public float soinPart = 0.25f;
         public float soinIncantation = 0.6f;
         public float soinRecharge = 30f;
+        [Header("Mage, style feu (valeurs de départ, à équilibrer)")]
+        public float magePV = 100f;
+        public float mageVitesse = 5f;
+        public float bouleDegats = 25f;
+        public float bouleDegatsZone = 15f;
+        public float bouleRayon = 2f;
+        public float bouleIntervalle = 0.9f;
+        public float bouleVitesse = 18f;
+        public float boulePortee = 30f;
+        [Tooltip("Instant où la boule quitte le bâton dans le geste (s, clip Ranged_Magic_Shoot accéléré).")]
+        public float bouleInstant = 0.28f;
+        public float manaMax = 100f;
+        [Tooltip("Mana rendu par seconde (wiki : environ 1).")]
+        public float manaRegen = 1f;
+        [Tooltip("Mana rendu par ennemi touché par la boule de feu (wiki : bonus).")]
+        public float manaParTouche = 4f;
+        public float coneMana = 14f;
+        public float coneDegats = 22f;
+        public float conePortee = 6f;
+        public float coneDemiAngle = 20f;
+        public float coneVitesse = 0.4f;
+        public float brulureDegats = 5f;
+        public float brulureDuree = 3f;
+
+        [Header("Rôdeur (wiki : charge 1,2 s, 10 à 40 dégâts, tête ×2)")]
+        public float rodeurPV = 110f;
+        public float rodeurVitesse = 5f;
+        public float arcCharge = 1.2f;
+        public float arcDegatsMin = 10f;
+        public float arcDegatsMax = 40f;
+        public float arcTete = 2f;
+        public float arcVitesseFleche = 30f;
+        public float arcPortee = 60f;
+        public float arcIntervalle = 0.3f;
+        public float arcVitesseBander = 0.5f;
+        public float viseeVitesse = 0.6f;
+        public float nueeRayon = 3f;
+        public int nueeSalves = 5;
+        public float nueeDegatsSalve = 10f;
+        public float nueePortee = 25f;
+        public float nueeRecharge = 12f;
+        public float rouladeDistance = 4f;
+        public float rouladeCout = 20f;
+        public int salveFleches = 5;
+        public float salveEcart = 20f;
+        public float salveDegats = 15f;
+        public float rouladeRecharge = 8f;
+
+        [Header("Assassin (wiki : ×2 furtif, ×3 dos, ×5 les deux ; détection 6 m / 1,5 m ; arbalète 6 s ; grenade 20 s, nuage 5 s)")]
+        public float assassinPV = 100f;
+        public float assassinVitesse = 5f;
+        public float marcheDiscrete = 3.2f;
+        public float dagueDegats = 20f;
+        public float dagueIntervalle = 0.55f;
+        public float daguePortee = 1.8f;
+        public float dagueDemiAngle = 45f;
+        public float dagueInstant = 0.25f;
+        public float critiqueFurtif = 2f;
+        public float critiqueDos = 3f;
+        public float critiqueFurtifDos = 5f;
+        [Tooltip("Angle (degrés) au-delà duquel un coup est « dans le dos ».")]
+        public float angleDos = 120f;
+        public float assassinDetectionVue = 6f;
+        public float assassinDetectionAngle = 60f;
+        public float assassinDetectionDos = 1.5f;
+        [Tooltip("Hors combat : aucun coup donné, reçu ni repérage depuis (s).")]
+        public float horsCombat = 4f;
+        public float arbaleteDegats = 45f;
+        public float arbaleteTete = 2f;
+        public float arbaleteVitesse = 45f;
+        public float arbaletePortee = 40f;
+        public float arbaleteRecharge = 6f;
+        public float grenadeRecharge = 20f;
+        public float grenadeNuage = 5f;
+        public float grenadePortee = 8f;
+
+        [Header("Viking (valeurs de départ, à équilibrer)")]
+        public float vikingPV = 140f;
+        public float vikingVitesse = 5f;
+        public float hacheDegats = 38f;
+        public float hacheIntervalle = 1.1f;
+        public float hachePortee = 2.4f;
+        public float hacheDemiAngle = 70f;
+        public float hacheInstant = 0.55f;
+        public float rageMax = 100f;
+        public float rageParTouche = 8f;
+        public float rageBaisse = 6f;
+        public float rageDelaiBaisse = 4f;
+        public float tournanteRage = 20f;
+        public float tournanteRageMin = 15f;
+        public float tournanteIntervalle = 0.3f;
+        public float tournanteRayon = 2.3f;
+        public float tournanteDegats = 12f;
+        public float tournanteVitesse = 0.6f;
+        public float rugissementRage = 25f;
+        public float rugissementRecharge = 12f;
+        public float rugissementRayon = 10f;
+        public float rugissementProvocation = 5f;
+        public float sautRage = 35f;
+        public float sautRecharge = 8f;
+        public float sautDistance = 5f;
+        public float sautRayon = 3.5f;
+        public float sautDegats = 45f;
+        public float sautEtourdi = 1f;
+
         [Header("Mort et réapparition (wiki : deroule)")]
         public float reapparitionBase = 8f;
         public float reapparitionParMort = 4f;
@@ -196,6 +301,8 @@ namespace Deathless.Jeu
         public bool nyxessaInvincible;
         [Tooltip("Saute le menu principal : la partie démarre au chargement de la scène.")]
         public bool lancerDirectement;
+        [Tooltip("Classe lancée par « lancerDirectement » (paladin, mage, rodeur, assassin, viking).")]
+        public string classeDeTest = "paladin";
         [Tooltip("Journal détaillé (vagues, tirs de Nyxessa).")]
         public bool journal = true;
 

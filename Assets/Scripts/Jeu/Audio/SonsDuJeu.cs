@@ -51,6 +51,34 @@ namespace Deathless.Jeu
         public static readonly string[] EnergieMort = { "nyxessa_onde_passage" };
         public static readonly string[] Victoire = { "partie_victoire", "dawn" };
 
+        // Classes
+        public static readonly string[] Critique = { "coup_critique" };
+        public static readonly string[] CritiqueMeilleur = { "coup_critique_meilleur", "coup_critique" };
+        public static readonly string[] BouleLancer = { "fireball_cast" };
+        public static readonly string[] BouleVol = { "fireball_flight_loop" };
+        public static readonly string[] BouleExplosion = { "fireball_explosion" };
+        public static readonly string[] Cone = { "mage_flame_cone_loop" };
+        public static readonly string[] Brulure = { "burn_loop", "brulure" };
+        public static readonly string[] ArcBander = { "arc_bander" };
+        public static readonly string[] ArcPret = { "arc_charge_complete" };
+        public static readonly string[] ArcTir = { "bow_shot_v3", "bow_shot_v2" };
+        public static readonly string[] ArcTirCharge = { "bow_shot_v3_charged", "bow_shot_charged" };
+        public static readonly string[] FlecheImpact = { "arrow_impact" };
+        public static readonly string[] NueeMarqueur = { "nuee_marqueur" };
+        public static readonly string[] Nuee = { "arrow_rain" };
+        public static readonly string[] Dague = { "dague_coup", "kenney_rpg_knifeslice" };
+        public static readonly string[] ArbaleteTir = { "crossbow_shot_v3", "crossbow_shot" };
+        public static readonly string[] ArbaleteRecharge = { "arbalete_recharge" };
+        public static readonly string[] FurtifEntree = { "assassin_furtif" };
+        public static readonly string[] FurtifSortie = { "assassin_furtif_sortie" };
+        public static readonly string[] Repere = { "assassin_repere" };
+        public static readonly string[] GrenadeLancer = { "grenade_lancer" };
+        public static readonly string[] Fumee = { "smoke_bomb" };
+        public static readonly string[] Hache = { "hache_coup", "kenney_rpg_chop" };
+        public static readonly string[] Tournante = { "whirlwind_loop" };
+        public static readonly string[] Rugissement = { "viking_roar" };
+        public static readonly string[] SautPercutant = { "viking_leap_land" };
+
         public static readonly string[] MusiqueJour = { "musique_dehors_jour" };
         public static readonly string[] MusiqueNuit = { "musique_dehors_nuit" };
     }

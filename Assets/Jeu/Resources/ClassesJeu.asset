@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d5c19d53f0ea4549baf1b195974cb94, type: 3}
+  m_Name: ClassesJeu
+  m_EditorClassIdentifier: Assembly-CSharp::Deathless.Jeu.ClassesJeu
+  classes:
+  - id: paladin
+    nom: Paladin
+    element: 
+    modele: {fileID: 919132149155446097, guid: 44ed97b97f29fa44ea30401fea35e26e, type: 3}
+    style: {fileID: 11400000, guid: 9fedfc40119c14e4f8d65b1b61af7a3d, type: 2}
+    controleur: {fileID: 9100000, guid: cf2794572a3cdd34abc7629c0bea7b9b, type: 2}
+    prefab: {fileID: 3912913806127434959, guid: f899e0b099a9b6146a0fe8b37107e9c1, type: 3}
+  - id: mage
+    nom: Mage
+    element: feu
+    modele: {fileID: 919132149155446097, guid: 29ff0adc8126aa04e88f2d70323fd98b, type: 3}
+    style: {fileID: 11400000, guid: d700171517df8324d94553fc6eaa4517, type: 2}
+    controleur: {fileID: 9100000, guid: dfbd1e0e66eda9f40935a66b8e4ec35d, type: 2}
+    prefab: {fileID: 6226347767875496428, guid: ccb0936f62bbe8944a4e6f4aee897f59, type: 3}
+  - id: rodeur
+    nom: "R\xF4deur"
+    element: 
+    modele: {fileID: 919132149155446097, guid: c706baf750932044d807a35d4a58bd56, type: 3}
+    style: {fileID: 11400000, guid: 8104bbd1147d4ed488d32d20c1883bbd, type: 2}
+    controleur: {fileID: 9100000, guid: f6ad5f291f5c00e4e9296bd919fdb555, type: 2}
+    prefab: {fileID: 155717538935538581, guid: 9655ea738187c5743a62a0c0b64ee738, type: 3}
+  - id: assassin
+    nom: Assassin
+    element: 
+    modele: {fileID: 919132149155446097, guid: 0b128186dda87324ea585d9a1867c141, type: 3}
+    style: {fileID: 11400000, guid: 9d3b48bb16464184482956f371c6c81f, type: 2}
+    controleur: {fileID: 9100000, guid: 3d0bc1dbbdf8631459e6c3f96d0e8e25, type: 2}
+    prefab: {fileID: 1294648538286676591, guid: 1b45901c2cccf03458d5f7f895c139f0, type: 3}
+  - id: viking
+    nom: Viking
+    element: 
+    modele: {fileID: 919132149155446097, guid: 8fbf44a315a23584d952e3db5213bbb4, type: 3}
+    style: {fileID: 11400000, guid: eb50f50ffeec29d4982622c28ad81bb9, type: 2}
+    controleur: {fileID: 9100000, guid: 689954a7dc226a5498b8a3648383499f, type: 2}
+    prefab: {fileID: 2521102611925663514, guid: 5f6b72cbcac98ec43878c956e276a0e6, type: 3}

@@ -95315,6 +95315,15 @@ MonoBehaviour:
   prefabChargeBelier: {fileID: 3949117160478105973, guid: 3a66a89455cda0a4dbac801b522da267, type: 3}
   prefabAuraSoin: {fileID: 7697916363016626549, guid: 62295d53c43c9ef45b9a7c81310f4ad5, type: 3}
   prefabOndeGolem: {fileID: 3347852130564595874, guid: 456c47efa230f714aa3ea773e6dd7abb, type: 3}
+  modeleFleche: {fileID: 919132149155446097, guid: deb46adc1df799247a1199765cfd4d27, type: 3}
+  prefabArcBande: {fileID: 7316305472232110535, guid: 1a36f537cba59a2468e3af52ae88e46a, type: 3}
+  prefabNuee: {fileID: 6464236316311723886, guid: f5521ca83ca2c7047898bf19602ad98d, type: 3}
+  prefabCone: {fileID: 379910610678764275, guid: 1e47bc2cd58cebd4baf6140f5ea27953, type: 3}
+  prefabBrulure: {fileID: 4445466942479569546, guid: 80222de34f817214993dc1fe9bd36a97, type: 3}
+  prefabFumigene: {fileID: 2540107917006005388, guid: c787ac7c4789eff4d87ba8fcf1323c35, type: 3}
+  prefabTournante: {fileID: 8939804154597098871, guid: 703896e0c4979554db8e52bd17a144ff, type: 3}
+  prefabRugissement: {fileID: 6550021971091707226, guid: 0874522fb57432448a30a3126515d043, type: 3}
+  prefabOndeSaut: {fileID: 3347852130564595874, guid: 456c47efa230f714aa3ea773e6dd7abb, type: 3}
 --- !u!4 &1378086240
 Transform:
   m_ObjectHideFlags: 0
@@ -105087,6 +105096,7 @@ MonoBehaviour:
   cible: {fileID: 0}
   lacet: 0
   tangage: 12
+  viseeVoulue: 0
   menuPosition: {x: -8, y: 13, z: -22}
   menuRotation: {x: 23.8, y: 13.4, z: 0}
   menuChamp: 44

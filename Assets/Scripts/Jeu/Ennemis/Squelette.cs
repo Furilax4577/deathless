@@ -68,6 +68,52 @@ namespace Deathless.Jeu
             Sante.equipe = Equipe.Ennemis;
             Sante.Touche += OnTouche;
             Sante.Tue += OnTue;
+            if (modele != null) Tete = MannequinEquip.Trouver(modele, "head");
+            if (modele != null)
+                foreach (var r in modele.GetComponentsInChildren<Renderer>())
+                    if (r.name.EndsWith("_Head")) m_RenduTete = r;
+        }
+
+        Renderer m_RenduTete;
+
+        /// Os de la tête (base du crâne) ; le centre et le rayon de la zone de tête (tirs à la tête du rôdeur et de
+        /// l'arbalète) viennent du maillage de la tête (gros crâne des squelettes KayKit).
+        public Transform Tete { get; private set; }
+        public Vector3 CentreTete => m_RenduTete != null ? m_RenduTete.bounds.center : (Tete != null ? Tete.position + Vector3.up * 0.3f : transform.position + Vector3.up * 1.4f);
+        public float RayonTete => m_RenduTete != null ? m_RenduTete.bounds.extents.y * 1.05f : 0.3f;
+
+        // ----------------------------------------------------------------- Vue : furtif, fumée, provocation
+
+        Heros m_Provocateur;
+        float m_ProvoqueJusque;
+
+        /// Rugissement du viking : ce squelette le prend pour cible pendant `duree` s (priorité sur Nyxessa).
+        public virtual void Provoquer(Heros h, float duree)
+        {
+            if (m_Etat == Etat.Mort || h == null) return;
+            m_Provocateur = h;
+            m_ProvoqueJusque = Time.time + duree;
+            m_Cible = h;
+            m_SansFrapper = 0f;
+            if (m_Etat == Etat.Marche) m_Etat = Etat.Poursuite;
+        }
+
+        protected bool Provoque => m_Provocateur != null && m_Provocateur.Vivant && Time.time < m_ProvoqueJusque;
+
+        /// Ce squelette voit-il le héros ? Personne n'est vu dans la fumée d'une grenade ; l'assassin furtif n'est repéré
+        /// que dans le cône de vue (wiki : environ 6 m) ou tout près dans le dos (1,5 m). Un repérage le fait sortir du
+        /// mode furtif.
+        protected bool Voit(Heros h)
+        {
+            if (h == null) return false;
+            if (ClasseAssassin.DansLaFumee(h.transform.position)) return false;
+            var a = h.Classe as ClasseAssassin;
+            if (a == null || !a.Furtif) return true;
+            Vector3 d = h.transform.position - transform.position; d.y = 0f;
+            float dist = d.magnitude;
+            bool vu = dist <= B.assassinDetectionDos || (dist <= B.assassinDetectionVue && Vector3.Angle(transform.forward, d) <= B.assassinDetectionAngle);
+            if (vu) a.Reperer();
+            return vu;
         }
 
         /// Pose le squelette : stats, PV (multiplicateur de la nuit), place autour de Nyxessa.
@@ -167,7 +213,7 @@ namespace Deathless.Jeu
             {
                 if (h == null || !h.Vivant) continue;
                 float dd = (h.transform.position - transform.position).sqrMagnitude;
-                if (dd < d) { d = dd; meilleur = h; }
+                if (dd < d && Voit(h)) { d = dd; meilleur = h; }
             }
             return meilleur;
         }
@@ -182,6 +228,7 @@ namespace Deathless.Jeu
 
         protected virtual void MajMarche(float dt)
         {
+            if (Provoque) { m_Cible = m_Provocateur; m_Etat = Etat.Poursuite; return; }
             // Nyxessa au contact : on la frappe (priorité).
             if (DistanceNyxessa() <= B.rayonContactNyxessa)
             {
@@ -203,7 +250,9 @@ namespace Deathless.Jeu
 
         protected virtual void MajPoursuite(float dt)
         {
-            if (DistanceNyxessa() <= B.rayonContactNyxessa && (m_Cible == null || !m_Cible.Vivant || Distance(m_Cible.transform.position) > m_Stats.portee))
+            if (Provoque) { m_Cible = m_Provocateur; m_SansFrapper = 0f; }
+            else if (m_Cible != null && !Voit(m_Cible)) { m_Cible = null; m_Etat = Etat.Marche; return; }
+            if (!Provoque && DistanceNyxessa() <= B.rayonContactNyxessa && (m_Cible == null || !m_Cible.Vivant || Distance(m_Cible.transform.position) > m_Stats.portee))
             {
                 m_Cible = null;
                 m_Etat = Etat.Marche;
@@ -292,13 +341,18 @@ namespace Deathless.Jeu
 
         void OnTouche(InfoDegats info, float reel)
         {
+            if (info.continu) return;
             AudioBank.Jouer(SonsDuJeu.SqueletteTouche, transform.position + Vector3.up, 0.8f, 0.05f);
             if (animator != null && m_Etat != Etat.Preparation && m_Etat != Etat.SortieDeTerre) animator.SetTrigger(P_Hit);
             // Un joueur qui frappe attire l'attention s'il est proche.
             if (info.sourceId > 0 && m_Etat == Etat.Marche && P != null)
             {
                 var h = P.HerosDe(info.sourceId);
-                if (h != null && Distance(h.transform.position) < B.detectionJoueur && DistanceNyxessa() > B.rayonContactNyxessa) { m_Cible = h; m_Etat = Etat.Poursuite; m_SansFrapper = 0f; }
+                if (h != null && Distance(h.transform.position) < B.detectionJoueur && DistanceNyxessa() > B.rayonContactNyxessa && !ClasseAssassin.DansLaFumee(h.transform.position))
+                {
+                    m_Cible = h; m_Etat = Etat.Poursuite; m_SansFrapper = 0f;
+                    if (h.Classe is ClasseAssassin a) a.Reperer();
+                }
             }
         }
 

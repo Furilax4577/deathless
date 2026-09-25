@@ -20,7 +20,7 @@ namespace Deathless.EditorTools
     /// Construit la version 0.1 jouable (menu Deathless > Jeu). Chaque étape est rejouable et met à jour les assets
     /// existants (GUID gardés) : réglages, catalogue des sons, contrôleurs d'animation, prefabs du héros et des
     /// squelettes, scène Assets/Scenes/Village.unity (décor du village + racine Jeu), cuisson du NavMesh.
-    public static class JeuBuilder
+    public static partial class JeuBuilder
     {
         const string Racine = "Assets/Jeu";
         const string ReglagesPath = "Assets/Jeu/Resources/GameBalance.asset";
@@ -523,43 +523,7 @@ namespace Deathless.EditorTools
             }
         }
 
-        static void PrefabHeros()
-        {
-            var b = GameBalance.Courant;
-            var style = AssetDatabase.LoadAssetAtPath<WeaponStyle>("Assets/WeaponStyles/SwordShield.asset");
-            var racine = new GameObject("Heros_Paladin");
-            var knight = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(KnightPath));
-            PrefabUtility.UnpackPrefabInstance(knight, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
-            knight.name = "Modele";
-            knight.transform.SetParent(racine.transform, false);
-            knight.transform.localScale = Vector3.one * b.echellePersonnages;
-            MannequinEquip.Equiper(knight, style);
-            foreach (var t in knight.GetComponentsInChildren<Transform>(true))
-                if (PrefabUtility.IsPartOfPrefabInstance(t.gameObject) && PrefabUtility.IsOutermostPrefabInstanceRoot(t.gameObject))
-                    PrefabUtility.UnpackPrefabInstance(t.gameObject, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
-            var anim = knight.GetComponent<Animator>(); if (anim == null) anim = knight.AddComponent<Animator>();
-            anim.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(AnimDir + "/Paladin_Jeu.controller");
-            anim.applyRootMotion = false;
-            var visiere = knight.AddComponent<HelmetVisor>();
-            visiere.open = true;
-
-            var cc = racine.AddComponent<CharacterController>();
-            cc.radius = 0.4f; cc.height = 1.9f; cc.center = Vector3.up * 0.95f; cc.stepOffset = 0.35f; cc.slopeLimit = 45f; cc.skinWidth = 0.06f;
-            racine.AddComponent<Sante>().equipe = Equipe.Heros;
-            racine.AddComponent<HerosEntrees>();
-            var h = racine.AddComponent<Heros>();
-            h.animator = anim;
-            h.visiere = visiere;
-            var auraPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/VFX/AuraSoin/AuraSoin.prefab");
-            if (auraPrefab != null)
-            {
-                var aura = (GameObject)PrefabUtility.InstantiatePrefab(auraPrefab, racine.transform);
-                aura.transform.localPosition = Vector3.zero;   // racine du prefab à y = −1 sous un centre de capsule : ici sous les pieds
-                h.aura = aura.GetComponent<AuraSoin>();
-            }
-            PrefabUtility.SaveAsPrefabAsset(racine, PrefabDir + "/Heros_Paladin.prefab");
-            Object.DestroyImmediate(racine);
-        }
+        static void PrefabHeros() => PrefabClasse("paladin");
 
         // ================================================================= Scène
 
@@ -594,6 +558,7 @@ namespace Deathless.EditorTools
             fx.prefabChargeBelier = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/VFX/ChargeBelier/ChargeBelier.prefab");
             fx.prefabAuraSoin = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/VFX/AuraSoin/AuraSoin.prefab");
             fx.prefabOndeGolem = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/VFX/OndeDeChoc/OndeDeChoc_SautPercutant.prefab");
+            RemplirEffetsClasses(fx);
             var mort = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/VFX/MortAllie/MortAllie.prefab");
             if (mort != null) PrefabUtility.InstantiatePrefab(mort, jeu.transform);
 

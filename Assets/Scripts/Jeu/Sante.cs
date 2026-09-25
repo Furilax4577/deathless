@@ -14,6 +14,8 @@ namespace Deathless.Jeu
         public Vector3 direction;
         public bool parable;
         public bool critique;
+        /// Dégâts continus (brûlure, tournante) : pas de réaction « touché » (son, animation) à chaque tic.
+        public bool continu;
     }
 
     /// Réponse d'un intercepteur (garde du héros) : le coup passe, est bloqué ou paré.

@@ -12,6 +12,9 @@ namespace Deathless.Jeu
         public Transform cible;
         public float lacet;
         public float tangage = 12f;
+        [Tooltip("Visée demandée par la classe (rôdeur : LT) : 0 normale, 1 serrée (épaule plus proche, champ réduit).")]
+        public float viseeVoulue;
+        float m_Visee;
         [Header("Plan du menu principal (sans cible)")]
         public Vector3 menuPosition = new Vector3(-8f, 13f, -22f);
         [Tooltip("Rotation de la caméra (angles d'Euler, degrés).")]
@@ -63,12 +66,13 @@ namespace Deathless.Jeu
                 if (m_Camera != null) m_Camera.fieldOfView = menuChamp;
                 return;
             }
-            if (m_Camera != null) m_Camera.fieldOfView = m_ChampJeu;
+            m_Visee = Mathf.MoveTowards(m_Visee, viseeVoulue, Time.deltaTime * 5f);
+            if (m_Camera != null) m_Camera.fieldOfView = m_ChampJeu * (1f - 0.25f * m_Visee);
             Quaternion rot = Quaternion.Euler(tangage, lacet, 0f);
             Vector3 pivot = cible.position + Vector3.up * b.cameraHauteur;
-            Vector3 epaule = pivot + rot * Vector3.right * b.cameraEpaule;
+            Vector3 epaule = pivot + rot * Vector3.right * (b.cameraEpaule * (1f + 0.3f * m_Visee));
             Vector3 dir = rot * Vector3.back;
-            float voulu = b.cameraDistance;
+            float voulu = b.cameraDistance * (1f - 0.3f * m_Visee);
             float d = voulu;
             int n = Physics.SphereCastNonAlloc(epaule, 0.25f, dir, m_Hits, voulu, ~0, QueryTriggerInteraction.Ignore);
             for (int i = 0; i < n; i++)

@@ -9,7 +9,7 @@ namespace Deathless.Jeu
     /// IEtatJoueur, IScoreFin et ICommandesPartie en lisant Partie.Etat (aucune logique de jeu ici) et s'enregistre dans
     /// DonneesUI. Au chargement : commandes seules (menu principal) ; partie lancée : toutes les sources (HUD) ; fin :
     /// Phase = Terminee puis PartieTerminee (écran de score). Gère aussi le curseur (caché et verrouillé en jeu).
-    public class HudPresenter : MonoBehaviour, IEtatPartie, IEtatJoueur, IScoreFin, ICommandesPartie, IClassesJouables
+    public class HudPresenter : MonoBehaviour, IEtatPartie, IEtatJoueur, IEtatJoueurClasse, IScoreFin, ICommandesPartie, IClassesJouables
     {
         public static readonly Color TeintePaladin = new Color32(0xd9, 0xb2, 0x64, 0xff);
 
@@ -28,20 +28,36 @@ namespace Deathless.Jeu
         {
             m_Camera = Camera.main;
             if (P == null) return;
-            P.PartieLancee += () => DonneesUI.Enregistrer(this, this, this, this);
+            P.PartieLancee += () => { ConstruireEmplacements(); DonneesUI.Enregistrer(this, this, this, this); };
             P.NuitCommencee += n => NuitCommencee?.Invoke(n);
             P.NyxessaTouchee += (d, p) => NyxessaFrappee?.Invoke();
             P.PartieTerminee += () => PartieTerminee?.Invoke();
-            if (P.Etat.phase != Jeu.Phase.Attente) DonneesUI.Enregistrer(this, this, this, this);
-            m_Competences = new List<ICompetenceHud>
-            {
-                new Competence("Gameplay/AttackPrimary", "Frappe à l'épée", "Ép", this, 0),
-                new Competence("Gameplay/AttackSecondary", "Garde et parade", "Ga", this, 1),
-                new Competence("Gameplay/Skill1", "Charge bélier", "Ch", this, 2),
-                new Competence("Gameplay/Skill2", "Soin sur soi", "So", this, 3),
-            };
             m_Lignes = new List<ILigneScore> { new Ligne(this) };
+            ConstruireEmplacements();
+            if (P.Etat.phase != Jeu.Phase.Attente) DonneesUI.Enregistrer(this, this, this, this);
         }
+
+        /// Emplacements du HUD de la classe du joueur local (RT, LT, LB, RB), noms tirés du catalogue de l'écran de choix.
+        void ConstruireEmplacements()
+        {
+            var classe = ClassesJouables.Trouver(J != null ? J.classeId : Partie.ClasseChoisie) ?? ClassesJouables.Trouver(ClassesJouables.ParDefaut);
+            m_Competences = new List<ICompetenceHud>();
+            for (int i = 0; i < 4; i++)
+            {
+                var a = classe != null && classe.Actions.Count > i ? classe.Actions[i] : null;
+                string nom = a != null ? a.Nom : null;
+                m_Competences.Add(new Competence(a != null ? a.Action : "", nom, Abreviation(nom), this, i));
+            }
+        }
+
+        static string Abreviation(string nom)
+        {
+            if (string.IsNullOrEmpty(nom)) return "";
+            string n = nom.Trim();
+            return n.Length >= 2 ? n.Substring(0, 2) : n;
+        }
+
+        IClasseJouable ClasseLocale => ClassesJouables.Trouver(J != null ? J.classeId : Partie.ClasseChoisie);
 
         void OnDisable()
         {
@@ -81,7 +97,8 @@ namespace Deathless.Jeu
         public float VieMaxNyxessa => P != null ? Mathf.Max(1f, P.Etat.nyxessa.pvMax) : 1f;
         public float Bouclier => 0f;       // pas de bouclier du sorcier dans la 0.1
         public float BouclierMax => 0f;
-        public int OrEquipe => 0;          // pas de donjon dans la 0.1
+        /// Caisse commune : l'or ne vient que du donjon (wiki : deroule), 0 tant qu'il n'y a pas de donjon.
+        public int OrEquipe => P != null ? P.Etat.orEquipe : 0;
         public bool VoteActif => P != null && P.EnCours && P.Etat.phase == Jeu.Phase.Jour;
         public int JoueursPrets => P != null ? P.JoueursPrets : 0;
         public int JoueursTotal => P != null ? Mathf.Max(1, P.Etat.joueurs.Count) : 1;
@@ -105,7 +122,7 @@ namespace Deathless.Jeu
 
         public string Nom => J != null ? J.nom : "Joueur";
         public string Classe => J != null ? J.classe : "Paladin";
-        public Color TeinteClasse => TeintePaladin;
+        public Color TeinteClasse => ClasseLocale != null ? ClasseLocale.Teinte : TeintePaladin;
         public float Vie => J != null ? J.pv : 0f;
         public float VieMax => J != null ? Mathf.Max(1f, J.pvMax) : 1f;
         public float Endurance => J != null ? J.endurance : 0f;
@@ -121,21 +138,37 @@ namespace Deathless.Jeu
         public ResultatPartie Resultat => P != null && P.Etat.resultat == Jeu.Resultat.Victoire ? ResultatPartie.Victoire : ResultatPartie.Defaite;
         public int NuitAtteinte => P != null ? P.Etat.nuitAtteinte : 1;
         public float DureeSecondes => P != null ? P.Etat.duree : 0f;
-        public int OrTotal => 0;
+        public int OrTotal
+        {
+            get
+            {
+                if (P == null) return 0;
+                // Or de l'équipe : la caisse commune, ou au moins la somme de l'or rapporté par les joueurs.
+                int rapporte = 0;
+                foreach (var j in P.Etat.joueurs) rapporte += j.score.orRapporte;
+                return Mathf.Max(P.Etat.orEquipe, rapporte);
+            }
+        }
         public IReadOnlyList<ILigneScore> Joueurs => m_Lignes;
         public bool EstPretLocal => EstPret;
 
         // ----------------------------------------------------------------- ICommandesPartie
 
-        public void LancerSolo() { if (P != null) P.LancerSolo(); }
+        public void LancerSolo() { if (P != null) P.LancerSolo(ClassesJouables.DerniereJouee); }
 
         // ----------------------------------------------------------------- IClassesJouables (écran de choix de classe)
 
         public IReadOnlyList<IClasseJouable> Classes => ClassesJouables.Catalogue;
 
-        /// Seul le Paladin est jouable pour l'instant : quelle que soit la classe choisie, la partie lance le Paladin
-        /// (l'agent jeu branchera les autres classes ici).
-        public void LancerSolo(string classeId) => LancerSolo();
+        /// Lance la partie avec la classe choisie (paladin, mage, rodeur, assassin, viking).
+        public void LancerSolo(string classeId) { if (P != null) P.LancerSolo(classeId); }
+
+        // ----------------------------------------------------------------- IEtatJoueurClasse (jauge, furtif)
+
+        public JaugeClasse Jauge => H != null && H.Classe != null ? H.Classe.Jauge : JaugeClasse.Aucune;
+        public float ValeurJauge => J != null ? J.jauge : 0f;
+        public float JaugeMax => J != null ? Mathf.Max(1f, J.jaugeMax) : 1f;
+        public bool Furtif => J != null && J.furtif;
         public void BasculerPret() { if (P != null) P.BasculerPret(J != null ? J.id : 1); }
         public void QuitterPartie() { if (P != null) P.QuitterPartie(); }
         public void QuitterJeu() { if (P != null) P.QuitterJeu(); }
@@ -150,24 +183,31 @@ namespace Deathless.Jeu
             public string Nom { get; }
             public Texture2D Icone => null;
             public string Abreviation { get; }
+            EtatEmplacement Lire(out float restant, out float total)
+            {
+                restant = total = 0f;
+                var h = m_H.H;
+                if (h == null || h.Classe == null) return EtatEmplacement.Indisponible;
+                return h.Classe.Emplacement(m_Index, out restant, out total);
+            }
             public EtatCompetence Etat
             {
                 get
                 {
                     var h = m_H.H;
-                    if (h == null || !h.Vivant) return EtatCompetence.Indisponible;
-                    var b = GameBalance.Courant;
-                    switch (m_Index)
+                    var e = Lire(out _, out _);
+                    if (e == EtatEmplacement.Vide || h == null || !h.Vivant) return EtatCompetence.Indisponible;
+                    switch (e)
                     {
-                        case 0: return h.ActionCourante == Heros.Action.Attaque ? EtatCompetence.Active : EtatCompetence.Prete;
-                        case 1: return h.EnGarde ? EtatCompetence.Active : h.Endurance <= 0f ? EtatCompetence.Indisponible : EtatCompetence.Prete;
-                        case 2: return h.ActionCourante == Heros.Action.Charge || h.ActionCourante == Heros.Action.ChargeAnticipation ? EtatCompetence.Active : h.RechargeCharge > 0f ? EtatCompetence.Recharge : EtatCompetence.Prete;
-                        default: return h.ActionCourante == Heros.Action.Soin ? EtatCompetence.Active : h.RechargeSoin > 0f ? EtatCompetence.Recharge : EtatCompetence.Prete;
+                        case EtatEmplacement.Actif: return EtatCompetence.Active;
+                        case EtatEmplacement.Recharge: return EtatCompetence.Recharge;
+                        case EtatEmplacement.Indisponible: return EtatCompetence.Indisponible;
+                        default: return EtatCompetence.Prete;
                     }
                 }
             }
-            public float RechargeRestante { get { var h = m_H.H; return h == null ? 0f : m_Index == 2 ? h.RechargeCharge : m_Index == 3 ? h.RechargeSoin : 0f; } }
-            public float RechargeTotale { get { var b = GameBalance.Courant; return m_Index == 2 ? b.chargeRecharge : m_Index == 3 ? b.soinRecharge : 0f; } }
+            public float RechargeRestante { get { Lire(out float r, out _); return r; } }
+            public float RechargeTotale { get { Lire(out _, out float t); return t; } }
         }
 
         /// Ligne de score du joueur local : les sept catégories de ILigneScore, lues dans ScoreJoueur.
@@ -178,7 +218,7 @@ namespace Deathless.Jeu
             ScoreJoueur S => m_H.J != null ? m_H.J.score : new ScoreJoueur();
             public string Nom => m_H.Nom;
             public string Classe => m_H.Classe;
-            public Color TeinteClasse => TeintePaladin;
+            public Color TeinteClasse => m_H.TeinteClasse;
             public bool EstLocal => true;
             public int OrRapporte => S.orRapporte;
             public int DegatsInfliges => Mathf.RoundToInt(S.degatsInfliges);

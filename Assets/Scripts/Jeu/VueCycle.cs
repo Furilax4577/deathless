@@ -19,7 +19,8 @@ namespace Deathless.Jeu
         void Start()
         {
             if (P != null) P.PhaseChangee += OnPhase;
-            AudioBank.Musique(SonsDuJeu.MusiqueJour);
+            // Menu principal (partie en attente) : plan de nuit, donc musique de nuit ; le jour 1 relance celle du jour.
+            AudioBank.Musique(P != null && P.Etat.phase != Phase.Attente && P.Etat.phase != Phase.Nuit ? SonsDuJeu.MusiqueJour : SonsDuJeu.MusiqueNuit);
             if (portail != null) m_Bourdon = AudioBank.Boucle(SonsDuJeu.PortailBourdon, portail.transform, 0.5f);
         }
 

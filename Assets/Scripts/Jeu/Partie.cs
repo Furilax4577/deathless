@@ -70,6 +70,7 @@ namespace Deathless.Jeu
             if (LancerAuChargement || B.lancerDirectement)
             {
                 LancerAuChargement = false;
+                if (B.lancerDirectement && !string.IsNullOrEmpty(B.classeDeTest)) ClasseChoisie = B.classeDeTest;
                 StartCoroutine(LancerApresUneImage());
             }
         }
@@ -83,28 +84,39 @@ namespace Deathless.Jeu
 
         // ----------------------------------------------------------------- Commandes (IPartieCommandes)
 
-        /// Menu principal > Solo : crée le Paladin et lance la partie au jour qui précède la nuit de départ.
-        public void LancerSolo()
+        /// Classe du joueur local (choix de classe ; gardée pour « Rejouer »).
+        public static string ClasseChoisie = "paladin";
+
+        /// Menu principal > Solo : lance la partie avec la dernière classe choisie.
+        public void LancerSolo() => LancerSolo(ClasseChoisie);
+
+        /// Crée le héros de la classe `classeId` et lance la partie au jour qui précède la nuit de départ.
+        public void LancerSolo(string classeId)
         {
             if (Etat.phase != Phase.Attente) return;
             var b = B;
-            var j = new EtatJoueur { id = 1, nom = "Joueur", classe = "Paladin", pvMax = b.herosPV, pv = b.herosPV, enduranceMax = b.endurance, endurance = b.endurance };
+            var def = ClassesJeu.Courant != null ? ClassesJeu.Courant.Trouver(classeId) : null;
+            if (def == null || def.prefab == null) { classeId = "paladin"; def = ClassesJeu.Courant != null ? ClassesJeu.Courant.Trouver(classeId) : null; }
+            ClasseChoisie = classeId;
+            var prefab = def != null && def.prefab != null ? def.prefab : prefabHeros;
+            var j = new EtatJoueur { id = 1, nom = "Joueur", classe = def != null ? def.nom : "Paladin", classeId = classeId, enduranceMax = b.endurance, endurance = b.endurance };
             Etat.joueurs.Add(j);
-            if (prefabHeros != null)
+            if (prefab != null)
             {
                 Vector3 p = pointDepart != null ? pointDepart.position : PointReapparition(Vector3.zero);
                 Quaternion r = pointDepart != null ? pointDepart.rotation : Quaternion.LookRotation(-new Vector3(p.x, 0f, p.z).normalized);
-                var go = Instantiate(prefabHeros, p, r);
-                go.name = "Heros_Paladin";
+                var go = Instantiate(prefab, p, r);
+                go.name = "Heros_" + classeId;
                 var h = go.GetComponent<Heros>();
                 h.Initialiser(this, j);
+                h.EcrireEtat(j);
                 m_Heros[j.id] = h;
                 HerosLocal = h;
                 if (cameraJeu != null) cameraJeu.Suivre(h.transform);
             }
             Etat.nuit = Mathf.Clamp(b.nuitDeDepart, 1, b.nuitsPourGagner);
             Etat.duree = 0f;
-            Journal("Partie lancée (nuit de départ " + Etat.nuit + ", vitesse ×" + b.vitesseCycle + ")");
+            Journal("Partie lancée (" + classeId + ", nuit de départ " + Etat.nuit + ", vitesse ×" + b.vitesseCycle + ")");
             PartieLancee?.Invoke();
             Passer(b.commencerALaNuit ? Phase.Crepuscule : Phase.Jour);
         }

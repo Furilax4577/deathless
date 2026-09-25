@@ -482,7 +482,7 @@ namespace Deathless.UI.Dev
             m_Lignes.Clear();
             m_Lignes.Add(m_Ligne);
             if (!actif) return;
-            m_Lignes.Add(new LigneFactice { nom = "Joueur 2", classe = "Mage de feu", teinte = new Color32(0xff, 0x61, 0x0a, 0xff), local = false,
+            m_Lignes.Add(new LigneFactice { nom = "Joueur 2", classe = "Mage", teinte = new Color32(0xff, 0x61, 0x0a, 0xff), local = false,
                 or = 2310, degats = 34800, tues = 131, morts = 4, critiques = 9, evites = 3120, soins = 0 });
             m_Lignes.Add(new LigneFactice { nom = "Joueur 3", classe = "Assassin", teinte = new Color32(0x9a, 0x8f, 0xd0, 0xff), local = false,
                 or = 2330, degats = 18900, tues = 74, morts = 2, critiques = 41, evites = 1480, soins = 0 });

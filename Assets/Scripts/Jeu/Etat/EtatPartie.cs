@@ -37,7 +37,9 @@ namespace Deathless.Jeu
         public bool mort;
         public float reapparitionRestante;
         public bool pret;
-        public float rechargeCharge, rechargeSoin;
+        public string classeId = "paladin";
+        public float jauge, jaugeMax;    // mana du mage, rage du viking (0 : pas de jauge)
+        public bool furtif;              // assassin en mode furtif
         public ScoreJoueur score = new ScoreJoueur();
     }
 
@@ -74,6 +76,7 @@ namespace Deathless.Jeu
         public bool comptePret;          // tous prêts : le jour a été ramené au compte à rebours
         public Resultat resultat;
         public int nuitAtteinte;
+        public int orEquipe;             // caisse commune (or rapporté du donjon : 0 tant qu'il n'y a pas de donjon)
         public EtatNyxessa nyxessa = new EtatNyxessa();
         public EtatVagues vagues = new EtatVagues();
         public List<EtatJoueur> joueurs = new List<EtatJoueur>();

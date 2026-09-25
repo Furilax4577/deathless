@@ -25,7 +25,7 @@ namespace Deathless.Jeu.Dev
                 var s = j.score;
                 sb.Append(" | score dégâts ").Append(s.degatsInfliges.ToString("F0")).Append(" tués ").Append(s.ennemisTues).Append(" morts ").Append(s.morts).Append(" évités ").Append(s.degatsEvitesNyxessa.ToString("F0")).Append(" soins ").Append(s.soinsProdigues.ToString("F0")).Append(" crit ").Append(s.coupsCritiques);
                 var h = p.HerosLocal;
-                if (h != null) sb.Append(" | action ").Append(h.ActionCourante).Append(h.EnGarde ? " GARDE" : "").Append(" pos ").Append(h.transform.position.ToString("F1"));
+                if (h != null) sb.Append(" | ").Append(h.Classe != null ? h.Classe.Id : "?").Append(" ").Append(h.EtatCourant).Append(h.Classe != null && h.Classe.Occupe ? " OCCUPE" : "").Append(h.Classe != null && h.Classe.JaugeMax > 0f ? " jauge " + h.Classe.ValeurJauge.ToString("F0") : "").Append(h.Classe != null && h.Classe.Furtif ? " FURTIF" : "").Append(" pos ").Append(h.transform.position.ToString("F1"));
             }
             return sb.ToString();
         }

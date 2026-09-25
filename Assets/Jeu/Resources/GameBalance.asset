@@ -169,6 +169,98 @@ MonoBehaviour:
   soinPart: 0.25
   soinIncantation: 0.6
   soinRecharge: 30
+  magePV: 100
+  mageVitesse: 5
+  bouleDegats: 25
+  bouleDegatsZone: 15
+  bouleRayon: 2
+  bouleIntervalle: 0.9
+  bouleVitesse: 18
+  boulePortee: 30
+  bouleInstant: 0.28
+  manaMax: 100
+  manaRegen: 1
+  manaParTouche: 4
+  coneMana: 14
+  coneDegats: 22
+  conePortee: 6
+  coneDemiAngle: 20
+  coneVitesse: 0.4
+  brulureDegats: 5
+  brulureDuree: 3
+  rodeurPV: 110
+  rodeurVitesse: 5
+  arcCharge: 1.2
+  arcDegatsMin: 10
+  arcDegatsMax: 40
+  arcTete: 2
+  arcVitesseFleche: 30
+  arcPortee: 60
+  arcIntervalle: 0.3
+  arcVitesseBander: 0.5
+  viseeVitesse: 0.6
+  nueeRayon: 3
+  nueeSalves: 5
+  nueeDegatsSalve: 10
+  nueePortee: 25
+  nueeRecharge: 12
+  rouladeDistance: 4
+  rouladeCout: 20
+  salveFleches: 5
+  salveEcart: 20
+  salveDegats: 15
+  rouladeRecharge: 8
+  assassinPV: 100
+  assassinVitesse: 5
+  marcheDiscrete: 3.2
+  dagueDegats: 20
+  dagueIntervalle: 0.55
+  daguePortee: 1.8
+  dagueDemiAngle: 45
+  dagueInstant: 0.25
+  critiqueFurtif: 2
+  critiqueDos: 3
+  critiqueFurtifDos: 5
+  angleDos: 120
+  assassinDetectionVue: 6
+  assassinDetectionAngle: 60
+  assassinDetectionDos: 1.5
+  horsCombat: 4
+  arbaleteDegats: 45
+  arbaleteTete: 2
+  arbaleteVitesse: 45
+  arbaletePortee: 40
+  arbaleteRecharge: 6
+  grenadeRecharge: 20
+  grenadeNuage: 5
+  grenadePortee: 8
+  vikingPV: 140
+  vikingVitesse: 5
+  hacheDegats: 38
+  hacheIntervalle: 1.1
+  hachePortee: 2.4
+  hacheDemiAngle: 70
+  hacheInstant: 0.55
+  rageMax: 100
+  rageParTouche: 8
+  rageBaisse: 6
+  rageDelaiBaisse: 4
+  tournanteRage: 20
+  tournanteRageMin: 15
+  tournanteIntervalle: 0.3
+  tournanteRayon: 2.3
+  tournanteDegats: 12
+  tournanteVitesse: 0.6
+  rugissementRage: 25
+  rugissementRecharge: 12
+  rugissementRayon: 10
+  rugissementProvocation: 5
+  sautRage: 35
+  sautRecharge: 8
+  sautDistance: 5
+  sautRayon: 3.5
+  sautDegats: 45
+  sautEtourdi: 1
   reapparitionBase: 8
   reapparitionParMort: 4
   reapparitionInvulnerable: 2
@@ -186,4 +278,5 @@ MonoBehaviour:
   joueurInvincible: 0
   nyxessaInvincible: 0
   lancerDirectement: 0
+  classeDeTest: paladin
   journal: 1

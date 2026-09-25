@@ -17,11 +17,13 @@ namespace Deathless.Jeu
         public Vector2 Deplacement { get; private set; }
         public bool GardeMaintenue { get; private set; }
         public bool SprintMaintenu { get; private set; }
+        /// Attaque principale maintenue (bander l'arc du rôdeur).
+        public bool AttaqueMaintenue { get; private set; }
         /// Action résolue (nom de l'action de la carte Gameplay : Jump, Dodge, AttackPrimary, Skill1…).
         public event Action<string> Action;
 
         InputChordResolver m_Accords;
-        InputAction m_Move, m_Look, m_Garde, m_Sprint;
+        InputAction m_Move, m_Look, m_Garde, m_Sprint, m_Attaque;
         InputActionMap m_Jeu;
         static bool s_NavigateurPresent;
 
@@ -34,6 +36,7 @@ namespace Deathless.Jeu
             m_Look = m_Jeu.FindAction("Look", true);
             m_Garde = m_Jeu.FindAction("AttackSecondary", true);
             m_Sprint = m_Jeu.FindAction("Sprint", true);
+            m_Attaque = m_Jeu.FindAction("AttackPrimary", true);
             m_Accords = InputChordResolver.ForGameplay(actions);
             m_Accords.Triggered += OnAction;
             s_NavigateurPresent = FindAnyObjectByType<Deathless.UI.Ecrans.NavigateurEcrans>() != null;
@@ -74,12 +77,13 @@ namespace Deathless.Jeu
             if (m_Jeu == null || !m_Jeu.enabled)
             {
                 Deplacement = Vector2.zero;
-                GardeMaintenue = SprintMaintenu = false;
+                GardeMaintenue = SprintMaintenu = AttaqueMaintenue = false;
                 return;
             }
             Deplacement = Vector2.ClampMagnitude(m_Move.ReadValue<Vector2>(), 1f);
             GardeMaintenue = m_Accords.IsHeld(m_Garde);
             SprintMaintenu = m_Accords.IsHeld(m_Sprint);
+            AttaqueMaintenue = m_Accords.IsHeld(m_Attaque);
         }
     }
 }
