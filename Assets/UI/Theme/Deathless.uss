@@ -30,7 +30,7 @@
     --dl-color-life: #e0483e;
     --dl-color-stamina: #f2c14e;
     --dl-color-mana: #4a8fe0;
-    --dl-color-rage: #f07b2a;
+    --dl-color-rage: #ff8c1a;                   /* orange vif : bien distinct du rouge de la vie et du jaune de l'endurance */
     --dl-color-nyxessa: #3fae5a;
     --dl-color-shield: #4a8fe0;
     --dl-color-shield-warn: #ff9a3c;
