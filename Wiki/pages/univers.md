@@ -8,13 +8,11 @@ Les héros utilisent eux aussi cette force. C'est ce qui leur vaut la **fureur d
 
 La relique au cœur du village est la forme visible de Nyxessa. Tant qu'elle tient, les héros tiennent aussi.
 
-## Le Nécromancien {décidé}
+## Nyxar, le Nécromancien {décidé}
 
-Le **Nécromancien** est l'**ancien possesseur de Nyxessa**. Il l'utilisait **seul, pour son propre pouvoir**. Il tente aujourd'hui de la récupérer, et c'est lui qui mène les squelettes contre le village.
+**Nyxar, le Nécromancien**, est l'**ancien possesseur de Nyxessa**. Il l'utilisait **seul, pour son propre pouvoir**. Il tente aujourd'hui de la récupérer, et c'est lui qui mène les squelettes contre le village.
 
 Il possède encore un **fragment de Nyxessa** : c'est de là que viennent ses **pouvoirs résiduels**, et la lueur verte de ses yeux.
-
-- Son nom : {à confirmer}.
 
 ## Ce que ça change dans le jeu {dev}
 

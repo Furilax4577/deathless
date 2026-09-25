@@ -30,7 +30,7 @@ Ordre d'apparition dans la partie : sbires dès la nuit 1, guerriers nuit 2, vol
 | Nuit | Boss | Allure |
 |---|---|---|
 | 10 | **Golem**, mini-boss | Grand squelette massif, hache géante |
-| 12 | **Nécromancien**, boss final, ancien possesseur de Nyxessa (voir [L'univers](univers.md)) | Couronne à crâne, robe violette, grimoire, grande faux et faucille, **yeux verts** qui brillent de la force de Nyxessa |
+| 12 | **Nyxar, le Nécromancien**, boss final, ancien possesseur de Nyxessa (voir [L'univers](univers.md)) | Couronne à crâne, robe violette, grimoire, grande faux et faucille, **yeux verts** qui brillent de la force de Nyxessa |
 
 Comportements, points de vie et attaques des boss : {à confirmer}.
 
