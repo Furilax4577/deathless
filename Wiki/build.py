@@ -506,7 +506,7 @@ def generer(public):
                        for n, c, _, _, sp in pages)
         pied = ("Mis à jour le %s." % maj) if public else ("Généré le %s depuis <code>Wiki/pages/%s.md</code>." % (maj, nom))
         doc = ('<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
-               '<title>%s · Wiki Deathless</title>'
+               '<title>%s · Wiki Deathless</title>' + ('' if public else '<meta name="robots" content="noindex, nofollow">')
                '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&amp;display=swap">'
                '<style>%s</style></head><body><div class="cadre"><nav aria-label="Pages du wiki">'
                '<a class="marque" href="index.html">DEATHLESS</a><p class="sous">%s</p>'
