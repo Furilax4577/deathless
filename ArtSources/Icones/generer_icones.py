@@ -11,11 +11,17 @@ Style : langage des gemmes low poly des effets. Uniquement des <polygon> remplis
 ombrées par une lumière unique venue du haut à gauche, 2 à 5 teintes par objet, prises telles quelles dans les
 palettes de thème du jeu (Assets/VFX/_Palettes/*.asset, lues à chaque exécution ; table de secours ci-dessous).
 """
+import base64
 import codecs
 import html
 import math
 import re
+import sys
 from pathlib import Path
+
+sys.dont_write_bytecode = True
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import raster  # noqa: E402  (rastérisation PNG / ICO en Python pur)
 
 ICI = Path(__file__).resolve().parent
 MAIN = ICI.parent.parent
@@ -23,6 +29,7 @@ DOSSIER_PALETTES = MAIN / "Assets" / "VFX" / "_Palettes"
 SORTIE_CLASSES = ICI / "Classes"
 SORTIE_COMPETENCES = ICI / "Competences"
 PLANCHE = MAIN / "Docs" / "icones" / "planche.html"
+SORTIE_NYXESSA = ICI / "Nyxessa"
 
 # ---------------------------------------------------------------------------------------------- palettes
 
@@ -980,6 +987,150 @@ def druide_soin_nature():
     return ic
 
 
+# ---------------------------------------------------------------------------------------------- Nyxessa (emblème du jeu)
+# Relique : gemme verte à facettes au-dessus d'un rocher, ceinture de petites gemmes en orbite. Seule icône où le vert
+# est de mise (palette Nyxessa). Pas d'hexagone : emblème du jeu (page du wiki, launcher, exe dans la barre des tâches).
+# Liseré sombre (encre de l'interface) pour rester lisible sur une barre des tâches claire.
+
+ENCRE = "#161a24"
+NYX = [c("Nyxessa", "Émeraude sombre"), c("Nyxessa", "Émeraude"), c("Nyxessa", "Vert vif"), c("Nyxessa", "Vert clair"),
+       c("Nyxessa", "Éclat")]
+ROCHER = [c("Rage", "Fer sombre"), c("Rage", "Fer"), c("Rage", "Fer clair")]
+NYXESSA_CHOIX = "a"          # variante des fichiers nyxessa.* (A par défaut)
+NYXESSA_SEUIL_SIMPLE = 32    # jusqu'à cette taille (px), la version simplifiée est rastérisée
+NYXESSA_TAILLES_PNG = [16, 24, 32, 48, 64, 128, 256, 512, 1024]
+NYXESSA_TAILLES_ICO = [256, 128, 64, 48, 32, 24, 16]
+
+
+def contour_convexe(pts, d):
+    """Polygone convexe agrandi de d (liseré d'épaisseur constante)."""
+    cen = centroide(pts)
+    n = len(pts)
+    lignes = []
+    for i in range(n):
+        a, b = pts[i], pts[(i + 1) % n]
+        e = norm(sub(b, a))
+        nn = (-e[1], e[0])
+        if dot(nn, sub(mul(add(a, b), 0.5), cen)) < 0:
+            nn = (-nn[0], -nn[1])
+        lignes.append((add(a, mul(nn, d)), e))
+    res = []
+    for i in range(n):
+        (p1, e1), (p2, e2) = lignes[i - 1], lignes[i]
+        det = e1[0] * e2[1] - e1[1] * e2[0]
+        if abs(det) < 1e-9:
+            res.append(p2)
+            continue
+        q = sub(p2, p1)
+        t = (q[0] * e2[1] - q[1] * e2[0]) / det
+        res.append(add(p1, mul(e1, t)))
+    return res
+
+
+def cristal(ic, cx, haut, bas, y_large, demi, liseré):
+    h = bas - haut
+    T, B = (cx, haut), (cx, bas)
+    L, R = (cx - demi, y_large), (cx + demi, y_large)
+    M1 = (cx - demi * 0.4, y_large + h * 0.06)
+    M2 = (cx + demi * 0.42, y_large + h * 0.06)
+    if liseré:
+        ic.poly(contour_convexe([T, R, B, L], liseré), ENCRE)
+    sombre, emeraude, vif, clair, eclat = NYX
+    ic.poly([T, L, M1], clair)
+    ic.poly([T, M1, M2], vif)
+    ic.poly([T, M2, R], emeraude)
+    ic.poly([L, B, M1], vif)
+    ic.poly([M1, B, M2], emeraude)
+    ic.poly([M2, B, R], sombre)
+    ic.poly([T, add(T, mul(sub(L, T), 0.72)), add(T, mul(sub(M1, T), 0.42))], eclat)
+
+
+def ceinture(ic, centre, rx, ry, incl, n, taille, devant, liseré, phase=0.0):
+    ca, sa = math.cos(math.radians(incl)), math.sin(math.radians(incl))
+    for i in range(n):
+        th = math.radians(phase + 360.0 * i / n)
+        prof = math.sin(th)
+        if (prof > 0) != devant:
+            continue
+        x0, y0 = rx * math.cos(th), ry * prof
+        x, y = centre[0] + x0 * ca - y0 * sa, centre[1] + x0 * sa + y0 * ca
+        t = taille * (0.75 + 0.5 * (prof + 1) / 2)
+        pts = [(x, y - t * 1.3), (x + t, y), (x, y + t * 1.3), (x - t, y)]
+        if liseré:
+            ic.poly(contour_convexe(pts, liseré), ENCRE)
+        ic.gemme(pts, [NYX[2], NYX[3]] if devant else [NYX[1], NYX[2]], dessous=False)
+
+
+def rocher(ic, pts, liseré):
+    if liseré:
+        ic.poly(contour_convexe(pts, liseré), ENCRE)
+    ic.gemme(pts, ROCHER, table=0.5, teinte_table=c("Rage", "Fer"))
+
+
+def nyxessa(variante, simple):
+    nom = "nyxessa_%s%s" % (variante, "_simple" if simple else "")
+    titre = "Nyxessa, variante %s%s" % (variante.upper(), " (petites tailles)" if simple else "")
+    ic = Icone(nom, "nyxessa", titre)
+    if variante == "a":
+        if simple:
+            ic.notes = "Gemme plus large, liseré plus épais, quatre gemmes en orbite."
+            ceinture(ic, (64, 66), 58, 17, -10, 4, 10, False, 5, phase=35)
+            cristal(ic, 64, 4, 124, 52, 31, 6)
+            ceinture(ic, (64, 66), 58, 17, -10, 4, 10, True, 5, phase=35)
+        else:
+            ic.notes = "Gemme verte à facettes dans sa ceinture de gemmes en orbite."
+            ceinture(ic, (64, 64), 58, 13, -10, 22, 3.8, False, 1.6)
+            cristal(ic, 64, 4, 124, 52, 26, 3)
+            ceinture(ic, (64, 64), 58, 13, -10, 22, 3.8, True, 1.6)
+    else:
+        caillou = [(38, 124), (90, 124), (96, 112), (86, 100), (64, 96), (44, 100), (32, 112)]
+        if simple:
+            ic.notes = "Gemme et rocher, sans ceinture."
+            rocher(ic, [(x, y + 2) for x, y in caillou], 5)
+            cristal(ic, 64, 3, 94, 42, 26, 5)
+        else:
+            ic.notes = "Gemme en ceinture au-dessus de son rocher (pierre de la place du village)."
+            rocher(ic, caillou, 3)
+            ic.poly([(40, 108), (90, 106), (92, 110), (38, 112)], NYX[2])
+            ceinture(ic, (64, 46), 50, 11, -10, 20, 3.4, False, 1.6)
+            cristal(ic, 64, 3, 90, 40, 21, 3)
+            ceinture(ic, (64, 46), 50, 11, -10, 20, 3.4, True, 1.6)
+    return ic
+
+
+def nyxessa_pour(variante, taille):
+    return nyxessa(variante, taille <= NYXESSA_SEUIL_SIMPLE)
+
+
+def exporter_nyxessa():
+    """SVG des deux variantes (pleine et simplifiée), puis PNG et ICO de la variante retenue dans Nyxessa/."""
+    SORTIE_NYXESSA.mkdir(parents=True, exist_ok=True)
+    icones = {}
+    for v in ("a", "b"):
+        for simple in (False, True):
+            ic = nyxessa(v, simple)
+            icones[ic.nom] = ic
+            (SORTIE_NYXESSA / (ic.nom + ".svg")).write_text(ic.svg(), encoding="utf-8", newline="\n")
+    for simple in (False, True):
+        ic = nyxessa(NYXESSA_CHOIX, simple)
+        ic.nom = "nyxessa_simple" if simple else "nyxessa"
+        (SORTIE_NYXESSA / (ic.nom + ".svg")).write_text(ic.svg(), encoding="utf-8", newline="\n")
+    pngs = {}
+    for t in NYXESSA_TAILLES_PNG:
+        ic = nyxessa_pour(NYXESSA_CHOIX, t)
+        donnees = raster.png(t, t, raster.rasteriser(ic.formes, t))
+        (SORTIE_NYXESSA / ("nyxessa_%d.png" % t)).write_bytes(donnees)
+        pngs[t] = donnees
+    (SORTIE_NYXESSA / "nyxessa.ico").write_bytes(raster.ico([(t, pngs[t]) for t in NYXESSA_TAILLES_ICO]))
+    # Aperçus pour la barre des tâches de la planche : vrais PNG rastérisés, les deux variantes.
+    apercus = {}
+    for v in ("a", "b"):
+        for t in (16, 24, 32, 48):
+            ic = nyxessa_pour(v, t)
+            apercus[(v, t)] = pngs[t] if v == NYXESSA_CHOIX else raster.png(t, t, raster.rasteriser(ic.formes, t))
+    return icones, apercus
+
+
 # ---------------------------------------------------------------------------------------------- catalogue
 
 CLASSES = [classe_paladin, classe_mage_feu, classe_rodeur, classe_assassin, classe_viking, classe_druide,
@@ -1037,7 +1188,7 @@ VERTS_INTERDITS = set(P["Nyxessa"].values()) | {c("Chasse", "Sous-bois"), c("Cha
 
 def verifier(ic):
     couleurs = {col for _, col in ic.formes}
-    interdites = couleurs & VERTS_INTERDITS
+    interdites = set() if ic.famille == "nyxessa" else couleurs & VERTS_INTERDITS
     if interdites:
         raise SystemExit("%s : teintes vertes interdites %s" % (ic.nom, sorted(interdites)))
     for pts, _ in ic.formes:
@@ -1118,6 +1269,17 @@ table.pal td { padding:4px 10px 4px 0; vertical-align:middle; }
 .modif .nom { font-weight:600; font-size:16px; }
 .modif .fichier { font-family:ui-monospace, Consolas, monospace; font-size:12px; color:var(--texte-off); }
 .modif .quoi { font-size:13px; color:var(--texte-2); margin-top:3px; }
+.nyxs { grid-template-columns:repeat(auto-fill, minmax(min(100%, 470px), 1fr)); }
+.carte.nyx .tailles { flex-wrap:wrap; margin:8px 0; }
+.carte.nyx .fond-clair { display:flex; align-items:flex-end; gap:10px; background:#f3efe6; border-radius:10px; padding:6px; }
+.carte.nyx .px { display:flex; flex-direction:column; align-items:center; gap:3px; font-size:11px; color:var(--texte-off); }
+.carte.nyx .simple { display:flex; flex-direction:column; align-items:center; font-size:11px; color:var(--texte-off);
+  margin-left:12px; }
+.carte.nyx img { display:block; }
+.barre-tb { display:flex; align-items:center; gap:4px; height:48px; border-radius:8px; padding:0 10px; margin-top:8px; }
+.tb-lib { font-size:11px; margin-right:auto; }
+.case-tb { width:40px; height:40px; border-radius:6px; display:flex; align-items:center; justify-content:center; }
+.case-tb i { display:block; width:24px; height:24px; border-radius:5px; }
 .sprite { position:absolute; width:0; height:0; overflow:hidden; }
 """
 
@@ -1190,6 +1352,40 @@ def bloc_modifiees(par_nom):
     return '<h2>Modifiées</h2><div class="modifs">%s</div>' % "".join(lignes)
 
 
+def _img(donnees, taille):
+    return ('<img width="%d" height="%d" alt="" style="image-rendering:auto" src="data:image/png;base64,%s">'
+            % (taille, taille, base64.b64encode(donnees).decode("ascii")))
+
+
+def bloc_nyxessa(nyx, apercus):
+    cartes = []
+    for v in ("a", "b"):
+        plein, simple = nyx["nyxessa_%s" % v], nyx["nyxessa_%s_simple" % v]
+        petits = "".join('<div class="px"><div>%s</div><span>%d</span></div>' % (_img(apercus[(v, t)], t), t)
+                         for t in (48, 32, 24, 16))
+        barres = ""
+        for theme, fond, autre in (("clair", "#f3f3f3", "#d6d9de"), ("sombre", "#1f1f1f", "#3a3d42")):
+            cases = "".join('<div class="case-tb" title="%d px">%s</div>' % (t, _img(apercus[(v, t)], t))
+                            for t in (16, 24, 32))
+            leurres = "".join('<div class="case-tb"><i style="background:%s"></i></div>' % autre for _ in range(3))
+            barres += ('<div class="barre-tb" style="background:%s"><span class="tb-lib" style="color:%s">'
+                       'Barre %s · 16, 24, 32 px</span>%s%s</div>'
+                       % (fond, "#555" if theme == "clair" else "#aaa", theme, leurres, cases))
+        choix = ' <span class="provisoire">nyxessa.*</span>' if v == NYXESSA_CHOIX else ""
+        cartes.append(
+            '<div class="carte nyx"><div class="nom">%s%s</div><div class="quoi">%s</div>'
+            '<div class="tailles">%s%s<div class="fond-clair">%s%s</div></div>'
+            '<div class="quoi">Petites tailles (PNG rastérisés par le script, version simplifiée jusqu\'à %d px) :</div>'
+            '<div class="tailles">%s<div class="simple">%s<span>SVG simplifié</span></div></div>%s</div>'
+            % (html.escape(plein.titre), choix, html.escape(plein.notes), _use(plein.nom, 128), _use(plein.nom, 64),
+               _use(plein.nom, 128), _use(plein.nom, 64), NYXESSA_SEUIL_SIMPLE, petits, _use(simple.nom, 64), barres))
+    return ('<h2>Nyxessa (emblème du jeu)</h2>'
+            '<p class="note">Pour la page du wiki, le launcher et l\'exe du jeu dans la barre des tâches. Palette '
+            'Nyxessa, liseré sombre pour les fonds clairs. Fichiers dans <code>ArtSources/Icones/Nyxessa/</code> : '
+            'SVG pleins et simplifiés, PNG 16 à 1024 px et <code>nyxessa.ico</code> (16 à 256 px) de la variante %s.</p>'
+            '<div class="grille nyxs">%s</div>' % (NYXESSA_CHOIX.upper(), "".join(cartes)))
+
+
 def bloc_mecanicien(par_nom):
     variantes = "".join(carte(par_nom[f.__name__]) for f in MECANICIEN_VARIANTES)
     return ('<h2>Mécanicien (classe à venir)</h2>'
@@ -1213,10 +1409,10 @@ def bloc_druide(par_nom):
             '<div class="grille">%s</div>' % (DRUIDE_CHOIX.upper(), variantes, comps))
 
 
-def planche(classes, competences):
+def planche(classes, competences, nyx, apercus):
     par_nom = {ic.nom: ic for ic in classes + competences}
     sprite = "".join('<symbol id="i-%s" viewBox="0 0 128 128">%s</symbol>' % (ic.nom, ic.polygones())
-                     for ic in classes + competences)
+                     for ic in classes + competences + list(nyx.values()))
     for nom, _ in MODIFIEES:
         ancien = HISTORIQUE / (nom + ".svg")
         if ancien.exists():
@@ -1229,6 +1425,7 @@ def planche(classes, competences):
                  'Gemmes low poly : polygones à bords nets, lumière unique en haut à gauche, couleurs lues dans les '
                  'palettes de thème du jeu. Les classes ont un cadre hexagonal, les compétences sont un glyphe seul '
                  '(le HUD dessine le cadre et la recharge).</p>')
+    corps.append(bloc_nyxessa(nyx, apercus))
     corps.append(bloc_mecanicien(par_nom))
     corps.append(bloc_druide(par_nom))
     corps.append(bloc_modifiees(par_nom))
@@ -1287,7 +1484,8 @@ def main():
         for f in dossier.glob("*.svg"):
             if f.name not in attendus:
                 print("  fichier orphelin (non régénéré) : %s" % f)
-    PLANCHE.write_text(planche(classes, competences), encoding="utf-8", newline="\n")
+    nyx, apercus = exporter_nyxessa()
+    PLANCHE.write_text(planche(classes, competences, nyx, apercus), encoding="utf-8", newline="\n")
     print("%d classes, %d compétences, %.1f Ko de SVG ; planche : %s"
           % (len(classes), len(competences), total / 1024.0, PLANCHE))
 

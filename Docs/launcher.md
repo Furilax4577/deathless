@@ -254,8 +254,10 @@ Tout est compilé dans l'exe (environ 1,6 Mo) :
 - les invites Kenney (Entrée, flèches, molette, N ; A, croix, stick droit, Y), lues dans
   `Assets/Art/UI/KenneyInputPrompts/*/Double/` ;
 - l'image de fond (voir ci-dessous) ;
-- l'icône, `Launcher/Ressources/deathless.ico` : la gemme de Nyxessa du HUD, régénérée par
-  `python Launcher/make_icon.py`.
+- l'icône, `Launcher/Ressources/deathless.ico` : régénérée par `python Launcher/make_icon.py`, qui recopie
+  l'emblème Nyxessa (`ArtSources/Icones/Nyxessa/nyxessa.ico`, dessiné et rastérisé par
+  `ArtSources/Icones/generer_icones.py` et `raster.py`). Tant que le script n'a pas été relancé, le fichier reste
+  l'ancienne gemme du HUD.
 
 Le launcher ne se met pas à jour lui-même : une nouvelle version se distribue à la main, en republiant
 `DeathlessLauncher.zip`.
