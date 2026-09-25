@@ -1,6 +1,22 @@
 {
   "versions": [
     {
+      "version": "0.4.0",
+      "date": "2026-09-25",
+      "titre": "Ensemble contre la nuit",
+      "notes": [
+        "Multijoueur jusqu'à 4 : créez un salon et partagez son code, vos amis le rejoignent sans adresse IP ni port à ouvrir. Rejoindre par adresse IP reste possible.",
+        "Lobby : chacun choisit sa classe (une classe par joueur), se déclare prêt, et la partie se lance quand tout le monde l'est.",
+        "Pseudo demandé au premier lancement, modifiable dans les options. Vie des alliés à gauche du HUD, pseudos au-dessus des têtes.",
+        "Le sorcier du village : il passe la journée chez lui et, la nuit, lève le bouclier de Nyxessa, dos à la relique. Si le bouclier cède, il tombe.",
+        "Le bouclier de Nyxessa encaisse les coups et renvoie des dégâts ; sa barre s'affiche à côté de la vie de Nyxessa.",
+        "De l'or à chaque squelette tué pendant les vagues, versé à la caisse commune.",
+        "Arc et arbalète visent enfin le réticule ; flèches et carreaux volent en cloche, plus loin quand l'arc est bien bandé.",
+        "Classes à venir dans le choix de classe : le Druide et le Mécanicien, bientôt.",
+        "Rage en orange, barres du HUD sans icônes, nouvelle icône du jeu : Nyxessa."
+      ]
+    },
+    {
       "version": "0.3.0",
       "date": "2026-09-25",
       "titre": "Visages et emblèmes",
