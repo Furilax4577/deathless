@@ -34,6 +34,8 @@ Les rôles sont {à confirmer}. Les armes et leurs animations sont {décidé}.
 - **Visée récompensée** {décidé} : un tir plus précis rapporte davantage.
   - **Tir à la tête** : une flèche dans la tête est un **coup critique**.
   - **Arc bandé** : maintenir l'attaque bande l'arc, avec une jauge de charge. Plus l'arc est tendu, plus les dégâts sont élevés.
+  - **Charge complète** : quand l'arc est complètement bandé, la flèche brille brièvement pour l'annoncer.
+- **Flèches non magiques** {décidé} : les flèches, du rôdeur comme toutes les autres, ne brillent pas et ne laissent pas de traînée lumineuse. Seule exception, le bref éclat de la charge complète.
 - Durée de charge, dégâts minimum et maximum, multiplicateur de critique : {à confirmer}.
 - Autres compétences et valeurs chiffrées : {à confirmer}.
 
@@ -63,7 +65,7 @@ L'assassin joue **principalement à la dague**. L'arbalète et la grenade sont d
 
 ### Arbalète {décidé}
 
-- Un carreau dans la **tête** est un **coup critique**.
+- Un carreau dans la **tête** est un **coup critique**. C'est le **seul** critique possible à l'arbalète : les passifs de furtivité et de coup dans le dos ne s'appliquent pas aux carreaux.
 - **Gros temps de recharge** : l'arbalète ne remplace pas la dague.
 - Durée exacte du temps de recharge : {à confirmer}.
 
