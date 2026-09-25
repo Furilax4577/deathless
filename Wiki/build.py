@@ -506,7 +506,7 @@ def generer(public):
                        for n, c, _, _, sp in pages)
         pied = ("Mis à jour le %s." % maj) if public else ("Généré le %s depuis <code>Wiki/pages/%s.md</code>." % (maj, nom))
         doc = ('<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
-               '<title>%s · Wiki Deathless</title>' + ('' if public else '<meta name="robots" content="noindex, nofollow">')
+               '<title>%s · Wiki Deathless</title>'
                '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&amp;display=swap">'
                '<style>%s</style></head><body><div class="cadre"><nav aria-label="Pages du wiki">'
                '<a class="marque" href="index.html">DEATHLESS</a><p class="sous">%s</p>'
@@ -516,6 +516,8 @@ def generer(public):
                '<main>%s<p class="maj">%s</p></main></div>'
                '<script>var INDEX=%s;%s</script></body></html>'
                % (html.escape(titre), CSS, sous_titre, menu, corps, pied, json.dumps(index, ensure_ascii=False), JS))
+        if not public:  # version développeur en ligne : pas d'indexation par les moteurs de recherche
+            doc = doc.replace("<title>", '<meta name="robots" content="noindex, nofollow"><title>', 1)
         io.open(os.path.join(dossier, nom + ".html"), "w", encoding="utf-8", newline="\n").write(doc)
     copier_sons()
     copier_icones(dossier)
