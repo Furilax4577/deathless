@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16cbdd13d2afa1e43a39f41123144561, type: 3}
+  m_Name: VfxPalettes
+  m_EditorClassIdentifier: Assembly-CSharp::VfxPalettes
+  palettes:
+  - {fileID: 11400000, guid: 612442b95ba3a7c49a1933d7bdc5de36, type: 2}
+  - {fileID: 11400000, guid: bb93285f7d6d6e140a6a22de73f0ec2c, type: 2}
+  - {fileID: 11400000, guid: cd2ea8f3e4348684b91379b19377042d, type: 2}
+  - {fileID: 11400000, guid: 26c375eaf63b1c243b463f936e5223a0, type: 2}
+  - {fileID: 11400000, guid: ef4f1da2cad4348488550f9b35a69c97, type: 2}
+  - {fileID: 11400000, guid: 039a8cd796d0f504aa581cfa44256681, type: 2}
+  - {fileID: 11400000, guid: 6ed816e111137df499bc5f63d6fa52f9, type: 2}
+  - {fileID: 11400000, guid: 46fa525e9f097b74784fc036929a3604, type: 2}
+  - {fileID: 11400000, guid: 57d5d30c8e0e6c84bb6208e6d600e4d4, type: 2}
+  - {fileID: 11400000, guid: a18f2adfb9436af4c85191a6927c13a8, type: 2}

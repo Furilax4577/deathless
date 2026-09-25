@@ -28,10 +28,21 @@ public class LowPolyBlast : MonoBehaviour
     public static void Fire(Vector3 center, float radius, Material material)
     {
         Spawn(center, radius, material,
-            new Color(1f, 0.38f, 0.04f), new Color(1.1f, 0.28f, 0.02f),
-            new Color(1f, 0.9f, 0.4f), new Color(2.2f, 1.7f, 0.45f),
-            new Color(0.8f, 0.12f, 0.03f), new Color(0.7f, 0.06f, 0.01f),
-            new Color(1f, 0.55f, 0.2f));
+            Feu(VfxRole.Vif), VfxPalette.Lueur(Feu(VfxRole.Vif), 1.1f),
+            Feu(VfxRole.Coeur), VfxPalette.Lueur(Feu(VfxRole.Coeur), 2.2f),
+            Feu(VfxRole.Base), VfxPalette.Lueur(Feu(VfxRole.Base), 1f),
+            Color.Lerp(Feu(VfxRole.Vif), Feu(VfxRole.Coeur), 0.3f));
+    }
+
+    // Teintes du thème Feu (palette de référence : boule de feu de Relic).
+    private static Color Feu(VfxRole role)
+    {
+        switch (role)
+        {
+            case VfxRole.Coeur: return VfxPalette.Couleur(VfxTheme.Feu, role, new Color(1f, 0.9f, 0.4f));
+            case VfxRole.Vif: return VfxPalette.Couleur(VfxTheme.Feu, role, new Color(1f, 0.38f, 0.04f));
+            default: return VfxPalette.Couleur(VfxTheme.Feu, role, new Color(0.8f, 0.12f, 0.03f));
+        }
     }
 
     public static LowPolyBlast Spawn(Vector3 center, float radius, Material material, Color outer, Color outerGlow,

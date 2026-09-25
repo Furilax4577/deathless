@@ -7,10 +7,13 @@ using UnityEngine;
 // sans émission. Purement visuel et local (EnemyVisual la crée chez chaque client).
 public class DirtBurst : MonoBehaviour
 {
-    private static readonly Color[] Palette =
+    private static Color[] Palette => VfxPalette.Cache("DirtBurst.Terre", () => new[]
     {
-        new Color(0.42f, 0.3f, 0.19f), new Color(0.3f, 0.21f, 0.13f), new Color(0.52f, 0.4f, 0.27f), new Color(0.55f, 0.53f, 0.5f),
-    };
+        Color.Lerp(VfxPalette.Couleur(VfxTheme.Terre, VfxRole.Base, new Color(0.357f, 0.247f, 0.165f)), VfxPalette.Couleur(VfxTheme.Terre, VfxRole.Vif, new Color(0.541f, 0.416f, 0.282f)), 0.4f),
+        VfxPalette.Couleur(VfxTheme.Terre, VfxRole.Base, new Color(0.3f, 0.21f, 0.13f)),
+        VfxPalette.Couleur(VfxTheme.Terre, VfxRole.Vif, new Color(0.52f, 0.4f, 0.27f)),
+        VfxPalette.Accent(VfxTheme.Terre, "Pierre", new Color(0.55f, 0.53f, 0.5f)),
+    });
 
     private const float Life = 1.6f;
     private const float SinkTime = 0.5f;

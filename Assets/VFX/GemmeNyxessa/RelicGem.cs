@@ -18,10 +18,13 @@ public class RelicGem : MonoBehaviour
     [Tooltip("Eclaircissement la nuit (pendant la vague), en plus de la lumière du cristal.")]
     [SerializeField] private float nightBoost = 0.3f;
 
-    private static readonly Color[] Palette =
+    private static Color[] Palette => VfxPalette.Cache("RelicGem.Nyxessa", () => new[]
     {
-        new Color(0.1f, 0.45f, 0.1f), new Color(0.2f, 0.62f, 0.14f), new Color(0.32f, 0.8f, 0.2f), new Color(0.5f, 0.95f, 0.32f),
-    };
+        VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Base, new Color(0.1f, 0.45f, 0.1f)),
+        VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Vif, new Color(0.2f, 0.62f, 0.14f)),
+        Color.Lerp(VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Vif, new Color(0.2f, 0.62f, 0.14f)), VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Coeur, new Color(0.5f, 0.95f, 0.32f)), 0.5f),
+        VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Coeur, new Color(0.5f, 0.95f, 0.32f)),
+    });
 
     private Mesh mesh;
     private Vector3[] faceNormals;

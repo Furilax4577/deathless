@@ -34,10 +34,10 @@ public class FireEffect : MonoBehaviour
         if (withFlames)
             fire.flames = Make(root, "Flames", flameMaterial, radius, scale, 0.45f * (1f + scale * 0.3f), 0.7f * (1f + scale * 0.3f),
             2.2f * rise, 3.6f * rise, 0.5f * scale, 0.9f * scale, 20f + 35f * radius,
-            Gradient(new Color(1f, 0.82f, 0.4f), new Color(1f, 0.5f, 0.12f), new Color(0.85f, 0.18f, 0.04f), 0.9f, 0.7f, 0f),
+            Gradient(Color.Lerp(Feu(VfxRole.Coeur), Feu(VfxRole.Vif), 0.15f), Color.Lerp(Feu(VfxRole.Vif), Feu(VfxRole.Coeur), 0.2f), Color.Lerp(Feu(VfxRole.Base), Feu(VfxRole.Vif), 0.2f), 0.9f, 0.7f, 0f),
             0.35f * scale, 0f);
         fire.embers = Make(root, "Embers", flameMaterial, radius, scale, 1.0f, 1.8f, 1.5f * scale, 3f * scale, 0.05f * scale, 0.1f * scale, 4f + 8f * radius,
-            Gradient(new Color(1f, 0.85f, 0.4f), new Color(1f, 0.55f, 0.15f), new Color(1f, 0.3f, 0.05f), 1f, 1f, 0f),
+            Gradient(Feu(VfxRole.Coeur), Color.Lerp(Feu(VfxRole.Vif), Feu(VfxRole.Coeur), 0.25f), Color.Lerp(Feu(VfxRole.Base), Feu(VfxRole.Vif), 0.6f), 1f, 1f, 0f),
             0.6f * scale, -0.05f);
         if (withSmoke && smokeMaterial != null)
         {
@@ -56,7 +56,7 @@ public class FireEffect : MonoBehaviour
             lightGo.transform.localPosition = new Vector3(0f, 0f, 0.6f * scale);
             fire.fireLight = lightGo.AddComponent<Light>();
             fire.fireLight.type = LightType.Point;
-            fire.fireLight.color = new Color(1f, 0.6f, 0.25f);
+            fire.fireLight.color = Color.Lerp(Feu(VfxRole.Vif), Feu(VfxRole.Coeur), 0.4f);
             fire.lightIntensity = 2.5f * scale;
             fire.fireLight.intensity = fire.lightIntensity;
             fire.fireLight.range = 5f + 5f * scale;
@@ -80,7 +80,7 @@ public class FireEffect : MonoBehaviour
         lightGo.transform.SetParent(root.transform, false);
         fire.fireLight = lightGo.AddComponent<Light>();
         fire.fireLight.type = LightType.Point;
-        fire.fireLight.color = new Color(1f, 0.68f, 0.36f);
+        fire.fireLight.color = Color.Lerp(Feu(VfxRole.Vif), Feu(VfxRole.Coeur), 0.55f);
         fire.lightIntensity = intensity;
         fire.fireLight.intensity = intensity;
         fire.fireLight.range = range;
@@ -97,7 +97,9 @@ public class FireEffect : MonoBehaviour
             main.startLifetime = 1000000f;
             main.startSpeed = 0f;
             main.startSize = 1.5f;
-            main.startColor = new Color(1f, 0.62f, 0.25f, 0.55f);
+            Color lueur = Color.Lerp(Feu(VfxRole.Vif), Feu(VfxRole.Coeur), 0.45f);
+            lueur.a = 0.55f;
+            main.startColor = lueur;
             main.maxParticles = 1;
             main.simulationSpace = ParticleSystemSimulationSpace.Local;
             var emission = glow.emission;
@@ -158,6 +160,17 @@ public class FireEffect : MonoBehaviour
         renderer.renderMode = ParticleSystemRenderMode.Billboard;
         renderer.sortingFudge = -10f;
         return system;
+    }
+
+    // Teintes du thème Feu (palette de référence : boule de feu de Relic).
+    private static Color Feu(VfxRole role)
+    {
+        switch (role)
+        {
+            case VfxRole.Coeur: return VfxPalette.Couleur(VfxTheme.Feu, role, new Color(1f, 0.9f, 0.4f));
+            case VfxRole.Vif: return VfxPalette.Couleur(VfxTheme.Feu, role, new Color(1f, 0.38f, 0.04f));
+            default: return VfxPalette.Couleur(VfxTheme.Feu, role, new Color(0.8f, 0.12f, 0.03f));
+        }
     }
 
     private static Gradient Gradient(Color a, Color b, Color c, float alphaStart, float alphaMid, float alphaEnd)

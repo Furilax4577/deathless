@@ -29,15 +29,15 @@ public class RugissementCrane : MonoBehaviour
     [SerializeField] private float angleBascule = 13f;
 
     // Rouges du crâne (creux → os), fond d'orbite presque noir, ivoire (dents, cornes), gris fer (casque).
-    private static readonly Color Dark = new Color(0.25f, 0.05f, 0.04f);
-    private static readonly Color Mid = new Color(0.43f, 0.08f, 0.06f);      // #6e1410
-    private static readonly Color Pale = new Color(0.7f, 0.15f, 0.12f);      // #b3261e
-    private static readonly Color Orbite = new Color(0.227f, 0.039f, 0.031f);   // #3a0a08
-    private static readonly Color Ivoire = new Color(0.91f, 0.863f, 0.753f);    // #e8dcc0
-    private static readonly Color Fer = new Color(0.353f, 0.373f, 0.4f);        // #5a5f66
-    private static readonly Color FerSombre = new Color(0.247f, 0.267f, 0.29f); // #3f444a
-    private static readonly Color FerClair = new Color(0.478f, 0.502f, 0.533f);  // #7a8088 (arêtes du heaume)
-    private static readonly Color IvoireClair = new Color(1f, 0.96f, 0.88f);      // pointe des cornes
+    private static Color Dark => Color.Lerp(VfxPalette.Couleur(VfxTheme.Rage, VfxRole.Ombre, new Color(0.227f, 0.039f, 0.031f)), VfxPalette.Couleur(VfxTheme.Rage, VfxRole.Base, new Color(0.43f, 0.08f, 0.06f)), 0.12f);
+    private static Color Mid => VfxPalette.Couleur(VfxTheme.Rage, VfxRole.Base, new Color(0.43f, 0.08f, 0.06f));      // #6e1410
+    private static Color Pale => VfxPalette.Couleur(VfxTheme.Rage, VfxRole.Vif, new Color(0.7f, 0.15f, 0.12f));      // #b3261e
+    private static Color Orbite => VfxPalette.Couleur(VfxTheme.Rage, VfxRole.Ombre, new Color(0.227f, 0.039f, 0.031f));   // #3a0a08
+    private static Color Ivoire => VfxPalette.Accent(VfxTheme.Rage, "Ivoire", new Color(0.91f, 0.863f, 0.753f));    // #e8dcc0
+    private static Color Fer => VfxPalette.Accent(VfxTheme.Rage, "Fer", new Color(0.353f, 0.373f, 0.4f));        // #5a5f66
+    private static Color FerSombre => VfxPalette.Accent(VfxTheme.Rage, "Fer sombre", new Color(0.247f, 0.267f, 0.29f)); // #3f444a
+    private static Color FerClair => VfxPalette.Accent(VfxTheme.Rage, "Fer clair", new Color(0.478f, 0.502f, 0.533f));  // #7a8088 (arêtes du heaume)
+    private static Color IvoireClair => VfxPalette.Accent(VfxTheme.Rage, "Ivoire clair", new Color(1f, 0.96f, 0.88f));      // pointe des cornes
 
     private const float GemSize = 0.028f;
 

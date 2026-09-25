@@ -26,8 +26,8 @@ public class OndeGemmes : MonoBehaviour
     [SerializeField] private Vector2 tailleEclatsPetits = new Vector2(0.06f, 0.1f);
     [SerializeField] private float gravite = 0.7f;
 
-    private static readonly Color TerreSombre = new Color(0.357f, 0.247f, 0.165f);  // #5b3f2a
-    private static readonly Color TerreClaire = new Color(0.541f, 0.416f, 0.282f);  // #8a6a48
+    private static Color TerreSombre => VfxPalette.Couleur(VfxTheme.Terre, VfxRole.Base, new Color(0.357f, 0.247f, 0.165f));  // #5b3f2a
+    private static Color TerreClaire => VfxPalette.Couleur(VfxTheme.Terre, VfxRole.Vif, new Color(0.541f, 0.416f, 0.282f));  // #8a6a48
 
     // Paramètres posés par OndeDeChoc.
     [System.NonSerialized] public float rayonDepart = 0.5f;

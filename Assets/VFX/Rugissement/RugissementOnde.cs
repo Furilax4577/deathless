@@ -19,9 +19,9 @@ public class RugissementOnde : MonoBehaviour
     [SerializeField] private int gemmesDetachees = 16;
     [SerializeField] private Vector2 taille = new Vector2(0.05f, 0.09f);
 
-    private static readonly Color RougeVif = new Color(0.7f, 0.15f, 0.12f);     // #b3261e
-    private static readonly Color RougeSombre = new Color(0.43f, 0.08f, 0.06f); // #6e1410
-    private static readonly Color RougePale = new Color(1f, 0.45f, 0.35f);      // éclair au point le plus large
+    private static Color RougeVif => VfxPalette.Couleur(VfxTheme.Rage, VfxRole.Vif, new Color(0.7f, 0.15f, 0.12f));     // #b3261e
+    private static Color RougeSombre => VfxPalette.Couleur(VfxTheme.Rage, VfxRole.Base, new Color(0.43f, 0.08f, 0.06f)); // #6e1410
+    private static Color RougePale => VfxPalette.Couleur(VfxTheme.Rage, VfxRole.Coeur, new Color(1f, 0.45f, 0.35f));      // éclair au point le plus large
 
     private Mesh mesh;
     private MeshRenderer rendu;

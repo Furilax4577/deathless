@@ -17,21 +17,30 @@ public class RelicShieldVisual : MonoBehaviour
     [SerializeField] private int gems = 900;
 
     // Trois teintes par palier, du plus sombre au plus clair, plus un reflet (index 3).
-    private static readonly Color[] BluePalette =
+    private static Color[] BluePalette => VfxPalette.Cache("Bouclier.Plein", () => new[]
     {
-        new Color(0.05f, 0.18f, 0.45f), new Color(0.1f, 0.4f, 0.85f), new Color(0.3f, 0.65f, 1f), new Color(0.7f, 0.9f, 1.2f),
-    };
-    private static readonly Color[] OrangePalette =
+        VfxPalette.Couleur(VfxTheme.BouclierPlein, VfxRole.Ombre, Color.white),
+        VfxPalette.Couleur(VfxTheme.BouclierPlein, VfxRole.Base, Color.white),
+        VfxPalette.Couleur(VfxTheme.BouclierPlein, VfxRole.Vif, Color.white),
+        VfxPalette.Couleur(VfxTheme.BouclierPlein, VfxRole.Coeur, Color.white) * 1.2f,
+    });
+    private static Color[] OrangePalette => VfxPalette.Cache("Bouclier.Entame", () => new[]
     {
-        new Color(0.45f, 0.18f, 0.03f), new Color(0.9f, 0.45f, 0.08f), new Color(1f, 0.68f, 0.25f), new Color(1.2f, 0.95f, 0.65f),
-    };
-    private static readonly Color[] RedPalette =
+        VfxPalette.Couleur(VfxTheme.BouclierEntame, VfxRole.Ombre, Color.white),
+        VfxPalette.Couleur(VfxTheme.BouclierEntame, VfxRole.Base, Color.white),
+        VfxPalette.Couleur(VfxTheme.BouclierEntame, VfxRole.Vif, Color.white),
+        VfxPalette.Couleur(VfxTheme.BouclierEntame, VfxRole.Coeur, Color.white) * 1.2f,
+    });
+    private static Color[] RedPalette => VfxPalette.Cache("Bouclier.Critique", () => new[]
     {
-        new Color(0.4f, 0.04f, 0.04f), new Color(0.85f, 0.12f, 0.1f), new Color(1f, 0.35f, 0.3f), new Color(1.2f, 0.75f, 0.7f),
-    };
-    private static readonly Color BlueGlow = new Color(0.35f, 0.65f, 1f);
-    private static readonly Color OrangeGlow = new Color(1f, 0.6f, 0.2f);
-    private static readonly Color RedGlow = new Color(1f, 0.25f, 0.2f);
+        VfxPalette.Couleur(VfxTheme.BouclierCritique, VfxRole.Ombre, Color.white),
+        VfxPalette.Couleur(VfxTheme.BouclierCritique, VfxRole.Base, Color.white),
+        VfxPalette.Couleur(VfxTheme.BouclierCritique, VfxRole.Vif, Color.white),
+        VfxPalette.Couleur(VfxTheme.BouclierCritique, VfxRole.Coeur, Color.white) * 1.2f,
+    });
+    private static Color BlueGlow => VfxPalette.Accent(VfxTheme.BouclierPlein, "Lueur", new Color(0.35f, 0.65f, 1f));
+    private static Color OrangeGlow => VfxPalette.Accent(VfxTheme.BouclierEntame, "Lueur", new Color(1f, 0.6f, 0.2f));
+    private static Color RedGlow => VfxPalette.Accent(VfxTheme.BouclierCritique, "Lueur", new Color(1f, 0.25f, 0.2f));
 
     private RelicShieldEtat shield;
     private Mesh mesh;

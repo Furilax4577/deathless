@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf4363f1aec8cf14b976af39b7bd79d8, type: 3}
+  m_Name: Os
+  m_EditorClassIdentifier: Assembly-CSharp::VfxPalette
+  theme: 6
+  usage: "Th\xE8me ajout\xE9 : d\xE9sint\xE9gration des ennemis \xE0 l'aube (poussi\xE8re
+    d'os, GemBurst.Rise). Ni \xE9l\xE9ment ni relique ; l'accent vert est la magie
+    Nyxessa qui quitte le squelette."
+  teintes:
+  - nom: Os gris
+    role: 0
+    couleur: {r: 0.6, g: 0.58, b: 0.52, a: 1}
+  - nom: Os
+    role: 1
+    couleur: {r: 0.78, g: 0.75, b: 0.66, a: 1}
+  - nom: "Os p\xE2le"
+    role: 3
+    couleur: {r: 0.92, g: 0.9, b: 0.8, a: 1}
+  - nom: Magie
+    role: 4
+    couleur: {r: 0.55, g: 1, b: 0.45, a: 1}
+  materiaux: []

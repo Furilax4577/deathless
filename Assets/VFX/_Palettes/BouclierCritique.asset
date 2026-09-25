@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf4363f1aec8cf14b976af39b7bd79d8, type: 3}
+  m_Name: BouclierCritique
+  m_EditorClassIdentifier: Assembly-CSharp::VfxPalette
+  theme: 9
+  usage: "Th\xE8me ajout\xE9 : bouclier de la relique critique (vie < 15 %)."
+  teintes:
+  - nom: Rouge sombre
+    role: 0
+    couleur: {r: 0.4, g: 0.04, b: 0.04, a: 1}
+  - nom: Rouge
+    role: 1
+    couleur: {r: 0.85, g: 0.12, b: 0.1, a: 1}
+  - nom: Rouge vif
+    role: 2
+    couleur: {r: 1, g: 0.35, b: 0.3, a: 1}
+  - nom: "Rouge p\xE2le"
+    role: 3
+    couleur: {r: 1, g: 0.625, b: 0.5833, a: 1}
+  - nom: Lueur
+    role: 4
+    couleur: {r: 1, g: 0.25, b: 0.2, a: 1}
+  materiaux: []

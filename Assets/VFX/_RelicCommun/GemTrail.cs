@@ -9,10 +9,13 @@ public class GemTrail : MonoBehaviour
     private const float Life = 0.55f;
     private const float Spacing = 0.06f;   // une gemme tous les 6 cm parcourus
 
-    private static readonly Color[] Palette =
+    private static Color[] Palette => VfxPalette.Cache("GemTrail.Nyxessa", () => new[]
     {
-        new Color(0.07f, 0.38f, 0.05f), new Color(0.25f, 0.7f, 0.08f), new Color(0.55f, 0.95f, 0.2f), new Color(0.95f, 1.25f, 0.55f),
-    };
+        VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Base, new Color(0.07f, 0.38f, 0.05f)),
+        VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Vif, new Color(0.25f, 0.7f, 0.08f)),
+        VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Coeur, new Color(0.55f, 0.95f, 0.2f)),
+        VfxPalette.Accent(VfxTheme.Nyxessa, "Éclat", new Color(0.76f, 1f, 0.44f)) * 1.25f,
+    });
 
     private Mesh mesh;
     private Vector3[] vertices;

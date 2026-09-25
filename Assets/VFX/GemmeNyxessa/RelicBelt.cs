@@ -30,11 +30,14 @@ public class RelicBelt : MonoBehaviour
     public bool portailOuvert = true;
 
     // Vert Nyxessa, du plus sombre au plus clair (même esprit que le portail).
-    private static readonly Color[] Palette =
+    private static Color[] Palette => VfxPalette.Cache("RelicBelt.Nyxessa", () => new[]
     {
-        new Color(0.04f, 0.22f, 0.05f), new Color(0.1f, 0.45f, 0.1f), new Color(0.25f, 0.72f, 0.16f),
-        new Color(0.5f, 0.95f, 0.3f), new Color(0.85f, 1.15f, 0.6f),
-    };
+        VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Ombre, new Color(0.04f, 0.22f, 0.05f)),
+        VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Base, new Color(0.1f, 0.45f, 0.1f)),
+        VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Vif, new Color(0.25f, 0.72f, 0.16f)),
+        VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Coeur, new Color(0.5f, 0.95f, 0.3f)),
+        VfxPalette.Accent(VfxTheme.Nyxessa, "Éclat", new Color(0.74f, 1f, 0.52f)) * 1.15f,
+    });
 
     private Mesh mesh;
     private Vector3[] vertices;

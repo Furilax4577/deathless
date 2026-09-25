@@ -10,9 +10,9 @@ using UnityEngine;
 public class SkullMissileVisual : MonoBehaviour
 {
     // Du plus sombre (orbites, dents) au plus pâle (os), vert Nyxessa.
-    private static readonly Color Dark = new Color(0.01f, 0.07f, 0.02f);
-    private static readonly Color Mid = new Color(0.18f, 0.6f, 0.1f);
-    private static readonly Color Pale = new Color(0.5f, 0.95f, 0.38f);   // sous 1 : le Bloom ne le délave pas en blanc
+    private static Color Dark => VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Ombre, new Color(0.03f, 0.23f, 0.07f)) * 0.3f;
+    private static Color Mid => VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Vif, new Color(0.18f, 0.6f, 0.1f));
+    private static Color Pale => VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Coeur, new Color(0.5f, 0.95f, 0.38f));   // sous 1 : le Bloom ne le délave pas en blanc
 
     private const float GemSize = 0.021f;
 
@@ -99,7 +99,7 @@ public class SkullMissileVisual : MonoBehaviour
         Light glow = new GameObject("Light").AddComponent<Light>();
         glow.transform.SetParent(transform, false);
         glow.type = LightType.Point;
-        glow.color = new Color(0.4f, 1f, 0.45f);
+        glow.color = VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Coeur, new Color(0.4f, 1f, 0.45f));
         glow.intensity = 2.5f;
         glow.range = 5f;
         glow.shadows = LightShadows.None;

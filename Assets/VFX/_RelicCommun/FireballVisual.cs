@@ -11,12 +11,12 @@ public class FireballVisual : MonoBehaviour
     private static readonly int EmissionColorId = Shader.PropertyToID("_EmissionColor");
 
     // Emission modérée : trop forte, le tonemapping ramène tout au jaune et les trois teintes se confondent.
-    private static readonly Color Yellow = new Color(1f, 0.9f, 0.4f);
-    private static readonly Color YellowGlow = new Color(2.2f, 1.7f, 0.45f);
-    private static readonly Color Orange = new Color(1f, 0.38f, 0.04f);
-    private static readonly Color OrangeGlow = new Color(1.1f, 0.28f, 0.02f);
-    private static readonly Color Red = new Color(0.8f, 0.12f, 0.03f);
-    private static readonly Color RedGlow = new Color(0.7f, 0.06f, 0.01f);
+    private static Color Yellow => VfxPalette.Couleur(VfxTheme.Feu, VfxRole.Coeur, new Color(1f, 0.9f, 0.4f));
+    private static Color YellowGlow => VfxPalette.Lueur(Yellow, 2.2f);
+    private static Color Orange => VfxPalette.Couleur(VfxTheme.Feu, VfxRole.Vif, new Color(1f, 0.38f, 0.04f));
+    private static Color OrangeGlow => VfxPalette.Lueur(Orange, 1.1f);
+    private static Color Red => VfxPalette.Couleur(VfxTheme.Feu, VfxRole.Base, new Color(0.8f, 0.12f, 0.03f));
+    private static Color RedGlow => VfxPalette.Lueur(Red, 1f);
 
     private static Mesh bodyMesh;
     private static Mesh coreMesh;
@@ -48,7 +48,7 @@ public class FireballVisual : MonoBehaviour
         Light glow = new GameObject("Light").AddComponent<Light>();
         glow.transform.SetParent(transform, false);
         glow.type = LightType.Point;
-        glow.color = new Color(1f, 0.55f, 0.2f);
+        glow.color = Color.Lerp(Orange, Yellow, 0.3f);
         glow.intensity = 3f;
         glow.range = 6f;
         glow.shadows = LightShadows.None;

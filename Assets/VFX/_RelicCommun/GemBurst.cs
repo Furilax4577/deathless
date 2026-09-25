@@ -10,10 +10,13 @@
 // Purement visuel et local ; shader Relic/VertexColorUnlit (matériau PortalVoxel).
 public class GemBurst : MonoBehaviour
 {
-    private static readonly Color[] Palette =
+    private static Color[] Palette => VfxPalette.Cache("GemBurst.Nyxessa", () => new[]
     {
-        new Color(0.07f, 0.38f, 0.05f), new Color(0.25f, 0.7f, 0.08f), new Color(0.55f, 0.95f, 0.2f), new Color(0.95f, 1.25f, 0.55f),
-    };
+        VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Base, new Color(0.07f, 0.38f, 0.05f)),
+        VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Vif, new Color(0.25f, 0.7f, 0.08f)),
+        VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Coeur, new Color(0.55f, 0.95f, 0.2f)),
+        VfxPalette.Accent(VfxTheme.Nyxessa, "Éclat", new Color(0.76f, 1f, 0.44f)) * 1.25f,
+    });
 
     private Mesh mesh;
     private Vector3[] vertices;
@@ -79,10 +82,13 @@ public class GemBurst : MonoBehaviour
     private bool rising;
 
     // Couleurs de la poussière d'os (vaporisation à l'aube) : os pâle, gris, et quelques éclats verts (la magie qui s'en va).
-    private static readonly Color[] BonePalette =
+    private static Color[] BonePalette => VfxPalette.Cache("GemBurst.Os", () => new[]
     {
-        new Color(0.92f, 0.9f, 0.8f), new Color(0.78f, 0.75f, 0.66f), new Color(0.6f, 0.58f, 0.52f), new Color(0.55f, 1f, 0.45f),
-    };
+        VfxPalette.Couleur(VfxTheme.Os, VfxRole.Coeur, new Color(0.92f, 0.9f, 0.8f)),
+        VfxPalette.Couleur(VfxTheme.Os, VfxRole.Base, new Color(0.78f, 0.75f, 0.66f)),
+        VfxPalette.Couleur(VfxTheme.Os, VfxRole.Ombre, new Color(0.6f, 0.58f, 0.52f)),
+        VfxPalette.Accent(VfxTheme.Os, "Magie", new Color(0.55f, 1f, 0.45f)),
+    });
 
     // Vaporisation d'un squelette à l'aube (étape 69) : des gemmes couleur os remplissent le volume `bounds` (une colonne
     // plus large en bas), puis montent en tournoyant, poussées par un léger vent, et rétrécissent jusqu'à disparaître.
@@ -194,7 +200,7 @@ public class GemBurst : MonoBehaviour
         flash = new GameObject("Flash").AddComponent<Light>();
         flash.transform.SetParent(transform, false);
         flash.type = LightType.Point;
-        flash.color = new Color(0.45f, 1f, 0.35f);
+        flash.color = VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Coeur, new Color(0.45f, 1f, 0.35f));
         flashIntensity = flashPower;
         flash.range = extent * 0.75f + 2f;
         flash.shadows = LightShadows.None;

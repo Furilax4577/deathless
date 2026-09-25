@@ -82,10 +82,10 @@ public class PortalVisual : MonoBehaviour
         rippleStart = Time.time;
     }
 
-    private static readonly Color Dark = new Color(0.07f, 0.38f, 0.05f);
-    private static readonly Color Mid = new Color(0.25f, 0.7f, 0.08f);
-    private static readonly Color Light = new Color(0.55f, 0.95f, 0.2f);
-    private static readonly Color Pale = new Color(0.95f, 1.25f, 0.55f);
+    private static Color Dark => VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Base, new Color(0.07f, 0.38f, 0.05f));
+    private static Color Mid => VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Vif, new Color(0.25f, 0.7f, 0.08f));
+    private static Color Light => VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Coeur, new Color(0.55f, 0.95f, 0.2f));
+    private static Color Pale => VfxPalette.Accent(VfxTheme.Nyxessa, "Éclat", new Color(0.76f, 1f, 0.44f)) * 1.25f;
 
 
     private void Start()
@@ -97,7 +97,7 @@ public class PortalVisual : MonoBehaviour
                 foreach (Renderer r in old.GetComponentsInChildren<Renderer>())
                     r.enabled = false;
         if (portalLight != null)
-            portalLight.color = new Color(0.45f, 1f, 0.3f);
+            portalLight.color = VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Coeur, new Color(0.45f, 1f, 0.3f));
 
         // Racine d'échelle 1 dans le monde, dans le plan de l'ancien tourbillon (un quad : face selon son z local).
         Transform parent = swirlFront != null ? swirlFront.parent : transform;
