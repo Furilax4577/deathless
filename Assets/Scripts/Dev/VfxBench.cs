@@ -61,6 +61,21 @@ public class VfxBench : MonoBehaviour
     public RelicShieldEtat bouclier;
     public float tenueBouclier = 3f;
     public float intervalleBouclier = 14f;
+    [Tooltip("Villageois sorcier (mannequin, style Staff) qui invoque le bouclier et le tient.")]
+    public GameObject sorcier;
+    public AnimationClip clipInvocation;     // Ranged_Magic_Summon : lever du bouclier
+    public AnimationClip clipCanalisation;   // Ranged_Magic_Spellcasting (boucle) : tient le bouclier
+    public AnimationClip clipChoc;           // optionnel : choc avant la chute (vide : Death_A contient déjà le choc)
+    public AnimationClip clipChute;          // Death_A : projeté en arrière au sol ; joué à l'envers pour se relever
+    [Tooltip("Amélioration : le sorcier canalise l'énergie de Nyxessa (flux de gemmes du cristal vers son bâton). Faux au départ.")]
+    public bool canalisationNyxessa;
+    private GemmesVolantes lienSorcier;
+
+    [Header("Mort et réapparition d'un allié")]
+    public MortAllie mortAllie;
+    public GameObject allieMort;
+    [Tooltip("Point de réapparition, près de la relique.")]
+    public Vector3 pointReapparition = new Vector3(-26.5f, 0f, 23f);
 
     [Header("Cône de flammes (mage bâton) + flammèches du burn sur la cible")]
     public GameObject mageCone;
@@ -254,6 +269,8 @@ public class VfxBench : MonoBehaviour
         Boucle(intervalleSquelettes, () => StartCoroutine(Vaporisation()));
         Boucle(intervalleSquelettes, () => StartCoroutine(Sortie()));
         StartCoroutine(Passage());
+        StartCoroutine(PosteSorcier());
+        StartCoroutine(PosteMortAllie());
         StartCoroutine(PosteCone());
         StartCoroutine(PosteBoule());
         StartCoroutine(PosteAura());
@@ -1179,6 +1196,131 @@ public class VfxBench : MonoBehaviour
             Vector3 point = bouclier.BasePosition + new Vector3(Mathf.Cos(azimut), 0f, Mathf.Sin(azimut)) * bouclier.Radius + Vector3.up * Random.Range(0.8f, 3f);
             bouclier.Frapper(coups[i], point);
             yield return new WaitForSeconds(1.2f);
+        }
+    }
+
+    // Villageois sorcier du bouclier : il suit l'état du bouclier (le cycle est piloté par CycleBouclier).
+    // Incantation (IsCasting) : Ranged_Magic_Summon, les bras montent pendant que le mur sort du sol ; levé : canalisation
+    // en boucle (Ranged_Magic_Spellcasting) et lien de gemmes Nyxessa du bâton vers le mur ; rupture (vie à 0) : Death_A
+    // (choc puis projeté en arrière de 1,3 m, au sol en 0,5 s), il reste au sol 1,2 s puis se relève (Death_A à l'envers).
+    private IEnumerator PosteSorcier()
+    {
+        Acteur a = A(sorcier);
+        if (a == null || bouclier == null || clipInvocation == null || clipCanalisation == null) yield break;
+        if (lienSorcier == null && gemmes != null)
+        {
+            lienSorcier = GemmesVolantes.Creer("Sorcier_Lien", gemmes, 400);
+            lienSorcier.transform.SetParent(sorcier.transform.parent, false);
+        }
+        Color vif = VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Vif, new Color(0.25f, 0.68f, 0.35f));
+        Color clair = VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Coeur, new Color(0.62f, 0.91f, 0.44f));
+        while (true)
+        {
+            // Repos : attend l'incantation.
+            float t = 0f;
+            while (!bouclier.IsCasting && !bouclier.IsUp) { a.Poser(clipIdle, Time.time); yield return null; }
+            // Invocation : le clip est calé sur la durée de l'incantation (le mur est complet quand les bras sont en haut).
+            float vitesse = clipInvocation.length / Mathf.Max(0.3f, bouclier.CastSeconds);
+            bool signe = false;
+            for (t = 0f; bouclier.IsCasting; t += Time.deltaTime)
+            {
+                a.Poser(clipInvocation, Mathf.Min(clipInvocation.length, t * vitesse), clipIdle, Time.time, 1f - Mathf.Clamp01(t / Fondu));
+                if (!signe && t >= bouclier.CastSeconds * 0.6f) { signe = true; Signal("sorcier.invoque"); }
+                yield return null;
+            }
+            // Canalisation tant que le bouclier tient.
+            bool incante = false;
+            for (t = 0f; bouclier.IsUp; t += Time.deltaTime)
+            {
+                a.Poser(clipCanalisation, t % clipCanalisation.length, clipInvocation, clipInvocation.length, 1f - Mathf.Clamp01(t / 0.3f));
+                if (!incante && t >= 2f) { incante = true; Signal("sorcier.incante"); }
+                // Canalisation (amélioration, `canalisationNyxessa`) : flux de gemmes du cristal de Nyxessa vers le bâton,
+                // en arc ; l'énergie coule vers le sorcier. Sans l'amélioration, pas de lien.
+                if (lienSorcier != null && canalisationNyxessa && Nyxessa.Instance != null)
+                {
+                    Vector3 pointe = PointArme(sorcier, "staff", new Vector3(0f, 1.2f, 0f));
+                    Vector3 source = Nyxessa.Instance.CentreCristal;
+                    Vector3 milieu = (source + pointe) * 0.5f + Vector3.up * Vector3.Distance(source, pointe) * 0.15f;
+                    for (int k = 0; k < 12; k++)
+                    {
+                        float u = Random.value;
+                        Vector3 p0 = (1f - u) * (1f - u) * source + 2f * u * (1f - u) * milieu + u * u * pointe + Random.insideUnitSphere * 0.06f;
+                        Vector3 tangente = 2f * (1f - u) * (milieu - source) + 2f * u * (pointe - milieu);
+                        lienSorcier.Emettre(p0, tangente.normalized * 6f, Random.Range(0.04f, 0.07f), 0.35f,
+                            (Random.value < 0.5f ? vif : clair) * 1.3f, 0f, 0f, 0.05f, 0.4f);
+                    }
+                }
+                yield return null;
+            }
+            if (bouclier.Health > 0f) continue;   // baissé à l'aube sans rupture : retour au repos
+            // Rupture : choc, projeté au sol, reste au sol, se relève.
+            Signal("sorcier.rupture");
+            if (clipChoc != null)
+                for (t = 0f; t < clipChoc.length * 0.55f; t += Time.deltaTime)
+                {
+                    a.Poser(clipChoc, t, clipCanalisation, 0f, 1f - Mathf.Clamp01(t / 0.08f));
+                    yield return null;
+                }
+            if (clipChute != null)
+            {
+                for (t = 0f; t < clipChute.length; t += Time.deltaTime)
+                {
+                    a.Poser(clipChute, t, clipChoc != null ? clipChoc : clipCanalisation, clipChoc != null ? clipChoc.length * 0.55f : 0f, 1f - Mathf.Clamp01(t / 0.08f));
+                    yield return null;
+                }
+                for (t = 0f; t < 1.2f; t += Time.deltaTime) { a.Poser(clipChute, clipChute.length); yield return null; }
+                // Se relève : la chute jouée à l'envers, 2,5 fois plus lentement, fondu vers le repos à la fin.
+                float relever = clipChute.length / 0.4f;
+                for (t = 0f; t < relever; t += Time.deltaTime)
+                {
+                    a.Poser(clipChute, clipChute.length - t * 0.4f, clipIdle, Time.time, Mathf.Clamp01((t - relever * 0.75f) / (relever * 0.25f)));
+                    yield return null;
+                }
+            }
+        }
+    }
+
+    // Mort d'un allié : il tombe (Death_A), se dissout, son énergie rejoint Nyxessa ; il réapparaît près de la relique
+    // (flux du cristal vers le point, recomposition), puis revient à pied à sa place.
+    private IEnumerator PosteMortAllie()
+    {
+        Acteur a = A(allieMort);
+        if (a == null || mortAllie == null || clipChute == null) yield break;
+        Transform t0 = allieMort.transform;
+        Pose origine = PoseInitiale(t0);
+        foreach (Renderer r in allieMort.GetComponentsInChildren<Renderer>(true)) r.enabled = true;
+        while (true)
+        {
+            t0.SetPositionAndRotation(origine.position, origine.rotation);
+            yield return Tenir(a, clipIdle, 1.5f);
+            for (float t = 0f; t < clipChute.length + 0.3f; t += Time.deltaTime)
+            {
+                a.Poser(clipChute, Mathf.Min(t, clipChute.length), clipIdle, Time.time, 1f - Mathf.Clamp01(t / 0.1f));
+                yield return null;
+            }
+            bool arrivee = false;
+            mortAllie.Mourir(allieMort, Nyxessa.Instance, () => arrivee = true);
+            yield return new WaitForSeconds(0.45f);
+            Signal("mort.dissolution");
+            yield return new WaitForSeconds(0.95f);
+            Signal("mort.energie");
+            while (!arrivee) yield return null;
+            yield return new WaitForSeconds(1.2f);
+            a.Poser(clipIdle, 0f);
+            bool revenu = false;
+            t0.rotation = Quaternion.LookRotation(new Vector3(origine.position.x - pointReapparition.x, 0f, origine.position.z - pointReapparition.z));
+            mortAllie.Reapparaitre(allieMort, pointReapparition, Nyxessa.Instance, () => revenu = true, () => Signal("mort.reapparition"));
+            while (!revenu) { a.Poser(clipIdle, Time.time); yield return null; }
+            yield return Tenir(a, clipIdle, 1.5f);
+            // Retour à pied.
+            Vector3 de = t0.position;
+            float d = Vector3.Distance(de, origine.position);
+            for (float t = 0f; t < d / 1.4f; t += Time.deltaTime)
+            {
+                t0.position = Vector3.Lerp(de, origine.position, t * 1.4f / d);
+                a.Poser(clipMarche, t, clipIdle, Time.time, 1f - Mathf.Clamp01(t / Fondu));
+                yield return null;
+            }
         }
     }
 

@@ -37,8 +37,8 @@ L'écran rappelle aussi le résultat de l'équipe : victoire ou nuit atteinte, d
 - **Villageois** : ils réapparaissent au **jour suivant**.
 - **Joueurs** : ils réapparaissent près de Nyxessa au bout de N secondes. **Chaque mort allonge ce délai.**
 - **Dans tous les cas**, un joueur mort revient **au début de la nouvelle journée**, même si son délai n'est pas écoulé.
-- Valeurs de départ : 8 s pour la première mort, +4 s à chaque mort suivante {à équilibrer}. Le compteur de morts se remet à zéro chaque partie ou chaque jour : {à confirmer}.
-- Ce qu'on garde d'une partie à l'autre : {à confirmer}.
+- Valeurs de départ : 8 s pour la première mort, +4 s à chaque mort suivante {à équilibrer}. Le compteur de morts se remet à zéro à chaque partie {décidé}.
+- **Entre deux parties**, on ne garde **rien** : chaque partie repart de zéro {décidé}.
 
 ## Victoire {décidé}
 
