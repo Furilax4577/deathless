@@ -4,6 +4,10 @@
 
 - L'interface se navigue entièrement à la manette comme au clavier et à la souris.
 - Les icônes de boutons suivent le dernier appareil utilisé : Xbox, PlayStation, ou clavier et souris. Ce sont les icônes du pack Kenney Input Prompts.
+- **Police** : Fredoka partout, titres en SemiBold ou Bold, texte en Regular ou Medium.
+- **Technologie** : UI Toolkit.
+- **Style** : celui des maquettes : fond ardoise sombre, panneaux bleu nuit, texte ivoire, et une bordure or pour l'élément sélectionné à la manette.
+- **Taille de l'interface** : réglable ×1, ×2 ou ×3 dans les options.
 
 ## Menus {à confirmer}
 

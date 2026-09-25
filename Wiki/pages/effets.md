@@ -16,6 +16,20 @@ Chaque effet prend ses couleurs dans la palette de son thème. Changer une coule
 
 Deux règles tranchées : **le feu est couleur feu**, et **le vert est réservé à Nyxessa** et à son énergie.
 
+### Nouveaux thèmes {à confirmer}
+
+Proposés pour les nouvelles compétences, en cours de réalisation :
+
+| Thème | Intention | Effets |
+|---|---|---|
+| Critique | Or et blanc chaud, bref et lumineux | Retour visuel de tout coup critique |
+| Chasse | Verts forêt et ocres, distincts du vert Nyxessa | Marqueur de zone de la Nuée de flèches |
+| Ombre | Violets sombres | Mode furtif et fumée de l'assassin |
+
+## Fin des effets {décidé}
+
+Les effets disparaissent par la taille, jamais par transparence. La fumée de la boule de feu, par exemple, est faite de bouffées à facettes gris charbon qui montent, s'élargissent puis rapetissent jusqu'à disparaître.
+
 ## Lumière des sorts {décidé}
 
 Tous les sorts éclairent leur environnement de la même façon :
@@ -23,4 +37,5 @@ Tous les sorts éclairent leur environnement de la même façon :
 - la lumière prend la couleur du thème du sort ;
 - trois tailles, petite, moyenne et grande, selon l'ampleur de l'effet ;
 - la même courbe pour tous : allumage rapide, maintien, extinction douce ;
-- seul le feu scintille.
+- seul le feu scintille ;
+- les flèches et les carreaux n'émettent aucune lumière, sauf le bref éclat de la flèche du rôdeur quand l'arc est complètement bandé.

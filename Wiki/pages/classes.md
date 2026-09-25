@@ -22,7 +22,7 @@ Les rôles sont {à confirmer}. Les armes et leurs animations sont {décidé}.
 
 ## Mage de feu
 
-- Bâton. L'attaque de base est une **boule de feu** qui explose à l'impact {effet validé}.
+- Bâton. L'attaque de base est une **boule de feu** qui explose à l'impact, puis laisse une fumée à facettes qui se dissipe {effet validé}.
 - **Cône de flammes** maintenu devant le mage {effet validé}.
 - **Brûlure** : les ennemis touchés brûlent pendant un moment {effet validé}.
 - Jauge de mana, ultime et valeurs chiffrées : {à confirmer}.
@@ -30,7 +30,7 @@ Les rôles sont {à confirmer}. Les armes et leurs animations sont {décidé}.
 ## Rôdeur
 
 - Arc et carquois {décidé} : au repos, l'arc est tenu le long du corps ; il se lève et se bande pour viser.
-- **Compétence 1 : Nuée de flèches** {décidé} : une pluie de flèches sur une zone ciblée.
+- **Compétence 1 : Nuée de flèches** {décidé} : un marqueur apparaît au sol, puis une pluie de flèches tombe sur la zone ciblée.
 - **Visée récompensée** {décidé} : un tir plus précis rapporte davantage.
   - **Tir à la tête** : une flèche dans la tête est un **coup critique**.
   - **Arc bandé** : maintenir l'attaque bande l'arc, avec une jauge de charge. Plus l'arc est tendu, plus les dégâts sont élevés.
@@ -71,7 +71,7 @@ L'assassin joue **principalement à la dague**. L'arbalète et la grenade sont d
 
 ### Grenade fumigène {décidé}
 
-- L'assassin la lance ; elle crée un nuage de fumée.
+- L'assassin la lance (modèle KayKit `smokebomb`, animation `Throw`) ; elle crée un nuage de fumée à l'impact.
 - Elle sert à **s'extraire d'un combat**.
 - **Furtif dans la fumée** {décidé} : tant qu'il est dans le nuage, les ennemis le perdent de vue et il redevient furtif, même en combat. En sortant, il reste furtif s'il marche, ce qui lui ouvre un coup critique au retour.
 - Nombre de grenades et recharge : {à confirmer}.
