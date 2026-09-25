@@ -26,6 +26,11 @@ namespace DeathlessLauncher
                     Shutdown(TestMaj.Executer(args));
                     return;
                 }
+                if (Array.IndexOf(args, "--test-video") >= 0)
+                {
+                    TestVideo.Demarrer(args, this); // quitte de lui-même à la fin de la mesure
+                    return;
+                }
             }
             catch (Exception ex)
             {

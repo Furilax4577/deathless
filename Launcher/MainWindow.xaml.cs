@@ -68,8 +68,9 @@ namespace DeathlessLauncher
             sondeManette.Tick += (s, e) => SonderManette();
 
             SourceInitialized += (s, e) => BarreDeTitreSombre();
-            Loaded += (s, e) => { BeginCheck(); sondeManette.Start(); };
-            Closing += (s, e) => { if (cancel != null) cancel.Cancel(); sondeManette.Stop(); };
+            Loaded += (s, e) => { Ecran.DemarrerVideo(AppDomain.CurrentDomain.BaseDirectory); BeginCheck(); sondeManette.Start(); };
+            StateChanged += (s, e) => Ecran.Video.Suspendre(WindowState == WindowState.Minimized);
+            Closing += (s, e) => { if (cancel != null) cancel.Cancel(); sondeManette.Stop(); Ecran.Video.Fermer(); };
         }
 
         // ---------- Mise à jour ----------

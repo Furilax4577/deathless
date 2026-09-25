@@ -6,7 +6,8 @@
 # 1. zippe le dossier de build (contenu à la racine du zip) en deathless-v<Version>.zip ;
 # 2. calcule son empreinte SHA-256 et sa taille, écrit version.json ;
 # 3. vérifie Launcher\changelog.json (ou -Changelog) et le copie à côté ;
-# 4. si -AvecLauncher est donné, zippe aussi le launcher construit (bin\Release\net48) en DeathlessLauncher.zip ;
+# 4. si -AvecLauncher est donné, zippe aussi le launcher construit (bin\Release\net48) en DeathlessLauncher.zip, avec le
+#    fond animé Assets\Screenshots\menu_nuit_boucle.mp4 copié en fond.mp4 s'il existe ;
 # 5. envoie le tout par scp (clé SSH : aucun mot de passe n'est demandé ni stocké ici), version.json en dernier ;
 # 6. si -BaseUrl est donné, relit version.json et changelog.json en HTTP pour vérifier la publication.
 # Sans -Remote, rien ne part : les fichiers restent dans Builds\publish\ (hors dépôt), pour contrôle.
@@ -32,13 +33,15 @@ $utf8 = New-Object System.Text.UTF8Encoding($false)
 Add-Type -AssemblyName System.IO.Compression
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
-function New-Zip([string] $source, [string] $zipPath) {
+# $exclure : chemins relatifs (avec /) à laisser hors du zip ; un chemin finissant par / exclut tout le dossier.
+function New-Zip([string] $source, [string] $zipPath, [string[]] $exclure = @()) {
     if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
     $full = (Resolve-Path $source).Path.TrimEnd("\")
     $zip = [System.IO.Compression.ZipFile]::Open($zipPath, [System.IO.Compression.ZipArchiveMode]::Create)
     try {
         Get-ChildItem -Path $full -Recurse -File | Where-Object { $_.Extension -ne ".log" -and $_.Name -ne "installed.json" -and $_.FullName -notmatch "DoNotShip" } | ForEach-Object {
             $relative = $_.FullName.Substring($full.Length + 1).Replace("\", "/")
+            foreach ($x in $exclure) { if ($relative -eq $x -or ($x.EndsWith("/") -and $relative.StartsWith($x))) { return } }
             [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $_.FullName, $relative, [System.IO.Compression.CompressionLevel]::Optimal) | Out-Null
         }
     } finally {
@@ -88,7 +91,24 @@ if ($AvecLauncher) {
     $launcherDir = Join-Path $PSScriptRoot "bin\Release\net48"
     if (-not (Test-Path (Join-Path $launcherDir "DeathlessLauncher.exe"))) { throw "Launcher non construit : dotnet build .\Launcher\DeathlessLauncher.csproj -c Release" }
     $launcherZip = Join-Path $outDir "DeathlessLauncher.zip"
-    New-Zip $launcherDir $launcherZip
+    # Ce qu'un lancement depuis bin\ a pu laisser à côté de l'exe ne part pas chez les joueurs.
+    New-Zip $launcherDir $launcherZip @("changelog.cache.json", "Game/", "Game.nouveau/", "fond.mp4", "fond.png", "fond.jpg")
+    # Fond animé : toujours repris de la vidéo du dépôt (un fond.mp4 resté dans bin\ pourrait être ancien).
+    $video = Join-Path (Split-Path -Parent $PSScriptRoot) "Assets\Screenshots\menu_nuit_boucle.mp4"
+    $zip = [System.IO.Compression.ZipFile]::Open($launcherZip, [System.IO.Compression.ZipArchiveMode]::Update)
+    try {
+        $old = $zip.GetEntry("fond.mp4")
+        if ($null -ne $old) { $old.Delete() }
+        if (Test-Path $video) {
+            # Déjà compressée : stockée telle quelle.
+            [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $video, "fond.mp4", [System.IO.Compression.CompressionLevel]::NoCompression) | Out-Null
+            Write-Host "Fond anime : $video -> fond.mp4 ($([int]((Get-Item $video).Length / 1MB)) Mo)"
+        } else {
+            Write-Warning "Pas de $video : le launcher gardera l'image de fond fixe."
+        }
+    } finally {
+        $zip.Dispose()
+    }
     Write-Host "Launcher : $launcherZip"
 }
 

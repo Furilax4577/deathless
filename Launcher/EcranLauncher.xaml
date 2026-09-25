@@ -14,6 +14,8 @@
         <!-- Fond : la scène du menu principal (voir Docs/launcher.md, « Changer le fond »). -->
         <Image x:Name="Fond" Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center"
                RenderOptions.BitmapScalingMode="HighQuality" />
+        <!-- Fond animé (fond.mp4 à côté de l'exe), posé sur l'image fixe ; absent ou illisible : l'image fixe reste. -->
+        <local:FondVideo x:Name="Video" />
 
         <Grid x:Name="Calque">
             <!-- menu__volet : 810 px à 1080p -->

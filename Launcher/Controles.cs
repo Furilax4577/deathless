@@ -95,10 +95,12 @@ namespace DeathlessLauncher
     /// Barre de téléchargement à la forme de la barre de vie du HUD (Deathless.UI.Gauge, classe dl-gauge--life) :
     /// libellé à gauche, valeur à droite, piste arrondie au creux sombre bordée d'un trait, remplissage rouge arrondi.
     /// Le remplissage suit la valeur en douceur (comme la transition de 0,15 s de l'USS). En mode indéterminé
-    /// (vérification, installation), une lueur balaie la piste.
+    /// (recherche, vérification, installation), le remplissage est masqué et une rangée de petites gemmes or, dans le
+    /// langage visuel du jeu (low poly, bords francs, pas de dégradé ni d'alpha), grossissent puis rétrécissent en vague
+    /// qui avance de gauche à droite : elles apparaissent et disparaissent par la taille.
     public sealed class JaugeVie : StackPanel
     {
-        /// Faux pour les captures : valeurs appliquées tout de suite, balayage figé.
+        /// Faux pour les captures : valeurs appliquées tout de suite, vague figée.
         public static bool Animer = true;
 
         const double Hauteur = 18;       // piste de la jauge du HUD (21 px à 1080p), un peu grandie pour le launcher
@@ -106,9 +108,14 @@ namespace DeathlessLauncher
         readonly TextBlock valeur = new TextBlock();
         readonly Grid interieur = new Grid { ClipToBounds = true };
         readonly Border remplissage;
-        readonly Rectangle balayage;
-        readonly TranslateTransform decalage = new TranslateTransform();
-        double cible, affiche, phase = 0.5;
+        readonly Canvas rangee = new Canvas { Visibility = Visibility.Collapsed };
+        readonly System.Collections.Generic.List<Gemme> gemmes = new System.Collections.Generic.List<Gemme>();
+        double cible, affiche, phase = 0.35;
+
+        // Vague de gemmes : une période de 1,4 s ; chaque gemme grossit puis rétrécit pendant 20 % de la période, avec un
+        // retard proportionnel à sa position (la vague avance de gauche à droite et se raccorde d'elle-même).
+        const double Periode = 1.4, Impulsion = 0.2, Retard = 0.75, Pas = 22;
+        const double GemmeHauteur = 12, GemmeLargeur = GemmeHauteur * 33 / 42; // proportions de hud-nyx__gemme
         bool indetermine;
         TimeSpan dernier = TimeSpan.Zero;
         bool abonne;
@@ -133,24 +140,9 @@ namespace DeathlessLauncher
                 Background = Teintes.Pinceau(Teintes.Vie),
                 Width = 0,
             };
-            var lueur = new LinearGradientBrush { StartPoint = new Point(0, 0.5), EndPoint = new Point(1, 0.5) };
-            lueur.GradientStops.Add(new GradientStop(Color.FromArgb(0, 0xe0, 0x48, 0x3e), 0));
-            lueur.GradientStops.Add(new GradientStop(Color.FromArgb(0xff, 0xe0, 0x48, 0x3e), 0.45));
-            lueur.GradientStops.Add(new GradientStop(Color.FromArgb(0xff, 0xff, 0x8a, 0x7a), 0.6));
-            lueur.GradientStops.Add(new GradientStop(Color.FromArgb(0, 0xe0, 0x48, 0x3e), 1));
-            lueur.Freeze();
-            balayage = new Rectangle
-            {
-                HorizontalAlignment = HorizontalAlignment.Left,
-                Fill = lueur,
-                RadiusX = (Hauteur - 2) / 2,
-                RadiusY = (Hauteur - 2) / 2,
-                RenderTransform = decalage,
-                Visibility = Visibility.Collapsed,
-            };
             interieur.Children.Add(remplissage);
-            interieur.Children.Add(balayage);
-            interieur.SizeChanged += (s, e) => { Decouper(); Appliquer(); };
+            interieur.Children.Add(rangee);
+            interieur.SizeChanged += (s, e) => { Decouper(); Disposer(); Appliquer(); };
             var piste = new Border
             {
                 Height = Hauteur,
@@ -195,7 +187,8 @@ namespace DeathlessLauncher
             set
             {
                 indetermine = value;
-                balayage.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
+                rangee.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
+                remplissage.Visibility = value ? Visibility.Hidden : Visibility.Visible;
                 Appliquer();
             }
         }
@@ -223,7 +216,7 @@ namespace DeathlessLauncher
             else if (affiche != cible) { affiche = cible; change = true; }
             if (indetermine)
             {
-                phase = (phase + dt / 1.5) % 1.0;
+                phase = (phase + dt / Periode) % 1.0;
                 change = true;
             }
             if (change) Appliquer();
@@ -240,16 +233,61 @@ namespace DeathlessLauncher
             double w = interieur.ActualWidth;
             if (w <= 0) return;
             remplissage.Width = w * affiche;
-            // Pendant un balayage, le remplissage reste en fond, estompé.
-            remplissage.Opacity = indetermine ? 0.28 : 1;
-            if (indetermine)
+            if (!indetermine) return;
+            for (int i = 0; i < gemmes.Count; i++)
             {
-                double largeur = Math.Max(40, w * 0.34);
-                balayage.Width = largeur;
-                double p = phase;
-                double lisse = p * p * (3 - 2 * p); // départ et arrivée en douceur
-                decalage.X = -largeur + lisse * (w + largeur);
+                double x = gemmes.Count > 1 ? (double)i / (gemmes.Count - 1) : 0;
+                double u = phase - x * Retard;
+                u -= Math.Floor(u);
+                // Taille : 0 hors de l'impulsion, puis une bosse lisse (sinus) ; à 0, la gemme n'est pas dessinée.
+                double t = u < Impulsion ? Math.Sin(Math.PI * u / Impulsion) : 0;
+                gemmes[i].Taille(t);
             }
+        }
+
+        /// Une gemme toutes les 22 px, centrées dans la piste.
+        void Disposer()
+        {
+            double w = interieur.ActualWidth, h = interieur.ActualHeight;
+            if (w <= 0) return;
+            int n = Math.Max(3, (int)Math.Floor((w - 12) / Pas) + 1);
+            while (gemmes.Count < n) { var g = new Gemme(GemmeLargeur, GemmeHauteur); gemmes.Add(g); rangee.Children.Add(g); }
+            while (gemmes.Count > n) { rangee.Children.Remove(gemmes[gemmes.Count - 1]); gemmes.RemoveAt(gemmes.Count - 1); }
+            double debut = (w - (n - 1) * Pas) / 2;
+            for (int i = 0; i < n; i++)
+            {
+                Canvas.SetLeft(gemmes[i], Math.Round(debut + i * Pas - GemmeLargeur / 2));
+                Canvas.SetTop(gemmes[i], Math.Round((h - GemmeHauteur) / 2));
+            }
+        }
+    }
+
+    /// Petite gemme or de la jauge, taillée comme GemmeNyxessa du HUD (losange et facette claire, couleurs pleines).
+    /// Elle grossit et rétrécit par sa taille (échelle autour de son centre), jamais par l'opacité.
+    sealed class Gemme : Canvas
+    {
+        static readonly Brush Corps = Teintes.Pinceau(Teintes.Or);
+        static readonly Brush Facette = Teintes.Pinceau(Teintes.Hex("#f2d79a"));
+        readonly ScaleTransform echelle = new ScaleTransform(0, 0);
+
+        public Gemme(double w, double h)
+        {
+            Width = w;
+            Height = h;
+            IsHitTestVisible = false;
+            RenderTransformOrigin = new Point(0.5, 0.5);
+            RenderTransform = echelle;
+            Point haut = new Point(w / 2, 0), droite = new Point(w, h / 2), bas = new Point(w / 2, h), gauche = new Point(0, h / 2);
+            Children.Add(new Polygon { Points = new PointCollection { haut, droite, bas, gauche }, Fill = Corps });
+            Children.Add(new Polygon { Points = new PointCollection { haut, droite, new Point(w / 2, h / 2 + h * 0.07) }, Fill = Facette });
+            Visibility = Visibility.Hidden;
+        }
+
+        public void Taille(double t)
+        {
+            echelle.ScaleX = t;
+            echelle.ScaleY = t;
+            Visibility = t > 0.1 ? Visibility.Visible : Visibility.Hidden;
         }
     }
 

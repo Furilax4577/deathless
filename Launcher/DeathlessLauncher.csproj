@@ -63,9 +63,13 @@
   <ItemGroup>
     <None Update="launcher.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Assets\Art\Fonts\Fredoka\OFL.txt" Link="OFL.txt" CopyToOutputDirectory="PreserveNewest" />
+    <!-- Fond animé : la vidéo de la scène du menu, copiée à côté de l'exe en fond.mp4 (jamais compilée dans l'exe). -->
+    <None Include="..\Assets\Screenshots\menu_nuit_boucle.mp4" Link="fond.mp4" CopyToOutputDirectory="PreserveNewest"
+          Condition="Exists('..\Assets\Screenshots\menu_nuit_boucle.mp4')" />
     <!-- Fichiers du dépôt qui ne sont pas des sources du launcher. -->
     <None Remove="captures\**;changelog.json" />
-    <Compile Remove="captures\**" />
+    <Compile Remove="captures\**;Outils\**" />
+    <None Remove="Outils\**" />
   </ItemGroup>
 
 </Project>

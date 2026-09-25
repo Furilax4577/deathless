@@ -11,7 +11,8 @@ logique, et l'habille comme le menu principal du jeu.
 
 1. Télécharger `http://srv617344.hstgr.cloud/deathless/DeathlessLauncher.zip` et le dézipper dans un dossier à soi,
    par exemple `Documents\Deathless\`. Le zip contient `DeathlessLauncher.exe`, `launcher.json` (déjà réglé sur le
-   serveur) et `OFL.txt` (licence de la police). Il n'y a rien à installer et aucun droit administrateur n'est demandé.
+   serveur), `OFL.txt` (licence de la police) et `fond.mp4` (le fond animé). Il n'y a rien à installer et aucun droit
+   administrateur n'est demandé.
    .NET Framework 4.8 est déjà présent sur Windows 10 et 11.
 2. Lancer `DeathlessLauncher.exe`. Il lit `version.json` et `changelog.json` sur le serveur. Si la version installée
    diffère, il télécharge `deathless-v<N>.zip` dans `%TEMP%\DeathlessLauncher\`, vérifie son empreinte SHA-256,
@@ -23,16 +24,20 @@ logique, et l'habille comme le menu principal du jeu.
 
 ### Écran
 
-- **Fond** : la scène du menu principal (village de nuit, Nyxessa et le portail), avec le volet gauche assombri.
+- **Fond** : la scène du menu principal (village de nuit, Nyxessa et le portail), avec le volet gauche assombri. Elle
+  est animée en boucle si `fond.mp4` est à côté de l'exe, et fixe sinon (voir « Changer le fond »).
 - **Volet gauche** : titre « DEATHLESS » et sous-titre, puis les entrées « Jouer », « Réessayer » (après un échec ou
   hors ligne) et « Quitter ». L'entrée sélectionnée a le fond actif et la bordure or, comme au menu du jeu. Pendant la
   mise à jour, « Jouer » reste sélectionné mais grisé, et sa description donne la version et le temps restant. Quand
   le jeu est prêt, la bordure or s'éclaire brièvement.
 - **Jauge** : elle reprend la barre de vie du HUD (`Gauge`, classe `dl-gauge--life`). Le libellé est à gauche, la
   valeur à droite, la piste est arrondie avec son trait, et le remplissage rouge suit la progression en douceur. Au
-  téléchargement, la valeur affiche les Mo téléchargés sur le total et le débit. Pendant la vérification et
-  l'installation, une lueur balaie la piste. Les erreurs s'affichent en dessous, en rouge clair. Le bouton de la
-  barre des tâches montre aussi l'avancement.
+  téléchargement, la valeur affiche les Mo téléchargés sur le total et le débit. Pendant la recherche de mise à
+  jour, la vérification et l'installation, le remplissage est masqué. À sa place, une rangée de petites gemmes or,
+  une toutes les 22 px, grossissent puis rétrécissent en une vague qui avance de gauche à droite (1,4 s par passage).
+  Elles suivent le langage visuel du jeu : low poly, bords francs, couleurs pleines, sans dégradé ni transparence,
+  et elles apparaissent et disparaissent par la taille. Les erreurs s'affichent sous la jauge, en rouge clair. Le
+  bouton de la barre des tâches montre aussi l'avancement.
 - **Notes de version** : panneau `dl-panel` à droite, de la version la plus récente à la plus ancienne. Chaque
   version a son numéro, sa date et ses notes en puces. La pastille « Installée » marque la version installée, et
   « Nouvelle » la version publiée qui n'est pas encore installée. La liste défile en douceur, avec un fondu en haut
@@ -173,9 +178,11 @@ par `scp`, `version.json` en dernier, puis relit `version.json` et `changelog.js
 dotnet build .\Launcher\DeathlessLauncher.csproj -c Release
 ```
 
-L'exe est dans `Launcher\bin\Release\net48\DeathlessLauncher.exe`, avec `launcher.json`, `OFL.txt` et
-`DeathlessLauncher.exe.config`. Ces quatre fichiers forment le launcher à distribuer (`publish.ps1 -AvecLauncher`
-les zippe). Le SDK `dotnet` récent suffit : les assemblies de référence .NET Framework 4.8 viennent du paquet NuGet
+L'exe est dans `Launcher\bin\Release\net48\DeathlessLauncher.exe`, avec `launcher.json`, `OFL.txt`,
+`DeathlessLauncher.exe.config` et `fond.mp4` (copie de `Assets/Screenshots/menu_nuit_boucle.mp4`, quand elle existe).
+Ces fichiers forment le launcher à distribuer, que `publish.ps1 -AvecLauncher` zippe. Le script laisse de côté ce
+qu'un lancement depuis `bin\` a pu y ajouter (`changelog.cache.json`, `Game\`), et reprend toujours `fond.mp4` du
+dépôt. Le SDK `dotnet` récent suffit : les assemblies de référence .NET Framework 4.8 viennent du paquet NuGet
 `Microsoft.NETFramework.ReferenceAssemblies`, utilisé à la compilation seulement.
 
 Tout est compilé dans l'exe (environ 1,6 Mo) :
@@ -192,7 +199,34 @@ Le launcher ne se met pas à jour lui-même : une nouvelle version se distribue 
 
 ## Changer le fond
 
-Il y a trois façons, de la plus simple à la plus durable :
+### Fond animé (vidéo)
+
+Au démarrage, le launcher cherche `fond.mp4` à côté de `DeathlessLauncher.exe` et le lit en boucle, muet, par-dessus
+l'image fixe. La vidéo n'est jamais compilée dans l'exe.
+
+- **Source** : `Assets/Screenshots/menu_nuit_boucle.mp4`, la scène du menu de nuit enregistrée dans Unity (H.264,
+  1920 × 1080, 30 images/s, environ 12 s). Le raccord doit être dans la vidéo elle-même : la dernière image doit
+  enchaîner sur la première. Le build la copie en `bin\Release\net48\fond.mp4`, et `publish.ps1 -AvecLauncher` la
+  met dans `DeathlessLauncher.zip` sous ce nom. Pour la changer, il suffit de remplacer ce fichier, puis de
+  reconstruire ou de republier le launcher. Pour essayer une vidéo sans rien reconstruire, on pose un `fond.mp4` à
+  côté de l'exe.
+- **Durée conseillée** : un nombre entier de secondes (12 s = 360 images). Le lecteur de Windows tronque la durée à
+  la seconde. Pour une vidéo de 12,000 s, l'échange des lecteurs se fait 5 ms avant la fin, par la position. Pour une
+  durée non entière, il se fait sur l'événement de fin, avec au pire une fraction d'image de retard au raccord.
+- **Boucle sans saccade** : un lecteur en boucle simple marque un à-coup au retour à zéro (arrêt, recherche de
+  l'image 0, redémarrage). `Launcher/FondVideo.cs` utilise donc deux lecteurs sur la même vidéo. Pendant que l'un
+  joue, l'autre est caché, déjà ouvert et posé sur l'image 0. À la fin, on démarre l'autre et on échange leur
+  visibilité dans la même image de rendu, sans fondu. Le lecteur qui vient de finir est remis sur l'image 0 et
+  attend le tour suivant.
+- **Repli** : si la vidéo est absente, illisible, trop longue à s'ouvrir (10 s), ou si Windows ne sait pas la lire
+  (Windows N sans le Media Feature Pack), le fond vidéo se retire et l'image fixe reste. Quand la fenêtre est
+  réduite, la vidéo est mise en pause.
+- Le mode `--capture` garde toujours l'image fixe.
+
+### Image fixe
+
+Elle sert de repli et de fond pendant l'ouverture de la vidéo. Il y a trois façons de la changer, de la plus simple
+à la plus durable :
 
 1. **Sans recompiler** : poser un `fond.png` (ou `fond.jpg`) à côté de `DeathlessLauncher.exe`. Il remplace l'image
    compilée. C'est pratique pour essayer une image.
@@ -218,6 +252,44 @@ droit). Le format conseillé est 16:9, 1920 × 1080 ou plus.
 - `DeathlessLauncher.exe --test-maj [--racine <dossier>]` déroule toute la mise à jour sans fenêtre, avec le
   `launcher.json` de la racine, et écrit un compte rendu sur la sortie standard. Le code de sortie vaut 0 si le jeu
   est à jour ou installé, 2 s'il est hors ligne avec une version jouable, 1 en cas d'échec.
+- `DeathlessLauncher.exe --test-video <vidéo.mp4> [--images 60] [--pas 1] [--secondes 12] [--naif]` est le banc du
+  fond animé, sans fenêtre. Il joue la vidéo avec `FondVideo` et rend le fond hors écran environ 60 fois par seconde.
+  Il relit le numéro de l'image réellement affichée, et celui que montre le lecteur caché juste avant chaque
+  échange. Il compte ensuite les images perdues ou répétées au raccord, et compare la durée d'affichage des images
+  autour du raccord à celle du reste de la vidéo. `--naif` mesure une boucle simple (un seul lecteur remis à zéro),
+  pour comparer. `--inventaire` parcourt le fichier image par image, à l'arrêt.
+- La vidéo de test est fabriquée par `Launcher/Outils/FabVideo`, avec l'encodeur de Windows : rien à télécharger.
+  Chaque image code son numéro dans sa couleur. L'option `bruit` donne une vidéo lourde à décoder, et `tronquee`
+  garde la durée d'origine de l'encodeur, pour tester l'échange sur l'événement de fin :
+
+  ```powershell
+  dotnet build -c Release Launcher\Outils\FabVideo
+  Launcher\Outils\FabVideo\bin\Release\net48\FabVideo.exe $env:TEMP\boucle.mp4 60
+  Launcher\bin\Release\net48\DeathlessLauncher.exe --test-video $env:TEMP\boucle.mp4 --images 60 --secondes 30
+  ```
+
+Le fond animé a été vérifié le 25/09/2026 sur quatre vidéos de test, pendant 30 s chacune :
+
+- 640 × 360 et 1920 × 1080 avec bruit ;
+- chacune avec la durée exacte (échange par la position) et avec la durée tronquée (échange sur l'événement de fin).
+
+Dans les quatre cas :
+
+- aucune image n'est perdue ni répétée au raccord (9 à 15 raccords par cas) ;
+- le lecteur caché montrait l'image 0 avant chaque échange ;
+- l'image la plus longue autour du raccord reste dans la variation normale du reste de la vidéo (par exemple
+  46,6 ms contre 55,9 ms ailleurs).
+
+La boucle simple, mesurée de la même façon, garde une image deux fois plus longtemps au raccord (72 ms). Sur la vidéo
+lourde, elle tient une image 185 ms, en saute une et montre des images illisibles pendant la recherche. La mesure lit
+l'image que le lecteur fournit au rendu de WPF, hors écran. Elle ne voit pas la présentation à l'écran elle-même, ni
+la synchronisation verticale de l'écran.
+
+Deux particularités de Windows, relevées pendant ces essais, sont prises en compte par `FondVideo` :
+
+- la durée annoncée par le lecteur est tronquée à la seconde, et sa position reste bloquée sur cette valeur ;
+- juste à la fin du flux, une remise à zéro n'est pas toujours prise en compte : elle est refaite deux fois, 250 ms
+  puis 500 ms après l'échange.
 
 Banc vérifié le 25/09/2026 avec `python -m http.server` en local et un faux build (`cmd.exe` renommé
 `Deathless.exe`, jamais lancé). Les cas couverts :
@@ -251,6 +323,11 @@ Banc vérifié le 25/09/2026 avec `python -m http.server` en local et un faux bu
 - **Réseau** : `version.json` et `changelog.json` ont un délai de 20 s, si bien qu'un serveur muet ne bloque pas le
   mode hors ligne. Le téléchargement a un délai de 30 min, reprend là où il s'était arrêté (`Range`), et envoie le
   User-Agent `DeathlessLauncher/1.0`.
+- **Fond animé** : la vidéo est à côté de l'exe (`fond.mp4`) plutôt que dedans. L'exe reste léger et la vidéo se
+  change sans recompiler. Elle est lue par le `MediaPlayer` de WPF, qui s'appuie sur le lecteur de Windows : aucune
+  bibliothèque à ajouter. La boucle utilise deux lecteurs en alternance (voir « Changer le fond »).
+- **Indicateur d'attente** : une vague de gemmes or plutôt qu'une lueur. C'est le langage des effets du jeu :
+  gemmes low poly, pas d'alpha, apparition par la taille.
 - **Sons d'interface** : aucun. Le jeu n'a pas encore de sons de survol ni de validation en `.wav` (seulement les
   `.ogg` Kenney, que `System.Media.SoundPlayer` ne lit pas).
 
@@ -269,6 +346,7 @@ Ce qui est ajouté :
 - l'installation par échange de dossiers ;
 - des délais courts pour la vérification ;
 - la manette Xbox et les invites qui suivent l'appareil ;
+- le fond animé en boucle, et la vague de gemmes pendant l'attente ;
 - la progression dans la barre des tâches ;
 - les modes capture et test ;
 - `publish.ps1 -AvecLauncher`, qui publie aussi le launcher.

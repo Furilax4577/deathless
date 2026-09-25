@@ -85,6 +85,16 @@ namespace DeathlessLauncher
             return Bitmap(new Uri("pack://application:,,,/Ressources/fond.png"));
         }
 
+        /// Fond animé : fond.mp4 du dossier, lu en boucle par-dessus l'image fixe (qui reste en cas d'échec). Pas appelé
+        /// en mode capture : les captures gardent l'image fixe.
+        public void DemarrerVideo(string dossier)
+        {
+            string chemin = FondVideo.Chercher(dossier);
+            if (chemin == null) return;
+            Video.Echec += raison => System.Diagnostics.Trace.WriteLine("Fond animé abandonné, image fixe gardée : " + raison);
+            Video.Ouvrir(chemin);
+        }
+
         static ImageSource Icone(string nom) => Bitmap(new Uri("pack://application:,,,/Invites/" + nom));
 
         static ImageSource Bitmap(Uri uri)

@@ -112,3 +112,6 @@ InitTestScene*.unity*
 /Launcher/bin/
 /Launcher/obj/
 !/Launcher/DeathlessLauncher.csproj
+/Launcher/Outils/*/bin/
+/Launcher/Outils/*/obj/
+!/Launcher/Outils/FabVideo/FabVideo.csproj
