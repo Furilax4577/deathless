@@ -11,9 +11,9 @@ Cinq classes jouables, et bientôt le **druide** et le **mécanicien**. Chaque c
 | {icone classe_viking} | [Viking](classe-viking.md) | Hache à deux mains | Mêlée, zone |
 | {icone classe_druide} | [Druide](classe-druide.md) | **Bientôt** | Prochaine version |
 | {icone classe_mecanicien} | [Mécanicien](classe-mecanicien.md) | **Bientôt** | Prochaine version |
-|  | [Barde](classe-barde.md) | **Bientôt** | Soutien, luth |
-|  | [Bavaroise](classe-bavaroise.md) | **Bientôt** | Mêlée, chopes de bière |
-|  | [Clochard](classe-clochard.md) | **Bientôt** | Contrôle, bouteille et gaz |
+| {icone classe_barde} | [Barde](classe-barde.md) | **Bientôt** | Soutien, luth |
+| {icone classe_bavaroise} | [Bavaroise](classe-bavaroise.md) | **Bientôt** | Mêlée, chopes de bière |
+| {icone classe_clochard} | [Clochard](classe-clochard.md) | **Bientôt** | Contrôle, bouteille et gaz |
 
 Chaque classe a sa page : présentation, actions et touches, règles détaillées.
 

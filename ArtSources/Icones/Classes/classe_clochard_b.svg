@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+<!-- Deathless : classe_clochard_b (Clochard, variante B : baluchon). Généré par ArtSources/Icones/generer_icones.py -->
+<polygon fill="#5a5f66" points="64,2 117.7,33 117.7,95 64,126 10.3,95 10.3,33"/>
+<polygon fill="#999485" points="64,2 117.7,33 108.2,38.5 64,13"/>
+<polygon fill="#7a8088" points="117.7,33 117.7,95 108.2,89.5 108.2,38.5"/>
+<polygon fill="#5a5f66" points="117.7,95 64,126 64,115 108.2,89.5"/>
+<polygon fill="#7a8088" points="64,126 10.3,95 19.8,89.5 64,115"/>
+<polygon fill="#999485" points="10.3,95 10.3,33 19.8,38.5 19.8,89.5"/>
+<polygon fill="#c7bfa8" points="10.3,33 64,2 64,13 19.8,38.5"/>
+<polygon fill="#4a3510" points="19.8,89.5 19.8,38.5 64,13 108.2,38.5"/>
+<polygon fill="#2e220a" points="108.2,38.5 108.2,89.5 64,115 19.8,89.5"/>
+<polygon fill="#5b3f2a" points="29,108.6 95,32.6 89,27.4 23,103.4"/>
+<polygon fill="#5b3f2a" points="26,106 92,30 95,32.6 29,108.6"/>
+<polygon fill="#b8966c" points="26,106 92,30 89,27.4 23,103.4"/>
+<polygon fill="#6e2a22" points="80,38 94.1,43.1 101.7,56.2 99.1,71 87.5,80.7 72.5,80.7 60.9,71 58.3,56.2 65.9,43.1"/>
+<polygon fill="#9a4232" points="94.1,43.1 101.7,56.2 90.6,56.1 86.5,49"/>
+<polygon fill="#6e2a22" points="101.7,56.2 99.1,71 87.5,80.7 72.5,80.7 74.5,69.6 82.8,69.6 89.2,64.3 90.6,56.1"/>
+<polygon fill="#9a4232" points="72.5,80.7 60.9,71 58.3,56.2 66.8,56.1 68.2,64.3 74.5,69.6"/>
+<polygon fill="#c06a52" points="58.3,56.2 65.9,43.1 80,38 94.1,43.1 86.5,49 78.7,46.1 70.9,49 66.8,56.1"/>
+<polygon fill="#9a4232" points="78.7,46.1 86.5,49 90.6,56.1 89.2,64.3 82.8,69.6 74.5,69.6 68.2,64.3 66.8,56.1 70.9,49"/>
+<polygon fill="#6e2a22" points="72,38 88,36 92,44 70,46"/>
+<polygon fill="#9a4232" points="80.5,41 88,36 92,44"/>
+<polygon fill="#6e2a22" points="80.5,41 92,44 70,46"/>
+<polygon fill="#c06a52" points="80.5,41 70,46 72,38 88,36"/>
+<polygon fill="#d9c8a0" points="72,52.5 75.5,56 72,59.5 68.5,56"/>
+<polygon fill="#d9c8a0" points="72,56 75.5,56 72,59.5 68.5,56"/>
+<polygon fill="#f2e8d0" points="72,56 68.5,56 72,52.5 75.5,56"/>
+<polygon fill="#d9c8a0" points="88,60.5 91.5,64 88,67.5 84.5,64"/>
+<polygon fill="#d9c8a0" points="88,64 91.5,64 88,67.5 84.5,64"/>
+<polygon fill="#f2e8d0" points="88,64 84.5,64 88,60.5 91.5,64"/>
+<polygon fill="#d9c8a0" points="78,68.5 81.5,72 78,75.5 74.5,72"/>
+<polygon fill="#d9c8a0" points="78,72 81.5,72 78,75.5 74.5,72"/>
+<polygon fill="#f2e8d0" points="78,72 74.5,72 78,68.5 81.5,72"/>
+<polygon fill="#d9c8a0" points="90,46.5 93.5,50 90,53.5 86.5,50"/>
+<polygon fill="#d9c8a0" points="90,50 93.5,50 90,53.5 86.5,50"/>
+<polygon fill="#f2e8d0" points="90,50 86.5,50 90,46.5 93.5,50"/>
+</svg>

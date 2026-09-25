@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+<!-- Deathless : classe_barde_b (Barde, variante B : chapeau à plume). Généré par ArtSources/Icones/generer_icones.py -->
+<polygon fill="#5a1a2a" points="64,2 117.7,33 117.7,95 64,126 10.3,95 10.3,33"/>
+<polygon fill="#8c2a3e" points="64,2 117.7,33 108.2,38.5 64,13"/>
+<polygon fill="#8c2a3e" points="117.7,33 117.7,95 108.2,89.5 108.2,38.5"/>
+<polygon fill="#5a1a2a" points="117.7,95 64,126 64,115 108.2,89.5"/>
+<polygon fill="#8c2a3e" points="64,126 10.3,95 19.8,89.5 64,115"/>
+<polygon fill="#8c2a3e" points="10.3,95 10.3,33 19.8,38.5 19.8,89.5"/>
+<polygon fill="#b8475a" points="10.3,33 64,2 64,13 19.8,38.5"/>
+<polygon fill="#5a1a2a" points="19.8,89.5 19.8,38.5 64,13 108.2,38.5"/>
+<polygon fill="#2a0e17" points="108.2,38.5 108.2,89.5 64,115 19.8,89.5"/>
+<polygon fill="#d9c8a0" points="83.7,66.5 97.8,49 102.9,30.9 98,18 98,18 93.1,29.1 86.2,43 76.3,61.5"/>
+<polygon fill="#d9c8a0" points="80,64 92,46 97.8,49 83.7,66.5"/>
+<polygon fill="#f2e8d0" points="80,64 92,46 86.2,43 76.3,61.5"/>
+<polygon fill="#d9c8a0" points="92,46 98,30 102.9,30.9 97.8,49"/>
+<polygon fill="#f2e8d0" points="92,46 98,30 93.1,29.1 86.2,43"/>
+<polygon fill="#d9c8a0" points="98,30 98,18 98,18 102.9,30.9"/>
+<polygon fill="#f2e8d0" points="98,30 98,18 98,18 93.1,29.1"/>
+<polygon fill="#5a1a2a" points="38,70 40,50 50,38 70,36 84,44 90,70"/>
+<polygon fill="#b8475a" points="38,70 40,50 50,38 70,36 64.4,40.2 53.4,41.3 47.9,47.9 46.8,58.9"/>
+<polygon fill="#8c2a3e" points="70,36 84,44 90,70 75.4,58.9 72.1,44.6 64.4,40.2"/>
+<polygon fill="#5a1a2a" points="90,70 38,70 46.8,58.9 75.4,58.9"/>
+<polygon fill="#8c2a3e" points="46.8,58.9 47.9,47.9 53.4,41.3 64.4,40.2 72.1,44.6 75.4,58.9"/>
+<polygon fill="#9a7414" points="39,67.5 89,67.5 89,58.5 39,58.5"/>
+<polygon fill="#9a7414" points="39,63 89,63 89,67.5 39,67.5"/>
+<polygon fill="#efd070" points="39,63 89,63 89,58.5 39,58.5"/>
+<polygon fill="#5a1a2a" points="18,80 30,71 50,68 78,68 98,71 110,80 100,88 64,91 28,88"/>
+<polygon fill="#b8475a" points="18,80 30,71 50,68 78,68 98,71 78.2,71 68.2,69.5 54.2,69.5 44.2,71 38.2,75.5"/>
+<polygon fill="#8c2a3e" points="98,71 110,80 84.2,75.5 78.2,71"/>
+<polygon fill="#5a1a2a" points="110,80 100,88 64,91 28,88 43.2,79.5 61.2,81 79.2,79.5 84.2,75.5"/>
+<polygon fill="#8c2a3e" points="28,88 18,80 38.2,75.5 43.2,79.5"/>
+<polygon fill="#8c2a3e" points="38.2,75.5 44.2,71 54.2,69.5 68.2,69.5 78.2,71 84.2,75.5 79.2,79.5 61.2,81 43.2,79.5"/>
+</svg>

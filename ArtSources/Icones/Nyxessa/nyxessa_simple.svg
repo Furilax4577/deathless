@@ -1,23 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
 <!-- Deathless : nyxessa_simple (Nyxessa, variante A (petites tailles)). Généré par ArtSources/Icones/generer_icones.py -->
 <polygon fill="#161a24" points="15.5,45.3 30.4,64.6 15.5,84 0.6,64.6"/>
-<polygon fill="#1e5a32" points="15.5,64.6 24.1,64.6 15.5,75.8 7,64.6"/>
-<polygon fill="#3fae5a" points="15.5,64.6 7,64.6 15.5,53.5 24.1,64.6"/>
+<polygon fill="#0b5226" points="15.5,64.6 24.1,64.6 15.5,75.8 7,64.6"/>
+<polygon fill="#178a36" points="15.5,64.6 7,64.6 15.5,53.5 24.1,64.6"/>
 <polygon fill="#161a24" points="94.3,28 108.6,46.5 94.3,65 80.1,46.5"/>
-<polygon fill="#1e5a32" points="94.3,46.5 102.3,46.5 94.3,56.8 86.4,46.5"/>
-<polygon fill="#3fae5a" points="94.3,46.5 86.4,46.5 94.3,36.2 102.3,46.5"/>
+<polygon fill="#0b5226" points="94.3,46.5 102.3,46.5 94.3,56.8 86.4,46.5"/>
+<polygon fill="#178a36" points="94.3,46.5 86.4,46.5 94.3,36.2 102.3,46.5"/>
 <polygon fill="#161a24" points="64,-7.1 101.8,51.4 64,139.2 26.2,51.4"/>
-<polygon fill="#9fe870" points="64,4 33,52 51.6,59.2"/>
-<polygon fill="#3fae5a" points="64,4 51.6,59.2 77,59.2"/>
-<polygon fill="#1e5a32" points="64,4 77,59.2 95,52"/>
-<polygon fill="#3fae5a" points="33,52 64,124 51.6,59.2"/>
-<polygon fill="#1e5a32" points="51.6,59.2 64,124 77,59.2"/>
-<polygon fill="#145032" points="77,59.2 64,124 95,52"/>
-<polygon fill="#e8ffc8" points="64,4 41.7,38.6 58.8,27.2"/>
+<polygon fill="#3fb552" points="64,4 33,52 51.6,59.2"/>
+<polygon fill="#178a36" points="64,4 51.6,59.2 77,59.2"/>
+<polygon fill="#0b5226" points="64,4 77,59.2 95,52"/>
+<polygon fill="#178a36" points="33,52 64,124 51.6,59.2"/>
+<polygon fill="#0b5226" points="51.6,59.2 64,124 77,59.2"/>
+<polygon fill="#062a17" points="77,59.2 64,124 95,52"/>
+<polygon fill="#a4ec90" points="64,4 41.7,38.6 58.8,27.2"/>
 <polygon fill="#161a24" points="112.5,44.3 130.2,67.4 112.5,90.4 94.7,67.4"/>
-<polygon fill="#3fae5a" points="112.5,67.4 123.9,67.4 112.5,82.2 101,67.4"/>
-<polygon fill="#9fe870" points="112.5,67.4 101,67.4 112.5,52.5 123.9,67.4"/>
+<polygon fill="#178a36" points="112.5,67.4 123.9,67.4 112.5,82.2 101,67.4"/>
+<polygon fill="#3fb552" points="112.5,67.4 101,67.4 112.5,52.5 123.9,67.4"/>
 <polygon fill="#161a24" points="33.7,61.6 52,85.5 33.7,109.4 15.3,85.5"/>
-<polygon fill="#3fae5a" points="33.7,85.5 45.7,85.5 33.7,101.2 21.6,85.5"/>
-<polygon fill="#9fe870" points="33.7,85.5 21.6,85.5 33.7,69.8 45.7,85.5"/>
+<polygon fill="#178a36" points="33.7,85.5 45.7,85.5 33.7,101.2 21.6,85.5"/>
+<polygon fill="#3fb552" points="33.7,85.5 21.6,85.5 33.7,69.8 45.7,85.5"/>
 </svg>

@@ -37,16 +37,15 @@ SORTIE_NYXESSA = ICI / "Nyxessa"
 SECOURS = {
     "Feu": {"Braise": "#4a1206", "Rouge": "#cc1f08", "Orange": "#ff610a", "Jaune": "#ffe666",
             "Blanc chaud": "#fff4d6", "Charbon": "#2e2a28", "Cendre": "#6a615a"},
-    "Nyxessa": {"Émeraude sombre": "#145032", "Émeraude": "#1e5a32", "Vert vif": "#3fae5a",
-                "Vert clair": "#9fe870", "Éclat": "#e8ffc8"},
+    "Nyxessa": {"Émeraude profonde": "#062a17", "Émeraude": "#0b5226", "Vert Nyx": "#178a36",
+                "Vert clair": "#3fb552", "Éclat": "#a4ec90"},
     "Terre": {"Terre profonde": "#3a281a", "Terre sombre": "#5b3f2a", "Terre claire": "#8a6a48",
               "Sable": "#b8966c", "Pierre": "#8c877f"},
     "Rage": {"Rouge noir": "#3a0a08", "Rouge sombre": "#6e1410", "Rouge vif": "#b3261e", "Rouge pâle": "#ff7359",
              "Ivoire": "#e8dcc0", "Ivoire clair": "#fff5e0", "Fer": "#5a5f66", "Fer sombre": "#3f444a",
              "Fer clair": "#7a8088"},
     "Sacre": {"Nuit": "#1e2a3a", "Or sombre": "#b8903a", "Or": "#e8c872", "Or clair": "#f4e2a8", "Acier": "#5a7aa0"},
-    "Soin": {"Menthe profonde": "#1b6a4c", "Menthe sombre": "#2e9e72", "Menthe": "#4fcf9a",
-             "Menthe claire": "#b8f5d8"},
+    "Soin": {"Or sombre": "#b8903a", "Or": "#e8c872", "Or clair": "#f4e2a8", "Blanc chaud": "#fff3d1"},
     "Os": {"Os gris": "#999485", "Os": "#c7bfa8", "Os pâle": "#ebe6cc", "Magie": "#8cff73"},
     "Critique": {"Ambre": "#a8641a", "Or chaud": "#e8a53a", "Or clair": "#ffd166", "Blanc chaud": "#fff3d1",
                  "Meilleur": "#ff5a3c"},
@@ -122,8 +121,10 @@ FER_RAGE = [c("Rage", "Fer sombre"), c("Rage", "Fer"), c("Rage", "Fer clair")]
 IVOIRE = [c("Rage", "Ivoire"), c("Rage", "Ivoire clair")]
 TERRE = [c("Terre", "Terre sombre"), c("Terre", "Terre claire"), c("Terre", "Sable")]
 # Soin (décision du 25/09/2026) : blanc chaud et or, lumière sacrée ; le vert reste à Nyxessa. Plus de menthe.
-SOIN = [c("Sacre", "Or sombre"), c("Sacre", "Or"), c("Sacre", "Or clair"), c("Critique", "Blanc chaud")]
-SOIN_BLANC = c("Critique", "Blanc chaud")
+SOIN = [c("Soin", "Or sombre"), c("Soin", "Or"), c("Soin", "Or clair"), c("Soin", "Blanc chaud")]
+SOIN_BLANC = c("Soin", "Blanc chaud")
+# Ancienne palette Soin (menthe, jusqu'au 25/09/2026) : interdite dans les icônes.
+MENTHE = {"#1b6a4c", "#2e9e72", "#4fcf9a", "#b8f5d8"}
 CRITIQUE = [c("Critique", "Ambre"), c("Critique", "Or chaud"), c("Critique", "Or clair")]
 OS = [c("Os", "Os gris"), c("Os", "Os"), c("Os", "Os pâle")]
 MANA = [c("BouclierPlein", "Bleu nuit"), c("BouclierPlein", "Bleu"), c("BouclierPlein", "Bleu vif"),
@@ -143,6 +144,42 @@ LUNE = [c("Os", "Os gris"), c("Os", "Os"), c("Os", "Os pâle")]
 LAITON = [c("Critique", "Ambre"), c("Critique", "Or chaud"), c("Critique", "Or clair")]
 ACIER_CLAIR = [c("Rage", "Fer clair"), c("Os", "Os"), c("Os", "Os pâle")]
 
+# Barde, Bavaroise, Clochard (classes à venir, kits proposés le 25/09/2026). Pas encore de palette de thème dans
+# Assets/VFX/_Palettes : teintes relevées sur les modèles (sandbox-rig, captures barde_* et bavaroise_*) et sur la
+# description du clochard. Aucune teinte n'est verte : teinte (hue) toujours sous 50° ou au-dessus de 180°, vérifié
+# par verifier(). À reporter en palettes du jeu quand les effets de ces classes seront faits.
+BARDE = {"nuit": "#2a0e17", "bordeaux sombre": "#5a1a2a", "bordeaux": "#8c2a3e", "bordeaux clair": "#b8475a",
+         "moutarde sombre": "#9a7414", "moutarde": "#d4a82a", "moutarde claire": "#efd070",
+         "crème ombre": "#d9c8a0", "crème": "#f2e8d0", "rosace": "#3a2410", "rosace claire": "#5a3a1c"}
+BAVAROISE = {"ambre sombre": "#7a3f0e", "ambre": "#c7741c", "ambre clair": "#f0a93a",
+             "mousse ombre": "#d8c8a4", "mousse": "#f6ecd4", "mousse claire": "#fffaf0",
+             "étain sombre": "#4e5864", "étain": "#8793a0", "étain clair": "#c3cbd3",
+             "cuivre sombre": "#8a4a30", "cuivre": "#b0603f", "cuivre clair": "#cf8460",
+             "bleu nuit": "#1c3358", "bleu": "#2a4a7a", "bretzel sombre": "#6e3c1a", "bretzel": "#a35f2a",
+             "bretzel clair": "#cf8a45"}
+CLOCHARD = {"kraft sombre": "#6e5230", "kraft": "#a07c4e", "kraft clair": "#c9a574",
+            "verre sombre": "#4a2c12", "verre": "#7a5226", "verre clair": "#a87a44",
+            "gaz nuit": "#2e220a", "gaz profond": "#4a3510", "gaz sombre": "#6a4a12", "gaz": "#a8782a",
+            "gaz clair": "#d4a440", "gaz pâle": "#ecca78",
+            "rouge usé sombre": "#6e2a22", "rouge usé": "#9a4232", "rouge usé clair": "#c06a52"}
+BA = lambda *n: [BARDE[x] for x in n]          # noqa: E731
+BV = lambda *n: [BAVAROISE[x] for x in n]      # noqa: E731
+CL = lambda *n: [CLOCHARD[x] for x in n]       # noqa: E731
+LUTH = [c("Terre", "Terre claire"), c("Terre", "Sable"), c("Chasse", "Ocre clair")]
+MANCHE_LUTH = [c("Terre", "Terre sombre"), c("Terre", "Terre claire")]
+MOUTARDE = BA("moutarde sombre", "moutarde", "moutarde claire")
+CREME = BA("crème ombre", "crème")
+BORDEAUX = BA("bordeaux sombre", "bordeaux", "bordeaux clair")
+ETAIN = BV("étain sombre", "étain", "étain clair")
+CUIVRE = BV("cuivre sombre", "cuivre", "cuivre clair")
+MOUSSE = BV("mousse ombre", "mousse", "mousse claire")
+BIERE = BV("ambre sombre", "ambre", "ambre clair")
+KRAFT = CL("kraft sombre", "kraft", "kraft clair")
+VERRE = CL("verre sombre", "verre", "verre clair")
+GAZ = CL("gaz sombre", "gaz", "gaz clair", "gaz pâle")
+ROUGE_USE = CL("rouge usé sombre", "rouge usé", "rouge usé clair")
+OR_PIECE = [c("Critique", "Ambre"), c("Critique", "Or chaud"), c("Critique", "Or clair")]
+
 # Cadres des classes : rampe de la bordure (sombre -> claire, 4 niveaux), puis les deux zones du fond de
 # l'hexagone, coupé en diagonale (« / », d'un sommet à l'autre) : moitié haut gauche claire, bas droite sombre.
 CADRES = {
@@ -158,6 +195,10 @@ CADRES = {
                c("Rage", "Rouge sombre"), c("Rage", "Rouge noir")),
     "mecanicien": ([c("Critique", "Ambre"), c("Critique", "Or chaud"), c("Critique", "Or chaud"), c("Critique", "Or clair")],
                    c("Rage", "Fer"), c("Rage", "Fer sombre")),
+    "barde": (BA("bordeaux sombre", "bordeaux", "bordeaux", "bordeaux clair"), BARDE["bordeaux sombre"], BARDE["nuit"]),
+    "bavaroise": (BV("étain sombre", "étain", "étain", "étain clair"), BAVAROISE["bleu"], BAVAROISE["bleu nuit"]),
+    "clochard": ([c("Rage", "Fer"), c("Rage", "Fer clair"), c("Os", "Os gris"), c("Os", "Os")],
+                 CLOCHARD["gaz profond"], CLOCHARD["gaz nuit"]),
     "druide": ([c("Os", "Os gris"), c("Os", "Os"), c("Os", "Os"), c("Os", "Os pâle")],
                c("Terre", "Terre profonde"), c("Feu", "Charbon")),
 }
@@ -802,6 +843,366 @@ def commun_coup_critique():
     return ic
 
 
+# ---------------------------------------------------------------------------------------------- barde, bavaroise, clochard
+
+def tr(cx, cy, k=1.0, ang=0.0, miroir_x=False):
+    """Transformation locale -> icône : miroir horizontal éventuel, rotation (degrés), échelle, translation."""
+    ca, sa = math.cos(math.radians(ang)), math.sin(math.radians(ang))
+
+    def f(x, y):
+        if miroir_x:
+            x = -x
+        return (cx + k * (x * ca - y * sa), cy + k * (x * sa + y * ca))
+
+    return f
+
+
+def _t(f, pts):
+    return [f(x, y) for x, y in pts]
+
+
+def luth(ic, f, k):
+    """Luth du barde : caisse en poire, rosace, cordes, manche, chevillier renversé (repère local, caisse en bas)."""
+    ic.bande(_t(f, [(0, -2), (0, -44)]), 9 * k, MANCHE_LUTH)
+    ic.bande(_t(f, [(0, -44), (-7, -56)]), 8 * k, MANCHE_LUTH)
+    corps = [(22 * math.cos(math.radians(a)), 20 + 24 * math.sin(math.radians(a))) for a in range(-20, 201, 20)]
+    corps += [(-12, -2), (-6, -8), (6, -8), (12, -2)]
+    ic.gemme(_t(f, corps), LUTH, table=0.62, teinte_table=LUTH[1], decalage=0.05)
+    ic.gemme(regulier(f(0, 13), 7 * k, 8, 22.5), BA("rosace", "rosace claire"))
+    ic.bande(_t(f, [(0, 34), (0, -42)]), 2.8 * k, [BARDE["crème"], BARDE["crème"]])
+    ic.bande(_t(f, [(-8, 32), (8, 32)]), 3.6 * k, BA("rosace", "rosace claire"))
+
+
+def chope(ic, f, k):
+    """Chope de la bavaroise (KayKit mug_full_Large) : corps cuivré, cerclages et anse en étain, mousse crème."""
+    ic.bande(_t(f, [(14, -12), (26, -12), (31, -2), (31, 8), (26, 16), (14, 16)]), 6.5 * k, ETAIN)
+    ic.gemme(_t(f, [(-17, -20), (17, -20), (16, 22), (13, 26), (-13, 26), (-16, 22)]), CUIVRE, table=0.7,
+             teinte_table=BAVAROISE["cuivre"], decalage=0.04)
+    for y in (-11, 16):
+        ic.bande(_t(f, [(-16.8, y), (16.6, y)]), 5.5 * k, ETAIN)
+    ic.gemme(_t(f, [(-20, -18), (-22, -26), (-14, -34), (-4, -36), (6, -33), (14, -37), (22, -28), (20, -18)]),
+             MOUSSE, centre=f(-2, -26))
+
+
+def bouteille_kraft(ic, f, k):
+    """Bouteille dans son sac en papier kraft : goulot en verre brun (jamais vert)."""
+    ic.bande(_t(f, [(0, -6), (0, -30)]), 10 * k, VERRE)
+    ic.bande(_t(f, [(-2.5, -8), (-2.5, -27)]), 2.6 * k, [CLOCHARD["kraft clair"], CLOCHARD["kraft clair"]])
+    ic.bande(_t(f, [(0, -29), (0, -37)]), 13 * k, ROUGE_USE)
+    sac = [(-16, 26), (16, 26), (19, -2), (15, -10), (9, -5), (3, -12), (-3, -6), (-10, -12), (-19, -3)]
+    ic.gemme(_t(f, sac), KRAFT, table=0.55, teinte_table=CLOCHARD["kraft"], decalage=0.05)
+    ic.bande(_t(f, [(-9, 2), (-7, 20)]), 2.4 * k, [CLOCHARD["kraft sombre"], CLOCHARD["kraft sombre"]])
+
+
+def nuage_gaz(ic, bouffees, rampe=GAZ):
+    for x, y, r in bouffees:
+        ic.gemme(regulier((x, y), r, 8, -80), rampe, table=0.55, teinte_table=rampe[1])
+
+
+def volute(ic, x, y0, y1, amp, larg, rampe):
+    n = 9
+    pts = [(x + amp * math.sin(math.pi * 2 * i / (n - 1)), y0 + (y1 - y0) * i / (n - 1)) for i in range(n)]
+    ic.bande(pts, [larg * (1 - 0.8 * i / (n - 1)) for i in range(n)], rampe)
+
+
+def chevron(ic, x, y, h, w, d, rampe):
+    ic.gemme([(x, y - h), (x + w, y - h), (x + w + d, y), (x + w, y + h), (x, y + h), (x + d, y)], rampe,
+             centre=(x + w * 0.5 + d * 0.5, y))
+
+
+def note(ic, x, y, hampe=48, drapeau=True, rampe=MOUTARDE):
+    """Croche : tête ovale inclinée, hampe, drapeau."""
+    tete = [(x + 13 * math.cos(math.radians(a)) * math.cos(math.radians(-25)) - 9 * math.sin(math.radians(a)) * math.sin(math.radians(-25)),
+             y + 13 * math.cos(math.radians(a)) * math.sin(math.radians(-25)) + 9 * math.sin(math.radians(a)) * math.cos(math.radians(-25)))
+            for a in range(0, 360, 36)]
+    ic.bande([(x + 10, y - 2), (x + 10, y - hampe)], 6, rampe)
+    if drapeau:
+        ic.bande([(x + 10, y - hampe), (x + 22, y - hampe + 12), (x + 26, y - hampe + 26), (x + 20, y - hampe + 36)],
+                 [7, 7, 5, 0], rampe)
+    ic.gemme(tete, rampe, table=0.5, teinte_table=BARDE["crème"])
+
+
+def impact(ic, cx, cy, n, r0, r1, larg, rampe, a0=-90.0, ouverture=360.0):
+    for i in range(n):
+        a = a0 + (ouverture * i / (n - 1) if ouverture < 360 else 360.0 * i / n)
+        ic.bande([polaire((cx, cy), r0, a), polaire((cx, cy), r1, a)], [larg, 0], rampe)
+
+
+def piece(ic, x, y, rx, ry, epaisseur=5):
+    bord = [(x + rx * math.cos(math.radians(a)), y + ry * math.sin(math.radians(a)) + epaisseur) for a in range(0, 181, 20)]
+    bord += [(x - rx, y), (x + rx, y)]
+    ic.poly(bord, c("Critique", "Ambre"))
+    ic.gemme([(x + rx * math.cos(math.radians(a)), y + ry * math.sin(math.radians(a))) for a in range(0, 360, 30)],
+             OR_PIECE, table=0.62, teinte_table=c("Critique", "Or chaud"), decalage=0.05)
+
+
+# ---- barde
+
+def classe_barde_a():
+    ic = Icone("classe_barde_a", "barde_variantes", "Barde, variante A : luth",
+               "Luth en diagonale, bois clair et rosace sombre. Cadre bordeaux, fond bordeaux sombre / nuit.")
+    cadre_hex(ic, "barde")
+    luth(ic, tr(68, 68, 1.02, 38), 1.02)
+    return ic
+
+
+def classe_barde_b():
+    ic = Icone("classe_barde_b", "barde_variantes", "Barde, variante B : chapeau à plume",
+               "Le grand chapeau bordeaux du barde, ruban moutarde et plume crème.")
+    cadre_hex(ic, "barde")
+    ic.bande([(80, 64), (92, 46), (98, 30), (98, 18)], [9, 13, 10, 0], CREME)
+    ic.gemme([(38, 70), (40, 50), (50, 38), (70, 36), (84, 44), (90, 70)], BORDEAUX, table=0.55,
+             teinte_table=BARDE["bordeaux"])
+    ic.bande([(39, 63), (89, 63)], 9, MOUTARDE)
+    ic.gemme([(18, 80), (30, 71), (50, 68), (78, 68), (98, 71), (110, 80), (100, 88), (64, 91), (28, 88)], BORDEAUX,
+             table=0.5, teinte_table=BARDE["bordeaux"])
+    return ic
+
+
+def barde_coup_de_luth():
+    ic = Icone("barde_coup_de_luth", "barde", "Coup de luth", "RT : le luth tenu par le manche, comme une massue ; le 3e coup étourdit.")
+    luth(ic, tr(62, 66, 1.0, -135), 1.0)
+    impact(ic, 96, 34, 5, 16, 30, 8, MOUTARDE, a0=-110, ouverture=150)
+    return ic
+
+
+def barde_jouer():
+    ic = Icone("barde_jouer", "barde", "Jouer", "LT maintenu : mélodie qui soigne les alliés proches.")
+    ic.bande([(46, 34), (98, 22)], 12, MOUTARDE)
+    note(ic, 36, 96, hampe=62, drapeau=False)
+    note(ic, 88, 84, hampe=62, drapeau=False)
+    for x, y in ((112, 60), (18, 50)):
+        ic.gemme([(x, y - 7), (x + 5, y), (x, y + 7), (x - 5, y)], CREME)
+    return ic
+
+
+def barde_ballade_entrainante():
+    ic = Icone("barde_ballade_entrainante", "barde", "Ballade entraînante", "LB : alliés proches plus rapides pendant 6 s.")
+    note(ic, 34, 94, hampe=64)
+    for dx in (0, 24):
+        chevron(ic, 70 + dx, 64, 26, 10, 16, BORDEAUX)
+    return ic
+
+
+def barde_accord_dissonant():
+    ic = Icone("barde_accord_dissonant", "barde", "Accord dissonant", "RB : onde sonore en cône qui repousse et étourdit.")
+    o = (16, 64)
+    for i, (r, rampe) in enumerate(((34, MOUTARDE), (60, BORDEAUX), (86, MOUTARDE))):
+        pts = [polaire(o, r + (2.5 if j % 2 else -2.5), a) for j, a in enumerate(range(-42, 43, 7))]
+        ic.bande(pts, 12 - 2 * i, rampe)
+    ic.gemme(regulier(o, 9, 6, 0), BORDEAUX)
+    return ic
+
+
+def barde_jauge_inspiration():
+    ic = Icone("barde_jauge_inspiration", "barde", "Inspiration", "Jauge : plume d'écrivain ; monte en frappant et en jouant.")
+    ic.bande([(20, 112), (36, 92), (58, 64), (80, 38), (100, 18), (110, 10)], [0, 10, 22, 24, 16, 0], CREME)
+    ic.bande([(22, 110), (36, 92), (90, 26)], [4, 3.5, 1.5], MOUTARDE)
+    ic.gemme([(14, 116), (22, 104), (28, 110)], BA("moutarde sombre", "moutarde"))
+    for x, y, r in ((104, 64, 7), (88, 86, 5)):
+        ic.gemme([(x, y - r * 1.5), (x + r, y), (x, y + r * 1.5), (x - r, y)], MOUTARDE)
+    return ic
+
+
+# ---- bavaroise
+
+def classe_bavaroise_a():
+    ic = Icone("classe_bavaroise_a", "bavaroise_variantes", "Bavaroise, variante A : chope",
+               "Chope cuivrée cerclée d'étain, mousse crème. Cadre étain, fond bleu bavarois.")
+    cadre_hex(ic, "bavaroise")
+    chope(ic, tr(58, 70, 1.25), 1.25)
+    return ic
+
+
+def classe_bavaroise_b():
+    ic = Icone("classe_bavaroise_b", "bavaroise_variantes", "Bavaroise, variante B : bretzel",
+               "Bretzel doré et grains de sel. Cadre étain, fond bleu bavarois.")
+    cadre_hex(ic, "bavaroise")
+    rampe = BV("bretzel sombre", "bretzel", "bretzel clair")
+    boucle = [(64 + 34 * math.cos(math.radians(a)), 58 + 28 * math.sin(math.radians(a))) for a in range(25, -206, -15)]
+    ic.bande(boucle, 12, rampe)
+    fin_g, fin_d = boucle[-1], boucle[0]
+    ic.bande([fin_d, (70, 76), (54, 90), (42, 98)], [12, 12, 12, 10], rampe)
+    ic.bande([fin_g, (58, 76), (74, 90), (86, 98)], [12, 12, 12, 10], rampe)
+    for x, y in ((46, 40), (64, 32), (82, 40), (36, 60), (92, 60), (64, 82)):
+        ic.gemme([(x, y - 3), (x + 3, y), (x, y + 3), (x - 3, y)], BV("mousse ombre", "mousse claire"))
+    return ic
+
+
+def bavaroise_coups_de_chopes():
+    ic = Icone("bavaroise_coups_de_chopes", "bavaroise", "Coups de chopes", "RT : enchaînement gauche-droite ; le 4e coup repousse.")
+    for r, larg in ((50, 7), (40, 5)):
+        pts = [polaire((74, 78), r, a) for a in range(-200, -129, 10)]
+        ic.bande(pts, [0] + [larg] * (len(pts) - 2) + [0], MOUSSE)
+    chope(ic, tr(70, 68, 1.2, 22), 1.2)
+    impact(ic, 104, 30, 4, 10, 22, 7, BIERE, a0=-80, ouverture=110)
+    return ic
+
+
+def bavaroise_trinquer():
+    ic = Icone("bavaroise_trinquer", "bavaroise", "Trinquer", "LT : une gorgée qui soigne et remplit l'Ivresse.")
+    chope(ic, tr(38, 72, 0.95, 18, miroir_x=True), 0.95)
+    chope(ic, tr(90, 72, 0.95, -18), 0.95)
+    for x, y, r in ((64, 22, 7), (52, 14, 5), (78, 14, 5)):
+        ic.gemme(regulier((x, y), r, 7, -90), MOUSSE)
+    return ic
+
+
+def bavaroise_tournee_generale():
+    ic = Icone("bavaroise_tournee_generale", "bavaroise", "Tournée générale", "LB : chope lancée qui éclate, mousse glissante en zone.")
+    cen = (64, 104)
+    ext = [(cen[0] + 54 * math.cos(math.radians(a)), cen[1] + 14 * math.sin(math.radians(a))) for a in range(0, 360, 30)]
+    ic.gemme(ext, MOUSSE, table=0.6, teinte_table=BAVAROISE["mousse"])
+    for ang, lg in ((-150, 30), (-120, 40), (-90, 44), (-60, 40), (-30, 30)):
+        a = polaire((64, 70), 12, ang)
+        b = polaire((64, 70), 12 + lg, ang)
+        ic.bande([a, b], [14, 0], MOUSSE)
+    for x, y, r in ((30, 40, 5), (98, 36, 6), (84, 18, 4), (44, 20, 4)):
+        ic.gemme([(x, y - r * 1.4), (x + r, y), (x, y + r * 1.4), (x - r, y)], BIERE)
+    chope(ic, tr(64, 76, 0.85, 160), 0.85)
+    return ic
+
+
+def bavaroise_charge_du_tonneau():
+    ic = Icone("bavaroise_charge_du_tonneau", "bavaroise", "Charge du tonneau", "RB : elle fonce épaule en avant et renverse tout.")
+    for y, lg in ((40, 26), (64, 34), (88, 26)):
+        ic.bande([(4, y), (4 + lg, y)], [0, 7], ETAIN)
+    f = tr(76, 64, 1.0, 12)
+    ic.gemme(_t(f, [(-24, -40), (24, -40), (32, 0), (24, 40), (-24, 40), (-32, 0)]), TERRE, table=0.7,
+             teinte_table=c("Terre", "Terre claire"), decalage=0.05)
+    for y in (-26, 26):
+        ic.bande(_t(f, [(-29 + abs(y) * 0.1, y), (29 - abs(y) * 0.1, y)]), 7, ETAIN)
+    for x in (-10, 10):
+        ic.bande(_t(f, [(x, -38), (x * 1.3, 0), (x, 38)]), 2.4, [c("Terre", "Terre sombre"), c("Terre", "Terre sombre")])
+    return ic
+
+
+def bavaroise_jauge_ivresse():
+    ic = Icone("bavaroise_jauge_ivresse", "bavaroise", "Ivresse", "Jauge : bulles de bière ; plus haute, coups plus forts, elle titube.")
+    for x, y, r in ((52, 88, 26), (86, 50, 17), (58, 34, 11), (88, 16, 7), (100, 86, 9)):
+        ic.gemme(regulier((x, y), r, 8, -67.5), BIERE, table=0.55, teinte_table=BAVAROISE["ambre"])
+        ic.gemme([(x - r * 0.55, y - r * 0.55), (x - r * 0.2, y - r * 0.62), (x - r * 0.42, y - r * 0.2)],
+                 BV("mousse", "mousse claire"))
+    return ic
+
+
+# ---- clochard
+
+def classe_clochard_a():
+    ic = Icone("classe_clochard_a", "clochard_variantes", "Clochard, variante A : bouteille dans le kraft",
+               "Bouteille dans son sac en papier, goulot en verre brun. Cadre gris usé, fond moutarde sombre (le gaz).")
+    cadre_hex(ic, "clochard")
+    bouteille_kraft(ic, tr(64, 72, 1.4, 12), 1.4)
+    return ic
+
+
+def classe_clochard_b():
+    ic = Icone("classe_clochard_b", "clochard_variantes", "Clochard, variante B : baluchon",
+               "Baluchon rouge usé à pois crème au bout d'un bâton.")
+    cadre_hex(ic, "clochard")
+    ic.bande([(26, 106), (92, 30)], 8, TERRE)
+    ic.gemme(regulier((80, 60), 22, 9, -90), ROUGE_USE, table=0.55, teinte_table=CLOCHARD["rouge usé"])
+    ic.gemme([(72, 38), (88, 36), (92, 44), (70, 46)], ROUGE_USE)
+    for x, y in ((72, 56), (88, 64), (78, 72), (90, 50)):
+        ic.gemme([(x, y - 3.5), (x + 3.5, y), (x, y + 3.5), (x - 3.5, y)], CREME)
+    return ic
+
+
+def clochard_coup_de_bouteille():
+    ic = Icone("clochard_coup_de_bouteille", "clochard", "Coup de bouteille", "RT : le 3e coup fait éclater la bouteille.")
+    bouteille_kraft(ic, tr(52, 74, 1.25, 40), 1.25)
+    for x, y, a in ((96, 24, 0), (110, 44, 30), (86, 10, -30), (112, 20, 60)):
+        f = tr(x, y, 1.0, a)
+        ic.gemme(_t(f, [(0, -7), (5, 3), (-4, 5)]), VERRE)
+    impact(ic, 92, 36, 3, 8, 16, 5, CL("gaz clair", "gaz pâle"), a0=-30, ouverture=90)
+    return ic
+
+
+def clochard_pet_de_defense():
+    ic = Icone("clochard_pet_de_defense", "clochard", "Pet de défense", "LT : petit nuage derrière lui qui repousse et empoisonne.")
+    nuage_gaz(ic, [(44, 92, 20), (72, 94, 18), (58, 76, 22), (84, 78, 15)])
+    for x in (40, 64, 88):
+        volute(ic, x, 50, 12, 6, 7, CL("gaz clair", "gaz pâle"))
+    return ic
+
+
+def clochard_nuage_pestilentiel():
+    ic = Icone("clochard_nuage_pestilentiel", "clochard", "Nuage pestilentiel", "LB : grand nuage moutarde qui ralentit et ronge.")
+    cen = (64, 104)
+    ext = [(cen[0] + 56 * math.cos(math.radians(a)), cen[1] + 15 * math.sin(math.radians(a))) for a in range(0, 360, 20)]
+    inte = [(cen[0] + 44 * math.cos(math.radians(a)), cen[1] + 9 * math.sin(math.radians(a))) for a in range(0, 360, 20)]
+    n = len(ext)
+    for i in range(n):
+        a, b = ext[i], ext[(i + 1) % n]
+        ic.poly([a, b, inte[(i + 1) % n], inte[i]], teinte(CL("gaz sombre", "gaz"), sub(cen, mul(add(a, b), 0.5))))
+    nuage_gaz(ic, [(30, 78, 18), (98, 78, 18), (48, 62, 22), (80, 60, 22), (64, 42, 22), (64, 84, 20), (40, 40, 12),
+                   (90, 36, 13)])
+    return ic
+
+
+def clochard_pet_propulsion():
+    ic = Icone("clochard_pet_propulsion", "clochard", "Pet-propulsion", "RB : bond en avant, petit nuage au départ.")
+    nuage_gaz(ic, [(22, 104, 14), (40, 110, 12), (30, 90, 12)])
+    arc = [(34 + 64 * t, 92 - 70 * math.sin(math.pi * 0.5 * t) + 0 * t) for t in [i / 8 for i in range(9)]]
+    ic.bande(arc, [3 + 8 * i / 8 for i in range(9)], ROUGE_USE)
+    f = tr(arc[-1][0], arc[-1][1], 1.0, math.degrees(math.atan2(arc[-1][1] - arc[-2][1], arc[-1][0] - arc[-2][0])))
+    ic.gemme(_t(f, [(-4, -14), (16, 0), (-4, 14)]), ROUGE_USE)
+    return ic
+
+
+def clochard_debrouille():
+    ic = Icone("clochard_debrouille", "clochard", "Débrouille", "Passif : un peu plus d'or sur les squelettes (+10 %).")
+    piece(ic, 54, 98, 34, 13)
+    piece(ic, 54, 84, 34, 13)
+    piece(ic, 54, 70, 34, 13)
+    ic.gemme([(96 + 18 * math.cos(math.radians(a)), 50 + 18 * math.sin(math.radians(a))) for a in range(0, 360, 30)],
+             OR_PIECE, table=0.6, teinte_table=c("Critique", "Or chaud"))
+    blanc = c("Critique", "Blanc chaud")
+    ic.poly([(92, 30), (100, 30), (100, 38), (108, 38), (108, 46), (100, 46), (100, 54), (92, 54), (92, 46),
+             (84, 46), (84, 38), (92, 38)], blanc)
+    return ic
+
+
+def clochard_jauge_gaz():
+    ic = Icone("clochard_jauge_gaz", "clochard", "Gaz", "Jauge : bulle de gaz moutarde ; les pets la dépensent.")
+    ic.gemme(regulier((56, 72), 38, 10, -72), GAZ, table=0.55, teinte_table=CLOCHARD["gaz"])
+    for x, y, r in ((100, 30, 11), (88, 12, 6)):
+        ic.gemme(regulier((x, y), r, 8, -67.5), GAZ, table=0.5, teinte_table=CLOCHARD["gaz"])
+    ic.gemme([(34, 50), (44, 42), (40, 58)], CL("gaz pâle", "gaz pâle"))
+    return ic
+
+
+# Variante retenue par classe (A par défaut) pour classe_<nom>.svg.
+NOUVELLES_CLASSES = {
+    "barde": ({"a": classe_barde_a, "b": classe_barde_b}, "a", "Barde",
+              [barde_coup_de_luth, barde_jouer, barde_ballade_entrainante, barde_accord_dissonant,
+               barde_jauge_inspiration]),
+    "bavaroise": ({"a": classe_bavaroise_a, "b": classe_bavaroise_b}, "a", "Bavaroise",
+                  [bavaroise_coups_de_chopes, bavaroise_trinquer, bavaroise_tournee_generale,
+                   bavaroise_charge_du_tonneau, bavaroise_jauge_ivresse]),
+    "clochard": ({"a": classe_clochard_a, "b": classe_clochard_b}, "a", "Clochard",
+                 [clochard_coup_de_bouteille, clochard_pet_de_defense, clochard_nuage_pestilentiel,
+                  clochard_pet_propulsion, clochard_debrouille, clochard_jauge_gaz]),
+}
+
+
+def classe_retenue(cle):
+    variantes, choix, titre, _ = NOUVELLES_CLASSES[cle]
+    ic = variantes[choix]()
+    ic.nom, ic.famille = "classe_" + cle, "classes"
+    ic.titre = "%s (à venir)" % titre
+    ic.notes = "Variante %s en attendant le choix de Quentin." % choix.upper()
+    return ic
+
+
+def nouvelles_variantes():
+    return [f() for cle in NOUVELLES_CLASSES for f in NOUVELLES_CLASSES[cle][0].values()]
+
+
+def nouvelles_competences():
+    return [f() for cle in NOUVELLES_CLASSES for f in NOUVELLES_CLASSES[cle][3]]
+
+
 # ---------------------------------------------------------------------------------------------- mécanicien (à venir)
 
 def engrenage(ic, centre, r_ext, r_int, dents, rampe, moyeu, a0=0.0):
@@ -993,8 +1394,8 @@ def druide_soin_nature():
 # Liseré sombre (encre de l'interface) pour rester lisible sur une barre des tâches claire.
 
 ENCRE = "#161a24"
-NYX = [c("Nyxessa", "Émeraude sombre"), c("Nyxessa", "Émeraude"), c("Nyxessa", "Vert vif"), c("Nyxessa", "Vert clair"),
-       c("Nyxessa", "Éclat")]
+NYX = [c("Nyxessa", "Émeraude profonde"), c("Nyxessa", "Émeraude"), c("Nyxessa", "Vert Nyx"),
+       c("Nyxessa", "Vert clair"), c("Nyxessa", "Éclat")]
 ROCHER = [c("Rage", "Fer sombre"), c("Rage", "Fer"), c("Rage", "Fer clair")]
 NYXESSA_CHOIX = "a"          # variante des fichiers nyxessa.* (A par défaut)
 NYXESSA_SEUIL_SIMPLE = 32    # jusqu'à cette taille (px), la version simplifiée est rastérisée
@@ -1149,7 +1550,7 @@ COMPETENCES = [
 
 NOMS_CLASSES = {"paladin": "Paladin", "mage_feu": "Mage de feu", "rodeur": "Rôdeur", "assassin": "Assassin",
                 "viking": "Viking", "communes": "Communes",
-                "druide": "Druide"}
+                "druide": "Druide", "barde": "Barde", "bavaroise": "Bavaroise", "clochard": "Clochard"}
 
 # Barre de compétences du HUD (RT, LT, LB, RB) : (icône ou None, invite, état) ; état = "", "active", "recharge:N:f".
 BARRES = {
@@ -1164,7 +1565,20 @@ BARRES = {
     "viking": [("viking_hache", "RT", ""), ("viking_attaque_tournante", "LT", ""), ("viking_rugissement", "LB", ""),
                ("viking_saut_percutant", "RB", "recharge:3:0.25")],
 }
-JAUGES = {"mage_feu": ("jauge_mana", "Mana", "#4a8fe0", 0.8), "viking": ("jauge_rage", "Rage", "#f07b2a", 0.55)}
+BARRES.update({
+    "barde": [("barde_coup_de_luth", "RT", ""), ("barde_jouer", "LT", "active"),
+              ("barde_ballade_entrainante", "LB", "recharge:5:0.4"), ("barde_accord_dissonant", "RB", "")],
+    "bavaroise": [("bavaroise_coups_de_chopes", "RT", ""), ("bavaroise_trinquer", "LT", "recharge:2:0.3"),
+                  ("bavaroise_tournee_generale", "LB", ""), ("bavaroise_charge_du_tonneau", "RB", "")],
+    "clochard": [("clochard_coup_de_bouteille", "RT", ""), ("clochard_pet_de_defense", "LT", ""),
+                 ("clochard_nuage_pestilentiel", "LB", "recharge:7:0.55"), ("clochard_pet_propulsion", "RB", "")],
+})
+JAUGES = {"mage_feu": ("jauge_mana", "Mana", "#4a8fe0", 0.8), "viking": ("jauge_rage", "Rage", "#f07b2a", 0.55),
+          "barde": ("barde_jauge_inspiration", "Inspiration", "#d4a82a", 0.6),
+          "bavaroise": ("bavaroise_jauge_ivresse", "Ivresse", "#e0962a", 0.45),
+          "clochard": ("clochard_jauge_gaz", "Gaz", "#a8782a", 0.7)}
+# Indicateur de passif sur le portrait.
+PASSIFS = {"assassin": "assassin_furtif", "clochard": "clochard_debrouille"}
 
 A_TRANCHER = [
     "Rôdeur, Viser (LT) : icône ajoutée (cercle de charge à quatre crans), absente de la liste demandée.",
@@ -1183,12 +1597,29 @@ HISTORIQUE = ICI / "Historique" / "v1"
 
 # Teintes interdites hors Nyxessa (règle : le vert est réservé à Nyxessa).
 VERTS_INTERDITS = set(P["Nyxessa"].values()) | {c("Chasse", "Sous-bois"), c("Chasse", "Forêt"), c("Chasse", "Olive"),
-                                                c("Os", "Magie")} | set(P["Soin"].values())
+                                                c("Os", "Magie")} | MENTHE
+
+
+def _verdatre(col):
+    """Vrai si la teinte tire vers le vert (teinte entre 56° et 180°, saturée ; le jaune du feu est à 50°) : interdit hors Nyxessa."""
+    r, g, b = (int(col[i:i + 2], 16) / 255.0 for i in (1, 3, 5))
+    mx, mn = max(r, g, b), min(r, g, b)
+    if mx - mn < 0.08:
+        return False
+    if mx == r:
+        h = (60 * (g - b) / (mx - mn)) % 360
+    elif mx == g:
+        h = 60 * (b - r) / (mx - mn) + 120
+    else:
+        h = 60 * (r - g) / (mx - mn) + 240
+    return 56 <= h <= 180
 
 
 def verifier(ic):
     couleurs = {col for _, col in ic.formes}
     interdites = set() if ic.famille == "nyxessa" else couleurs & VERTS_INTERDITS
+    if not interdites and ic.famille != "nyxessa":
+        interdites = {col for col in couleurs if _verdatre(col)}
     if interdites:
         raise SystemExit("%s : teintes vertes interdites %s" % (ic.nom, sorted(interdites)))
     for pts, _ in ic.formes:
@@ -1306,8 +1737,8 @@ def hud(classe, par_nom):
         jauges.append('<div class="jauge">%s%s<span class="barre"><i style="width:%d%%;background:%s"></i></span></div>'
                       % (_use(nom, 20), lib, v * 100, coul))
     indic = ""
-    if classe == "assassin":
-        indic = '<span class="indic">%s</span>' % _use("assassin_furtif", 24)
+    if classe in PASSIFS:
+        indic = '<span class="indic">%s</span>' % _use(PASSIFS[classe], 24)
     cases = []
     for nom, invite, etat in BARRES[classe]:
         if nom is None:
@@ -1386,6 +1817,19 @@ def bloc_nyxessa(nyx, apercus):
             '<div class="grille nyxs">%s</div>' % (NYXESSA_CHOIX.upper(), "".join(cartes)))
 
 
+def bloc_nouvelle_classe(cle, par_nom):
+    variantes, choix, titre, comps = NOUVELLES_CLASSES[cle]
+    cartes_v = "".join(carte(par_nom["classe_%s_%s" % (cle, v)]) for v in variantes)
+    cartes_c = "".join(carte(par_nom[f.__name__]) for f in comps)
+    return ('<h2>%s (classe à venir)</h2>'
+            '<p class="note">Kit proposé dans le wiki (<code>classe-%s.md</code>, {à confirmer}). Emblème en deux '
+            'variantes : le choix de Quentin deviendra <code>classe_%s.svg</code> (aujourd\'hui la variante %s). '
+            'Puis une icône par action, la jauge et le passif, et la barre du HUD.</p>'
+            '<div class="grille">%s</div><div class="grille" style="margin-top:12px">%s</div>'
+            '<div style="margin-top:12px">%s</div>'
+            % (titre, cle, cle, choix.upper(), cartes_v, cartes_c, hud(cle, par_nom)))
+
+
 def bloc_mecanicien(par_nom):
     variantes = "".join(carte(par_nom[f.__name__]) for f in MECANICIEN_VARIANTES)
     return ('<h2>Mécanicien (classe à venir)</h2>'
@@ -1425,6 +1869,8 @@ def planche(classes, competences, nyx, apercus):
                  'Gemmes low poly : polygones à bords nets, lumière unique en haut à gauche, couleurs lues dans les '
                  'palettes de thème du jeu. Les classes ont un cadre hexagonal, les compétences sont un glyphe seul '
                  '(le HUD dessine le cadre et la recharge).</p>')
+    for cle in NOUVELLES_CLASSES:
+        corps.append(bloc_nouvelle_classe(cle, par_nom))
     corps.append(bloc_nyxessa(nyx, apercus))
     corps.append(bloc_mecanicien(par_nom))
     corps.append(bloc_druide(par_nom))
@@ -1470,12 +1916,13 @@ def main():
     SORTIE_CLASSES.mkdir(parents=True, exist_ok=True)
     SORTIE_COMPETENCES.mkdir(parents=True, exist_ok=True)
     PLANCHE.parent.mkdir(parents=True, exist_ok=True)
-    classes = [f() for f in CLASSES] + [f() for f in DRUIDE_VARIANTES] + [f() for f in MECANICIEN_VARIANTES]
-    competences = [f() for f in COMPETENCES] + [f() for f in DRUIDE_COMPETENCES]
+    classes = ([f() for f in CLASSES] + [classe_retenue(cle) for cle in NOUVELLES_CLASSES]
+               + [f() for f in DRUIDE_VARIANTES] + [f() for f in MECANICIEN_VARIANTES] + nouvelles_variantes())
+    competences = [f() for f in COMPETENCES] + [f() for f in DRUIDE_COMPETENCES] + nouvelles_competences()
     total = 0
     for ic in classes + competences:
         verifier(ic)
-        dossier = SORTIE_CLASSES if ic.famille in ("classes", "druide_variantes", "mecanicien_variantes") else SORTIE_COMPETENCES
+        dossier = SORTIE_CLASSES if ic.famille == "classes" or ic.famille.endswith("_variantes") else SORTIE_COMPETENCES
         texte = ic.svg()
         (dossier / (ic.nom + ".svg")).write_text(texte, encoding="utf-8", newline="\n")
         total += len(texte.encode("utf-8"))

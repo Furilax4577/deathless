@@ -8,11 +8,11 @@
 <polygon fill="#5a5f66" points="32,114 38,126 49.2,116.3 46.2,110.3"/>
 <polygon fill="#5a5f66" points="49.2,116.3 75.2,116.3 78.2,110.3 73.2,104.3 62.2,102.3 52.2,104.3 46.2,110.3"/>
 <polygon fill="#161a24" points="64,-6 95.8,41.6 64,105.2 32.2,41.6"/>
-<polygon fill="#9fe870" points="64,3 38,42 53.6,47.5"/>
-<polygon fill="#3fae5a" points="64,3 53.6,47.5 74.9,47.5"/>
-<polygon fill="#1e5a32" points="64,3 74.9,47.5 90,42"/>
-<polygon fill="#3fae5a" points="38,42 64,94 53.6,47.5"/>
-<polygon fill="#1e5a32" points="53.6,47.5 64,94 74.9,47.5"/>
-<polygon fill="#145032" points="74.9,47.5 64,94 90,42"/>
-<polygon fill="#e8ffc8" points="64,3 45.3,31.1 59.6,21.7"/>
+<polygon fill="#3fb552" points="64,3 38,42 53.6,47.5"/>
+<polygon fill="#178a36" points="64,3 53.6,47.5 74.9,47.5"/>
+<polygon fill="#0b5226" points="64,3 74.9,47.5 90,42"/>
+<polygon fill="#178a36" points="38,42 64,94 53.6,47.5"/>
+<polygon fill="#0b5226" points="53.6,47.5 64,94 74.9,47.5"/>
+<polygon fill="#062a17" points="74.9,47.5 64,94 90,42"/>
+<polygon fill="#a4ec90" points="64,3 45.3,31.1 59.6,21.7"/>
 </svg>

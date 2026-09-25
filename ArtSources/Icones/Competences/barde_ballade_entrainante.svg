@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+<!-- Deathless : barde_ballade_entrainante (Ballade entraînante). Généré par ArtSources/Icones/generer_icones.py -->
+<polygon fill="#9a7414" points="47,92 47,30 41,30 41,92"/>
+<polygon fill="#9a7414" points="44,92 44,30 47,30 47,92"/>
+<polygon fill="#efd070" points="44,92 44,30 41,30 41,92"/>
+<polygon fill="#9a7414" points="41.5,32.5 53,43.8 57.5,55.7 54,66 54,66 62.5,56.3 59,40.2 46.5,27.5"/>
+<polygon fill="#d4a82a" points="44,30 56,42 53,43.8 41.5,32.5"/>
+<polygon fill="#d4a82a" points="44,30 56,42 59,40.2 46.5,27.5"/>
+<polygon fill="#d4a82a" points="56,42 60,56 57.5,55.7 53,43.8"/>
+<polygon fill="#d4a82a" points="56,42 60,56 62.5,56.3 59,40.2"/>
+<polygon fill="#efd070" points="60,56 54,66 54,66 57.5,55.7"/>
+<polygon fill="#9a7414" points="60,56 54,66 54,66 62.5,56.3"/>
+<polygon fill="#9a7414" points="45.8,88.5 45.8,94.3 41.3,100.1 34,103.5 26.7,103.2 22.2,99.5 22.2,93.7 26.7,87.9 34,84.5 41.3,84.8"/>
+<polygon fill="#9a7414" points="45.8,88.5 45.8,94.3 41.3,100.1 34,103.5 26.7,103.2 29.6,97.6 33.2,97.7 36.8,96 39.1,93.1 39.1,90.2"/>
+<polygon fill="#d4a82a" points="26.7,103.2 22.2,99.5 27.3,95.7 29.6,97.6"/>
+<polygon fill="#efd070" points="22.2,99.5 22.2,93.7 26.7,87.9 34,84.5 41.3,84.8 36.9,88.3 33.2,88.2 29.6,89.9 27.3,92.8 27.3,95.7"/>
+<polygon fill="#d4a82a" points="41.3,84.8 45.8,88.5 39.1,90.2 36.9,88.3"/>
+<polygon fill="#f2e8d0" points="39.1,90.2 39.1,93.1 36.8,96 33.2,97.7 29.6,97.6 27.3,95.7 27.3,92.8 29.6,89.9 33.2,88.2 36.9,88.3"/>
+<polygon fill="#5a1a2a" points="70,38 80,38 96,64 80,90 70,90 86,64"/>
+<polygon fill="#b8475a" points="83,64 70,38 80,38"/>
+<polygon fill="#8c2a3e" points="83,64 80,38 96,64"/>
+<polygon fill="#5a1a2a" points="83,64 96,64 80,90 70,90 86,64"/>
+<polygon fill="#8c2a3e" points="83,64 86,64 70,38"/>
+<polygon fill="#5a1a2a" points="94,38 104,38 120,64 104,90 94,90 110,64"/>
+<polygon fill="#b8475a" points="107,64 94,38 104,38"/>
+<polygon fill="#8c2a3e" points="107,64 104,38 120,64"/>
+<polygon fill="#5a1a2a" points="107,64 120,64 104,90 94,90 110,64"/>
+<polygon fill="#8c2a3e" points="107,64 110,64 94,38"/>
+</svg>

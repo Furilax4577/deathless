@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+<!-- Deathless : classe_bavaroise_b (Bavaroise, variante B : bretzel). Généré par ArtSources/Icones/generer_icones.py -->
+<polygon fill="#4e5864" points="64,2 117.7,33 117.7,95 64,126 10.3,95 10.3,33"/>
+<polygon fill="#8793a0" points="64,2 117.7,33 108.2,38.5 64,13"/>
+<polygon fill="#8793a0" points="117.7,33 117.7,95 108.2,89.5 108.2,38.5"/>
+<polygon fill="#4e5864" points="117.7,95 64,126 64,115 108.2,89.5"/>
+<polygon fill="#8793a0" points="64,126 10.3,95 19.8,89.5 64,115"/>
+<polygon fill="#8793a0" points="10.3,95 10.3,33 19.8,38.5 19.8,89.5"/>
+<polygon fill="#c3cbd3" points="10.3,33 64,2 64,13 19.8,38.5"/>
+<polygon fill="#2a4a7a" points="19.8,89.5 19.8,38.5 64,13 108.2,38.5"/>
+<polygon fill="#1c3358" points="108.2,38.5 108.2,89.5 64,115 19.8,89.5"/>
+<polygon fill="#6e3c1a" points="100.4,72 103.4,64.1 103.8,54.9 101.4,46 96.4,38.1 89.3,31.6 80.5,27 70.8,24.5 60.6,24.1 50.6,25.9 41.5,29.9 33.7,35.7 28,43.2 24.6,51.9 24.2,61.1 26.3,69.1 37.8,66 36.1,59.8 36.4,54.4 38.4,49.1 42.2,44.3 47.5,40.3 54.1,37.4 61.5,36.1 69,36.4 76.2,38.2 82.4,41.5 87.3,45.8 90.5,50.8 91.9,56.2 91.6,61.6 89.2,67.7"/>
+<polygon fill="#6e3c1a" points="94.8,69.8 97.5,62.9 103.4,64.1 100.4,72"/>
+<polygon fill="#cf8a45" points="94.8,69.8 97.5,62.9 91.6,61.6 89.2,67.7"/>
+<polygon fill="#6e3c1a" points="97.5,62.9 97.9,55.6 103.8,54.9 103.4,64.1"/>
+<polygon fill="#cf8a45" points="97.5,62.9 97.9,55.6 91.9,56.2 91.6,61.6"/>
+<polygon fill="#a35f2a" points="97.9,55.6 95.9,48.4 101.4,46 103.8,54.9"/>
+<polygon fill="#a35f2a" points="97.9,55.6 95.9,48.4 90.5,50.8 91.9,56.2"/>
+<polygon fill="#a35f2a" points="95.9,48.4 91.9,41.9 96.4,38.1 101.4,46"/>
+<polygon fill="#a35f2a" points="95.9,48.4 91.9,41.9 87.3,45.8 90.5,50.8"/>
+<polygon fill="#a35f2a" points="91.9,41.9 85.9,36.6 89.3,31.6 96.4,38.1"/>
+<polygon fill="#a35f2a" points="91.9,41.9 85.9,36.6 82.4,41.5 87.3,45.8"/>
+<polygon fill="#a35f2a" points="85.9,36.6 78.4,32.6 80.5,27 89.3,31.6"/>
+<polygon fill="#a35f2a" points="85.9,36.6 78.4,32.6 76.2,38.2 82.4,41.5"/>
+<polygon fill="#cf8a45" points="78.4,32.6 69.9,30.4 70.8,24.5 80.5,27"/>
+<polygon fill="#6e3c1a" points="78.4,32.6 69.9,30.4 69,36.4 76.2,38.2"/>
+<polygon fill="#cf8a45" points="69.9,30.4 61,30.1 60.6,24.1 70.8,24.5"/>
+<polygon fill="#6e3c1a" points="69.9,30.4 61,30.1 61.5,36.1 69,36.4"/>
+<polygon fill="#cf8a45" points="61,30.1 52.4,31.7 50.6,25.9 60.6,24.1"/>
+<polygon fill="#6e3c1a" points="61,30.1 52.4,31.7 54.1,37.4 61.5,36.1"/>
+<polygon fill="#cf8a45" points="52.4,31.7 44.5,35.1 41.5,29.9 50.6,25.9"/>
+<polygon fill="#6e3c1a" points="52.4,31.7 44.5,35.1 47.5,40.3 54.1,37.4"/>
+<polygon fill="#cf8a45" points="44.5,35.1 38,40 33.7,35.7 41.5,29.9"/>
+<polygon fill="#6e3c1a" points="44.5,35.1 38,40 42.2,44.3 47.5,40.3"/>
+<polygon fill="#cf8a45" points="38,40 33.2,46.2 28,43.2 33.7,35.7"/>
+<polygon fill="#6e3c1a" points="38,40 33.2,46.2 38.4,49.1 42.2,44.3"/>
+<polygon fill="#cf8a45" points="33.2,46.2 30.5,53.1 24.6,51.9 28,43.2"/>
+<polygon fill="#6e3c1a" points="33.2,46.2 30.5,53.1 36.4,54.4 38.4,49.1"/>
+<polygon fill="#cf8a45" points="30.5,53.1 30.1,60.4 24.2,61.1 24.6,51.9"/>
+<polygon fill="#6e3c1a" points="30.5,53.1 30.1,60.4 36.1,59.8 36.4,54.4"/>
+<polygon fill="#a35f2a" points="30.1,60.4 32.1,67.6 26.3,69.1 24.2,61.1"/>
+<polygon fill="#a35f2a" points="30.1,60.4 32.1,67.6 37.8,66 36.1,59.8"/>
+<polygon fill="#6e3c1a" points="93.4,64 67.2,70.7 50.4,85.2 39.2,93.8 44.8,102.2 57.6,94.8 72.8,81.3 96.3,75.7"/>
+<polygon fill="#cf8a45" points="94.8,69.8 70,76 67.2,70.7 93.4,64"/>
+<polygon fill="#6e3c1a" points="94.8,69.8 70,76 72.8,81.3 96.3,75.7"/>
+<polygon fill="#cf8a45" points="70,76 54,90 50.4,85.2 67.2,70.7"/>
+<polygon fill="#6e3c1a" points="70,76 54,90 57.6,94.8 72.8,81.3"/>
+<polygon fill="#cf8a45" points="54,90 42,98 39.2,93.8 50.4,85.2"/>
+<polygon fill="#6e3c1a" points="54,90 42,98 44.8,102.2 57.6,94.8"/>
+<polygon fill="#6e3c1a" points="30.2,73.3 55,81.2 70.4,94.8 83.2,102.2 88.8,93.8 77.6,85.2 61,70.8 33.9,61.9"/>
+<polygon fill="#6e3c1a" points="32.1,67.6 58,76 55,81.2 30.2,73.3"/>
+<polygon fill="#cf8a45" points="32.1,67.6 58,76 61,70.8 33.9,61.9"/>
+<polygon fill="#a35f2a" points="58,76 74,90 70.4,94.8 55,81.2"/>
+<polygon fill="#a35f2a" points="58,76 74,90 77.6,85.2 61,70.8"/>
+<polygon fill="#a35f2a" points="74,90 86,98 83.2,102.2 70.4,94.8"/>
+<polygon fill="#a35f2a" points="74,90 86,98 88.8,93.8 77.6,85.2"/>
+<polygon fill="#d8c8a4" points="46,37 49,40 46,43 43,40"/>
+<polygon fill="#d8c8a4" points="46,40 49,40 46,43 43,40"/>
+<polygon fill="#fffaf0" points="46,40 43,40 46,37 49,40"/>
+<polygon fill="#d8c8a4" points="64,29 67,32 64,35 61,32"/>
+<polygon fill="#d8c8a4" points="64,32 67,32 64,35 61,32"/>
+<polygon fill="#fffaf0" points="64,32 61,32 64,29 67,32"/>
+<polygon fill="#d8c8a4" points="82,37 85,40 82,43 79,40"/>
+<polygon fill="#d8c8a4" points="82,40 85,40 82,43 79,40"/>
+<polygon fill="#fffaf0" points="82,40 79,40 82,37 85,40"/>
+<polygon fill="#d8c8a4" points="36,57 39,60 36,63 33,60"/>
+<polygon fill="#d8c8a4" points="36,60 39,60 36,63 33,60"/>
+<polygon fill="#fffaf0" points="36,60 33,60 36,57 39,60"/>
+<polygon fill="#d8c8a4" points="92,57 95,60 92,63 89,60"/>
+<polygon fill="#d8c8a4" points="92,60 95,60 92,63 89,60"/>
+<polygon fill="#fffaf0" points="92,60 89,60 92,57 95,60"/>
+<polygon fill="#d8c8a4" points="64,79 67,82 64,85 61,82"/>
+<polygon fill="#d8c8a4" points="64,82 67,82 64,85 61,82"/>
+<polygon fill="#fffaf0" points="64,82 61,82 64,79 67,82"/>
+</svg>

@@ -1,5 +1,7 @@
 # Bavaroise
 
+{icone-grande classe_bavaroise}
+
 **Bientôt.** Une classe jouable à venir. Le kit ci-dessous est une **proposition** à valider {à confirmer}.
 
 **Bagarreuse joviale** : en dirndl, une chope de bière dans chaque main, elle cogne vite, trinque pour se requinquer et arrose tout le monde.
@@ -12,10 +14,10 @@
 
 | Touche | Action | Idée |
 |---|---|---|
-| RT | **Coups de chopes** | Enchaînement rapide gauche-droite ; le 4e coup est un double coup qui repousse. |
-| LT | **Trinquer** | Elle boit une gorgée : se soigne un peu et remplit sa jauge d'Ivresse. Recharge courte. |
-| LB | **Tournée générale** | Elle lance une chope qui éclate en zone : la mousse rend le sol glissant, les squelettes ralentissent et glissent. |
-| RB | **Charge du tonneau** | Elle fonce en avant, épaule en avant, et renverse les squelettes sur son passage. |
+| RT | {icone bavaroise_coups_de_chopes} **Coups de chopes** | Enchaînement rapide gauche-droite ; le 4e coup est un double coup qui repousse. |
+| LT | {icone bavaroise_trinquer} **Trinquer** | Elle boit une gorgée : se soigne un peu et remplit sa jauge d'Ivresse. Recharge courte. |
+| LB | {icone bavaroise_tournee_generale} **Tournée générale** | Elle lance une chope qui éclate en zone : la mousse rend le sol glissant, les squelettes ralentissent et glissent. |
+| RB | {icone bavaroise_charge_du_tonneau} **Charge du tonneau** | Elle fonce en avant, épaule en avant, et renverse les squelettes sur son passage. |
 
 - **Jauge : Ivresse** : plus elle est haute, plus ses coups font mal, mais elle titube légèrement ; elle redescend avec le temps.
 - **Effets** : mousse et éclaboussures en gemmes crème et ambre ; pas de vert.
