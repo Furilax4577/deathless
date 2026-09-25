@@ -15,11 +15,11 @@ Le village est une clairière entourée de forêt. Nyxessa est au centre, les ma
 
 Aucune maison n'est posée dans l'axe d'une clairière d'apparition : les ennemis ont toujours un passage dégagé vers le centre.
 
-## Retiré {décidé}
+## Retiré {décidé} {dev}
 
 Ces éléments ont été essayés puis retirés du village le 25/09/2026 : l'enceinte et ses portes, la scierie, la mine, le marchand, les tours, les garnisons, le poste de construction, les couloirs fermés, les sentiers de terre dans la forêt.
 
-## Taille des maisons {décidé}
+## Taille des maisons {décidé} {dev}
 
 Les portes des maisons sont à l'échelle du joueur : 2,1 m pour un personnage de 2 m. Les maisons font donc 6 à 6,5 m de large.
 

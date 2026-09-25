@@ -40,7 +40,8 @@ Cinq paliers, soit environ un palier toutes les deux nuits sur une partie de 45 
 
 - Au palier 1, il faut trois missiles pour un sbire : Nyxessa aide, mais ne tient pas seule.
 - Au palier 5, un missile tue un sbire, et le stock permet des salves.
-- **Coût** des paliers 2 à 5 : ×1, ×2, ×3,5 et ×5,5 d'un coût de base, payé par la caisse commune. Le coût de base est {à confirmer}.
+- **Coût** des paliers 2 à 5 : ×1, ×2, ×3,5 et ×5,5 d'un coût de base, payé par la caisse commune.
+- Coût de base en or : {à confirmer}.
 
 ### Règles de tir {décidé}
 

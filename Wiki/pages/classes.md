@@ -45,7 +45,7 @@ Les rôles sont {à confirmer}. Les armes et leurs animations sont {décidé}.
 
 ### Passifs {décidé}
 
-- **Marche discrète** : l'assassin ne s'accroupit pas. Il marche discrètement (animation KayKit `Sneaking`) et passe en **mode furtif**. Un coup porté sans avoir été détecté est un **coup critique**.
+- **Marche discrète** : l'assassin ne s'accroupit pas. Il marche discrètement {{dev: (animation KayKit `Sneaking`)}} et passe en **mode furtif**. Un coup porté sans avoir été détecté est un **coup critique**.
 - **Coups dans le dos** : tout coup porté dans le dos d'un ennemi est un **coup critique**.
 - **Furtif et dans le dos** : les deux se cumulent et donnent le **meilleur critique** du jeu.
 
@@ -56,7 +56,7 @@ Les rôles sont {à confirmer}. Les armes et leurs animations sont {décidé}.
 | Dans le dos | Critique |
 | Furtif et dans le dos | Meilleur critique |
 
-- Multiplicateurs : {à confirmer}. Pour mémoire, Relic utilisait ×3 dans le dos et ×2 en furtivité, cumulables.
+- Multiplicateurs : {à confirmer}. {{dev: Pour mémoire, Relic utilisait ×3 dans le dos et ×2 en furtivité, cumulables.}}
 - **Déclenchement** {décidé} : automatique. Hors combat, dès que l'assassin marche sans courir ni sprinter, il passe en marche discrète et devient furtif. Courir, attaquer ou être repéré le fait sortir du mode furtif.
 - Portée de détection des ennemis : {à confirmer}.
 ### Style de jeu {décidé}
@@ -71,7 +71,7 @@ L'assassin joue **principalement à la dague**. L'arbalète et la grenade sont d
 
 ### Grenade fumigène {décidé}
 
-- L'assassin la lance (modèle KayKit `smokebomb`, animation `Throw`) ; elle crée un nuage de fumée à l'impact.
+- L'assassin la lance {{dev: (modèle KayKit `smokebomb`, animation `Throw`)}} ; elle crée un nuage de fumée à l'impact.
 - Elle sert à **s'extraire d'un combat**.
 - **Furtif dans la fumée** {décidé} : tant qu'il est dans le nuage, les ennemis le perdent de vue et il redevient furtif, même en combat. En sortant, il reste furtif s'il marche, ce qui lui ouvre un coup critique au retour.
 - Nombre de grenades et recharge : {à confirmer}.
@@ -79,7 +79,7 @@ L'assassin joue **principalement à la dague**. L'arbalète et la grenade sont d
 ## Viking
 
 - Hache à deux mains **uniquement** {décidé}. Pas de bouclier.
-- **Attaque tournante** {décidé} : le viking tourne sur lui-même, hache tendue, et frappe tout autour de lui (animations KayKit `Melee_2H_Attack_Spin` et `Melee_2H_Attack_Spinning`). Son emplacement et sa durée sont {à confirmer}.
+- **Attaque tournante** {décidé} : le viking tourne sur lui-même, hache tendue, et frappe tout autour de lui {{dev: (animations KayKit `Melee_2H_Attack_Spin` et `Melee_2H_Attack_Spinning`)}}. Son emplacement et sa durée sont {à confirmer}.
 - **Rugissement** : un crâne de barbare casqué en gemmes rouges surgit au-dessus du viking, rugit, et une onde part de lui puis revient comme pour dire « venez » {effet validé}.
 - **Saut percutant** : le viking bondit d'environ 5 m vers l'avant et frappe le sol, une onde de terre part du point d'impact {effet validé}.
 - Jauge de rage et valeurs chiffrées : {à confirmer}.

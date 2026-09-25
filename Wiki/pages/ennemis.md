@@ -23,11 +23,13 @@ Les modèles disponibles dans le pack KayKit Skeletons :
 
 Ordre d'apparition dans la partie : sbires dès la nuit 1, guerriers nuit 2, voleurs nuit 3, mages et premier élite nuit 5, nécromancien nuit 6, mini-boss nuit 10, boss final nuit 12. Voir [Déroulé d'une partie](deroule.md) {à équilibrer}.
 
-Le casque du squelette guerrier sert aussi de modèle au heaume du rugissement du viking.
+{dev} Le casque du squelette guerrier sert aussi de modèle au heaume du rugissement du viking.
 
 ## Nécromancien
 
-Le nécromancien tire un **missile en forme de crâne** fait de gemmes {effet validé}. C'est le même missile que celui de Nyxessa, à taille normale, alors que celui de Nyxessa est une fois et demie plus gros {décidé}. Son modèle, sa vie et son comportement sont {à confirmer}.
+- Le nécromancien tire un **missile en forme de crâne** fait de gemmes {effet validé}.
+- C'est le même missile que celui de Nyxessa, à taille normale ; celui de Nyxessa est une fois et demie plus gros {décidé}.
+- Son modèle, sa vie et son comportement sont {à confirmer}.
 
 ## Comportement et détection {à confirmer}
 
