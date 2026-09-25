@@ -55182,12 +55182,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GroundMist
   template: {fileID: 2100000, guid: 87b877fb62238c740ad78f0695806578, type: 2}
-  color: {r: 0.36, g: 0.42, b: 0.62, a: 1}
-  glow: {r: 0.04, g: 0.05, b: 0.1, a: 1}
-  nightAlpha: 0.16
+  color: {r: 0.4, g: 0.36, b: 0.6, a: 1}
+  glow: {r: 0.06, g: 0.04, b: 0.13, a: 1}
+  nightAlpha: 0.2
   radius: 62
-  clearRadius: 6.5
-  banks: 90
+  clearRadius: 11
+  banks: 110
   puffsPerBank: 5
   width: {x: 2.5, y: 6}
   height: {x: 0.7, y: 1.2}
@@ -62291,6 +62291,7 @@ MonoBehaviour:
   hud: {fileID: 9197481963319205126, guid: be48d26cab738194a8230d14fe0edc80, type: 3}
   pause: {fileID: 9197481963319205126, guid: 3e9ee49c74b5807499de507fece58e8e, type: 3}
   score: {fileID: 9197481963319205126, guid: 0e4c91561b4b96e4a99a80441b190237, type: 3}
+  choixClasse: {fileID: 9197481963319205126, guid: a2296fe7ea520de468909b9646944035, type: 3}
 --- !u!114 &864476794
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -92212,7 +92213,7 @@ MonoBehaviour:
   dayCycle: {fileID: 1077421904}
   portail: {fileID: 470175068}
   lumiereNyxessa: {fileID: 1005541781}
-  intensiteNyxessa: 9
+  intensiteNyxessa: 11
   lanternes:
   - {fileID: 2042727462}
   - {fileID: 1684487192}
@@ -92241,7 +92242,7 @@ MonoBehaviour:
   soleilChaud: {r: 1, g: 0.55, b: 0.32, a: 1}
   brouillardChaud: {r: 0.42, g: 0.28, b: 0.32, a: 1}
   cielChaud: {r: 0.95, g: 0.45, b: 0.35, a: 1}
-  solCielNuit: {r: 0.02, g: 0.03, b: 0.07, a: 1}
+  solCielNuit: {r: 0.03, g: 0.018, b: 0.07, a: 1}
 --- !u!1001 &1321620299
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -105086,10 +105087,11 @@ MonoBehaviour:
   cible: {fileID: 0}
   lacet: 0
   tangage: 12
-  centreMenu: {x: 0, y: 3, z: 0}
-  rayonMenu: 26
-  hauteurMenu: 11
-  vitesseMenu: 3
+  menuPosition: {x: -8, y: 13, z: -22}
+  menuRotation: {x: 23.8, y: 13.4, z: 0}
+  menuChamp: 44
+  menuBalancement: 0.8
+  menuPeriode: 50
 --- !u!114 &1558389949
 MonoBehaviour:
   m_ObjectHideFlags: 0

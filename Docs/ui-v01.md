@@ -92,16 +92,34 @@ Barre du Paladin dans la démo : Frappe à l'épée (`Gameplay/AttackPrimary`), 
 | `Resultat` | `Victoire` (« Nyxessa a survécu aux 12 nuits ») ou `Defaite` (« Nyxessa est tombée à la nuit N »). |
 | `NuitAtteinte` | Nuit de la chute (12 en cas de victoire). |
 | `DureeSecondes`, `OrTotal` | En-tête : « DURÉE 38:40 », « OR DE L'ÉQUIPE 1 840 ». |
-| `Joueurs` | `IReadOnlyList<ILigneScore>` : `Nom`, `Classe`, `TeinteClasse`, `EstLocal`, `OrRapporte`, `DegatsInfliges`, `EnnemisTues`, `Morts`. Le meilleur de chaque catégorie (le plus élevé ; **le moins de morts**) reçoit une pastille or et une couronne. |
+| `Joueurs` | `IReadOnlyList<ILigneScore>` : `Nom`, `Classe`, `TeinteClasse`, `EstLocal`, puis les sept catégories dans l'ordre des colonnes : `OrRapporte`, `DegatsInfliges`, `EnnemisTues`, `Morts`, `CoupsCritiques`, `DegatsEvitesNyxessa` (dégâts que le joueur a empêchés d'atteindre Nyxessa), `SoinsProdigues`. Le meilleur de chaque catégorie (le plus élevé ; **le moins de morts**) reçoit une pastille or et une couronne. |
 | `JoueursPrets`, `JoueursTotal`, `EstPretLocal` | Bouton Rejouer : « Prêts 0 / 1 ». |
 
-Catégories {à confirmer} du wiki (critiques, dégâts évités à Nyxessa, soins) : non affichées ; ajouter une propriété et une colonne quand elles seront décidées.
+Les trois catégories ajoutées le 25/09/2026 (Coups critiques, Dégâts évités à Nyxessa, Soins prodigués : le plus élevé gagne) sont affichées ; l'écran a donc sept colonnes, sur une ligne à toutes les tailles (à ×3, textes et pastilles resserrés, en-têtes sur deux lignes). Ajouter une catégorie : une propriété dans `ILigneScore`, une entrée dans `EcranScore.s_Categories`, un en-tête dans `Score.uxml`.
+
+### Classes : `IClassesJouables`, `IClasseJouable`, `IEtatJoueurClasse` (`Donnees/IClasses.cs`, 25/09/2026)
+
+Cinq classes jouables (Wiki `classes.md`, `commandes.md`). Tout est **facultatif et rétrocompatible** : un jeu qui n'implémente rien de nouveau garde son comportement (choix affiché depuis le catalogue, `LancerSolo()` appelé).
+
+| Type | Membres | Rôle |
+|---|---|---|
+| `IClasseJouable` | `Id` (« paladin », « mage », « rodeur », « assassin », « viking »), `Nom`, `Role`, `Arme`, `Description`, `Teinte`, `Jauge` (`JaugeClasse.Aucune` / `Mana` / `Rage`), `Actions` | Une classe, pour l'écran de choix et la carte du menu principal. |
+| `IActionClasse` | `Action` (« Gameplay/AttackPrimary »…), `Nom` (null ou vide : emplacement vide, affiché grisé « Vide pour l'instant ») | Cinq actions dans l'ordre : attaque principale (RT), attaque secondaire (LT), compétences 1 (LB), 2 (RB), 3 (LB + RB). |
+| `IClassesJouables` | `Classes`, `LancerSolo(string classeId)` | À implémenter par l'objet enregistré comme `ICommandesPartie` (trouvé par `DonneesUI.Commandes as IClassesJouables`). Sans lui, l'écran affiche `ClassesJouables.Catalogue` et appelle `LancerSolo()`. |
+| `IEtatJoueurClasse` | `Jauge`, `ValeurJauge`, `JaugeMax`, `Furtif` | À implémenter par l'objet enregistré comme `IEtatJoueur` (trouvé par `DonneesUI.Joueur as IEtatJoueurClasse`). Le HUD affiche alors la jauge de classe (Mana bleue, Rage orange) sous l'endurance et, si `Furtif`, un œil barré (thème Ombre) sur le portrait. |
+| `ClassesJouables` (statique) | `Catalogue`, `Proposees`, `Trouver(id)`, `DerniereJouee` (PlayerPrefs `Deathless.DerniereClasse`, défaut « paladin »), `Derniere`, `Lancer(id)` | Données des cinq classes tirées du wiki, et mémoire de la dernière classe jouée. |
+
+Catalogue (actions RT / LT / LB / RB ; LB + RB vide pour toutes) : **Paladin** (épée, garde et parade, charge bélier, soin sur soi) ; **Mage de feu** (boule de feu, cône de flammes maintenu, LB et RB vides ; mana) ; **Rôdeur** (bander et tirer, viser, nuée de flèches, roulade arrière et salve) ; **Assassin** (dague, arbalète en main et visée, grenade fumigène, RB vide ; furtif) ; **Viking** (hache, attaque tournante maintenue, rugissement, saut percutant ; rage). Teintes des portraits : Paladin `#d9b264` (inchangée), Mage `#ff610a` (Feu, vif), Rôdeur `#a8742f` (Chasse, accent ocre : l'ocre clair `#d9b45a` proposé était trop proche de l'or du Paladin), Assassin `#a58ad6` (Ombre, cœur), Viking `#b3261e` (Rage, vif).
+
+**Emplacement vide dans le HUD** : un `ICompetenceHud` dont `Nom` est vide s'affiche grisé (case sombre, sans abréviation ni recharge, invite atténuée).
+
+Côté jeu (`HudPresenter`) : `IClassesJouables` est branché sur l'existant ; `Classes` renvoie le catalogue et `LancerSolo(classeId)` lance le Paladin quelle que soit la classe choisie (l'agent jeu branchera les autres). `IEtatJoueurClasse` n'est pas encore implémenté par le jeu (le Paladin n'a ni jauge ni mode furtif).
 
 ### `ICommandesPartie` (UI → jeu)
 
 | Méthode | Appelée par |
 |---|---|
-| `LancerSolo()` | Menu principal > Solo. |
+| `LancerSolo()` | Choix de classe > Jouer, si le jeu n'implémente pas `IClassesJouables` (sinon `LancerSolo(classeId)`). |
 | `BasculerPret()` | Écran de score > Rejouer (A). Le vote du jour vient de l'entrée `Gameplay/Ready`, lue par le jeu. |
 | `QuitterPartie()` | Pause > Quitter la partie ; score > Arrêter (B). |
 | `QuitterJeu()` | Menu principal > Quitter ; pause > Quitter le jeu. |
@@ -124,12 +142,13 @@ public class PartieUI : MonoBehaviour, IEtatPartie, IEtatJoueur, IScoreFin, ICom
 
 | Écran | UXML / USS | Contrôleur | Contenu |
 |---|---|---|---|
-| Menu principal | `MenuPrincipal/MenuPrincipal.uxml`, `V01.uss` | `EcranMenuPrincipal` | Solo, Options, Crédits, Quitter ; carte « Classe : Paladin » ; « Version 0.1 ». |
-| Options | `Options/Options.uxml` | `EcranOptions` | Onglets Jeu / Commandes (LB, RB). Jeu : taille ×1 (80 %), ×2 (100 %), ×3 (135 %). Commandes : table en lecture seule (clavier et manette, la colonne manette suit la dernière manette), lignes focusables et défilantes. Réinitialiser (Y) : taille ×2. |
+| Menu principal | `MenuPrincipal/MenuPrincipal.uxml`, `V01.uss` | `EcranMenuPrincipal` | Solo (« Défendre Nyxessa seul, choisir sa classe » : ouvre le choix de classe), Options, Crédits, Quitter ; carte « Dernière classe jouée » (pastille, nom, arme, actions) ; « Version 0.1 ». |
+| Choix de classe | `ChoixClasse/ChoixClasse.uxml`, `V01.uss` | `EcranChoixClasse` | Les cinq classes à gauche (pastille, nom, rôle, étiquette « Dernière »), fiche à droite (nom, rôle, arme, description, jauge, cinq actions avec l'icône du bouton de l'appareil actif ; emplacement vide grisé). Dernière classe jouée présélectionnée ; la fiche suit le focus (manette, clavier) et le survol (souris). Valider (A, Entrée, clic) : retient la classe et lance la partie ; Retour (B, Échap) : menu principal. Captures : `UI01_choix_classe.png` (Paladin) et `UI01_choix_classe_<id>.png` (une par classe). |
+| Options | `Options/Options.uxml` | `EcranOptions` | Onglets Jeu / Commandes / Audio (LB, RB). Jeu : taille ×1 (80 %), ×2 (100 %), ×3 (135 %). Commandes : table en lecture seule (clavier et manette, la colonne manette suit la dernière manette), lignes focusables et défilantes. Audio : volumes principal, musique, effets spéciaux, interface (voir « Audio »). Réinitialiser (Y) : réglages de l'onglet affiché (taille ×2, ou volumes par défaut). |
 | Crédits | `Credits/Credits.uxml` | `EcranCredits` | Contenu de `Wiki/pages/credits.md`. |
 | HUD | `Hud/Hud.uxml`, `Hud/Hud.uss` | `EcranHud` | Nyxessa (barre verte) et bouclier (bleu → orange → rouge, masqué sans bouclier), temps avec icône jour ou nuit (« Jour · 1:42 avant la nuit », « Nuit 3 · 2:10 avant l'aube », « Crépuscule · la nuit 3 tombe », « Aube · le jour se lève »), « Prêts 1 / 1 » et invite de `Gameplay/Ready`, **alerte avant la nuit** (pastille orange qui clignote, 15 s), **bannière « NUIT N »**, indicateur de bord « Nyxessa attaquée », or, portrait + vie + endurance, barre de compétences avec invites et **temps de recharge**, réticule, invite d'interaction, **écran de mort**. |
 | Pause | `Pause/Pause.uxml` | `EcranPause` | « La partie continue » ; Reprendre, Options, Quitter la partie, Quitter le jeu. Le HUD reste visible et vivant dessous. |
-| Score | `Score/Score.uxml` | `EcranScore` | Résultat, durée, or ; table par joueur avec meilleur mis en avant ; Rejouer (vote prêt, « Prêts 0 / 1 ») / Arrêter. |
+| Score | `Score/Score.uxml` | `EcranScore` | Résultat, durée, or ; table par joueur, sept catégories (or rapporté, dégâts infligés, ennemis tués, morts, coups critiques, dégâts évités à Nyxessa, soins prodigués), meilleur mis en avant ; Rejouer (vote prêt, « Prêts 0 / 1 ») / Arrêter. |
 
 Formes vectorielles (`Assets/Scripts/UI/FormesHud.cs`, Painter2D, nettes à toutes les tailles) : `GemmeNyxessa`, `IconeJourNuit` (`nuit`), `PieceOr`, `Reticule`, `Couronne`, `FlecheHud` (`angle`).
 
@@ -141,7 +160,26 @@ Formes vectorielles (`Assets/Scripts/UI/FormesHud.cs`, Painter2D, nettes à tout
 - `UI/TabPrevious`, `UI/TabNext`, `UI/Reset` sont transmis au sommet.
 - Les libellés `dl-device-name` des barres d'invites affichent l'appareil détecté.
 
-Ajouter un écran : une classe `Ecran` (`Construire`, `PremierFocus`, `Opaque`, `CarteUI`, `Retour`…), un UXML dans `Assets/UI/Screens/<Nom>/`, un champ `VisualTreeAsset` et une ligne `Creer(...)` dans `NavigateurEcrans`.
+Ajouter un écran : une classe `Ecran` (`Construire`, `PremierFocus`, `Opaque`, `CarteUI`, `Retour`…), un UXML dans `Assets/UI/Screens/<Nom>/`, un champ `VisualTreeAsset` et une ligne `Creer(...)` dans `NavigateurEcrans`, puis renseigner ce champ dans les scènes (Village, UIv01) et dans les générateurs `Assets/Editor/Jeu/JeuBuilder.cs` et `Assets/Editor/UI/DeathlessUISetup.cs` (fait pour `choixClasse`).
+
+### Audio : volumes et mixer (25/09/2026)
+
+- **Mixer** `Assets/Audio/Deathless.mixer` : groupe Master et trois sous-groupes, **Musique**, **Effets** (combats, compétences, ennemis, Nyxessa, portail, ambiance) et **Interface** (sons des menus). Paramètres exposés en dB : `VolumePrincipal` (Master), `VolumeMusique`, `VolumeEffets`, `VolumeInterface`.
+- **`Deathless.Audio.VolumesAudio`** (`Assets/Scripts/Audio/`) : quatre volumes de 0 à 1 (`CanalAudio.Principal`, `Musique`, `Effets`, `Interface`), conversion en dB (20 log10 v ; 0 = coupé, -80 dB), enregistrés dans les PlayerPrefs (`Deathless.Volume.<Canal>`), chargés et appliqués **avant la première scène** (`RuntimeInitializeOnLoadMethod(BeforeSceneLoad)`, puis de nouveau à la première image). Défauts : principal 100, musique 70, effets 100, interface 80. `Groupe(canal)` et `Router(source, canal)` branchent une source ; `JouerInterface(Survol | Clic | Retour)` ; `JouerApercu(canal)` ; `JouerAuPoint(clip, point)` remplace `AudioSource.PlayClipAtPoint` (dont la source ne passe par aucun groupe).
+- Réglages : asset `Assets/Audio/Resources/DeathlessAudio.asset` (`ReglagesAudio` : mixer, groupes, sons d'interface Kenney `tick_002` (survol), `click_002` (clic), `back_001` (retour), aperçu des effets `skeleton_hit`).
+- **Routage** : `AudioBank` met ses sources 3D, sa source 2D et les boucles (`Boucle` : missile, bourdon du portail) dans Effets, les deux sources de musique (jour et nuit) dans Musique ; `ArcBande` passe par `JouerAuPoint`. Les écrans jouent leurs sons dans Interface : survol quand le focus change (pas à l'ouverture d'un écran ni juste après une validation), clic sur tout bouton (`Ecran.SonDeClic` pour un bouton créé après `Construire`), retour sur UI/Cancel. Vérifié en Play (Village, combat) : 30 sources, toutes dans un groupe ; Effets à 0 : -80 dB sur Effets, la musique continue (-3,1 dB).
+- **Onglet Audio** : un `Slider` 0-100 par volume (classe `dl-field`, bordure or au focus), pourcentage à droite. Manette et flèches : gauche / droite ±5 % (`EcranOptions.PasVolume`), haut / bas passent d'un réglage à l'autre ; souris : glisser. L'effet s'entend tout de suite : un son court de la catégorie quand on change Principal, Effets ou Interface. Enregistré sur le disque à la fermeture de l'écran. Capture : `Assets/Screenshots/UI01_options_audio.png`.
+
+### Fond du menu principal (scène Village, 25/09/2026)
+
+Le menu principal s'affiche par-dessus le village **de nuit**, sur un plan fixe où Nyxessa et le portail sont lisibles dans la moitié droite (le panneau du menu couvre environ 44 % à gauche à ×2, la carte de classe est en bas à droite). Ce plan n'existe que dans l'état « menu » (`Partie.Etat.phase == Attente`) : pas de squelettes, pas d'horloge, pas de HUD.
+
+- **Caméra** : `Deathless.Jeu.CameraEpaule` sans cible (aucun héros) se place sur le plan du menu. Champs (inspecteur de la caméra de Village, mêmes valeurs par défaut dans le code) : `menuPosition` (-8, 13, -22), `menuRotation` (23,8 ; 13,4 ; 0), `menuChamp` 44° (champ vertical ; le champ de jeu de la caméra est rendu dès qu'elle suit le héros), `menuBalancement` 0,8 m et `menuPeriode` 50 s (très lent va-et-vient latéral ; 0 pour un plan fixe). L'ancienne orbite autour du village est retirée.
+- **Ambiance** : `Deathless.Jeu.VueCycle` pilote le cycle en **milieu de nuit** tant que la partie est en attente (`CycleJourNuit.Piloter(Nuit, dureeNuit / 2)`) : lumière, brume, lanternes et lueurs vertes de Nyxessa sont celles de la nuit en partie.
+- **Portail ouvert** : en partie, le portail est absent la nuit (seul son socle reste). Pour ce seul plan, `VueCycle` pose `CycleJourNuit.portailForceOuvert = (phase == Attente)` ; la règle de jeu n'est pas changée (le drapeau retombe dès `LancerSolo`).
+- Captures des cadrages essayés (`Assets/Screenshots/`) : `menu_nuit_1_rapproche.png` (position (-10, 7, -13), rotation (18,7 ; 29,4 ; 0), champ 44°), **`menu_nuit_2_retenu.png`** (cadrage en place), `menu_nuit_3_moyen.png` ((-4, 11, -20), (22,3 ; 3,4 ; 0), 50°), `menu_nuit_4_large.png` ((-14, 18, -26), (25,3 ; 19,2 ; 0), 40°). Fond sans interface en 1920 × 1080 (pour le launcher) : `menu_nuit_fond.png`.
+- Pour changer de cadrage : Play dans Village, régler les champs `menu*` de la caméra en direct, puis reporter les valeurs hors Play.
+- **Boucle vidéo pour le launcher** : `Assets/Screenshots/menu_nuit_boucle.mp4` (H.264, 1920 × 1080, 30 images/s, 12 s, muette, 7,5 Mbit/s, 11,2 Mo), même cadrage et même ambiance que `menu_nuit_fond.png`, sans interface. Outil : `Assets/Scripts/Dev/EnregistreurBoucle.cs` (en Play, `UnityEditor.Media.MediaEncoder`, `Time.captureFramerate = 30`, rendu de la caméra seule dans une RenderTexture). Pour l'enregistrement seulement (valeurs de la scène inchangées) : période du balancement de la caméra 12 s (un aller-retour), rotation du cristal 30°/s au lieu de 40 (un tour ; balancement vertical de 3 s : 4 cycles), anneaux du portail 60 et -60°/s au lieu de 70 et -45 (2 tours), vitesse de chaque gemme de la ceinture arrondie à un nombre entier de tours (au moins un). Le reste (brume, lucioles, voxels du portail, oscillations de la ceinture, flammes) : 13 s capturées, la dernière seconde fondue pixel par pixel dans la première. Raccord mesuré : écart moyen entre la dernière et la première image de 0,65 (sur 255, par canal), contre 0,55 entre deux images consécutives ; côte à côte : `menu_nuit_boucle_raccord.png`. Écrire la vidéo hors de `Assets` (Temp) puis la copier : sinon Unity importe le fichier encore incomplet.
 
 ### Tailles 80 / 100 / 135 %
 
@@ -151,7 +189,9 @@ Chaque écran a ses règles `.dl-scale-3` (fin de `Hud.uss` et `V01.uss`) : HUD 
 
 Partie accélérée (×4 par défaut : jour de 120 s en 30 s), bouclier à partir du jour 2, coups sur Nyxessa la nuit (angles variés), ennemis tués et or, dégâts subis, **mort pendant la nuit 2** (réapparition en 10 s), **chute de Nyxessa pendant la nuit 3** (écran de score), Rejouer relance après 1,5 s. Les entrées de jeu passent par `InputChordResolver` : LB (A) lance la charge, RB (R) le soin, LT maintenue lève la garde, Vue / pavé tactile / F1 vote « prêt ».
 
-Méthodes de test : `Forcer(phase, nuit, reste)`, `ForcerNyxessa(vie01, bouclier01)`, `Frapper(angle)`, `ForcerJoueur(vie, endurance, rechargeCharge, rechargeSoin, garde)`, `ForcerMort(s)`, `ForcerScore(or, dégâts, tués, morts)`, `ForcerFin(résultat, nuit, durée)`, `ForcerPret(bool)`, champ `figer`.
+Classes : `EtatFactice` implémente `IClassesJouables` et `IEtatJoueurClasse` ; `LancerSolo(id)` joue la classe choisie (le Paladin garde sa simulation complète ; les autres classes ont leur barre d'actions, vides comprises, une jauge simulée : mana +3/s, -8 par attaque, -12/s cône maintenu ; rage +12 par attaque, -1,5/s hors combat, compétences à 30 ; assassin furtif hors combat et hors nuit). Captures du HUD : `UI01_hud_mage_mana.png`, `UI01_hud_viking_rage.png`, `UI01_hud_assassin_furtif.png`.
+
+Méthodes de test : `Forcer(phase, nuit, reste)`, `ForcerNyxessa(vie01, bouclier01)`, `Frapper(angle)`, `ForcerJoueur(vie, endurance, rechargeCharge, rechargeSoin, garde)`, `ForcerMort(s)`, `ForcerScore(or, dégâts, tués, morts, critiques, évités, soins)`, `ForcerFin(résultat, nuit, durée)`, `ForcerPret(bool)`, `ForcerJoueursDeTest(bool)` (deux joueurs fictifs pour tester la table du score), `LancerSolo(classeId)`, `ForcerJauge(0-100)`, `ForcerFurtif(bool?)`, champ `figer`.
 
 ## Vérifié en Play (manette simulée)
 
@@ -167,7 +207,7 @@ Menu → A sur Solo → HUD (carte Gameplay seule, pas de focus) ; Start → pau
 
 ## Hors 0.1 (non construit)
 
-Multijoueur (vie des autres joueurs à gauche, « Prêts 2 / 3 »), choix de classe, jauge de classe (Paladin n'en a pas), potions, donjon et portail (rappel, butin), catégories de score {à confirmer}, options Affichage / Audio / manette, personnalisation des touches.
+Multijoueur (vie des autres joueurs à gauche, « Prêts 2 / 3 »), potions, donjon et portail (rappel, butin), options Affichage / Audio / manette, personnalisation des touches.
 
 ## Report dans main
 

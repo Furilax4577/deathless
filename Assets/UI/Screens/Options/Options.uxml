@@ -7,6 +7,7 @@
                 <dl:InputPrompt action="UI/TabPrevious" />
                 <ui:Button name="onglet-jeu" text="Jeu" class="dl-tab" />
                 <ui:Button name="onglet-commandes" text="Commandes" class="dl-tab" />
+                <ui:Button name="onglet-audio" text="Audio" class="dl-tab" />
                 <dl:InputPrompt action="UI/TabNext" />
             </ui:VisualElement>
         </ui:VisualElement>
@@ -39,6 +40,12 @@
             </ui:VisualElement>
             <ui:ScrollView name="options-table" class="options__table" mode="Vertical" horizontal-scroller-visibility="Hidden" />
             <ui:Label text="Lecture seule : la personnalisation des touches viendra plus tard." class="dl-text dl-text--small dl-text--muted options__note" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="options-audio" class="dl-panel options__page options__page--audio">
+            <ui:Label text="AUDIO" class="dl-section-label" />
+            <ui:VisualElement name="options-volumes" class="options__volumes" />
+            <ui:Label text="Effets : combats, compétences, ennemis, Nyxessa, portail, ambiance. Interface : sons des menus." class="dl-text dl-text--small dl-text--muted options__note" />
         </ui:VisualElement>
 
         <ui:Button name="options-retour" text="Retour" class="options__retour" />

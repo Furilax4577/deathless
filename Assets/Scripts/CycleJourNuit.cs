@@ -10,6 +10,11 @@ using UnityEngine;
 // brouillard et ciel entre les deux préréglages de l'asset Ambiance (AmbianceVillage : jour, nuit). Par-dessus, pendant
 // le crépuscule et l'aube, une teinte chaude sur le soleil, le brouillard et le ciel. Le reste suit le fondu : lumière
 // de nuit de Nyxessa, lanternes des maisons, fenêtres (émission), lucioles. La brume au sol (GroundMist) lit DayCycle.Night.
+//
+// Nuit violette (demande de Quentin, 25/09/2026) : préréglage « nuit » d'AmbianceVillage tiré vers un bleu-violet plus
+// sombre (lune, ambiante, brouillard, ciel), sol du ciel violet nuit (solCielNuit), lumière verte de Nyxessa plus forte
+// pour ressortir sur ce fond ; lanternes et fenêtres restent chaudes. Brume basse GroundMist violet-gris, plus dense
+// hors de la place (clearRadius). Valeurs dans Docs/vfx.md, section « Ambiance de nuit ».
 public class CycleJourNuit : MonoBehaviour
 {
     public enum Phase { Jour, Crepuscule, Nuit, Aube }
@@ -45,7 +50,7 @@ public class CycleJourNuit : MonoBehaviour
     public Color brouillardChaud = new Color(0.42f, 0.28f, 0.32f);
     public Color cielChaud = new Color(0.95f, 0.45f, 0.35f);
     [Tooltip("Couleur du sol du ciel (sous l'horizon) en pleine nuit.")]
-    public Color solCielNuit = new Color(0.02f, 0.03f, 0.07f);
+    public Color solCielNuit = new Color(0.03f, 0.018f, 0.07f);
     private Color solCielJour = new Color(0.37f, 0.35f, 0.34f);
     private bool solCielLu;
 
@@ -88,6 +93,8 @@ public class CycleJourNuit : MonoBehaviour
     // plus son temps lui-même ; Deathless.Jeu.VueCycle lui donne chaque image la phase et le temps écoulé dans la phase
     // (et règle les durées, qui peuvent être accélérées en mode test). Sans pilote, comportement du bac à sable.
     [System.NonSerialized] public bool pilote;
+    // Portail ouvert quelle que soit la phase (plan de nuit du menu principal, posé par VueCycle ; jamais en partie).
+    [System.NonSerialized] public bool portailForceOuvert;
     public void Piloter(Phase p, float tempsDansPhase)
     {
         pilote = true;
@@ -147,7 +154,7 @@ public class CycleJourNuit : MonoBehaviour
             }
         }
         // Portail présent le jour ; il se referme au crépuscule (charge rendue à Nyxessa) et se rouvre à l'aube (charge).
-        if (portail != null) portail.ouvert = PhaseCourante == Phase.Jour || PhaseCourante == Phase.Aube;
+        if (portail != null) portail.ouvert = portailForceOuvert || PhaseCourante == Phase.Jour || PhaseCourante == Phase.Aube;
 
         // Lumières qui suivent la nuit : Nyxessa, lanternes (allumées dès la première moitié du crépuscule), fenêtres.
         float allume = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.15f, 0.7f, n));

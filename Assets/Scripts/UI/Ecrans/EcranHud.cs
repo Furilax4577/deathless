@@ -32,7 +32,9 @@ namespace Deathless.UI.Ecrans
         FlecheHud m_FlecheAttaque;
         VisualElement m_Portrait;
         Label m_Initiale;
-        Gauge m_Vie, m_Endurance;
+        Gauge m_Vie, m_Endurance, m_JaugeClasse;
+        VisualElement m_Furtif;
+        JaugeClasse m_JaugeAffichee = (JaugeClasse)(-1);
         VisualElement m_Barre;
         VisualElement m_Interaction;
         Label m_InteractionTexte;
@@ -75,6 +77,8 @@ namespace Deathless.UI.Ecrans
             m_Initiale = Racine.Q<Label>("portrait-initiale");
             m_Vie = Racine.Q<Gauge>("joueur-vie");
             m_Endurance = Racine.Q<Gauge>("joueur-endurance");
+            m_JaugeClasse = Racine.Q<Gauge>("joueur-jauge");
+            m_Furtif = Racine.Q("furtif");
             m_Barre = Racine.Q("competences");
             m_Interaction = Racine.Q("interaction");
             m_InteractionTexte = Racine.Q<Label>("interaction-texte");
@@ -230,6 +234,7 @@ namespace Deathless.UI.Ecrans
             m_Initiale.text = string.IsNullOrEmpty(joueur.Classe) ? "?" : joueur.Classe.Substring(0, 1);
             m_Vie.SetValue(joueur.Vie, joueur.VieMax);
             m_Endurance.SetValue(joueur.Endurance, joueur.EnduranceMax);
+            MajClasse(joueur as IEtatJoueurClasse);
 
             if (!ReferenceEquals(m_CompetencesAffichees, joueur.Competences)) ConstruireBarre(joueur.Competences);
             for (var i = 0; i < m_Emplacements.Count && i < joueur.Competences.Count; i++)
@@ -244,6 +249,23 @@ namespace Deathless.UI.Ecrans
             if (!string.IsNullOrEmpty(invite)) m_InteractionTexte.text = invite;
             m_Reticule.style.display = mort ? DisplayStyle.None : DisplayStyle.Flex;
             m_Barre.EnableInClassList("hud-competences--mort", mort);
+        }
+
+        /// Jauge de classe (mana, rage) sous l'endurance et œil barré du mode furtif : seulement si la source du joueur
+        /// implémente IEtatJoueurClasse (facultatif).
+        void MajClasse(IEtatJoueurClasse classe)
+        {
+            var jauge = classe != null ? classe.Jauge : JaugeClasse.Aucune;
+            if (jauge != m_JaugeAffichee)
+            {
+                m_JaugeAffichee = jauge;
+                m_JaugeClasse.style.display = jauge == JaugeClasse.Aucune ? DisplayStyle.None : DisplayStyle.Flex;
+                m_JaugeClasse.label = jauge == JaugeClasse.Rage ? "Rage" : "Mana";
+                m_JaugeClasse.EnableInClassList("dl-gauge--mana", jauge == JaugeClasse.Mana);
+                m_JaugeClasse.EnableInClassList("dl-gauge--rage", jauge == JaugeClasse.Rage);
+            }
+            if (jauge != JaugeClasse.Aucune) m_JaugeClasse.SetValue(classe.ValeurJauge, Mathf.Max(1f, classe.JaugeMax));
+            m_Furtif.style.display = classe != null && classe.Furtif ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
         void ConstruireBarre(IReadOnlyList<ICompetenceHud> competences)
@@ -284,7 +306,11 @@ namespace Deathless.UI.Ecrans
             if (icone != null) e.icone.style.backgroundImage = new StyleBackground(icone);
             e.abreviation.text = c.Abreviation;
 
-            var etat = mort ? EtatCompetence.Indisponible : c.Etat;
+            // Emplacement vide (pas de compétence : Nom vide) : case grisée, sans abréviation ni recharge.
+            var vide = string.IsNullOrEmpty(c.Nom);
+            e.racine.EnableInClassList("hud-emplacement--vide", vide);
+            if (vide) e.abreviation.text = "";
+            var etat = mort || vide ? EtatCompetence.Indisponible : c.Etat;
             // En recharge, seul le compte à rebours est lisible (comme la maquette).
             var enRecharge = etat == EtatCompetence.Recharge && c.RechargeRestante > 0f;
             e.abreviation.style.display = icone != null || enRecharge ? DisplayStyle.None : DisplayStyle.Flex;

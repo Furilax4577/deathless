@@ -20,11 +20,15 @@ namespace Deathless.UI.Donnees
         /// Vrai pour le joueur local (ligne soulignée).
         bool EstLocal { get; }
 
-        /// Catégories décidées (deroule.md). Meilleur : le plus élevé, sauf Morts (le plus bas).
+        /// Catégories décidées (deroule.md), dans l'ordre des colonnes. Meilleur : le plus élevé, sauf Morts (le plus bas).
         int OrRapporte { get; }
         int DegatsInfliges { get; }
         int EnnemisTues { get; }
         int Morts { get; }
+        int CoupsCritiques { get; }
+        /// Dégâts que le joueur a empêchés d'atteindre Nyxessa (ennemis tués ou arrêtés avant de la frapper).
+        int DegatsEvitesNyxessa { get; }
+        int SoinsProdigues { get; }
     }
 
     /// Données de l'écran de score, valables après IEtatPartie.PartieTerminee.

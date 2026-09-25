@@ -13,7 +13,7 @@ namespace Deathless.UI.Dev
     {
         public InputActionAsset actions;
 
-        [Tooltip("Délai d'accord de la manette (LB + RB, L3 + R3), en secondes.")]
+        [Tooltip("Délai d'accord de la manette (LB + RB), en secondes.")]
         public float chordWindow = InputChordResolver.DefaultChordWindow;
 
         /// Dernières actions de jeu résolues (la plus récente en premier), pour la démo et les tests.
@@ -33,9 +33,7 @@ namespace Deathless.UI.Dev
             Row("Gameplay/Skill1", "Compétence 1"),
             Row("Gameplay/Skill2", "Compétence 2"),
             Row("Gameplay/Skill3", "Compétence 3"),
-            Row("Gameplay/Ultimate", "Ultime"),
             Row("Gameplay/Sprint", "Sprinter"),
-            Row("Gameplay/Crouch", "S’accroupir"),
             Row("Gameplay/DrinkPotion", "Boire une potion"),
             Row("Gameplay/Ready", "Se déclarer prêt"),
             Row("Gameplay/Pause", "Pause"),

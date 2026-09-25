@@ -203,29 +203,9 @@ public partial class @DeathlessControls: IInputActionCollection2, IDisposable
                     ""priority"": 0
                 },
                 {
-                    ""name"": ""Ultimate"",
-                    ""type"": ""Button"",
-                    ""id"": ""331b0fa2-b5a8-5040-a45e-6a0a98377203"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false,
-                    ""priority"": 0
-                },
-                {
                     ""name"": ""Sprint"",
                     ""type"": ""Button"",
                     ""id"": ""84965ab3-9066-5dbf-9f9f-66907072891e"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false,
-                    ""priority"": 0
-                },
-                {
-                    ""name"": ""Crouch"",
-                    ""type"": ""Button"",
-                    ""id"": ""f746dc99-347b-59ea-814c-6e21218e2943"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -573,50 +553,6 @@ public partial class @DeathlessControls: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": ""L3+R3"",
-                    ""id"": ""0ae70fbd-8bc3-5924-8ce6-044d0fdd56c6"",
-                    ""path"": ""ButtonWithOneModifier(modifiersOrder=2)"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Ultimate"",
-                    ""isComposite"": true,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""modifier"",
-                    ""id"": ""956c0d10-1668-52db-8b76-f186de04277c"",
-                    ""path"": ""<Gamepad>/leftStickPress"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Gamepad"",
-                    ""action"": ""Ultimate"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""button"",
-                    ""id"": ""d6e49250-0f26-5f14-b68e-7f92db1b4d73"",
-                    ""path"": ""<Gamepad>/rightStickPress"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Gamepad"",
-                    ""action"": ""Ultimate"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""c64db81f-d9c0-5021-bcc4-d435d56a5e47"",
-                    ""path"": ""<Keyboard>/g"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""KeyboardMouse"",
-                    ""action"": ""Ultimate"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
                     ""name"": """",
                     ""id"": ""8c87c8d7-806e-5b17-8cf4-fb3dc5af4888"",
                     ""path"": ""<Gamepad>/leftStickPress"",
@@ -635,28 +571,6 @@ public partial class @DeathlessControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""KeyboardMouse"",
                     ""action"": ""Sprint"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""ff75a5db-8034-5911-a8e6-5bcbbc30bc46"",
-                    ""path"": ""<Gamepad>/rightStickPress"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Gamepad"",
-                    ""action"": ""Crouch"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""867f2b39-4e02-5f32-8e0e-418adbc39bd1"",
-                    ""path"": ""<Keyboard>/c"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""KeyboardMouse"",
-                    ""action"": ""Crouch"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1186,9 +1100,7 @@ public partial class @DeathlessControls: IInputActionCollection2, IDisposable
         m_Gameplay_Skill1 = m_Gameplay.FindAction("Skill1", throwIfNotFound: true);
         m_Gameplay_Skill2 = m_Gameplay.FindAction("Skill2", throwIfNotFound: true);
         m_Gameplay_Skill3 = m_Gameplay.FindAction("Skill3", throwIfNotFound: true);
-        m_Gameplay_Ultimate = m_Gameplay.FindAction("Ultimate", throwIfNotFound: true);
         m_Gameplay_Sprint = m_Gameplay.FindAction("Sprint", throwIfNotFound: true);
-        m_Gameplay_Crouch = m_Gameplay.FindAction("Crouch", throwIfNotFound: true);
         m_Gameplay_DrinkPotion = m_Gameplay.FindAction("DrinkPotion", throwIfNotFound: true);
         m_Gameplay_Ready = m_Gameplay.FindAction("Ready", throwIfNotFound: true);
         m_Gameplay_Pause = m_Gameplay.FindAction("Pause", throwIfNotFound: true);
@@ -1298,9 +1210,7 @@ public partial class @DeathlessControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Gameplay_Skill1;
     private readonly InputAction m_Gameplay_Skill2;
     private readonly InputAction m_Gameplay_Skill3;
-    private readonly InputAction m_Gameplay_Ultimate;
     private readonly InputAction m_Gameplay_Sprint;
-    private readonly InputAction m_Gameplay_Crouch;
     private readonly InputAction m_Gameplay_DrinkPotion;
     private readonly InputAction m_Gameplay_Ready;
     private readonly InputAction m_Gameplay_Pause;
@@ -1360,17 +1270,9 @@ public partial class @DeathlessControls: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @Skill3 => m_Wrapper.m_Gameplay_Skill3;
         /// <summary>
-        /// Provides access to the underlying input action "Gameplay/Ultimate".
-        /// </summary>
-        public InputAction @Ultimate => m_Wrapper.m_Gameplay_Ultimate;
-        /// <summary>
         /// Provides access to the underlying input action "Gameplay/Sprint".
         /// </summary>
         public InputAction @Sprint => m_Wrapper.m_Gameplay_Sprint;
-        /// <summary>
-        /// Provides access to the underlying input action "Gameplay/Crouch".
-        /// </summary>
-        public InputAction @Crouch => m_Wrapper.m_Gameplay_Crouch;
         /// <summary>
         /// Provides access to the underlying input action "Gameplay/DrinkPotion".
         /// </summary>
@@ -1442,15 +1344,9 @@ public partial class @DeathlessControls: IInputActionCollection2, IDisposable
             @Skill3.started += instance.OnSkill3;
             @Skill3.performed += instance.OnSkill3;
             @Skill3.canceled += instance.OnSkill3;
-            @Ultimate.started += instance.OnUltimate;
-            @Ultimate.performed += instance.OnUltimate;
-            @Ultimate.canceled += instance.OnUltimate;
             @Sprint.started += instance.OnSprint;
             @Sprint.performed += instance.OnSprint;
             @Sprint.canceled += instance.OnSprint;
-            @Crouch.started += instance.OnCrouch;
-            @Crouch.performed += instance.OnCrouch;
-            @Crouch.canceled += instance.OnCrouch;
             @DrinkPotion.started += instance.OnDrinkPotion;
             @DrinkPotion.performed += instance.OnDrinkPotion;
             @DrinkPotion.canceled += instance.OnDrinkPotion;
@@ -1504,15 +1400,9 @@ public partial class @DeathlessControls: IInputActionCollection2, IDisposable
             @Skill3.started -= instance.OnSkill3;
             @Skill3.performed -= instance.OnSkill3;
             @Skill3.canceled -= instance.OnSkill3;
-            @Ultimate.started -= instance.OnUltimate;
-            @Ultimate.performed -= instance.OnUltimate;
-            @Ultimate.canceled -= instance.OnUltimate;
             @Sprint.started -= instance.OnSprint;
             @Sprint.performed -= instance.OnSprint;
             @Sprint.canceled -= instance.OnSprint;
-            @Crouch.started -= instance.OnCrouch;
-            @Crouch.performed -= instance.OnCrouch;
-            @Crouch.canceled -= instance.OnCrouch;
             @DrinkPotion.started -= instance.OnDrinkPotion;
             @DrinkPotion.performed -= instance.OnDrinkPotion;
             @DrinkPotion.canceled -= instance.OnDrinkPotion;
@@ -1883,26 +1773,12 @@ public partial class @DeathlessControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnSkill3(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Ultimate" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnUltimate(InputAction.CallbackContext context);
-        /// <summary>
         /// Method invoked when associated input action "Sprint" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnSprint(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "Crouch" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnCrouch(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "DrinkPotion" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>

@@ -173,6 +173,11 @@
     padding: 0;
 }
 
+.hud-joueur__furtif { position: absolute; right: -12px; top: -12px; width: 48px; height: 48px; display: none; }
+.hud-joueur__jauge-classe { display: none; }
+.hud-emplacement--vide .hud-emplacement__case { border-color: var(--dl-color-line); background-color: rgba(16, 19, 27, 0.5); }
+.hud-emplacement--vide .hud-emplacement__abrev { color: var(--dl-color-text-disabled); }
+.hud-emplacement--vide .hud-emplacement__invite { opacity: 0.35; }
 .hud-joueur__jauges { width: 420px; padding: 12px 18px 6px 18px; border-radius: 18px; background-color: rgba(16, 19, 27, 0.78); }
 .hud-joueur__jauges > .dl-gauge { margin-bottom: 6px; }
 

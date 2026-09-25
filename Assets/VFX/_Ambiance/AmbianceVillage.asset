@@ -27,16 +27,16 @@ MonoBehaviour:
     atmosphereThickness: 0.85
   dusk:
     sunEuler: {x: 38, y: 200}
-    sunColor: {r: 0.55, g: 0.66, b: 0.95, a: 1}
-    sunIntensity: 0.32
-    ambientSky: {r: 0.11, g: 0.14, b: 0.26, a: 1}
-    ambientEquator: {r: 0.07, g: 0.09, b: 0.17, a: 1}
-    ambientGround: {r: 0.02, g: 0.025, b: 0.05, a: 1}
-    fogColor: {r: 0.035, g: 0.05, b: 0.1, a: 1}
-    fogStart: 15
-    fogEnd: 95
-    skyTint: {r: 0.05, g: 0.08, b: 0.22, a: 1}
-    skyExposure: 0.18
+    sunColor: {r: 0.6, g: 0.52, b: 0.95, a: 1}
+    sunIntensity: 0.25
+    ambientSky: {r: 0.105, g: 0.078, b: 0.215, a: 1}
+    ambientEquator: {r: 0.07, g: 0.05, b: 0.14, a: 1}
+    ambientGround: {r: 0.02, g: 0.014, b: 0.042, a: 1}
+    fogColor: {r: 0.05, g: 0.03, b: 0.1, a: 1}
+    fogStart: 14
+    fogEnd: 90
+    skyTint: {r: 0.1, g: 0.055, b: 0.24, a: 1}
+    skyExposure: 0.16
     atmosphereThickness: 0.5
   transitionSeconds: 5
   duskLeadSeconds: 0

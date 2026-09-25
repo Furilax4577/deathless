@@ -58,7 +58,9 @@ namespace Deathless.Jeu
             cycle.dureeAube = b.Duree(Phase.Aube);
             switch (e.phase)
             {
-                case Phase.Attente: cycle.Piloter(CycleJourNuit.Phase.Jour, cycle.dureeJour * 0.35f); break;
+                // Menu principal : plan de nuit figé (milieu de la nuit), portail ouvert pour ce seul plan (en partie, il
+                // est absent la nuit). Rien d'autre ne tourne avant LancerSolo (ni vagues ni horloge).
+                case Phase.Attente: cycle.Piloter(CycleJourNuit.Phase.Nuit, cycle.dureeNuit * 0.5f); break;
                 case Phase.Jour:
                     // Jour écourté (tous prêts) : le soleil suit le temps restant, pas le temps écoulé.
                     cycle.Piloter(CycleJourNuit.Phase.Jour, Mathf.Clamp(cycle.dureeJour - e.TempsRestant, 0f, cycle.dureeJour));
@@ -68,6 +70,7 @@ namespace Deathless.Jeu
                 case Phase.Aube: cycle.Piloter(CycleJourNuit.Phase.Aube, e.tempsPhase); break;
                 case Phase.Terminee: break;   // ambiance figée
             }
+            cycle.portailForceOuvert = e.phase == Phase.Attente;
             bool ouvert = portail != null && portail.ouvert;
             if (ouvert != m_PortailOuvert)
             {

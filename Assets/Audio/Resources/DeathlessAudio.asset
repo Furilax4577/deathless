@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b0780939a962b6458371f9396a47242, type: 3}
+  m_Name: DeathlessAudio
+  m_EditorClassIdentifier: Assembly-CSharp::Deathless.Audio.ReglagesAudio
+  mixer: {fileID: 24100000, guid: 75d511586a74db0469e259cfc0b2c42b, type: 2}
+  groupeMusique: {fileID: 3334393702570242783, guid: 75d511586a74db0469e259cfc0b2c42b, type: 2}
+  groupeEffets: {fileID: -8139486541471880038, guid: 75d511586a74db0469e259cfc0b2c42b, type: 2}
+  groupeInterface: {fileID: 7055238058104291052, guid: 75d511586a74db0469e259cfc0b2c42b, type: 2}
+  survol: {fileID: 8300000, guid: c6a8dc3072244084fb6a260334aadd05, type: 3}
+  clic: {fileID: 8300000, guid: 603dae63f659ecd40bffb9bb3945f30d, type: 3}
+  retour: {fileID: 8300000, guid: 0c7fc15692d4d2d4a90f097148b66635, type: 3}
+  apercuEffets: {fileID: 8300000, guid: c1b7204f347e5d7498815c22dfb494a1, type: 3}

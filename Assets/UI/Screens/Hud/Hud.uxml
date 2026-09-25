@@ -66,10 +66,12 @@
         <ui:VisualElement class="hud-joueur">
             <ui:VisualElement name="portrait" class="hud-joueur__portrait">
                 <ui:Label name="portrait-initiale" text="P" class="hud-joueur__initiale" />
+                <dl:OeilBarre name="furtif" class="hud-joueur__furtif" tooltip="Furtif" />
             </ui:VisualElement>
             <ui:VisualElement class="hud-joueur__jauges">
                 <dl:Gauge name="joueur-vie" label="Vie" value="100" max="100" class="dl-gauge--life" />
                 <dl:Gauge name="joueur-endurance" label="Endurance" value="100" max="100" class="dl-gauge--stamina dl-gauge--thin" />
+                <dl:Gauge name="joueur-jauge" label="Mana" value="100" max="100" class="dl-gauge--mana dl-gauge--thin hud-joueur__jauge-classe" />
             </ui:VisualElement>
         </ui:VisualElement>
 

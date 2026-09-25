@@ -60,7 +60,7 @@ public class ArcBande : MonoBehaviour
                 pleine = true;
                 instantPret = Time.time;
                 if (encochee != null) StartCoroutine(Flash(encochee));
-                if (sonPret != null) AudioSource.PlayClipAtPoint(sonPret, Pointe());
+                if (sonPret != null) Deathless.Audio.VolumesAudio.JouerAuPoint(sonPret, Pointe());
                 if (Pret != null) Pret();
             }
         }

@@ -690,6 +690,7 @@ namespace Deathless.EditorTools
             nav.hud = Uxml("Hud");
             nav.pause = Uxml("Pause");
             nav.score = Uxml("Score");
+            nav.choixClasse = Uxml("ChoixClasse");
 
             // NavMesh (géométrie : colliders physiques ; les feuillages ne bloquent pas).
             var navGo = new GameObject("NavMesh");

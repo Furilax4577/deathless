@@ -6,9 +6,9 @@ using UnityEngine.InputSystem.LowLevel;
 
 namespace Deathless.Controls
 {
-    /// Résout les accords de la manette (décision du 25/09/2026, « court délai ») :
-    ///   LB → Compétence 1, RB → Compétence 2, LB + RB → Compétence 3 ;
-    ///   L3 → Sprinter,    R3 → S'accroupir,  L3 + R3 → Ultime.
+    /// Résout l'accord de la manette (décision du 25/09/2026, « court délai ») :
+    ///   LB → Compétence 1, RB → Compétence 2, LB + RB → Compétence 3.
+    /// (Pas d'ultime ni d'accroupissement : L3 est Sprinter seul, sans délai ; R3 est libre.)
     /// Quand un des deux boutons est pressé, l'action seule attend <see cref="chordWindow"/> secondes (0,1 par défaut).
     /// Si l'autre bouton arrive dans ce délai, c'est l'accord qui part, et aucune des deux actions seules.
     /// Sinon l'action seule part à la fin du délai (même si le bouton a déjà été relâché).
@@ -18,8 +18,8 @@ namespace Deathless.Controls
     /// s'abonne à <see cref="Triggered"/> au lieu des `performed` de la carte Gameplay. S'abonner directement à
     /// `Skill1.performed` contournerait la résolution (Compétence 1 partirait avec la 3).
     ///
-    /// Actions maintenues (Sprinter) : <see cref="IsHeld"/> est vrai entre le départ résolu et le relâchement ;
-    /// il reste faux si le bouton a servi à un accord.
+    /// Actions maintenues (garde, Sprinter) : <see cref="IsHeld"/>. Pour un côté d'accord, vrai entre le départ résolu
+    /// et le relâchement, faux si le bouton a servi à l'accord ; pour les autres actions, simple IsPressed.
     public sealed class InputChordResolver : IDisposable
     {
         public const float DefaultChordWindow = 0.1f;
@@ -56,13 +56,12 @@ namespace Deathless.Controls
         readonly List<Chord> m_Chords = new List<Chord>();
         bool m_Disposed;
 
-        /// Résolveur sur la carte Gameplay de DeathlessControls, avec les deux accords du jeu.
+        /// Résolveur sur la carte Gameplay de DeathlessControls, avec l'accord du jeu (LB + RB).
         public static InputChordResolver ForGameplay(InputActionAsset asset, float window = DefaultChordWindow)
         {
             var map = asset.FindActionMap("Gameplay", throwIfNotFound: true);
             var resolver = new InputChordResolver(map) { chordWindow = window };
             resolver.AddChord(map.FindAction("Skill1", true), map.FindAction("Skill2", true), map.FindAction("Skill3", true));
-            resolver.AddChord(map.FindAction("Sprint", true), map.FindAction("Crouch", true), map.FindAction("Ultimate", true));
             resolver.RelayOtherButtons();
             return resolver;
         }
@@ -103,7 +102,7 @@ namespace Deathless.Controls
             }
         }
 
-        /// Vrai si l'action est maintenue et a été déclenchée seule (pas consommée par un accord). Pour Sprinter.
+        /// Vrai si l'action est maintenue et a été déclenchée seule (pas consommée par un accord).
         public bool IsHeld(InputAction action)
         {
             if (m_Sides.TryGetValue(action, out var side)) return side.pressed && side.phase == Phase.Fired;

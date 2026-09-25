@@ -1,10 +1,12 @@
 using System.Collections.Generic;
+using Deathless.Audio;
 using UnityEngine;
 
 namespace Deathless.Jeu
 {
     /// Lecture des sons du catalogue : effets 3D (réserve de sources), sons 2D, boucles attachées, musique en fondu
     /// enchaîné. Une instance par scène (AudioBank.Instance) ; les appels statiques ne font rien sans elle.
+    /// Mixer : effets, sons 2D et boucles dans le groupe Effets, musique dans le groupe Musique (VolumesAudio).
     public class AudioBank : MonoBehaviour
     {
         public static AudioBank Instance { get; private set; }
@@ -36,16 +38,19 @@ namespace Deathless.Jeu
                 s.minDistance = 3f;
                 s.maxDistance = 60f;
                 s.dopplerLevel = 0f;
+                VolumesAudio.Router(s, CanalAudio.Effets);
                 m_Sources.Add(s);
             }
             m_Source2D = gameObject.AddComponent<AudioSource>();
             m_Source2D.playOnAwake = false;
+            VolumesAudio.Router(m_Source2D, CanalAudio.Effets);
             for (int i = 0; i < 2; i++)
             {
                 m_Musique[i] = gameObject.AddComponent<AudioSource>();
                 m_Musique[i].loop = true;
                 m_Musique[i].playOnAwake = false;
                 m_Musique[i].volume = 0f;
+                VolumesAudio.Router(m_Musique[i], CanalAudio.Musique);
             }
         }
 
@@ -104,6 +109,7 @@ namespace Deathless.Jeu
             s.maxDistance = 45f;
             s.dopplerLevel = 0f;
             s.volume = volume * Instance.volumeEffets;
+            VolumesAudio.Router(s, CanalAudio.Effets);
             s.Play();
             return s;
         }

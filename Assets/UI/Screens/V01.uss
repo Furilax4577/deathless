@@ -25,8 +25,43 @@
 .menu__sous-titre { font-size: 26px; margin-top: 3px; }
 .menu__liste { position: absolute; left: 90px; top: 390px; width: 600px; }
 .menu__classe { position: absolute; right: 84px; bottom: 144px; width: 495px; padding: 27px 30px; background-color: rgba(22, 26, 36, 0.94); }
-.menu__note { margin-top: var(--dl-space-2); }
+.menu__note { margin-top: var(--dl-space-2); white-space: normal; }
 .menu__version { position: absolute; right: 60px; top: 36px; font-size: var(--dl-text-small); color: #e9eef5; margin: 0; padding: 0; }
+
+.menu__classe-entete { flex-direction: row; align-items: center; margin-top: 6px; }
+.menu__classe-pastille { width: 60px; height: 60px; border-radius: 30px; border-width: 3px; border-color: var(--dl-color-text); align-items: center; justify-content: center; margin-right: 18px; }
+.menu__classe-initiale { -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Bold-SDF.asset"); font-size: 27px; color: var(--dl-color-ink); margin: 0; padding: 0; }
+.menu__classe-nom { margin: 0; }
+.menu__classe-arme { margin: 0; color: var(--dl-color-text-muted); }
+
+/* ---------- Choix de classe ---------- */
+.choix { padding: 54px 102px 0 102px; }
+.choix__entete { margin-bottom: var(--dl-space-4); }
+.choix__aide { margin: 3px 0 0 0; }
+.choix__corps { flex-direction: row; flex-grow: 1; flex-shrink: 1; margin-bottom: 120px; }
+.choix__liste { width: 600px; flex-shrink: 0; }
+.choix-classe { flex-direction: row; align-items: center; justify-content: flex-start; min-height: 114px; margin: 0 0 12px 0; padding: 0 24px; border-radius: 18px; }
+.choix-classe__pastille { width: 72px; height: 72px; border-radius: 36px; border-width: 3px; border-color: var(--dl-color-text); align-items: center; justify-content: center; margin-right: 21px; flex-shrink: 0; }
+.choix-classe__initiale { -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Bold-SDF.asset"); font-size: 33px; color: var(--dl-color-ink); margin: 0; padding: 0; }
+.choix-classe__textes { flex-grow: 1; align-items: flex-start; }
+.choix-classe__nom { -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); font-size: var(--dl-text-large); margin: 0; padding: 0; }
+.choix-classe__role { font-size: var(--dl-text-small); color: var(--dl-color-text-muted); margin: 0; padding: 0; }
+.choix-classe__derniere { font-size: var(--dl-text-caption); color: var(--dl-color-gold); margin: 0; padding: 3px 12px; border-radius: 15px; border-width: 2px; border-color: var(--dl-color-gold); }
+.choix__fiche { flex-grow: 1; margin-left: 36px; padding: 30px 39px; background-color: rgba(35, 42, 58, 0.97); }
+.choix__fiche-entete { flex-direction: row; align-items: center; margin-bottom: var(--dl-space-3); }
+.choix__portrait { width: 108px; height: 108px; border-radius: 54px; border-width: 4px; border-color: var(--dl-color-text); align-items: center; justify-content: center; margin-right: 27px; }
+.choix__portrait-initiale { -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Bold-SDF.asset"); font-size: 48px; color: var(--dl-color-ink); margin: 0; padding: 0; }
+.choix__nom { margin: 0; }
+.choix__role { margin: 0; }
+.choix__arme { margin: 0 0 var(--dl-space-2) 0; }
+.choix__description { margin: 0 0 var(--dl-space-1) 0; white-space: normal; }
+.choix__jauge { margin: 0; color: var(--dl-color-gold); }
+.choix__titre-actions { margin-top: var(--dl-space-3); }
+.choix-action { flex-direction: row; align-items: center; min-height: 60px; border-top-width: 1px; border-color: var(--dl-color-line); }
+.choix-action__invite { width: 180px; flex-shrink: 0; --dl-prompt-size: 42px; --dl-key-height: 30px; --dl-key-text: 16px; }
+.choix-action__nom { font-size: var(--dl-text-body); margin: 0; padding: 0; }
+.choix-action--vide .choix-action__nom { color: var(--dl-color-text-disabled); }
+.choix-action--vide .choix-action__invite { opacity: 0.4; }
 
 /* ---------- Pause ---------- */
 .pause {
@@ -55,6 +90,12 @@
 .options__titre { margin-right: auto; }
 .options__page { width: 100%; max-height: 780px; }
 .options__page--jeu { width: 840px; }
+.options__page--audio { width: 1020px; }
+.options__volumes { margin: var(--dl-space-2) 0 var(--dl-space-1) 0; }
+.options-volume { min-height: var(--dl-control-height); margin-bottom: 6px; }
+.options-volume > .unity-base-field__label { flex-grow: 1; font-size: var(--dl-text-body); }
+.options-volume > .unity-base-slider__input { flex-grow: 1.3; }
+.options-volume__pc { width: 96px; margin: 0; padding: 0; -unity-text-align: middle-right; font-size: var(--dl-text-body); -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); color: var(--dl-color-text); }
 .options__tailles { flex-direction: row; margin: var(--dl-space-2) -6px var(--dl-space-3) -6px; }
 .options__taille { flex-grow: 1; flex-basis: 0; min-height: 96px; margin: 0 6px; flex-direction: column; }
 .options__taille-titre { -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); font-size: var(--dl-text-heading); margin: 0; padding: 0; }
@@ -110,7 +151,7 @@
 .credits__retour { align-self: flex-end; width: 240px; margin-top: var(--dl-space-3); }
 
 /* ---------- Score ---------- */
-.score { padding: 60px 120px 0 120px; }
+.score { padding: 60px 90px 0 90px; }
 .score__entete { flex-direction: row; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; }
 .score__resultat { font-size: var(--dl-text-small); letter-spacing: 2px; color: #ff9a8a; margin: 0; padding: 0; -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Medium-SDF.asset"); }
 .score-resultat--victoire { color: var(--dl-color-gold); }
@@ -120,12 +161,12 @@
 .score__chiffre-titre { font-size: 18px; letter-spacing: 1.5px; color: var(--dl-color-text-muted); margin: 0; padding: 0; }
 .score__chiffre-valeur { font-size: var(--dl-text-heading); -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); margin: 0; padding: 0; }
 
-.score__table { padding: 24px 39px; background-color: rgba(35, 42, 58, 0.97); }
+.score__table { padding: 18px 33px 24px 33px; background-color: rgba(35, 42, 58, 0.97); }
 .score-ligne { flex-direction: row; align-items: center; min-height: 96px; border-top-width: 1px; border-color: var(--dl-color-line); }
-.score-ligne--entete { min-height: 51px; border-top-width: 0; }
-.score-ligne--entete > .dl-section-label { margin: 0; }
+.score-ligne--entete { min-height: 60px; border-top-width: 0; align-items: flex-end; padding-bottom: 9px; }
+.score-ligne--entete > .dl-section-label { margin: 0; padding-right: 12px; white-space: normal; font-size: 16px; letter-spacing: 1.5px; }
 .score-ligne--local .score-joueur__nom { color: #ffffff; }
-.score-joueur { flex-grow: 2; flex-basis: 0; flex-direction: row; align-items: center; }
+.score-joueur { flex-grow: 1.6; flex-basis: 0; flex-direction: row; align-items: center; }
 .score-joueur__pastille {
     width: 60px;
     height: 60px;
@@ -144,15 +185,15 @@
     flex-direction: row;
     align-items: center;
     height: 51px;
-    padding: 0 18px;
+    padding: 0 15px;
     border-radius: 26px;
     border-width: 2px;
     border-color: rgba(0, 0, 0, 0);
 }
 .score-valeur--meilleur { background-color: #3a3420; border-color: var(--dl-color-gold); }
-.score-valeur__texte { -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); font-size: 27px; margin: 0; padding: 0; }
+.score-valeur__texte { -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); font-size: 26px; margin: 0; padding: 0; }
 .score-valeur--meilleur .score-valeur__texte { color: #ffffff; }
-.score-valeur__couronne { width: 24px; height: 18px; margin-left: 9px; }
+.score-valeur__couronne { width: 22px; height: 17px; margin-left: 8px; }
 
 .score__actions { flex-direction: row; margin-top: 30px; }
 .score-bouton {
@@ -176,6 +217,22 @@
 .dl-scale-3 .menu__liste { left: 42px; top: 220px; width: 560px; }
 .dl-scale-3 .menu__classe { right: 36px; bottom: 120px; width: 420px; }
 .dl-scale-3 .pause { top: 60px; }
+.dl-scale-3 .choix { padding: 30px 48px 0 48px; }
+.dl-scale-3 .choix__entete { margin-bottom: var(--dl-space-2); }
+.dl-scale-3 .choix__entete > .dl-title { font-size: 40px; }
+.dl-scale-3 .choix__aide { display: none; }
+.dl-scale-3 .choix__corps { margin-bottom: 100px; }
+.dl-scale-3 .choix__liste { width: 430px; }
+.dl-scale-3 .choix-classe { min-height: 84px; margin-bottom: 8px; padding: 0 16px; }
+.dl-scale-3 .choix-classe__pastille { width: 54px; height: 54px; border-radius: 27px; margin-right: 14px; }
+.dl-scale-3 .choix-classe__initiale { font-size: 26px; }
+.dl-scale-3 .choix__fiche { margin-left: 24px; padding: 18px 24px; }
+.dl-scale-3 .choix__fiche-entete { margin-bottom: var(--dl-space-1); }
+.dl-scale-3 .choix__portrait { width: 72px; height: 72px; border-radius: 36px; margin-right: 18px; }
+.dl-scale-3 .choix__portrait-initiale { font-size: 33px; }
+.dl-scale-3 .choix__nom { font-size: 40px; }
+.dl-scale-3 .choix__titre-actions { margin-top: var(--dl-space-1); }
+.dl-scale-3 .choix-action { min-height: 46px; }
 .dl-scale-3 .options { padding: 30px 48px 0 48px; }
 .dl-scale-3 .options__page { max-height: 520px; }
 .dl-scale-3 .options__retour { right: 48px; bottom: 100px; }
@@ -183,5 +240,13 @@
 .dl-scale-3 .score { padding: 30px 48px 0 48px; }
 .dl-scale-3 .score__titre { font-size: 48px; }
 .dl-scale-3 .score-ligne { min-height: 72px; }
+.dl-scale-3 .score__table { padding: 12px 21px 18px 21px; }
+.dl-scale-3 .score-joueur { flex-grow: 1.3; }
+.dl-scale-3 .score-joueur__pastille { width: 48px; height: 48px; border-radius: 24px; font-size: 22px; margin-right: 12px; }
+.dl-scale-3 .score-joueur__nom { font-size: 22px; }
+.dl-scale-3 .score-ligne--entete > .dl-section-label { font-size: 13px; letter-spacing: 1px; padding-right: 8px; }
+.dl-scale-3 .score-valeur { height: 42px; padding: 0 10px; }
+.dl-scale-3 .score-valeur__texte { font-size: 21px; }
+.dl-scale-3 .score-valeur__couronne { width: 17px; height: 13px; margin-left: 5px; }
 .dl-scale-3 .score__actions { margin-top: 18px; }
 .dl-scale-3 .dl-prompt-bar { padding: 0 var(--dl-space-4); }

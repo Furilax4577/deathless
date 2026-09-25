@@ -19,7 +19,7 @@ Démo : scène `Assets/Scenes/UISocle.unity`. Captures : `Assets/Screenshots/UIS
 | `Assets/UI/Screens/<Écran>/` | Un dossier par écran : `.uxml` et `.uss` propres à l'écran (ex. `UISocle/`). |
 | `Assets/Input/DeathlessControls.inputactions` | Actions (cartes Gameplay et UI, schémas Gamepad et KeyboardMouse) et classe générée `DeathlessControls.cs`. |
 | `Assets/Scripts/UI/` | `InputDeviceWatcher`, `InputGlyphs`, `InputPrompt`, `Gauge`, `UIScale`, `UINavigation` (espace de noms `Deathless.UI`). |
-| `Assets/Scripts/Input/InputChordResolver.cs` | Résolveur des accords de la manette (LB + RB, L3 + R3), espace de noms `Deathless.Controls`. |
+| `Assets/Scripts/Input/InputChordResolver.cs` | Résolveur de l'accord de la manette (LB + RB), espace de noms `Deathless.Controls`. |
 | `Assets/Scripts/UI/Dev/UISocleDemo.cs` | Script de la scène de démonstration. |
 | `Assets/Editor/UI/DeathlessUISetup.cs` | Menu **Deathless > UI** : régénère polices, PanelSettings, table d'icônes et scène de démo (rejouable, garde les GUID). |
 
@@ -113,14 +113,14 @@ C# : `parent.Add(new InputPrompt("UI/Cancel", "Retour"));`
 - Touches dont l'icône Kenney porte un mot anglais (ESC, DEL, CTRL, ALT, HOME…) : volontairement retirées de la table, l'invite les **dessine en français** (Échap, Suppr, Ctrl, Alt, Début…) dans une pastille ivoire. Même repli pour toute touche sans icône.
 - Mise à jour automatique à chaque `InputDeviceWatcher.Changed`. Hors mode Play (UI Builder), l'aperçu est en Xbox.
 
-## Accords de la manette (LB + RB, L3 + R3)
+## Accord de la manette (LB + RB)
 
 Décision du 25/09/2026 : **court délai**. `Deathless.Controls.InputChordResolver` (C#, sans composant) :
 
 - Au premier appui sur LB (ou RB), l'action seule attend `chordWindow` = **0,1 s** (`InputChordResolver.DefaultChordWindow`, à équilibrer ; dans la démo : champ `chordWindow` de `UISocleDemo`).
 - Si l'autre bouton arrive dans ce délai, **Compétence 3** part, et ni la 1 ni la 2. Sinon **Compétence 1** (ou 2) part à la fin du délai, même si le bouton a déjà été relâché. L'ordre des deux boutons est libre.
-- Même règle pour **L3 (Sprinter) / R3 (S'accroupir) / L3 + R3 (Ultime)**.
-- Au clavier (A, R, F, G, Maj, C), tout part immédiatement.
+- **Pas d'accord L3 + R3** (décision de Quentin, 25/09/2026 : aucune classe n'a d'ultime, personne ne s'accroupit ; actions `Ultimate` et `Crouch` retirées). L3 est Sprinter seul, relayé sans délai ; R3 est libre.
+- Au clavier (A, R, F), tout part immédiatement.
 - Le délai est mesuré sur l'horodatage des événements (`CallbackContext.time`) et vérifié après chaque mise à jour de l'Input System (`InputSystem.onAfterUpdate`) : le résultat ne dépend pas de la fréquence d'images.
 
 Utilisation (code de jeu) :
@@ -130,11 +130,11 @@ var controls = new DeathlessControls();          // ou l'asset DeathlessControls
 var chords = InputChordResolver.ForGameplay(controls.asset);
 chords.Triggered += action => { /* action résolue : Skill1, Skill3, Jump… */ };
 controls.Gameplay.Enable();
-// Sprinter maintenu : chords.IsHeld(controls.Gameplay.Sprint) (faux si L3 a servi à l'Ultime)
+// Sprinter maintenu : chords.IsHeld(controls.Gameplay.Sprint)
 // À la destruction : chords.Dispose();
 ```
 
-`Triggered` relaie aussi, sans délai, toutes les autres actions « Button » de la carte Gameplay : c'est le seul point d'entrée à utiliser. S'abonner directement à `Skill1.performed` contournerait la résolution. Les composites LB + RB et L3 + R3 restent dans l'asset pour les invites et le clavier ; à la manette, le résolveur les ignore et détecte l'accord lui-même.
+`Triggered` relaie aussi, sans délai, toutes les autres actions « Button » de la carte Gameplay : c'est le seul point d'entrée à utiliser. S'abonner directement à `Skill1.performed` contournerait la résolution. Le composite LB + RB reste dans l'asset pour les invites et le clavier ; à la manette, le résolveur l'ignore et détecte l'accord lui-même.
 
 Vérifié en Play (événements simulés et horodatés sur une manette XInput ; résultat affiché dans la démo, bloc « Dernière action en jeu ») :
 
@@ -145,11 +145,7 @@ Vérifié en Play (événements simulés et horodatés sur une manette XInput ; 
 | LB puis RB à 50 ms | Compétence 3 |
 | LB puis RB à 200 ms | Compétence 1, puis Compétence 2 |
 | RB puis LB à 50 ms | Compétence 3 |
-| L3 seul | Sprinter |
-| R3 seul | S'accroupir |
-| L3 puis R3 à 50 ms | Ultime |
-| L3 puis R3 à 200 ms | Sprinter, puis S'accroupir |
-| R3 puis L3 à 50 ms | Ultime |
+| L3 seul | Sprinter (sans délai depuis le retrait de L3 + R3) |
 
 ### Appareil actif
 
@@ -178,9 +174,7 @@ Clavier : l'Input System lie des **positions physiques** (disposition US). La ta
 | Skill1 | `leftShoulder` (LB, L1) | `q` | **A** |
 | Skill2 | `rightShoulder` (RB, R1) | `r` | R |
 | Skill3 | ButtonWithOneModifier `leftShoulder` + `rightShoulder`, ordre libre | `f` | F |
-| Ultimate | ButtonWithOneModifier `leftStickPress` + `rightStickPress`, ordre libre | `g` | G |
 | Sprint | `leftStickPress` (L3) | `leftShift` | Maj |
-| Crouch | `rightStickPress` (R3) | `c` | C |
 | DrinkPotion | `dpad/up` | `1` (rangée des chiffres) | 1 (icône ; la touche porte « & » en AZERTY) |
 | Ready | `<DualShockGamepad>/touchpadButton` (pavé tactile) et `select` (Vue ; Create sur DualSense, voulu) | `f1` | F1 |
 | Pause | `start` (Menu, Options) | `escape` | Échap |
@@ -213,7 +207,8 @@ Schémas : **Gamepad** (`<Gamepad>`) et **KeyboardMouse** (`<Keyboard>` + `<Mous
 
 ## Décisions prises (25/09/2026)
 
-- Accords de la manette : court délai (section « Accords de la manette »).
+- Accord de la manette : court délai (section « Accord de la manette »).
+- **Pas d'ultime ni d'accroupissement** : actions `Ultimate` (L3 + R3, G) et `Crouch` (R3, C) retirées de DeathlessControls et du résolveur ; R3, G et C sont libres.
 - **DualSense : le bouton Create déclare aussi « prêt »**, en plus du pavé tactile (liaison `<Gamepad>/select` gardée volontairement ; l'invite affiche le pavé tactile).
 - Taille de l'interface : ×1 = 0,8, ×2 = 1, ×3 = 1,35.
 - **DeathlessControls est l'asset d'actions du projet** (Project Settings > Input System > Project-wide Actions) dans main ; `Assets/InputSystem_Actions.inputactions` du gabarit a été retiré de main (aucune référence). Le bac à sable garde l'ancien réglage.

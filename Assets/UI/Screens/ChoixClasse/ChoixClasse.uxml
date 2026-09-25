@@ -1,0 +1,41 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:dl="Deathless.UI" editor-extension-mode="False">
+    <Style src="../V01.uss" />
+    <ui:VisualElement class="v01-plein v01-voile choix">
+        <ui:VisualElement class="choix__entete">
+            <ui:Label text="Choisir sa classe" class="dl-title" />
+            <ui:Label text="Défendre Nyxessa seul. Les cinq classes, avec leur arme et leurs actions." class="dl-text dl-text--muted choix__aide" />
+        </ui:VisualElement>
+
+        <ui:VisualElement class="choix__corps">
+            <!-- Liste des classes (boutons construits par EcranChoixClasse) -->
+            <ui:VisualElement name="choix-liste" class="choix__liste" />
+
+            <!-- Fiche de la classe sélectionnée -->
+            <ui:VisualElement class="dl-panel choix__fiche">
+                <ui:VisualElement class="choix__fiche-entete">
+                    <ui:VisualElement name="fiche-portrait" class="choix__portrait">
+                        <ui:Label name="fiche-initiale" text="P" class="choix__portrait-initiale" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="choix__fiche-titres">
+                        <ui:Label name="fiche-nom" text="Paladin" class="dl-title choix__nom" />
+                        <ui:Label name="fiche-role" text="Tank, une cible à la fois" class="dl-subtitle choix__role" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:Label text="ARME" class="dl-section-label" />
+                <ui:Label name="fiche-arme" text="Épée et bouclier" class="dl-text choix__arme" />
+                <ui:Label name="fiche-description" text="" class="dl-text dl-text--muted choix__description" />
+                <ui:Label name="fiche-jauge" text="Jauge : mana" class="dl-text dl-text--small choix__jauge" />
+                <ui:Label text="ACTIONS" class="dl-section-label choix__titre-actions" />
+                <ui:VisualElement name="fiche-actions" class="choix__actions" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement class="dl-prompt-bar">
+            <ui:VisualElement class="dl-prompt-bar__group">
+                <dl:InputPrompt action="UI/Submit" label="Jouer" />
+                <dl:InputPrompt action="UI/Cancel" label="Retour" />
+            </ui:VisualElement>
+            <ui:Label text="Clavier et souris" class="dl-text dl-text--small dl-text--muted dl-device-name" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -110,7 +110,7 @@
                         <ui:VisualElement name="last-action-box" class="socle-last">
                             <ui:Label text="DERNIÈRE ACTION EN JEU" class="dl-section-label" />
                             <ui:Label name="last-action" text="—" class="dl-heading socle-last__action" />
-                            <ui:Label name="last-history" text="Accords manette : LB + RB, L3 + R3 (délai 0,1 s)" class="dl-text dl-text--small dl-text--muted socle-last__history" />
+                            <ui:Label name="last-history" text="Accord manette : LB + RB (délai 0,1 s)" class="dl-text dl-text--small dl-text--muted socle-last__history" />
                         </ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>

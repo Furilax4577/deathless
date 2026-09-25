@@ -106,27 +106,9 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Ultimate",
-                    "type": "Button",
-                    "id": "331b0fa2-b5a8-5040-a45e-6a0a98377203",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "Sprint",
                     "type": "Button",
                     "id": "84965ab3-9066-5dbf-9f9f-66907072891e",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "Crouch",
-                    "type": "Button",
-                    "id": "f746dc99-347b-59ea-814c-6e21218e2943",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -470,50 +452,6 @@
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "L3+R3",
-                    "id": "0ae70fbd-8bc3-5924-8ce6-044d0fdd56c6",
-                    "path": "ButtonWithOneModifier(modifiersOrder=2)",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Ultimate",
-                    "isComposite": true,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "modifier",
-                    "id": "956c0d10-1668-52db-8b76-f186de04277c",
-                    "path": "<Gamepad>/leftStickPress",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
-                    "action": "Ultimate",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "button",
-                    "id": "d6e49250-0f26-5f14-b68e-7f92db1b4d73",
-                    "path": "<Gamepad>/rightStickPress",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
-                    "action": "Ultimate",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "",
-                    "id": "c64db81f-d9c0-5021-bcc4-d435d56a5e47",
-                    "path": "<Keyboard>/g",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "KeyboardMouse",
-                    "action": "Ultimate",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
                     "name": "",
                     "id": "8c87c8d7-806e-5b17-8cf4-fb3dc5af4888",
                     "path": "<Gamepad>/leftStickPress",
@@ -532,28 +470,6 @@
                     "processors": "",
                     "groups": "KeyboardMouse",
                     "action": "Sprint",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "ff75a5db-8034-5911-a8e6-5bcbbc30bc46",
-                    "path": "<Gamepad>/rightStickPress",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
-                    "action": "Crouch",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "867f2b39-4e02-5f32-8e0e-418adbc39bd1",
-                    "path": "<Keyboard>/c",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "KeyboardMouse",
-                    "action": "Crouch",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

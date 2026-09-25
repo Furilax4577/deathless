@@ -10,14 +10,14 @@
             <ui:Button name="menu-solo" class="dl-menu-item">
                 <ui:VisualElement class="dl-menu-item__texts">
                     <ui:Label text="Solo" class="dl-menu-item__label" />
-                    <ui:Label text="Défendre Nyxessa seul, avec le Paladin" class="dl-menu-item__desc" />
+                    <ui:Label text="Défendre Nyxessa seul, choisir sa classe" class="dl-menu-item__desc" />
                 </ui:VisualElement>
                 <dl:InputPrompt action="UI/Submit" class="dl-menu-item__prompt" />
             </ui:Button>
             <ui:Button name="menu-options" class="dl-menu-item">
                 <ui:VisualElement class="dl-menu-item__texts">
                     <ui:Label text="Options" class="dl-menu-item__label" />
-                    <ui:Label text="Taille de l’interface, commandes" class="dl-menu-item__desc" />
+                    <ui:Label text="Taille de l’interface, commandes, audio" class="dl-menu-item__desc" />
                 </ui:VisualElement>
                 <dl:InputPrompt action="UI/Submit" class="dl-menu-item__prompt" />
             </ui:Button>
@@ -37,10 +37,17 @@
             </ui:Button>
         </ui:VisualElement>
         <ui:VisualElement class="dl-panel menu__classe">
-            <ui:Label text="CLASSE" class="dl-section-label" />
-            <ui:Label text="Paladin" class="dl-heading" />
-            <ui:Label text="Épée et bouclier. Garde et parade, charge bélier, soin sur soi." class="dl-text dl-text--muted" />
-            <ui:Label text="Seule classe de la version 0.1." class="dl-text dl-text--small dl-text--muted menu__note" />
+            <ui:Label text="DERNIÈRE CLASSE JOUÉE" class="dl-section-label" />
+            <ui:VisualElement class="menu__classe-entete">
+                <ui:VisualElement name="menu-classe-pastille" class="menu__classe-pastille">
+                    <ui:Label name="menu-classe-initiale" text="P" class="menu__classe-initiale" />
+                </ui:VisualElement>
+                <ui:VisualElement>
+                    <ui:Label name="menu-classe-nom" text="Paladin" class="dl-heading menu__classe-nom" />
+                    <ui:Label name="menu-classe-arme" text="Épée et bouclier" class="dl-text menu__classe-arme" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:Label name="menu-classe-actions" text="Frappe à l’épée, garde et parade, charge bélier, soin sur soi." class="dl-text dl-text--muted menu__note" />
         </ui:VisualElement>
         <ui:Label text="Version 0.1" class="menu__version" />
         <ui:VisualElement class="dl-prompt-bar">

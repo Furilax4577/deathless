@@ -4,19 +4,35 @@ namespace Deathless.Jeu
 {
     /// Caméra orbitale derrière l'épaule droite du héros (troisième personne ; la vue FPS est proscrite). Lacet et
     /// tangage pilotés par la souris ou le stick droit (HerosEntrees.Regard), collision par SphereCast (les personnages
-    /// sont ignorés). Sans cible (menu principal), la caméra tourne lentement autour du village.
+    /// sont ignorés). Sans cible (menu principal) : plan fixe du village de nuit, Nyxessa et le portail dans la moitié
+    /// droite de l'image (le panneau du menu couvre la gauche), avec un très lent balancement latéral.
     [DefaultExecutionOrder(100)]
     public class CameraEpaule : MonoBehaviour
     {
         public Transform cible;
         public float lacet;
         public float tangage = 12f;
-        [Tooltip("Vue du menu : orbite lente autour de ce point.")]
-        public Vector3 centreMenu = new Vector3(0f, 3f, 0f);
-        public float rayonMenu = 26f, hauteurMenu = 11f, vitesseMenu = 3f;
+        [Header("Plan du menu principal (sans cible)")]
+        public Vector3 menuPosition = new Vector3(-8f, 13f, -22f);
+        [Tooltip("Rotation de la caméra (angles d'Euler, degrés).")]
+        public Vector3 menuRotation = new Vector3(23.8f, 13.4f, 0f);
+        [Tooltip("Champ de vision vertical du plan du menu (degrés). En jeu, celui de la caméra est rendu.")]
+        public float menuChamp = 44f;
+        [Tooltip("Balancement latéral lent (m, de part et d'autre) ; 0 : plan fixe.")]
+        public float menuBalancement = 0.8f;
+        [Tooltip("Période du balancement (s).")]
+        public float menuPeriode = 50f;
 
         float m_Distance;
         readonly RaycastHit[] m_Hits = new RaycastHit[16];
+        Camera m_Camera;
+        float m_ChampJeu;
+
+        void Awake()
+        {
+            m_Camera = GetComponent<Camera>();
+            if (m_Camera != null) m_ChampJeu = m_Camera.fieldOfView;
+        }
 
         public void Suivre(Transform t)
         {
@@ -40,11 +56,14 @@ namespace Deathless.Jeu
             var b = GameBalance.Courant;
             if (cible == null)
             {
-                float a = Time.time * vitesseMenu * Mathf.Deg2Rad;
-                transform.position = centreMenu + new Vector3(Mathf.Sin(a) * rayonMenu, hauteurMenu, Mathf.Cos(a) * rayonMenu);
-                transform.rotation = Quaternion.LookRotation(centreMenu + Vector3.up * 2f - transform.position);
+                Quaternion r = Quaternion.Euler(menuRotation);
+                float s = menuPeriode > 0f ? Mathf.Sin(Time.time * 2f * Mathf.PI / menuPeriode) : 0f;
+                transform.position = menuPosition + r * Vector3.right * (menuBalancement * s);
+                transform.rotation = r;
+                if (m_Camera != null) m_Camera.fieldOfView = menuChamp;
                 return;
             }
+            if (m_Camera != null) m_Camera.fieldOfView = m_ChampJeu;
             Quaternion rot = Quaternion.Euler(tangage, lacet, 0f);
             Vector3 pivot = cible.position + Vector3.up * b.cameraHauteur;
             Vector3 epaule = pivot + rot * Vector3.right * b.cameraEpaule;

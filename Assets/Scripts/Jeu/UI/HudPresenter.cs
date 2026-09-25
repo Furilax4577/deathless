@@ -9,7 +9,7 @@ namespace Deathless.Jeu
     /// IEtatJoueur, IScoreFin et ICommandesPartie en lisant Partie.Etat (aucune logique de jeu ici) et s'enregistre dans
     /// DonneesUI. Au chargement : commandes seules (menu principal) ; partie lancée : toutes les sources (HUD) ; fin :
     /// Phase = Terminee puis PartieTerminee (écran de score). Gère aussi le curseur (caché et verrouillé en jeu).
-    public class HudPresenter : MonoBehaviour, IEtatPartie, IEtatJoueur, IScoreFin, ICommandesPartie
+    public class HudPresenter : MonoBehaviour, IEtatPartie, IEtatJoueur, IScoreFin, ICommandesPartie, IClassesJouables
     {
         public static readonly Color TeintePaladin = new Color32(0xd9, 0xb2, 0x64, 0xff);
 
@@ -128,6 +128,14 @@ namespace Deathless.Jeu
         // ----------------------------------------------------------------- ICommandesPartie
 
         public void LancerSolo() { if (P != null) P.LancerSolo(); }
+
+        // ----------------------------------------------------------------- IClassesJouables (écran de choix de classe)
+
+        public IReadOnlyList<IClasseJouable> Classes => ClassesJouables.Catalogue;
+
+        /// Seul le Paladin est jouable pour l'instant : quelle que soit la classe choisie, la partie lance le Paladin
+        /// (l'agent jeu branchera les autres classes ici).
+        public void LancerSolo(string classeId) => LancerSolo();
         public void BasculerPret() { if (P != null) P.BasculerPret(J != null ? J.id : 1); }
         public void QuitterPartie() { if (P != null) P.QuitterPartie(); }
         public void QuitterJeu() { if (P != null) P.QuitterJeu(); }
@@ -162,8 +170,7 @@ namespace Deathless.Jeu
             public float RechargeTotale { get { var b = GameBalance.Courant; return m_Index == 2 ? b.chargeRecharge : m_Index == 3 ? b.soinRecharge : 0f; } }
         }
 
-        /// Ligne de score du joueur local. Les trois catégories ajoutées par l'utilisateur (coups critiques, dégâts
-        /// évités à Nyxessa, soins prodigués) sont exposées ici en attendant que l'agent ui les ajoute à ILigneScore.
+        /// Ligne de score du joueur local : les sept catégories de ILigneScore, lues dans ScoreJoueur.
         class Ligne : ILigneScore
         {
             readonly HudPresenter m_H;

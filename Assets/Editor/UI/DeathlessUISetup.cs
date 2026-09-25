@@ -338,6 +338,7 @@ namespace Deathless.UI.EditorTools
             nav.hud = Uxml("Hud");
             nav.pause = Uxml("Pause");
             nav.score = Uxml("Score");
+            nav.choixClasse = Uxml("ChoixClasse");
             uiGo.AddComponent<Deathless.UI.Dev.DemoV01>();
 
             EditorSceneManager.SaveScene(scene, V01ScenePath);

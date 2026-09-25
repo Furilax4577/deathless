@@ -1,3 +1,4 @@
+using Deathless.Audio;
 using UnityEngine.UIElements;
 
 namespace Deathless.UI.Ecrans
@@ -25,8 +26,24 @@ namespace Deathless.UI.Ecrans
             Racine.pickingMode = PickingMode.Ignore;
             Racine.style.position = Position.Absolute;
             Racine.style.left = Racine.style.top = Racine.style.right = Racine.style.bottom = 0;
-            Racine.RegisterCallback<FocusInEvent>(e => m_DernierFocus = e.target as VisualElement);
+            Racine.RegisterCallback<FocusInEvent>(e =>
+            {
+                m_DernierFocus = e.target as VisualElement;
+                if (Navigateur.SurvolPermis) VolumesAudio.JouerInterface(SonInterface.Survol, 0.6f);
+            });
             Construire();
+            // Son de validation sur tous les boutons de l'écran (groupe Interface du mixer).
+            Racine.Query<Button>().ForEach(SonDeClic);
+        }
+
+        /// Ajoute le son de validation à un bouton (à appeler pour les boutons créés après Construire).
+        protected void SonDeClic(Button bouton)
+        {
+            bouton.clicked += () =>
+            {
+                Navigateur.SilencerSurvol();
+                VolumesAudio.JouerInterface(SonInterface.Clic);
+            };
         }
 
         /// Recherche des éléments, abonnements aux boutons.

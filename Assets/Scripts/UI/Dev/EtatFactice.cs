@@ -14,7 +14,7 @@ namespace Deathless.UI.Dev
     /// réapparition ; fin de partie. Les entrées de jeu (carte Gameplay, via InputChordResolver) déclenchent
     /// les compétences et le vote prêt, comme le ferait le vrai jeu.
     /// Les méthodes Forcer… servent aux tests et aux captures.
-    public class EtatFactice : MonoBehaviour, IEtatPartie, IEtatJoueur, IScoreFin, ICommandesPartie
+    public class EtatFactice : MonoBehaviour, IEtatPartie, IEtatJoueur, IScoreFin, ICommandesPartie, IClassesJouables, IEtatJoueurClasse
     {
         public InputActionAsset actions;
 
@@ -54,6 +54,14 @@ namespace Deathless.UI.Dev
         readonly List<CompetenceFactice> m_Competences = new List<CompetenceFactice>();
         CompetenceFactice m_Attaque, m_Garde, m_Charge, m_Soin;
         float m_ProchaineAuto;
+
+        // --- Classe (écran de choix : les cinq classes ; le Paladin garde sa simulation complète)
+        IClasseJouable m_Classe;
+        List<CompetenceFactice> m_CompetencesClasse = new List<CompetenceFactice>();
+        float m_ValeurJauge;
+        float m_DerniereAttaque = -99f;
+        bool? m_FurtifForce;
+        bool EstPaladin => m_Classe == null || m_Classe.Id == "paladin";
 
         // --- Score
         ResultatPartie m_Resultat;
@@ -114,6 +122,8 @@ namespace Deathless.UI.Dev
             if (m_Phase == PhasePartie.Terminee) return;
 
             foreach (var c in m_Competences) c.Avancer(dt);
+            if (!EstPaladin) foreach (var c in m_CompetencesClasse) c.Avancer(dt);
+            SimulerJauge(dt);
             m_Garde.etat = m_Garde.finActive > m_Duree || (m_Accords != null && actions != null && m_Accords.IsHeld(actions.FindAction("Gameplay/AttackSecondary")))
                 ? EtatCompetence.Active : EtatCompetence.Prete;
             m_Attaque.etat = m_Attaque.finActive > m_Duree ? EtatCompetence.Active : EtatCompetence.Prete;
@@ -167,6 +177,8 @@ namespace Deathless.UI.Dev
                 m_Ligne.or += or;
                 m_Or += or;
                 m_Ligne.degats += Random.Range(80, 160);
+                m_Ligne.evites += Random.Range(10, 40);
+                if (Random.value < 0.25f) m_Ligne.critiques++;
             }
 
             // Dégâts subis ; mort scénarisée.
@@ -232,7 +244,11 @@ namespace Deathless.UI.Dev
             if (!c.EstPrete || EstMort || m_Endurance < endurance) return;
             m_Endurance -= endurance;
             c.Lancer();
-            if (c == m_Soin) m_Vie = Mathf.Min(100f, m_Vie + 35f);
+            if (c == m_Soin)
+            {
+                m_Ligne.soins += Mathf.RoundToInt(Mathf.Min(35f, 100f - m_Vie));
+                m_Vie = Mathf.Min(100f, m_Vie + 35f);
+            }
         }
 
         void Mourir(float secondes)
@@ -255,6 +271,11 @@ namespace Deathless.UI.Dev
         void OnAction(InputAction action)
         {
             if (!m_EnCours || m_Phase == PhasePartie.Terminee) return;
+            if (!EstPaladin)
+            {
+                ActionClasse(action.name);
+                return;
+            }
             switch (action.name)
             {
                 case "Skill1": Utiliser(m_Charge, 25f); break;
@@ -264,9 +285,76 @@ namespace Deathless.UI.Dev
             }
         }
 
+        // ================================================================== Classes (hors Paladin : simulation simple)
+
+        /// Barre de la classe : attaque, attaque secondaire, compétences 1 et 2 (un emplacement vide a un nom vide).
+        void ConstruireCompetencesClasse()
+        {
+            m_CompetencesClasse = new List<CompetenceFactice>();
+            if (EstPaladin) return;
+            var recharges = new[] { 0f, 0f, 12f, 18f };
+            for (var i = 0; i < 4 && i < m_Classe.Actions.Count; i++)
+            {
+                var a = m_Classe.Actions[i];
+                var abr = string.IsNullOrEmpty(a.Nom) ? "" : a.Nom.Substring(0, Mathf.Min(2, a.Nom.Length));
+                m_CompetencesClasse.Add(new CompetenceFactice(a.Action, a.Nom, abr, recharges[i]));
+            }
+        }
+
+        void ActionClasse(string action)
+        {
+            switch (action)
+            {
+                case "Ready": BasculerPret(); return;
+                case "AttackPrimary":
+                    m_DerniereAttaque = m_Duree;
+                    m_CompetencesClasse[0].finActive = m_Duree + 0.3f;
+                    if (m_Classe.Jauge == JaugeClasse.Mana) m_ValeurJauge = Mathf.Max(0f, m_ValeurJauge - 8f);
+                    if (m_Classe.Jauge == JaugeClasse.Rage) m_ValeurJauge = Mathf.Min(100f, m_ValeurJauge + 12f);
+                    return;
+                case "Skill1": UtiliserClasse(2); return;
+                case "Skill2": UtiliserClasse(3); return;
+            }
+        }
+
+        void UtiliserClasse(int index)
+        {
+            if (index >= m_CompetencesClasse.Count) return;
+            var c = m_CompetencesClasse[index];
+            if (string.IsNullOrEmpty(c.Nom) || !c.EstPrete || EstMort) return;
+            if (m_Classe.Jauge == JaugeClasse.Rage)
+            {
+                if (m_ValeurJauge < 30f) return;
+                m_ValeurJauge -= 30f;
+            }
+            m_DerniereAttaque = m_Duree;
+            c.Lancer();
+        }
+
+        /// Mana : +3 par seconde ; rage : -1,5 par seconde hors combat. Attaque secondaire maintenue : le mage
+        /// consomme du mana (cône), le viking de la rage (attaque tournante).
+        void SimulerJauge(float dt)
+        {
+            if (EstPaladin || m_Classe.Jauge == JaugeClasse.Aucune) return;
+            var maintenue = m_Accords != null && actions != null && m_Accords.IsHeld(actions.FindAction("Gameplay/AttackSecondary"));
+            if (m_CompetencesClasse.Count > 1) m_CompetencesClasse[1].etat = maintenue ? EtatCompetence.Active : EtatCompetence.Prete;
+            if (m_Classe.Jauge == JaugeClasse.Mana)
+                m_ValeurJauge = Mathf.Clamp(m_ValeurJauge + (maintenue ? -12f : 3f) * dt, 0f, 100f);
+            else
+                m_ValeurJauge = Mathf.Clamp(m_ValeurJauge + (maintenue ? -10f : m_Duree - m_DerniereAttaque > 3f ? -1.5f : 0f) * dt, 0f, 100f);
+        }
+
         // ================================================================== Commandes (UI → jeu)
 
         public void LancerSolo() => Demarrer();
+
+        public IReadOnlyList<IClasseJouable> Classes => ClassesJouables.Catalogue;
+
+        public void LancerSolo(string classeId)
+        {
+            m_Classe = ClassesJouables.Trouver(classeId);
+            Demarrer();
+        }
 
         public void BasculerPret()
         {
@@ -313,6 +401,12 @@ namespace Deathless.UI.Dev
             m_Reapparition = 0f;
             m_Ligne.Reinitialiser();
             foreach (var c in m_Competences) c.Reinitialiser();
+            if (m_Classe == null) m_Classe = ClassesJouables.Trouver(ClassesJouables.ParDefaut);
+            m_Ligne.classe = m_Classe.Nom;
+            m_Ligne.teinte = m_Classe.Teinte;
+            ConstruireCompetencesClasse();
+            m_ValeurJauge = m_Classe.Jauge == JaugeClasse.Mana ? 100f : 0f;
+            m_DerniereAttaque = -99f;
             DefinirPhase(PhasePartie.Jour, dureeJour);
             DonneesUI.Enregistrer(this, this, this, this);
         }
@@ -360,8 +454,11 @@ namespace Deathless.UI.Dev
             Mourir(secondes);
         }
 
-        public void ForcerScore(int or, int degats, int tues, int morts)
+        public void ForcerScore(int or, int degats, int tues, int morts, int critiques = 0, int evites = 0, int soins = 0)
         {
+            m_Ligne.critiques = critiques;
+            m_Ligne.evites = evites;
+            m_Ligne.soins = soins;
             m_Ligne.or = or;
             m_Or = or;
             m_Ligne.degats = degats;
@@ -378,6 +475,18 @@ namespace Deathless.UI.Dev
         }
 
         public void ForcerPret(bool pret) => m_Pret = pret;
+
+        /// Test de mise en page du score : ajoute (ou retire) deux joueurs fictifs (la 0.1 est solo).
+        public void ForcerJoueursDeTest(bool actif)
+        {
+            m_Lignes.Clear();
+            m_Lignes.Add(m_Ligne);
+            if (!actif) return;
+            m_Lignes.Add(new LigneFactice { nom = "Joueur 2", classe = "Mage de feu", teinte = new Color32(0xff, 0x61, 0x0a, 0xff), local = false,
+                or = 2310, degats = 34800, tues = 131, morts = 4, critiques = 9, evites = 3120, soins = 0 });
+            m_Lignes.Add(new LigneFactice { nom = "Joueur 3", classe = "Assassin", teinte = new Color32(0x9a, 0x8f, 0xd0, 0xff), local = false,
+                or = 2330, degats = 18900, tues = 74, morts = 2, critiques = 41, evites = 1480, soins = 0 });
+        }
 
         // ================================================================== IEtatPartie
 
@@ -400,15 +509,30 @@ namespace Deathless.UI.Dev
         // ================================================================== IEtatJoueur
 
         public string Nom => "Quentin";
-        public string Classe => "Paladin";
-        public Color TeinteClasse => new Color32(0xd9, 0xb2, 0x64, 0xff);
+        public string Classe => m_Classe != null ? m_Classe.Nom : "Paladin";
+        public Color TeinteClasse => m_Classe != null ? m_Classe.Teinte : (Color)new Color32(0xd9, 0xb2, 0x64, 0xff);
         public float Vie => m_Vie;
         public float VieMax => 100f;
         public float Endurance => m_Endurance;
         public float EnduranceMax => 100f;
         public bool EstMort => m_Reapparition > 0f;
         public float TempsAvantReapparition => m_Reapparition;
-        public IReadOnlyList<ICompetenceHud> Competences => m_Competences;
+        public IReadOnlyList<ICompetenceHud> Competences => EstPaladin ? (IReadOnlyList<ICompetenceHud>)m_Competences : m_CompetencesClasse;
+
+        // ================================================================== IEtatJoueurClasse
+
+        public JaugeClasse Jauge => m_Classe != null ? m_Classe.Jauge : JaugeClasse.Aucune;
+        public float ValeurJauge => m_ValeurJauge;
+        public float JaugeMax => 100f;
+        /// Assassin : furtif hors combat (pas d'attaque depuis 2 s, pas la nuit), ou forcé par ForcerFurtif.
+        public bool Furtif => m_Classe != null && m_Classe.Id == "assassin" && !EstMort
+            && (m_FurtifForce ?? (m_Duree - m_DerniereAttaque > 2f * acceleration && m_Phase != PhasePartie.Nuit));
+
+        /// Tests : force le mode furtif (null : simulation).
+        public void ForcerFurtif(bool? furtif) => m_FurtifForce = furtif;
+
+        /// Tests : valeur de la jauge de classe (0-100).
+        public void ForcerJauge(float valeur) => m_ValeurJauge = Mathf.Clamp(valeur, 0f, 100f);
         public string InviteInteraction => m_EnCours && m_Phase == PhasePartie.Jour && m_Reste > dureeJour * 0.35f ? "Parler au sorcier" : null;
         public bool EstPret => m_Pret;
 
@@ -463,16 +587,22 @@ namespace Deathless.UI.Dev
 
         sealed class LigneFactice : ILigneScore
         {
-            public int or, degats, tues, morts;
-            public string Nom => "Quentin";
-            public string Classe => "Paladin";
-            public Color TeinteClasse => new Color32(0xd9, 0xb2, 0x64, 0xff);
-            public bool EstLocal => true;
+            public int or, degats, tues, morts, critiques, evites, soins;
+            public string nom = "Quentin", classe = "Paladin";
+            public Color teinte = new Color32(0xd9, 0xb2, 0x64, 0xff);
+            public bool local = true;
+            public string Nom => nom;
+            public string Classe => classe;
+            public Color TeinteClasse => teinte;
+            public bool EstLocal => local;
             public int OrRapporte => or;
             public int DegatsInfliges => degats;
             public int EnnemisTues => tues;
             public int Morts => morts;
-            public void Reinitialiser() => or = degats = tues = morts = 0;
+            public int CoupsCritiques => critiques;
+            public int DegatsEvitesNyxessa => evites;
+            public int SoinsProdigues => soins;
+            public void Reinitialiser() => or = degats = tues = morts = critiques = evites = soins = 0;
         }
     }
 }

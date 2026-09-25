@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Deathless.Audio;
 using Deathless.UI.Donnees;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -26,6 +27,7 @@ namespace Deathless.UI.Ecrans
         public VisualTreeAsset hud;
         public VisualTreeAsset pause;
         public VisualTreeAsset score;
+        public VisualTreeAsset choixClasse;
 
         public EcranMenuPrincipal MenuPrincipal { get; private set; }
         public EcranOptions Options { get; private set; }
@@ -33,6 +35,7 @@ namespace Deathless.UI.Ecrans
         public EcranHud Hud { get; private set; }
         public EcranPause Pause { get; private set; }
         public EcranScore Score { get; private set; }
+        public EcranChoixClasse ChoixClasse { get; private set; }
 
         readonly List<Ecran> m_Pile = new List<Ecran>();
         readonly List<Ecran> m_Tous = new List<Ecran>();
@@ -41,6 +44,11 @@ namespace Deathless.UI.Ecrans
         InputActionMap m_CarteJeu;
         IEtatPartie m_PartieSuivie;
         int m_ImageDerniereBascule = -1;
+        float m_SilenceSurvol;
+
+        /// Son de survol (le focus change) : pas pendant l'ouverture d'un écran ni juste après une validation.
+        public bool SurvolPermis => Time.unscaledTime >= m_SilenceSurvol;
+        public void SilencerSurvol(float duree = 0.3f) => m_SilenceSurvol = Time.unscaledTime + duree;
 
         public Ecran Sommet => m_Pile.Count > 0 ? m_Pile[m_Pile.Count - 1] : null;
         public IReadOnlyList<Ecran> Pile => m_Pile;
@@ -58,6 +66,7 @@ namespace Deathless.UI.Ecrans
             Pause = Creer(new EcranPause(), pause, conteneur);
             Options = Creer(new EcranOptions(), options, conteneur);
             Credits = Creer(new EcranCredits(), credits, conteneur);
+            ChoixClasse = Creer(new EcranChoixClasse(), choixClasse, conteneur);
 
             UINavigation.SetupScreen(m_Racine);
             UIScale.TagRoot(m_Racine);
@@ -163,6 +172,7 @@ namespace Deathless.UI.Ecrans
 
             var sommet = Sommet;
             if (sommet == null) return;
+            SilencerSurvol();
             AppliquerCarte(sommet.CarteUI);
             sommet.AuSommet();
             if (sommet.CarteUI)
@@ -224,7 +234,9 @@ namespace Deathless.UI.Ecrans
         {
             if (BasculeRecente) return;
             var sommet = Sommet;
-            if (sommet == null || sommet.Retour()) return;
+            if (sommet == null) return;
+            if (sommet.CarteUI && sommet != MenuPrincipal) VolumesAudio.JouerInterface(SonInterface.Retour);
+            if (sommet.Retour()) return;
             Fermer();
         }
 

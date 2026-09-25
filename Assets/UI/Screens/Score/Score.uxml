@@ -25,6 +25,9 @@
                 <ui:Label text="DÉGÂTS INFLIGÉS" class="dl-section-label score-cellule" />
                 <ui:Label text="ENNEMIS TUÉS" class="dl-section-label score-cellule" />
                 <ui:Label text="MORTS" class="dl-section-label score-cellule" />
+                <ui:Label text="COUPS CRITIQUES" class="dl-section-label score-cellule" />
+                <ui:Label text="DÉGÂTS ÉVITÉS À NYXESSA" class="dl-section-label score-cellule" />
+                <ui:Label text="SOINS PRODIGUÉS" class="dl-section-label score-cellule" />
             </ui:VisualElement>
             <ui:VisualElement name="score-lignes" />
         </ui:VisualElement>

@@ -142,6 +142,41 @@ namespace Deathless.UI
         }
     }
 
+    /// Œil barré (assassin furtif), thème Ombre : lilas #a58ad6 sur pastille violet nuit.
+    [UxmlElement]
+    public partial class OeilBarre : FormeHud
+    {
+        protected override void Dessiner(Painter2D p, Rect r)
+        {
+            var c = r.center;
+            var rayon = Mathf.Min(r.width, r.height) * 0.5f;
+            p.fillColor = Hex("#2b1840");
+            p.BeginPath();
+            p.Arc(c, rayon, 0f, 360f);
+            p.Fill();
+            var lilas = Hex("#a58ad6");
+            // Amande de l'œil (deux arcs), pupille, puis trait en diagonale.
+            float w = rayon * 0.62f, h = rayon * 0.36f;
+            p.strokeColor = lilas;
+            p.lineWidth = Mathf.Max(1.5f, rayon * 0.13f);
+            p.BeginPath();
+            p.MoveTo(new Vector2(c.x - w, c.y));
+            p.QuadraticCurveTo(new Vector2(c.x, c.y - h * 2f), new Vector2(c.x + w, c.y));
+            p.QuadraticCurveTo(new Vector2(c.x, c.y + h * 2f), new Vector2(c.x - w, c.y));
+            p.ClosePath();
+            p.Stroke();
+            p.fillColor = lilas;
+            p.BeginPath();
+            p.Arc(c, rayon * 0.16f, 0f, 360f);
+            p.Fill();
+            p.lineWidth = Mathf.Max(2f, rayon * 0.16f);
+            p.BeginPath();
+            p.MoveTo(new Vector2(c.x - rayon * 0.6f, c.y + rayon * 0.6f));
+            p.LineTo(new Vector2(c.x + rayon * 0.6f, c.y - rayon * 0.6f));
+            p.Stroke();
+        }
+    }
+
     /// Flèche pleine (triangle) pointant dans la direction « angle », en degrés à l'écran :
     /// 0 = droite, 90 = bas, 180 = gauche, 270 = haut.
     [UxmlElement]

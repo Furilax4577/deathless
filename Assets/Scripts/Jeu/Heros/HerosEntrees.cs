@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 namespace Deathless.Jeu
 {
     /// Entrées du héros local. Les actions « Button » viennent **uniquement** de InputChordResolver.Triggered (accords
-    /// LB + RB et L3 + R3 résolus) ; les valeurs continues (Move, Look) sont lues par ReadValue et les maintiens (garde,
+    /// LB + RB résolu) ; les valeurs continues (Move, Look) sont lues par ReadValue et les maintiens (garde,
     /// sprint) par resolver.IsHeld. Asset d'actions : celui du projet (InputSystem.actions = DeathlessControls), le même
     /// que l'EventSystem et le navigateur d'écrans, pour qu'une seule carte soit active à la fois (le navigateur bascule
     /// Gameplay / UI ; sans navigateur, ce composant active Gameplay lui-même).
