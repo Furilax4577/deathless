@@ -368,7 +368,12 @@ namespace Deathless.UI.Ecrans
                 if (Navigateur.Sommet == this && salon != etaitSalon)
                     Racine.schedule.Execute(() => { if (Navigateur.Sommet == this) UINavigation.Focus(PremierFocus); }).StartingIn(30);
             }
-            m_Message.text = l.Message ?? "";
+            // Place réservée en permanence (une ligne, même vide : texte de remplacement transparent, à la hauteur exacte de
+            // la police à toutes les tailles d'interface) : un message qui apparaît ou disparaît (erreur, hôte parti, services
+            // indisponibles) ne décale rien ; trop long, il est coupé par des points de suspension.
+            var vide = string.IsNullOrEmpty(l.Message);
+            m_Message.text = vide ? "Message" : l.Message;
+            m_Message.EnableInClassList("lobby__message--vide", vide);
             m_Message.EnableInClassList("lobby__message--erreur", etat == EtatLobby.Erreur);
             m_SousTitre.text = etat == EtatLobby.Connexion ? "Connexion…"
                 : salon ? (l.EstHote ? "Tu héberges ce salon. " : "") + "Choisis ta classe, puis déclare-toi prêt. La partie se lance quand tous sont prêts."
@@ -381,7 +386,7 @@ namespace Deathless.UI.Ecrans
             m_Afficher.style.display = l.EstHote ? DisplayStyle.Flex : DisplayStyle.None;
             m_Afficher.text = m_CodeVisible ? "Masquer" : "Afficher";
             m_Copier.style.display = l.EstHote ? DisplayStyle.Flex : DisplayStyle.None;
-            m_Copie.style.display = Time.unscaledTime < m_CopieJusqua ? DisplayStyle.Flex : DisplayStyle.None;
+            m_Copie.style.visibility = Time.unscaledTime < m_CopieJusqua ? Visibility.Visible : Visibility.Hidden;
 
             var tousPrets = l.Joueurs.Count > 0;
             for (var i = 0; i < m_Emplacements.Count; i++)
@@ -414,7 +419,8 @@ namespace Deathless.UI.Ecrans
             m_Lancer.style.display = l.EstHote ? DisplayStyle.Flex : DisplayStyle.None;
             m_Lancer.SetEnabled(tousPrets);
             var compte = etat == EtatLobby.CompteARebours;
-            m_Compte.style.display = compte ? DisplayStyle.Flex : DisplayStyle.None;
+            // Décompte : sa ligne est toujours réservée (masquée hors décompte), les boutons en dessous ne bougent jamais.
+            m_Compte.style.visibility = compte ? Visibility.Visible : Visibility.Hidden;
             if (compte) m_Compte.text = "Tous prêts : la partie commence dans " + Mathf.CeilToInt(l.CompteARebours);
         }
 

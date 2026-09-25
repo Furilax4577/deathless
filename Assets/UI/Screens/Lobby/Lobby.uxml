@@ -25,7 +25,7 @@
                 <ui:Button name="lobby-par-ip" text="Rejoindre par adresse IP" class="lobby__lien" />
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:Label name="lobby-message" text="" class="dl-text lobby__message" />
+        <ui:Label name="lobby-message" text="Message" class="dl-text lobby__message lobby__message--vide" />
 
         <!-- Salon -->
         <ui:VisualElement name="lobby-salon" class="lobby__salon">
@@ -34,10 +34,10 @@
                 <ui:Label name="lobby-code-valeur" text="••••••" class="lobby__code-valeur" />
                 <ui:Button name="lobby-afficher" text="Afficher" class="lobby__petit-bouton" />
                 <ui:Button name="lobby-copier" text="Copier" class="lobby__petit-bouton" />
-                <ui:Label name="lobby-copie" text="Copié" class="dl-text dl-text--small lobby__copie" />
+                <ui:Label name="lobby-copie" text="Copié" class="dl-text dl-text--small lobby__copie" style="visibility: hidden;" />
             </ui:VisualElement>
             <ui:VisualElement name="lobby-emplacements" class="lobby__emplacements" />
-            <ui:Label name="lobby-compte" text="La partie commence dans 3" class="lobby__compte" />
+            <ui:Label name="lobby-compte" text="Tous prêts : la partie commence dans 3" class="lobby__compte" style="visibility: hidden;" />
             <ui:VisualElement class="lobby__actions">
                 <ui:Button name="lobby-classe" text="Choisir sa classe" class="lobby__bouton" />
                 <ui:Button name="lobby-pret" text="Je suis prêt" class="lobby__bouton lobby__bouton--pret" />

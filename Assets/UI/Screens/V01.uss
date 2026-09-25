@@ -112,8 +112,9 @@
 .lobby__champ-texte--vide { color: var(--dl-color-text-disabled); -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Regular-SDF.asset"); font-size: var(--dl-text-body); letter-spacing: 0; }
 .lobby__lien { align-self: flex-start; min-height: 42px; padding: 0 12px; margin: 6px 0 0 -6px; border-width: 0; background-color: rgba(0, 0, 0, 0); color: var(--dl-color-text-muted); font-size: var(--dl-text-small); }
 .lobby__lien:hover:enabled, .lobby__lien:focus:enabled { color: var(--dl-color-gold); }
-.lobby__message { margin: var(--dl-space-3) 0 0 0; min-height: 30px; color: var(--dl-color-text-muted); }
+.lobby__message { margin: var(--dl-space-3) 0 0 0; min-height: 30px; color: var(--dl-color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .lobby__message--erreur { color: #ff8a70; }
+.lobby__message--vide { color: rgba(0, 0, 0, 0); }
 .lobby__salon { flex-grow: 1; }
 .lobby__code-ligne { flex-direction: row; align-items: center; margin-bottom: var(--dl-space-3); }
 .lobby__code-titre { margin: 0 18px 0 0; }
