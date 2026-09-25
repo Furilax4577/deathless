@@ -8,6 +8,7 @@ namespace DeathlessLauncher
     //   --capture <fichier.png> [--etat accueil|telechargement|verification|pret|horsligne|erreur] [--notes deplie] [--manette]
     //             [--changelog <changelog.json>] [--largeur 1280 --hauteur 720]
     //   --test-maj [--racine <dossier>]   déroulé complet de la mise à jour, compte rendu sur la sortie standard
+    //   --test-rafraichir [--racine <dossier>]   la vérification de Rafraîchir (à jour, nouvelle version, injoignable)
     //   --image0 <vidéo.mp4> <image.png>   extrait l'image 0 de la vidéo (fond0.png, au build)
     //   --test-video, --test-demarrage     bancs du fond animé (TestVideo.cs, TestDemarrage.cs)
     public partial class App : Application
@@ -21,6 +22,11 @@ namespace DeathlessLauncher
                 if (Array.IndexOf(args, "--capture") >= 0)
                 {
                     Shutdown(Capture.Executer(args));
+                    return;
+                }
+                if (Array.IndexOf(args, "--test-rafraichir") >= 0)
+                {
+                    Shutdown(TestRafraichir.Executer(args));
                     return;
                 }
                 if (Array.IndexOf(args, "--test-maj") >= 0)

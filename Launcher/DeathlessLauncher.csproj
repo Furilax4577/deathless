@@ -13,7 +13,8 @@
     <AssemblyName>DeathlessLauncher</AssemblyName>
     <RootNamespace>DeathlessLauncher</RootNamespace>
     <ApplicationIcon>Ressources\deathless.ico</ApplicationIcon>
-    <Version>1.0.0</Version>
+    <!-- Version du launcher lui-même (majeur.mineur.correctif, comme le jeu), affichée en bas de l'écran. -->
+    <Version>1.1.0</Version>
     <Product>Deathless Launcher</Product>
     <Company>Quentin Douville</Company>
     <Deterministic>true</Deterministic>
@@ -58,6 +59,8 @@
     <Resource Include="..\Assets\Art\UI\KenneyInputPrompts\Xbox Series\Double\xbox_stick_r_vertical.png" Link="Invites\xbox_stick_r_vertical.png" />
     <Resource Include="..\Assets\Art\UI\KenneyInputPrompts\Keyboard &amp; Mouse\Double\keyboard_n.png" Link="Invites\keyboard_n.png" />
     <Resource Include="..\Assets\Art\UI\KenneyInputPrompts\Xbox Series\Double\xbox_button_color_y.png" Link="Invites\xbox_button_color_y.png" />
+    <Resource Include="..\Assets\Art\UI\KenneyInputPrompts\Keyboard &amp; Mouse\Double\keyboard_f5.png" Link="Invites\keyboard_f5.png" />
+    <Resource Include="..\Assets\Art\UI\KenneyInputPrompts\Xbox Series\Double\xbox_button_color_x.png" Link="Invites\xbox_button_color_x.png" />
     <Resource Include="$(FondLauncher)" Link="Ressources\fond.png" />
     <Resource Include="Ressources\deathless.ico" />
   </ItemGroup>

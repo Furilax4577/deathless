@@ -20,7 +20,7 @@ namespace DeathlessLauncher
         public const double LargeurBase = 1280, HauteurBase = 720;
         const double LargeurUtile = 1180; // en dessous, on réduit pour que le volet et les notes ne se chevauchent pas
 
-        public event Action JouerDemande, ReessayerDemande, QuitterDemande, WikiDemande;
+        public event Action JouerDemande, ReessayerDemande, QuitterDemande, WikiDemande, RafraichirDemande;
         /// Avancement pour le bouton de la barre des tâches (état, valeur de 0 à 1).
         public Action<TaskbarItemProgressState, double> Tache = (s, v) => { };
 
@@ -40,15 +40,21 @@ namespace DeathlessLauncher
         static readonly ImageSource IconeStickDroit = Icone("xbox_stick_r_vertical.png");
         static readonly ImageSource IconeN = Icone("keyboard_n.png");
         static readonly ImageSource IconeY = Icone("xbox_button_color_y.png");
+        static readonly ImageSource IconeF5 = Icone("keyboard_f5.png");
+        static readonly ImageSource IconeX = Icone("xbox_button_color_x.png");
+        System.Windows.Threading.DispatcherTimer retourAJour;   // fin du message bref « Déjà à jour »
+        string versionPrete;
 
         public EcranLauncher()
         {
             InitializeComponent();
+            VersionLauncher.Text = "Launcher " + Updater.VersionLauncher;
             Fond.Source = ChargerFond(AppDomain.CurrentDomain.BaseDirectory);
             entrees = new List<EntreeMenu> { EntreeJouer, EntreeReessayer, EntreeWiki, EntreeQuitter };
             EntreeJouer.Clic += () => JouerDemande?.Invoke();
             EntreeReessayer.Clic += () => ReessayerDemande?.Invoke();
             EntreeWiki.Clic += () => WikiDemande?.Invoke();
+            BoutonRafraichir.Clic += () => RafraichirDemande?.Invoke();
             EntreeQuitter.Clic += () => QuitterDemande?.Invoke();
             foreach (EntreeMenu e in entrees)
             {
@@ -159,6 +165,7 @@ namespace DeathlessLauncher
             InviteNotes.Source = estManette ? IconeY : IconeN;
             InviteNotesCarte.Source = InviteNotes.Source;
             InviteDefiler.Source = estManette ? IconeStickDroit : IconeMolette;
+            InviteRafraichir.Source = estManette ? IconeX : IconeF5;
             foreach (EntreeMenu e in entrees) e.Invite = InviteValider.Source;
         }
 
@@ -331,6 +338,65 @@ namespace DeathlessLauncher
 
         // ---------- États de la mise à jour ----------
 
+        // ---------- Rafraîchir ----------
+
+        /// Vrai quand l'action Rafraîchir est proposée et utilisable (jeu à jour, rien en cours).
+        public bool RafraichirDisponible => BoutonRafraichir.Visibility == Visibility.Visible && BoutonRafraichir.Active;
+
+        /// visible : le bouton est montré (le jeu a été vu à jour) ; actif : il répond (rien n'est en cours).
+        void Rafraichir(bool visible, bool actif)
+        {
+            BoutonRafraichir.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
+            BoutonRafraichir.Active = actif;
+            if (!visible) BoutonRafraichir.EnAvant = false;
+            InviteRafraichirGroupe.Visibility = visible && actif ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        /// Rafraîchir demandé : la jauge montre le scan, Jouer reste utilisable, le bouton est inactif.
+        public void MontrerRafraichissement()
+        {
+            retourAJour?.Stop();
+            Avertir(null);
+            Jauge.Libelle = "Recherche de mise à jour";
+            Jauge.Valeur = "";
+            Jauge.Indetermine = true;
+            Rafraichir(true, false);
+            Tache(TaskbarItemProgressState.Indeterminate, 0);
+        }
+
+        /// Rien de nouveau en ligne : « Déjà à jour · version x.y.z » quelques secondes, puis l'état prêt habituel.
+        public void MontrerDejaAJour(string version)
+        {
+            MontrerPret(version, false);
+            Jauge.Libelle = "Déjà à jour · version " + version;
+            Jauge.Valeur = "";
+            retourAJour?.Stop();
+            retourAJour = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
+            retourAJour.Tick += (s, e) =>
+            {
+                retourAJour.Stop();
+                if (versionPrete == version && !Jauge.Indetermine) { Jauge.Libelle = "À jour"; Jauge.Valeur = "Version " + version; }
+            };
+            if (JaugeVie.Animer) retourAJour.Start();
+        }
+
+        /// Serveur injoignable lors d'un Rafraîchir : le jeu reste prêt, un message l'explique.
+        public void MontrerRafraichissementImpossible(string version, string erreur)
+        {
+            MontrerPret(version, false);
+            Avertir("Vérification impossible (" + erreur + "). La version " + version + " installée reste jouable.");
+        }
+
+        /// Revérification automatique : une nouvelle version est publiée. Rien n'est téléchargé tout seul ; Jouer le dit,
+        /// le bouton Rafraîchir passe en or (le presser lance la mise à jour).
+        public void SignalerNouvelleVersion(string installee, string nouvelle)
+        {
+            Jouer(true, "Nouvelle version disponible · " + nouvelle);
+            Jauge.Libelle = "Nouvelle version disponible";
+            Jauge.Valeur = "Version " + nouvelle;
+            BoutonRafraichir.EnAvant = true;
+        }
+
         public void MontrerRecherche()
         {
             Reessayer(false);
@@ -340,6 +406,7 @@ namespace DeathlessLauncher
             Jauge.Placer(0);
             Jauge.Indetermine = true;
             Jouer(false, "Recherche de mise à jour…");
+            Rafraichir(BoutonRafraichir.Visibility == Visibility.Visible, false);
             Tache(TaskbarItemProgressState.Indeterminate, 0);
         }
 
@@ -347,6 +414,7 @@ namespace DeathlessLauncher
         {
             switch (a.Phase)
             {
+                case Phase.Comparaison: MontrerComparaison(a.Version); break;
                 case Phase.Telechargement: MontrerTelechargement(a); break;
                 case Phase.Verification: MontrerVerification(a.Version); break;
                 case Phase.Installation: MontrerInstallation(a.Version); break;
@@ -356,7 +424,9 @@ namespace DeathlessLauncher
         public void MontrerTelechargement(Avancement a)
         {
             Jauge.Indetermine = false;
-            Jauge.Libelle = a.Reprise ? "Téléchargement repris" : "Téléchargement";
+            Jauge.Libelle = a.Incrementiel
+                ? "Mise à jour · " + a.FichiersFaits + " / " + a.FichiersTotal + (a.FichiersTotal > 1 ? " fichiers" : " fichier")
+                : a.Reprise ? "Téléchargement repris" : "Téléchargement";
             string valeur = a.Total > 0 ? Format.Mo(a.Fait) + " / " + Format.Mo(a.Total) + " Mo" : Format.Mo(a.Fait) + " Mo";
             string debit = Format.Debit(a.Debit);
             if (debit.Length > 0) valeur += "  ·  " + debit;
@@ -366,7 +436,19 @@ namespace DeathlessLauncher
             string description = "Version " + a.Version;
             if (a.Total > 0 && a.Debit > 0) description += " · encore " + Format.Duree((a.Total - a.Fait) / a.Debit);
             Jouer(false, description);
+            Rafraichir(BoutonRafraichir.Visibility == Visibility.Visible, false);
             Tache(TaskbarItemProgressState.Normal, f);
+        }
+
+        /// Mise à jour fichier par fichier : comparaison des fichiers installés à ceux de la version publiée.
+        public void MontrerComparaison(string version)
+        {
+            Jauge.Libelle = "Comparaison des fichiers installés";
+            Jauge.Valeur = "";
+            Jauge.Indetermine = true;
+            Jouer(false, "Préparation de la version " + version + "…");
+            Rafraichir(BoutonRafraichir.Visibility == Visibility.Visible, false);
+            Tache(TaskbarItemProgressState.Indeterminate, 0);
         }
 
         public void MontrerVerification(string version)
@@ -375,6 +457,7 @@ namespace DeathlessLauncher
             Jauge.Valeur = "SHA-256";
             Jauge.Indetermine = true;
             Jouer(false, "Vérification de la version " + version + "…");
+            Rafraichir(BoutonRafraichir.Visibility == Visibility.Visible, false);
             Tache(TaskbarItemProgressState.Indeterminate, 0);
         }
 
@@ -384,6 +467,7 @@ namespace DeathlessLauncher
             Jauge.Valeur = "";
             Jauge.Indetermine = true;
             Jouer(false, "Installation de la version " + version + "…");
+            Rafraichir(BoutonRafraichir.Visibility == Visibility.Visible, false);
             Tache(TaskbarItemProgressState.Indeterminate, 0);
         }
 
@@ -396,6 +480,9 @@ namespace DeathlessLauncher
             Jauge.Libelle = vientDEtreInstallee ? "Installation terminée" : "À jour";
             Jauge.Valeur = "Version " + version;
             Jouer(true, "Version " + version + (vientDEtreInstallee ? " installée, prête" : " à jour"));
+            versionPrete = version;
+            BoutonRafraichir.EnAvant = false;
+            Rafraichir(true, true);
             Tache(TaskbarItemProgressState.None, 0);
         }
 
@@ -408,6 +495,7 @@ namespace DeathlessLauncher
             Jauge.Valeur = "Version " + versionInstallee + " installée";
             Avertir("Impossible de vérifier les mises à jour (" + erreur + "). Vous pouvez lancer la version installée.");
             Jouer(true, "Serveur injoignable · version " + versionInstallee + " installée");
+            Rafraichir(false, false);
             Tache(TaskbarItemProgressState.None, 0);
         }
 
@@ -421,6 +509,7 @@ namespace DeathlessLauncher
             Jauge.Valeur = versionJouable != null ? "Version " + versionJouable + " installée" : "";
             Avertir(detail);
             Jouer(versionJouable != null, versionJouable != null ? "Lancer la version " + versionJouable + " installée" : "Aucune version installée");
+            Rafraichir(false, false);
             Tache(TaskbarItemProgressState.Error, 1);
         }
 
@@ -433,6 +522,7 @@ namespace DeathlessLauncher
             Jauge.Valeur = versionJouable != null ? "Version " + versionJouable + " installée" : "";
             Avertir("Le fichier launcher.json, à côté de DeathlessLauncher.exe, doit contenir l'adresse (baseUrl) du dossier où sont publiés version.json et le jeu.");
             Jouer(versionJouable != null, versionJouable != null ? "Version " + versionJouable + " installée" : "Aucune version installée");
+            Rafraichir(false, false);
             Tache(TaskbarItemProgressState.None, 0);
         }
 

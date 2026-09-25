@@ -249,6 +249,61 @@ namespace DeathlessLauncher
         }
     }
 
+    /// Petit bouton rond « Rafraîchir », à droite de la jauge : flèche circulaire ivoire à bords nets dans un rond du
+    /// thème (fond creux, trait bord ; survol : trait fort ; mis en avant : trait or, quand une nouvelle version est
+    /// signalée). Inactif (grisé, sans clic) pendant une vérification, un téléchargement ou une installation.
+    public sealed class BoutonRafraichir : Border
+    {
+        const double Taille = 28;
+        readonly Path fleche = new Path { StrokeThickness = 2, StrokeStartLineCap = PenLineCap.Flat, StrokeEndLineCap = PenLineCap.Flat };
+        readonly Polygon pointe = new Polygon();
+        bool active = true, survol, enAvant;
+
+        public event Action Clic;
+
+        public BoutonRafraichir()
+        {
+            Width = Taille;
+            Height = Taille;
+            CornerRadius = new CornerRadius(Taille / 2);
+            BorderThickness = new Thickness(2);
+            SnapsToDevicePixels = true;
+            ToolTip = "Rafraîchir : revérifier la version en ligne (F5, X)";
+
+            // Arc de 300° (de -30° à 270°, sens horaire à l'écran), ouvert en haut à droite, pointe au sommet vers la droite.
+            double c = (Taille - 4) / 2, r = 6.5;
+            Point Sur(double deg) => new Point(c + r * Math.Cos(deg * Math.PI / 180), c + r * Math.Sin(deg * Math.PI / 180));
+            var figure = new PathFigure { StartPoint = Sur(-30), IsClosed = false, IsFilled = false };
+            figure.Segments.Add(new ArcSegment(Sur(270), new Size(r, r), 0, true, SweepDirection.Clockwise, true));
+            fleche.Data = new PathGeometry(new[] { figure });
+            Point sommet = Sur(270);
+            pointe.Points = new PointCollection { new Point(sommet.X + 4, sommet.Y), new Point(sommet.X - 1.5, sommet.Y - 4.5), new Point(sommet.X - 1.5, sommet.Y + 4.5) };
+            var dessin = new Canvas { Width = Taille - 4, Height = Taille - 4 };
+            dessin.Children.Add(fleche);
+            dessin.Children.Add(pointe);
+            Child = dessin;
+
+            MouseEnter += (s, e) => { survol = true; Actualiser(); };
+            MouseLeave += (s, e) => { survol = false; Actualiser(); };
+            MouseLeftButtonUp += (s, e) => { if (active) { e.Handled = true; Clic?.Invoke(); } };
+            Actualiser();
+        }
+
+        public bool Active { get => active; set { active = value; Actualiser(); } }
+        /// Trait or : une nouvelle version attend (revérification automatique).
+        public bool EnAvant { get => enAvant; set { enAvant = value; Actualiser(); } }
+
+        void Actualiser()
+        {
+            Cursor = active ? System.Windows.Input.Cursors.Hand : null;
+            Background = Teintes.Pinceau(active && survol ? Teintes.PanneauActif : Teintes.Creux);
+            BorderBrush = Teintes.Pinceau(!active ? Teintes.Ligne : enAvant ? Teintes.Or : survol ? Teintes.BordFort : Teintes.Bord);
+            Brush trait = Teintes.Pinceau(active ? Teintes.Texte : Teintes.TexteInactif);
+            fleche.Stroke = trait;
+            pointe.Fill = trait;
+        }
+    }
+
     /// Entrée du menu, comme dl-menu-item du jeu : invisible au repos, fond éclairci au survol, fond actif et bordure
     /// or une fois sélectionnée, invite Valider à droite. Une entrée inactive peut rester sélectionnée (Jouer pendant le
     /// téléchargement) : bordure or estompée, textes grisés, pas d'invite.

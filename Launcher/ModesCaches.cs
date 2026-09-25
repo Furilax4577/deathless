@@ -43,7 +43,12 @@ namespace DeathlessLauncher
             bool notesDepliees = (Arguments.Valeur(args, "--notes") ?? "").StartsWith("depli", StringComparison.OrdinalIgnoreCase);
 
             string notes = cheminNotes != null ? File.ReadAllText(cheminNotes, Encoding.UTF8) : Exemple;
-            var enLigne = new Manifest { Version = "1", Nom = "0.1", Zip = "deathless-v1.zip" };
+            // Version d'exemple : la plus récente des notes (ex. 0.4.1) ; « suivante » : correctif d'après (0.4.2).
+            string v = Changelog.Construire(notes, null).Select(e => e.Version).FirstOrDefault() ?? "0.1";
+            var morceaux = v.Split('.');
+            string suivante = int.TryParse(morceaux[morceaux.Length - 1], out int dernier)
+                ? string.Join(".", morceaux.Take(morceaux.Length - 1).Concat(new[] { (dernier + 1).ToString() })) : v + ".1";
+            var enLigne = new Manifest { Version = "1", Nom = v, Zip = "deathless-v1.zip" };
             var liste = Changelog.Construire(notes, enLigne);
 
             switch (etat)
@@ -53,28 +58,44 @@ namespace DeathlessLauncher
                     ecran.MontrerRecherche();
                     break;
                 case "telechargement":
-                    ecran.AfficherNotes(liste, null, "0.1");
-                    ecran.MontrerTelechargement(new Avancement { Phase = Phase.Telechargement, Version = "0.1", Fait = 212 * Mo + Mo / 3, Total = 487 * Mo, Debit = 4.3 * Mo });
+                    ecran.AfficherNotes(liste, null, v);
+                    ecran.MontrerTelechargement(new Avancement { Phase = Phase.Telechargement, Version = v, Fait = 212 * Mo + Mo / 3, Total = 487 * Mo, Debit = 4.3 * Mo });
                     break;
                 case "verification":
-                    ecran.AfficherNotes(liste, null, "0.1");
-                    ecran.MontrerTelechargement(new Avancement { Phase = Phase.Telechargement, Version = "0.1", Fait = 487 * Mo, Total = 487 * Mo });
-                    ecran.MontrerVerification("0.1");
+                    ecran.AfficherNotes(liste, null, v);
+                    ecran.MontrerTelechargement(new Avancement { Phase = Phase.Telechargement, Version = v, Fait = 487 * Mo, Total = 487 * Mo });
+                    ecran.MontrerVerification(v);
                     break;
                 case "pret":
-                    ecran.AfficherNotes(liste, "0.1", "0.1");
-                    ecran.MontrerPret("0.1", false);
+                    ecran.AfficherNotes(liste, v, v);
+                    ecran.MontrerPret(v, false);
+                    break;
+                case "rafraichir":
+                    // Rafraîchir en cours : jeu prêt, scan dans la jauge, bouton inactif.
+                    ecran.AfficherNotes(liste, v, v);
+                    ecran.MontrerPret(v, false);
+                    ecran.MontrerRafraichissement();
+                    break;
+                case "dejaajour":
+                    ecran.AfficherNotes(liste, v, v);
+                    ecran.MontrerDejaAJour(v);
+                    break;
+                case "nouvelle":
+                    // Revérification automatique : une version plus récente est publiée.
+                    ecran.AfficherNotes(Changelog.Construire(notes, new Manifest { Version = "2", Nom = suivante, Zip = "deathless-v2.zip" }), v, suivante);
+                    ecran.MontrerPret(v, false);
+                    ecran.SignalerNouvelleVersion(v, suivante);
                     break;
                 case "horsligne":
-                    ecran.AfficherNotes(liste, "0.1", null);
-                    ecran.MontrerHorsLigne("0.1", "impossible de se connecter au serveur distant");
+                    ecran.AfficherNotes(liste, v, null);
+                    ecran.MontrerHorsLigne(v, "impossible de se connecter au serveur distant");
                     break;
                 case "erreur":
-                    ecran.AfficherNotes(liste, null, "0.1");
+                    ecran.AfficherNotes(liste, null, v);
                     ecran.MontrerEchec("La mise à jour a échoué", "Le fichier téléchargé est corrompu (empreinte SHA-256 différente). Vérifiez la connexion, puis Réessayer.", null);
                     break;
                 default:
-                    throw new ArgumentException("État inconnu : " + etat + " (accueil, telechargement, verification, pret, horsligne, erreur).");
+                    throw new ArgumentException("État inconnu : " + etat + " (accueil, telechargement, verification, pret, rafraichir, dejaajour, nouvelle, horsligne, erreur).");
             }
 
             var taille = new Size(largeur, hauteur);
@@ -105,6 +126,38 @@ namespace DeathlessLauncher
             + "\"Nuit 10 : Morgrim, le Roi des os.\", \"Nuit 12 : Nyxar, le Nécromancien.\", \"Écran de score.\" ] } ] }";
     }
 
+    // --test-rafraichir [--racine <dossier>] : la vérification de Rafraîchir (et de la revérification automatique), sans
+    // fenêtre : relit version.json et changelog.json et compare à la version installée. Sortie 0 à jour, 3 nouvelle
+    // version publiée, 2 serveur injoignable, 1 non configuré.
+    static class TestRafraichir
+    {
+        public static int Executer(string[] args)
+        {
+            Sortie.Attacher();
+            string racine = Path.GetFullPath(Arguments.Valeur(args, "--racine") ?? AppDomain.CurrentDomain.BaseDirectory);
+            var updater = new Updater(LauncherConfig.Load(Path.Combine(racine, "launcher.json")), racine);
+            Manifest installed = updater.Installed;
+            Console.WriteLine("Installée : " + (updater.IsInstalled && installed != null ? installed.Affichage + " (publication " + installed.Version + ")" : "aucune"));
+            if (!updater.IsConfigured) { Console.WriteLine("RÉSULTAT  : NON CONFIGURÉ"); return 1; }
+            var chrono = System.Diagnostics.Stopwatch.StartNew();
+            VerificationEnLigne v = updater.VerifierAsync(CancellationToken.None).GetAwaiter().GetResult();
+            string duree = " (" + chrono.ElapsedMilliseconds + " ms)";
+            switch (v.Etat)
+            {
+                case EtatEnLigne.AJour:
+                    Console.WriteLine("RÉSULTAT  : DÉJÀ À JOUR · version " + v.Remote.Affichage + duree);
+                    return 0;
+                case EtatEnLigne.Nouvelle:
+                    Console.WriteLine("RÉSULTAT  : NOUVELLE VERSION " + v.Remote.Affichage + " (publication " + v.Remote.Version + ", " + v.Remote.Zip + ")"
+                        + (v.Changelog != null ? ", changelog.json lu" : ", sans changelog.json") + duree);
+                    return 3;
+                default:
+                    Console.WriteLine("RÉSULTAT  : INJOIGNABLE (" + MainWindow.Explication(v.Erreur) + ")" + duree);
+                    return 2;
+            }
+        }
+    }
+
     // --test-maj [--racine <dossier>] : déroulé complet sans fenêtre, avec le launcher.json de la racine (par défaut le
     // dossier de l'exe) et installation dans <racine>/Game. Code de sortie : 0 à jour ou installé, 2 hors ligne avec une
     // version jouable, 1 échec.
@@ -116,6 +169,9 @@ namespace DeathlessLauncher
             string racine = Path.GetFullPath(Arguments.Valeur(args, "--racine") ?? AppDomain.CurrentDomain.BaseDirectory);
             LauncherConfig config = LauncherConfig.Load(Path.Combine(racine, "launcher.json"));
             var updater = new Updater(config, racine);
+            updater.NettoyerAuDemarrage();
+            // Bancs : attente entre deux tentatives réduite (--attente-ms), pour ne pas attendre des minutes.
+            if (int.TryParse(Arguments.Valeur(args, "--attente-ms"), out int attente)) Telechargement.AttenteBase = TimeSpan.FromMilliseconds(attente);
             Manifest installed = updater.Installed;
             string installedName = updater.IsInstalled && installed != null ? installed.Affichage : null;
             Ecrire("Racine    : " + racine);
@@ -173,6 +229,7 @@ namespace DeathlessLauncher
 
             if (Updater.IsUpToDate(installed, remote, updater.IsInstalled))
             {
+                updater.NettoyerTemporaires();
                 Ecrire("RÉSULTAT  : À JOUR (" + remote.Affichage + ")");
                 return 0;
             }
@@ -180,13 +237,20 @@ namespace DeathlessLauncher
             {
                 updater.InstallAsync(remote, CancellationToken.None).GetAwaiter().GetResult();
                 string[] fichiers = Directory.GetFiles(updater.GameDir, "*", SearchOption.AllDirectories);
-                Ecrire("Game/     : " + string.Join(", ", fichiers.Select(f => f.Substring(updater.GameDir.Length + 1))));
+                Ecrire("Game/     : " + fichiers.Length + " fichiers");
+                Ecrire("Mode      : " + updater.ModeInstallation + (updater.RaisonZip.Length > 0 ? " (" + updater.RaisonZip + ")" : "")
+                    + (updater.ModeInstallation == "incrémentielle" ? ", " + updater.FichiersTelecharges + " fichier(s) téléchargé(s), " + updater.FichiersReutilises + " repris" : ""));
+                Ecrire("Réseau    : " + updater.OctetsRecus + " octets reçus (" + Format.Mo(updater.OctetsRecus) + " Mo ; zip complet : " + Format.Mo(remote.Size) + " Mo)");
+                string temp = Path.Combine(Path.GetTempPath(), Updater.TempFolder);
+                int restes = Directory.Exists(temp) ? Directory.GetFileSystemEntries(temp, "*", SearchOption.AllDirectories).Length : 0;
+                Ecrire("Ménage    : " + restes + " élément(s) dans le dossier temporaire, Game.nouveau " + (Directory.Exists(updater.GameDir + ".nouveau") ? "PRÉSENT" : "absent"));
                 Ecrire("RÉSULTAT  : INSTALLÉ (" + remote.Affichage + "), " + config.GameExe + (File.Exists(updater.GameExePath) ? " présent" : " ABSENT"));
                 return 0;
             }
             catch (Exception e)
             {
                 string playable = updater.IsInstalled && updater.Installed != null ? updater.Installed.Affichage : null;
+                Ecrire("Mode      : " + updater.ModeInstallation + (updater.RaisonZip.Length > 0 ? " (" + updater.RaisonZip + ")" : "") + " ; réseau : " + updater.OctetsRecus + " octets reçus");
                 Ecrire("RÉSULTAT  : ÉCHEC de la mise à jour (" + MainWindow.Explication(e) + ")" + (playable != null ? ", version " + playable + " toujours jouable" : ""));
                 return 1;
             }

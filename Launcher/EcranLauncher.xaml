@@ -40,7 +40,12 @@
             <Border Margin="60,0,0,84" Width="400" HorizontalAlignment="Left" VerticalAlignment="Bottom"
                     Background="{StaticResource FondJauges}" CornerRadius="12" Padding="14,10,14,12">
                 <StackPanel>
-                    <local:JaugeVie x:Name="Jauge" />
+                    <!-- Rafraîchir (F5, X) : à droite de la jauge, quand le jeu est à jour. -->
+                    <DockPanel>
+                        <local:BoutonRafraichir x:Name="BoutonRafraichir" DockPanel.Dock="Right" VerticalAlignment="Bottom"
+                                                Margin="10,0,0,-5" Visibility="Collapsed" />
+                        <local:JaugeVie x:Name="Jauge" />
+                    </DockPanel>
                     <TextBlock x:Name="Message" FontSize="14" Foreground="{StaticResource Alerte}" TextWrapping="Wrap"
                                Margin="0,8,0,0" MaxHeight="60" TextTrimming="CharacterEllipsis" Visibility="Collapsed" />
                 </StackPanel>
@@ -80,6 +85,9 @@
                 <DockPanel>
                     <TextBlock x:Name="NomAppareil" DockPanel.Dock="Right" VerticalAlignment="Center" FontSize="14"
                                Foreground="{StaticResource TexteSecondaire}" Text="Clavier et souris" />
+                    <!-- Version du launcher (pas celle du jeu), discrète, avant l'appareil actif. -->
+                    <TextBlock x:Name="VersionLauncher" DockPanel.Dock="Right" VerticalAlignment="Center" FontSize="13"
+                               Foreground="{StaticResource TexteInactif}" Margin="0,0,24,0" />
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <Image x:Name="InviteValider" Width="32" Height="32" />
                         <TextBlock Text="Valider" VerticalAlignment="Center" Margin="8,0,28,0" />
@@ -87,6 +95,10 @@
                         <TextBlock Text="Choisir" VerticalAlignment="Center" Margin="8,0,28,0" />
                         <Image x:Name="InviteNotes" Width="32" Height="32" />
                         <TextBlock Text="Notes de version" VerticalAlignment="Center" Margin="8,0,28,0" />
+                        <StackPanel x:Name="InviteRafraichirGroupe" Orientation="Horizontal" Visibility="Collapsed">
+                            <Image x:Name="InviteRafraichir" Width="32" Height="32" />
+                            <TextBlock Text="Rafraîchir" VerticalAlignment="Center" Margin="8,0,28,0" />
+                        </StackPanel>
                         <StackPanel x:Name="InviteDefilerGroupe" Orientation="Horizontal" Visibility="Collapsed">
                             <Image x:Name="InviteDefiler" Width="32" Height="32" />
                             <TextBlock Text="Défiler" VerticalAlignment="Center" Margin="8,0,0,0" />

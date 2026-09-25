@@ -27,6 +27,9 @@ namespace DeathlessLauncher
         public string Sha256 = "";
         public long Size;
         public string Notes = "";
+        /// Dossier des fichiers de la version (« v5/ », avec v5/fichiers.json) pour la mise à jour incrémentielle ;
+        /// vide sur une publication ancienne : seul le zip est alors utilisé.
+        public string Dossier = "";
 
         /// Nom affiché : « nom » s'il est donné, sinon le numéro de publication.
         public string Affichage => string.IsNullOrEmpty(Nom) ? Version : Nom;
@@ -43,6 +46,7 @@ namespace DeathlessLauncher
                 Sha256 = Json.Texte(o, "sha256"),
                 Size = long.TryParse(Json.Texte(o, "size"), out long size) ? size : 0,
                 Notes = Json.Texte(o, "notes"),
+                Dossier = Json.Texte(o, "dossier"),
             };
         }
 
@@ -56,6 +60,7 @@ namespace DeathlessLauncher
                 ["sha256"] = Sha256 ?? "",
                 ["size"] = Size,
                 ["notes"] = Notes ?? "",
+                ["dossier"] = Dossier ?? "",
             };
             return Json.Ecrire(o) + "\n";
         }
@@ -84,7 +89,18 @@ namespace DeathlessLauncher
         }
     }
 
-    public enum Phase { Recherche, Telechargement, Verification, Installation, Termine }
+    public enum Phase { Recherche, Comparaison, Telechargement, Verification, Installation, Termine }
+
+    public enum EtatEnLigne { AJour, Nouvelle, Injoignable }
+
+    /// Résultat d'une vérification en ligne (Rafraîchir, ou la revérification automatique toutes les 10 minutes).
+    public sealed class VerificationEnLigne
+    {
+        public EtatEnLigne Etat;
+        public Manifest Remote;          // null si injoignable
+        public string Changelog;         // null si absent ou illisible
+        public Exception Erreur;         // si injoignable
+    }
 
     /// Avancement transmis à l'interface (sur un fil de travail : l'interface le repasse à son Dispatcher).
     public sealed class Avancement
@@ -95,13 +111,23 @@ namespace DeathlessLauncher
         public long Total;            // octets attendus (0 si inconnu)
         public double Debit;          // octets par seconde, lissé
         public bool Reprise;          // téléchargement repris là où il s'était arrêté
+        public bool Incrementiel;     // mise à jour fichier par fichier (Fait / Total : seulement ce qui change)
+        public int FichiersFaits, FichiersTotal;
     }
 
     // Le travail du launcher : vérifier la version en ligne, télécharger et installer si besoin, lancer le jeu.
     // Tout est asynchrone ; l'interface reçoit l'avancement par le rappel Rapport.
-    public sealed class Updater
+    public sealed partial class Updater
     {
-        public const string UserAgent = "DeathlessLauncher/1.0";
+        /// Version du launcher lui-même (Version du .csproj), sans rapport avec la version du jeu.
+        public static readonly string VersionLauncher = VersionDeLAssemblage();
+        public static readonly string UserAgent = "DeathlessLauncher/" + VersionLauncher;
+
+        static string VersionDeLAssemblage()
+        {
+            Version v = typeof(Updater).Assembly.GetName().Version;
+            return v == null ? "?" : v.Major + "." + v.Minor + "." + Math.Max(0, v.Build);
+        }
         public const string TempFolder = "DeathlessLauncher";
         static readonly TimeSpan ManifestTimeout = TimeSpan.FromSeconds(20);
 
@@ -157,6 +183,21 @@ namespace DeathlessLauncher
             return remote;
         }
 
+        /// Relit version.json et changelog.json (sans cache) et compare à la version installée, sans rien télécharger
+        /// d'autre. Jamais d'exception, sauf annulation : un serveur injoignable donne l'état Injoignable.
+        public async Task<VerificationEnLigne> VerifierAsync(CancellationToken token)
+        {
+            Task<string> changelog = FetchChangelogAsync(token);
+            Manifest remote;
+            try { remote = await FetchRemoteAsync(token).ConfigureAwait(false); }
+            catch (OperationCanceledException) when (token.IsCancellationRequested) { throw; }
+            catch (Exception e) { return new VerificationEnLigne { Etat = EtatEnLigne.Injoignable, Erreur = e }; }
+            string notes = null;
+            try { notes = await changelog.ConfigureAwait(false); } catch (OperationCanceledException) when (token.IsCancellationRequested) { throw; } catch { }
+            bool aJour = IsUpToDate(Installed, remote, IsInstalled);
+            return new VerificationEnLigne { Etat = aJour ? EtatEnLigne.AJour : EtatEnLigne.Nouvelle, Remote = remote, Changelog = notes };
+        }
+
         /// changelog.json du serveur, gardé en copie locale pour le mode hors ligne. Jamais d'exception : null si absent
         /// ou illisible (le launcher se rabat alors sur « notes » de version.json).
         public async Task<string> FetchChangelogAsync(CancellationToken token)
@@ -182,57 +223,102 @@ namespace DeathlessLauncher
             }
         }
 
-        // Téléchargement dans un fichier temporaire (repris s'il a été interrompu), vérification SHA-256, extraction dans
-        // Game/ (l'ancienne installation est retirée d'abord), écriture de installed.json.
+        /// Installe la version publiée : d'abord fichier par fichier (seuls les fichiers nouveaux ou modifiés sont
+        /// téléchargés, voir Incrementiel.cs), sinon, ou en cas d'échec, par le zip complet. Dans les deux cas, tout est
+        /// préparé dans Game.nouveau, vérifié par SHA-256, puis échangé d'un coup avec Game : une mise à jour ratée ne
+        /// touche jamais la version jouable. Après une réussite, le dossier temporaire est vidé.
         public async Task InstallAsync(Manifest remote, CancellationToken token)
         {
-            string temp = Path.Combine(Path.GetTempPath(), TempFolder);
-            Directory.CreateDirectory(temp);
-            string zipPath = Path.Combine(temp, Path.GetFileName(remote.Zip));
-            string partPath = zipPath + ".part";
-
-            await DownloadAsync(config.BaseUrl + remote.Zip, partPath, remote, token).ConfigureAwait(false);
-
-            if (!string.IsNullOrEmpty(remote.Sha256))
+            NettoyerAvantInstallation(remote);
+            RaisonZip = "";
+            if (string.IsNullOrEmpty(remote.Dossier))
+                RaisonZip = "publication sans fichiers.json";
+            else
             {
-                Rapport(new Avancement { Phase = Phase.Verification, Version = remote.Affichage });
-                string actual = await Task.Run(() => Sha256Of(partPath), token).ConfigureAwait(false);
-                if (!string.Equals(actual, remote.Sha256, StringComparison.OrdinalIgnoreCase))
-                {
-                    TryDelete(partPath);
-                    throw new InvalidDataException("Le fichier téléchargé est corrompu (empreinte SHA-256 différente).");
-                }
-            }
-            TryDelete(zipPath);
-            File.Move(partPath, zipPath);
-
-            Rapport(new Avancement { Phase = Phase.Installation, Version = remote.Affichage });
-            await Task.Run(() =>
-            {
-                // Extraction à côté (Game.nouveau), puis échange : un zip invalide ou une extraction ratée laisse
-                // l'ancienne version intacte et jouable.
-                string fresh = gameDir + ".nouveau";
-                if (Directory.Exists(fresh)) Directory.Delete(fresh, true);
-                Directory.CreateDirectory(fresh);
                 try
                 {
-                    ExtractFlat(zipPath, fresh);
-                    if (!File.Exists(Path.Combine(fresh, config.GameExe)))
-                        throw new InvalidDataException(config.GameExe + " est absent du zip publié.");
-                    File.WriteAllText(Path.Combine(fresh, "installed.json"), remote.ToJson(), new UTF8Encoding(false));
+                    if (await InstallIncrementielAsync(remote, token).ConfigureAwait(false))
+                    {
+                        ModeInstallation = "incrémentielle";
+                        NettoyerTemporaires();
+                        Rapport(new Avancement { Phase = Phase.Termine, Version = remote.Affichage });
+                        return;
+                    }
                 }
-                catch
-                {
-                    try { Directory.Delete(fresh, true); } catch { }
-                    throw;
-                }
-                if (Directory.Exists(gameDir))
-                    Directory.Delete(gameDir, true);
-                Directory.Move(fresh, gameDir);
-            }, token).ConfigureAwait(false);
-
-            TryDelete(zipPath);
+                catch (OperationCanceledException) when (token.IsCancellationRequested) { throw; }
+                catch (Exception e) { RaisonZip = "échec de la mise à jour fichier par fichier (" + e.Message + ")"; }
+            }
+            ModeInstallation = "zip";
+            await InstallZipAsync(remote, token).ConfigureAwait(false);
+            NettoyerTemporaires();
             Rapport(new Avancement { Phase = Phase.Termine, Version = remote.Affichage });
+        }
+
+        /// Le zip complet : téléchargé dans un fichier temporaire (repris s'il a été coupé), vérifié (SHA-256), extrait
+        /// dans Game.nouveau puis échangé avec Game.
+        async Task InstallZipAsync(Manifest remote, CancellationToken token)
+        {
+            Directory.CreateDirectory(DossierTemporaire);
+            string zipPath = Path.Combine(DossierTemporaire, Path.GetFileName(remote.Zip));
+            string partPath = zipPath + ".part";
+
+            var mesure = new MesureDebit();
+            long fait = File.Exists(partPath) ? new FileInfo(partPath).Length : 0;
+            bool reprise = fait > 0;
+            var horloge = Stopwatch.StartNew();
+            double dernier = -1;
+            Action<bool> rapporter = force =>
+            {
+                double debit = mesure.Ajouter(fait);
+                double t = horloge.Elapsed.TotalSeconds;
+                if (!force && t - dernier < 0.1) return;
+                dernier = t;
+                Rapport(new Avancement { Phase = Phase.Telechargement, Version = remote.Affichage, Fait = fait, Total = remote.Size, Debit = debit, Reprise = reprise });
+            };
+            rapporter(true);
+            await Telechargement.TelechargerAsync(config.BaseUrl + remote.Zip, partPath, remote.Size,
+                n => { fait += n; if (n > 0) Interlocked.Add(ref octetsRecus, n); rapporter(false); }, token).ConfigureAwait(false);
+            rapporter(true);
+
+            try
+            {
+                if (!string.IsNullOrEmpty(remote.Sha256))
+                {
+                    Rapport(new Avancement { Phase = Phase.Verification, Version = remote.Affichage });
+                    string actual = await Task.Run(() => Sha256Of(partPath), token).ConfigureAwait(false);
+                    if (!string.Equals(actual, remote.Sha256, StringComparison.OrdinalIgnoreCase))
+                    {
+                        TryDelete(partPath);
+                        throw new InvalidDataException("Le fichier téléchargé est corrompu (empreinte SHA-256 différente).");
+                    }
+                }
+                TryDelete(zipPath);
+                File.Move(partPath, zipPath);
+
+                Rapport(new Avancement { Phase = Phase.Installation, Version = remote.Affichage });
+                await Task.Run(() =>
+                {
+                    string nouveau = DossierNouveau;
+                    SupprimerDossier(nouveau);
+                    Directory.CreateDirectory(nouveau);
+                    try
+                    {
+                        ExtractFlat(zipPath, nouveau);
+                        if (!File.Exists(Path.Combine(nouveau, config.GameExe)))
+                            throw new InvalidDataException(config.GameExe + " est absent du zip publié.");
+                        File.WriteAllText(Path.Combine(nouveau, "installed.json"), remote.ToJson(), new UTF8Encoding(false));
+                        Echanger(nouveau);
+                    }
+                    finally
+                    {
+                        SupprimerDossier(nouveau);
+                    }
+                }, token).ConfigureAwait(false);
+            }
+            finally
+            {
+                TryDelete(zipPath); // zip complet vérifié : jamais gardé, qu'il ait servi ou non
+            }
         }
 
         public void Launch()
@@ -254,67 +340,6 @@ namespace DeathlessLauncher
                     throw new HttpRequestException(file + " : le serveur répond " + (int)response.StatusCode + " (" + response.ReasonPhrase + ").");
                 byte[] bytes = await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
                 return Encoding.UTF8.GetString(bytes).TrimStart('﻿');
-            }
-        }
-
-        // Si un .part du même zip existe (téléchargement coupé), on demande la suite (Range). Un serveur qui ne sait pas
-        // reprendre renvoie le fichier entier : on repart de zéro. L'empreinte SHA-256 vérifie le résultat dans tous les cas.
-        private async Task DownloadAsync(string url, string partPath, Manifest remote, CancellationToken token)
-        {
-            long existing = File.Exists(partPath) ? new FileInfo(partPath).Length : 0;
-            if (remote.Size > 0 && existing > remote.Size) { TryDelete(partPath); existing = 0; }
-            if (remote.Size > 0 && existing == remote.Size)
-            {
-                Rapport(new Avancement { Phase = Phase.Telechargement, Version = remote.Affichage, Fait = existing, Total = existing, Reprise = true });
-                return;
-            }
-
-            using (var http = NewClient(TimeSpan.FromMinutes(30)))
-            using (var request = new HttpRequestMessage(HttpMethod.Get, url))
-            {
-                if (existing > 0) request.Headers.Range = new RangeHeaderValue(existing, null);
-                using (HttpResponseMessage response = await http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token).ConfigureAwait(false))
-                {
-                    if (!response.IsSuccessStatusCode)
-                        throw new HttpRequestException(remote.Zip + " : le serveur répond " + (int)response.StatusCode + " (" + response.ReasonPhrase + ").");
-                    bool resumed = existing > 0 && response.StatusCode == HttpStatusCode.PartialContent;
-                    if (!resumed) existing = 0;
-                    long length = response.Content.Headers.ContentLength ?? -1;
-                    long total = length >= 0 ? existing + length : remote.Size;
-
-                    using (Stream source = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
-                    using (var target = new FileStream(partPath, resumed ? FileMode.Append : FileMode.Create, FileAccess.Write, FileShare.None, 1 << 16, true))
-                    {
-                        byte[] buffer = new byte[1 << 16];
-                        long done = existing;
-                        var clock = Stopwatch.StartNew();
-                        long lastBytes = done;
-                        double lastTime = 0, speed = 0, lastReport = -1;
-                        Rapport(new Avancement { Phase = Phase.Telechargement, Version = remote.Affichage, Fait = done, Total = total, Reprise = resumed });
-                        int read;
-                        while ((read = await source.ReadAsync(buffer, 0, buffer.Length, token).ConfigureAwait(false)) > 0)
-                        {
-                            await target.WriteAsync(buffer, 0, read, token).ConfigureAwait(false);
-                            done += read;
-                            double now = clock.Elapsed.TotalSeconds;
-                            if (now - lastTime >= 0.25)
-                            {
-                                double instant = (done - lastBytes) / (now - lastTime);
-                                speed = speed <= 0 ? instant : speed * 0.7 + instant * 0.3;
-                                lastBytes = done;
-                                lastTime = now;
-                            }
-                            if (now - lastReport >= 0.1)
-                            {
-                                lastReport = now;
-                                Rapport(new Avancement { Phase = Phase.Telechargement, Version = remote.Affichage, Fait = done, Total = total, Debit = speed, Reprise = resumed });
-                            }
-                        }
-                        Rapport(new Avancement { Phase = Phase.Telechargement, Version = remote.Affichage, Fait = done, Total = Math.Max(total, done), Debit = speed, Reprise = resumed });
-                        if (total > 0 && done < total)
-                            throw new IOException("Téléchargement interrompu (" + Format.Mo(done) + " sur " + Format.Mo(total) + " Mo). Réessayer reprendra là où il s'est arrêté.");
-                    }
-                }
             }
         }
 
@@ -362,7 +387,9 @@ namespace DeathlessLauncher
             }
         }
 
-        private static HttpClient NewClient(TimeSpan timeout)
+        private static HttpClient NewClient(TimeSpan timeout) => NouveauClient(timeout);
+
+        public static HttpClient NouveauClient(TimeSpan timeout)
         {
             // TLS 1.2 explicite : .NET Framework 4.8 le prend par défaut, on force pour les Windows 10 anciens.
             ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;

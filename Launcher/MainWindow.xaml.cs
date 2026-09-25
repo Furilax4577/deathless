@@ -19,6 +19,10 @@ namespace DeathlessLauncher
         private Updater updater;
         private CancellationTokenSource cancel;
         private bool ready;
+        private bool verificationEnCours;           // Rafraîchir ou revérification automatique
+        private readonly DispatcherTimer revérification;
+        /// Revérification automatique discrète quand le jeu est à jour et la fenêtre ouverte.
+        public static readonly TimeSpan IntervalleRevérification = TimeSpan.FromMinutes(10);
 
         private readonly Manette manette = new Manette();
         private readonly DispatcherTimer sondeManette;
@@ -52,6 +56,9 @@ namespace DeathlessLauncher
             Ecran.ReessayerDemande += BeginCheck;
             Ecran.QuitterDemande += Close;
             Ecran.WikiDemande += OuvrirWiki;
+            Ecran.RafraichirDemande += () => { var _ = RafraichirAsync(false); };
+            revérification = new DispatcherTimer { Interval = IntervalleRevérification };
+            revérification.Tick += (s, e) => { var _ = RafraichirAsync(true); };
             Ecran.Tache = (etat, valeur) => { Tache.ProgressState = etat; Tache.ProgressValue = valeur; };
 
             PreviewKeyDown += OnKey;
@@ -70,9 +77,9 @@ namespace DeathlessLauncher
             sondeManette.Tick += (s, e) => SonderManette();
 
             SourceInitialized += (s, e) => BarreDeTitreSombre();
-            Loaded += (s, e) => { Ecran.DemarrerVideo(AppDomain.CurrentDomain.BaseDirectory); BeginCheck(); sondeManette.Start(); };
+            Loaded += (s, e) => { Ecran.DemarrerVideo(AppDomain.CurrentDomain.BaseDirectory); BeginCheck(); sondeManette.Start(); revérification.Start(); };
             StateChanged += (s, e) => Ecran.Video.Suspendre(WindowState == WindowState.Minimized);
-            Closing += (s, e) => { if (cancel != null) cancel.Cancel(); sondeManette.Stop(); Ecran.Video.Fermer(); };
+            Closing += (s, e) => { if (cancel != null) cancel.Cancel(); sondeManette.Stop(); revérification.Stop(); Ecran.Video.Fermer(); };
         }
 
         // ---------- Mise à jour ----------
@@ -85,6 +92,7 @@ namespace DeathlessLauncher
             LauncherConfig config = LauncherConfig.Load(Path.Combine(root, "launcher.json"));
             Ecran.Wiki(AdresseWeb(config.WikiUrl));
             Updater courant = new Updater(config, root);
+            courant.NettoyerAuDemarrage(); // restes d'une installation interrompue
             updater = courant;
             // Les rapports d'une vérification abandonnée (Réessayer) sont ignorés.
             courant.Rapport = a => Dispatcher.BeginInvoke((Action)(() => { if (updater == courant && !ready) Ecran.MontrerAvancement(a); }));
@@ -138,6 +146,7 @@ namespace DeathlessLauncher
 
             if (upToDate)
             {
+                updater.NettoyerTemporaires();
                 ready = true;
                 Ecran.MontrerPret(remote.Affichage, false);
                 return;
@@ -161,6 +170,49 @@ namespace DeathlessLauncher
                 ready = playable != null;
                 Ecran.MontrerEchec("La mise à jour a échoué", Phrase(e) + " Vérifiez la connexion, puis Réessayer.", playable);
             }
+        }
+
+        /// Rafraîchir (F5, X, clic) ou revérification automatique (automatique = vrai, toutes les 10 minutes). Seulement
+        /// quand le jeu est à jour et que rien n'est en cours. Manuel : la jauge montre le scan ; si une nouvelle version
+        /// est publiée, la mise à jour se lance comme au démarrage ; sinon « Déjà à jour ». Automatique : rien ne bouge
+        /// à l'écran, et une nouvelle version est seulement signalée (Jouer, pastille « Nouvelle », bouton en or).
+        private async Task RafraichirAsync(bool automatique)
+        {
+            if (!ready || verificationEnCours || updater == null || !Ecran.RafraichirDisponible) return;
+            Updater courant = updater;
+            verificationEnCours = true;
+            try
+            {
+                if (!automatique) Ecran.MontrerRafraichissement();
+                VerificationEnLigne v = await courant.VerifierAsync(cancel?.Token ?? CancellationToken.None);
+                if (courant != updater) return;
+                Manifest installed = courant.Installed;
+                string installedName = courant.IsInstalled && installed != null ? installed.Affichage : "?";
+                switch (v.Etat)
+                {
+                    case EtatEnLigne.AJour:
+                        Ecran.AfficherNotes(Changelog.Construire(v.Changelog ?? courant.CachedChangelog, v.Remote), v.Remote.Affichage, v.Remote.Affichage);
+                        if (!automatique) Ecran.MontrerDejaAJour(v.Remote.Affichage);
+                        break;
+                    case EtatEnLigne.Nouvelle:
+                        if (automatique)
+                        {
+                            Ecran.AfficherNotes(Changelog.Construire(v.Changelog ?? courant.CachedChangelog, v.Remote), installedName, v.Remote.Affichage);
+                            Ecran.SignalerNouvelleVersion(installedName, v.Remote.Affichage);
+                        }
+                        else
+                        {
+                            verificationEnCours = false;
+                            BeginCheck(); // mise à jour comme au démarrage
+                        }
+                        break;
+                    case EtatEnLigne.Injoignable:
+                        if (!automatique) Ecran.MontrerRafraichissementImpossible(installedName, Explication(v.Erreur));
+                        break;
+                }
+            }
+            catch (OperationCanceledException) { }
+            finally { verificationEnCours = false; }
         }
 
         /// Message d'erreur lisible (HttpClient enveloppe souvent la vraie cause).
@@ -237,6 +289,7 @@ namespace DeathlessLauncher
                 case Key.Home: Ecran.DefilerDebut(); break;
                 case Key.End: Ecran.DefilerFin(); break;
                 case Key.N: Ecran.BasculerNotes(); break;
+                case Key.F5: { var _ = RafraichirAsync(false); } break;
                 case Key.Escape:
                     if (!Ecran.NotesDepliees) return;
                     Ecran.Replier(true);
@@ -258,6 +311,7 @@ namespace DeathlessLauncher
 
             if ((manette.Appuis & Manette.A) != 0) { Ecran.Valider(); return; }
             if ((manette.Appuis & Manette.Y) != 0) Ecran.BasculerNotes();
+            if ((manette.Appuis & Manette.X) != 0) { var _ = RafraichirAsync(false); }
             if ((manette.Appuis & Manette.B) != 0 && Ecran.NotesDepliees) Ecran.Replier(true);
 
             // Croix ou stick gauche : entrée précédente ou suivante, avec répétition si on garde la direction.
