@@ -194,7 +194,8 @@ MonoBehaviour:
   arcDegatsMin: 10
   arcDegatsMax: 40
   arcTete: 2
-  arcVitesseFleche: 30
+  arcVitesseMin: 18
+  arcVitesseMax: 55
   arcPortee: 60
   arcIntervalle: 0.3
   arcVitesseBander: 0.5
@@ -228,7 +229,7 @@ MonoBehaviour:
   horsCombat: 4
   arbaleteDegats: 45
   arbaleteTete: 2
-  arbaleteVitesse: 45
+  arbaleteVitesse: 60
   arbaletePortee: 40
   arbaleteRecharge: 6
   grenadeRecharge: 20

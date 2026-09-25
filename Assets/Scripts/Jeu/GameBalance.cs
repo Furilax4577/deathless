@@ -192,6 +192,14 @@ namespace Deathless.Jeu
         public float brulureDegats = 5f;
         public float brulureDuree = 3f;
 
+        [Header("Projectiles (wiki classes.md : vitesse et pesanteur)")]
+        [Tooltip("Pesanteur des flèches et carreaux (m/s², réelle : 9,81).")]
+        public float projectileGravite = 9.81f;
+        [Tooltip("Aide à la visée : relèvement maximal (degrés) ajouté pour compenser la chute ; au-delà, le joueur vise au-dessus.")]
+        public float aideChuteMax = 3f;
+        [Tooltip("Longueur de vol maximale d'une flèche ou d'un carreau (m) avant de disparaître.")]
+        public float projectileVolMax = 200f;
+
         [Header("Rôdeur (wiki : charge 1,2 s, 10 à 40 dégâts, tête ×2)")]
         public float rodeurPV = 110f;
         public float rodeurVitesse = 5f;
@@ -199,7 +207,10 @@ namespace Deathless.Jeu
         public float arcDegatsMin = 10f;
         public float arcDegatsMax = 40f;
         public float arcTete = 2f;
-        public float arcVitesseFleche = 30f;
+        [Tooltip("Vitesse de départ de la flèche selon la charge (m/s) : tir rapide → minimum, charge complète → maximum (wiki : projectiles).")]
+        public float arcVitesseMin = 18f;
+        public float arcVitesseMax = 55f;
+        [Tooltip("Distance du point visé par le réticule (m).")]
         public float arcPortee = 60f;
         public float arcIntervalle = 0.3f;
         public float arcVitesseBander = 0.5f;
@@ -214,6 +225,8 @@ namespace Deathless.Jeu
         public int salveFleches = 5;
         public float salveEcart = 20f;
         public float salveDegats = 15f;
+        [Tooltip("Vitesse des flèches de la salve de la roulade (m/s).")]
+        public float salveVitesse = 35f;
         public float rouladeRecharge = 8f;
 
         [Header("Assassin (wiki : ×2 furtif, ×3 dos, ×5 les deux ; détection 6 m / 1,5 m ; arbalète 6 s ; grenade 20 s, nuage 5 s)")]
@@ -237,7 +250,8 @@ namespace Deathless.Jeu
         public float horsCombat = 4f;
         public float arbaleteDegats = 45f;
         public float arbaleteTete = 2f;
-        public float arbaleteVitesse = 45f;
+        [Tooltip("Vitesse fixe du carreau (m/s).")]
+        public float arbaleteVitesse = 60f;
         public float arbaletePortee = 40f;
         public float arbaleteRecharge = 6f;
         public float grenadeRecharge = 20f;

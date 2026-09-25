@@ -4,12 +4,20 @@ using UnityEngine;
 namespace Deathless.Jeu
 {
     /// Projectile des classes : flèches et carreaux (modèle KayKit `arrow_bow`, non magiques, traînée d'air TraineeAir),
-    /// boule de feu (FireballVisual en vol, légère cloche). Balayage par SphereCast à chaque image ; au contact, le rappel
+    /// boule de feu (FireballVisual en vol, légère cloche). Flèches et carreaux ont une vitesse et subissent la pesanteur
+    /// (GameBalance.projectileGravite) : ils volent en cloche, orientés le long de leur trajectoire ; l'aide à la visée ne
+    /// relève le tir que d'un petit angle (GameBalance.aideChuteMax) pour compenser la chute. Balayage par SphereCast à chaque image ; au contact, le rappel
     /// `impact(point, direction, sante)` reçoit l'ennemi touché (ou null pour le décor). Les flèches restent plantées
     /// dans ce qu'elles touchent (suivent le squelette) puis disparaissent.
     public class ProjectileJeu : MonoBehaviour
     {
         public enum Genre { Fleche, Carreau, BouleDeFeu }
+
+        /// Tests (ScenariosClasses « balistique ») : arrivée d'un projectile (genre, point, ennemi touché ou null, hauteur
+        /// maximale atteinte au-dessus du départ).
+        public static event Action<Genre, Vector3, Sante, float> Arrivee;
+        Vector3 m_Depart;
+        float m_Sommet;
 
         Genre m_Genre;
         Vector3 m_Vitesse;
@@ -37,12 +45,15 @@ namespace Deathless.Jeu
             else go = new GameObject(genre.ToString());
             go.name = genre.ToString();
             Vector3 dir = (cible - depart).sqrMagnitude > 0.0001f ? (cible - depart).normalized : tireur.forward;
+            var bal = GameBalance.Courant;
+            if (genre != Genre.BouleDeFeu) dir = DirectionBalistique(depart, cible, vitesse, bal.projectileGravite, bal.aideChuteMax, dir);
             go.transform.SetPositionAndRotation(depart, Quaternion.LookRotation(dir));
             var p = go.AddComponent<ProjectileJeu>();
             p.m_Genre = genre;
             p.m_Tireur = tireur;
             p.m_Impact = impact;
             p.m_Reste = portee;
+            p.m_Depart = depart;
             if (genre == Genre.BouleDeFeu)
             {
                 // Légère cloche (Relic : +1,5 m/s vers le haut, chute 5), visée corrigée pour tomber sur la cible.
@@ -55,6 +66,8 @@ namespace Deathless.Jeu
             else
             {
                 p.m_Vitesse = dir * vitesse;
+                p.m_Gravite = bal.projectileGravite;
+                p.m_Reste = Mathf.Max(portee, bal.projectileVolMax);
                 var mf = go.GetComponentInChildren<MeshFilter>();
                 p.m_DemiLongueur = mf != null && mf.sharedMesh != null ? mf.sharedMesh.bounds.extents.z * go.transform.lossyScale.z : 0.35f;
                 if (fx != null && fx.gemmes != null)
@@ -62,6 +75,23 @@ namespace Deathless.Jeu
                         fx.gemmes, genre == Genre.Carreau ? 1.2f : 2.4f, genre == Genre.Carreau ? 0.009f : 0.012f, genre == Genre.Carreau ? 0.16f : 0.22f);
             }
             return p;
+        }
+
+        /// Direction de tir d'un projectile lent (vitesse `v`, pesanteur `g`) vers `cible` : la visée droite, relevée au plus de
+        /// `aideMaxDeg` degrés vers l'angle qui touche la cible (tir tendu, la solution basse). Au-delà (cible trop loin pour
+        /// cette vitesse, ou chute trop forte), le relèvement reste plafonné : le joueur vise au-dessus.
+        public static Vector3 DirectionBalistique(Vector3 depart, Vector3 cible, float v, float g, float aideMaxDeg, Vector3 repli)
+        {
+            Vector3 d = cible - depart;
+            Vector3 plat = new Vector3(d.x, 0f, d.z);
+            float x = plat.magnitude, y = d.y;
+            if (x < 0.05f || g <= 0f || v <= 0.1f) return d.sqrMagnitude > 0.0001f ? d.normalized : repli;
+            float droit = Mathf.Atan2(y, x);
+            float v2 = v * v;
+            float disc = v2 * v2 - g * (g * x * x + 2f * y * v2);
+            float ideal = disc >= 0f ? Mathf.Atan((v2 - Mathf.Sqrt(disc)) / (g * x)) : Mathf.PI * 0.25f;
+            float a = droit + Mathf.Clamp(ideal - droit, 0f, aideMaxDeg * Mathf.Deg2Rad);
+            return (plat / x * Mathf.Cos(a) + Vector3.up * Mathf.Sin(a)).normalized;
         }
 
         void Update()
@@ -93,6 +123,7 @@ namespace Deathless.Jeu
                 return;
             }
             transform.position += pas;
+            m_Sommet = Mathf.Max(m_Sommet, transform.position.y - m_Depart.y);
             transform.rotation = Quaternion.LookRotation(dir);
             m_Reste -= d;
             if (m_Reste <= 0f) Arriver(transform.position, dir, null);
@@ -102,6 +133,7 @@ namespace Deathless.Jeu
         {
             m_Fini = true;
             var s = touche != null ? touche.GetComponentInParent<Sante>() : null;
+            Arrivee?.Invoke(m_Genre, point, s, m_Sommet);
             if (m_Trainee != null) m_Trainee.Detacher();
             if (m_Boucle != null) m_Boucle.Stop();
             if (m_Genre == Genre.BouleDeFeu)

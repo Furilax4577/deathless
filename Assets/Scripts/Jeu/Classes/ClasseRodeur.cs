@@ -68,6 +68,21 @@ namespace Deathless.Jeu
         public override bool FaceVisee => m_Visee || m_Action != Action.Aucune;
         public override bool HautDuCorps => m_Action == Action.Bander || m_Action == Action.Lacher;
 
+        Transform m_MainArc, m_MainCorde;
+
+        /// Arc bandé : la ligne de tir va de la main de la corde (handslot.r) à la main de l'arc (handslot.l).
+        public override bool AxeDeTir(out Vector3 origine, out Vector3 direction)
+        {
+            origine = direction = Vector3.zero;
+            if (m_Action != Action.Bander) return false;
+            if (m_MainArc == null) m_MainArc = MannequinEquip.Trouver(transform, "handslot.l");
+            if (m_MainCorde == null) m_MainCorde = MannequinEquip.Trouver(transform, "handslot.r");
+            if (m_MainArc == null || m_MainCorde == null) return false;
+            origine = m_MainCorde.position;
+            direction = m_MainArc.position - m_MainCorde.position;
+            return direction.sqrMagnitude > 0.0001f;
+        }
+
         public override void SurAction(string action)
         {
             switch (action)
@@ -101,13 +116,14 @@ namespace Deathless.Jeu
             Vector3 cible = Combat.PointVise(H.CameraJeu, transform, b.arcPortee, out _);
             Vector3 depart = m_Encochee != null ? m_Encochee.transform.position : transform.position + Vector3.up * 1.4f + transform.forward * 0.5f;
             float degats = Mathf.Lerp(b.arcDegatsMin, b.arcDegatsMax, charge);
-            TirerFleche(depart, cible, degats, b.arcTete);
+            // Vitesse selon la charge : tir rapide lent (retombe vite), charge complète rapide (file loin et tendu).
+            TirerFleche(depart, cible, Mathf.Lerp(b.arcVitesseMin, b.arcVitesseMax, charge), degats, b.arcTete);
             AudioBank.Jouer(charge >= 0.999f ? SonsDuJeu.ArcTirCharge : SonsDuJeu.ArcTir, depart, 0.9f);
         }
 
-        void TirerFleche(Vector3 depart, Vector3 cible, float degats, float multTete)
+        void TirerFleche(Vector3 depart, Vector3 cible, float vitesse, float degats, float multTete)
         {
-            ProjectileJeu.Tirer(ProjectileJeu.Genre.Fleche, depart, cible, B.arcVitesseFleche, B.arcPortee, transform, (point, dir, s) =>
+            ProjectileJeu.Tirer(ProjectileJeu.Genre.Fleche, depart, cible, vitesse, B.arcPortee, transform, (point, dir, s) =>
             {
                 AudioBank.Jouer(SonsDuJeu.FlecheImpact, point, 0.7f, 0.05f);
                 if (s == null) return;
@@ -173,7 +189,7 @@ namespace Deathless.Jeu
             {
                 float a = b.salveFleches > 1 ? Mathf.Lerp(-b.salveEcart, b.salveEcart, i / (float)(b.salveFleches - 1)) : 0f;
                 Vector3 dir = Quaternion.AngleAxis(a, Vector3.up) * axe;
-                TirerFleche(depart, depart + dir, b.salveDegats, b.arcTete);
+                TirerFleche(depart, depart + dir, b.salveVitesse, b.salveDegats, b.arcTete);
             }
             AudioBank.Jouer(SonsDuJeu.ArcTir, depart, 1f);
         }

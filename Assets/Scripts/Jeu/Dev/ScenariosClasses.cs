@@ -23,6 +23,7 @@ namespace Deathless.Jeu.Dev
                 case "rodeur": s_I.StartCoroutine(s_I.Rodeur()); break;
                 case "assassin": s_I.StartCoroutine(s_I.Assassin()); break;
                 case "premierA": s_I.StartCoroutine(s_I.PremierA()); break;
+                case "balistique": s_I.StartCoroutine(s_I.Balistique()); break;
             }
         }
 
@@ -215,6 +216,67 @@ namespace Deathless.Jeu.Dev
         }
 
         // ================================================================= Assassin
+
+        // ================================================================= Balistique (flèches et carreaux)
+
+        /// Rôdeur : tirs à la tête d'un guerrier figé à 15, 30 et 45 m, tir rapide (0,25 s) puis chargé (1,3 s) ; assassin :
+        /// carreau à 30 et 45 m. Journal : touché ou non, écart vertical de l'impact au centre de la tête, flèche la plus haute.
+        IEnumerator Balistique()
+        {
+            string classe = Partie.ClasseChoisie;
+            ProjectileJeu.Genre dernierGenre = ProjectileJeu.Genre.Fleche;
+            Vector3 dernierPoint = Vector3.zero; Sante derniereCible = null; float dernierSommet = 0f; bool arrive = false;
+            System.Action<ProjectileJeu.Genre, Vector3, Sante, float> suivi = (g, p, s, h) => { if (arrive) return; arrive = true; dernierGenre = g; dernierPoint = p; derniereCible = s; dernierSommet = h; };
+            ProjectileJeu.Arrivee += suivi;
+            var distances = new[] { 15f, 30f, 45f };
+            var tenues = classe == "rodeur" ? new[] { 0.25f, 1.3f } : new[] { 0.05f };
+            int n = 0;
+            foreach (float d in distances)
+            {
+                foreach (float tenue in tenues)
+                {
+                    DevPartie.PlacerHeros(Depart, Loin);
+                    var cible = DevPartie.PoserDevant(TypeEnnemi.Guerrier, d, (n % 3 - 1) * 3f);
+                    n++;
+                    if (cible == null) continue;
+                    yield return Sortir(new[] { cible });
+                    Figer(new[] { cible }, 30f);
+                    yield return new WaitForSeconds(0.2f);
+                    Vector3 tete = cible.CentreTete;
+                    float pv = cible.Sante.Pv;
+                    ViserPoint(tete);
+                    arrive = false;
+                    if (classe == "rodeur")
+                    {
+                        EntreesSimulees.Maintenir("rightTrigger", true);
+                        yield return new WaitForSeconds(tenue);
+                        ViserPoint(tete);
+                        EntreesSimulees.Maintenir("rightTrigger", false);
+                    }
+                    else
+                    {
+                        EntreesSimulees.Maintenir("leftTrigger", true);
+                        yield return new WaitForSeconds(0.6f);
+                        ViserPoint(tete);
+                        yield return new WaitForSeconds(0.2f);
+                        EntreesSimulees.Appui("rightTrigger", 0.1f);
+                    }
+                    float t = 0f;
+                    while (!arrive && t < 4f) { t += Time.deltaTime; yield return null; }
+                    EntreesSimulees.ToutRelacher();
+                    bool touche = derniereCible == cible.Sante;
+                    Log("balistique " + classe + " " + d + " m, tenue " + tenue + " s : " + (touche ? "touché (" + (pv - cible.Sante.Pv).ToString("F0") + " dégâts)" : "manqué")
+                        + ", impact à " + (dernierPoint.y - tete.y).ToString("+0.00;-0.00") + " m de la tête (vertical), à " + Vector3.Distance(Flat(dernierPoint), Flat(H.transform.position)).ToString("F1") + " m, sommet +" + dernierSommet.ToString("F2") + " m");
+                    yield return new WaitForSeconds(0.5f);
+                    if (cible != null) Destroy(cible.gameObject);
+                    yield return new WaitForSeconds(classe == "rodeur" ? 0.3f : 6.2f);
+                }
+            }
+            ProjectileJeu.Arrivee -= suivi;
+            Log("balistique terminée");
+        }
+
+        static Vector3 Flat(Vector3 v) => new Vector3(v.x, 0f, v.z);
 
         IEnumerator Assassin()
         {

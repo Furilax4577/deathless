@@ -51,6 +51,13 @@ namespace Deathless.Jeu
         float m_HautJusque;
         bool m_Sprint;
         Unity.Netcode.Components.NetworkAnimator m_AnimReseau;
+        // Alignement de l'arme sur la visée (arc, arbalète) : décalage de lacet de la pose de tir, direction voulue, penché
+        // du buste (appliqué après l'Animator).
+        float m_DecalageVisee, m_PencheBuste;
+        Vector3 m_DirVisee;
+        bool m_Aligne;
+        float m_AligneDepuis = -99f;
+        Transform m_Buste;
 
         static readonly int P_Speed = Animator.StringToHash("Speed");
         static readonly int P_Grounded = Animator.StringToHash("Grounded");
@@ -73,6 +80,7 @@ namespace Deathless.Jeu
             if (visiere == null) visiere = GetComponentInChildren<HelmetVisor>();
             if (animator != null) m_CoucheHaut = animator.GetLayerIndex("HautDuCorps");
             m_AnimReseau = GetComponent<Unity.Netcode.Components.NetworkAnimator>();
+            if (animator != null) foreach (var t in animator.GetComponentsInChildren<Transform>(true)) if (t.name == "chest") { m_Buste = t; break; }
         }
 
         /// Multijoueur : ce héros appartient à un autre poste (avant Initialiser).
@@ -379,7 +387,7 @@ namespace Deathless.Jeu
                     float vitesse = (Classe != null ? Classe.Vitesse : b.vitesse) * (m_Sprint ? b.sprintMultiplicateur : 1f) * facteur;
                     if (m_Sprint) { m_Endurance = Mathf.Max(0f, m_Endurance - b.sprintCout * dt); m_EnduranceUtilisee = Time.time; }
                     deplacement = dir * vitesse;
-                    Vector3 face = Classe != null && Classe.FaceVisee ? AvantCamera : dir;
+                    Vector3 face = Classe != null && Classe.FaceVisee ? FaceDeVisee() : dir;
                     if (face.sqrMagnitude > 0.01f)
                         transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(face), 720f * dt);
                     vitesseAnim = dir.magnitude * (m_Sprint ? 1f : 0.62f) * (Classe != null ? Classe.FacteurAnimation : 1f);
@@ -424,6 +432,54 @@ namespace Deathless.Jeu
         }
 
         public bool Sprinte => m_Sprint;
+
+        /// Direction du corps en visée : vers la visée, corrigée du décalage de lacet de la pose de tir (l'arme regarde le
+        /// réticule, pas le nez du personnage).
+        Vector3 FaceDeVisee()
+        {
+            // Juste après un tir (lâcher), le décalage est gardé un instant : le corps ne pivote pas d'un coup.
+            bool recent = Time.time - m_AligneDepuis < 0.45f;
+            if ((!m_Aligne && !recent) || m_DirVisee.sqrMagnitude < 0.01f) return AvantCamera;
+            return Quaternion.Euler(0f, -m_DecalageVisee, 0f) * m_DirVisee;
+        }
+
+        /// Après l'Animator : mesure la ligne de tir posée par l'animation (ClasseHeros.AxeDeTir), en tire le décalage de
+        /// lacet (utilisé par Update au tour suivant) et penche le buste pour que l'arme suive le tangage de la visée.
+        void LateUpdate()
+        {
+            if (Distant || Classe == null) return;
+            float k = 1f - Mathf.Exp(-Time.deltaTime * 14f);
+            Vector3 o = Vector3.zero, axe = Vector3.zero;
+            bool aligne = Classe.FaceVisee && Vivant && Classe.AxeDeTir(out o, out axe);
+            if (aligne)
+            {
+                var cam = CameraJeu;
+                Vector3 point = cam != null ? Combat.PointVise(cam, transform, 80f, out _) : o + AvantCamera * 30f;
+                Vector3 voulu = point - o;
+                Vector3 plat = new Vector3(voulu.x, 0f, voulu.z);
+                Vector3 axePlat = new Vector3(axe.x, 0f, axe.z);
+                if (plat.sqrMagnitude > 0.25f && axePlat.sqrMagnitude > 0.0001f)
+                {
+                    m_DirVisee = plat.normalized;
+                    float decalage = Vector3.SignedAngle(new Vector3(transform.forward.x, 0f, transform.forward.z), axePlat, Vector3.up);
+                    m_DecalageVisee = m_Aligne ? Mathf.LerpAngle(m_DecalageVisee, decalage, k) : decalage;
+                    float tangageVoulu = Mathf.Atan2(voulu.y, plat.magnitude) * Mathf.Rad2Deg;
+                    float tangageArme = Mathf.Atan2(axe.y, axePlat.magnitude) * Mathf.Rad2Deg;
+                    m_PencheBuste = Mathf.Lerp(m_PencheBuste, Mathf.Clamp(tangageVoulu - tangageArme, -40f, 40f), k);
+                }
+                else aligne = false;
+            }
+            if (!aligne) m_PencheBuste = Mathf.Lerp(m_PencheBuste, 0f, k);
+            m_Aligne = aligne;
+            if (aligne) m_AligneDepuis = Time.time;
+            // Buste : rotation autour de l'axe horizontal perpendiculaire à la visée (positif : l'arme monte).
+            if (m_Buste != null && Mathf.Abs(m_PencheBuste) > 0.05f)
+            {
+                Vector3 d = m_DirVisee.sqrMagnitude > 0.01f ? m_DirVisee : transform.forward;
+                Vector3 droite = Vector3.Cross(Vector3.up, d).normalized;
+                m_Buste.rotation = Quaternion.AngleAxis(-m_PencheBuste, droite) * m_Buste.rotation;
+            }
+        }
 
         void MajAnimation(float vitesse)
         {

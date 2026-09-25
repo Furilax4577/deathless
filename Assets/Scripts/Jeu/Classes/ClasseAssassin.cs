@@ -77,6 +77,20 @@ namespace Deathless.Jeu
         public override bool Furtif => m_Furtif;
         public override float FacteurAnimation => m_Furtif ? 1f : 1f;
 
+        Transform m_Arbal;
+
+        /// Arbalète en main : la ligne de tir est l'axe avant du modèle crossbow_1handed.
+        public override bool AxeDeTir(out Vector3 origine, out Vector3 direction)
+        {
+            origine = direction = Vector3.zero;
+            if (!m_Arbalete) return false;
+            if (m_Arbal == null) m_Arbal = MannequinEquip.Trouver(transform, "crossbow_1handed");
+            if (m_Arbal == null || !m_Arbal.gameObject.activeInHierarchy) return false;
+            origine = m_Arbal.position;
+            direction = m_Arbal.forward;
+            return true;
+        }
+
         /// Repéré par un squelette : sortie du mode furtif.
         public void Reperer()
         {

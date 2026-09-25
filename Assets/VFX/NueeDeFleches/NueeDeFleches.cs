@@ -15,6 +15,8 @@ public class NueeDeFleches : MonoBehaviour
     [SerializeField] private float dureePluie = 1.2f;
     [SerializeField] private float hauteurDepart = 9f;
     [SerializeField] private float vitesseChute = 26f;
+    [Tooltip("Pesanteur de la chute (m/s², réelle : 9,81).")]
+    [SerializeField] private float gravite = 9.81f;
     [Tooltip("Marqueur : durée d'apparition avant la pluie (s).")]
     [SerializeField] private float delaiMarqueur = 0.35f;
 
@@ -68,12 +70,20 @@ public class NueeDeFleches : MonoBehaviour
         MeshFilter mf = f.GetComponentInChildren<MeshFilter>();
         float demi = mf != null && mf.sharedMesh != null ? mf.sharedMesh.bounds.extents.z : 0f;
         TraineeAir trainee = TraineeAir.Attacher(f.transform, new Vector3(0f, 0f, -demi), materiau, 1.8f, 0.01f);
+        // Chute balistique (flèches non magiques : pesanteur réelle) : vitesse de départ choisie pour arriver sur `sol`
+        // en `duree` ; la flèche accélère et s'oriente le long de sa trajectoire.
         float duree = hauteurDepart / vitesseChute;
+        Vector3 g = Vector3.down * gravite;
+        Vector3 v0 = (sol - depart) / duree - 0.5f * g * duree;
         for (float t = 0f; t < duree; t += Time.deltaTime)
         {
-            f.transform.position = Vector3.Lerp(depart, sol, t / duree);
+            f.transform.position = depart + v0 * t + 0.5f * g * t * t;
+            Vector3 v = v0 + g * t;
+            if (v.sqrMagnitude > 0.01f) f.transform.rotation = Quaternion.LookRotation(v);
             yield return null;
         }
+        penche = (v0 + g * duree).normalized;
+        f.transform.rotation = Quaternion.LookRotation(penche);
         // Plantée : la pointe s'enfonce de 15 cm.
         f.transform.position = sol + penche * 0.15f;
         if (trainee != null) trainee.Detacher();

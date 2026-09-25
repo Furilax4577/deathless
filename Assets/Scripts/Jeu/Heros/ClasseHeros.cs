@@ -34,6 +34,10 @@ namespace Deathless.Jeu
         public virtual bool BloqueSprint => false;
         /// Le héros se tourne vers la visée (caméra) au lieu de la direction de marche.
         public virtual bool FaceVisee => false;
+        /// Ligne de tir de l'arme tenue en visée (arc bandé, arbalète), telle que l'animation la pose : origine et direction
+        /// (monde). Heros tourne le corps et penche le buste pour l'aligner sur le point visé par le réticule (le décalage de
+        /// lacet des animations KayKit de tir est compensé). Faux : pas d'alignement (le héros regarde la visée).
+        public virtual bool AxeDeTir(out Vector3 origine, out Vector3 direction) { origine = direction = Vector3.zero; return false; }
         /// Déplacement imposé (ruée, bond, roulade) : vrai et vitesse monde, ou faux (déplacement libre).
         public virtual bool DeplacementImpose(float dt, out Vector3 vitesse) { vitesse = Vector3.zero; return false; }
         /// Couche « haut du corps » active (garde, visée, cône…).
