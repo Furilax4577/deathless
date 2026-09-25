@@ -61,12 +61,12 @@ Un bouclier cylindrique de gemmes en lévitation protège Nyxessa {effet validé
 
 ### Règles {décidé}
 
-- **Invocation** : c'est un **villageois sorcier** qui invoque le bouclier.
+- **Invocation** : c'est un **villageois sorcier** qui invoque le bouclier, **seulement la nuit**.
 - **Encaissement** : la quantité de dégâts que le bouclier peut absorber est **améliorable**.
 - **Riposte** : quand il est frappé, le bouclier **renvoie des dégâts** à l'attaquant.
 - **Canalisation** : au départ, le sorcier tient le bouclier par sa seule incantation. Une **amélioration** du sorcier lui apprend à **canaliser l'énergie de Nyxessa** : un lien d'énergie apparaît entre la relique et son bâton, et il puise dans sa force {décidé}. Palier d'obtention (pas avant le rang 4, par exemple) et effet précis sur le bouclier : {à confirmer}.
 
 ### À décider
 
-- **Signe visuel de l'amélioration** {à confirmer} : un bouclier amélioré montre soit des gemmes plus **intenses** (plus lumineuses), soit des gemmes **plus nombreuses** en lévitation.
-- Paliers, valeurs d'encaissement, dégâts renvoyés, durée et moment de l'invocation : {à confirmer}.
+- **Signe visuel de l'amélioration** {décidé} : chaque palier rend le bouclier **plus dense** : davantage de gemmes dans le mur et davantage de gemmes en lévitation autour. Un bouclier qui encaisse plus paraît plus épais.
+- Paliers, valeurs d'encaissement, dégâts renvoyés et durée de l'invocation : {à confirmer}.
