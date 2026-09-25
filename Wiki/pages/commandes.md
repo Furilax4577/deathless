@@ -19,7 +19,7 @@ Le jeu se joue à la manette Xbox ou PlayStation, ou au clavier et à la souris.
 | Sprinter | L3 | L3 | Maj | {à confirmer} |
 | S'accroupir | R3 | R3 | C | {à confirmer} |
 | Boire une potion | Croix directionnelle haut | Croix directionnelle haut | 1 | {à confirmer} |
-| Se déclarer prêt (jour, voir [Déroulé d'une partie](deroule.md)) | Vue | Pavé tactile | F1 | {à confirmer} |
+| Se déclarer prêt (jour, voir [Déroulé d'une partie](deroule.md)) | Vue | Pavé tactile ou Create | F1 | {à confirmer} |
 | Pause | Menu | Options | Échap | {à confirmer} |
 
 Au clavier, les touches sont données sur une disposition AZERTY. Le déplacement se fait avec ZQSD et la caméra avec la souris.
