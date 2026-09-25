@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+<!-- Deathless : classe_assassin (Assassin). Généré par ArtSources/Icones/generer_icones.py -->
+<polygon fill="#5b3a8a" points="64,2 117.7,33 117.7,95 64,126 10.3,95 10.3,33"/>
+<polygon fill="#a58ad6" points="64,2 117.7,33 108.2,38.5 64,13"/>
+<polygon fill="#5b3a8a" points="117.7,33 117.7,95 108.2,89.5 108.2,38.5"/>
+<polygon fill="#5b3a8a" points="117.7,95 64,126 64,115 108.2,89.5"/>
+<polygon fill="#5b3a8a" points="64,126 10.3,95 19.8,89.5 64,115"/>
+<polygon fill="#a58ad6" points="10.3,95 10.3,33 19.8,38.5 19.8,89.5"/>
+<polygon fill="#a58ad6" points="10.3,33 64,2 64,13 19.8,38.5"/>
+<polygon fill="#140b1f" points="64,13 108.2,38.5 108.2,89.5 64,115 19.8,89.5 19.8,38.5"/>
+<polygon fill="#2b1840" points="64,18 80,30 92,50 96,76 92,100 36,100 32,76 36,50 48,30"/>
+<polygon fill="#5b3a8a" points="58,60 64,18 80,30 92,50 96,76"/>
+<polygon fill="#2b1840" points="58,60 96,76 92,100 36,100"/>
+<polygon fill="#5b3a8a" points="58,60 36,100 32,76"/>
+<polygon fill="#a58ad6" points="58,60 32,76 36,50 48,30 64,18"/>
+<polygon fill="#140b1f" points="64,44 78,56 82,76 74,92 54,92 46,76 50,56"/>
+<polygon fill="#a58ad6" points="51,68 61,71 60,75 52,73"/>
+<polygon fill="#a58ad6" points="77,68 67,71 68,75 76,73"/>
+</svg>

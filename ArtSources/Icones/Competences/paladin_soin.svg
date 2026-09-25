@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+<!-- Deathless : paladin_soin (Soin sur soi). Généré par ArtSources/Icones/generer_icones.py -->
+<polygon fill="#2e9e72" points="45,26 71,26 71,57 102,57 102,83 71,83 71,114 45,114 45,83 14,83 14,57 45,57"/>
+<polygon fill="#2e9e72" points="71,26 71,57 65,60.5 65,41.3"/>
+<polygon fill="#b8f5d8" points="71,57 102,57 84.2,60.5 65,60.5"/>
+<polygon fill="#2e9e72" points="102,57 102,83 71,83 71,114 45,114 48.8,95.8 65,95.8 65,76.6 84.2,76.6 84.2,60.5"/>
+<polygon fill="#b8f5d8" points="45,114 45,83 48.8,76.6 48.8,95.8"/>
+<polygon fill="#2e9e72" points="45,83 14,83 29.6,76.6 48.8,76.6"/>
+<polygon fill="#b8f5d8" points="14,83 14,57 45,57 45,26 71,26 65,41.3 48.8,41.3 48.8,60.5 29.6,60.5 29.6,76.6"/>
+<polygon fill="#4fcf9a" points="48.8,41.3 65,41.3 65,60.5 84.2,60.5 84.2,76.6 65,76.6 65,95.8 48.8,95.8 48.8,76.6 29.6,76.6 29.6,60.5 48.8,60.5"/>
+<polygon fill="#4fcf9a" points="106,29.5 113,40 106,50.5 99,40"/>
+<polygon fill="#4fcf9a" points="106,40 106,29.5 113,40 106,50.5"/>
+<polygon fill="#b8f5d8" points="106,40 106,50.5 99,40 106,29.5"/>
+<polygon fill="#4fcf9a" points="96,12.5 101,20 96,27.5 91,20"/>
+<polygon fill="#4fcf9a" points="96,20 96,12.5 101,20 96,27.5"/>
+<polygon fill="#b8f5d8" points="96,20 96,27.5 91,20 96,12.5"/>
+<polygon fill="#4fcf9a" points="114,14 118,20 114,26 110,20"/>
+<polygon fill="#4fcf9a" points="114,20 114,14 118,20 114,26"/>
+<polygon fill="#b8f5d8" points="114,20 114,26 110,20 114,14"/>
+</svg>
