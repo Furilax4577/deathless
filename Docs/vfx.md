@@ -15,7 +15,7 @@ Non transférés : tous les `*Demo.cs` et `Assets/VFX/_Lab/` (`VfxLabDemo`, `IEf
 - Feu de Relic (boule, explosion, gerbe de terre) : `FireBurst.mat` émissif + particules additives (`FlameParticle`, `SmokeParticle`).
 - **Couleurs par thème** (source unique, voir « Palettes de thème » ci-dessous) : chaque effet prend ses teintes dans la palette de son thème. **Le feu est couleur feu ; le vert Nyxessa est réservé à la relique et à son énergie.**
 
-## Palettes de thème (25/09/2026)
+## Palettes de thème (25/09/2026, validées par l'utilisateur, vert Nyxessa émeraude conservé)
 
 Source unique : `Assets/VFX/_Palettes/` — `VfxPalette.cs` (ScriptableObject : thème, teintes ordonnées de la plus sombre à la plus claire avec un rôle ombre / base / vif / cœur, accents nommés, matériaux Lit ciblés), un asset par thème (`Feu.asset`, `Nyxessa.asset`, …) et le registre `Resources/VfxPalettes.asset` (`VfxPalettes.cs`) qui les rend accessibles aux API statiques. Planche : `Assets/Screenshots/VfxPalettes.png`.
 
