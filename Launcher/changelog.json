@@ -1,6 +1,20 @@
 {
   "versions": [
     {
+      "version": "0.2",
+      "date": "2026-09-25",
+      "titre": "Cinq héros",
+      "notes": [
+        "Les cinq classes sont jouables : Paladin, Viking, Mage, Rôdeur et Assassin.",
+        "Viking : hache à deux mains qui touche tout l'arc, attaque tournante maintenue, rugissement qui attire les squelettes, saut percutant. Sa rage monte à chaque coup.",
+        "Mage : boules de feu qui explosent et font brûler, cône de flammes maintenu. Tout coûte du mana.",
+        "Rôdeur : arc à bander, plus il est tendu plus il fait mal ; une flèche dans la tête est un critique. Nuée de flèches et roulade arrière avec salve.",
+        "Assassin : furtif en marchant, critiques dans le dos (jusqu'à ×5), arbalète pour les tirs à la tête, grenade fumigène pour disparaître.",
+        "Les squelettes ont une vraie tête à viser, ne voient plus rien dans la fumée et répondent au rugissement.",
+        "Le menu joue la musique de nuit ; la classe choisie est gardée pour « Rejouer »."
+      ]
+    },
+    {
       "version": "0.1",
       "date": "2026-09-25",
       "titre": "Première défense du village",
