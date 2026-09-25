@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Deathless.Reseau;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -8,7 +9,9 @@ namespace Deathless.Jeu
     /// Autorité de la partie (un par scène) : seule horloge du jeu (jour 120 s, crépuscule 5 s, nuit 120 s, aube 5 s),
     /// vote « prêt », victoire à l'aube de la nuit 12, défaite quand Nyxessa est détruite, morts et réapparitions, score.
     /// Tout l'état qui fait foi est dans `Etat` (données pures) ; les vues (ambiance, sons, HUD) s'abonnent aux événements.
-    /// En réseau, seule cette classe (et ce qu'elle possède) tournera chez l'hôte.
+    /// Multijoueur (Docs/reseau.md) : chaque poste simule son propre héros ; l'hôte fait apparaître les héros de tous
+    /// (ApparaitreHerosReseau) et fera autorité sur le monde (ReseauJeu.Autorite) ; les héros des autres postes sont des
+    /// marionnettes (Heros.Distant) tenues hors de Etat.joueurs.
     [DefaultExecutionOrder(-50)]
     public class Partie : MonoBehaviour
     {
@@ -30,6 +33,7 @@ namespace Deathless.Jeu
         public bool EnCours => Etat.phase != Phase.Attente && Etat.phase != Phase.Terminee && !m_Chute;
 
         readonly Dictionary<int, Heros> m_Heros = new Dictionary<int, Heros>();
+        readonly Dictionary<int, EtatJoueur> m_Distants = new Dictionary<int, EtatJoueur>();
         public Heros HerosLocal { get; private set; }
         public EtatJoueur JoueurLocal => Etat.joueurs.Count > 0 ? Etat.joueurs[0] : null;
         bool m_Chute;          // Nyxessa détruite, écran de score imminent
@@ -52,6 +56,7 @@ namespace Deathless.Jeu
         {
             Instance = this;
             if (reglages != null) GameBalance.Courant = reglages;
+            ReseauJeu.Assurer();
         }
 
         void OnDestroy() { if (Instance == this) Instance = null; }
@@ -67,7 +72,14 @@ namespace Deathless.Jeu
             }
             Etat.nyxessa.pvMax = B.nyxessaPV;
             Etat.nyxessa.pv = B.nyxessaPV;
-            if (LancerAuChargement || B.lancerDirectement)
+            if (ReseauJeu.EnPartie)
+            {
+                // Partie réseau : le village vient d'être chargé par l'hôte ; la partie commence quand le héros de ce
+                // poste apparaît (HerosReseau → LancerReseau).
+                LancerAuChargement = false;
+                Journal("Village chargé en mode réseau (" + (ReseauJeu.Autorite ? "hôte" : "client") + "), attente des héros");
+            }
+            else if (LancerAuChargement || B.lancerDirectement)
             {
                 LancerAuChargement = false;
                 if (B.lancerDirectement && !string.IsNullOrEmpty(B.classeDeTest)) ClasseChoisie = B.classeDeTest;
@@ -94,20 +106,41 @@ namespace Deathless.Jeu
         public void LancerSolo(string classeId)
         {
             if (Etat.phase != Phase.Attente) return;
-            var b = B;
-            var def = ClassesJeu.Courant != null ? ClassesJeu.Courant.Trouver(classeId) : null;
-            if (def == null || def.prefab == null) { classeId = "paladin"; def = ClassesJeu.Courant != null ? ClassesJeu.Courant.Trouver(classeId) : null; }
-            ClasseChoisie = classeId;
+            var def = Definition(ref classeId);
             var prefab = def != null && def.prefab != null ? def.prefab : prefabHeros;
-            var j = new EtatJoueur { id = 1, nom = "Joueur", classe = def != null ? def.nom : "Paladin", classeId = classeId, enduranceMax = b.endurance, endurance = b.endurance };
-            Etat.joueurs.Add(j);
+            Heros h = null;
             if (prefab != null)
             {
                 Vector3 p = pointDepart != null ? pointDepart.position : PointReapparition(Vector3.zero);
                 Quaternion r = pointDepart != null ? pointDepart.rotation : Quaternion.LookRotation(-new Vector3(p.x, 0f, p.z).normalized);
                 var go = Instantiate(prefab, p, r);
                 go.name = "Heros_" + classeId;
-                var h = go.GetComponent<Heros>();
+                h = go.GetComponent<Heros>();
+            }
+            Commencer(NouveauJoueur(1, "Joueur", classeId, def), h);
+        }
+
+        ClassesJeu.ClasseDef Definition(ref string classeId)
+        {
+            var def = ClassesJeu.Courant != null ? ClassesJeu.Courant.Trouver(classeId) : null;
+            if (def == null || def.prefab == null) { classeId = "paladin"; def = ClassesJeu.Courant != null ? ClassesJeu.Courant.Trouver(classeId) : null; }
+            return def;
+        }
+
+        EtatJoueur NouveauJoueur(int id, string nom, string classeId, ClassesJeu.ClasseDef def)
+        {
+            var b = B;
+            return new EtatJoueur { id = id, nom = nom, classe = def != null ? def.nom : "Paladin", classeId = classeId, enduranceMax = b.endurance, endurance = b.endurance };
+        }
+
+        /// Le joueur local et son héros entrent en jeu : la partie commence (jour qui précède la nuit de départ).
+        void Commencer(EtatJoueur j, Heros h)
+        {
+            var b = B;
+            ClasseChoisie = j.classeId;
+            Etat.joueurs.Add(j);
+            if (h != null)
+            {
                 h.Initialiser(this, j);
                 h.EcrireEtat(j);
                 m_Heros[j.id] = h;
@@ -116,9 +149,82 @@ namespace Deathless.Jeu
             }
             Etat.nuit = Mathf.Clamp(b.nuitDeDepart, 1, b.nuitsPourGagner);
             Etat.duree = 0f;
-            Journal("Partie lancée (" + classeId + ", nuit de départ " + Etat.nuit + ", vitesse ×" + b.vitesseCycle + ")");
+            Journal("Partie lancée (" + j.classeId + ", nuit de départ " + Etat.nuit + ", vitesse ×" + b.vitesseCycle + ")");
             PartieLancee?.Invoke();
             Passer(b.commencerALaNuit ? Phase.Crepuscule : Phase.Jour);
+        }
+
+        // ----------------------------------------------------------------- Multijoueur (Docs/reseau.md)
+
+        /// Identifiant de joueur d'un poste réseau (1 pour l'hôte, comme en solo).
+        public static int IdJoueur(ulong clientId) => (int)clientId + 1;
+
+        /// Héros des autres postes (multijoueur ; vide en solo), pour la colonne du HUD.
+        public IEnumerable<Heros> HerosDistants { get { foreach (var id in m_Distants.Keys) if (m_Heros.TryGetValue(id, out var h) && h != null) yield return h; } }
+
+        /// Hôte, village chargé chez tous : le héros de chaque joueur du salon (sa classe) apparaît près de Nyxessa,
+        /// côte à côte au point de départ ; chaque poste prend le contrôle du sien.
+        public void ApparaitreHerosReseau()
+        {
+            var nm = ReseauJeu.Instance != null ? ReseauJeu.Instance.Reseau : null;
+            if (nm == null || !nm.IsServer) return;
+            var joueurs = new List<JoueurSalon>(ReseauJeu.JoueursPartie);
+            Vector3 p0 = pointDepart != null ? pointDepart.position : PointReapparition(Vector3.zero);
+            Quaternion r = pointDepart != null ? pointDepart.rotation : Quaternion.LookRotation(-new Vector3(p0.x, 0f, p0.z).normalized);
+            Vector3 cote = r * Vector3.right;
+            for (int i = 0; i < joueurs.Count; i++)
+            {
+                var js = joueurs[i];
+                if (!nm.ConnectedClients.ContainsKey(js.clientId)) continue;
+                string classeId = js.classeId.ToString();
+                var def = Definition(ref classeId);
+                if (def == null || def.prefab == null || def.prefab.GetComponent<Unity.Netcode.NetworkObject>() == null)
+                {
+                    Debug.LogError("[Réseau] préfab réseau manquant pour la classe " + classeId);
+                    continue;
+                }
+                Vector3 p = p0 + cote * ((i - (joueurs.Count - 1) * 0.5f) * 1.8f);
+                var go = Instantiate(def.prefab, p, r);
+                var hr = go.GetComponent<HerosReseau>();
+                hr.NomJoueur.Value = js.pseudo;
+                hr.Classe.Value = new Unity.Collections.FixedString32Bytes(classeId);
+                go.GetComponent<Unity.Netcode.NetworkObject>().SpawnAsPlayerObject(js.clientId, true);
+                ReseauJeu.Journal("héros de " + js.pseudo + " (" + classeId + ") apparu pour le client " + js.clientId);
+            }
+        }
+
+        /// Le héros de ce poste est apparu (réseau) : la partie commence ici.
+        public void LancerReseau(Heros h, string classeId, string pseudo, ulong clientId)
+        {
+            if (Etat.phase != Phase.Attente || h == null) return;
+            var def = Definition(ref classeId);
+            Commencer(NouveauJoueur(IdJoueur(clientId), pseudo, classeId, def), h);
+        }
+
+        /// Héros d'un autre poste : marionnette (position et animations par le réseau), hors de Etat.joueurs.
+        public void AttacherHerosDistant(Heros h, string classeId, string pseudo, ulong clientId)
+        {
+            if (h == null) return;
+            var def = Definition(ref classeId);
+            var j = NouveauJoueur(IdJoueur(clientId), pseudo, classeId, def);
+            h.DevenirDistant();
+            h.Initialiser(this, j);
+            m_Heros[j.id] = h;
+            m_Distants[j.id] = j;
+            Journal("Héros distant : " + pseudo + " (" + classeId + ")");
+        }
+
+        public void DetacherHeros(ulong clientId)
+        {
+            int id = IdJoueur(clientId);
+            if (m_Distants.Remove(id)) m_Heros.Remove(id);
+        }
+
+        /// Hôte : un joueur a quitté la partie (son héros disparaît avec lui).
+        public void JoueurParti(ulong clientId)
+        {
+            Journal("Joueur " + IdJoueur(clientId) + " a quitté la partie");
+            DetacherHeros(clientId);
         }
 
         /// Vote « prêt » (jour) ou Rejouer (écran de score).
@@ -152,7 +258,12 @@ namespace Deathless.Jeu
             }
         }
 
-        public void QuitterPartie() => Recharger(false);
+        public void QuitterPartie()
+        {
+            // Multijoueur : on quitte d'abord la session (l'hôte la ferme pour tous), puis retour au menu en solo.
+            if (ReseauJeu.Actif && ReseauJeu.Instance.Lobby != null) ReseauJeu.Instance.Lobby.Quitter();
+            Recharger(false);
+        }
 
         public void QuitterJeu()
         {

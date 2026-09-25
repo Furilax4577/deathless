@@ -82,7 +82,7 @@ namespace Deathless.Jeu
             m_CoupPorte = false;
             m_Combo = 1 - m_Combo;
             H.Tourner(H.AvantCamera);
-            if (Anim != null) Anim.SetTrigger(m_Combo == 0 ? P_Attack1 : P_Attack2);
+            if (Anim != null) H.Declencher(m_Combo == 0 ? P_Attack1 : P_Attack2);
             AudioBank.Jouer(SonsDuJeu.EpeeElan, transform.position + Vector3.up, 0.7f);
         }
 
@@ -132,7 +132,7 @@ namespace Deathless.Jeu
             m_RechargeCharge = b.chargeRecharge;
             m_Repousses.Clear();
             m_ParcouruCharge = 0f;
-            if (Anim != null) Anim.SetTrigger(P_Charge);
+            if (Anim != null) H.Declencher(P_Charge);
             if (m_ChargeVisuel != null) m_ChargeVisuel.Jouer(transform, m_Dir, 99f, b.chargeDistance);
             AudioBank.Jouer(SonsDuJeu.Charge, transform.position + Vector3.up, 1f);
         }
@@ -144,7 +144,7 @@ namespace Deathless.Jeu
             m_Depuis = 0f;
             m_SoinDonne = false;
             m_RechargeSoin = B.soinRecharge;
-            if (Anim != null) Anim.SetTrigger(P_Heal);
+            if (Anim != null) H.Declencher(P_Heal);
             AudioBank.Jouer(SonsDuJeu.Soin, transform.position + Vector3.up, 0.9f);
         }
 
@@ -278,7 +278,7 @@ namespace Deathless.Jeu
         public override void SurIntercepte(InfoDegats info, Interception r)
         {
             if (H.EstInvulnerable && !m_Garde) return;   // coup esquivé
-            if (Anim != null) Anim.SetTrigger(P_BlockHit);
+            if (Anim != null) H.Declencher(P_BlockHit);
             H.HautDuCorpsPendant(0.5f);
             AudioBank.Jouer(r == Interception.Pare ? SonsDuJeu.Parade : SonsDuJeu.Blocage, transform.position + Vector3.up * 1.2f, 1f);
             if (r == Interception.Pare && H.Partie != null) H.Partie.Journal("Parade !");

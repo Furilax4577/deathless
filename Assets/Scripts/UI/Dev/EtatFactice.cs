@@ -14,7 +14,7 @@ namespace Deathless.UI.Dev
     /// réapparition ; fin de partie. Les entrées de jeu (carte Gameplay, via InputChordResolver) déclenchent
     /// les compétences et le vote prêt, comme le ferait le vrai jeu.
     /// Les méthodes Forcer… servent aux tests et aux captures.
-    public class EtatFactice : MonoBehaviour, IEtatPartie, IEtatJoueur, IScoreFin, ICommandesPartie, IClassesJouables, IEtatJoueurClasse, IEtatJoueurPotions
+    public class EtatFactice : MonoBehaviour, IEtatPartie, IEtatJoueur, IScoreFin, ICommandesPartie, IClassesJouables, IEtatJoueurClasse, IEtatJoueurPotions, IEtatEquipe
     {
         public InputActionAsset actions;
 
@@ -493,6 +493,35 @@ namespace Deathless.UI.Dev
                 or = 2310, degats = 34800, tues = 131, morts = 4, critiques = 9, evites = 3120, soins = 0 });
             m_Lignes.Add(new LigneFactice { nom = "Joueur 3", classe = "Assassin", teinte = new Color32(0x9a, 0x8f, 0xd0, 0xff), local = false,
                 or = 2330, degats = 18900, tues = 74, morts = 2, critiques = 41, evites = 1480, soins = 0 });
+        }
+
+        // ================================================================== IEtatEquipe (multijoueur)
+
+        sealed class AllieFactice : IAllie
+        {
+            public string Pseudo { get; set; }
+            public string ClasseId { get; set; }
+            public float Vie { get; set; }
+            public float VieMax { get; set; } = 100f;
+            public bool EstMort { get; set; }
+            public float TempsAvantReapparition { get; set; }
+            public Vector3? PositionTete => null;
+        }
+
+        readonly List<IAllie> m_Allies = new List<IAllie>();
+        public IReadOnlyList<IAllie> Allies => m_Allies;
+
+        /// Test de la colonne « vie des autres joueurs » : 0 à 3 alliés fictifs (le troisième est mort, 12 s).
+        public void ForcerAllies(int n)
+        {
+            m_Allies.Clear();
+            var modeles = new[]
+            {
+                new AllieFactice { Pseudo = "Morgane", ClasseId = "mage", Vie = 64f, VieMax = 80f },
+                new AllieFactice { Pseudo = "Bjorn le Rouge", ClasseId = "viking", Vie = 38f, VieMax = 140f },
+                new AllieFactice { Pseudo = "Sylve", ClasseId = "rodeur", Vie = 0f, VieMax = 90f, EstMort = true, TempsAvantReapparition = 12f },
+            };
+            for (int i = 0; i < Mathf.Clamp(n, 0, modeles.Length); i++) m_Allies.Add(modeles[i]);
         }
 
         // ================================================================== IEtatPartie

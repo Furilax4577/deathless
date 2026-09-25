@@ -72,8 +72,26 @@ namespace Deathless.Jeu
             return v * b.sensibiliteManette * Time.deltaTime;
         }
 
+        /// Tests (client automatique du réseau) : déplacement et sprint imposés, à la place de la manette.
+        public Vector2? DeplacementTest;
+        public bool SprintTest;
+
+        /// Tests : action simulée, comme si elle venait de InputChordResolver.
+        public void SimulerAction(string action)
+        {
+            Derniere = action + "@" + Time.time.ToString("F2");
+            Action?.Invoke(action);
+        }
+
         void Update()
         {
+            if (DeplacementTest.HasValue)
+            {
+                Deplacement = Vector2.ClampMagnitude(DeplacementTest.Value, 1f);
+                SprintMaintenu = SprintTest;
+                GardeMaintenue = AttaqueMaintenue = false;
+                return;
+            }
             if (m_Jeu == null || !m_Jeu.enabled)
             {
                 Deplacement = Vector2.zero;

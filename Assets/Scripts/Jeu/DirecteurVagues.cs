@@ -41,6 +41,7 @@ namespace Deathless.Jeu
 
         void OnPhase(Phase avant, Phase apres)
         {
+            if (!Deathless.Reseau.ReseauJeu.Autorite) return;   // multijoueur : l'hôte seul mène les vagues
             switch (apres)
             {
                 case Phase.Crepuscule: Preparer(P.Etat.nuit); break;
@@ -122,7 +123,7 @@ namespace Deathless.Jeu
 
         void Update()
         {
-            if (P == null || P.Etat.phase != Phase.Nuit || !P.EnCours) return;
+            if (P == null || P.Etat.phase != Phase.Nuit || !P.EnCours || !Deathless.Reseau.ReseauJeu.Autorite) return;
             float t = P.Etat.tempsPhase;
             var v = P.Etat.vagues;
             float vit = Mathf.Max(0.01f, B.vitesseCycle);

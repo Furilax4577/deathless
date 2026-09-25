@@ -9,7 +9,7 @@ namespace Deathless.Jeu
     /// IEtatJoueur, IScoreFin et ICommandesPartie en lisant Partie.Etat (aucune logique de jeu ici) et s'enregistre dans
     /// DonneesUI. Au chargement : commandes seules (menu principal) ; partie lancée : toutes les sources (HUD) ; fin :
     /// Phase = Terminee puis PartieTerminee (écran de score). Gère aussi le curseur (caché et verrouillé en jeu).
-    public class HudPresenter : MonoBehaviour, IEtatPartie, IEtatJoueur, IEtatJoueurClasse, IScoreFin, ICommandesPartie, IClassesJouables
+    public class HudPresenter : MonoBehaviour, IEtatPartie, IEtatJoueur, IEtatJoueurClasse, IScoreFin, ICommandesPartie, IClassesJouables, IEtatEquipe
     {
         public static readonly Color TeintePaladin = new Color32(0xd9, 0xb2, 0x64, 0xff);
 
@@ -118,6 +118,21 @@ namespace Deathless.Jeu
         public event Action<int> NuitCommencee;
         public event Action NyxessaFrappee;
         public event Action PartieTerminee;
+
+        // ----------------------------------------------------------------- IEtatEquipe (multijoueur)
+
+        readonly List<IAllie> m_Allies = new List<IAllie>();
+
+        /// Autres joueurs de la partie réseau (héros apparus, sauf le sien), dans l'ordre d'apparition ; vide en solo.
+        public IReadOnlyList<IAllie> Allies
+        {
+            get
+            {
+                m_Allies.Clear();
+                foreach (var h in Deathless.Reseau.HerosReseau.Tous) if (h != null && !h.IsOwner) m_Allies.Add(h);
+                return m_Allies;
+            }
+        }
 
         // ----------------------------------------------------------------- IEtatJoueur
 

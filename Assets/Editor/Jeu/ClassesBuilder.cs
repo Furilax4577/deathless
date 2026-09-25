@@ -150,8 +150,72 @@ namespace Deathless.EditorTools
                 var mf = racine.AddComponent<ModeFurtif>();
                 if (source != null) EditorUtility.CopySerialized(source, mf);
             }
+            AjouterReseau(racine);
             PrefabUtility.SaveAsPrefabAsset(racine, PrefabDir + "/Heros_" + Capitale(id) + ".prefab");
             Object.DestroyImmediate(racine);
+        }
+
+        // ================================================================= Réseau (Docs/reseau.md)
+
+        const string SalonReseauPath = "Assets/Jeu/Resources/Reseau/SalonReseau.prefab";
+
+        /// Préfabs réseau : composants réseau des héros (sans reconstruire les prefabs) et objet du salon.
+        [MenuItem("Deathless/Jeu/8. Réseau (préfabs des héros et du salon)")]
+        public static string Reseau()
+        {
+            int n = 0;
+            foreach (var d in s_Defs)
+            {
+                string chemin = PrefabDir + "/Heros_" + Capitale(d.id) + ".prefab";
+                var racine = PrefabUtility.LoadPrefabContents(chemin);
+                if (racine == null) continue;
+                AjouterReseau(racine);
+                PrefabUtility.SaveAsPrefabAsset(racine, chemin);
+                PrefabUtility.UnloadPrefabContents(racine);
+                n++;
+            }
+            Dossier("Assets/Jeu/Resources/Reseau");
+            var salon = new GameObject("SalonReseau");
+            salon.AddComponent<Unity.Netcode.NetworkObject>();
+            salon.AddComponent<Deathless.Reseau.SalonReseau>();
+            PrefabUtility.SaveAsPrefabAsset(salon, SalonReseauPath);
+            Object.DestroyImmediate(salon);
+            // Identifiant réseau des préfabs (GlobalObjectIdHash) : calculé par NetworkObject.OnValidate sur l'asset.
+            var valider = typeof(Unity.Netcode.NetworkObject).GetMethod("OnValidate", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+            foreach (var d in s_Defs) Valider(PrefabDir + "/Heros_" + Capitale(d.id) + ".prefab", valider);
+            Valider(SalonReseauPath, valider);
+            AssetDatabase.SaveAssets();
+            string r = "Réseau : " + n + " héros équipés (NetworkObject, NetworkTransform, NetworkAnimator, HerosReseau), salon " + SalonReseauPath;
+            Debug.Log(r);
+            return r;
+        }
+
+        static void Valider(string chemin, System.Reflection.MethodInfo valider)
+        {
+            var go = AssetDatabase.LoadAssetAtPath<GameObject>(chemin);
+            var no = go != null ? go.GetComponent<Unity.Netcode.NetworkObject>() : null;
+            if (no == null || valider == null) return;
+            valider.Invoke(no, null);
+            EditorUtility.SetDirty(no);
+        }
+
+        /// Héros réseau : le propriétaire fait foi pour sa position (NetworkTransform, lacet seul) et ses animations
+        /// (NetworkAnimator : paramètres, poids des couches, déclencheurs) ; HerosReseau porte pseudo, classe et vie.
+        static void AjouterReseau(GameObject racine)
+        {
+            if (racine.GetComponent<Unity.Netcode.NetworkObject>() == null) racine.AddComponent<Unity.Netcode.NetworkObject>();
+            var nt = racine.GetComponent<Unity.Netcode.Components.NetworkTransform>();
+            if (nt == null) nt = racine.AddComponent<Unity.Netcode.Components.NetworkTransform>();
+            nt.AuthorityMode = Unity.Netcode.Components.NetworkTransform.AuthorityModes.Owner;
+            nt.SyncRotAngleX = false;
+            nt.SyncRotAngleZ = false;
+            nt.SyncScaleX = nt.SyncScaleY = nt.SyncScaleZ = false;
+            nt.Interpolate = true;
+            var na = racine.GetComponent<Unity.Netcode.Components.NetworkAnimator>();
+            if (na == null) na = racine.AddComponent<Unity.Netcode.Components.NetworkAnimator>();
+            na.Animator = racine.GetComponentInChildren<Animator>(true);
+            na.AuthorityMode = Unity.Netcode.Components.NetworkAnimator.AuthorityModes.Owner;
+            if (racine.GetComponent<Deathless.Reseau.HerosReseau>() == null) racine.AddComponent<Deathless.Reseau.HerosReseau>();
         }
 
         // ================================================================= Contrôleurs

@@ -126,7 +126,7 @@ namespace Deathless.Jeu
             m_FurtifAuCoup = m_Furtif;
             var cibles = Combat.Ennemis(transform.position, H.AvantCamera, B.daguePortee + 0.8f, 70f);
             H.Tourner(cibles.Count > 0 ? cibles[0].transform.position - transform.position : H.AvantCamera);
-            if (Anim != null) Anim.SetTrigger(P_Stab);
+            if (Anim != null) H.Declencher(P_Stab);
         }
 
         void PorterDague()
@@ -163,7 +163,7 @@ namespace Deathless.Jeu
             m_RechargeArbalete = b.arbaleteRecharge;
             m_DernierCombat = Time.time;
             SortirFurtif();
-            if (Anim != null) Anim.SetTrigger(P_Shoot);
+            if (Anim != null) H.Declencher(P_Shoot);
             Vector3 cible = Combat.PointVise(H.CameraJeu, transform, b.arbaletePortee, out _);
             var arbalete = MannequinEquip.Trouver(transform, "crossbow_1handed");
             Vector3 depart = arbalete != null ? arbalete.position + H.AvantCamera * 0.4f : transform.position + Vector3.up * 1.4f;
@@ -197,7 +197,7 @@ namespace Deathless.Jeu
             m_Depuis = 0f;
             m_GrenadeTenue = m_GrenadeLancee = false;
             H.Tourner(p - transform.position);
-            if (Anim != null) Anim.SetTrigger(P_Throw);
+            if (Anim != null) H.Declencher(P_Throw);
         }
 
         public override void Temps(float dt)

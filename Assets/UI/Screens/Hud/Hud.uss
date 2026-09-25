@@ -144,6 +144,55 @@
 }
 .hud-or__legende { font-size: var(--dl-text-small); color: var(--dl-color-text-muted); margin: 0; padding: 0; }
 
+/* ---------- Autres joueurs (gauche, à mi-hauteur ; multijoueur) ---------- */
+.hud-allies { position: absolute; left: 48px; top: 40%; width: 312px; }
+.hud-allie {
+    flex-direction: row;
+    align-items: center;
+    height: 63px;
+    padding: 0 21px 0 9px;
+    margin-bottom: 9px;
+    border-radius: 32px;
+    background-color: rgba(16, 19, 27, 0.78);
+}
+.hud-allie__embleme { width: 45px; height: 45px; margin-right: 12px; flex-shrink: 0; }
+.hud-allie__corps { flex-grow: 1; flex-shrink: 1; justify-content: center; overflow: hidden; }
+.hud-allie__pseudo {
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+    font-size: var(--dl-text-small);
+    color: var(--dl-color-text);
+    margin: 0;
+    padding: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.hud-allie__piste { height: 8px; margin-top: 6px; border-radius: 4px; background-color: var(--dl-color-well); overflow: hidden; }
+.hud-allie__vie { height: 100%; width: 100%; background-color: var(--dl-color-life); }
+.hud-allie__etat { font-size: var(--dl-text-caption); color: var(--dl-color-text-muted); margin: 2px 0 0 0; padding: 0; display: none; }
+/* Allié mort : ligne grisée, compte à rebours à la place de la barre. */
+.hud-allie--mort { background-color: rgba(16, 19, 27, 0.6); }
+.hud-allie--mort .hud-allie__embleme { opacity: 0.35; }
+.hud-allie--mort .hud-allie__pseudo { color: var(--dl-color-text-muted); }
+.hud-allie--mort .hud-allie__piste { display: none; }
+.hud-allie--mort .hud-allie__etat { display: flex; }
+
+/* Pseudos au-dessus des têtes (placés chaque image par EcranHud) */
+.hud-pseudos { position: absolute; left: 0; top: 0; right: 0; bottom: 0; }
+.hud-pseudo {
+    position: absolute;
+    translate: -50% -100%;
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+    font-size: var(--dl-text-small);
+    color: var(--dl-color-text);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: var(--dl-color-ink);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+    white-space: nowrap;
+    margin: 0;
+    padding: 0;
+}
+
 /* ---------- Joueur (bas, à gauche) ---------- */
 .hud-joueur {
     position: absolute;
@@ -302,3 +351,6 @@
 .dl-scale-3 .hud-competences { bottom: 24px; left: auto; right: 24px; translate: 0 0; }
 .dl-scale-3 .hud-interaction { top: 480px; }
 .dl-scale-3 .hud-banniere { top: 150px; }
+.dl-scale-3 .hud-allies { left: 24px; top: 34%; width: 272px; }
+.dl-scale-3 .hud-allie { height: 54px; padding: 0 15px 0 6px; margin-bottom: 6px; }
+.dl-scale-3 .hud-allie__embleme { width: 39px; height: 39px; margin-right: 9px; }

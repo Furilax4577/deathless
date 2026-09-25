@@ -49,7 +49,7 @@ namespace Deathless.Jeu
         {
             var p = Partie.Instance;
             var e = E;
-            if (p == null || e == null || !p.EnCours) return;
+            if (p == null || e == null || !p.EnCours || !Deathless.Reseau.ReseauJeu.Autorite) return;   // multijoueur : l'hôte seul tire
             var b = B;
             float dt = Time.deltaTime;
             e.pv = m_Sante.Pv;

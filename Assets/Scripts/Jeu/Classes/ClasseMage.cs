@@ -79,7 +79,7 @@ namespace Deathless.Jeu
             m_DerniereBoule = Time.time;
             m_BouleLancee = false;
             H.Tourner(H.AvantCamera);
-            if (Anim != null) Anim.SetTrigger(P_Attack1);
+            if (Anim != null) H.Declencher(P_Attack1);
             AudioBank.Jouer(SonsDuJeu.BouleLancer, transform.position + Vector3.up * 1.5f, 0.8f);
         }
 

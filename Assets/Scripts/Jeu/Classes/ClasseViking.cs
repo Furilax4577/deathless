@@ -95,7 +95,7 @@ namespace Deathless.Jeu
             m_CoupPorte = false;
             m_Combo = 1 - m_Combo;
             H.Tourner(H.AvantCamera);
-            if (Anim != null) Anim.SetTrigger(m_Combo == 0 ? P_Attack1 : P_Attack2);
+            if (Anim != null) H.Declencher(m_Combo == 0 ? P_Attack1 : P_Attack2);
             AudioBank.Jouer(SonsDuJeu.EpeeElan, transform.position + Vector3.up, 0.6f);
         }
 
@@ -107,7 +107,7 @@ namespace Deathless.Jeu
             m_Action = Action.Rugissement;
             m_Depuis = 0f;
             m_Crie = m_VfxCri = false;
-            if (Anim != null) Anim.SetTrigger(P_Rugir);
+            if (Anim != null) H.Declencher(P_Rugir);
         }
 
         void Sauter()
@@ -122,7 +122,7 @@ namespace Deathless.Jeu
             m_DepartSaut = transform.position;
             H.TraverserEnnemis(true);
             H.Tourner(m_DirSaut);
-            if (Anim != null) Anim.SetTrigger(P_Saut);
+            if (Anim != null) H.Declencher(P_Saut);
         }
 
         public override void Temps(float dt)

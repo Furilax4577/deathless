@@ -96,7 +96,7 @@ namespace Deathless.Jeu
             m_Action = Action.Lacher;
             m_Depuis = 0f;
             m_DernierTir = Time.time;
-            if (Anim != null) { Anim.SetBool(P_Aiming, false); Anim.SetTrigger(P_Shoot); }
+            if (Anim != null) { Anim.SetBool(P_Aiming, false); H.Declencher(P_Shoot); }
             if (m_Cercle != null) m_Cercle.Annuler();
             Vector3 cible = Combat.PointVise(H.CameraJeu, transform, b.arcPortee, out _);
             Vector3 depart = m_Encochee != null ? m_Encochee.transform.position : transform.position + Vector3.up * 1.4f + transform.forward * 0.5f;
@@ -131,7 +131,7 @@ namespace Deathless.Jeu
             m_Depuis = 0f;
             m_NueeLancee = false;
             H.Tourner(d);
-            if (Anim != null) Anim.SetTrigger(P_TirHaut);
+            if (Anim != null) H.Declencher(P_TirHaut);
         }
 
         IEnumerator Pluie(Vector3 centre)

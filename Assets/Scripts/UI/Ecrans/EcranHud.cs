@@ -6,8 +6,9 @@ using UnityEngine.UIElements;
 namespace Deathless.UI.Ecrans
 {
     /// HUD en jeu (interface.md) : Nyxessa et son bouclier, temps restant, vote prêt, alerte avant la nuit,
-    /// bannière « NUIT N », indicateur « Nyxessa attaquée », or, joueur, compétences, interaction, mort.
-    /// Lit DonneesUI.Partie et DonneesUI.Joueur à chaque image.
+    /// bannière « NUIT N », indicateur « Nyxessa attaquée », or, joueur, compétences, interaction, mort ; en multijoueur,
+    /// vie des autres joueurs (colonne de gauche) et leur pseudo au-dessus de leur tête.
+    /// Lit DonneesUI.Partie (et IEtatEquipe s'il l'implémente) et DonneesUI.Joueur à chaque image.
     public class EcranHud : Ecran
     {
         /// Délai d'alerte avant la nuit (deroule.md : 15 s avant le crépuscule, à équilibrer).
@@ -45,6 +46,22 @@ namespace Deathless.UI.Ecrans
         Label m_MortTexte;
 
         readonly List<Emplacement> m_Emplacements = new List<Emplacement>();
+
+        /// Autres joueurs affichés (colonne de gauche) : trois au plus (salon de quatre).
+        public const int AlliesMax = 3;
+        /// Distance au-delà de laquelle le pseudo d'un allié n'est plus écrit au-dessus de sa tête.
+        public static float DistancePseudo = 70f;
+
+        sealed class LigneAllie
+        {
+            public VisualElement racine, embleme, piste, vie;
+            public Label pseudo, etat;
+            public string classe;
+        }
+
+        readonly List<LigneAllie> m_Allies = new List<LigneAllie>();
+        readonly List<Label> m_PseudosTetes = new List<Label>();
+        VisualElement m_ColonneAllies;
         IReadOnlyList<ICompetenceHud> m_CompetencesAffichees;
         IEtatPartie m_Partie;
         float m_TempsBanniere = -1f;
@@ -95,6 +112,43 @@ namespace Deathless.UI.Ecrans
             m_Reticule = Racine.Q("reticule");
             m_Mort = Racine.Q("mort");
             m_MortTexte = Racine.Q<Label>("mort-texte");
+            ConstruireAllies();
+        }
+
+        void ConstruireAllies()
+        {
+            m_ColonneAllies = Racine.Q("allies");
+            var pseudos = Racine.Q("pseudos");
+            for (var i = 0; i < AlliesMax; i++)
+            {
+                var l = new LigneAllie { racine = new VisualElement(), piste = new VisualElement(), vie = new VisualElement() };
+                l.racine.AddToClassList("hud-allie");
+                l.racine.pickingMode = PickingMode.Ignore;
+                l.embleme = IconesUI.Creer(IconesUI.RepliClasse, "hud-allie__embleme");
+                var corps = new VisualElement { pickingMode = PickingMode.Ignore };
+                corps.AddToClassList("hud-allie__corps");
+                l.pseudo = new Label { pickingMode = PickingMode.Ignore };
+                l.pseudo.AddToClassList("hud-allie__pseudo");
+                l.piste.AddToClassList("hud-allie__piste");
+                l.vie.AddToClassList("hud-allie__vie");
+                l.piste.Add(l.vie);
+                l.etat = new Label { pickingMode = PickingMode.Ignore };
+                l.etat.AddToClassList("hud-allie__etat");
+                corps.Add(l.pseudo);
+                corps.Add(l.piste);
+                corps.Add(l.etat);
+                l.racine.Add(l.embleme);
+                l.racine.Add(corps);
+                l.racine.style.display = DisplayStyle.None;
+                m_ColonneAllies?.Add(l.racine);
+                m_Allies.Add(l);
+
+                var t = new Label { pickingMode = PickingMode.Ignore };
+                t.AddToClassList("hud-pseudo");
+                t.style.display = DisplayStyle.None;
+                pseudos?.Add(t);
+                m_PseudosTetes.Add(t);
+            }
         }
 
         /// Appelé par le navigateur quand la source de la partie change.
@@ -131,6 +185,58 @@ namespace Deathless.UI.Ecrans
             var joueur = DonneesUI.Joueur;
             if (partie != null) MajPartie(partie, dt);
             if (joueur != null) MajJoueur(joueur, partie);
+            MajEquipe(partie as IEtatEquipe);
+        }
+
+        /// Colonne de gauche : un allié par ligne (emblème de classe, pseudo, barre de vie fine ; mort : ligne grisée et
+        /// compte à rebours). Vide (masquée) en solo. Pseudo au-dessus de la tête de chaque allié vivant et visible.
+        void MajEquipe(IEtatEquipe equipe)
+        {
+            var allies = equipe?.Allies;
+            var n = allies == null ? 0 : Mathf.Min(allies.Count, AlliesMax);
+            if (m_ColonneAllies != null) m_ColonneAllies.style.display = n > 0 ? DisplayStyle.Flex : DisplayStyle.None;
+            var cam = n > 0 ? Camera.main : null;
+            for (var i = 0; i < m_Allies.Count; i++)
+            {
+                var l = m_Allies[i];
+                var t = m_PseudosTetes[i];
+                if (i >= n)
+                {
+                    l.racine.style.display = DisplayStyle.None;
+                    t.style.display = DisplayStyle.None;
+                    continue;
+                }
+                var a = allies[i];
+                l.racine.style.display = DisplayStyle.Flex;
+                if (l.classe != a.ClasseId)
+                {
+                    l.classe = a.ClasseId;
+                    var c = ClassesJouables.Trouver(a.ClasseId);
+                    IconesUI.Poser(l.embleme, c != null ? c.Embleme : IconesUI.RepliClasse);
+                }
+                l.pseudo.text = a.Pseudo;
+                l.racine.EnableInClassList("hud-allie--mort", a.EstMort);
+                if (a.EstMort) l.etat.text = "Réapparition dans " + Mathf.CeilToInt(Mathf.Max(0f, a.TempsAvantReapparition)) + " s";
+                else l.vie.style.width = Length.Percent((a.VieMax > 0f ? Mathf.Clamp01(a.Vie / a.VieMax) : 0f) * 100f);
+                PlacerPseudo(t, a, cam);
+            }
+        }
+
+        void PlacerPseudo(Label t, IAllie a, Camera cam)
+        {
+            var tete = a.PositionTete;
+            var visible = tete.HasValue && !a.EstMort && cam != null && Racine.panel != null;
+            if (visible)
+            {
+                var v = cam.WorldToViewportPoint(tete.Value);
+                visible = v.z > 0.5f && v.z < DistancePseudo && v.x > -0.05f && v.x < 1.05f && v.y > -0.05f && v.y < 1.05f;
+            }
+            t.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
+            if (!visible) return;
+            var p = RuntimePanelUtils.CameraTransformWorldToPanel(Racine.panel, tete.Value, cam);
+            t.text = a.Pseudo;
+            t.style.left = p.x;
+            t.style.top = p.y;
         }
 
         void MajPartie(IEtatPartie partie, float dt)

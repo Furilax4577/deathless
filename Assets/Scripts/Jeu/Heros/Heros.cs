@@ -21,6 +21,9 @@ namespace Deathless.Jeu
         public HerosEntrees Entrees { get; private set; }
         public CharacterController CC { get; private set; }
         public Partie Partie { get; private set; }
+        /// Multijoueur : héros d'un autre poste (marionnette). Position et animations arrivent par le réseau
+        /// (NetworkTransform, NetworkAnimator) ; ni entrées, ni caméra, ni logique de classe, ni déplacement ici.
+        public bool Distant { get; private set; }
         public int Id => m_Etat != null ? m_Etat.id : 0;
         public bool Vivant => !Sante.Mort && m_EtatCourant != Etat.Mort && m_EtatCourant != Etat.Reapparition;
         public Etat EtatCourant => m_EtatCourant;
@@ -47,6 +50,7 @@ namespace Deathless.Jeu
         float m_PoidsHaut;
         float m_HautJusque;
         bool m_Sprint;
+        Unity.Netcode.Components.NetworkAnimator m_AnimReseau;
 
         static readonly int P_Speed = Animator.StringToHash("Speed");
         static readonly int P_Grounded = Animator.StringToHash("Grounded");
@@ -68,13 +72,42 @@ namespace Deathless.Jeu
             if (animator == null) animator = GetComponentInChildren<Animator>();
             if (visiere == null) visiere = GetComponentInChildren<HelmetVisor>();
             if (animator != null) m_CoucheHaut = animator.GetLayerIndex("HautDuCorps");
+            m_AnimReseau = GetComponent<Unity.Netcode.Components.NetworkAnimator>();
         }
+
+        /// Multijoueur : ce héros appartient à un autre poste (avant Initialiser).
+        public void DevenirDistant()
+        {
+            Distant = true;
+            Entrees.enabled = false;
+        }
+
+        /// Place le héros sans passer par le déplacement (CharacterController coupé le temps du saut de position).
+        public void Teleporter(Vector3 point)
+        {
+            bool actif = CC.enabled;
+            CC.enabled = false;
+            transform.position = point;
+            m_VitesseY = 0f;
+            Physics.SyncTransforms();
+            CC.enabled = actif;
+        }
+
+        /// Déclencheur d'animation : par le NetworkAnimator en réseau (les autres postes le jouent aussi), sinon direct.
+        public void Declencher(int hash)
+        {
+            if (animator == null) return;
+            if (m_AnimReseau != null && m_AnimReseau.IsSpawned) m_AnimReseau.SetTrigger(hash);
+            else animator.SetTrigger(hash);
+        }
+
+        public void Declencher(string nom) => Declencher(Animator.StringToHash(nom));
 
         public void Initialiser(Partie partie, EtatJoueur etat)
         {
             Partie = partie;
             m_Etat = etat;
-            m_Camera = partie.cameraJeu;
+            m_Camera = Distant ? null : partie.cameraJeu;
             if (Classe != null) Classe.Initialiser(this);
             Sante.Initialiser(Classe != null ? Classe.PvMax : B.herosPV);
             Sante.invulnerable = B.joueurInvincible;
@@ -84,7 +117,7 @@ namespace Deathless.Jeu
             Sante.Tue += OnTue;
             Sante.Soigne += reel => { if (Partie != null) Partie.CompterSoins(Id, reel); };
             m_Endurance = B.endurance;
-            Entrees.Action += OnAction;
+            if (!Distant) Entrees.Action += OnAction;
         }
 
         /// Recopie l'état qui fait foi dans l'EtatJoueur (lu par le HUD et, plus tard, par le réseau).
@@ -179,7 +212,7 @@ namespace Deathless.Jeu
             m_EtatCourant = Etat.Esquive;
             m_EtatDepuis = 0f;
             Invulnerable(B.esquiveInvulnerable);
-            if (animator != null) animator.SetTrigger(arriere ? "DodgeBack" : "Dodge");
+            if (animator != null) Declencher(arriere ? "DodgeBack" : "Dodge");
         }
 
         /// Pendant une ruée ou un bond, le héros traverse les squelettes (sauf `sauf`) ; seul le décor l'arrête.
@@ -220,7 +253,7 @@ namespace Deathless.Jeu
             if (!PeutAgir || !m_AuSol || !Depenser(B.sautCout)) return;
             m_VitesseY = Mathf.Sqrt(2f * B.gravite * B.hauteurSaut);
             m_AuSol = false;
-            if (animator != null) animator.SetTrigger(P_Jump);
+            if (animator != null) Declencher(P_Jump);
             AudioBank.Jouer(SonsDuJeu.Saut, transform.position, 0.5f);
         }
 
@@ -246,7 +279,7 @@ namespace Deathless.Jeu
         {
             if (reel <= 0f) return;
             AudioBank.Jouer(SonsDuJeu.JoueurTouche, transform.position + Vector3.up, 0.9f, 0.2f);
-            if (animator != null && !Sante.Mort) { animator.SetTrigger(P_Hit); HautDuCorpsPendant(0.6f); }
+            if (animator != null && !Sante.Mort) { Declencher(P_Hit); HautDuCorpsPendant(0.6f); }
             if (Classe != null) Classe.SurTouche(info, reel);
         }
 
@@ -282,7 +315,7 @@ namespace Deathless.Jeu
             transform.position = point;
             Vector3 vers = -new Vector3(point.x, 0f, point.z);
             if (vers.sqrMagnitude > 0.01f) transform.rotation = Quaternion.LookRotation(-vers.normalized);
-            if (animator != null) { animator.SetBool(P_Dead, false); animator.SetTrigger(P_Respawn); }
+            if (animator != null) { animator.SetBool(P_Dead, false); Declencher(P_Respawn); }
             System.Action fin = () =>
             {
                 m_EtatCourant = Etat.Libre;
@@ -309,6 +342,13 @@ namespace Deathless.Jeu
             {
                 var ph = Partie.Etat.phase;
                 visiere.open = !(ph == Phase.Crepuscule || ph == Phase.Nuit);
+            }
+            if (Distant) return;
+            // Filet de sécurité : un héros passé sous le sol revient au point de réapparition le plus proche.
+            if (transform.position.y < -25f && Partie != null)
+            {
+                Debug.LogWarning("[Héros] " + name + " sous le sol (" + transform.position + "), replacé");
+                Teleporter(Partie.PointReapparition(transform.position) + Vector3.up * 0.1f);
             }
 
             if (m_Camera != null && m_EtatCourant != Etat.Mort) { Vector2 r = Entrees.Regard(); m_Camera.Tourner(r.x, r.y); }
