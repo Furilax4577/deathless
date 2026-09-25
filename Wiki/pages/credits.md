@@ -15,7 +15,7 @@ Les licences CC0 n'exigent pas de crédit : ils figurent ici par reconnaissance.
 
 | Police | Auteur | Licence |
 |---|---|---|
-| Fredoka {à confirmer} | Milena Brandão, via Google Fonts | SIL Open Font License |
+| Fredoka | The Fredoka Project Authors (Milena Brandão, Hafontia), via Google Fonts | SIL Open Font License 1.1 |
 
 ## Outils
 
