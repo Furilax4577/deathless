@@ -21,7 +21,6 @@ Travaux prévus ou notés, pas encore faits. Une ligne quitte cette page quand l
 
 ## En cours
 
-- Jeu : caméra dans les petites pièces.
 - Donjon : générateur prêt dans le bac à sable (2e étage compris) ; report dans main et branchement au portail.
 - Barde : modèle prêt dans le bac à sable ; en attente de validation, animation de luth à créer.
 
