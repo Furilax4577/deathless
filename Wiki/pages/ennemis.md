@@ -97,5 +97,14 @@ Points de vie, dégâts et cadence : {à équilibrer}.
 | Nyxar | 1 200 | | 18 par crâne, toutes les 3 s | reste entre 12 et 18 m ; relève 3 sbires toutes les 15 s, 12 au plus |
 
 - **Composition des vagues** {à équilibrer} : vagues de 30, 35 et 35 % des squelettes de la nuit ; avec quatre vagues, 22, 24, 26 et 28 %. La part de guerriers passe de 0 % la nuit 1 à 50 % dès la nuit 5.
-- Or rapporté par type : {à confirmer}.
+- **Or rapporté** par squelette tué, versé à la caisse commune (règle provisoire en attendant le donjon, voir [Déroulé d'une partie](deroule.md)) {à équilibrer} :
+
+| Ennemi | Or |
+|---|---|
+| Sbire | 5 |
+| Guerrier, voleur | 8 |
+| Mage | 10 |
+| Élite | 25 |
+| Morgrim | 150 |
+| Nyxar | 300 |
 - {dev} Dans la version 0.1, voleurs et mages sont encore joués comme des guerriers, et les élites sont des guerriers renforcés.

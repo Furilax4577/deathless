@@ -63,6 +63,8 @@ Le donjon est **régénéré chaque nuit** : chaque jour, le portail mène à un
 
 **Butin** {décidé} : on ne rapporte du donjon que de l'**or**, versé à la caisse commune au retour par le portail.
 
+**Or des vagues, en attendant le donjon** {décidé} : tant que le donjon n'existe pas, chaque squelette tué pendant les vagues rapporte de l'or à la caisse commune (montants dans [Ennemis](ennemis.md)). Règle provisoire, à réajuster quand le donjon arrivera.
+
 ### Rester au donjon à la tombée de la nuit {décidé}
 
 - **Alerte** : avant la fermeture du portail, les joueurs au donjon sont prévenus, à l'écran et par un son. Délai d'alerte : 15 s avant le crépuscule {à équilibrer}.
