@@ -84,6 +84,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: PortailDonjon
       objectReference: {fileID: 0}
+    - target: {fileID: 9029175604996422544, guid: 8738e0330059a5e40a8126ea2797a3da, type: 3}
+      propertyPath: reagirRelique
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9029175604996422544, guid: 8738e0330059a5e40a8126ea2797a3da, type: 3}
+      propertyPath: alimenteParNyxessa
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

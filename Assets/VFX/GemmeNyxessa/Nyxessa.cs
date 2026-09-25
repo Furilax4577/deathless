@@ -78,6 +78,21 @@ public class Nyxessa : MonoBehaviour
         }
     }
 
+    // Charge d'ouverture : réaction d'ouverture, puis flux de gemmes en arc du cristal à `cible` (centre du portail) en
+    // `duree` s ; `aLArrivee` est appelé à l'arrivée de la tête (le portail s'ouvre).
+    public ChargeNyxessa EnvoyerCharge(Vector3 cible, float duree, System.Action aLArrivee)
+    {
+        Reagir(ReactionNyxessa.OuverturePortail);
+        return ChargeNyxessa.Lancer(CentreCristal, cible, duree, gemmes, aLArrivee);
+    }
+
+    // Charge reprise à la fermeture : flux de `source` (centre du portail) vers le cristal le long du même arc ; la
+    // réaction de fermeture se joue à l'arrivée.
+    public ChargeNyxessa ReprendreCharge(Vector3 source, float duree)
+    {
+        return ChargeNyxessa.Lancer(source, CentreCristal, duree, gemmes, () => { if (this != null) Reagir(ReactionNyxessa.FermeturePortail); });
+    }
+
     // Tir d'un missile magique par la relique : éclat au départ, réaction, et crâne en gemmes à l'échelle `echelle`
     // (1,5 par défaut pour la relique). Le projectile (vide) est déplacé par l'appelant.
     public SkullMissileVisual TirerMissile(Transform projectile, GemShape forme, Material materiau, float echelle = 1.5f)

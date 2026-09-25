@@ -327,6 +327,11 @@ MonoBehaviour:
   radius: 1.6
   epaisseur: 0.35
   reagirRelique: 1
+  alimenteParNyxessa: 1
+  dureeCharge: 0.7
+  goutteLongueurOnde: 0.6
+  goutteDecalage: 0.32
+  goutteAnneaux: 3
   cell: 0.1
   particleCount: 1700
   ouvert: 1

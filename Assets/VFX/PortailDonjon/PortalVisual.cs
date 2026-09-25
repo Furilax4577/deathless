@@ -38,6 +38,20 @@ public class PortalVisual : MonoBehaviour
     [Range(0.1f, 0.6f)] [SerializeField] private float epaisseur = 0.35f;
     [Tooltip("Prévenir la relique (Nyxessa) à l'ouverture et à la fermeture.")]
     [SerializeField] private bool reagirRelique = true;
+    [Header("Charge de Nyxessa (25/09/2026)")]
+    [Tooltip("Portail alimenté par la relique : à l'ouverture, Nyxessa envoie une charge (flux de gemmes en arc) et le portail " +
+             "s'ouvre à son arrivée ; à la fermeture, le portail se referme et la charge repart vers le cristal. Faux (portail " +
+             "de retour du donjon) : ouverture et fermeture immédiates. Sans relique dans la scène : comme faux.")]
+    [SerializeField] private bool alimenteParNyxessa;
+    [Tooltip("Durée du vol de la charge (s).")]
+    [SerializeField] private float dureeCharge = 0.7f;
+    [Header("Goutte d'eau (passage d'un joueur)")]
+    [Tooltip("Distance entre deux anneaux (m).")]
+    [SerializeField] private float goutteLongueurOnde = 0.6f;
+    [Tooltip("Décalage de départ entre deux anneaux (s) ; la vitesse des anneaux vaut longueur d'onde / décalage.")]
+    [SerializeField] private float goutteDecalage = 0.32f;
+    [Tooltip("Nombre d'anneaux.")]
+    [SerializeField] private int goutteAnneaux = 3;
     [Tooltip("Taille moyenne d'un cube de la soupe (m).")]
     [SerializeField] private float cell = 0.1f;
     [Tooltip("Nombre de cubes de la soupe.")]
@@ -77,7 +91,8 @@ public class PortalVisual : MonoBehaviour
     // du centre vers le bord ; sortie : du bord vers le centre).
     private float goutteStart = -100f;
     private bool goutteSortie;
-    private const float GoutteSecondes = 1.5f;
+    private const float GoutteSecondes = 1.7f;
+    private bool chargeEnVol;   // charge de Nyxessa en route vers le portail (ouverture différée)
     private VfxLumiere lumiere;
 
     // Centre de la soupe dans le monde (où convergent les gemmes d'un joueur qui entre).
@@ -237,6 +252,17 @@ public class PortalVisual : MonoBehaviour
             GemBurst.Explode(root.position, size, voxelMaterial);
     }
 
+    // Ouverture : gerbe au centre, la soupe jaillit du centre vers le bord (et goutte d'eau si la charge arrive).
+    private void Ouvrir()
+    {
+        SetState(State.Opening);
+        root.gameObject.SetActive(true);
+        if (lumiere != null) lumiere.Allumer();
+        else if (portalLight != null) portalLight.enabled = true;
+        Pop(1f, false);
+        if (alimenteParNyxessa) Entrer();
+    }
+
     // Rebond élastique : dépasse un peu 1 puis s'y pose.
     private static float ElasticOut(float t)
     {
@@ -259,20 +285,35 @@ public class PortalVisual : MonoBehaviour
         }
 
         bool wantOpen = !PreviewClosed && ouvert;
-        if (wantOpen && (state == State.Closed || state == State.Closing))
+        bool charge = alimenteParNyxessa && Nyxessa.Instance != null;
+        if (wantOpen && (state == State.Closed || state == State.Closing) && !chargeEnVol)
         {
-            SetState(State.Opening);
-            root.gameObject.SetActive(true);
-            if (lumiere != null) lumiere.Allumer();
-            else if (portalLight != null) portalLight.enabled = true;
-            Pop(1f, false);
-            if (reagirRelique) Nyxessa.Signaler(ReactionNyxessa.OuverturePortail);
+            if (charge)
+            {
+                // Nyxessa réagit et envoie sa charge ; le portail s'ouvre à l'arrivée du flux.
+                chargeEnVol = true;
+                Nyxessa.Instance.EnvoyerCharge(Center, dureeCharge, () =>
+                {
+                    chargeEnVol = false;
+                    if (this != null && !PreviewClosed && ouvert && (state == State.Closed || state == State.Closing))
+                        Ouvrir();
+                });
+            }
+            else
+            {
+                Ouvrir();
+                if (reagirRelique) Nyxessa.Signaler(ReactionNyxessa.OuverturePortail);
+            }
         }
         else if (!wantOpen && (state == State.Open || state == State.Opening))
         {
             SetState(State.Closing);
             Pop(1.3f, true);
-            if (reagirRelique) Nyxessa.Signaler(ReactionNyxessa.FermeturePortail);
+            // Portail alimenté : la charge repart vers le cristal, la réaction de fermeture se joue à son arrivée.
+            if (charge)
+                Nyxessa.Instance.ReprendreCharge(Center, dureeCharge);
+            else if (reagirRelique)
+                Nyxessa.Signaler(ReactionNyxessa.FermeturePortail);
         }
         if (state == State.Closed)
             return;
@@ -367,7 +408,8 @@ public class PortalVisual : MonoBehaviour
             float thickness = demi * Mathf.Sqrt(Mathf.Max(0f, 1f - r * r * r * r)) + 0.03f;
             float wave = 0.25f * Mathf.Sin(t * 1.7f + pPhase[i]) + 0.2f * Mathf.Sin(r * 8f - t * 3f);
             float z = (pDepth[i] + wave * 0.3f) * thickness;
-            // Goutte d'eau : trois anneaux (0,16 s d'écart) qui parcourent la surface, crête suivie d'un creux, amortis ;
+            // Goutte d'eau : `goutteAnneaux` anneaux espacés de `goutteLongueurOnde` (départs décalés de `goutteDecalage`)
+            // qui parcourent la surface, crête suivie d'un creux, amortis ;
             // entrée : du centre vers le bord, creux au centre qui rebondit ; sortie : du bord vers le centre, petite
             // bosse au centre quand ils s'y résorbent. Les crêtes s'éclaircissent.
             float goutte = Time.time - goutteStart;
@@ -377,15 +419,18 @@ public class PortalVisual : MonoBehaviour
                 // Pendant la goutte, le cœur clair de la soupe est atténué pour que les crêtes se détachent.
                 if (color == Pale && amort > 0.25f)
                     color = Light;
-                for (int k = 0; k < 3; k++)
+                float vitesse = goutteLongueurOnde / Mathf.Max(0.05f, goutteDecalage) / radius;   // rayon relatif par seconde
+                float decalageCreux = 0.45f * goutteLongueurOnde / radius;
+                for (int k = 0; k < Mathf.Max(1, goutteAnneaux); k++)
                 {
-                    float ak = goutte - k * 0.16f;
+                    float ak = goutte - k * goutteDecalage;
                     if (ak < 0f) continue;
-                    float ring = goutteSortie ? 1.1f - ak * 1.2f : ak * 1.2f;
+                    float ring = goutteSortie ? 1.1f - ak * vitesse : ak * vitesse;
                     if (ring < -0.1f || ring > 1.2f) continue;
-                    float amp = 0.34f * (1f - k * 0.25f) * amort * (goutteSortie ? Mathf.Clamp01(ak / 0.25f) : Mathf.Exp(-ak * 1.2f));
+                    float amp = 0.34f * (1f - k * 0.2f) * amort * (goutteSortie ? Mathf.Clamp01(ak / 0.25f) : Mathf.Exp(-ak * 1.2f));
                     float d1 = (r - ring) / 0.09f;
-                    float creux = Mathf.Exp(-((r - ring + (goutteSortie ? -0.16f : 0.16f)) / 0.09f) * ((r - ring + (goutteSortie ? -0.16f : 0.16f)) / 0.09f));
+                    float dc = (r - ring + (goutteSortie ? -decalageCreux : decalageCreux)) / 0.09f;
+                    float creux = Mathf.Exp(-dc * dc);
                     float crete = Mathf.Exp(-d1 * d1);
                     z += amp * (crete - 0.55f * creux);
                     // Crête claire, creux sombre : les anneaux se lisent aussi de face.
