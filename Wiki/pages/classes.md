@@ -10,7 +10,7 @@ Cinq classes jouables. Chaque classe a un style d'arme, et ses compétences sont
 | Assassin | Dague, arbalète dans le dos | Furtif, coups critiques |
 | Viking | Hache à deux mains | Mêlée, zone |
 
-Les rôles sont {à confirmer}. Les armes et leurs animations sont {décidé}.
+Les rôles, les armes et leurs animations sont {décidé}.
 
 ## Paladin {décidé}
 
@@ -29,7 +29,8 @@ Les rôles sont {à confirmer}. Les armes et leurs animations sont {décidé}.
 - Bâton. L'attaque de base est une **boule de feu** qui explose à l'impact, puis laisse une fumée à facettes qui se dissipe {effet validé}.
 - **Cône de flammes** maintenu devant le mage {effet validé}.
 - **Brûlure** : les ennemis touchés brûlent pendant un moment {effet validé}.
-- Jauge de mana, ultime et valeurs chiffrées : {à confirmer}.
+- **Mana** {décidé} : jauge de 100. Elle remonte d'environ 1 par seconde, plus un bonus à chaque ennemi touché par la boule de feu. Les compétences coûtent du mana ; le cône de flammes en consomme tant qu'il est maintenu. Valeurs {à équilibrer}.
+- Ultime et valeurs chiffrées : {à confirmer}.
 
 ## Rôdeur
 
@@ -88,4 +89,5 @@ L'assassin joue **principalement à la dague**. L'arbalète et la grenade sont d
 - **Attaque tournante** {décidé} : le viking tourne sur lui-même, hache tendue, et frappe tout autour de lui {{dev: (animations KayKit `Melee_2H_Attack_Spin` et `Melee_2H_Attack_Spinning`)}}. Son emplacement et sa durée sont {à confirmer}.
 - **Rugissement** : un crâne de barbare casqué en gemmes rouges surgit au-dessus du viking, rugit, et une onde part de lui puis revient comme pour dire « venez » {effet validé}.
 - **Saut percutant** : le viking bondit d'environ 5 m vers l'avant et frappe le sol, une onde de terre part du point d'impact {effet validé}.
-- Jauge de rage et valeurs chiffrées : {à confirmer}.
+- **Rage** {décidé} : jauge de 100. Elle monte quand le viking frappe et redescend lentement hors combat. Les compétences du viking coûtent de la rage. Valeurs {à équilibrer}.
+- Valeurs chiffrées des compétences : {à confirmer}.
