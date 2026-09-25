@@ -18,7 +18,9 @@ Travaux prévus ou notés, pas encore faits. Une ligne quitte cette page quand l
 ## En cours
 
 - Donjon : générateur prêt dans le bac à sable (2e étage compris) ; report dans main et branchement au portail.
-- Barde : modèle prêt dans le bac à sable ; en attente de validation, animation de luth à créer.
+- Barde : modèle prêt dans le bac à sable. **Attaque de base** : il tient son luth par le manche et frappe avec, comme une massue (référence d'image de Quentin). Animation de jeu du luth à créer.
+- Bavaroise (chopes KayKit) et clochard : en cours dans les bacs à sable.
+- Wiki dev : rubrique Animations (toutes les animations en vidéo, sur le mannequin, avec l'arme adaptée) en cours.
 
 ## Plus tard
 
