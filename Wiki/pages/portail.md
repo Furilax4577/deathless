@@ -23,3 +23,10 @@ Le portail mène du village au donjon. C'est un disque de gemmes vertes d'enviro
 ## Portail de retour {décidé}
 
 Le portail qui ramène du donjon au village n'est pas alimenté par Nyxessa : il s'ouvre et se ferme sans charge.
+
+## Dans le jeu (26/09/2026)
+
+- **Entrée** : de jour, un joueur entre en passant dans le portail du village. Son corps part en gemmes vers le centre du portail, puis se reforme sur la dalle d'arrivée du donjon.
+- **Retour** : il revient en passant dans le portail de retour du donjon. Il réapparaît 5 m devant le portail du village, du côté de Nyxessa, et les gemmes jaillissent du portail. L'or qu'il porte est versé à la caisse commune.
+- **Visibilité** : les autres joueurs voient le passage : dissolution au départ, reconstitution à l'arrivée.
+- **Portail fermé** : la nuit, le portail est fermé et on ne peut pas passer.

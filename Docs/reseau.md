@@ -95,6 +95,12 @@ Arguments de `ClientAutomatique` :
 
 `-deathless-competences` : le héros enchaîne toutes ses compétences (saut, esquive, RT, LB, RB, LT maintenu, RT maintenu), jauge remplie, et le journal compte les effets reçus des autres (`HerosReseau.EffetsRecus`). `-deathless-attendre=2` : l'hôte construit ne se déclare prêt qu'à 2 joueurs. `-deathless-solo` : partie solo lancée aussitôt (vérification d'un build : le journal donne aussi l'état de la caméra).
 
+`-deathless-donjon=retour|rester` fait le test du donjon.
+- Le héros entre par le portail du village, marche sur un tas d'or, puis ouvre un coffre avec Interagir.
+- Avec `retour`, il revient ensuite par le portail de retour, et son or est versé à la caisse. Avec `rester`, il attend le rappel du crépuscule.
+- Le journal donne ce que voit le poste : graine, butins pris, or porté, caisse, présence au donjon.
+- Script d'hôte : `scratchpad/reseau/donjon.sh`.
+
 Il rejoint, prend sa classe, se déclare prêt, puis fait marcher son héros en rond (sprint une seconde sur trois ; saut, esquive, attaque toutes les 1,5 s) et journalise toutes les 2 s le salon, sa position, le sol sous lui et les héros des autres (position, vie). Pseudo et classe imposés ne touchent pas au profil enregistré.
 
 Résultats du 25/09/2026 (hôte Paladin « Quentin », client Mage « Morgane ») :
@@ -109,6 +115,20 @@ Résultats du 25/09/2026 (hôte Paladin « Quentin », client Mage « Morgane »
 | L'hôte ferme le salon / quitte la partie | le client reçoit « L’hôte a fermé le salon. », revient au menu (scène rechargée) |
 
 Résultats de l'étape 2 (25/09/2026, hôte Paladin, client Mage, adresse IP) : vote des deux joueurs → jour écourté, nuit chez les deux ; squelettes vus par le client, qui en tue (dégâts, tués et or crédités par l'hôte : 4 tués, 320 dégâts, 20 or) ; squelettes qui frappent le héros du client ; coup mortel porté chez l'hôte → mort chez le client, comptée par l'hôte (délai 8 s), réapparition au bout du délai ; sorcier et bouclier suivis ; victoire forcée → écran de score à deux lignes chez les deux ; « Rejouer » → nouvelle partie pour les deux ; Nyxessa détruite chez l'hôte → défaite chez le client. Aucune erreur dans les consoles.
+
+## Donjon (26/09/2026)
+
+`Assets/Scripts/Jeu/Donjon/DonjonJeu.cs` est posé sur l'objet « Donjon » de Village.unity, à (1000, 0, 0), par le menu Deathless > Donjon > Placer dans le village. `CoffreDonjon.cs` complète le dispositif.
+
+- **Graine** : l'hôte (ou le poste solo) tire la graine au début du jour (`NouveauDonjon`) et la publie dans `PartieReseau.GraineDonjon`. Chaque client construit le donjon de cette graine (`DonjonGenerateur.Generer`, déterministe, avec son propre NavMesh).
+- **Butin** : les butins pris sont un masque de bits, `PartieReseau.ButinsPris`.
+  - Un client demande un butin avec `DemanderButin(index)` (RPC au serveur). L'hôte vérifie la distance et l'accorde (`DonjonJeu.Accorder`) en ajoutant l'or à `EtatJoueur.orPorte`.
+  - L'or porté est répliqué dans `ScoreReseau.orPorte`.
+- **Dépôt** : au portail de retour, un client envoie `DeposerOr()`, et l'hôte verse l'or à la caisse avec `GagnerOr`.
+- **Rappel** : au crépuscule, l'hôte calcule la part gardée (`GameBalance.partGardeeRappel` au palier des missiles), puis envoie `HerosReseau.Rappeler(garde, perdu)` au propriétaire, qui se téléporte près de Nyxessa.
+- **Passages** : le propriétaire joue la téléportation (`PortalTransit`) et la diffuse avec `ClasseHeros.DiffuserTransit` (effets 203 et 204). Il saute de position avec `NetworkTransform.Teleport`, sans interpolation. Chez les autres, la marionnette est cachée entre le départ et l'arrivée.
+- **Gardiens** : ils sont posés par l'hôte avec `DirecteurVagues.Poser` puis `Squelette.Garder(poste)`, et répliqués comme les autres squelettes.
+- **Local à chaque poste** : le masquage des étages (capteurs sur le héros local et sa caméra), l'ambiance sombre et l'animation des coffres (cadenas, couvercle).
 
 ## Limites connues
 

@@ -97,6 +97,13 @@ Barre du Paladin dans la démo : Frappe à l'épée (`Gameplay/AttackPrimary`), 
 
 Les trois catégories ajoutées le 25/09/2026 (Coups critiques, Dégâts évités à Nyxessa, Soins prodigués : le plus élevé gagne) sont affichées ; l'écran a donc sept colonnes, sur une ligne à toutes les tailles (à ×3, textes et pastilles resserrés, en-têtes sur deux lignes). Ajouter une catégorie : une propriété dans `ILigneScore`, une entrée dans `EcranScore.s_Categories`, un en-tête dans `Score.uxml`.
 
+### Donjon : `IEtatDonjon` (`Donnees/IEtatDonjon.cs`, 26/09/2026)
+
+Cette interface est enregistrée dans `DonneesUI.Donjon` et implémentée par `DonjonJeu`. Le HUD la lit ainsi :
+- **`OrPorte`, `AuDonjon`** : la pastille « or porté · au donjon » s'affiche sous la caisse commune (`or-porte`) quand de l'or est porté ou que le joueur est au donjon.
+- **`AvantRappel`** : s'il vaut 0 ou plus et que le joueur est au donjon, une alerte rouge pulsée s'affiche (`donjon-alerte`), avec le texte « Le portail se ferme dans N s : rentrez au village ! ». Elle remplace l'alerte de la tombée de la nuit.
+- **`Message`** : une pastille (`donjon-message`) affiche par exemple « 140 or versés à la caisse commune » ou « Rappelé par Nyxessa : 88 or gardés, 132 perdus ».
+
 ### Classes : `IClassesJouables`, `IClasseJouable`, `IEtatJoueurClasse` (`Donnees/IClasses.cs`, 25/09/2026)
 
 Cinq classes jouables (Wiki `classes.md`, `commandes.md`). Tout est **facultatif et rétrocompatible** : un jeu qui n'implémente rien de nouveau garde son comportement (choix affiché depuis le catalogue, `LancerSolo()` appelé).

@@ -69,7 +69,25 @@ Le donjon est **régénéré chaque nuit** : chaque jour, le portail mène à un
 
 **Butin** {décidé} : on ne rapporte du donjon que de l'**or**, versé à la caisse commune au retour par le portail.
 
-**Or des vagues, en attendant le donjon** {décidé} : tant que le donjon n'existe pas, chaque squelette tué pendant les vagues rapporte de l'or à la caisse commune (montants dans [Ennemis](ennemis.md)). Règle provisoire, à réajuster quand le donjon arrivera.
+**Dans le jeu (26/09/2026)** :
+- **Le donjon du jour** : au lever du jour, l'hôte tire une graine et construit le donjon ; les autres joueurs reçoivent la graine et construisent le même. Le donjon est dans la même scène que le village, loin de lui.
+- **Portails** : de jour, on entre en passant dans le portail du village. On arrive sur la dalle d'arrivée du donjon. Le portail de retour ramène devant le portail du village, du côté de Nyxessa. Le passage se fait avec l'effet de téléportation (le corps part en gemmes vers le portail puis se reforme), vu par tous les joueurs.
+- **Emplacements de butin** : 7 emplacements, avec les montants suivants.
+
+  | Butin | Nombre | Or | Comment on le prend |
+  |---|---|---|---|
+  | Grand coffre | 1 | 120 | Touche Interagir. Il est sur le 2e étage, fermé par un cadenas d'or. |
+  | Coffre | 2 | 50 | Touche Interagir. Il est fermé par un cadenas d'acier. |
+  | Tas d'or | 4 | 20 | On passe dessus. |
+
+  Un butin n'est pris qu'une fois : c'est l'hôte qui décide. Les montants augmentent de 10 % par nuit déjà passée. Tous les montants sont {à équilibrer}.
+- **Or porté** : l'or pris est **porté** par le joueur. Le HUD l'affiche sous la caisse commune (« or porté · au donjon »). Il est versé à la caisse commune au retour par le portail.
+- **Gardiens** : 6 squelettes gardent le butin, dont 35 % de guerriers et le reste de sbires {à équilibrer}. Ils apparaissent au lever du jour sur les points d'apparition les plus proches du butin. Ils restent à leur poste et poursuivent les joueurs qui approchent. Ils n'attaquent pas Nyxessa, ne rapportent pas d'or et disparaissent au crépuscule.
+- **Ambiance** : pour le joueur au donjon, le lieu est sombre, éclairé par les torches, sans ciel.
+- **Eau** : ralentissement ×0,6, pour les héros comme pour les squelettes {à équilibrer}.
+- **Mort au donjon** : un joueur qui meurt au donjon perd l'or qu'il portait, comme un joueur rappelé (Nyxessa en garde la part de son palier). Il réapparaît au village {à confirmer}.
+
+**Or des vagues** {décidé} : chaque squelette tué pendant les vagues rapporte de l'or à la caisse commune (montants dans [Ennemis](ennemis.md)). Cette règle était prévue en attendant le donjon. Elle **reste en place** maintenant que le donjon est arrivé, jusqu'à ce que Quentin décide de la réajuster.
 
 ### Rester au donjon à la tombée de la nuit {décidé}
 
@@ -87,6 +105,10 @@ Le donjon est **régénéré chaque nuit** : chaque jour, le portail mène à un
 | 5 | 75 % |
 
 Ces parts sont {à équilibrer}. Rentrer par le portail avant la nuit garde toujours 100 % du butin.
+
+Dans le jeu :
+- **Alerte** : 15 s avant le crépuscule, un joueur au donjon voit « Le portail se ferme dans N s : rentrez au village ! » et entend Nyxessa. Cette alerte remplace, pour lui, celle de la tombée de la nuit.
+- **Rappel** : au crépuscule, Nyxessa le ramène près d'elle, avec l'effet de téléportation. La part gardée va à la caisse commune, et le HUD affiche par exemple « Rappelé par Nyxessa : 88 or gardés, 132 perdus ».
 
 ## Vote « prêt » {décidé}
 
