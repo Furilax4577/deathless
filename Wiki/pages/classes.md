@@ -44,6 +44,7 @@ Les rôles, les armes et leurs animations sont {décidé}.
 - **Brûlure** : les ennemis touchés brûlent pendant un moment {effet validé}.
 - **Mana** {décidé} : jauge de 100. Elle remonte d'environ 1 par seconde, plus un bonus à chaque ennemi touché par la boule de feu. Les compétences coûtent du mana ; le cône de flammes en consomme tant qu'il est maintenu. Valeurs {à équilibrer}.
 - **Pas d'ultime** {décidé} : le mage garde la boule de feu, le cône de flammes et la brûlure.
+- **Compétences LB et RB** : vides pour l'instant {décidé}. Le mage joue avec la boule de feu (attaque principale) et le cône de flammes (attaque secondaire maintenue). Ses compétences : {à confirmer}.
 - Valeurs chiffrées : {à confirmer}.
 
 ## Rôdeur
