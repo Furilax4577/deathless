@@ -13,8 +13,8 @@ namespace Deathless.Audio
     /// premier son. Toute source audio du jeu passe par un groupe du mixer : `Groupe(canal)`.
     public static class VolumesAudio
     {
-        /// Valeurs par défaut (demande de Quentin) : principal 100, musique 70, effets 100, interface 80.
-        public static readonly float[] ParDefaut = { 1f, 0.7f, 1f, 0.8f };
+        /// Valeurs par défaut (demande de Quentin, 25/09/2026) : principal 100, musique 10, effets 15, interface 15.
+        public static readonly float[] ParDefaut = { 1f, 0.1f, 0.15f, 0.15f };
         static readonly string[] s_Parametres = { "VolumePrincipal", "VolumeMusique", "VolumeEffets", "VolumeInterface" };
         const string PrefixeCle = "Deathless.Volume.";
 
