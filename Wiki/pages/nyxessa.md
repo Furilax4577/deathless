@@ -64,6 +64,7 @@ Un bouclier cylindrique de gemmes en lévitation protège Nyxessa {effet validé
 - **Invocation** : c'est un **villageois sorcier** qui invoque le bouclier.
 - **Encaissement** : la quantité de dégâts que le bouclier peut absorber est **améliorable**.
 - **Riposte** : quand il est frappé, le bouclier **renvoie des dégâts** à l'attaquant.
+- **Canalisation** : au départ, le sorcier tient le bouclier par sa seule incantation. Une **amélioration** du sorcier lui apprend à **canaliser l'énergie de Nyxessa** : un lien d'énergie apparaît entre la relique et son bâton, et il puise dans sa force {décidé}. Palier d'obtention (pas avant le rang 4, par exemple) et effet précis sur le bouclier : {à confirmer}.
 
 ### À décider
 

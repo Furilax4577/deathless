@@ -30,6 +30,14 @@ L'écran de score met les joueurs en compétition. Pour chaque catégorie, le me
 L'écran rappelle aussi le résultat de l'équipe : victoire ou nuit atteinte, durée de la partie, or total.
 
 - **Défaite** {décidé} : la partie est perdue quand **Nyxessa est détruite**. Tant qu'elle tient, les joueurs morts réapparaissent.
+
+## Mort et réapparition {décidé}
+
+- **Mort** : tout joueur ou villageois du camp des héros qui meurt **se dissout**, comme lors d'une téléportation, et **son énergie retourne à Nyxessa**.
+- **Villageois** : ils réapparaissent au **jour suivant**.
+- **Joueurs** : ils réapparaissent près de Nyxessa au bout de N secondes. **Chaque mort allonge ce délai.**
+- **Dans tous les cas**, un joueur mort revient **au début de la nouvelle journée**, même si son délai n'est pas écoulé.
+- Valeurs de départ : 8 s pour la première mort, +4 s à chaque mort suivante {à équilibrer}. Le compteur de morts se remet à zéro chaque partie ou chaque jour : {à confirmer}.
 - Ce qu'on garde d'une partie à l'autre : {à confirmer}.
 
 ## Victoire {décidé}

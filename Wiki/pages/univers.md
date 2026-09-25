@@ -6,7 +6,7 @@
 
 Les héros utilisent eux aussi cette force. C'est ce qui leur vaut la **fureur de ceux qui tentent de la récupérer** : chaque nuit, les squelettes sortent de terre pour reprendre ce que les héros leur ont pris.
 
-La relique au cœur du village est la forme visible de Nyxessa. Tant qu'elle tient, les héros tiennent aussi.
+La relique au cœur du village est la forme visible de Nyxessa. Tant qu'elle tient, les héros tiennent aussi : quand l'un d'eux tombe, son énergie retourne à Nyxessa, qui le fait renaître.
 
 ## Nyxar, le Nécromancien {décidé}
 
