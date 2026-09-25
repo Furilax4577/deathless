@@ -7,7 +7,7 @@ Travaux prévus ou notés, pas encore faits. Une ligne quitte cette page quand l
 - **Revoir le menu des options de jeu.** (noté le 25/09/2026)
 - **Barde** : nouvelle passe pour qu'il soit aussi lisse que les personnages KayKit.
 - **Taverne** : se restaurer et boire une bière, de jour uniquement ; « payer une tournée » rend tout le monde ivre quelques secondes. Des breuvages viendront plus tard.
-- **Roue à emotes** : si assez d'animations s'y prêtent (repérage en cours dans la rubrique Animations).
+- **Roue à emotes** : 11 animations s'y prêtent (voir la rubrique Animations), assez pour une roue de 8. Pas de danse, rire ni applaudissement dans les packs.
 - **Idées de personnages** (classes jouables possibles, noté le 25/09/2026) :
   - une **Bavaroise** qui se bat à coups de chopes de bière ;
   - un **barde** et son luth ;
@@ -18,7 +18,6 @@ Travaux prévus ou notés, pas encore faits. Une ligne quitte cette page quand l
 - Donjon : générateur prêt dans le bac à sable (2e étage compris) ; report dans main et branchement au portail.
 - Barde : modèle prêt dans le bac à sable. **Attaque de base** : il tient son luth par le manche et frappe avec, comme une massue (référence d'image de Quentin). Animation de jeu du luth à créer.
 - Bavaroise (chopes KayKit) et clochard : en cours dans les bacs à sable.
-- Wiki dev : rubrique Animations (toutes les animations en vidéo, sur le mannequin, avec l'arme adaptée) en cours.
 
 ## Plus tard
 

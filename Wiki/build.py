@@ -19,6 +19,10 @@
 # {sons à écouter} (encart : liens vers les sons créés qui attendent l'écoute de Quentin) et {sons à créer} (sons
 # nécessaires qui n'existent pas), lues dans data/sons.json ; les fichiers audio sont copiés de Assets/Audio/ vers
 # site/sons/ à chaque génération (seulement s'ils ont changé).
+# Vidéos : une ligne qui commence par {video chemin} (chemin relatif à Wiki/, ex. media/animations/Idle_A.mp4) devient une
+# carte vidéo (lecture automatique en boucle, muette, chargée seulement quand elle arrive à l'écran) ; le texte qui suit la
+# balise est la légende, en parties séparées par " | " (une ligne chacune). Les lignes {video} consécutives forment une
+# grille. Le fichier est copié dans site/videos/ ; la version joueur n'a jamais de vidéo (balise retirée).
 import html, io, json, os, re, datetime, shutil, unicodedata, urllib.parse
 
 ICI = os.path.dirname(os.path.abspath(__file__))
@@ -30,6 +34,7 @@ AUDIO = os.path.normpath(os.path.join(ICI, "..", "Assets", "Audio"))
 SITE_SONS = os.path.join(SITE, "sons")
 ICONES = os.path.normpath(os.path.join(ICI, "..", "ArtSources", "Icones"))
 ICONES_COPIEES = set()  # icônes SVG référencées par {icone nom}, copiées dans <version>/icones/
+VIDEOS_COPIEES = set()  # vidéos référencées par {video chemin} (chemins relatifs à media/), copiées dans site/videos/
 
 # Ordre du menu : (fichier sans extension, libellé court[, options]). Options, séparées par des espaces : "dev" si la page
 # est réservée à la version développeur, "sous" pour une sous-page (affichée en retrait sous la page qui la précède).
@@ -56,6 +61,7 @@ MENU = [
     ("commandes", "Commandes"),
     ("interface", "Interface"),
     ("effets", "Effets et couleurs", "dev"),
+    ("animations", "Animations", "dev"),
     ("a-decider", "À décider", "dev"),
     ("a-faire", "À faire", "dev"),
     ("sons", "Sons", "dev"),
@@ -68,6 +74,7 @@ BADGES = {
     "effet validé": '<span class="badge fx">effet validé</span>',
     "à équilibrer": '<span class="badge tune">à équilibrer</span>',
     "provisoire": '<span class="badge tune">valeurs provisoires</span>',
+    "emote possible": '<span class="badge emote">emote possible</span>',
 }
 PAGES_PRESENTES = None  # pages de la version en cours ; un lien vers une page absente devient du texte
 
@@ -79,7 +86,7 @@ def inline(txt):
     t = re.sub(r"\[([^\]]+)\]\(([^)#]+)\.md(#[^)]*)?\)", lambda m: m.group(1) if PAGES_PRESENTES is not None and m.group(2) not in PAGES_PRESENTES
                else '<a href="%s.html%s">%s</a>' % (m.group(2), m.group(3) or "", m.group(1)), t)
     t = re.sub(r"\[([^\]]+)\]\((https?://[^)]+)\)", r'<a href="\2">\1</a>', t)
-    t = re.sub(r"\{(décidé|à confirmer|effet validé|à équilibrer|provisoire)\}", lambda m: BADGES[m.group(1)], t)
+    t = re.sub(r"\{(décidé|à confirmer|effet validé|à équilibrer|provisoire|emote possible)\}", lambda m: BADGES[m.group(1)], t)
     t = re.sub(r"\{icone(-grande)? ([a-z0-9_]+)\}", icone, t)
     t = re.sub(r"\{couleur (#[0-9a-fA-F]{6})\}", r'<span class="swatch" style="background:\1"></span><code>\1</code>', t)
     return t
@@ -101,6 +108,67 @@ def copier_icones(dossier):
     os.makedirs(cible, exist_ok=True)
     for sous, nom in ICONES_COPIEES:
         shutil.copyfile(os.path.join(ICONES, sous, nom + ".svg"), os.path.join(cible, nom + ".svg"))
+
+
+# ------------------------------------------------------------------ vidéos ({video chemin}, version développeur)
+
+RE_VIDEO = re.compile(r"^\{video ([^}]+)\}\s*(.*)$")
+
+
+def carte_video(m):
+    """{video chemin} légende | ligne 2 | ... : carte avec une vidéo muette en boucle, chargée paresseusement (data-src,
+    posée par JS_VIDEOS quand la carte approche de l'écran). Le fichier est copié plus tard dans site/videos/."""
+    chemin = m.group(1).strip().replace("\\", "/")
+    rel = chemin[len("media/"):] if chemin.startswith("media/") else chemin
+    if not os.path.isfile(os.path.join(ICI, chemin)):
+        print("Attention : vidéo absente : Wiki/%s" % chemin)
+        video = '<span class="manque">vidéo absente : %s</span>' % html.escape(chemin)
+    else:
+        VIDEOS_COPIEES.add(rel)
+        video = ('<video data-src="videos/%s" muted loop playsinline preload="none" disablepictureinpicture></video>'
+                 % html.escape(urllib.parse.quote(rel), quote=True))
+    parts = [p.strip() for p in m.group(2).split(" | ") if p.strip()]
+    legende = "".join("<span>%s</span>" % inline(p) for p in parts)
+    return '<figure class="carte-video">%s<figcaption>%s</figcaption></figure>' % (video, legende)
+
+
+JS_VIDEOS = """
+(function(){
+  var vs=document.querySelectorAll('video[data-src]');
+  if(!vs.length) return;
+  function charge(v){ if(!v.src){ v.src=v.dataset.src; } var p=v.play(); if(p&&p.catch) p.catch(function(){}); }
+  if(!('IntersectionObserver' in window)){ vs.forEach(charge); return; }
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting) charge(e.target); else if(e.target.src) e.target.pause(); });
+  },{rootMargin:'200px 0px'});
+  vs.forEach(function(v){ io.observe(v); });
+})();
+"""
+
+
+def copier_videos(dossier):
+    """Copie dans <dossier>/videos/ les vidéos référencées (seulement celles qui ont changé) et retire les autres."""
+    cible = os.path.join(dossier, "videos")
+    copies = 0
+    for rel in VIDEOS_COPIEES:
+        src, dst = os.path.join(ICI, "media", rel), os.path.join(cible, rel)
+        a = os.stat(src)
+        if os.path.exists(dst):
+            b = os.stat(dst)
+            if b.st_size == a.st_size and int(b.st_mtime) == int(a.st_mtime):
+                continue
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        shutil.copy2(src, dst)
+        copies += 1
+    gardes = {os.path.normcase(os.path.join(cible, r)) for r in VIDEOS_COPIEES}
+    for dp, dn, fn in os.walk(cible, topdown=False):
+        for f in fn:
+            if os.path.normcase(os.path.join(dp, f)) not in gardes:
+                os.remove(os.path.join(dp, f))
+        if dp != cible and not os.listdir(dp):
+            os.rmdir(dp)
+    if VIDEOS_COPIEES:
+        print("Vidéos : %d fichiers dans %s (%d copiés)" % (len(VIDEOS_COPIEES), os.path.relpath(cible, ICI), copies))
 
 
 def options(e):
@@ -291,6 +359,8 @@ def filtrer(md, public):
         md = re.sub(r"\{\{dev:\s*(.*?)\}\}", r"\1", md)
     out, saut, table_cols = [], None, None
     for l in md.split("\n"):
+        if public and RE_VIDEO.match(l.strip()):
+            continue  # pas de vidéos dans la version joueur
         m = re.match(r"^(#{1,3}) ", l)
         if m:
             n = len(m.group(1))
@@ -371,6 +441,13 @@ def convertir(md):
             titres.extend(sous)
             i += 1
             continue
+        if RE_VIDEO.match(l.strip()):
+            cartes = []
+            while i < len(lignes) and RE_VIDEO.match(lignes[i].strip()):
+                cartes.append(carte_video(RE_VIDEO.match(lignes[i].strip())))
+                i += 1
+            out.append('<div class="grille-videos">%s</div>' % "".join(cartes))
+            continue
         m = re.match(r"^(#{1,3}) (.+)$", l)
         if m:
             n = len(m.group(1)); txt = m.group(2).strip()
@@ -412,7 +489,7 @@ def convertir(md):
             out.append('<aside class="note">%s</aside>' % inline(" ".join(bloc)))
             continue
         para = []
-        while i < len(lignes) and lignes[i].strip() and not re.match(r"^(#{1,3} |- |\||> )", lignes[i]):
+        while i < len(lignes) and lignes[i].strip() and not re.match(r"^(#{1,3} |- |\||> |\{video )", lignes[i]):
             para.append(lignes[i].strip())
             i += 1
         out.append("<p>%s</p>" % inline(" ".join(para)))
@@ -463,6 +540,13 @@ table.sons td{padding:7px 10px}table.sons td small{color:var(--doux)}
 table.sons audio{display:block;width:210px;height:32px}
 .var{display:flex;align-items:center;gap:6px;margin:2px 0}.var span{min-width:1em;color:var(--doux);font-size:12px}
 .fic{font-size:12px;word-break:break-all}.manque{color:var(--wait);font-size:13px}
+.grille-videos{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;margin:14px 0 8px}
+.carte-video{margin:0;background:var(--surface);border:1px solid var(--ligne);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.carte-video video{display:block;width:100%;aspect-ratio:1/1;background:#1c1f26}
+.carte-video figcaption{padding:8px 10px 10px;display:flex;flex-direction:column;gap:3px;font-size:13px;line-height:1.4;color:var(--doux)}
+.carte-video figcaption span:first-child{color:var(--encre);font-size:14px}
+.carte-video code{font-size:12px;word-break:break-all}.carte-video .badge{margin-left:0}
+.badge.emote{background:var(--tune-fond);color:var(--tune)}
 @media (max-width:760px){.cadre{grid-template-columns:minmax(0,1fr)}nav{position:static;height:auto;border-right:0;border-bottom:1px solid var(--ligne)}}
 """
 
@@ -488,6 +572,7 @@ def generer(public):
     SITE_SONS = os.path.join(dossier, "sons")
     SONS_COPIES.clear()
     ICONES_COPIEES.clear()
+    VIDEOS_COPIEES.clear()
     os.makedirs(dossier, exist_ok=True)
     menu_ok = [e for e in MENU if not (public and "dev" in options(e)) and os.path.exists(os.path.join(PAGES, e[0] + ".md"))]
     PAGES_PRESENTES = {e[0] for e in menu_ok}
@@ -519,12 +604,14 @@ def generer(public):
                '<ul class="res" id="res"></ul><ul>%s</ul></nav>'
                '<main>%s<p class="maj">%s</p></main></div>'
                '<script>var INDEX=%s;%s</script></body></html>'
-               % (html.escape(titre), CSS, sous_titre, menu, corps, pied, json.dumps(index, ensure_ascii=False), JS))
+               % (html.escape(titre), CSS, sous_titre, menu, corps, pied, json.dumps(index, ensure_ascii=False),
+                  JS + (JS_VIDEOS if 'class="carte-video"' in corps else "")))
         if not public:  # version développeur en ligne : pas d'indexation par les moteurs de recherche
             doc = doc.replace("<title>", '<meta name="robots" content="noindex, nofollow"><title>', 1)
         io.open(os.path.join(dossier, nom + ".html"), "w", encoding="utf-8", newline="\n").write(doc)
     copier_sons()
     copier_icones(dossier)
+    copier_videos(dossier)
     print("Wiki %s : %d pages dans %s" % ("joueur" if public else "développeur", len(pages), dossier))
 
 
