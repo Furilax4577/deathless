@@ -94,6 +94,51 @@ public class VfxBench : MonoBehaviour
     public float hauteurSaut = 0.6f;
     public float intervalleSaut = 4f;
 
+    [Header("Compétences du Wiki (25/09/2026) : critique, rôdeur, assassin, attaque tournante")]
+    public Critique critique;
+    public WeaponStyle styleArc;
+    public WeaponStyle styleDague;
+    [Header("Rôdeur : arc bandé")]
+    public GameObject rodeurArc;
+    public ArcBande arcBande;
+    public GameObject cibleArc;
+    public AnimationClip clipBander;          // Ranged_Bow_Draw
+    public AnimationClip clipViseeTenue;      // Ranged_Bow_Aiming_Idle
+    public AnimationClip clipRelacher;        // Ranged_Bow_Release
+    [Header("Rôdeur : nuée de flèches")]
+    public GameObject rodeurNuee;
+    public NueeDeFleches nuee;
+    public Transform zoneNuee;
+    public float rayonNuee = 2.5f;
+    public AnimationClip clipBanderHaut;      // Ranged_Bow_Draw_Up
+    public AnimationClip clipRelacherHaut;    // Ranged_Bow_Release_Up
+    [Header("Assassin : coup dans le dos, marche discrète et mode furtif")]
+    public GameObject assassinDos;
+    public ModeFurtif furtifDos;
+    public GameObject cibleDos;
+    public AnimationClip clipSneak;           // Sneaking
+    public AnimationClip clipEstoc;           // Melee_1H_Attack_Stab
+    [Header("Assassin : grenade fumigène")]
+    public GameObject assassinFumee;
+    public ModeFurtif furtifFumee;
+    public Fumigene fumigene;
+    public AnimationClip clipLancer;          // Throw
+    [Header("Assassin : arbalète")]
+    public GameObject assassinArbalete;
+    public Carreau carreau;
+    public GameObject cibleArbalete;
+    public AnimationClip clipViseeArbalete;   // Ranged_1H_Aiming
+    public AnimationClip clipTirArbalete;     // Ranged_1H_Shoot
+    public AnimationClip clipRechargeArbalete;// Ranged_1H_Reload
+    [Header("Viking : attaque tournante")]
+    public GameObject vikingTournant;
+    public AttaqueTournante tournante;
+    public AnimationClip clipTourne;          // Melee_2H_Attack_Spin
+    public AnimationClip clipTournoie;        // Melee_2H_Attack_Spinning
+
+    // Instants des gestes (s dans le clip), mesurés sur les clips (voir Docs/vfx.md).
+    public const float TempsDecocher = 0.05f, TempsEstoc = 0.5f, TempsLacher = 0.75f, TempsTirArbalete = 0.35f;
+
     [Header("Charge bélier (chevalier épée + bouclier) : ruée, bulle en tête de bélier, traînée, onde")]
     public GameObject chevalier;
     public ChargeBelier charge;
@@ -154,6 +199,21 @@ public class VfxBench : MonoBehaviour
         acteurs.Clear();
     }
 
+    // Pose de départ d'un personnage qui se déplace pendant son poste, relevée une seule fois : ToutJouer() peut
+    // interrompre un passage, le poste relancé repart alors de cette pose et non de l'endroit où il s'était arrêté.
+    private readonly Dictionary<Transform, Pose> posesInitiales = new Dictionary<Transform, Pose>();
+
+    private Pose PoseInitiale(Transform t)
+    {
+        Pose p;
+        if (!posesInitiales.TryGetValue(t, out p))
+        {
+            p = new Pose(t.position, t.rotation);
+            posesInitiales[t] = p;
+        }
+        return p;
+    }
+
     private Acteur A(GameObject go)
     {
         if (go == null) return null;
@@ -185,6 +245,12 @@ public class VfxBench : MonoBehaviour
         StartCoroutine(PosteRugissement());
         StartCoroutine(PosteSaut());
         StartCoroutine(PosteCharge());
+        StartCoroutine(PosteArcBande());
+        StartCoroutine(PosteNuee());
+        StartCoroutine(PosteDos());
+        StartCoroutine(PosteFumigene());
+        StartCoroutine(PosteArbalete());
+        StartCoroutine(PosteTournante());
     }
 
     private void Boucle(float intervalle, System.Action action)
@@ -459,7 +525,7 @@ public class VfxBench : MonoBehaviour
         projectiles.Add(projectile);
         projectile.transform.position = depart;
         projectile.transform.rotation = Quaternion.LookRotation(cible - depart);
-        FireballVisual.Attach(projectile.transform, feu);
+        FireballVisual.Attach(projectile.transform, feu, 1f, gemmes);
         float duree = Vector3.Distance(depart, cible) / 18f;
         for (float t = 0f; t < duree && projectile != null; t += Time.deltaTime)
         {
@@ -468,15 +534,9 @@ public class VfxBench : MonoBehaviour
         }
         if (projectile == null) yield break;
         Destroy(projectile);
-        LowPolyBlast.Fire(cible, 2.5f, feu);
-        if (fumee != null)
-        {
-            FireEffect smoke = FireEffect.Create(null, cible, 1f, 0.8f, flamme, fumee, false, true, false);
-            yield return new WaitForSeconds(0.4f);
-            if (smoke != null) smoke.SetEmitting(false);
-            yield return new WaitForSeconds(2.6f);
-            if (smoke != null) Destroy(smoke.gameObject);
-        }
+        // Fin refaite en low poly (ExplosionFeu) : éclat de gemmes Feu, flash, braises, fumée à facettes.
+        ExplosionFeu.Jouer(cible, 2.5f, gemmes);
+        Signal("boule.impact");
     }
 
     // Cône de flammes : Ranged_Magic_Spellcasting_Long jusqu'à la poussée du bâton, pose maintenue pendant `dureeCone`
@@ -582,6 +642,303 @@ public class VfxBench : MonoBehaviour
         return new Bounds(pieds + Vector3.up * 0.95f, new Vector3(0.8f, 1.9f, 0.8f));
     }
 
+    // ---------------------------------------------------------------- compétences du Wiki (25/09/2026)
+
+    private GameObject Piece(GameObject perso, string nom)
+    {
+        Transform t = perso != null ? MannequinEquip.Trouver(perso.transform, nom) : null;
+        return t != null ? t.gameObject : null;
+    }
+
+    private static Vector3 Tete(GameObject cible)
+    {
+        Transform t = cible != null ? MannequinEquip.Trouver(cible.transform, "head") : null;
+        return t != null ? t.position + Vector3.up * 0.3f : Poitrine(cible) + Vector3.up * 0.7f;
+    }
+
+    private void ArcVisee(GameObject perso, bool visee, float bandage)
+    {
+        MannequinEquip.PoseAlternative(perso, styleArc, visee);
+        GameObject fleche = Piece(perso, "arrow_bow");
+        if (fleche != null) fleche.SetActive(visee && bandage >= 0f);
+        GameObject arc = Piece(perso, "bow_withString");
+        SkinnedMeshRenderer smr = arc != null ? arc.GetComponent<SkinnedMeshRenderer>() : null;
+        if (smr != null && smr.sharedMesh != null && smr.sharedMesh.blendShapeCount > 0) smr.SetBlendShapeWeight(0, Mathf.Clamp01(bandage) * 100f);
+    }
+
+    // Pointe de la flèche encochée (enfant créé une fois au bout du modèle, +Z).
+    private Transform PointeFleche(GameObject perso)
+    {
+        GameObject f = Piece(perso, "arrow_bow");
+        if (f == null) return perso.transform;
+        Transform p = f.transform.Find("Pointe");
+        if (p == null)
+        {
+            p = new GameObject("Pointe").transform;
+            p.SetParent(f.transform, false);
+            MeshFilter mf = f.GetComponentInChildren<MeshFilter>();
+            p.localPosition = new Vector3(0f, 0f, mf != null && mf.sharedMesh != null ? mf.sharedMesh.bounds.max.z : 0.4f);
+        }
+        return p;
+    }
+
+    // Arc bandé : trois tirs en boucle : faible (1/3 de charge) au corps, plein au corps, plein à la tête (critique).
+    // Les flèches ne sont pas magiques : la charge se lit par la tension de l'arc (blendshape Draw) et la pose ; seul un
+    // bref éclat de la flèche annonce la pleine charge.
+    private IEnumerator PosteArcBande()
+    {
+        Acteur a = A(rodeurArc);
+        if (a == null || arcBande == null || clipBander == null) yield break;
+        float[] charges = { 0.35f, 1f, 1f };
+        bool[] tetes = { false, false, true };
+        int n = 0;
+        while (true)
+        {
+            int k = n % 3; n++;
+            ArcVisee(rodeurArc, false, -1f);
+            yield return Tenir(a, clipIdle, 0.6f);
+            ArcVisee(rodeurArc, true, 0f);
+            Transform pointe = PointeFleche(rodeurArc);
+            arcBande.Bander(Piece(rodeurArc, "arrow_bow"));   // la flèche encochée brille brièvement à pleine charge
+            float bander = clipBander.length * charges[k];
+            for (float t = 0f; t < bander; t += Time.deltaTime)
+            {
+                float c = t / clipBander.length;
+                arcBande.Charge = c;
+                ArcVisee(rodeurArc, true, c);
+                a.Poser(clipBander, t, clipIdle, Time.time, 1f - Mathf.Clamp01(t / Fondu));
+                yield return null;
+            }
+            arcBande.Charge = charges[k];
+            if (charges[k] >= 1f) Signal("arc.pleine");
+            if (charges[k] >= 1f)
+                for (float t = 0f; t < 0.5f; t += Time.deltaTime)
+                {
+                    a.Poser(clipViseeTenue, t, clipBander, clipBander.length, 1f - Mathf.Clamp01(t / 0.1f));
+                    yield return null;
+                }
+            bool tire = false;
+            for (float t = 0f; t < clipRelacher.length; t += Time.deltaTime)
+            {
+                a.Poser(clipRelacher, t);
+                if (!tire && t >= TempsDecocher)
+                {
+                    tire = true;
+                    bool tete = tetes[k];
+                    Vector3 cible = Surface(tete ? Tete(cibleArc) : Poitrine(cibleArc), pointe.position, tete);
+                    arcBande.Relacher(pointe.position, cible, (p, d) => { if (tete && critique != null) critique.Jouer(p, d, false); Signal(tete ? "arc.critique" : "arc.impact"); });
+                    ArcVisee(rodeurArc, true, -1f);
+                }
+                yield return null;
+            }
+        }
+    }
+
+    // Nuée de flèches : tir en cloche (Ranged_Bow_Draw_Up / Release_Up), marqueur puis pluie sur la zone.
+    private IEnumerator PosteNuee()
+    {
+        Acteur a = A(rodeurNuee);
+        if (a == null || nuee == null || clipBanderHaut == null) yield break;
+        while (true)
+        {
+            ArcVisee(rodeurNuee, false, -1f);
+            yield return Tenir(a, clipIdle, 0.8f);
+            ArcVisee(rodeurNuee, true, 0f);
+            for (float t = 0f; t < clipBanderHaut.length; t += Time.deltaTime)
+            {
+                ArcVisee(rodeurNuee, true, t / clipBanderHaut.length);
+                a.Poser(clipBanderHaut, t, clipIdle, Time.time, 1f - Mathf.Clamp01(t / Fondu));
+                yield return null;
+            }
+            bool tire = false;
+            for (float t = 0f; t < clipRelacherHaut.length; t += Time.deltaTime)
+            {
+                a.Poser(clipRelacherHaut, t);
+                if (!tire && t >= TempsDecocher)
+                {
+                    tire = true;
+                    ArcVisee(rodeurNuee, true, -1f);
+                    nuee.Jouer(zoneNuee != null ? zoneNuee.position : rodeurNuee.transform.position + rodeurNuee.transform.forward * 6f, rayonNuee);
+                }
+                yield return null;
+            }
+            ArcVisee(rodeurNuee, false, -1f);
+            yield return Fondre(a, clipRelacherHaut, clipIdle, 3f);
+        }
+    }
+
+    // Coup dans le dos : un passage en marche normale (critique), puis un passage en marche discrète et mode furtif
+    // (meilleur critique : furtif et dans le dos). Le squelette tourne le dos à l'assassin.
+    private IEnumerator PosteDos()
+    {
+        Acteur a = A(assassinDos);
+        if (a == null || cibleDos == null || clipEstoc == null) yield break;
+        Transform t0 = assassinDos.transform;
+        Vector3 origine = PoseInitiale(t0).position;
+        Quaternion rot = PoseInitiale(t0).rotation;
+        Vector3 arrivee = cibleDos.transform.position - rot * Vector3.forward * 0.85f;
+        bool furtif = false;
+        while (true)
+        {
+            t0.SetPositionAndRotation(origine, rot);
+            yield return Tenir(a, clipIdle, 0.5f);
+            if (furtif && furtifDos != null) furtifDos.Entrer();
+            AnimationClip marche = furtif && clipSneak != null ? clipSneak : clipMarche;
+            float duree = furtif ? 3f : 2.2f;
+            for (float t = 0f; t < duree; t += Time.deltaTime)
+            {
+                t0.position = Vector3.Lerp(origine, arrivee, t / duree);
+                a.Poser(marche, t, clipIdle, Time.time, 1f - Mathf.Clamp01(t / Fondu));
+                if (furtif && t >= duree * 0.5f && t - Time.deltaTime < duree * 0.5f) Signal("dos.furtif");
+                yield return null;
+            }
+            bool frappe = false;
+            for (float t = 0f; t < clipEstoc.length; t += Time.deltaTime)
+            {
+                a.Poser(clipEstoc, t, marche, duree, 1f - Mathf.Clamp01(t / Fondu));
+                if (!frappe && t >= TempsEstoc)
+                {
+                    frappe = true;
+                    // Attaquer fait sortir du mode furtif ; le coup porte avec le bonus acquis.
+                    if (critique != null) critique.Jouer(Poitrine(cibleDos) + Vector3.up * 0.15f, t0.forward, furtif);
+                    Signal(furtif ? "dos.meilleur" : "dos.critique");
+                    if (furtifDos != null) furtifDos.Sortir();
+                }
+                yield return null;
+            }
+            yield return Fondre(a, clipEstoc, clipIdle, 1f);
+            furtif = !furtif;
+        }
+    }
+
+    // Grenade fumigène : lancer (Throw), nuage, l'assassin y entre et passe en mode furtif ; en sortant il reste furtif
+    // tant qu'il marche, puis s'arrête (fin de la démonstration : il redevient visible).
+    private IEnumerator PosteFumigene()
+    {
+        Acteur a = A(assassinFumee);
+        if (a == null || fumigene == null || clipLancer == null) yield break;
+        Transform t0 = assassinFumee.transform;
+        Vector3 origine = PoseInitiale(t0).position;
+        Quaternion rot = PoseInitiale(t0).rotation;
+        Vector3 nuage = origine + rot * Vector3.forward * 3.5f;
+        while (true)
+        {
+            t0.SetPositionAndRotation(origine, rot);
+            if (furtifFumee != null) furtifFumee.Sortir();
+            yield return Tenir(a, clipIdle, 0.6f);
+            bool lance = false, tenue = false;
+            for (float t = 0f; t < clipLancer.length; t += Time.deltaTime)
+            {
+                a.Poser(clipLancer, t, clipIdle, Time.time, 1f - Mathf.Clamp01(t / Fondu));
+                // La grenade (smokebomb) apparaît dans la main droite juste avant l'armé du lancer.
+                if (!tenue && t >= 0.1f) { tenue = true; fumigene.Tenir(MannequinEquip.Trouver(assassinFumee.transform, "handslot.r")); }
+                if (!lance && t >= TempsLacher)
+                {
+                    lance = true;
+                    fumigene.Lancer(Os(assassinFumee, "handslot.r"), nuage, 0.6f);
+                }
+                yield return null;
+            }
+            Vector3 fin = origine + rot * Vector3.forward * 6.5f;
+            for (float t = 0f; t < 3.6f; t += Time.deltaTime)
+            {
+                t0.position = Vector3.Lerp(origine, fin, t / 3.6f);
+                a.Poser(clipMarche, t, clipLancer, clipLancer.length, 1f - Mathf.Clamp01(t / Fondu));
+                if (furtifFumee != null && !furtifFumee.EstFurtif && fumigene.Contient(t0.position + Vector3.up * 0.8f))
+                {
+                    furtifFumee.Entrer();
+                    Signal("fumigene.furtif");
+                }
+                yield return null;
+            }
+            yield return Tenir(a, clipIdle, 0.8f);
+            if (furtifFumee != null) furtifFumee.Sortir();
+            yield return Tenir(a, clipIdle, 2.5f);
+        }
+    }
+
+    // Arbalète : visée, tir, recharge ; le squelette tourne le dos : un carreau dans le dos (coup normal : les passifs de
+    // l'assassin ne s'appliquent pas aux carreaux), un carreau dans la tête (critique, seul cas de critique à l'arbalète).
+    private IEnumerator PosteArbalete()
+    {
+        Acteur a = A(assassinArbalete);
+        if (a == null || carreau == null || clipTirArbalete == null) yield break;
+        MannequinEquip.PoseAlternative(assassinArbalete, styleDague, true);   // arbalète en main, dague dans le dos
+        bool tete = false;
+        while (true)
+        {
+            yield return Tenir(a, clipIdle, 0.5f);
+            for (float t = 0f; t < 0.8f; t += Time.deltaTime)
+            {
+                a.Poser(clipViseeArbalete, t, clipIdle, Time.time, 1f - Mathf.Clamp01(t / Fondu));
+                yield return null;
+            }
+            bool tire = false;
+            for (float t = 0f; t < clipTirArbalete.length; t += Time.deltaTime)
+            {
+                a.Poser(clipTirArbalete, t, clipViseeArbalete, 0.8f, 1f - Mathf.Clamp01(t / 0.1f));
+                if (!tire && t >= TempsTirArbalete)
+                {
+                    tire = true;
+                    GameObject arb = Piece(assassinArbalete, "crossbow_1handed");
+                    Vector3 depart = arb != null ? arb.transform.position + arb.transform.forward * 0.35f : Poitrine(assassinArbalete);
+                    bool critiqueTete = tete;
+                    carreau.Tirer(depart, Surface(critiqueTete ? Tete(cibleArbalete) : Poitrine(cibleArbalete), depart, critiqueTete),
+                        (p, d) => { if (critiqueTete && critique != null) critique.Jouer(p, d, false); Signal(critiqueTete ? "arbalete.critique" : "arbalete.impact"); }, true);
+                }
+                yield return null;
+            }
+            if (clipRechargeArbalete != null)
+                for (float t = 0f; t < clipRechargeArbalete.length; t += Time.deltaTime)
+                {
+                    a.Poser(clipRechargeArbalete, t, clipTirArbalete, clipTirArbalete.length, 1f - Mathf.Clamp01(t / Fondu));
+                    yield return null;
+                }
+            yield return Fondre(a, clipRechargeArbalete != null ? clipRechargeArbalete : clipTirArbalete, clipIdle, 1f);
+            tete = !tete;
+        }
+    }
+
+    // Attaque tournante : Melee_2H_Attack_Spin (élan et premier tour), deux tours de Melee_2H_Attack_Spinning, fin du Spin.
+    private IEnumerator PosteTournante()
+    {
+        Acteur a = A(vikingTournant);
+        if (a == null || tournante == null || clipTourne == null || clipTournoie == null) yield break;
+        Transform hache = MannequinEquip.Trouver(vikingTournant.transform, "axe_2handed");
+        Transform tete = hache != null ? hache.Find("TeteHache") : null;
+        if (hache != null && tete == null)
+        {
+            tete = new GameObject("TeteHache").transform;
+            tete.SetParent(hache, false);
+            tete.localPosition = new Vector3(0f, 0.92f, 0f);
+        }
+        while (true)
+        {
+            yield return Tenir(a, clipIdle2H, 1f);
+            bool commence = false;
+            for (float t = 0f; t < 1.2f; t += Time.deltaTime)
+            {
+                a.Poser(clipTourne, t, clipIdle2H, Time.time, 1f - Mathf.Clamp01(t / Fondu));
+                if (!commence && t >= 0.55f) { commence = true; tournante.Commencer(vikingTournant.transform, tete); }
+                yield return null;
+            }
+            float boucle = clipTournoie.length * 2f;
+            for (float t = 0f; t < boucle; t += Time.deltaTime)
+            {
+                a.Poser(clipTournoie, t % clipTournoie.length, clipTourne, 1.2f, 1f - Mathf.Clamp01(t / 0.1f));
+                yield return null;
+            }
+            bool arrete = false;
+            for (float t = 1.25f; t < clipTourne.length; t += Time.deltaTime)
+            {
+                a.Poser(clipTourne, t, clipTournoie, 0f, 1f - Mathf.Clamp01((t - 1.25f) / 0.12f));
+                if (!arrete && t >= 1.4f) { arrete = true; tournante.Arreter(); }
+                yield return null;
+            }
+            yield return Fondre(a, clipTourne, clipIdle2H, 1f);
+        }
+    }
+
     private IEnumerator Idle(Acteur a, float phase)
     {
         while (true)
@@ -608,6 +965,13 @@ public class VfxBench : MonoBehaviour
             a.Poser(vers, Time.time, de, de.length, 1f - Mathf.Clamp01(t / Fondu));
             yield return null;
         }
+    }
+
+    // Point d'impact à la surface de la cible (le projectile s'y fiche au lieu de disparaître dans le casque ou le
+    // torse) : recul depuis le centre vers le tireur, rayon approché du casque KayKit ou du buste.
+    private static Vector3 Surface(Vector3 centre, Vector3 depart, bool tete)
+    {
+        return centre - (centre - depart).normalized * (tete ? 0.42f : 0.15f);
     }
 
     private static Vector3 Poitrine(GameObject cible)
@@ -749,12 +1113,47 @@ public class VfxBench : MonoBehaviour
     [Tooltip("Captures : le temps est ralenti pendant l'attente (les à-coups de l'éditeur décalent moins l'instant).")]
     public float ralentiCapture = 0.25f;
 
-    private IEnumerator CaptureRoutine(string chemin, float delai, Vector3 position, Vector3 visee, float fov)
+    // Événements du banc (critiques, passages en furtif) : pour caler une capture sur l'instant exact.
+    private string attendu;
+    private bool arrive;
+    private void Signal(string evenement) { if (evenement == attendu) arrive = true; }
+
+    // Capture déclenchée `apres` s après l'événement `evenement` (caméra qui suit `suivi`, comme CapturerSuivi).
+    public void CapturerEvenement(string chemin, string evenement, float apres, Transform suivi, Vector3 decalage, Vector3 visee, float fov)
+    {
+        ToutJouer();
+        attendu = evenement;
+        arrive = false;
+        StartCoroutine(CaptureEvenementRoutine(chemin, apres, suivi, decalage, visee, fov));
+    }
+
+    private IEnumerator CaptureEvenementRoutine(string chemin, float apres, Transform suivi, Vector3 decalage, Vector3 visee, float fov)
+    {
+        float echelleTemps = Time.timeScale;
+        Time.timeScale = Mathf.Clamp(ralentiCapture, 0.05f, 1f);
+        while (!arrive) yield return null;
+        Time.timeScale = echelleTemps;
+        yield return CaptureRoutine(chemin, apres, decalage, visee, fov, suivi);
+    }
+
+    // Capture qui suit un objet : caméra à `decalage` de `suivi` (repère monde), visant `suivi` + `visee`.
+    public void CapturerSuivi(string chemin, float delai, Transform suivi, Vector3 decalage, Vector3 visee, float fov)
+    {
+        ToutJouer();
+        StartCoroutine(CaptureRoutine(chemin, delai, decalage, visee, fov, suivi));
+    }
+
+    private IEnumerator CaptureRoutine(string chemin, float delai, Vector3 position, Vector3 visee, float fov, Transform suivi = null)
     {
         float echelleTemps = Time.timeScale;
         Time.timeScale = Mathf.Clamp(ralentiCapture, 0.05f, 1f);
         yield return new WaitForSeconds(delai);
         Time.timeScale = echelleTemps;
+        if (suivi != null)
+        {
+            visee = suivi.position + visee;
+            position = suivi.position + position;
+        }
         yield return new WaitForEndOfFrame();
         Camera cam = Camera.main;
         GameObject temporaire = null;

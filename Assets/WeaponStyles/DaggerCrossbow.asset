@@ -70,6 +70,7 @@ MonoBehaviour:
   idle: {fileID: -5624545281902316504, guid: b1c0e3347a15f9146815c3a63dd8e52b, type: 3}
   walk: {fileID: 7060811993321468294, guid: f3d018d923e635741ae7993f77defe2c, type: 3}
   run: {fileID: 3543698089625107784, guid: f3d018d923e635741ae7993f77defe2c, type: 3}
+  sneak: {fileID: -2142295610736234269, guid: 381d8896754d83b4484173d8a0eb5e1c, type: 3}
   attacks:
   - {fileID: -929289162156707164, guid: 2e2d132d19b4bc341bbe0f045df41929, type: 3}
   - {fileID: 3433596340313048746, guid: 0db9b1e346d22df4d98e0119109b82f3, type: 3}

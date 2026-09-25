@@ -3,7 +3,8 @@ using UnityEngine;
 
 // Thèmes de couleur des effets visuels (source unique, 25/09/2026). Règle : le feu est couleur feu ; le vert Nyxessa est
 // réservé à la relique et à son énergie. Voir Docs/vfx.md (table des thèmes).
-public enum VfxTheme { Feu, Nyxessa, Terre, Rage, Sacre, Soin, Os, BouclierPlein, BouclierEntame, BouclierCritique }
+// Nouveaux thèmes ajoutés en fin de liste (valeurs sérialisées dans les assets).
+public enum VfxTheme { Feu, Nyxessa, Terre, Rage, Sacre, Soin, Os, BouclierPlein, BouclierEntame, BouclierCritique, Critique, Chasse, Ombre }
 
 // Rôle d'une teinte dans son thème, du plus sombre au plus clair ; Accent = teinte à part, retrouvée par son nom.
 public enum VfxRole { Ombre, Base, Vif, Coeur, Accent }

@@ -59,6 +59,23 @@ public static class MannequinEquip
         return t;
     }
 
+    // Pose alternative (visée de l'arc, arbalète en main...) : chaque pièce qui en a une (hasAlternate) est rangée sous
+    // son os alternatif (ou ramenée à sa pose de base) ; les pièces sont retrouvées par le nom de leur modèle.
+    public static void PoseAlternative(GameObject personnage, WeaponStyle style, bool alternative)
+    {
+        if (personnage == null || style == null || style.attachments == null) return;
+        foreach (WeaponStyle.Attachment a in style.attachments)
+        {
+            if (a.prefab == null || !a.hasAlternate) continue;
+            Transform piece = Trouver(personnage.transform, a.prefab.name);
+            Transform os = Trouver(personnage.transform, alternative && !string.IsNullOrEmpty(a.alternateBone) ? a.alternateBone : a.boneName);
+            if (piece == null || os == null) continue;
+            piece.SetParent(os, false);
+            piece.localPosition = alternative ? a.alternatePosition : a.localPosition;
+            piece.localRotation = Quaternion.Euler(alternative ? a.alternateEuler : a.localEuler);
+        }
+    }
+
     public static Transform Trouver(Transform racine, string nom)
     {
         foreach (Transform t in racine.GetComponentsInChildren<Transform>(true))

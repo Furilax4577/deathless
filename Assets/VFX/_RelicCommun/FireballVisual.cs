@@ -26,9 +26,12 @@ public class FireballVisual : MonoBehaviour
     private Material material;
     private Transform body;
     private float nextEmber;
+    private GemmesVolantes coeur;
 
     // Construit la boule de feu sous `parent`. `size` : 1 = environ 45 cm de diamètre.
-    public static FireballVisual Attach(Transform parent, Material material, float size = 1f)
+    // `gemmes` (optionnel, matériau à couleurs par sommet) : cœur scintillant en gemmes claires autour de la boule
+    // (25/09/2026 : la boule doit se lire comme du feu, cœur clair et non un noyau uni).
+    public static FireballVisual Attach(Transform parent, Material material, float size = 1f, Material gemmes = null)
     {
         EnsureMeshes();
         GameObject root = new GameObject("Fireball");
@@ -37,6 +40,11 @@ public class FireballVisual : MonoBehaviour
         FireballVisual fireball = root.AddComponent<FireballVisual>();
         fireball.material = material;
         fireball.Build();
+        if (gemmes != null)
+        {
+            fireball.coeur = GemmesVolantes.Creer("Fireball_Coeur", gemmes, 90);
+            fireball.coeur.transform.SetParent(root.transform, false);
+        }
         return fireball;
     }
 
@@ -82,6 +90,14 @@ public class FireballVisual : MonoBehaviour
     {
         // Le corps roule sur lui-même ; la traînée, ce sont les débris facettés laissés derrière.
         body.Rotate(0f, 0f, 300f * Time.deltaTime, Space.Self);
+        // Cœur clair : petites gemmes blanc chaud et jaunes qui scintillent à la surface de la boule, en avant.
+        if (coeur != null)
+            for (int k = 0; k < 3; k++)
+            {
+                Vector3 p = transform.position + (Random.onUnitSphere * 0.2f + transform.forward * 0.08f) * transform.lossyScale.x;
+                Color c = Random.value < 0.4f ? VfxPalette.Accent(VfxTheme.Feu, "Blanc chaud", new Color(1f, 0.96f, 0.84f)) * 1.8f : Yellow * 1.6f;
+                coeur.Emettre(p, Vector3.zero, Random.Range(0.03f, 0.055f) * transform.lossyScale.x, Random.Range(0.08f, 0.16f), c, 0f, 0f, 0.02f, 0.3f);
+            }
 
         // Débris semés le long du trajet parcouru depuis l'image précédente (un tous les `EmberSpacing` m), pour une traînée
         // continue quelle que soit la cadence d'affichage ; immobile, la boule en lâche quand même quelques-uns.

@@ -43,6 +43,8 @@ public class WeaponStyle : ScriptableObject
     public AnimationClip idle;
     public AnimationClip walk;
     public AnimationClip run;
+    [Tooltip("Marche discrète (assassin : Sneaking, passage en mode furtif). Vide pour les styles qui n'en ont pas.")]
+    public AnimationClip sneak;
     public AnimationClip[] attacks;
     public AnimationClip guard;
     public AnimationClip guardHit;

@@ -29,7 +29,7 @@ L'écran de score met les joueurs en compétition. Pour chaque catégorie, le me
 
 L'écran rappelle aussi le résultat de l'équipe : victoire ou nuit atteinte, durée de la partie, or total.
 
-- Condition de défaite : {à confirmer}. Piste : Nyxessa détruite.
+- **Défaite** {décidé} : la partie est perdue quand **Nyxessa est détruite**. Tant qu'elle tient, les joueurs morts réapparaissent.
 - Ce qu'on garde d'une partie à l'autre : {à confirmer}.
 
 ## Victoire {décidé}
