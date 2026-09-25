@@ -1,6 +1,6 @@
 # Classes
 
-Cinq classes jouables, et le **druide** bientôt. Chaque classe a un style d'arme, et ses compétences sont réparties sur trois emplacements au plus. Aucune classe n'a d'ultime {décidé}. Les rôles, les armes et leurs animations sont fixés {décidé}.
+Cinq classes jouables, et bientôt le **druide** et le **mécanicien**. Chaque classe a un style d'arme, et ses compétences sont réparties sur trois emplacements au plus. Aucune classe n'a d'ultime {décidé}. Les rôles, les armes et leurs animations sont fixés {décidé}.
 
 | | Classe | Style d'arme | Rôle |
 |---|---|---|---|
@@ -10,6 +10,7 @@ Cinq classes jouables, et le **druide** bientôt. Chaque classe a un style d'arm
 | {icone classe_assassin} | [Assassin](classe-assassin.md) | Dague, arbalète dans le dos | Furtif, coups critiques |
 | {icone classe_viking} | [Viking](classe-viking.md) | Hache à deux mains | Mêlée, zone |
 | {icone classe_druide} | [Druide](classe-druide.md) | **Bientôt** | Prochaine version |
+|  | [Mécanicien](classe-mecanicien.md) | **Bientôt** | Prochaine version |
 
 Chaque classe a sa page : présentation, actions et touches, règles détaillées.
 
