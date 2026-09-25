@@ -237,7 +237,8 @@ namespace Deathless.EditorTools
             m.EnableKeyword("_EMISSION");
             m.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
             m.SetTexture("_EmissionMap", AssetDatabase.LoadAssetAtPath<Texture2D>(pe));
-            m.SetColor("_EmissionColor", Color.white * 1.2f);
+            // Lueur douce (Quentin) : visible la nuit, les facettes restent lisibles ; pas de lumière ni de halo (pas de bloom).
+            m.SetColor("_EmissionColor", Color.white * 0.8f);
             EditorUtility.SetDirty(m);
             Debug.Log("Bâton du sorcier : " + n + " pixels du cristal passés au vert Nyxessa");
             return m;
