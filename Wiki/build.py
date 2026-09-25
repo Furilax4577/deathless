@@ -22,6 +22,7 @@ MENU = [
     ("interface", "Interface"),
     ("effets", "Effets et couleurs"),
     ("a-decider", "À décider"),
+    ("credits", "Crédits"),
 ]
 
 BADGES = {

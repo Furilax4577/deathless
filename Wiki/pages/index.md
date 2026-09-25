@@ -23,3 +23,4 @@ Ce wiki fixe les règles du jeu. Quand une page dit une chose et que le jeu en f
 | [Commandes](commandes.md) | Manette Xbox, PlayStation, clavier et souris |
 | [Interface](interface.md) | Menus, HUD, icônes de boutons |
 | [Effets et couleurs](effets.md) | Palettes par thème, lumière des sorts |
+| [Crédits](credits.md) | Auteurs des assets et des polices |

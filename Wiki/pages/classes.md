@@ -30,16 +30,34 @@ Les rôles sont {à confirmer}. Les armes et leurs animations sont {décidé}.
 ## Rôdeur
 
 - Arc et carquois {décidé} : au repos, l'arc est tenu le long du corps ; il se lève et se bande pour viser.
-- Compétences : {à confirmer}.
+- **Compétence 1 : Nuée de flèches** {décidé} : une pluie de flèches sur une zone ciblée.
+- Autres compétences et valeurs chiffrées : {à confirmer}.
 
 ## Assassin
 
 - Dague en main, arbalète rangée dans le dos {décidé}. Changer d'arme fait passer l'arbalète en main et range la dague dans le dos.
-- Compétences : {à confirmer}.
+
+### Passifs {décidé}
+
+- **Marche discrète** : l'assassin ne s'accroupit pas. Il marche discrètement (animation KayKit `Sneaking`) et passe en **mode furtif**. Un coup porté sans avoir été détecté est un **coup critique**.
+- **Coups dans le dos** : tout coup porté dans le dos d'un ennemi est un **coup critique**.
+- **Furtif et dans le dos** : les deux se cumulent et donnent le **meilleur critique** du jeu.
+
+| Situation | Coup |
+|---|---|
+| Ni furtif, ni dans le dos | Normal |
+| Furtif, non détecté | Critique |
+| Dans le dos | Critique |
+| Furtif et dans le dos | Meilleur critique |
+
+- Multiplicateurs : {à confirmer}. Pour mémoire, Relic utilisait ×3 dans le dos et ×2 en furtivité, cumulables.
+- Déclenchement du mode furtif et conditions de détection : {à confirmer}.
+- Compétences actives : {à confirmer}.
 
 ## Viking
 
-- Hache à deux mains {décidé}. Un style hache à une main et bouclier existe aussi ; son usage est {à confirmer}.
+- Hache à deux mains **uniquement** {décidé}. Pas de bouclier.
+- **Attaque tournante** {décidé} : le viking tourne sur lui-même, hache tendue, et frappe tout autour de lui (animations KayKit `Melee_2H_Attack_Spin` et `Melee_2H_Attack_Spinning`). Son emplacement et sa durée sont {à confirmer}.
 - **Rugissement** : un crâne de barbare casqué en gemmes rouges surgit au-dessus du viking, rugit, et une onde part de lui puis revient comme pour dire « venez » {effet validé}.
 - **Saut percutant** : le viking bondit d'environ 5 m vers l'avant et frappe le sol, une onde de terre part du point d'impact {effet validé}.
 - Jauge de rage et valeurs chiffrées : {à confirmer}.
