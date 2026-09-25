@@ -4,7 +4,8 @@ using UnityEngine.AI;
 namespace Deathless.Jeu
 {
     /// Villageois sorcier (wiki : village, nyxessa ; sans combat, on ne lui parle pas pour l'instant). Le jour, il reste
-    /// dans sa maison (invisible, à la porte). Au crépuscule, il sort, marche jusqu'à Nyxessa, lève son bâton et incante
+    /// dans sa maison : debout à sa place (Ancre_Villageois_Sorcier, intérieurs de InterieursBuilder), visible par la porte
+    /// ouverte ; sans intérieur, invisible devant la porte. Au crépuscule, il traverse la pièce, passe la porte, puis sort, marche jusqu'à Nyxessa, lève son bâton et incante
     /// toute la nuit (sort en boucle, son `sorcier_incantation`) : il lève le bouclier (BouclierNyxessa) à la tombée de la
     /// nuit. À l'aube, le bouclier redescend et il rentre chez lui. Bouclier brisé : il meurt (dissolution, son énergie
     /// retourne à Nyxessa : MortAllie) et réapparaît chez lui le jour suivant. Les squelettes peuvent le frapper comme
@@ -27,6 +28,14 @@ namespace Deathless.Jeu
 
         Etat m_Etat = Etat.Maison;
         Vector3 m_Porte, m_Place;
+        // Intérieur (maison ouverte) : sa place et le passage de la porte (place -> milieu de la pièce -> seuil -> dehors),
+        // marché sans NavMesh (les pièces sont hors NavMesh : les squelettes n'y entrent pas).
+        bool m_Interieur;
+        Vector3 m_Place0; Quaternion m_RotationPlace = Quaternion.identity;
+        Vector3[] m_Chemin, m_Couloir; int m_Pas;
+        float m_VitesseCouloir;
+        /// Vitesse de marche actuelle (NavMesh ou passage de la porte), pour l'animation des clients.
+        public float Vitesse => m_Couloir != null ? m_VitesseCouloir : Agent != null && Agent.enabled ? Agent.velocity.magnitude : 0f;
         Quaternion m_RotationPorte = Quaternion.identity;
         AudioSource m_Boucle;
         int m_CoucheHaut = -1;
@@ -96,6 +105,27 @@ namespace Deathless.Jeu
             }
             else m_Porte = nyx + new Vector3(-12f, 0f, 0f);
             if (NavMesh.SamplePosition(m_Porte, out var h1, 4f, NavMesh.AllAreas)) m_Porte = h1.position;
+            // Maison ouverte : sa place à l'intérieur et le passage de la porte, dans l'axe du linteau (repère de l'intérieur).
+            var it = GameObject.Find("VillageBlockout/Interieurs/Interieur_Sorcier");
+            var ancre = it != null ? it.transform.Find("Ancre_Villageois_Sorcier") : null;
+            Transform linteau = null;
+            if (it != null) foreach (var c in it.GetComponentsInChildren<Transform>(true)) if (c.name == "Linteau") { linteau = c; break; }
+            m_Interieur = ancre != null && linteau != null;
+            if (m_Interieur)
+            {
+                var t = it.transform;
+                Vector3 l = t.InverseTransformPoint(linteau.position);
+                float yIn = ancre.position.y;
+                m_Place0 = ancre.position;
+                Vector3 milieu = t.TransformPoint(new Vector3(l.x, 0f, l.z - 1.0f)); milieu.y = yIn;
+                Vector3 seuil = t.TransformPoint(new Vector3(l.x, 0f, l.z)); seuil.y = yIn;
+                Vector3 dehors = t.TransformPoint(new Vector3(l.x, 0f, l.z + 1.0f)); dehors.y = m_Porte.y;
+                if (NavMesh.SamplePosition(dehors, out var h3, 1.5f, NavMesh.AllAreas)) dehors = h3.position;
+                m_Chemin = new[] { m_Place0, milieu, seuil, dehors };
+                m_Porte = dehors;   // le NavMesh prend le relais au pied du perron
+                Vector3 face = milieu - m_Place0; face.y = 0f;
+                m_RotationPlace = face.sqrMagnitude > 0.01f ? Quaternion.LookRotation(face) : ancre.rotation;
+            }
             Vector3 cote = m_Porte - nyx; cote.y = 0f;
             m_Place = nyx + (cote.sqrMagnitude > 0.01f ? cote.normalized : Vector3.back) * B.sorcierDistanceNyxessa;
             if (NavMesh.SamplePosition(m_Place, out var h2, 3f, NavMesh.AllAreas)) m_Place = h2.position;
@@ -129,6 +159,13 @@ namespace Deathless.Jeu
         void Sortir()
         {
             Visible(true);
+            if (m_Interieur) { Couloir(true); m_Etat = Etat.Sortie; P?.Journal("Sorcier : quitte sa place et passe la porte"); return; }
+            SortirDehors();
+        }
+
+        /// Dehors, devant la porte : le NavMesh prend le relais jusqu'à la place d'incantation.
+        void SortirDehors()
+        {
             Agent.enabled = true;
             Agent.Warp(m_Porte);
             Agent.isStopped = false;
@@ -137,10 +174,36 @@ namespace Deathless.Jeu
             P?.Journal("Sorcier : sort de sa maison");
         }
 
+        /// Passage de la porte, marché pas à pas : sortie (place -> dehors) ou entrée (dehors -> place).
+        void Couloir(bool sortie)
+        {
+            if (Agent.enabled) { Agent.isStopped = true; Agent.enabled = false; }
+            m_Couloir = new Vector3[m_Chemin.Length];
+            for (int i = 0; i < m_Chemin.Length; i++) m_Couloir[i] = m_Chemin[sortie ? i : m_Chemin.Length - 1 - i];
+            m_Pas = 1;
+            if (sortie) transform.position = m_Couloir[0];
+        }
+
+        /// Une image de marche dans le passage de la porte ; vrai quand il est au bout.
+        bool Marcher(float dt)
+        {
+            Vector3 cible = m_Couloir[m_Pas];
+            float v = B.sorcierVitesse * 0.8f;
+            Vector3 d = cible - transform.position;
+            Vector3 plat = new Vector3(d.x, 0f, d.z);
+            if (plat.sqrMagnitude > 0.0004f)
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(plat), 360f * dt);
+            transform.position = Vector3.MoveTowards(transform.position, cible, v * dt);
+            m_VitesseCouloir = v;
+            if ((transform.position - cible).sqrMagnitude < 0.0004f && ++m_Pas >= m_Couloir.Length) { m_Couloir = null; m_VitesseCouloir = 0f; return true; }
+            return false;
+        }
+
         void Retour()
         {
             ArreterBoucle();
             if (animator != null) animator.SetBool(P_Cone, false);
+            if (m_Couloir != null) { Couloir(false); m_Etat = Etat.Retour; P?.Journal("Sorcier : rentre chez lui"); return; }   // pas encore sorti : demi-tour
             Agent.enabled = true;
             Agent.isStopped = false;
             Agent.SetDestination(m_Porte);
@@ -148,14 +211,16 @@ namespace Deathless.Jeu
             P?.Journal("Sorcier : rentre chez lui");
         }
 
-        /// Chez lui : invisible, à la porte, rien ne tourne.
+        /// Chez lui : à sa place dans la pièce, visible par la porte ouverte (sans intérieur : invisible, à la porte).
         void Rentrer(bool debut)
         {
             ArreterBoucle();
+            m_Couloir = null;
             if (Agent.enabled) { Agent.Warp(m_Porte); Agent.isStopped = true; }
-            transform.SetPositionAndRotation(m_Porte, m_RotationPorte);
+            if (m_Interieur) transform.SetPositionAndRotation(m_Place0, m_RotationPlace);
+            else transform.SetPositionAndRotation(m_Porte, m_RotationPorte);
             Agent.enabled = false;
-            Visible(false);
+            Visible(m_Interieur);
             m_Etat = Etat.Maison;
             if (!debut) P?.Journal("Sorcier : chez lui");
         }
@@ -165,6 +230,7 @@ namespace Deathless.Jeu
             if (m_Etat == Etat.Mort || m_Etat == Etat.Maison) return;
             m_Etat = Etat.Mort;
             ArreterBoucle();
+            m_Couloir = null;
             if (Bouclier != null && Bouclier.Incantation) Bouclier.Baisser();
             if (Agent.enabled) { Agent.isStopped = true; Agent.enabled = false; }
             if (animator != null) { animator.SetBool(P_Cone, false); animator.SetBool(P_Dead, true); }
@@ -199,6 +265,7 @@ namespace Deathless.Jeu
             switch (m_Etat)
             {
                 case Etat.Sortie:
+                    if (m_Couloir != null) { vitesse = m_VitesseCouloir; if (Marcher(Time.deltaTime)) SortirDehors(); break; }
                     vitesse = Agent.velocity.magnitude;
                     if (!Agent.pathPending && Agent.remainingDistance <= 0.25f)
                     {
@@ -217,8 +284,13 @@ namespace Deathless.Jeu
                     Orienter(Time.deltaTime);
                     break;
                 case Etat.Retour:
+                    if (m_Couloir != null) { vitesse = m_VitesseCouloir; if (Marcher(Time.deltaTime)) Rentrer(false); break; }
                     vitesse = Agent.velocity.magnitude;
-                    if (!Agent.pathPending && Agent.remainingDistance <= 0.3f) Rentrer(false);
+                    if (!Agent.pathPending && Agent.remainingDistance <= 0.3f)
+                    {
+                        if (m_Interieur) { Couloir(false); vitesse = 0f; }   // devant la porte : il entre et regagne sa place
+                        else Rentrer(false);
+                    }
                     break;
             }
             if (animator != null)
@@ -283,7 +355,8 @@ namespace Deathless.Jeu
                         ArreterBoucle();
                         if (animator != null) { animator.SetBool(P_Cone, false); if (avant == Etat.Mort) { animator.SetBool(P_Dead, false); animator.SetTrigger(P_Respawn); } }
                         CancelInvoke(nameof(Dissoudre));
-                        Visible(false);
+                        if (m_Interieur) transform.SetPositionAndRotation(m_Place0, m_RotationPlace);
+                        Visible(m_Interieur);
                         break;
                     case Etat.Sortie:
                     case Etat.Retour:

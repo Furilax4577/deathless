@@ -100,7 +100,7 @@ namespace Deathless.Reseau
                 Ecrire(SorcierEtat, (byte)so.EtatCourant);
                 if ((SorcierPosition.Value - so.transform.position).sqrMagnitude > 0.0004f) SorcierPosition.Value = so.transform.position;
                 if (Mathf.Abs(Mathf.DeltaAngle(SorcierLacet.Value, so.transform.eulerAngles.y)) > 0.5f) SorcierLacet.Value = so.transform.eulerAngles.y;
-                float v = so.Agent != null && so.Agent.enabled ? so.Agent.velocity.magnitude : 0f;
+                float v = so.Vitesse;
                 if (Mathf.Abs(SorcierVitesse.Value - v) > 0.1f) SorcierVitesse.Value = v;
             }
             // Scores et état de chaque joueur.
