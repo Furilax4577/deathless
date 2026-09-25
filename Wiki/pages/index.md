@@ -18,6 +18,7 @@ Deathless est un jeu d'action en coopération, vu à la troisième personne. Les
 
 | Page | Contenu |
 |---|---|
+| [L'univers](univers.md) | Nyxessa, la force dont sont issus les squelettes |
 | [Principes](principes.md) | Caméra, style visuel, lien entre armes et animations |
 | [Déroulé d'une partie](deroule.md) | Cycle de jour et de nuit, donjon régénéré chaque nuit |
 | [Le village](village.md) | Disposition du village, forêt, points d'apparition des ennemis |

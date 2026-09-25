@@ -16,7 +16,7 @@ Chaque effet prend ses couleurs dans la palette de son thème. Changer une coule
 
 Deux règles tranchées : **le feu est couleur feu**, et **le vert est réservé à Nyxessa** et à son énergie.
 
-Exception décidée : la **zone d'apparition** des squelettes est verte elle aussi, dans la famille de Nyxessa {décidé}.
+La **zone d'apparition** des squelettes est verte elle aussi, dans la famille de Nyxessa {décidé} : les squelettes sont issus de sa force (voir [L'univers](univers.md)).
 
 ### Nouveaux thèmes {à confirmer}
 

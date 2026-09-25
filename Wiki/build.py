@@ -32,6 +32,7 @@ SITE_SONS = os.path.join(SITE, "sons")
 # Ordre du menu : (fichier sans extension, libellé court[, "dev" si la page est réservée à la version développeur]).
 MENU = [
     ("index", "Accueil"),
+    ("univers", "L'univers"),
     ("principes", "Principes"),
     ("deroule", "Déroulé d'une partie"),
     ("village", "Le village"),

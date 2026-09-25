@@ -1,6 +1,6 @@
 # Nyxessa, la relique
 
-Nyxessa est une gemme verte à facettes qui flotte et tourne au-dessus d'un rocher, entourée d'une ceinture de petites gemmes en orbite. Elle est au centre du village.
+Nyxessa est une force mystérieuse, celle dont sont issus les squelettes et qu'utilisent les héros (voir [L'univers](univers.md)). Au centre du village, elle prend la forme d'une gemme verte à facettes qui flotte et tourne au-dessus d'un rocher, entourée d'une ceinture de petites gemmes en orbite.
 
 ## Réactions {décidé}
 
