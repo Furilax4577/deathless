@@ -6,9 +6,7 @@ Ce qui reste ouvert. Une ligne quitte cette page quand la règle est tranchée e
 |---|---|---|
 | Nyxessa | Coût de base des paliers, équilibrage des valeurs en jeu | [Nyxessa](nyxessa.md) |
 | Bouclier | Paliers, encaissement, dégâts renvoyés, durée de l'invocation | [Nyxessa](nyxessa.md) |
-| Rôdeur | Durée de charge de l'arc, dégâts minimum et maximum, multiplicateur de critique | [Classes](classes.md) |
 | Classes | Valeurs chiffrées | [Classes](classes.md) |
-| Viking | Emplacement et durée de l'attaque tournante | [Classes](classes.md) |
 | Commandes | Attribution des gâchettes, des compétences et des touches clavier | [Commandes](commandes.md) |
 | Interface | Contenu final des menus et du HUD | [Interface](interface.md) |
 | Village | Rôle de jeu des maisons, autres villageois | [Le village](village.md) |

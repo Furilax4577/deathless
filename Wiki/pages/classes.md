@@ -45,7 +45,7 @@ Les rôles, les armes et leurs animations sont {décidé}.
   - **Coup prêt** : quand le cercle atteint sa taille minimale, il se verrouille sur la pointe et la flèche brille brièvement : le tir est chargé à fond.
   - **Traînée** : en vol, la flèche laisse une traînée d'air fine, sans lueur, non magique.
 - **Flèches non magiques** {décidé} : les flèches, du rôdeur comme toutes les autres, ne brillent pas. Elles laissent une traînée d'air, jamais lumineuse. Seule exception, le bref éclat de la charge complète.
-- Durée de charge, dégâts minimum et maximum, multiplicateur de critique : {à confirmer}.
+- Valeurs de départ : charge complète en **1,2 s** ; **10 dégâts** sans charge, **40** chargé à fond ; tir à la tête **×2** {à équilibrer}.
 - Valeurs chiffrées des compétences : {à confirmer}.
 
 ## Assassin
@@ -88,7 +88,8 @@ L'assassin joue **principalement à la dague**. L'arbalète et la grenade sont d
 ## Viking
 
 - Hache à deux mains **uniquement** {décidé}. Pas de bouclier.
-- **Attaque tournante** {décidé} : le viking tourne sur lui-même, hache tendue, et frappe tout autour de lui {{dev: (animations KayKit `Melee_2H_Attack_Spin` et `Melee_2H_Attack_Spinning`)}}. Son emplacement et sa durée sont {à confirmer}.
+- **Attaque tournante** {décidé} : le viking tourne sur lui-même, hache tendue, et frappe tout autour de lui {{dev: (animations KayKit `Melee_2H_Attack_Spin` et `Melee_2H_Attack_Spinning`)}}.
+  - **Maintenue** {décidé} : tant que la touche est tenue, le viking tourne. Elle consomme de la rage en continu et s'arrête quand la rage est vide. Consommation {à équilibrer}.
 - **Rugissement** : un crâne de barbare casqué en gemmes rouges surgit au-dessus du viking, rugit, et une onde part de lui puis revient comme pour dire « venez » {effet validé}.
 - **Saut percutant** : le viking bondit d'environ 5 m vers l'avant et frappe le sol, une onde de terre part du point d'impact {effet validé}.
 - **Rage** {décidé} : jauge de 100. Elle monte quand le viking frappe et redescend lentement hors combat. Les compétences du viking coûtent de la rage. Valeurs {à équilibrer}.
