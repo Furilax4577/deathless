@@ -1,6 +1,6 @@
 # Classes
 
-Cinq classes jouables. Chaque classe a un style d'arme, et ses compétences sont réparties sur trois emplacements au plus, plus une ultime pour certaines.
+Cinq classes jouables. Chaque classe a un style d'arme, et ses compétences sont réparties sur trois emplacements au plus. Aucune classe n'a d'ultime {décidé}.
 
 | Classe | Style d'arme | Rôle |
 |---|---|---|
@@ -22,6 +22,19 @@ Les rôles, les armes et leurs animations sont {décidé}.
   - **Dégâts à l'impact** : **proportionnels à la distance parcourue** : une charge courte fait peu de dégâts, une charge complète fait le maximum {décidé}.
   - Valeurs de départ : étourdissement final 2,5 s, repoussés 0,6 s et 2,5 m sur le côté, dégâts de 15 à 60 selon la distance {à équilibrer}.
 - **Soin sur soi** : aura de croix vertes qui montent autour du paladin {effet validé}.
+- **Valeurs de départ** de la version 0.1 {à équilibrer} {{dev: (réglées dans `Assets/Jeu/Resources/GameBalance.asset`)}} :
+
+| Sujet | Valeur |
+|---|---|
+| Vie | 150 |
+| Endurance | 100, +15 par seconde après 1 s sans effort |
+| Vitesse | 5 m/s, sprint ×1,6 |
+| Esquive | 4 m, 25 d'endurance, invulnérable 0,3 s |
+| Épée | 30 dégâts toutes les 0,75 s, une cible |
+| Garde | un coup bloqué coûte de l'endurance |
+| Parade | fenêtre de 0,25 s, l'attaquant est étourdi 1 s |
+| Charge bélier | recharge 14 s |
+| Soin | +25 % de la vie, recharge 30 s |
 - La poussée au bouclier et les valeurs chiffrées sont {à confirmer}.
 
 ## Mage de feu

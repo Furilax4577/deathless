@@ -27,6 +27,8 @@ L'écran de score met les joueurs en compétition. Pour chaque catégorie, le me
 | Dégâts évités à Nyxessa | le plus élevé | {décidé} |
 | Soins prodigués | le plus élevé | {décidé} |
 
+- **Dégâts évités à Nyxessa** {à équilibrer} : tuer un squelette qui frappait Nyxessa compte 10 s de ses coups ; l'étourdir compte ses coups pendant la durée de l'étourdissement.
+
 L'écran rappelle aussi le résultat de l'équipe : victoire ou nuit atteinte, durée de la partie, or total.
 
 - **Défaite** {décidé} : la partie est perdue quand **Nyxessa est détruite**. Tant qu'elle tient, les joueurs morts réapparaissent.
