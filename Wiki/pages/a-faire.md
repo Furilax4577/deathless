@@ -10,6 +10,7 @@ Travaux prévus ou notés, pas encore faits. Une ligne quitte cette page quand l
 - **Menu du personnage (Tab)** : le personnage, l'inventaire et l'amélioration des compétences.
 - **Points de compétence** : 1 point par jour survécu.
 - **Taverne** : se restaurer et boire une bière, de jour uniquement ; « payer une tournée » rend tout le monde ivre quelques secondes. Des breuvages viendront plus tard.
+- **Roue à emotes** : si assez d'animations s'y prêtent (repérage en cours dans la rubrique Animations).
 - **Idées de personnages** (classes jouables possibles, noté le 25/09/2026) :
   - une **Bavaroise** qui se bat à coups de chopes de bière ;
   - un **barde** et son luth ;
