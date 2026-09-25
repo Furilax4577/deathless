@@ -5,7 +5,6 @@ Travaux prévus ou notés, pas encore faits. Une ligne quitte cette page quand l
 ## Noté par Quentin
 
 - **Revoir le menu des options de jeu.** (noté le 25/09/2026)
-- **Achats à la relique** : touche E près de Nyxessa, menu d'achat des paliers (missiles, bouclier).
 - **Barde** : nouvelle passe pour qu'il soit aussi lisse que les personnages KayKit.
 - **Menu du personnage (Tab)** : le personnage, l'inventaire et l'amélioration des compétences.
 - **Points de compétence** : 1 point par jour survécu.
@@ -26,8 +25,8 @@ Travaux prévus ou notés, pas encore faits. Une ligne quitte cette page quand l
 ## Plus tard
 
 - Lobby à la taille ×3 sur un écran très large : le bas passe sous la barre des invites.
-- Achat des paliers de Nyxessa et du bouclier à la relique (l'or s'accumule sans pouvoir être dépensé).
 - Deux versions du mini-boss : massue et martache.
+- Bouclier plus dense à chaque palier (davantage de gemmes), lien d'énergie de la canalisation au palier 4.
 - Effet visuel de la parade, son à chaque coup de l'attaque tournante.
 - Caméra qui passe dans les feuillages en forêt.
 - Réseau : penché du buste en visée, arrivée en cours de partie.

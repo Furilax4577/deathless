@@ -49,6 +49,10 @@ Cinq paliers, soit environ un palier toutes les deux nuits sur une partie de 45 
 - **Coût** des paliers 2 à 5 : ×1, ×2, ×3,5 et ×5,5 d'un coût de base, payé par la caisse commune.
 - Coût de base : **100 or**, soit 100, 200, 350 et 550 or pour les paliers 2 à 5 {à équilibrer}.
 
+### Achats à la relique {décidé}
+
+De **jour**, près de Nyxessa (sur son plateau ou à ses pieds), la touche **Interagir** (E, X, Carré) ouvre le **menu d'achat des paliers** : missiles de Nyxessa et bouclier du sorcier. Chaque ligne montre le palier atteint, ce qu'apporte le suivant et son prix ; l'or est pris dans la **caisse commune**. En multijoueur, **l'hôte décide** : un achat demandé par un autre joueur lui est transmis, et tous entendent le palier monter. Le menu se ferme à la tombée de la nuit. {{dev: (`AchatRelique`, `Partie.Acheter`, écran `EcranAchat`)}}
+
 ### Règles de tir {décidé}
 
 - **Portée** : 30 m, jusqu'à la lisière de la forêt. Les ennemis sous les arbres sont hors d'atteinte.
@@ -70,7 +74,7 @@ Un bouclier cylindrique de gemmes en lévitation protège Nyxessa {effet validé
 - **Invocation** : c'est un **villageois sorcier** qui invoque le bouclier, **seulement la nuit**. Au crépuscule, il sort de sa maison et vient se placer près de Nyxessa ; à l'aube, il rentre chez lui.
 - **Posture du sorcier** {décidé} : il incante **dos à Nyxessa**, face à l'extérieur, à l'intérieur du bouclier. Il peut se tourner **de quelques degrés** vers les ennemis qui arrivent devant lui, mais garde toujours Nyx dans le dos. À sa mort, il **tombe en arrière**, sans que rien ne le gêne.
 - **Plateforme** {décidé} : la plateforme de pierre de Nyxessa a le **diamètre du bouclier** ; le cylindre de gemmes repose sur son bord.
-- **Valeurs de départ** {à équilibrer} : bouclier de 5,3 m de rayon et 6 m de haut, palier 1 en jeu pour l'instant ; incantation de 3 s ; sorcier : 60 points de vie, 3,2 m/s, pivot de ±20°, incantation à 3,6 m du centre de Nyxessa. S'il cède sur un coup, le reste de ce coup passe à Nyxessa. Tant qu'il est levé, il protège aussi le sorcier.
+- **Valeurs de départ** {à équilibrer} : bouclier de 5,3 m de rayon et 6 m de haut, palier 1 au départ (les suivants s'achètent à la relique) ; incantation de 3 s ; sorcier : 60 points de vie, 3,2 m/s, pivot de ±20°, incantation à 3,6 m du centre de Nyxessa. S'il cède sur un coup, le reste de ce coup passe à Nyxessa. Tant qu'il est levé, il protège aussi le sorcier.
 - **Encaissement** : la quantité de dégâts que le bouclier peut absorber est **améliorable**.
 - **Riposte** : quand il est frappé, le bouclier **renvoie des dégâts** à l'attaquant.
 - **Canalisation** : au départ, le sorcier tient le bouclier par sa seule incantation. Une **amélioration** du sorcier lui apprend à **canaliser l'énergie de Nyxessa** : un lien d'énergie apparaît entre la relique et son bâton, et il puise dans sa force {décidé}. Elle s'obtient au **palier 4** du bouclier {décidé}.
