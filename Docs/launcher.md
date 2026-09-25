@@ -52,26 +52,20 @@ La manette est lue par XInput (`xinput1_4.dll`, avec repli sur `xinput9_1_0.dll`
 quand le launcher est au premier plan. Les manettes PlayStation ne passent pas par XInput : avec elles, il faut le
 clavier et la souris.
 
-## Côté serveur (à mettre en place : rien n'est fait)
+## Côté serveur (en place depuis le 25/09/2026)
 
-Le serveur visé est le VPS de Quentin (`srv617344.hstgr.cloud`, déjà utilisé par Relic : Ubuntu, Nginx, accès SSH
-`root` par clé, jamais de mot de passe dans le dépôt ni dans une conversation). Aucune connexion au serveur n'a été
-faite pour Deathless. À faire une fois :
+Le serveur est le VPS de Quentin (`srv617344.hstgr.cloud`, déjà utilisé par Relic : Ubuntu, Nginx, accès SSH
+`root` par clé, jamais de mot de passe dans le dépôt ni dans une conversation). Quentin a lancé le script
+`Deathless-Workspace/tools/serveur-deathless.sh` le 25/09/2026, qui a :
 
-1. Créer le dossier web : `mkdir -p /var/www/deathless`.
-2. Le servir avec Nginx à l'adresse `http://srv617344.hstgr.cloud/deathless/`, sur le modèle du site `relic` :
+1. sauvegardé la configuration Nginx (`/root/nginx-relic.bak-<date>`) ;
+2. créé `/var/www/deathless` (propriétaire `www-data`) et `/root/deathless-staging/current` pour `publish-diff.ps1` ;
+3. ajouté au site `relic` (`/etc/nginx/sites-available/relic`) un bloc `location /deathless/`, servi à l'adresse
+   `http://srv617344.hstgr.cloud/deathless/`, avec `Cache-Control: no-store` sur `version.json` et `changelog.json` ;
+4. déposé un `changelog.json` vide (`{ "versions": [] }`), vérifié en ligne le même jour.
 
-   ```nginx
-   location /deathless/ {
-       root /var/www;   # /deathless/x -> /var/www/deathless/x
-       location ~ (version|changelog)\.json$ { add_header Cache-Control "no-store"; }
-   }
-   ```
-
-   Puis `nginx -t && systemctl reload nginx`. Nginx accepte les requêtes `Range` par défaut : la reprise des
-   téléchargements fonctionne sans réglage.
-3. Pour `publish-diff.ps1`, créer le dossier de travail : `mkdir -p /root/deathless-staging/current`.
-4. Déposer le launcher (`DeathlessLauncher.zip`) avec la première publication (`publish.ps1 -AvecLauncher`).
+Nginx accepte les requêtes `Range` par défaut : la reprise des téléchargements fonctionne sans réglage. Reste à faire :
+la première publication, avec le launcher (`publish.ps1 -AvecLauncher`, qui envoie aussi `DeathlessLauncher.zip`).
 
 Le VPS expire le 10 octobre 2026 : il faudra le prolonger ou changer `baseUrl`.
 
