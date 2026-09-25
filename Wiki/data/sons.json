@@ -459,11 +459,41 @@
     "id": "brulure",
     "nom": "Brûlure — crépitement (boucle)",
     "categorie": "Sorts du mage",
-    "usage": "Un ennemi touché par le feu brûle pendant un moment : petites flammes et braises (boucle de 4 s sur l'ennemi).",
+    "usage": "Un ennemi touché par le feu brûle pendant un moment : petites flammes et braises (boucle de 4 s sur l'ennemi). Version en place : B. Trois versions à comparer ci-dessous.",
     "fichier": "Relic/burn_loop.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "disponible"
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "brulure_a",
+    "nom": "Brûlure — version A",
+    "categorie": "Sorts du mage",
+    "usage": "Braises seules : pops secs et aléatoires, sans souffle. À comparer pour remplacer la brûlure.",
+    "fichier": "Relic/burn_loop_a.wav",
+    "source": "Généré pour Deathless (synth_deathless.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "brulure_b",
+    "nom": "Brûlure — version B",
+    "categorie": "Sorts du mage",
+    "usage": "Braises aléatoires sur un léger souffle clair et constant. À comparer pour remplacer la brûlure.",
+    "fichier": "Relic/burn_loop_b.wav",
+    "source": "Généré pour Deathless (synth_deathless.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "brulure_c",
+    "nom": "Brûlure — version C",
+    "categorie": "Sorts du mage",
+    "usage": "Feu de camp doux : pops plus rares et plus ronds, souffle très bas. À comparer pour remplacer la brûlure.",
+    "fichier": "Relic/burn_loop_c.wav",
+    "source": "Généré pour Deathless (synth_deathless.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "a_ecouter"
   },
   {
     "id": "shield_block",

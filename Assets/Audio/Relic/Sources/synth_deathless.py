@@ -503,22 +503,47 @@ def _embers(seconds, rate, loud, band=(1800, 7000), dur=(0.0008, 0.004)):
     return buf
 
 
-def burn_loop():
-    # Brûlure (boucle 4 s), refaite le 25/09/2026 (« ça fait trop locomotive ») : plus aucune modulation régulière.
-    # Braises qui crépitent au hasard au premier plan, souffle de flamme discret dont le niveau dérive lentement,
-    # quelques claquements plus gros et rares. Boucle longue pour qu'on n'entende pas la répétition.
+def _hiss(n, level_env):
+    """Souffle de flamme clair et constant (pas de grave : un grondement modulé évoque une locomotive)."""
+    h = highpass(bandpass(white(n), lambda k: 3200, 0.35), 900)
+    return [x * e for x, e in zip(h, level_env)]
+
+
+def burn_loop_a():
+    # Brûlure A (boucle 4 s) : braises seules, pops secs et aléatoires, sans aucun souffle.
+    d, fade = 4.0, 0.6
+    total = d + fade
+    buf = zeros(total)
+    mix(buf, _embers(total, 11, (0.2, 0.7), band=(2000, 8000), dur=(0.0006, 0.003)), 0.0, 1.0)
+    mix(buf, _embers(total, 0.9, (0.6, 1.0), band=(900, 2500), dur=(0.002, 0.006)), 0.0, 1.0)
+    return loop_master(buf, d, fade)
+
+
+def burn_loop_b():
+    # Brûlure B (boucle 4 s) : braises aléatoires sur un léger souffle clair et constant.
     d, fade = 4.0, 0.6
     total = d + fade
     n = int(total * RATE)
-    body = lowpass(v4.brown(n, 0.01), 450)
-    env = _random_env(total, (0.15, 0.5), 0.45, 1.0)
-    buf = [s * e * 0.35 for s, e in zip(body, env)]
-    hiss = bandpass(white(n), lambda k: 2600, 0.5)
-    env2 = _random_env(total, (0.1, 0.35), 0.2, 1.0)
-    mix(buf, [s * e for s, e in zip(hiss, env2)], 0.0, 0.05)
-    mix(buf, _embers(total, 16, (0.15, 0.55)), 0.0, 1.0)
-    mix(buf, _embers(total, 1.3, (0.5, 0.9), band=(700, 1800), dur=(0.004, 0.012)), 0.0, 1.0)
+    buf = _hiss(n, _random_env(total, (0.3, 0.8), 0.75, 1.0))
+    buf = [x * 0.06 for x in buf]
+    mix(buf, _embers(total, 13, (0.2, 0.65), band=(2000, 8000), dur=(0.0006, 0.003)), 0.0, 1.0)
+    mix(buf, _embers(total, 1.0, (0.6, 1.0), band=(900, 2500), dur=(0.002, 0.006)), 0.0, 1.0)
     return loop_master(buf, d, fade)
+
+
+def burn_loop_c():
+    # Brûlure C (boucle 4 s) : feu de camp doux, pops plus rares et plus ronds, souffle très bas.
+    d, fade = 4.0, 0.6
+    total = d + fade
+    n = int(total * RATE)
+    buf = _hiss(n, _random_env(total, (0.3, 0.8), 0.8, 1.0))
+    buf = [x * 0.04 for x in buf]
+    mix(buf, _embers(total, 7, (0.25, 0.7), band=(1200, 5000), dur=(0.001, 0.005)), 0.0, 1.0)
+    mix(buf, _embers(total, 0.7, (0.55, 0.9), band=(600, 1500), dur=(0.004, 0.01)), 0.0, 1.0)
+    return loop_master(buf, d, fade)
+
+
+burn_loop = burn_loop_b  # version en place en attendant le choix de Quentin
 
 
 # ------------------------------------------------------------------ catalogue
@@ -549,6 +574,9 @@ CATALOG = {
     "stealth_spotted": (stealth_spotted, False, 1, 801),
     "smoke_bomb_throw": (smoke_bomb_throw, False, 1, 802),
     "burn_loop": (burn_loop, True, 1, 803),
+    "burn_loop_a": (burn_loop_a, True, 1, 804),
+    "burn_loop_b": (burn_loop_b, True, 1, 805),
+    "burn_loop_c": (burn_loop_c, True, 1, 806),
 }
 # Volume perçu visé quand il diffère de LOUDNESS_DB (-14 dB ; boucles : -15 dB) : événements majeurs plus forts.
 LOUD = {"critical_best": -12.5, "nyxessa_destroyed": -12.5, "victory": -12.5, "nyxessa_recall": -13.0}
