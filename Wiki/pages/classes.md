@@ -9,7 +9,7 @@ Cinq classes jouables, et le **druide** bientôt. Chaque classe a un style d'arm
 | {icone classe_rodeur} | [Rôdeur](classe-rodeur.md) | Arc et carquois | Distance, précision |
 | {icone classe_assassin} | [Assassin](classe-assassin.md) | Dague, arbalète dans le dos | Furtif, coups critiques |
 | {icone classe_viking} | [Viking](classe-viking.md) | Hache à deux mains | Mêlée, zone |
-|  | [Druide](classe-druide.md) | **Bientôt** | Prochaine version |
+| {icone classe_druide} | [Druide](classe-druide.md) | **Bientôt** | Prochaine version |
 
 Chaque classe a sa page : présentation, actions et touches, règles détaillées.
 
