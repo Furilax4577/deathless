@@ -2,6 +2,8 @@
 
 Jeu Unity 6000.3.24f1 (URP, Input System). Successeur de Relic (`C:/Dev/Unity/Relic`, lecture seule : référence, jamais modifié).
 
+**Wiki des règles** : `Wiki/` (pages Markdown dans `Wiki/pages/`, site généré par `Wiki/build.py`, ouverture par `Wiki/ouvrir-wiki.cmd`). C'est lui qui fixe les règles du jeu (classes, armes, ennemis, vagues, compétences, améliorations, commandes). Toute décision de jeu de Quentin y est écrite, avec l'étiquette `{décidé}`, `{effet validé}` ou `{à confirmer}` ; ce qui reste ouvert est listé dans `Wiki/pages/a-decider.md`.
+
 **Caméra** : le jeu se joue à la troisième personne. La vue à la première personne (FPS) est proscrite pour l'instant (décision de Quentin, 25/09/2026).
 
 **Règle d'équipement** : le lien est **arme / style de jeu → animation**, jamais personnage → animation. Un style (épée + bouclier, bâton, dague + arbalète, hache + bouclier, hache à deux mains, arc + carquois) définit ses sockets, ses offsets et son set de clips ; tout personnage au squelette KayKit Rig_Medium avec les sockets `handslot.r` / `handslot.l` le porte sans réglage.

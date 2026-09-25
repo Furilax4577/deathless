@@ -1,0 +1,24 @@
+# Interface
+
+## Principes {décidé}
+
+- L'interface se navigue entièrement à la manette comme au clavier et à la souris.
+- Les icônes de boutons suivent le dernier appareil utilisé : Xbox, PlayStation, ou clavier et souris. Ce sont les icônes du pack Kenney Input Prompts.
+
+## Menus {à confirmer}
+
+- **Menu principal** : Solo, Multijoueur, Options, Quitter. La dernière classe jouée est présentée à côté.
+- **Choix de classe** : les cinq classes, avec leur arme et leurs actions.
+- **Options** : jeu (pseudo, taille de l'interface, langue), commandes, affichage, audio. Côté manette : sensibilité de la caméra, inversion de l'axe vertical, vibrations, aide à la visée, zone morte des sticks.
+- **Pause** : la partie continue pendant la pause. Reprendre, Options, Quitter la partie, Quitter le jeu.
+
+## HUD en jeu {à confirmer}
+
+| Zone | Contenu |
+|---|---|
+| Haut, au centre | Vie de Nyxessa et de son bouclier, temps restant avant la nuit ou avant l'aube |
+| Haut, à droite | Or de l'équipe |
+| Gauche | Vie des autres joueurs |
+| Bas, à gauche | Portrait, vie, endurance, et la jauge de la classe s'il y en a une |
+| Bas, au centre | Attaques et compétences avec leur bouton et leur temps de recharge, potions |
+| Centre | Réticule de visée, et l'action possible devant soi (par exemple « Entrer dans le portail ») |
