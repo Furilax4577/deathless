@@ -16,7 +16,11 @@ Les rôles sont {à confirmer}. Les armes et leurs animations sont {décidé}.
 
 - Épée et bouclier. La visière du casque s'abaisse et se relève.
 - **Garde et parade** : l'attaque secondaire lève le bouclier. Déclenchée au bon moment face à un coup, la garde devient une parade {décidé}.
-- **Charge bélier** : le paladin s'élance d'environ 7 m, enveloppé d'une tête de bélier en gemmes dorées, et percute à l'arrivée {effet validé}.
+- **Charge bélier** : le paladin s'élance d'environ 7 m, enveloppé d'une tête de bélier en gemmes dorées qui le précède, et percute à l'arrivée {effet validé}.
+  - **Au bout de la trajectoire** : la cible percutée est **étourdie longuement** {décidé}.
+  - **Sur le chemin** : les ennemis traversés sont **repoussés sur les côtés** et brièvement étourdis {décidé}.
+  - **Dégâts à l'impact** : **proportionnels à la distance parcourue** : une charge courte fait peu de dégâts, une charge complète fait le maximum {décidé}.
+  - Valeurs de départ : étourdissement final 2,5 s, repoussés 0,6 s et 2,5 m sur le côté, dégâts de 15 à 60 selon la distance {à équilibrer}.
 - **Soin sur soi** : aura de croix vertes qui montent autour du paladin {effet validé}.
 - La poussée au bouclier et les valeurs chiffrées sont {à confirmer}.
 
