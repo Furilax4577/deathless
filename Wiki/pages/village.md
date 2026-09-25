@@ -26,7 +26,15 @@ Les portes des maisons sont à l'échelle du joueur : 2,1 m pour un personnage d
 ## Villageois
 
 - **Sorcier** {décidé} : un villageois sorcier invoque le bouclier de Nyxessa. Voir [Nyxessa](nyxessa.md).
+- **Druide** {décidé} : il vend les potions de soin le jour. {{dev: Modèle : le druide du pack KayKit Adventurers 2.0 EXTRA. Seuls sa texture et son bâton (`druid_staff`) sont présents dans Relic ; le modèle `Druid.fbx` est à récupérer depuis le pack complet.}}
 - Autres villageois : {à confirmer}.
+
+## Potions de soin {décidé}
+
+- Les héros **achètent des potions de soin en or, le jour**, au village.
+- Chacun en porte **3 au maximum**. On boit avec la croix directionnelle haut, ou la touche 1 au clavier (voir [Commandes](commandes.md)).
+- Prix et soin rendu : {à équilibrer}.
+- **Le druide** les vend {décidé}. Voir Villageois.
 
 ## Rôle des maisons {à confirmer}
 
