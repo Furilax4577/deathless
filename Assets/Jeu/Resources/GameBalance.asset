@@ -174,13 +174,16 @@ MonoBehaviour:
   esquiveRecharge: 1.2
   epeeDegats: 30
   epeeIntervalle: 0.75
-  epeePortee: 2.2
-  epeeDemiAngle: 50
+  epeePortee: 2.6
+  epeeDemiAngle: 40
   epeeInstant: 0.38
   epeeVitesseClip: 1.4
-  epeeCiblesParCoup: 1
+  epeeCiblesParCoup: 3
+  epeePas: 0.6
+  epeePasDuree: 0.18
+  epeeVitesse: 0.4
   gardeDemiAngle: 70
-  gardeVitesse: 0.5
+  gardeVitesse: 0.7
   gardeCoutParDegat: 1
   gardeBriseeEtourdi: 0.8
   paradeFenetre: 0.25

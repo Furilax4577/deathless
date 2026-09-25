@@ -179,6 +179,9 @@ namespace Deathless.Jeu.Dev
             Figer(new[] { cible }, 25f);
             yield return new WaitForSeconds(0.2f);
             ViserPoint(cible.CentreTete);
+            // Viser (LT maintenu), puis bander pendant la visée (RT maintenu), relâcher RT pour tirer.
+            EntreesSimulees.Maintenir("leftTrigger", true);
+            yield return new WaitForSeconds(0.2f);
             EntreesSimulees.Maintenir("rightTrigger", true);
             yield return new WaitForSeconds(0.6f);
             DevPartie.Capturer("classes_rodeur_bander");
@@ -195,6 +198,7 @@ namespace Deathless.Jeu.Dev
             yield return new WaitForSeconds(0.4f);
             EntreesSimulees.Maintenir("rightTrigger", false);
             yield return new WaitForSeconds(0.8f);
+            EntreesSimulees.Maintenir("leftTrigger", false);
             Log("rôdeur : tir faible au corps");
             // Nuée sur un groupe.
             var groupe = new List<Squelette> { DevPartie.PoserDevant(TypeEnnemi.Sbire, 14f, -1f), DevPartie.PoserDevant(TypeEnnemi.Sbire, 14f, 1f) };
@@ -248,10 +252,14 @@ namespace Deathless.Jeu.Dev
                     arrive = false;
                     if (classe == "rodeur")
                     {
+                        EntreesSimulees.Maintenir("leftTrigger", true);
+                        yield return new WaitForSeconds(0.1f);
                         EntreesSimulees.Maintenir("rightTrigger", true);
                         yield return new WaitForSeconds(tenue);
                         ViserPoint(tete);
                         EntreesSimulees.Maintenir("rightTrigger", false);
+                        yield return new WaitForSeconds(0.05f);
+                        EntreesSimulees.Maintenir("leftTrigger", false);
                     }
                     else
                     {

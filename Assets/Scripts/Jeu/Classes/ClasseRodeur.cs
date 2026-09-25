@@ -3,8 +3,10 @@ using UnityEngine;
 
 namespace Deathless.Jeu
 {
-    /// Rôdeur (arc et carquois) : bander et tirer (RT maintenu puis relâché : charge 1,2 s, 10 à 40 dégâts, tir à la tête
-    /// ×2 et critique), visée (LT), nuée de flèches (LB), roulade arrière et salve (RB). Flèches non magiques (modèle
+    /// Rôdeur (arc et carquois) : visée (LT / clic droit maintenu, sans zoom de caméra) ; pendant la visée, bander et tirer
+    /// (RT / clic gauche maintenu puis relâché : charge 1,2 s, 10 à 40 dégâts, tir à la tête ×2 et critique) ; lâcher la
+    /// visée pendant qu'il bande repose la flèche sans tirer (wiki : classe-rodeur, Viser puis bander, 26/09/2026) ;
+    /// nuée de flèches (LB), roulade arrière et salve (RB). Flèches non magiques (modèle
     /// KayKit, traînée d'air) ; cercle de charge et éclat à 100 % par l'effet ArcBande. Arc repos / visée, flèche encochée
     /// et blendshape `Draw` pilotés ici (mêmes valeurs que BowStance).
     public class ClasseRodeur : ClasseHeros
@@ -90,7 +92,7 @@ namespace Deathless.Jeu
         {
             switch (action)
             {
-                case "AttackPrimary": Bander(); break;
+                case "AttackPrimary": if (m_Visee) Bander(); break;   // RT ne bande que pendant la visée
                 case "Skill1": Nuee(); break;
                 case "Skill2": Roulade(); break;
             }
@@ -208,7 +210,7 @@ namespace Deathless.Jeu
             m_RechargeRoulade = Mathf.Max(0f, m_RechargeRoulade - dt);
             AppliquerPose();
             m_Visee = H.Vivant && H.EnJeu && H.Entrees.GardeMaintenue;
-            if (H.CameraEpaule != null) H.CameraEpaule.viseeVoulue = m_Visee || m_Action == Action.Bander ? 1f : 0f;
+            if (H.CameraEpaule != null) H.CameraEpaule.viseeVoulue = 0f;   // visée sans zoom (décision de Quentin, 26/09/2026)
         }
 
         public override void Maj(float dt, Vector3 dir)
@@ -220,7 +222,12 @@ namespace Deathless.Jeu
                 case Action.Bander:
                     m_Charge = Mathf.Clamp01(m_Depuis / b.arcCharge);
                     if (m_Cercle != null) m_Cercle.Charge = m_Charge;
-                    if (!H.Entrees.AttaqueMaintenue) Lacher();
+                    if (!m_Visee) Reposer();                               // visée lâchée : pas de tir
+                    else if (!H.Entrees.AttaqueMaintenue) Lacher();
+                    break;
+                case Action.Aucune:
+                    // RT déjà maintenu quand la visée commence : il bande aussitôt.
+                    if (m_Visee && H.Entrees.AttaqueMaintenue && Time.time - m_DernierTir >= b.arcIntervalle + 0.15f) Bander();
                     break;
                 case Action.Lacher:
                     if (m_Depuis >= 0.3f) m_Action = Action.Aucune;
@@ -270,13 +277,18 @@ namespace Deathless.Jeu
                 m_ArcRendu.SetBlendShapeWeight(0, m_Action == Action.Bander ? m_Charge * 100f : 0f);
         }
 
+        /// Visée lâchée pendant qu'il bande : la flèche est reposée, sans tir.
+        void Reposer()
+        {
+            if (m_Cercle != null) m_Cercle.Annuler();
+            if (Anim != null) Anim.SetBool(P_Aiming, false);
+            m_Action = Action.Aucune;
+            m_DernierTir = Time.time;
+        }
+
         public override void Interrompre()
         {
-            if (m_Action == Action.Bander)
-            {
-                if (m_Cercle != null) m_Cercle.Annuler();
-                if (Anim != null) Anim.SetBool(P_Aiming, false);
-            }
+            if (m_Action == Action.Bander) Reposer();
             m_Action = Action.Aucune;
         }
 

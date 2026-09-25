@@ -32,7 +32,7 @@ namespace Deathless.UI.Donnees
         /// Identifiant stable : « paladin », « mage », « rodeur », « assassin », « viking ».
         string Id { get; }
         string Nom { get; }
-        /// Rôle (wiki, classes.md) : « Tank, une cible à la fois ».
+        /// Rôle (wiki, classes.md) : « Tank, mêlée vers l’avant ».
         string Role { get; }
         /// Style d'arme : « Épée et bouclier ».
         string Arme { get; }
@@ -155,7 +155,7 @@ namespace Deathless.UI.Donnees
         {
             new Classe
             {
-                Id = "paladin", Nom = "Paladin", Role = "Tank, une cible à la fois", Arme = "Épée et bouclier",
+                Id = "paladin", Nom = "Paladin", Role = "Tank, mêlée vers l’avant", Arme = "Épée et bouclier",
                 Description = "Il tient la ligne : la garde bloque les coups et devient une parade au bon moment.",
                 Teinte = Hex("#d9b264"), Embleme = "classe_paladin", Jauge = JaugeClasse.Aucune,
                 Actions = Actions(("Frappe à l’épée", "paladin_epee"), ("Garde et parade", "paladin_garde"),
@@ -173,7 +173,7 @@ namespace Deathless.UI.Donnees
                 Id = "rodeur", Nom = "Rôdeur", Role = "Distance, précision", Arme = "Arc et carquois",
                 Description = "Plus l’arc est bandé, plus le tir fait mal. Une flèche dans la tête est un coup critique.",
                 Teinte = Hex("#a8742f"), Embleme = "classe_rodeur", Jauge = JaugeClasse.Aucune,
-                Actions = Actions(("Bander et tirer", "rodeur_tir"), ("Viser", "rodeur_visee"),
+                Actions = Actions(("Bander en visant, relâcher pour tirer", "rodeur_tir"), ("Viser (maintenu, sans zoom)", "rodeur_visee"),
                     ("Nuée de flèches", "rodeur_nuee_de_fleches"), ("Roulade arrière et salve", "rodeur_roulade_salve")),
             },
             new Classe

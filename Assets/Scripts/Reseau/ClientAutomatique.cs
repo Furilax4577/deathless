@@ -209,7 +209,11 @@ namespace Deathless.Reseau
                     case 3: h.Entrees.SimulerAction("Skill1"); m_ProchaineAction = t + 2.2f; break;
                     case 4: h.Entrees.SimulerAction("Skill2"); m_ProchaineAction = t + 2.2f; break;
                     case 5: h.Entrees.SimulerAction("AttackSecondary"); m_GardeJusqua = t + 2.5f; m_ProchaineAction = t + 3f; break;
-                    case 6: m_AttaqueJusqua = t + 1.3f; h.Entrees.SimulerAction("AttackPrimary"); break;
+                    case 6:
+                        // Rôdeur : viser (LT) puis bander pendant la visée (RT) et relâcher.
+                        if (h.Classe is ClasseRodeur) { m_GardeJusqua = t + 1.6f; m_AttaqueJusqua = t + 1.3f; }
+                        else { m_AttaqueJusqua = t + 1.3f; h.Entrees.SimulerAction("AttackPrimary"); }
+                        break;
                 }
                 ReseauJeu.Journal("[auto] compétence " + k);
             }

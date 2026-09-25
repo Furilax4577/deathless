@@ -5,8 +5,6 @@ Travaux prévus ou notés, pas encore faits. Une ligne quitte cette page quand l
 ## Noté par Quentin
 
 - **Revoir le menu des options de jeu.** (noté le 25/09/2026)
-- **Paladin plus mobile** : un peu plus de portée, et un angle d'attaque vers l'avant qui touche plusieurs ennemis en face, moins large que celui du Viking.
-- **Rôdeur** : clic droit maintenu pour viser, clic gauche pour bander, sans zoom de caméra.
 - **Achats à la relique** : touche E près de Nyxessa, menu d'achat des paliers (missiles, bouclier).
 - **Barde** : nouvelle passe pour qu'il soit aussi lisse que les personnages KayKit.
 - **Menu du personnage (Tab)** : le personnage, l'inventaire et l'amélioration des compétences.

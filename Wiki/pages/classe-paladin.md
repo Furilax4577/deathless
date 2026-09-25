@@ -2,11 +2,11 @@
 
 {icone-grande classe_paladin}
 
-Le rempart du village. Il tient la ligne au bouclier, charge pour ouvrir un passage et se soigne seul. Il combat une cible à la fois.
+Le rempart du village. Il tient la ligne au bouclier, charge pour ouvrir un passage et se soigne seul. Son épée frappe devant lui, jusqu'à trois ennemis en face.
 
 | Rôle | Arme |
 |---|---|
-| Tank, une cible à la fois | Épée et bouclier |
+| Tank, mêlée vers l'avant | Épée et bouclier |
 
 {dev} Modèle : le chevalier KayKit (`Knight`), style d'arme `SwordShield`.
 
@@ -25,6 +25,7 @@ Actions communes à toutes les classes : voir [Classes](classes.md#actions-commu
 ## Règles
 
 - Épée et bouclier. La visière du casque s'abaisse et se relève.
+- **Épée plus mobile** {décidé} (26/09/2026) : un peu plus de portée, et un **angle d'attaque vers l'avant** qui touche plusieurs ennemis en face, **moins large que la hache du Viking**. Chaque attaque **avance d'un pas** (sauf s'il y a déjà un ennemi au contact), et le paladin **se déplace plus vite en garde**.
 - **Garde et parade** : l'attaque secondaire lève le bouclier. Déclenchée au bon moment face à un coup, la garde devient une parade {décidé}.
 - **Charge bélier** : le paladin s'élance d'environ 7 m, enveloppé d'une tête de bélier en gemmes dorées qui le précède, et percute à l'arrivée {effet validé}.
   - **Au bout de la trajectoire** : la cible percutée est **étourdie longuement** {décidé}.
@@ -38,9 +39,9 @@ Actions communes à toutes les classes : voir [Classes](classes.md#actions-commu
 |---|---|
 | Vie | 150 |
 | Endurance | 100, +15 par seconde après 1 s sans effort |
-| Vitesse | 5 m/s, sprint ×1,6 |
+| Vitesse | 5 m/s, sprint ×1,6 ; ×0,7 en garde ; ×0,4 pendant l'attaque |
 | Esquive | 4 m, 25 d'endurance, invulnérable 0,3 s |
-| Épée | 30 dégâts toutes les 0,75 s, une cible |
+| Épée | 30 dégâts toutes les 0,75 s, portée 2,6 m, 40° de part et d'autre de l'avant (hache du Viking : 70°), 3 ennemis au plus par coup, pas en avant de 0,6 m |
 | Garde | un coup bloqué coûte de l'endurance |
 | Parade | fenêtre de 0,25 s, l'attaquant est étourdi 1 s |
 | Charge bélier | recharge 14 s |

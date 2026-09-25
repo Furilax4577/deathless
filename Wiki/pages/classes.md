@@ -4,7 +4,7 @@ Cinq classes jouables, et bientôt le **druide** et le **mécanicien**. Chaque c
 
 | | Classe | Style d'arme | Rôle |
 |---|---|---|---|
-| {icone classe_paladin} | [Paladin](classe-paladin.md) | Épée et bouclier | Tank, une cible à la fois |
+| {icone classe_paladin} | [Paladin](classe-paladin.md) | Épée et bouclier | Tank, mêlée vers l'avant |
 | {icone classe_mage_feu} | [Mage](classe-mage.md) | Bâton | Distance, zone ; style feu pour l'instant |
 | {icone classe_rodeur} | [Rôdeur](classe-rodeur.md) | Arc et carquois | Distance, précision |
 | {icone classe_assassin} | [Assassin](classe-assassin.md) | Dague, arbalète dans le dos | Furtif, coups critiques |

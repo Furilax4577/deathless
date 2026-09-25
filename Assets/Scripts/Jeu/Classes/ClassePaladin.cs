@@ -30,6 +30,7 @@ namespace Deathless.Jeu
         Vector3 m_DepartCharge;
         readonly HashSet<Squelette> m_Repousses = new HashSet<Squelette>();
         bool m_SoinDonne;
+        float m_PasReste;
 
         static readonly int P_Guard = Animator.StringToHash("Guard");
         static readonly int P_Attack1 = Animator.StringToHash("Attack1");
@@ -60,7 +61,7 @@ namespace Deathless.Jeu
 
         public override bool Occupe => m_Action != Action.Aucune;
         public override bool PeutEsquiver => m_Action == Action.Aucune || m_Action == Action.Attaque;
-        public override float FacteurVitesse => m_Action == Action.Attaque ? 0.25f : m_Action == Action.Soin ? 0f : m_Garde ? B.gardeVitesse : 1f;
+        public override float FacteurVitesse => m_Action == Action.Attaque ? B.epeeVitesse : m_Action == Action.Soin ? 0f : m_Garde ? B.gardeVitesse : 1f;
         public override bool BloqueSprint => m_Garde;
         public override bool FaceVisee => m_Garde;
         public override bool HautDuCorps => m_Garde || m_Action == Action.ChargeAnticipation;
@@ -85,6 +86,8 @@ namespace Deathless.Jeu
             m_CoupPorte = false;
             m_Combo = 1 - m_Combo;
             H.Tourner(H.AvantCamera);
+            // Pas en avant, sauf s'il y a déjà un ennemi au contact devant lui (il ne le pousse pas).
+            m_PasReste = Combat.Ennemis(transform.position, H.AvantCamera, 1.2f, 45f).Count == 0 ? B.epeePas : 0f;
             if (Anim != null) H.Declencher(m_Combo == 0 ? P_Attack1 : P_Attack2);
             AudioBank.Jouer(SonsDuJeu.EpeeElan, transform.position + Vector3.up, 0.7f);
             Diffuser(E_Elan);
@@ -201,6 +204,14 @@ namespace Deathless.Jeu
         public override bool DeplacementImpose(float dt, out Vector3 vitesse)
         {
             vitesse = Vector3.zero;
+            if (m_Action == Action.Attaque && m_PasReste > 0f)
+            {
+                // Pas en avant : epeePas mètres en epeePasDuree secondes (le reste de l'attaque, déplacement libre ralenti).
+                float d = Mathf.Min(m_PasReste, B.epeePas / Mathf.Max(0.05f, B.epeePasDuree) * dt);
+                m_PasReste -= d;
+                vitesse = transform.forward * d / Mathf.Max(dt, 0.001f);
+                return true;
+            }
             if (m_Action == Action.ChargeAnticipation) return true;
             if (m_Action != Action.Charge) return false;
             var b = B;

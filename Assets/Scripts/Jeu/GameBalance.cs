@@ -175,15 +175,25 @@ namespace Deathless.Jeu
         [Header("Épée")]
         public float epeeDegats = 30f;
         public float epeeIntervalle = 0.75f;
-        public float epeePortee = 2.2f;
-        public float epeeDemiAngle = 50f;
+        [Tooltip("Portée de l'épée (m). 2,6 : un peu plus que la hache à deux mains du Viking (26/09/2026).")]
+        public float epeePortee = 2.6f;
+        [Tooltip("Demi-angle du coup vers l'avant (°) : touche plusieurs ennemis en face, moins large que la hache du Viking (70°).")]
+        public float epeeDemiAngle = 40f;
         [Tooltip("Instant du coup dans l'attaque (s, clip accéléré).")]
         public float epeeInstant = 0.38f;
         public float epeeVitesseClip = 1.4f;
-        public int epeeCiblesParCoup = 1;
+        [Tooltip("Ennemis touchés au plus par coup (les plus proches, dans l'angle vers l'avant).")]
+        public int epeeCiblesParCoup = 3;
+        [Tooltip("Pas en avant au début de l'attaque (m) ; aucun s'il y a déjà un ennemi au contact devant lui.")]
+        public float epeePas = 0.6f;
+        [Tooltip("Durée du pas en avant (s).")]
+        public float epeePasDuree = 0.18f;
+        [Tooltip("Vitesse de déplacement pendant le reste de l'attaque (facteur).")]
+        public float epeeVitesse = 0.4f;
         [Header("Garde et parade")]
         public float gardeDemiAngle = 70f;
-        public float gardeVitesse = 0.5f;
+        [Tooltip("Vitesse en garde (facteur). 0,7 : paladin plus mobile (26/09/2026).")]
+        public float gardeVitesse = 0.7f;
         [Tooltip("Endurance payée par point de dégâts bloqué.")]
         public float gardeCoutParDegat = 1f;
         public float gardeBriseeEtourdi = 0.8f;
