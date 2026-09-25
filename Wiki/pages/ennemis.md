@@ -60,7 +60,7 @@ Invocateur qui combat à distance :
 - il tire des **salves de crânes** ;
 - il **relève des squelettes** du sol autour de lui ;
 - il **fauche à la faux** ceux qui le serrent de près ;
-- son **éclat de Nyx brille** : c'est son **point faible**.
+- ses **deux éclats de Nyx brillent**, dans le crâne de sa couronne et dans celui de son grimoire à la ceinture : ce sont ses **points faibles** {décidé}.
 
 Points de vie, dégâts et cadence : {à équilibrer}.
 
