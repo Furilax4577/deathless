@@ -114,23 +114,27 @@ RAGE = [c("Rage", "Rouge sombre"), c("Rage", "Rouge vif"), c("Rage", "Rouge pâl
 FER_RAGE = [c("Rage", "Fer sombre"), c("Rage", "Fer"), c("Rage", "Fer clair")]
 IVOIRE = [c("Rage", "Ivoire"), c("Rage", "Ivoire clair")]
 TERRE = [c("Terre", "Terre sombre"), c("Terre", "Terre claire"), c("Terre", "Sable")]
-SOIN = [c("Soin", "Menthe sombre"), c("Soin", "Menthe"), c("Soin", "Menthe claire")]
+# Soin (décision du 25/09/2026) : blanc chaud et or, lumière sacrée ; le vert reste à Nyxessa. Plus de menthe.
+SOIN = [c("Sacre", "Or sombre"), c("Sacre", "Or"), c("Sacre", "Or clair"), c("Critique", "Blanc chaud")]
+SOIN_BLANC = c("Critique", "Blanc chaud")
 CRITIQUE = [c("Critique", "Ambre"), c("Critique", "Or chaud"), c("Critique", "Or clair")]
 OS = [c("Os", "Os gris"), c("Os", "Os"), c("Os", "Os pâle")]
 MANA = [c("BouclierPlein", "Bleu nuit"), c("BouclierPlein", "Bleu"), c("BouclierPlein", "Bleu vif"),
         c("BouclierPlein", "Bleu pâle")]
 
-# Cadres des classes : rampe de la bordure (sombre -> claire, 4 niveaux) et fond de l'hexagone.
+# Cadres des classes : rampe de la bordure (sombre -> claire, 4 niveaux), puis les deux zones du fond de
+# l'hexagone, coupé en diagonale (« / », d'un sommet à l'autre) : moitié haut gauche claire, bas droite sombre.
 CADRES = {
     "paladin": ([c("Sacre", "Or sombre"), c("Sacre", "Or"), c("Sacre", "Or"), c("Sacre", "Or clair")],
-                c("Sacre", "Nuit")),
-    "mage_feu": ([c("Feu", "Rouge"), c("Feu", "Orange"), c("Feu", "Orange"), c("Feu", "Jaune")], c("Feu", "Braise")),
+                c("Sacre", "Acier"), c("Sacre", "Nuit")),
+    "mage_feu": ([c("Feu", "Rouge"), c("Feu", "Orange"), c("Feu", "Orange"), c("Feu", "Jaune")],
+                 c("Feu", "Braise"), c("Feu", "Charbon")),
     "rodeur": ([c("Terre", "Terre claire"), c("Chasse", "Ocre"), c("Chasse", "Ocre"), c("Chasse", "Ocre clair")],
-               c("Terre", "Terre profonde")),
+               c("Terre", "Terre sombre"), c("Terre", "Terre profonde")),
     "assassin": ([c("Ombre", "Violet"), c("Ombre", "Violet"), c("Ombre", "Lilas"), c("Ombre", "Lilas")],
-                 c("Ombre", "Nuit")),
+                 c("Ombre", "Violet sombre"), c("Ombre", "Nuit")),
     "viking": ([c("Rage", "Rouge sombre"), c("Rage", "Rouge vif"), c("Rage", "Rouge vif"), c("Rage", "Rouge pâle")],
-               c("Rage", "Rouge noir")),
+               c("Rage", "Rouge sombre"), c("Rage", "Rouge noir")),
 }
 
 # ---------------------------------------------------------------------------------------------- géométrie
@@ -294,7 +298,7 @@ def _n(v):
 # ---------------------------------------------------------------------------------------------- pièces communes
 
 def cadre_hex(ic, classe):
-    rampe, fond = CADRES[classe]
+    rampe, fond_clair, fond_sombre = CADRES[classe]
     ext = regulier((64, 64), 62, 6, -90)
     inte = regulier((64, 64), 51, 6, -90)
     ic.poly(ext, rampe[0])
@@ -305,7 +309,9 @@ def cadre_hex(ic, classe):
         if dot(nn, sub(mul(add(a, b), 0.5), (64, 64))) < 0:
             nn = (-nn[0], -nn[1])
         ic.poly([a, b, inte[(i + 1) % 6], inte[i]], teinte(rampe, nn))
-    ic.poly(inte, fond)
+    # Sommets : 0 haut, 1 haut droite, 2 bas droite, 3 bas, 4 bas gauche, 5 haut gauche. Coupe de 1 à 4.
+    ic.poly([inte[4], inte[5], inte[0], inte[1]], fond_clair)
+    ic.poly([inte[1], inte[2], inte[3], inte[4]], fond_sombre)
 
 
 def flamme(ic, cx, base, h, demi, couches=(FEU_EXT, FEU_MIL, FEU_COEUR)):
@@ -383,15 +389,18 @@ def classe_mage_feu():
 
 
 def classe_rodeur():
-    ic = Icone("classe_rodeur", "classes", "Rôdeur", "Arc et flèche croisés, bois et ocres (Chasse, sans vert).")
+    ic = Icone("classe_rodeur", "classes", "Rôdeur",
+               "Arc bandé debout, flèche encochée, bois et ocres (Chasse, sans vert).")
     cadre_hex(ic, "rodeur")
-    centre = (98, 64)
-    arc = [polaire(centre, 58, a) for a in range(142, 219, 8)]
-    haut, bas = arc[0], arc[-1]
-    ic.bande([bas, haut], 2.6, [CORDE, CORDE])
-    ic.bande(arc, [4, 6, 8, 9, 10, 10, 9, 8, 6, 4], ARC)
-    ic.bande([polaire(centre, 58, 174), polaire(centre, 58, 186)], 12, OCRE)
-    fleche(ic, (40, 104), (98, 26), epaisseur=5, tete=15)
+    centre = (26, 64)
+    arc = [polaire(centre, 60, a) for a in range(-52, 53, 8)]
+    encoche = (24, 64)
+    ic.bande([arc[0], encoche], 4.2, [CORDE, CORDE])
+    ic.bande([encoche, arc[-1]], 4.2, [CORDE, CORDE])
+    fleche(ic, (22, 64), (105, 64), epaisseur=7.5, tete=20, rampe_hampe=[c("Terre", "Terre claire"), c("Terre", "Sable")])
+    n = len(arc)
+    ic.bande(arc, [7 + 9 * math.sin(math.pi * i / (n - 1)) for i in range(n)], OCRE)
+    ic.bande([polaire(centre, 60, -7), polaire(centre, 60, 7)], 20, [c("Terre", "Terre claire"), c("Chasse", "Ocre clair")])
     return ic
 
 
@@ -411,7 +420,7 @@ def classe_assassin():
 def classe_viking():
     ic = Icone("classe_viking", "classes", "Viking", "Hache à deux mains à double fer, cadre rouge (Rage).")
     cadre_hex(ic, "viking")
-    ic.bande([(64, 112), (64, 22)], 8, RAGE)
+    ic.bande([(64, 112), (64, 22)], 9, [c("Rage", "Rouge vif"), c("Rage", "Rouge pâle")])
     for y in (84, 98):
         ic.bande([(64, y), (64, y + 5)], 10, IVOIRE)
     f = repere((64, 48), (0, -1))
@@ -468,16 +477,15 @@ def paladin_charge_belier():
 
 
 def paladin_soin():
-    ic = Icone("paladin_soin", "paladin", "Soin sur soi", "Compétence 2 (RB) : croix de soin (thème Soin, menthe).")
+    ic = Icone("paladin_soin", "paladin", "Soin sur soi", "Compétence 2 (RB) : croix de lumière sacrée, blanc chaud et or.")
     b = 13
     cx, cy = 58, 70
     croix = [(cx - b, cy - 44), (cx + b, cy - 44), (cx + b, cy - b), (cx + 44, cy - b), (cx + 44, cy + b),
              (cx + b, cy + b), (cx + b, cy + 44), (cx - b, cy + 44), (cx - b, cy + b), (cx - 44, cy + b),
              (cx - 44, cy - b), (cx - b, cy - b)]
-    ic.gemme(croix, SOIN, table=0.62, centre=(cx, cy), teinte_table=c("Soin", "Menthe"), decalage=0.04)
+    ic.gemme(croix, SOIN[:3], table=0.62, centre=(cx, cy), teinte_table=SOIN_BLANC, decalage=0.04)
     for (x, y, r) in ((106, 40, 7), (96, 20, 5), (114, 20, 4)):
-        ic.gemme([(x, y - r * 1.5), (x + r, y), (x, y + r * 1.5), (x - r, y)],
-                 [c("Soin", "Menthe"), c("Soin", "Menthe claire")])
+        ic.gemme([(x, y - r * 1.5), (x + r, y), (x, y + r * 1.5), (x - r, y)], [c("Sacre", "Or"), SOIN_BLANC])
     return ic
 
 
@@ -743,17 +751,18 @@ def commun_esquive():
 
 
 def commun_potion_soin():
-    ic = Icone("commun_potion_soin", "communes", "Potion de soin", "Commune (croix haut / 1) : vendue par le druide.")
-    ic.gemme(regulier((64, 80), 36, 12, -75), SOIN, table=0.6, teinte_table=c("Soin", "Menthe"), decalage=0.08)
+    ic = Icone("commun_potion_soin", "communes", "Potion de soin",
+               "Commune (croix haut / 1) : vendue par le druide ; liquide or, croix blanc chaud.")
+    ic.gemme(regulier((64, 80), 36, 12, -75), SOIN[:3], table=0.6, teinte_table=c("Sacre", "Or sombre"), decalage=0.08)
     ic.bande([(64, 48), (64, 30)], 20, OS)
     ic.bande([(64, 32), (64, 26)], 28, OS)
     ic.bande([(64, 27), (64, 10)], 16, TERRE)
-    ic.poly([(44, 64), (50, 58), (46, 76), (40, 80)], c("Soin", "Menthe claire"))
-    b = 5
+    ic.poly([(40, 66), (47, 58), (44, 76), (37, 80)], SOIN_BLANC)
+    b = 6
     cx, cy = 66, 84
-    ic.poly([(cx - b, cy - 16), (cx + b, cy - 16), (cx + b, cy - b), (cx + 16, cy - b), (cx + 16, cy + b),
-             (cx + b, cy + b), (cx + b, cy + 16), (cx - b, cy + 16), (cx - b, cy + b), (cx - 16, cy + b),
-             (cx - 16, cy - b), (cx - b, cy - b)], c("Os", "Os pâle"))
+    ic.poly([(cx - b, cy - 17), (cx + b, cy - 17), (cx + b, cy - b), (cx + 17, cy - b), (cx + 17, cy + b),
+             (cx + b, cy + b), (cx + b, cy + 17), (cx - b, cy + 17), (cx - b, cy + b), (cx - 17, cy + b),
+             (cx - 17, cy - b), (cx - b, cy - b)], SOIN_BLANC)
     return ic
 
 
@@ -799,19 +808,29 @@ BARRES = {
 JAUGES = {"mage_feu": ("jauge_mana", "Mana", "#4a8fe0", 0.8), "viking": ("jauge_rage", "Rage", "#f07b2a", 0.55)}
 
 A_TRANCHER = [
-    "Soin sur soi et potion de soin : thème Soin (menthe) comme l'aura du jeu. C'est une teinte vert-bleu, proche de "
-    "la règle « le vert est réservé à Nyxessa » : garder la menthe, ou passer le soin en blanc et or ?",
-    "Mana : aucun thème d'effet ; la goutte reprend le bleu de la jauge du HUD (palette BouclierPlein). "
-    "Autre piste : une gemme de feu.",
-    "Rage : poing serré en rouges du thème Rage (la jauge du HUD est orange #f07b2a).",
     "Rôdeur, Viser (LT) : icône ajoutée (cercle de charge à quatre crans), absente de la liste demandée.",
-    "Classe Assassin : capuche et regard plutôt qu'une dague, pour ne pas doubler l'icône de la dague.",
     "Flèches et carreaux : bois (Terre), fer (accents Fer de Rage), plumes ocre ; aucune lueur.",
+    "L'aura de soin du jeu (palette Soin, menthe) n'est pas encore passée en blanc et or : les icônes ont pris "
+    "de l'avance sur l'effet.",
 ]
+
+# Icônes modifiées depuis la version 1 (commit fb1b64a), avec la raison ; l'ancienne version, gardée dans
+# Historique/v1/, est montrée à côté de la nouvelle en tête de la planche.
+MODIFIEES = [
+    ("classe_paladin", "Fond coupé en diagonale : acier / nuit."),
+    ("classe_mage_feu", "Fond coupé en diagonale : braise / charbon."),
+    ("classe_rodeur", "Refaite : arc bandé debout qui remplit l'hexagone, branches plus épaisses et plus claires, "
+                      "flèche encochée bien visible. Fond terre sombre / terre profonde."),
+    ("classe_assassin", "Fond coupé en diagonale : violet sombre / nuit."),
+    ("classe_viking", "Fond coupé en diagonale : rouge sombre / rouge noir ; manche éclairci pour ressortir."),
+    ("paladin_soin", "Soin en blanc chaud et or (plus de menthe)."),
+    ("commun_potion_soin", "Liquide or et croix blanc chaud (plus de menthe)."),
+]
+HISTORIQUE = ICI / "Historique" / "v1"
 
 # Teintes interdites hors Nyxessa (règle : le vert est réservé à Nyxessa).
 VERTS_INTERDITS = set(P["Nyxessa"].values()) | {c("Chasse", "Sous-bois"), c("Chasse", "Forêt"), c("Chasse", "Olive"),
-                                                c("Os", "Magie")}
+                                                c("Os", "Magie")} | set(P["Soin"].values())
 
 
 def verifier(ic):
@@ -885,6 +904,16 @@ table.pal { border-collapse:collapse; font-size:13px; color:var(--texte-2); }
 table.pal td { padding:4px 10px 4px 0; vertical-align:middle; }
 .pastille { display:inline-block; width:18px; height:18px; border-radius:4px; vertical-align:middle; margin-right:3px;
   border:1px solid rgba(255,255,255,.08); }
+.modifs { display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 520px), 1fr)); gap:12px; }
+.modif { background:var(--nuit); border:1px solid var(--ligne); border-radius:14px; padding:12px 14px;
+  display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
+.modif .tailles { display:flex; align-items:flex-end; gap:10px; }
+.modif .lib { font-size:12px; color:var(--texte-off); margin-bottom:4px; }
+.modif .fleche-av { color:var(--or); font-size:22px; }
+.modif .txt { flex:1; min-width:180px; }
+.modif .nom { font-weight:600; font-size:16px; }
+.modif .fichier { font-family:ui-monospace, Consolas, monospace; font-size:12px; color:var(--texte-off); }
+.modif .quoi { font-size:13px; color:var(--texte-2); margin-top:3px; }
 .sprite { position:absolute; width:0; height:0; overflow:hidden; }
 """
 
@@ -936,10 +965,33 @@ def hud(classe, par_nom):
             % (_use(ic_classe.nom, 64), indic, NOMS_CLASSES[classe], "".join(jauges), "".join(cases), extra, ennemi))
 
 
+def bloc_modifiees(par_nom):
+    lignes = []
+    for nom, pourquoi in MODIFIEES:
+        ic = par_nom[nom]
+        avant = ""
+        if (HISTORIQUE / (nom + ".svg")).exists():
+            avant = ('<div class="av"><div class="lib">avant</div><div class="tailles">'
+                     '<svg width="96" height="96" viewBox="0 0 128 128"><use href="#a-%s"/></svg>'
+                     '<svg width="40" height="40" viewBox="0 0 128 128"><use href="#a-%s"/></svg></div></div>'
+                     '<span class="fleche-av">&#8594;</span>' % (nom, nom))
+        apres = ('<div class="av"><div class="lib">après</div><div class="tailles">%s%s</div></div>'
+                 % (_use(nom, 96), _use(nom, 40)))
+        lignes.append('<div class="modif">%s%s<div class="txt"><div class="nom">%s</div>'
+                      '<div class="fichier">%s.svg</div><div class="quoi">%s</div></div></div>'
+                      % (avant, apres, html.escape(ic.titre), nom, html.escape(pourquoi)))
+    return '<h2>Modifiées</h2><div class="modifs">%s</div>' % "".join(lignes)
+
+
 def planche(classes, competences):
     par_nom = {ic.nom: ic for ic in classes + competences}
     sprite = "".join('<symbol id="i-%s" viewBox="0 0 128 128">%s</symbol>' % (ic.nom, ic.polygones())
                      for ic in classes + competences)
+    for nom, _ in MODIFIEES:
+        ancien = HISTORIQUE / (nom + ".svg")
+        if ancien.exists():
+            polys = "".join(re.findall(r"<polygon [^>]*/>", ancien.read_text(encoding="utf-8")))
+            sprite += '<symbol id="a-%s" viewBox="0 0 128 128">%s</symbol>' % (nom, polys)
     corps = []
     corps.append('<h1>Icônes : classes et compétences</h1>')
     corps.append('<p class="intro">Planche de revue générée par <code>ArtSources/Icones/generer_icones.py</code>. '
@@ -947,6 +999,7 @@ def planche(classes, competences):
                  'Gemmes low poly : polygones à bords nets, lumière unique en haut à gauche, couleurs lues dans les '
                  'palettes de thème du jeu. Les classes ont un cadre hexagonal, les compétences sont un glyphe seul '
                  '(le HUD dessine le cadre et la recharge).</p>')
+    corps.append(bloc_modifiees(par_nom))
     corps.append('<h2>À trancher</h2><ul class="note">%s</ul>' % "".join("<li>%s</li>" % html.escape(t) for t in A_TRANCHER))
     corps.append('<h2>Classes</h2><div class="grille">%s</div>' % "".join(carte(ic) for ic in classes))
     for famille in ("paladin", "mage_feu", "rodeur", "assassin", "viking", "communes"):
@@ -969,7 +1022,7 @@ def planche(classes, competences):
     for classe in ("paladin", "mage_feu", "rodeur", "assassin", "viking"):
         corps.append(hud(classe, par_nom))
     lignes_pal = []
-    for theme in ("Sacre", "Feu", "Chasse", "Terre", "Ombre", "Rage", "Soin", "Critique", "Os", "BouclierPlein"):
+    for theme in ("Sacre", "Feu", "Chasse", "Terre", "Ombre", "Rage", "Critique", "Os", "BouclierPlein"):
         lignes_pal.append('<tr><td>%s</td><td>%s</td></tr>' % (theme, "".join(
             '<span class="pastille" title="%s %s" style="background:%s"></span>' % (html.escape(n), v, v)
             for n, v in P[theme].items())))

@@ -7,8 +7,7 @@
 <polygon fill="#e8c872" points="64,126 10.3,95 19.8,89.5 64,115"/>
 <polygon fill="#e8c872" points="10.3,95 10.3,33 19.8,38.5 19.8,89.5"/>
 <polygon fill="#f4e2a8" points="10.3,33 64,2 64,13 19.8,38.5"/>
-<polygon fill="#5a7aa0" points="19.8,89.5 19.8,38.5 64,13 108.2,38.5"/>
-<polygon fill="#1e2a3a" points="108.2,38.5 108.2,89.5 64,115 19.8,89.5"/>
+<polygon fill="#1e2a3a" points="64,13 108.2,38.5 108.2,89.5 64,115 19.8,89.5 19.8,38.5"/>
 <polygon fill="#5a7aa0" points="60,23 60,36 68,36 68,23"/>
 <polygon fill="#b8903a" points="64,23 64,36 60,36 60,23"/>
 <polygon fill="#5a7aa0" points="64,23 64,36 68,36 68,23"/>
