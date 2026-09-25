@@ -24,9 +24,10 @@ public class AuraGemmes : MonoBehaviour
     [Tooltip("Les apparitions s'étalent sur ce temps (s).")]
     [SerializeField] private float etalement = 0.3f;
 
-    // Menthe du soin : clair (deux tiers) et sombre (un tiers), avec une légère variation.
-    private static Color Menthe => VfxPalette.Couleur(VfxTheme.Soin, VfxRole.Vif, new Color(0.31f, 0.81f, 0.6f));        // #4fcf9a
-    private static Color MentheSombre => VfxPalette.Couleur(VfxTheme.Soin, VfxRole.Base, new Color(0.18f, 0.62f, 0.45f)); // #2e9e72
+    // Lumière sacrée du soin (Quentin, 26/09/2026) : or (deux tiers) et or sombre (un tiers), palette Soin blanc chaud et
+    // or (le blanc chaud vient de la lumière de l'effet) ; les croix qui montent restent vertes (palette SoinCroix).
+    private static Color Menthe => VfxPalette.Couleur(VfxTheme.Soin, VfxRole.Base, new Color(0.91f, 0.784f, 0.447f));      // #e8c872
+    private static Color MentheSombre => VfxPalette.Couleur(VfxTheme.Soin, VfxRole.Ombre, new Color(0.722f, 0.565f, 0.227f)); // #b8903a
 
     private Mesh mesh;
     private MeshRenderer rendu;

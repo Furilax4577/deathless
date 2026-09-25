@@ -17,21 +17,21 @@ MonoBehaviour:
     t\xE9l\xE9portation, missile cr\xE2ne tir\xE9 par la relique, gerbes de gemmes
     (GemBurst, GemTrail)."
   teintes:
-  - nom: "\xC9meraude sombre"
+  - nom: "\xC9meraude profonde"
     role: 0
-    couleur: {r: 0.0784, g: 0.3137, b: 0.1961, a: 1}
+    couleur: {r: 0.023529412, g: 0.16470589, b: 0.09019608, a: 1}
   - nom: "\xC9meraude"
     role: 1
-    couleur: {r: 0.1176, g: 0.3529, b: 0.1961, a: 1}
-  - nom: Vert vif
+    couleur: {r: 0.043137256, g: 0.32156864, b: 0.14901961, a: 1}
+  - nom: Vert Nyx
     role: 2
-    couleur: {r: 0.2471, g: 0.6824, b: 0.3529, a: 1}
+    couleur: {r: 0.09019608, g: 0.5411765, b: 0.21176471, a: 1}
   - nom: Vert clair
     role: 3
-    couleur: {r: 0.6235, g: 0.9098, b: 0.4392, a: 1}
+    couleur: {r: 0.24705882, g: 0.70980394, b: 0.32156864, a: 1}
   - nom: "\xC9clat"
     role: 4
-    couleur: {r: 0.9098, g: 1, b: 0.7843, a: 1}
+    couleur: {r: 0.6431373, g: 0.9254902, b: 0.5647059, a: 1}
   materiaux:
   - materiau: {fileID: 2100000, guid: ff1a9b46b6bce0c41b5fe7197d1c2717, type: 2}
     role: 0

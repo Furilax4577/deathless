@@ -1081,6 +1081,43 @@ public static class VillageBuilder
     // sombre (dessus abaissé de SupportDrop), habillé de dalles découpées au contour (dessus) et de blocs chanfreinés (contremarche
     // visible entre `bottom` et `top`). `inner` = rayon de l'assise du dessus (0 s'il n'y en a pas) : les dalles entièrement
     // dessous sont omises.
+    /// Lueur légère (bloom) du village, plus présente la nuit : profil Assets/VFX/_Ambiance/Lueur.asset (Bloom seul, seuil
+    /// haut, sans salissure ni teinte), Volume global « Lueur_Nuit » sous Ambiance, piloté par LueurNuit (CycleJourNuit).
+    [MenuItem("Deathless/Village/Lueur (bloom)")]
+    public static string Lueur()
+    {
+        GameObject rootGo = GameObject.Find("VillageBlockout");
+        Transform amb = rootGo != null ? rootGo.transform.Find("Ambiance") : null;
+        if (amb == null) return "Ambiance introuvable";
+        const string chemin = "Assets/VFX/_Ambiance/Lueur.asset";
+        var profil = AssetDatabase.LoadAssetAtPath<UnityEngine.Rendering.VolumeProfile>(chemin);
+        if (profil == null) { profil = ScriptableObject.CreateInstance<UnityEngine.Rendering.VolumeProfile>(); AssetDatabase.CreateAsset(profil, chemin); }
+        if (!profil.TryGet(out UnityEngine.Rendering.Universal.Bloom bloom)) { bloom = profil.Add<UnityEngine.Rendering.Universal.Bloom>(true); AssetDatabase.AddObjectToAsset(bloom, profil); }
+        bloom.active = true;
+        bloom.threshold.overrideState = true; bloom.threshold.value = 1.25f;
+        bloom.intensity.overrideState = true; bloom.intensity.value = 0.12f;
+        bloom.scatter.overrideState = true; bloom.scatter.value = 0.55f;
+        bloom.clamp.overrideState = true; bloom.clamp.value = 8f;
+        bloom.highQualityFiltering.overrideState = true; bloom.highQualityFiltering.value = false;
+        bloom.dirtIntensity.overrideState = true; bloom.dirtIntensity.value = 0f;
+        EditorUtility.SetDirty(bloom); EditorUtility.SetDirty(profil);
+        Transform t = amb.Find("Lueur_Nuit");
+        GameObject go = t != null ? t.gameObject : new GameObject("Lueur_Nuit");
+        go.transform.SetParent(amb, false);
+        var vol = go.GetComponent<UnityEngine.Rendering.Volume>(); if (vol == null) vol = go.AddComponent<UnityEngine.Rendering.Volume>();
+        vol.isGlobal = true; vol.priority = 5f; vol.sharedProfile = profil;
+        var lueur = go.GetComponent<LueurNuit>(); if (lueur == null) lueur = go.AddComponent<LueurNuit>();
+        lueur.cycle = amb.GetComponent<CycleJourNuit>();
+        foreach (var cam in Object.FindObjectsByType<Camera>(FindObjectsSortMode.None))
+        {
+            var data = cam.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
+            if (data != null && cam.CompareTag("MainCamera")) data.renderPostProcessing = true;
+        }
+        AssetDatabase.SaveAssets();
+        UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(rootGo.scene);
+        return "Lueur : Volume global Lueur_Nuit (Bloom, seuil 1,25 le jour → 0,9 la nuit, intensité 0,12 → 0,5)";
+    }
+
     /// Lanternes et fenêtres (sandbox-vfx, 25/09/2026) appliquées à la scène ouverte sans la regénérer : matériau des
     /// maisons (fenêtres pilotées par MaterialPropertyBlock), lanternes existantes réglées par LanterneLumiere (lumière et
     /// flamme au centre de la cage, vitres émissives, couleur commune LanternesReglages, scintillement ±10 %).

@@ -11956,6 +11956,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1472278022}
     m_Modifications:
+    - target: {fileID: 6129213559967213631, guid: d738c47737f75d447ada9e6e8cd25244, type: 3}
+      propertyPath: nightBoost
+      value: 0.15
+      objectReference: {fileID: 0}
     - target: {fileID: 7811834244543653917, guid: d738c47737f75d447ada9e6e8cd25244, type: 3}
       propertyPath: m_Name
       value: GemmeNyxessa
@@ -69096,6 +69100,73 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: e8da6fdb87bc73d4b9c217e1fa9b87ee, type: 3}
   m_PrefabInstance: {fileID: 937031015}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &937984573
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 937984574}
+  - component: {fileID: 937984576}
+  - component: {fileID: 937984575}
+  m_Layer: 0
+  m_Name: Lueur_Nuit
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &937984574
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 937984573}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1320832204}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &937984575
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 937984573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46ebea64ec6a2604c8ee630fc9b65469, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LueurNuit
+  cycle: {fileID: 1320832205}
+  intensiteJour: 0.12
+  seuilJour: 1.25
+  intensiteNuit: 0.7
+  seuilNuit: 0.9
+--- !u!114 &937984576
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 937984573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.Volume
+  m_IsGlobal: 1
+  priority: 5
+  blendDistance: 0
+  weight: 1
+  sharedProfile: {fileID: 11400000, guid: 76a8d9dd771bcea4f8632fe8144b72a0, type: 2}
 --- !u!1001 &938087024
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -94803,6 +94874,7 @@ Transform:
   - {fileID: 1654599018}
   - {fileID: 768696981}
   - {fileID: 54573899}
+  - {fileID: 937984574}
   m_Father: {fileID: 832710352}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1320832205
@@ -108119,7 +108191,7 @@ MonoBehaviour:
   tangage: 12
   viseeVoulue: 0
   menuPosition: {x: -8, y: 13, z: -22}
-  menuRotation: {x: 23.8, y: 13.4, z: 0}
+  menuRotation: {x: 11.8, y: 13.4, z: 0}
   menuChamp: 44
   menuBalancement: 0.8
   menuPeriode: 50

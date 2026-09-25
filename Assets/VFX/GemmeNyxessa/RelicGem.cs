@@ -16,7 +16,7 @@ public class RelicGem : MonoBehaviour
     [Tooltip("Nombre de pans autour de la gemme.")]
     [SerializeField] private int sides = 7;
     [Tooltip("Eclaircissement la nuit (pendant la vague), en plus de la lumière du cristal.")]
-    [SerializeField] private float nightBoost = 0.3f;
+    [SerializeField] private float nightBoost = 0.15f;
 
     private static Color[] Palette => VfxPalette.Cache("RelicGem.Nyxessa", () => new[]
     {
@@ -129,7 +129,8 @@ public class RelicGem : MonoBehaviour
         for (int f = 0; f < faceNormals.Length; f++)
         {
             Vector3 world = transform.TransformDirection(faceNormals[f]).normalized;
-            float shade = 0.45f + 0.6f * Mathf.Abs(Vector3.Dot(world, light));
+            // Vert plus profond (Quentin, 26/09/2026) : facettes sombres plus sombres, la plus claire garde sa lecture.
+            float shade = 0.36f + 0.66f * Mathf.Abs(Vector3.Dot(world, light));
             Color c = faceColors[f] * shade * boost;
             c.a = 1f;
             colors[f * 3] = colors[f * 3 + 1] = colors[f * 3 + 2] = c;

@@ -18,7 +18,7 @@ namespace Deathless.Jeu
         [Header("Plan du menu principal (sans cible)")]
         public Vector3 menuPosition = new Vector3(-8f, 13f, -22f);
         [Tooltip("Rotation de la caméra (angles d'Euler, degrés).")]
-        public Vector3 menuRotation = new Vector3(23.8f, 13.4f, 0f);
+        public Vector3 menuRotation = new Vector3(11.8f, 13.4f, 0f);   // relevée de 12° (Quentin, 26/09/2026) : un bout de ciel et des nuages
         [Tooltip("Champ de vision vertical du plan du menu (degrés). En jeu, celui de la caméra est rendu.")]
         public float menuChamp = 44f;
         [Tooltip("Balancement latéral lent (m, de part et d'autre) ; 0 : plan fixe.")]

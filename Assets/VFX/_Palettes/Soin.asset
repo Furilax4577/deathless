@@ -13,27 +13,21 @@ MonoBehaviour:
   m_Name: Soin
   m_EditorClassIdentifier: Assembly-CSharp::VfxPalette
   theme: 5
-  usage: "Soins : aura de soin (croix Lit, paillettes en gemmes). Plus bleut\xE9
-    que le feu et le vert Nyxessa."
+  usage: "Soins : aura de soin du Paladin (paillettes en gemmes, lumi\xE8re), blanc
+    chaud et or, lumi\xE8re sacr\xE9e (ic\xF4ne paladin_soin : Or sombre, Or, Or
+    clair de Sacre, Blanc chaud de Critique). Les croix qui montent restent vertes
+    : palette SoinCroix."
   teintes:
-  - nom: Menthe profonde
+  - nom: Or sombre
     role: 0
-    couleur: {r: 0.1059, g: 0.4157, b: 0.298, a: 1}
-  - nom: Menthe sombre
+    couleur: {r: 0.72156864, g: 0.5647059, b: 0.22745098, a: 1}
+  - nom: Or
     role: 1
-    couleur: {r: 0.1804, g: 0.6196, b: 0.4471, a: 1}
-  - nom: Menthe
+    couleur: {r: 0.9098039, g: 0.78431374, b: 0.44705883, a: 1}
+  - nom: Or clair
     role: 2
-    couleur: {r: 0.3098, g: 0.8118, b: 0.6039, a: 1}
-  - nom: Menthe claire
+    couleur: {r: 0.95686275, g: 0.8862745, b: 0.65882355, a: 1}
+  - nom: Blanc chaud
     role: 3
-    couleur: {r: 0.7216, g: 0.9608, b: 0.8471, a: 1}
-  materiaux:
-  - materiau: {fileID: 2100000, guid: 2ab6b5bdffa4b944798a9891bebc3f13, type: 2}
-    role: 2
-    accent: 
-    propriete: _BaseColor
-  - materiau: {fileID: 2100000, guid: e6650c01e62175e469d9144109969a77, type: 2}
-    role: 1
-    accent: 
-    propriete: _BaseColor
+    couleur: {r: 1, g: 0.9529412, b: 0.81960785, a: 1}
+  materiaux: []
