@@ -4,7 +4,8 @@ Ce qui reste ouvert. Une ligne quitte cette page quand la règle est tranchée e
 
 | Sujet | Question | Page |
 |---|---|---|
-| Déroulé d'une partie | Vagues d'ennemis, joueur resté au donjon à la nuit, vote « prêt », défaite | [Déroulé d'une partie](deroule.md) |
+| Déroulé d'une partie | Joueur resté au donjon à la nuit, vote « prêt », défaite, nombre de joueurs maximum | [Déroulé d'une partie](deroule.md) |
+| Ennemis d'élite et boss | Ce qui distingue un élite, le mini-boss de la nuit 10 et le boss final de la nuit 12 | [Ennemis](ennemis.md) |
 | Nyxessa | Coût de base des paliers, équilibrage des valeurs en jeu | [Nyxessa](nyxessa.md) |
 | Bouclier | Signe visuel de l'amélioration (gemmes plus intenses ou plus nombreuses), paliers, encaissement, dégâts renvoyés, moment de l'invocation | [Nyxessa](nyxessa.md) |
 | Rôdeur | Durée de charge de l'arc, dégâts minimum et maximum, multiplicateur de critique | [Classes](classes.md) |
