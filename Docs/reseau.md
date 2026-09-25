@@ -76,6 +76,7 @@ Scripts/Reseau/
 - **Squelettes** : préfabs réseau (NetworkObject, NetworkTransform et NetworkAnimator en autorité serveur, échelle synchronisée pour les élites, `EnnemiReseau`), apparus par l'hôte (`DirecteurVagues.Poser`) ; nombre par nuit × (1 + 0,6 par joueur en plus) (`GameBalance.ennemisParJoueurEnPlus`).
 - **Missiles en crâne** (Nyxessa, Nécromancien) : même vol chez les clients, sans dégâts (`MissileCrane.TirerVisuel`).
 - **Tirs des joueurs** (flèches, carreaux, boules de feu) : rejoués chez les autres (`ProjectileJeu.TirerVisuel`, même balistique, sans dégâts).
+- **Effets de compétence** (26/09/2026) : chaque classe diffuse ses effets par `ClasseHeros.Diffuser(effet, a, b, v)` → `HerosReseau.EffetRpc` (propriétaire → autres postes) → `ClasseHeros.EffetDistant` sur la marionnette, qui rejoue visuel et son à la même position et dans la même orientation, sans dégâts (ils restent décidés comme avant). Paladin : élan et impact de l'épée, charge bélier et son impact, soin et aura, garde et parade ; Viking : élan, coup de hache, attaque tournante (début, effet, coups, fin), rugissement (effet et cri), saut percutant (onde) ; Mage : lancer de boule, cône de flammes (allumé, suit l'orientation du héros, éteint) ; Rôdeur : bander, tir, nuée de flèches (effet et sons), roulade, salve ; Assassin : dague, arbalète (et son rechargement), fumigène (`FumeeRpc`, avec le son du nuage) ; toutes les classes : marque de critique, esquive, saut.
 - **Sorcier et bouclier** : l'hôte pilote ; les clients suivent (marionnette du sorcier, effet du bouclier levé, frappé, brisé, baissé).
 - Préfabs : `Deathless > Jeu > 8. Réseau` équipe aussi les 4 squelettes et crée `Resources/Reseau/PartieReseau.prefab`.
 
@@ -89,7 +90,10 @@ Arguments de `ClientAutomatique` :
 -deathless-rejoindre=127.0.0.1[:7777]   ou   -deathless-code=ABC123   ou   -deathless-heberger
 -deathless-pseudo=Morgane -deathless-classe=mage -deathless-duree=60
 [-deathless-profil=client2] [-deathless-direct] [-deathless-quitter-salon=6]
+[-deathless-competences] [-deathless-attendre=2] [-deathless-solo]
 ```
+
+`-deathless-competences` : le héros enchaîne toutes ses compétences (saut, esquive, RT, LB, RB, LT maintenu, RT maintenu), jauge remplie, et le journal compte les effets reçus des autres (`HerosReseau.EffetsRecus`). `-deathless-attendre=2` : l'hôte construit ne se déclare prêt qu'à 2 joueurs. `-deathless-solo` : partie solo lancée aussitôt (vérification d'un build : le journal donne aussi l'état de la caméra).
 
 Il rejoint, prend sa classe, se déclare prêt, puis fait marcher son héros en rond (sprint une seconde sur trois ; saut, esquive, attaque toutes les 1,5 s) et journalise toutes les 2 s le salon, sa position, le sol sous lui et les héros des autres (position, vie). Pseudo et classe imposés ne touchent pas au profil enregistré.
 
@@ -108,7 +112,7 @@ Résultats de l'étape 2 (25/09/2026, hôte Paladin, client Mage, adresse IP) : 
 
 ## Limites connues
 
-- Effets de compétence des autres joueurs non rejoués (cône de flammes, attaque tournante, charge, rugissement, nuée, soin, aura) : on voit leurs animations et leurs projectiles, pas ces effets. Leurs conséquences sur les squelettes (dégâts, étourdissements, poussées, provocation) passent bien par l'hôte.
+- Pose de l'arc des autres rôdeurs (flèche encochée, corde tendue) et cercle de charge : visibles seulement par le tireur.
 - Le penché du buste en visée (arc, arbalète) n'est pas recopié chez les autres ; l'orientation du corps l'est.
 - Chaque coup d'un client sur un squelette est un message ; les dégâts continus (cône, brûlure) en envoient beaucoup (sans gêne constatée à deux).
 - Pas d'arrivée en cours de partie ; pas de reconnexion.

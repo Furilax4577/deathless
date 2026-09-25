@@ -283,6 +283,7 @@ namespace Deathless.Jeu
             m_AuSol = false;
             if (animator != null) Declencher(P_Jump);
             AudioBank.Jouer(SonsDuJeu.Saut, transform.position, 0.5f);
+            if (Classe != null) Classe.DiffuserCommun(ClasseHeros.EffetSaut);
         }
 
         void Esquiver()
@@ -295,6 +296,7 @@ namespace Deathless.Jeu
             m_RechargeEsquive = B.esquiveRecharge;
             EsquiveImposee(dir, false);
             AudioBank.Jouer(SonsDuJeu.Esquive, transform.position + Vector3.up, 0.8f);
+            if (Classe != null) Classe.DiffuserCommun(ClasseHeros.EffetEsquive);
         }
 
         Interception Intercepter(InfoDegats info)

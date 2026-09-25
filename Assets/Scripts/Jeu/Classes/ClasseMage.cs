@@ -28,6 +28,10 @@ namespace Deathless.Jeu
         AudioSource m_SonCone;
         float m_TicCone;
 
+        // Effets diffusés aux autres postes (ClasseHeros.Diffuser).
+        const int E_Boule = 1, E_ConeDebut = 2, E_ConeFin = 3;
+        bool m_ConeDistant;
+
         static readonly int P_Attack1 = Animator.StringToHash("Attack1");
         static readonly int P_Cone = Animator.StringToHash("Cone");
 
@@ -81,6 +85,7 @@ namespace Deathless.Jeu
             H.Tourner(H.AvantCamera);
             if (Anim != null) H.Declencher(P_Attack1);
             AudioBank.Jouer(SonsDuJeu.BouleLancer, transform.position + Vector3.up * 1.5f, 0.8f);
+            Diffuser(E_Boule);
         }
 
         void LancerBoule()
@@ -164,8 +169,22 @@ namespace Deathless.Jeu
             m_Depuis = 0f;
             m_TicCone = 0f;
             if (Anim != null) Anim.SetBool(P_Cone, true);
+            AllumerCone(H.AvantCamera);
+            Diffuser(E_ConeDebut);
+        }
+
+        void AllumerCone(Vector3 f)
+        {
+            if (m_ConeGo != null && f.sqrMagnitude > 0.001f) m_ConeGo.transform.rotation = Quaternion.LookRotation(f);
             if (m_Cone != null) foreach (var ps in m_Cone) ps.Play(false);
+            if (m_SonCone != null) Destroy(m_SonCone);
             m_SonCone = AudioBank.Boucle(SonsDuJeu.Cone, pointeBaton != null ? pointeBaton : transform, 0.8f);
+        }
+
+        void EteindreCone()
+        {
+            if (m_Cone != null) foreach (var ps in m_Cone) ps.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+            if (m_SonCone != null) { Destroy(m_SonCone); m_SonCone = null; }
         }
 
         void ArreterCone()
@@ -174,8 +193,27 @@ namespace Deathless.Jeu
             m_Action = Action.Aucune;
             m_Mana = Mathf.Max(0f, m_Mana);
             if (Anim != null) Anim.SetBool(P_Cone, false);
-            if (m_Cone != null) foreach (var ps in m_Cone) ps.Stop(true, ParticleSystemStopBehavior.StopEmitting);
-            if (m_SonCone != null) { Destroy(m_SonCone); m_SonCone = null; }
+            EteindreCone();
+            Diffuser(E_ConeFin);
+        }
+
+        // ----------------------------------------------------------------- Multijoueur (marionnette)
+
+        public override void EffetDistant(int effet, Vector3 a, Vector3 b, float v)
+        {
+            switch (effet)
+            {
+                case E_Boule: AudioBank.Jouer(SonsDuJeu.BouleLancer, transform.position + Vector3.up * 1.5f, 0.8f); break;
+                case E_ConeDebut: m_ConeDistant = true; AllumerCone(transform.forward); break;
+                case E_ConeFin: m_ConeDistant = false; EteindreCone(); break;
+                default: base.EffetDistant(effet, a, b, v); break;
+            }
+        }
+
+        /// Marionnette : le cône suit l'orientation du héros (tourné vers la visée de son propriétaire).
+        void LateUpdate()
+        {
+            if (m_ConeDistant && m_ConeGo != null) m_ConeGo.transform.rotation = Quaternion.LookRotation(transform.forward);
         }
 
         public override void Interrompre()

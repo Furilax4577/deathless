@@ -38,6 +38,10 @@ namespace Deathless.Jeu
         static readonly int P_Rugir = Animator.StringToHash("Rugir");
         static readonly int P_Saut = Animator.StringToHash("Saut");
 
+        // Effets diffusés aux autres postes (ClasseHeros.Diffuser).
+        const int E_Elan = 1, E_Hache = 2, E_TournanteDebut = 3, E_TournanteVfx = 4, E_TournanteTic = 5, E_TournanteFin = 6,
+            E_RugirVfx = 7, E_RugirCri = 8, E_Saut = 9;
+
         // Instants du geste (clips à vitesse 1, mesurés par VfxBench) et vitesses de lecture du contrôleur.
         const float CriClip = 1.63f, VitesseCri = 1.6f;
         const float DecollageClip = 0.19f, AtterrissageClip = 0.69f, ImpactClip = 0.79f, VitesseSaut = 1.2f;
@@ -97,6 +101,7 @@ namespace Deathless.Jeu
             H.Tourner(H.AvantCamera);
             if (Anim != null) H.Declencher(m_Combo == 0 ? P_Attack1 : P_Attack2);
             AudioBank.Jouer(SonsDuJeu.EpeeElan, transform.position + Vector3.up, 0.6f);
+            Diffuser(E_Elan);
         }
 
         void Rugir()
@@ -158,13 +163,13 @@ namespace Deathless.Jeu
                             H.Frapper(s, b.hacheDegats);
                             touche = true;
                         }
-                        if (touche) AudioBank.Jouer(SonsDuJeu.Hache, transform.position + transform.forward + Vector3.up, 1f);
+                        if (touche) { AudioBank.Jouer(SonsDuJeu.Hache, transform.position + transform.forward + Vector3.up, 1f); Diffuser(E_Hache); }
                     }
                     if (m_Depuis >= b.hacheIntervalle) m_Action = Action.Aucune;
                     break;
                 case Action.Tournante:
                     m_Rage -= b.tournanteRage * dt;
-                    if (!m_VfxTournante && m_Depuis >= 0.35f && m_Tournante != null && teteHache != null) { m_Tournante.Commencer(transform, teteHache); m_VfxTournante = true; }
+                    if (!m_VfxTournante && m_Depuis >= 0.35f && m_Tournante != null && teteHache != null) { m_Tournante.Commencer(transform, teteHache); m_VfxTournante = true; Diffuser(E_TournanteVfx); }
                     if (m_Depuis >= 0.35f && Time.time >= m_ProchainTic)
                     {
                         m_ProchainTic = Time.time + b.tournanteIntervalle;
@@ -174,18 +179,19 @@ namespace Deathless.Jeu
                             H.Frapper(s, b.tournanteDegats, false, s.transform.position + Vector3.up, (s.transform.position - transform.position).normalized, false, true);
                             touche = true;
                         }
-                        if (touche) AudioBank.Jouer(SonsDuJeu.Hache, transform.position + Vector3.up, 0.6f, 0.25f);
+                        if (touche) { AudioBank.Jouer(SonsDuJeu.Hache, transform.position + Vector3.up, 0.6f, 0.25f); Diffuser(E_TournanteTic); }
                     }
                     if (!tenue || m_Rage <= 0f) Arreter();
                     break;
                 case Action.Rugissement:
                 {
                     float cri = CriClip / VitesseCri;
-                    if (!m_VfxCri && m_Depuis >= cri - 0.32f) { m_VfxCri = true; if (m_Rugissement != null) m_Rugissement.Jouer(); }
+                    if (!m_VfxCri && m_Depuis >= cri - 0.32f) { m_VfxCri = true; if (m_Rugissement != null) m_Rugissement.Jouer(); Diffuser(E_RugirVfx); }
                     if (!m_Crie && m_Depuis >= cri)
                     {
                         m_Crie = true;
                         AudioBank.Jouer(SonsDuJeu.Rugissement, transform.position + Vector3.up * 1.6f, 1f);
+                        Diffuser(E_RugirCri);
                         int n = 0;
                         var dv = DirecteurVagues.Instance;
                         if (dv != null)
@@ -211,6 +217,7 @@ namespace Deathless.Jeu
             m_VfxTournante = false;
             if (Anim != null) Anim.SetBool(P_Tourne, true);
             m_SonTournante = AudioBank.Boucle(SonsDuJeu.Tournante, transform, 0.8f);
+            Diffuser(E_TournanteDebut);
         }
 
         void Arreter()
@@ -218,10 +225,16 @@ namespace Deathless.Jeu
             if (m_Action != Action.Tournante) return;
             m_Action = Action.Aucune;
             if (Anim != null) Anim.SetBool(P_Tourne, false);
+            FinTournante();
+            Diffuser(E_TournanteFin);
+            m_Rage = Mathf.Max(0f, m_Rage);
+        }
+
+        void FinTournante()
+        {
             if (m_Tournante != null && m_VfxTournante) m_Tournante.Arreter();
             m_VfxTournante = false;
             if (m_SonTournante != null) { Destroy(m_SonTournante); m_SonTournante = null; }
-            m_Rage = Mathf.Max(0f, m_Rage);
         }
 
         public override bool DeplacementImpose(float dt, out Vector3 vitesse)
@@ -244,15 +257,8 @@ namespace Deathless.Jeu
             H.TraverserEnnemis(false);
             var b = B;
             Vector3 point = transform.position + m_DirSaut * 1f;
-            var fx = EffetsJeu.Instance;
-            if (fx != null && fx.prefabOndeSaut != null)
-            {
-                var onde = Instantiate(fx.prefabOndeSaut, point + Vector3.up, Quaternion.LookRotation(m_DirSaut));
-                var o = onde.GetComponent<OndeDeChoc>();
-                if (o != null) o.Jouer();
-                Destroy(onde, 3f);
-            }
-            AudioBank.Jouer(SonsDuJeu.SautPercutant, point, 1f);
+            EffetSaut(point, m_DirSaut);
+            Diffuser(E_Saut, point, m_DirSaut);
             int n = 0;
             foreach (var s in Combat.Ennemis(point, m_DirSaut, b.sautRayon, 180f))
             {
@@ -262,6 +268,43 @@ namespace Deathless.Jeu
                 n++;
             }
             if (H.Partie != null) H.Partie.Journal("Saut percutant : " + Vector3.Distance(m_DepartSaut, transform.position).ToString("F1") + " m, " + n + " touchés");
+        }
+
+        void EffetSaut(Vector3 point, Vector3 dir)
+        {
+            var fx = EffetsJeu.Instance;
+            if (fx != null && fx.prefabOndeSaut != null)
+            {
+                var onde = Instantiate(fx.prefabOndeSaut, point + Vector3.up, Quaternion.LookRotation(dir));
+                var o = onde.GetComponent<OndeDeChoc>();
+                if (o != null) o.Jouer();
+                Destroy(onde, 3f);
+            }
+            AudioBank.Jouer(SonsDuJeu.SautPercutant, point, 1f);
+        }
+
+        // ----------------------------------------------------------------- Multijoueur (marionnette)
+
+        public override void EffetDistant(int effet, Vector3 a, Vector3 b, float v)
+        {
+            switch (effet)
+            {
+                case E_Elan: AudioBank.Jouer(SonsDuJeu.EpeeElan, transform.position + Vector3.up, 0.6f); break;
+                case E_Hache: AudioBank.Jouer(SonsDuJeu.Hache, transform.position + transform.forward + Vector3.up, 1f); break;
+                case E_TournanteDebut:
+                    FinTournante();
+                    m_SonTournante = AudioBank.Boucle(SonsDuJeu.Tournante, transform, 0.8f);
+                    break;
+                case E_TournanteVfx:
+                    if (m_Tournante != null && teteHache != null && !m_VfxTournante) { m_Tournante.Commencer(transform, teteHache); m_VfxTournante = true; }
+                    break;
+                case E_TournanteTic: AudioBank.Jouer(SonsDuJeu.Hache, transform.position + Vector3.up, 0.6f, 0.25f); break;
+                case E_TournanteFin: FinTournante(); break;
+                case E_RugirVfx: if (m_Rugissement != null) m_Rugissement.Jouer(); break;
+                case E_RugirCri: AudioBank.Jouer(SonsDuJeu.Rugissement, transform.position + Vector3.up * 1.6f, 1f); break;
+                case E_Saut: EffetSaut(a, b); break;
+                default: base.EffetDistant(effet, a, b, v); break;
+            }
         }
 
         public override void Interrompre()

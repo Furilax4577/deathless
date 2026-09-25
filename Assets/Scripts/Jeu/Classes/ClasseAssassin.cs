@@ -92,6 +92,9 @@ namespace Deathless.Jeu
         }
 
         /// Repéré par un squelette : sortie du mode furtif.
+        // Effets diffusés aux autres postes (ClasseHeros.Diffuser).
+        const int E_Dague = 1, E_DagueVide = 2, E_Arbalete = 3;
+
         public void Reperer()
         {
             // Multijoueur : repéré chez l'hôte (marionnette) ; c'est son propriétaire qui sort du mode furtif.
@@ -159,12 +162,13 @@ namespace Deathless.Jeu
                 bool critique = furtif || dos;
                 Vector3 point = s.transform.position + Vector3.up * 1.1f;
                 Vector3 dir = (s.transform.position - transform.position).normalized;
-                if (critique) Combat.Critique(point, -dir, furtif && dos);
+                if (critique) Critique(point, -dir, furtif && dos);
                 H.Frapper(s, b.dagueDegats * mult, critique, point, dir);
                 AudioBank.Jouer(SonsDuJeu.Dague, point, 0.9f);
+                Diffuser(E_Dague, point);
                 if (H.Partie != null && critique) H.Partie.Journal("Dague : " + (furtif && dos ? "meilleur critique ×" : "critique ×") + mult + (dos ? " (dos)" : "") + (furtif ? " (furtif)" : ""));
             }
-            else AudioBank.Jouer(SonsDuJeu.EpeeElan, transform.position + Vector3.up, 0.5f);
+            else { AudioBank.Jouer(SonsDuJeu.EpeeElan, transform.position + Vector3.up, 0.5f); Diffuser(E_DagueVide); }
             // Attaquer fait sortir du mode furtif (wiki).
             m_DernierCombat = Time.time;
             SortirFurtif();
@@ -189,11 +193,12 @@ namespace Deathless.Jeu
                 if (s == null) return;
                 // Seul critique de l'arbalète : la tête (les passifs ne s'appliquent pas aux carreaux, wiki).
                 bool tete = Combat.ALaTete(s.GetComponent<Squelette>(), point, dir);
-                if (tete) Combat.Critique(point, -dir, false);
+                if (tete) Critique(point, -dir, false);
                 H.Frapper(s, b.arbaleteDegats * (tete ? b.arbaleteTete : 1f), tete, point, dir);
             });
             AudioBank.Jouer(SonsDuJeu.ArbaleteTir, depart, 1f);
             Invoke(nameof(SonRecharge), 0.6f);
+            Diffuser(E_Arbalete, depart);
         }
 
         void SonRecharge() => AudioBank.Jouer(SonsDuJeu.ArbaleteRecharge, transform.position + Vector3.up * 1.3f, 0.7f);
@@ -292,6 +297,19 @@ namespace Deathless.Jeu
             if (m_Fumigene == null) return;
             m_Fumigene.Lancer(depart, cible, duree);
             AudioBank.Jouer(SonsDuJeu.GrenadeLancer, depart, 0.8f);
+            m_CibleGrenade = cible;
+            Invoke(nameof(SonFumee), duree);
+        }
+
+        public override void EffetDistant(int effet, Vector3 a, Vector3 b, float v)
+        {
+            switch (effet)
+            {
+                case E_Dague: AudioBank.Jouer(SonsDuJeu.Dague, a, 0.9f); break;
+                case E_DagueVide: AudioBank.Jouer(SonsDuJeu.EpeeElan, transform.position + Vector3.up, 0.5f); break;
+                case E_Arbalete: AudioBank.Jouer(SonsDuJeu.ArbaleteTir, a, 1f); Invoke(nameof(SonRecharge), 0.6f); break;
+                default: base.EffetDistant(effet, a, b, v); break;
+            }
         }
 
         void SonFumee() => AudioBank.Jouer(SonsDuJeu.Fumee, m_CibleGrenade, 1f);

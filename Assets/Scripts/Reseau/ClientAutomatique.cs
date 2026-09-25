@@ -11,6 +11,8 @@ namespace Deathless.Reseau
     /// qu'il voit (salon, héros des autres et leur position) et quitte au bout de la durée donnée.
     ///   -deathless-rejoindre=127.0.0.1[:7777] | -deathless-code=ABC123 | -deathless-heberger
     ///   -deathless-pseudo=Bot -deathless-classe=mage -deathless-duree=60 [-deathless-profil=client2] [-deathless-direct]
+    ///   -deathless-attendre=2 : ne se déclare prêt qu'une fois 2 joueurs dans le salon (hôte construit)
+    ///   -deathless-competences : le héros enchaîne toutes ses compétences (effets vus par les autres postes)
     ///   -deathless-solo : partie solo lancée aussitôt avec la classe donnée (vérification du build : caméra, héros)
     ///   [-deathless-quitter-salon=5] : quitte le salon 5 s après y être entré (test de la classe libérée), sans se déclarer prêt
     public class ClientAutomatique : MonoBehaviour
@@ -48,6 +50,8 @@ namespace Deathless.Reseau
             c.m_Code = code;
             c.m_Heberger = heberger;
             c.m_Solo = solo;
+            c.m_Competences = Drapeau("deathless-competences");
+            if (int.TryParse(Arg("deathless-attendre"), out var att)) c.m_Attendre = att;
             c.m_Classe = Arg("deathless-classe") ?? "mage";
             LobbyReseau.PseudoForce = Arg("deathless-pseudo") ?? "Bot";
             LobbyReseau.ClasseForcee = c.m_Classe;
@@ -104,7 +108,7 @@ namespace Deathless.Reseau
                     bool ok = lobby.ChoisirClasse(m_Classe);
                     ReseauJeu.Journal("[auto] demande la classe " + m_Classe + (ok ? "" : " (prise par " + LobbyOutils.PrisePar(lobby, m_Classe) + ")"));
                 }
-                if (m_QuitterSalon < 0f && moi != null && !moi.Pret && !m_PretDemande && !string.IsNullOrEmpty(moi.ClasseId) && (moi.ClasseId == m_Classe || m_ClasseDemandee))
+                if (m_QuitterSalon < 0f && moi != null && !moi.Pret && lobby.Joueurs.Count >= m_Attendre && !m_PretDemande && !string.IsNullOrEmpty(moi.ClasseId) && (moi.ClasseId == m_Classe || m_ClasseDemandee))
                 {
                     m_PretDemande = true;
                     lobby.BasculerPret();
@@ -183,13 +187,37 @@ namespace Deathless.Reseau
             float a = t * Mathf.PI * 2f / 12f;
             h.Entrees.DeplacementTest = new Vector2(Mathf.Cos(a), Mathf.Sin(a));
             h.Entrees.SprintTest = Mathf.Repeat(t, 3f) < 1f;
+            h.Entrees.GardeTest = m_Competences && t < m_GardeJusqua;
+            h.Entrees.AttaqueTest = m_Competences && t < m_AttaqueJusqua;
             if (t >= m_ProchaineAction)
             {
                 m_ProchaineAction = t + 1.5f;
-                string action = (m_Action++ % 3) switch { 0 => "Jump", 1 => "Dodge", _ => "AttackPrimary" };
-                h.Entrees.SimulerAction(action);
+                if (!m_Competences)
+                {
+                    string action = (m_Action++ % 3) switch { 0 => "Jump", 1 => "Dodge", _ => "AttackPrimary" };
+                    h.Entrees.SimulerAction(action);
+                    return;
+                }
+                // Toutes les compétences, à tour de rôle (jauge remplie : rage, mana), pour les effets vus par les autres.
+                if (h.Classe != null) h.Classe.RemplirJauge();
+                int k = m_Action++ % 8;
+                switch (k)
+                {
+                    case 0: h.Entrees.SimulerAction("Jump"); break;
+                    case 1: h.Entrees.SimulerAction("Dodge"); break;
+                    case 2: case 7: h.Entrees.SimulerAction("AttackPrimary"); m_AttaqueJusqua = t + 1.3f; break;
+                    case 3: h.Entrees.SimulerAction("Skill1"); m_ProchaineAction = t + 2.2f; break;
+                    case 4: h.Entrees.SimulerAction("Skill2"); m_ProchaineAction = t + 2.2f; break;
+                    case 5: h.Entrees.SimulerAction("AttackSecondary"); m_GardeJusqua = t + 2.5f; m_ProchaineAction = t + 3f; break;
+                    case 6: m_AttaqueJusqua = t + 1.3f; h.Entrees.SimulerAction("AttackPrimary"); break;
+                }
+                ReseauJeu.Journal("[auto] compétence " + k);
             }
         }
+
+        bool m_Competences;
+        int m_Attendre = 1;
+        float m_GardeJusqua, m_AttaqueJusqua;
 
         void Journaliser(ILobby l, Partie p)
         {
@@ -202,6 +230,7 @@ namespace Deathless.Reseau
                 if (Physics.Raycast(new Vector3(pos.x, 60f, pos.z), Vector3.down, out var sol, 400f, ~0, QueryTriggerInteraction.Ignore))
                     t += ", sol " + sol.collider.name + " à " + sol.point.y.ToString("F1");
                 else t += ", pas de sol sous le héros";
+                foreach (var hr in HerosReseau.Tous) if (hr != null && !hr.IsOwner) t += " | effets reçus de " + hr.Pseudo + " : " + hr.EffetsRecus + " (" + string.Join(",", hr.EffetsVus) + ")";
                 if (p.cameraJeu != null) t += " | " + p.cameraJeu.Diagnostic() + (p.cameraJeu.cible == p.HerosLocal.transform ? " (héros local)" : " (PAS le héros local)");
             }
             if (p != null && p.Etat.phase != Phase.Attente)

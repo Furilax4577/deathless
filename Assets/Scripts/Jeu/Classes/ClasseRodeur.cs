@@ -30,6 +30,9 @@ namespace Deathless.Jeu
         Vector3 m_CentreNuee;
         bool m_NueeLancee;
 
+        // Effets diffusés aux autres postes (ClasseHeros.Diffuser).
+        const int E_Bander = 1, E_Tir = 2, E_Nuee = 3, E_Roulade = 4, E_Salve = 5;
+
         static readonly Vector3 ReposEuler = new Vector3(286f, 183f, 357f), ViseeEuler = new Vector3(0f, 0f, 180f);
         static readonly int P_Aiming = Animator.StringToHash("Aiming");
         static readonly int P_Shoot = Animator.StringToHash("Shoot");
@@ -102,6 +105,7 @@ namespace Deathless.Jeu
             if (Anim != null) Anim.SetBool(P_Aiming, true);
             if (m_Cercle != null && m_Encochee != null) m_Cercle.Bander(m_Encochee);
             AudioBank.Jouer(SonsDuJeu.ArcBander, transform.position + Vector3.up * 1.4f, 0.7f);
+            Diffuser(E_Bander);
         }
 
         void Lacher()
@@ -119,6 +123,7 @@ namespace Deathless.Jeu
             // Vitesse selon la charge : tir rapide lent (retombe vite), charge complète rapide (file loin et tendu).
             TirerFleche(depart, cible, Mathf.Lerp(b.arcVitesseMin, b.arcVitesseMax, charge), degats, b.arcTete);
             AudioBank.Jouer(charge >= 0.999f ? SonsDuJeu.ArcTirCharge : SonsDuJeu.ArcTir, depart, 0.9f);
+            Diffuser(E_Tir, depart, default, charge);
         }
 
         void TirerFleche(Vector3 depart, Vector3 cible, float vitesse, float degats, float multTete)
@@ -128,7 +133,7 @@ namespace Deathless.Jeu
                 AudioBank.Jouer(SonsDuJeu.FlecheImpact, point, 0.7f, 0.05f);
                 if (s == null) return;
                 bool tete = Combat.ALaTete(s.GetComponent<Squelette>(), point, dir);
-                if (tete) Combat.Critique(point, -dir, false);
+                if (tete) Critique(point, -dir, false);
                 H.Frapper(s, degats * (tete ? multTete : 1f), tete, point, dir);
             });
         }
@@ -150,12 +155,13 @@ namespace Deathless.Jeu
             if (Anim != null) H.Declencher(P_TirHaut);
         }
 
-        IEnumerator Pluie(Vector3 centre)
+        IEnumerator Pluie(Vector3 centre, bool degats = true)
         {
             var b = B;
             AudioBank.Jouer(SonsDuJeu.NueeMarqueur, centre, 0.8f);
             yield return new WaitForSeconds(0.35f);
             AudioBank.Jouer(SonsDuJeu.Nuee, centre, 1f);
+            if (!degats) yield break;   // marionnette : visuel et sons seulement
             for (int i = 0; i < b.nueeSalves; i++)
             {
                 foreach (var s in Combat.Ennemis(centre, Vector3.forward, b.nueeRayon, 180f))
@@ -175,6 +181,7 @@ namespace Deathless.Jeu
             H.Tourner(avant);
             H.EsquiveImposee(-avant, true);
             AudioBank.Jouer(SonsDuJeu.Esquive, transform.position + Vector3.up, 0.8f);
+            Diffuser(E_Roulade);
             StartCoroutine(Salve(avant));
         }
 
@@ -192,6 +199,7 @@ namespace Deathless.Jeu
                 TirerFleche(depart, depart + dir, b.salveVitesse, b.salveDegats, b.arcTete);
             }
             AudioBank.Jouer(SonsDuJeu.ArcTir, depart, 1f);
+            Diffuser(E_Salve, depart);
         }
 
         public override void Temps(float dt)
@@ -224,9 +232,29 @@ namespace Deathless.Jeu
                         if (m_Nuee != null) m_Nuee.Jouer(m_CentreNuee, b.nueeRayon);
                         StartCoroutine(Pluie(m_CentreNuee));
                         AudioBank.Jouer(SonsDuJeu.ArcTir, transform.position + Vector3.up * 1.6f, 0.8f);
+                        Diffuser(E_Nuee, m_CentreNuee, default, b.nueeRayon);
                     }
                     if (m_Depuis >= 1.0f) m_Action = Action.Aucune;
                     break;
+            }
+        }
+
+        // ----------------------------------------------------------------- Multijoueur (marionnette)
+
+        public override void EffetDistant(int effet, Vector3 a, Vector3 b, float v)
+        {
+            switch (effet)
+            {
+                case E_Bander: AudioBank.Jouer(SonsDuJeu.ArcBander, transform.position + Vector3.up * 1.4f, 0.7f); break;
+                case E_Tir: AudioBank.Jouer(v >= 0.999f ? SonsDuJeu.ArcTirCharge : SonsDuJeu.ArcTir, a, 0.9f); break;
+                case E_Nuee:
+                    if (m_Nuee != null) m_Nuee.Jouer(a, v);
+                    StartCoroutine(Pluie(a, false));
+                    AudioBank.Jouer(SonsDuJeu.ArcTir, transform.position + Vector3.up * 1.6f, 0.8f);
+                    break;
+                case E_Roulade: AudioBank.Jouer(SonsDuJeu.Esquive, transform.position + Vector3.up, 0.8f); break;
+                case E_Salve: AudioBank.Jouer(SonsDuJeu.ArcTir, a, 1f); break;
+                default: base.EffetDistant(effet, a, b, v); break;
             }
         }
 

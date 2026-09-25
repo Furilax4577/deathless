@@ -40,6 +40,9 @@ namespace Deathless.Jeu
 
         public bool EnGarde => m_Garde;
 
+        // Effets diffusés aux autres postes (ClasseHeros.Diffuser).
+        const int E_Elan = 1, E_Impact = 2, E_Charge = 3, E_ChargeImpact = 4, E_Soin = 5, E_Aura = 6, E_Garde = 7;
+
         public override void Initialiser(Heros heros)
         {
             base.Initialiser(heros);
@@ -84,6 +87,7 @@ namespace Deathless.Jeu
             H.Tourner(H.AvantCamera);
             if (Anim != null) H.Declencher(m_Combo == 0 ? P_Attack1 : P_Attack2);
             AudioBank.Jouer(SonsDuJeu.EpeeElan, transform.position + Vector3.up, 0.7f);
+            Diffuser(E_Elan);
         }
 
         void PorterCoup()
@@ -94,6 +98,7 @@ namespace Deathless.Jeu
             {
                 H.Frapper(cibles[i], B.epeeDegats);
                 AudioBank.Jouer(SonsDuJeu.EpeeImpact, cibles[i].transform.position + Vector3.up, 0.9f);
+                Diffuser(E_Impact, cibles[i].transform.position + Vector3.up);
             }
         }
 
@@ -133,7 +138,13 @@ namespace Deathless.Jeu
             m_Repousses.Clear();
             m_ParcouruCharge = 0f;
             if (Anim != null) H.Declencher(P_Charge);
-            if (m_ChargeVisuel != null) m_ChargeVisuel.Jouer(transform, m_Dir, 99f, b.chargeDistance);
+            EffetCharge(m_Dir);
+            Diffuser(E_Charge, m_Dir);
+        }
+
+        void EffetCharge(Vector3 dir)
+        {
+            if (m_ChargeVisuel != null) m_ChargeVisuel.Jouer(transform, dir, 99f, B.chargeDistance);
             AudioBank.Jouer(SonsDuJeu.Charge, transform.position + Vector3.up, 1f);
         }
 
@@ -146,6 +157,7 @@ namespace Deathless.Jeu
             m_RechargeSoin = B.soinRecharge;
             if (Anim != null) H.Declencher(P_Heal);
             AudioBank.Jouer(SonsDuJeu.Soin, transform.position + Vector3.up, 0.9f);
+            Diffuser(E_Soin);
         }
 
         public override void Temps(float dt)
@@ -179,6 +191,7 @@ namespace Deathless.Jeu
                         m_SoinDonne = true;
                         H.Sante.Soigner(H.Sante.pvMax * b.soinPart);
                         if (aura != null) aura.Jouer();
+                        Diffuser(E_Aura);
                     }
                     if (m_Depuis >= b.soinIncantation + 0.5f) m_Action = Action.Aucune;
                     break;
@@ -237,11 +250,17 @@ namespace Deathless.Jeu
                 if (p != null) p.Journal("Charge : " + m_ParcouruCharge.ToString("F1") + " m, force " + force.ToString("F2") + ", " + degats.ToString("F0") + " dégâts sur " + m_CibleCharge.type + ", " + m_Repousses.Count + " repoussés");
             }
             else if (p != null) p.Journal("Charge : " + m_ParcouruCharge.ToString("F1") + " m sans cible, " + m_Repousses.Count + " repoussés");
-            if (m_ChargeVisuel != null) m_ChargeVisuel.Impact(force);
+            EffetChargeImpact(force);
+            Diffuser(E_ChargeImpact, default, default, force);
             TraverserEnnemis(false);
-            AudioBank.Jouer(SonsDuJeu.ChargeImpact, transform.position + transform.forward, 0.8f * (0.5f + force));
             m_Action = Action.Aucune;
             m_CibleCharge = null;
+        }
+
+        void EffetChargeImpact(float force)
+        {
+            if (m_ChargeVisuel != null) m_ChargeVisuel.Impact(force);
+            AudioBank.Jouer(SonsDuJeu.ChargeImpact, transform.position + transform.forward, 0.8f * (0.5f + force));
         }
 
         void TraverserEnnemis(bool traverser) => H.TraverserEnnemis(traverser, m_CibleCharge);
@@ -281,7 +300,25 @@ namespace Deathless.Jeu
             if (Anim != null) H.Declencher(P_BlockHit);
             H.HautDuCorpsPendant(0.5f);
             AudioBank.Jouer(r == Interception.Pare ? SonsDuJeu.Parade : SonsDuJeu.Blocage, transform.position + Vector3.up * 1.2f, 1f);
+            Diffuser(E_Garde, default, default, r == Interception.Pare ? 1f : 0f);
             if (r == Interception.Pare && H.Partie != null) H.Partie.Journal("Parade !");
+        }
+
+        // ----------------------------------------------------------------- Multijoueur (marionnette)
+
+        public override void EffetDistant(int effet, Vector3 a, Vector3 b, float v)
+        {
+            switch (effet)
+            {
+                case E_Elan: AudioBank.Jouer(SonsDuJeu.EpeeElan, transform.position + Vector3.up, 0.7f); break;
+                case E_Impact: AudioBank.Jouer(SonsDuJeu.EpeeImpact, a, 0.9f); break;
+                case E_Charge: EffetCharge(a); break;
+                case E_ChargeImpact: EffetChargeImpact(v); break;
+                case E_Soin: AudioBank.Jouer(SonsDuJeu.Soin, transform.position + Vector3.up, 0.9f); break;
+                case E_Aura: if (aura != null) aura.Jouer(); break;
+                case E_Garde: AudioBank.Jouer(v > 0.5f ? SonsDuJeu.Parade : SonsDuJeu.Blocage, transform.position + Vector3.up * 1.2f, 1f); break;
+                default: base.EffetDistant(effet, a, b, v); break;
+            }
         }
 
         // ----------------------------------------------------------------- HUD

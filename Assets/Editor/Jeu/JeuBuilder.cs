@@ -383,15 +383,17 @@ namespace Deathless.EditorTools
 
         // ================================================================= Yeux des squelettes (wiki : ennemis, Yeux)
 
-        /// Yeux lumineux : jaune-orangé pour les squelettes ordinaires et Morgrim (comme les modèles KayKit), vert Nyxessa
-        /// pour les élites (éclat de Nyx ; posé à l'apparition par Squelette.MarquerElite). Matériaux Lit à émission HDR
+        /// Yeux lumineux : jaune-orangé pour les squelettes ordinaires et Morgrim (comme les modèles KayKit), rouges pour les
+        /// élites (thème Rage ; posés à l'apparition par Squelette.MarquerElite ; le vert reste à Nyxar). Matériaux Lit à émission HDR
         /// sur les maillages « *_Eyes » seuls : la lueur de nuit (bloom) les fait briller un peu, sans éblouir.
         [MenuItem("Deathless/Jeu/10. Yeux des squelettes")]
         public static string YeuxSquelettes()
         {
             Dossier(MatDir);
             var jaune = MateriauYeux("Yeux_Squelette", new Color32(0xff, 0xb3, 0x2e, 0xff), 1.05f);
-            var vert = MateriauYeux("Yeux_Elite", VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Coeur, new Color32(0x3f, 0xb5, 0x52, 0xff)), 1.25f);
+            // Rouge vif du thème Rage, resserré sur le rouge (vert et bleu réduits) : sinon la lueur le fait virer au rose.
+            Color vif = VfxPalette.Couleur(VfxTheme.Rage, VfxRole.Vif, new Color32(0xb3, 0x26, 0x1e, 0xff));
+            var rouge = MateriauYeux("Yeux_Elite", new Color(vif.r * 1.2f, vif.g * 0.35f, vif.b * 0.35f), 1f);
             int n = 0;
             foreach (var nom in new[] { "Squelette_Sbire", "Squelette_Guerrier", "Squelette_Golem" })
             {
@@ -400,12 +402,12 @@ namespace Deathless.EditorTools
                 if (racine == null) continue;
                 foreach (var r in racine.GetComponentsInChildren<Renderer>(true)) if (r.name.EndsWith("_Eyes")) { r.sharedMaterial = jaune; n++; }
                 var sq = racine.GetComponent<Squelette>();
-                if (sq != null) sq.yeuxElite = vert;
+                if (sq != null) sq.yeuxElite = rouge;
                 PrefabUtility.SaveAsPrefabAsset(racine, chemin);
                 PrefabUtility.UnloadPrefabContents(racine);
             }
             AssetDatabase.SaveAssets();
-            string res = "Yeux : " + n + " maillages en jaune-orangé (sbire, guerrier, Morgrim) ; vert Nyxessa pour les élites (à l'apparition)";
+            string res = "Yeux : " + n + " maillages en jaune-orangé (sbire, guerrier, Morgrim) ; rouge pour les élites (à l'apparition)";
             Debug.Log(res);
             return res;
         }

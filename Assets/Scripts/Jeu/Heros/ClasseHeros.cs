@@ -65,6 +65,39 @@ namespace Deathless.Jeu
         /// Heros a heurté le décor sur le côté pendant un déplacement imposé.
         public virtual void SurCollisionCote() { }
 
+        // ----------------------------------------------------------------- Effets visibles par tous (multijoueur)
+
+        /// Effets communs à toutes les classes (numéros 200 et plus ; ceux des classes sont en dessous).
+        protected const int EffetCritique = 200;
+        public const int EffetEsquive = 201, EffetSaut = 202;
+
+        /// Heros : effet commun (esquive, saut) à rejouer chez les autres.
+        public void DiffuserCommun(int effet) => Diffuser(effet);
+
+        /// Propriétaire, en partie réseau : l'effet `effet` vient d'être joué ici (visuel et son) ; les autres postes le
+        /// rejouent sur la marionnette de ce héros (EffetDistant). Rien que du visuel et du son : les dégâts restent
+        /// décidés comme avant. `a`, `b` : points ou directions, `v` : valeur libre (force, charge, rayon…).
+        protected void Diffuser(int effet, Vector3 a = default, Vector3 b = default, float v = 0f)
+        {
+            if (H == null || H.Distant) return;
+            Deathless.Reseau.HerosReseau.Local(H)?.Effet((byte)effet, a, b, v);
+        }
+
+        /// Marque de coup critique (Combat.Critique), jouée ici et chez les autres.
+        protected void Critique(Vector3 point, Vector3 direction, bool meilleur)
+        {
+            Combat.Critique(point, direction, meilleur);
+            Diffuser(EffetCritique, point, direction, meilleur ? 1f : 0f);
+        }
+
+        /// Autre poste : rejoue sur cette marionnette l'effet diffusé par son propriétaire (sans dégâts).
+        public virtual void EffetDistant(int effet, Vector3 a, Vector3 b, float v)
+        {
+            if (effet == EffetCritique) Combat.Critique(a, b, v > 0.5f);
+            else if (effet == EffetEsquive) AudioBank.Jouer(SonsDuJeu.Esquive, transform.position + Vector3.up, 0.8f);
+            else if (effet == EffetSaut) AudioBank.Jouer(SonsDuJeu.Saut, transform.position, 0.5f);
+        }
+
         // ----------------------------------------------------------------- HUD
 
         public virtual JaugeClasse Jauge => JaugeClasse.Aucune;

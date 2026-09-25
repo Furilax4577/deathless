@@ -12,7 +12,7 @@ namespace Deathless.Reseau
     /// NetworkAnimator) ; mort et délai de réapparition écrits par l'hôte, qui fait foi (étape 2). Chez les autres postes,
     /// le héros est une marionnette (Heros.Distant). Chez l'hôte, les coups portés à une marionnette (squelettes, missiles)
     /// partent vers son propriétaire, qui les applique (garde, parade, esquive comprises). Les tirs du propriétaire
-    /// (flèches, carreaux, boules de feu) et sa grenade fumigène sont rejoués chez les autres. Implémente IAllie (HUD).
+    /// (flèches, carreaux, boules de feu), sa grenade fumigène et les effets de ses compétences sont rejoués chez les autres. Implémente IAllie (HUD).
     [DisallowMultipleComponent]
     public class HerosReseau : NetworkBehaviour, IAllie
     {
@@ -166,6 +166,22 @@ namespace Deathless.Reseau
 
         [Rpc(SendTo.NotMe, InvokePermission = RpcInvokePermission.Owner)]
         void FumeeRpc(Vector3 depart, Vector3 cible, float duree) { if (Heros.Classe is ClasseAssassin a) a.LancerFumeeDistante(depart, cible, duree); }
+
+        /// Propriétaire : effet de compétence (soin, charge, nuée, cône, tournante, rugissement, saut, critique…) rejoué chez
+        /// les autres postes, avec son son, sur la marionnette (ClasseHeros.Diffuser / EffetDistant).
+        public void Effet(byte effet, Vector3 a, Vector3 b, float v) => EffetRpc(effet, a, b, v);
+
+        [Rpc(SendTo.NotMe, InvokePermission = RpcInvokePermission.Owner)]
+        void EffetRpc(byte effet, Vector3 a, Vector3 b, float v)
+        {
+            EffetsRecus++;
+            if (!EffetsVus.Contains(effet)) EffetsVus.Add(effet);
+            if (Heros != null && Heros.Classe != null) Heros.Classe.EffetDistant(effet, a, b, v);
+        }
+
+        /// Tests : effets reçus de ce héros (marionnette) et numéros déjà vus.
+        public int EffetsRecus { get; private set; }
+        public readonly List<byte> EffetsVus = new List<byte>();
 
         /// Hôte : un squelette a repéré cet assassin (marionnette) ; son propriétaire sort du mode furtif.
         public void SignalerRepere() => RepereRpc();
