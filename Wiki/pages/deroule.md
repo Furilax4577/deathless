@@ -6,6 +6,32 @@ Une partie enchaîne des cycles de jour et de nuit autour de Nyxessa.
 
 Deathless est un jeu de type **die and retry** : on recommence après une défaite. Une partie dure **environ 45 minutes en moyenne**, soit une dizaine de cycles.
 
+## Fin de partie {décidé}
+
+À la défaite comme à la victoire, un **écran de score** s'affiche. Chaque joueur choisit ensuite :
+
+- **Rejouer** : c'est un vote « prêt ». Quand tous les joueurs restants sont prêts, une nouvelle partie commence.
+- **Arrêter** : retour au menu principal.
+
+### Écran de score : une compétition {décidé}
+
+L'écran de score met les joueurs en compétition. Pour chaque catégorie, le meilleur joueur est mis en avant.
+
+| Catégorie | Meilleur quand | Statut |
+|---|---|---|
+| Or rapporté | le plus élevé | {décidé} |
+| Dégâts infligés | le plus élevé | {décidé} |
+| Ennemis tués | le plus élevé | {décidé} |
+| Nombre de morts | le plus bas | {décidé} |
+| Coups critiques | le plus élevé | {à confirmer} |
+| Dégâts évités à Nyxessa | le plus élevé | {à confirmer} |
+| Soins prodigués | le plus élevé | {à confirmer} |
+
+L'écran rappelle aussi le résultat de l'équipe : victoire ou nuit atteinte, durée de la partie, or total.
+
+- Condition de défaite : {à confirmer}. Piste : Nyxessa détruite.
+- Ce qu'on garde d'une partie à l'autre : {à confirmer}.
+
 ## Victoire {décidé}
 
 La partie est **gagnée en survivant à la nuit 12** et à son boss final, à l'aube. Une partie gagnée dure donc 12 cycles, soit environ 50 minutes. La plupart des parties perdues s'arrêtent entre la nuit 8 et la nuit 11.
@@ -86,4 +112,3 @@ Pour un joueur :
 
 ## À décider
 
-- La défaite, et ce qu'on garde ou perd d'une partie à l'autre. {à confirmer}

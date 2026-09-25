@@ -15,6 +15,7 @@
 - **Choix de classe** : les cinq classes, avec leur arme et leurs actions.
 - **Options** : jeu (pseudo, taille de l'interface, langue), commandes, affichage, audio. Côté manette : sensibilité de la caméra, inversion de l'axe vertical, vibrations, aide à la visée, zone morte des sticks.
 - **Pause** : la partie continue pendant la pause. Reprendre, Options, Quitter la partie, Quitter le jeu.
+- **Écran de score** {décidé} : en fin de partie, classement des joueurs par catégorie, puis Rejouer (vote prêt) ou Arrêter. Voir [Déroulé d'une partie](deroule.md).
 
 ## HUD en jeu {à confirmer}
 
