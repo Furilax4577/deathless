@@ -54,6 +54,8 @@ Colosse très résistant et lent, il marche droit sur Nyxessa. Chaque attaque se
 - **Coup écrasé** au sol, qui fait une onde de choc autour de lui ;
 - **Cri** qui renforce les squelettes proches.
 
+**Déclinaisons à créer** {décidé} : le mini-boss existera en **deux versions**, l'une armée d'une **massue** (boule à pointes), l'autre d'une **martache** (hache-marteau), avec des **comportements et des compétences différents**. Le pack KayKit propose aussi une texture alternative (yeux bleu glacé) qui peut les distinguer. Détail des deux versions : {à confirmer}.
+
 Points de vie et dégâts : {à équilibrer}.
 
 ### Nyxar, le Nécromancien {décidé}
