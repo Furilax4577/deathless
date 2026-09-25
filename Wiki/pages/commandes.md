@@ -2,6 +2,8 @@
 
 Le jeu se joue à la manette Xbox ou PlayStation, ou au clavier et à la souris. Les icônes de boutons affichées changent automatiquement selon le dernier appareil utilisé.
 
+Cette table est la seule référence des commandes : dans Unity, elle correspond au fichier d'actions `DeathlessControls` {décidé}.
+
 ## Table de correspondance
 
 | Action | Xbox | PlayStation | Clavier et souris | Statut |
