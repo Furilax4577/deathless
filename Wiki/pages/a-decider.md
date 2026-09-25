@@ -4,8 +4,8 @@ Ce qui reste ouvert. Une ligne quitte cette page quand la règle est tranchée e
 
 | Sujet | Question | Page |
 |---|---|---|
-| Nyxessa | Coût de base des paliers, équilibrage des valeurs en jeu | [Nyxessa](nyxessa.md) |
-| Bouclier | Paliers, encaissement, dégâts renvoyés, durée de l'invocation | [Nyxessa](nyxessa.md) |
+| Nyxessa | Équilibrage des valeurs en jeu | [Nyxessa](nyxessa.md) |
+| Bouclier | Effet de la canalisation | [Nyxessa](nyxessa.md) |
 | Classes | Valeurs chiffrées | [Classes](classes.md) |
 | Ennemis | Vie, vitesse, dégâts et or rapporté par type | [Ennemis](ennemis.md) |
 | Univers | Origine de Nyxessa, comment elle a échappé au Nécromancien, rôle du donjon | [L'univers](univers.md) |

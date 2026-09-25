@@ -41,7 +41,7 @@ Cinq paliers, soit environ un palier toutes les deux nuits sur une partie de 45 
 - Au palier 1, il faut trois missiles pour un sbire : Nyxessa aide, mais ne tient pas seule.
 - Au palier 5, un missile tue un sbire, et le stock permet des salves.
 - **Coût** des paliers 2 à 5 : ×1, ×2, ×3,5 et ×5,5 d'un coût de base, payé par la caisse commune.
-- Coût de base en or : {à confirmer}.
+- Coût de base : **100 or**, soit 100, 200, 350 et 550 or pour les paliers 2 à 5 {à équilibrer}.
 
 ### Règles de tir {décidé}
 
@@ -64,9 +64,17 @@ Un bouclier cylindrique de gemmes en lévitation protège Nyxessa {effet validé
 - **Invocation** : c'est un **villageois sorcier** qui invoque le bouclier, **seulement la nuit**.
 - **Encaissement** : la quantité de dégâts que le bouclier peut absorber est **améliorable**.
 - **Riposte** : quand il est frappé, le bouclier **renvoie des dégâts** à l'attaquant.
-- **Canalisation** : au départ, le sorcier tient le bouclier par sa seule incantation. Une **amélioration** du sorcier lui apprend à **canaliser l'énergie de Nyxessa** : un lien d'énergie apparaît entre la relique et son bâton, et il puise dans sa force {décidé}. Palier d'obtention (pas avant le rang 4, par exemple) et effet précis sur le bouclier : {à confirmer}.
+- **Canalisation** : au départ, le sorcier tient le bouclier par sa seule incantation. Une **amélioration** du sorcier lui apprend à **canaliser l'énergie de Nyxessa** : un lien d'énergie apparaît entre la relique et son bâton, et il puise dans sa force {décidé}. Elle s'obtient au **palier 4** du bouclier {décidé}. Effet précis sur le bouclier : {à confirmer}.
 
 ### À décider
 
 - **Signe visuel de l'amélioration** {décidé} : chaque palier rend le bouclier **plus dense** : davantage de gemmes dans le mur et davantage de gemmes en lévitation autour. Un bouclier qui encaisse plus paraît plus épais.
-- Paliers, valeurs d'encaissement, dégâts renvoyés et durée de l'invocation : {à confirmer}.
+- **Paliers** {décidé} : 5 paliers, achetés **à la relique**, comme ses missiles, aux mêmes coûts (100, 200, 350 et 550 or pour les paliers 2 à 5) {à équilibrer}.
+- **Durée** {décidé} : le sorcier invoque le bouclier au début de la nuit ; il tient **jusqu'à être brisé**.
+- **Bouclier brisé** {décidé} : le sorcier **meurt**. Comme un héros, il se dissout et son énergie retourne à Nyxessa {{dev: (même effet que la mort d'un allié, `MortAllie`)}}. Plus de bouclier jusqu'à la nuit suivante ; le sorcier **réapparaît le jour suivant**.
+- **Valeurs par palier** {à équilibrer} :
+
+| Palier | 1 | 2 | 3 | 4 | 5 |
+|---|---|---|---|---|---|
+| Encaissement | 150 | 260 | 370 | 480 | 600 |
+| Dégâts renvoyés par coup | 5 | 9 | 12 | 16 | 20 |
