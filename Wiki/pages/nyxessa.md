@@ -26,6 +26,8 @@ Nyxessa tire des missiles en forme de crâne faits de gemmes vertes, une fois et
 
 ### Paliers {à équilibrer}
 
+Les paliers de Nyxessa améliorent ses missiles et la part de butin qu'elle sauve quand elle rappelle un joueur resté au donjon (voir [Déroulé d'une partie](deroule.md)).
+
 Cinq paliers, soit environ un palier toutes les deux nuits sur une partie de 45 minutes. Les dégâts supposent un squelette sbire à 100 points de vie.
 
 | Palier | Stock N | Régénération d'un missile | Intervalle de tir | Dégâts | Missiles par nuit | Dégâts par nuit |

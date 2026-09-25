@@ -25,6 +25,23 @@ Un cycle complet dure **4 min 10 s**. Les 5 s de crépuscule et d'aube laissent 
 
 Le donjon est **régénéré chaque nuit** : chaque jour, le portail mène à un donjon nouveau.
 
+### Rester au donjon à la tombée de la nuit {décidé}
+
+- **Alerte** : avant la fermeture du portail, les joueurs au donjon sont prévenus, à l'écran et par un son. Délai d'alerte : 15 s avant le crépuscule {à équilibrer}.
+- **Rappel** : un joueur encore au donjon au crépuscule est **rappelé de force par Nyxessa** avant que le portail se ferme. Il revient au village.
+- **Perte de butin** : un joueur rappelé perd le butin qu'il portait depuis le donjon, **en totalité** au départ.
+- **Améliorations de Nyxessa** : chaque palier de Nyxessa lui fait **garder une part** de ce butin.
+
+| Palier de Nyxessa | Part du butin gardée |
+|---|---|
+| 1 | 0 % |
+| 2 | 20 % |
+| 3 | 40 % |
+| 4 | 60 % |
+| 5 | 75 % |
+
+Ces parts sont {à équilibrer}. Rentrer par le portail avant la nuit garde toujours 100 % du butin.
+
 ## Les nuits {décidé}
 
 ### Structure d'une nuit
@@ -62,6 +79,5 @@ Pour un joueur :
 
 ## À décider
 
-- Ce qui arrive à un joueur resté au donjon quand la nuit tombe, et une alerte avant la fermeture du portail. {à confirmer}
 - Un vote « prêt » pour écourter le jour quand toute l'équipe est rentrée. {à confirmer}
 - La défaite, et ce qu'on garde ou perd d'une partie à l'autre. {à confirmer}
