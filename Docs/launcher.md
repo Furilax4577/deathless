@@ -186,6 +186,18 @@ Il est posé à côté de l'exe :
 `wikiUrl` est l'adresse ouverte par l'entrée « Wiki », dans le navigateur par défaut. Si le champ est absent,
 c'est cette adresse par défaut ; s'il est vide, l'entrée est masquée.
 
+## Numéros de version (décidé le 25/09/2026)
+
+Format **majeur.mineur.correctif**, comme npm (versionnement sémantique) :
+
+- **majeur** : changement cassant (sauvegardes ou parties en réseau incompatibles, règles refondues). Reste à 0 tant que le jeu est en développement ;
+- **mineur** : nouveautés (classes, écrans, contenu) ;
+- **correctif** : corrections et équilibrage seulement.
+
+Le numéro affiché est le `-Nom` de `publish.ps1` (par exemple `0.3.0`), le même que `version` dans `changelog.json` et que
+la version du jeu (`PlayerSettings.bundleVersion`, posée par le script de build). `-Version` reste un simple compteur
+entier de publications (1, 2, 3…). Le launcher considère `0.2` et `0.2.0` comme la même version.
+
 ## Côté Quentin : publier une version
 
 Prérequis, une seule fois : une clé SSH (`ssh-keygen -t ed25519`) dont la clé publique est déposée sur le serveur

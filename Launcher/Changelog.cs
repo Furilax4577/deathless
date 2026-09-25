@@ -86,8 +86,17 @@ namespace DeathlessLauncher
             return list;
         }
 
+        /// Versions au format majeur.mineur.correctif (façon npm) : « 0.2 » et « 0.2.0 » désignent la même version.
         public static bool MemeVersion(string a, string b) =>
-            string.Equals((a ?? "").Trim(), (b ?? "").Trim(), StringComparison.OrdinalIgnoreCase);
+            string.Equals(Normaliser(a), Normaliser(b), StringComparison.OrdinalIgnoreCase);
+
+        static string Normaliser(string v)
+        {
+            v = (v ?? "").Trim();
+            if (v.StartsWith("v", StringComparison.OrdinalIgnoreCase)) v = v.Substring(1);
+            while (v.EndsWith(".0") && v.Split('.').Length > 2) v = v.Substring(0, v.Length - 2);
+            return v;
+        }
 
         static void AjouterLignes(List<string> notes, string text)
         {

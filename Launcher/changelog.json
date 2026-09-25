@@ -1,7 +1,7 @@
 {
   "versions": [
     {
-      "version": "0.3",
+      "version": "0.3.0",
       "date": "2026-09-25",
       "titre": "Visages et emblèmes",
       "notes": [
@@ -12,7 +12,7 @@
       ]
     },
     {
-      "version": "0.2",
+      "version": "0.2.0",
       "date": "2026-09-25",
       "titre": "Cinq héros",
       "notes": [
@@ -26,7 +26,7 @@
       ]
     },
     {
-      "version": "0.1",
+      "version": "0.1.0",
       "date": "2026-09-25",
       "titre": "Première défense du village",
       "notes": [
