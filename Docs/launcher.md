@@ -34,11 +34,10 @@ logique, et l'habille comme le menu principal du jeu.
 - **Jauge** : elle reprend la barre de vie du HUD (`Gauge`, classe `dl-gauge--life`). Le libellé est à gauche, la
   valeur à droite, la piste est arrondie avec son trait, et le remplissage rouge suit la progression en douceur. Au
   téléchargement, la valeur affiche les Mo téléchargés sur le total et le débit. Pendant la recherche de mise à
-  jour, la vérification et l'installation, le remplissage est masqué. À sa place, une rangée de petites gemmes or,
-  une toutes les 22 px, grossissent puis rétrécissent en une vague qui avance de gauche à droite (1,4 s par passage).
-  Elles suivent le langage visuel du jeu : low poly, bords francs, couleurs pleines, sans dégradé ni transparence,
-  et elles apparaissent et disparaissent par la taille. Les erreurs s'affichent sous la jauge, en rouge clair. Le
-  bouton de la barre des tâches montre aussi l'avancement.
+  jour, la vérification et l'installation, le remplissage est masqué. À sa place, un petit scan : un segment court
+  (13 % de la piste), du rouge de la barre de vie, arrondi comme la piste, sans dégradé ni fondu. Il glisse de gauche
+  à droite à vitesse constante, sort à droite et repart de la gauche, un passage toutes les 1,2 s. Les erreurs
+  s'affichent sous la jauge, en rouge clair. Le bouton de la barre des tâches montre aussi l'avancement.
 - **Notes de version** : panneau `dl-panel` à droite.
   - **Replié, par défaut** : une petite carte en haut à droite, posée sur les arbres, qui laisse voir Nyxessa et le
     portail. Elle montre « NOTES DE VERSION », la dernière version, son étiquette et son titre (par exemple
@@ -423,8 +422,8 @@ Banc vérifié le 25/09/2026 avec `python -m http.server` en local et un faux bu
 - **Fond animé** : la vidéo est à côté de l'exe (`fond.mp4`) plutôt que dedans. L'exe reste léger et la vidéo se
   change sans recompiler. Elle est lue par le `MediaPlayer` de WPF, qui s'appuie sur le lecteur de Windows : aucune
   bibliothèque à ajouter. La boucle utilise deux lecteurs en alternance (voir « Changer le fond »).
-- **Indicateur d'attente** : une vague de gemmes or plutôt qu'une lueur. C'est le langage des effets du jeu :
-  gemmes low poly, pas d'alpha, apparition par la taille.
+- **Indicateur d'attente** : un petit scan rouge à bords francs, choisi par Quentin après une lueur floue puis une
+  vague de gemmes or, toutes deux refusées.
 - **Sons d'interface** : aucun. Le jeu n'a pas encore de sons de survol ni de validation en `.wav` (seulement les
   `.ogg` Kenney, que `System.Media.SoundPlayer` ne lit pas).
 
@@ -443,7 +442,7 @@ Ce qui est ajouté :
 - l'installation par échange de dossiers ;
 - des délais courts pour la vérification ;
 - la manette Xbox et les invites qui suivent l'appareil ;
-- le fond animé en boucle, et la vague de gemmes pendant l'attente ;
+- le fond animé en boucle, et le scan pendant l'attente ;
 - les notes de version repliables et l'entrée Wiki ;
 - la progression dans la barre des tâches ;
 - les modes capture et test ;

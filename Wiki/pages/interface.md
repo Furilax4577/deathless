@@ -14,7 +14,7 @@
 - **Premier lancement** {décidé} : le jeu demande le **pseudo** souhaité. Il reste modifiable dans les options.
 - **Menu principal** : Solo, Multijoueur, Options, Quitter. La classe se choisit juste avant de lancer la partie : le menu principal n'affiche plus la dernière classe jouée {décidé}.
 - **Choix de classe** : les cinq classes, avec leur arme, leurs actions et le personnage en 3D. Les classes à venir, **Druide** et **Mécanicien**, y figurent **verrouillées**, avec une étiquette « Bientôt » {décidé}.
-- **Lobby multijoueur** {décidé} : chaque joueur choisit son personnage puis se déclare **prêt** ; la partie se lance quand **tous** sont prêts. Quatre joueurs au plus. Façon de se rejoindre (code de salon, adresse IP directe) : {à confirmer}.
+- **Lobby multijoueur** {décidé} : chaque joueur choisit son personnage puis se déclare **prêt** ; la partie se lance quand **tous** sont prêts. Quatre joueurs au plus. **Rejoindre par un code** {décidé} : l'hôte crée un salon et reçoit un code court ; les amis le saisissent, sans adresse IP ni port à ouvrir {{dev: (Unity Relay et Lobby, services Unity Gaming Services)}}. Une connexion par **adresse IP directe** reste possible en secours.
 - **Options** : jeu (pseudo, taille de l'interface, langue), commandes, affichage, audio. L'onglet audio règle quatre volumes : principal, musique, effets spéciaux et interface. Côté manette : sensibilité de la caméra, inversion de l'axe vertical, vibrations, aide à la visée, zone morte des sticks.
 - **Pause** : la partie continue pendant la pause. Reprendre, Options, Quitter la partie, Quitter le jeu.
 - **Écran de score** {décidé} : en fin de partie, classement des joueurs par catégorie, puis Rejouer (vote prêt) ou Arrêter. Voir [Déroulé d'une partie](deroule.md).

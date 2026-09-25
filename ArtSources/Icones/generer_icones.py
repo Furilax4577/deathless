@@ -131,6 +131,11 @@ AUTOMNE = [c("Critique", "Ambre"), c("Chasse", "Ocre"), c("Critique", "Or chaud"
 BOIS_CERF = [c("Terre", "Sable"), c("Os", "Os"), c("Os", "Os pâle")]
 LUNE = [c("Os", "Os gris"), c("Os", "Os"), c("Os", "Os pâle")]
 
+# Mécanicien (classe à venir, 25/09/2026) : pas de palette de thème. Laiton (Critique : ambre, or chaud, or clair),
+# acier clair (Fer clair de Rage, Os) sur fond d'acier (Fer / Fer sombre de Rage), comme l'ingénieur KayKit.
+LAITON = [c("Critique", "Ambre"), c("Critique", "Or chaud"), c("Critique", "Or clair")]
+ACIER_CLAIR = [c("Rage", "Fer clair"), c("Os", "Os"), c("Os", "Os pâle")]
+
 # Cadres des classes : rampe de la bordure (sombre -> claire, 4 niveaux), puis les deux zones du fond de
 # l'hexagone, coupé en diagonale (« / », d'un sommet à l'autre) : moitié haut gauche claire, bas droite sombre.
 CADRES = {
@@ -144,6 +149,8 @@ CADRES = {
                  c("Ombre", "Violet sombre"), c("Ombre", "Nuit")),
     "viking": ([c("Rage", "Rouge sombre"), c("Rage", "Rouge vif"), c("Rage", "Rouge vif"), c("Rage", "Rouge pâle")],
                c("Rage", "Rouge sombre"), c("Rage", "Rouge noir")),
+    "mecanicien": ([c("Critique", "Ambre"), c("Critique", "Or chaud"), c("Critique", "Or chaud"), c("Critique", "Or clair")],
+                   c("Rage", "Fer"), c("Rage", "Fer sombre")),
     "druide": ([c("Os", "Os gris"), c("Os", "Os"), c("Os", "Os"), c("Os", "Os pâle")],
                c("Terre", "Terre profonde"), c("Feu", "Charbon")),
 }
@@ -788,6 +795,67 @@ def commun_coup_critique():
     return ic
 
 
+# ---------------------------------------------------------------------------------------------- mécanicien (à venir)
+
+def engrenage(ic, centre, r_ext, r_int, dents, rampe, moyeu, a0=0.0):
+    """Roue dentée à facettes, moyeu sombre au centre."""
+    pts = []
+    for i in range(dents):
+        base = a0 + 360.0 * i / dents
+        pas = 360.0 / dents
+        for da, r in ((-0.30, r_int), (-0.17, r_ext), (0.17, r_ext), (0.30, r_int)):
+            pts.append(polaire(centre, r, base + da * pas))
+    ic.gemme(pts, rampe, table=0.62, teinte_table=rampe[1], decalage=0.05)
+    ic.gemme(regulier(centre, r_int * 0.42, 8, 22.5), moyeu)
+
+
+def cle(ic, depart, arrivee, largeur=11.0, rampe=ACIER_CLAIR):
+    """Clé plate : œil fermé à `depart`, mâchoire ouverte à `arrivee` (clé engineer_Wrench)."""
+    f = repere(depart, sub(arrivee, depart))
+    lg = math.hypot(*sub(arrivee, depart))
+    ic.bande([f(6, 0), f(lg - 10, 0)], largeur, rampe)
+    r = largeur * 1.45
+    machoire = [f(lg + r * math.cos(math.radians(a)), r * math.sin(math.radians(a))) for a in range(45, 316, 30)]
+    machoire += [f(lg + r * 0.7, -r * 0.4), f(lg + 1, -r * 0.4), f(lg + 1, r * 0.4), f(lg + r * 0.7, r * 0.4)]
+    ic.gemme(machoire, rampe, centre=f(lg - r * 0.4, 0))
+    ic.gemme([f(r * 1.05 * math.cos(math.radians(a)), r * 1.05 * math.sin(math.radians(a))) for a in range(0, 360, 45)],
+             rampe, table=0.45, teinte_table=c("Rage", "Fer sombre"), decalage=0.0)
+
+
+def classe_mecanicien_a():
+    ic = Icone("classe_mecanicien_a", "mecanicien_variantes", "Mécanicien, variante A : clé et engrenage",
+               "Clé plate en acier sur un engrenage de laiton. Cadre laiton, fond acier (Fer / Fer sombre).")
+    cadre_hex(ic, "mecanicien")
+    engrenage(ic, (64, 64), 40, 31, 8, LAITON, [c("Rage", "Fer sombre"), c("Rage", "Fer")], a0=22.5)
+    cle(ic, (34, 96), (92, 36), largeur=12)
+    return ic
+
+
+def classe_mecanicien_b():
+    ic = Icone("classe_mecanicien_b", "mecanicien_variantes", "Mécanicien, variante B : clé et marteau croisés",
+               "Clé plate en acier croisée avec un marteau (manche bois, tête laiton).")
+    cadre_hex(ic, "mecanicien")
+    manche = ((94, 100), (46, 48))
+    ic.bande(list(manche), 10, BOIS_CLAIR)
+    f = repere(manche[1], sub(manche[1], manche[0]))
+    tete = [f(-8, -19), f(8, -19), f(10, -10), f(10, 14), f(-10, 14), f(-10, -10)]
+    ic.gemme(tete, LAITON, table=0.55, teinte_table=c("Critique", "Or chaud"))
+    cle(ic, (34, 96), (90, 38), largeur=12)
+    return ic
+
+
+# Variante retenue pour classe_mecanicien.svg (A par défaut, à changer selon le choix de Quentin, puis relancer).
+MECANICIEN_CHOIX = "a"
+
+
+def classe_mecanicien():
+    ic = {"a": classe_mecanicien_a, "b": classe_mecanicien_b}[MECANICIEN_CHOIX]()
+    ic.nom, ic.famille = "classe_mecanicien", "classes"
+    ic.titre = "Mécanicien (à venir)"
+    ic.notes = "Variante %s en attendant le choix de Quentin." % MECANICIEN_CHOIX.upper()
+    return ic
+
+
 # ---------------------------------------------------------------------------------------------- druide (à venir)
 
 def classe_druide_a():
@@ -914,7 +982,9 @@ def druide_soin_nature():
 
 # ---------------------------------------------------------------------------------------------- catalogue
 
-CLASSES = [classe_paladin, classe_mage_feu, classe_rodeur, classe_assassin, classe_viking, classe_druide]
+CLASSES = [classe_paladin, classe_mage_feu, classe_rodeur, classe_assassin, classe_viking, classe_druide,
+           classe_mecanicien]
+MECANICIEN_VARIANTES = [classe_mecanicien_a, classe_mecanicien_b]
 DRUIDE_VARIANTES = [classe_druide_a, classe_druide_b, classe_druide_c]
 DRUIDE_COMPETENCES = [druide_metamorphose, druide_ronces, druide_soin_nature]
 COMPETENCES = [
@@ -1120,6 +1190,16 @@ def bloc_modifiees(par_nom):
     return '<h2>Modifiées</h2><div class="modifs">%s</div>' % "".join(lignes)
 
 
+def bloc_mecanicien(par_nom):
+    variantes = "".join(carte(par_nom[f.__name__]) for f in MECANICIEN_VARIANTES)
+    return ('<h2>Mécanicien (classe à venir)</h2>'
+            '<p class="note">Arme, rôle et compétences pas encore définis (wiki : « bientôt »). Modèle pressenti : '
+            'l\'ingénieur KayKit et sa clé <code>engineer_Wrench</code>. Sans vert : laiton (ambre et ors de Critique), '
+            'acier clair, fond coupé en diagonale acier / acier sombre (Fer de Rage), cadre laiton. Deux variantes '
+            'd\'emblème : le choix de Quentin deviendra <code>classe_mecanicien.svg</code> (aujourd\'hui la '
+            'variante %s).</p><div class="grille">%s</div>' % (MECANICIEN_CHOIX.upper(), variantes))
+
+
 def bloc_druide(par_nom):
     variantes = "".join(carte(par_nom[f.__name__]) for f in DRUIDE_VARIANTES)
     comps = "".join(carte(par_nom[f.__name__], provisoire=True) for f in DRUIDE_COMPETENCES)
@@ -1149,6 +1229,7 @@ def planche(classes, competences):
                  'Gemmes low poly : polygones à bords nets, lumière unique en haut à gauche, couleurs lues dans les '
                  'palettes de thème du jeu. Les classes ont un cadre hexagonal, les compétences sont un glyphe seul '
                  '(le HUD dessine le cadre et la recharge).</p>')
+    corps.append(bloc_mecanicien(par_nom))
     corps.append(bloc_druide(par_nom))
     corps.append(bloc_modifiees(par_nom))
     corps.append('<h2>À trancher</h2><ul class="note">%s</ul>' % "".join("<li>%s</li>" % html.escape(t) for t in A_TRANCHER))
@@ -1192,12 +1273,12 @@ def main():
     SORTIE_CLASSES.mkdir(parents=True, exist_ok=True)
     SORTIE_COMPETENCES.mkdir(parents=True, exist_ok=True)
     PLANCHE.parent.mkdir(parents=True, exist_ok=True)
-    classes = [f() for f in CLASSES] + [f() for f in DRUIDE_VARIANTES]
+    classes = [f() for f in CLASSES] + [f() for f in DRUIDE_VARIANTES] + [f() for f in MECANICIEN_VARIANTES]
     competences = [f() for f in COMPETENCES] + [f() for f in DRUIDE_COMPETENCES]
     total = 0
     for ic in classes + competences:
         verifier(ic)
-        dossier = SORTIE_CLASSES if ic.famille in ("classes", "druide_variantes") else SORTIE_COMPETENCES
+        dossier = SORTIE_CLASSES if ic.famille in ("classes", "druide_variantes", "mecanicien_variantes") else SORTIE_COMPETENCES
         texte = ic.svg()
         (dossier / (ic.nom + ".svg")).write_text(texte, encoding="utf-8", newline="\n")
         total += len(texte.encode("utf-8"))
