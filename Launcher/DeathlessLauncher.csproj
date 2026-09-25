@@ -1,0 +1,71 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Launcher de Deathless : exe Windows (WPF, .NET Framework 4.8, présent d'office sur Windows 10 et 11 : rien à
+       installer chez les amis, aucune bibliothèque tierce à l'exécution). Il lit version.json et changelog.json sur le
+       serveur, télécharge et vérifie le zip du jeu, l'extrait dans Game/ à côté de lui, puis lance Deathless.exe.
+       Repris du launcher de Relic. Voir Docs/launcher.md. -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <AssemblyName>DeathlessLauncher</AssemblyName>
+    <RootNamespace>DeathlessLauncher</RootNamespace>
+    <ApplicationIcon>Ressources\deathless.ico</ApplicationIcon>
+    <Version>1.0.0</Version>
+    <Product>Deathless Launcher</Product>
+    <Company>Quentin Douville</Company>
+    <Deterministic>true</Deterministic>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- Pas de dossier de langue (fr, de…) à côté de l'exe. -->
+    <SatelliteResourceLanguages>fr</SatelliteResourceLanguages>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
+  <!-- Image de fond, compilée dans l'exe (un fond.png ou fond.jpg posé à côté de l'exe la remplace sans recompiler).
+       Par défaut : la scène du menu principal sans interface (produite par l'agent ui), sinon une capture de nuit
+       provisoire. Autre image : dotnet build -c Release -p:FondLauncher=chemin\vers\image.png -->
+  <PropertyGroup>
+    <FondLauncher Condition="'$(FondLauncher)' == '' and Exists('..\Assets\Screenshots\menu_nuit_fond.png')">..\Assets\Screenshots\menu_nuit_fond.png</FondLauncher>
+    <FondLauncher Condition="'$(FondLauncher)' == ''">..\Assets\Screenshots\v01_nuit_vague.png</FondLauncher>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Assemblies de référence net48 pour la compilation seulement (rien n'est copié à côté de l'exe). -->
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Police du jeu (Fredoka, licence OFL) et invites de boutons Kenney (CC0), lues directement dans Assets/ :
+         pas de copie dans le dépôt. -->
+    <Resource Include="..\Assets\Art\Fonts\Fredoka\*.ttf" Link="Polices\%(Filename)%(Extension)" />
+    <Resource Include="..\Assets\Art\UI\KenneyInputPrompts\Keyboard &amp; Mouse\Double\keyboard_return.png" Link="Invites\keyboard_return.png" />
+    <Resource Include="..\Assets\Art\UI\KenneyInputPrompts\Keyboard &amp; Mouse\Double\keyboard_arrows_vertical.png" Link="Invites\keyboard_arrows_vertical.png" />
+    <Resource Include="..\Assets\Art\UI\KenneyInputPrompts\Keyboard &amp; Mouse\Double\mouse_scroll_vertical.png" Link="Invites\mouse_scroll_vertical.png" />
+    <Resource Include="..\Assets\Art\UI\KenneyInputPrompts\Xbox Series\Double\xbox_button_color_a.png" Link="Invites\xbox_button_color_a.png" />
+    <Resource Include="..\Assets\Art\UI\KenneyInputPrompts\Xbox Series\Double\xbox_dpad_vertical.png" Link="Invites\xbox_dpad_vertical.png" />
+    <Resource Include="..\Assets\Art\UI\KenneyInputPrompts\Xbox Series\Double\xbox_stick_r_vertical.png" Link="Invites\xbox_stick_r_vertical.png" />
+    <Resource Include="$(FondLauncher)" Link="Ressources\fond.png" />
+    <Resource Include="Ressources\deathless.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="launcher.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Assets\Art\Fonts\Fredoka\OFL.txt" Link="OFL.txt" CopyToOutputDirectory="PreserveNewest" />
+    <!-- Fichiers du dépôt qui ne sont pas des sources du launcher. -->
+    <None Remove="captures\**;changelog.json" />
+    <Compile Remove="captures\**" />
+  </ItemGroup>
+
+</Project>

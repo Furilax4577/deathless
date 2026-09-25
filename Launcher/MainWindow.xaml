@@ -1,0 +1,12 @@
+<Window x:Class="DeathlessLauncher.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:DeathlessLauncher"
+        Title="Deathless" Icon="pack://application:,,,/Ressources/deathless.ico"
+        Background="{StaticResource Encre}" WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResize" SizeToContent="WidthAndHeight">
+    <Window.TaskbarItemInfo>
+        <TaskbarItemInfo x:Name="Tache" />
+    </Window.TaskbarItemInfo>
+    <local:EcranLauncher x:Name="Ecran" />
+</Window>

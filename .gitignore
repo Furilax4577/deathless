@@ -107,3 +107,8 @@ InitTestScene*.unity*
 
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
+
+# Launcher Windows (projet .NET hors Unity, voir Docs/launcher.md) : sorties de compilation ignorées, projet suivi.
+/Launcher/bin/
+/Launcher/obj/
+!/Launcher/DeathlessLauncher.csproj
