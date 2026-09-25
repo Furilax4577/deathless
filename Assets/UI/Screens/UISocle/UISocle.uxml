@@ -1,0 +1,132 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xmlns:dl="Deathless.UI" editor-extension-mode="False">
+    <Style src="UISocle.uss" />
+    <ui:VisualElement name="root" class="dl-screen socle">
+        <ui:VisualElement name="header" class="socle-header">
+            <ui:VisualElement class="socle-header__titles">
+                <ui:Label text="DEATHLESS" class="dl-display" />
+                <ui:Label text="Socle d’interface : thème, navigation à la manette, invites de boutons" class="dl-subtitle" />
+            </ui:VisualElement>
+            <ui:VisualElement name="device" class="dl-pill socle-device">
+                <ui:VisualElement name="device-icon" class="dl-pill__icon" />
+                <ui:Label name="device-label" text="Clavier et souris" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:ScrollView name="body-scroll" class="socle-scroll" mode="Vertical" horizontal-scroller-visibility="Hidden">
+        <ui:VisualElement name="body" class="socle-body">
+            <!-- Colonne 1 : menu principal et jauges -->
+            <ui:VisualElement name="col-menu" class="socle-col socle-col--menu">
+                <ui:Label text="MENU PRINCIPAL" class="dl-section-label" />
+                <ui:Button name="menu-solo" class="dl-menu-item">
+                    <ui:VisualElement class="dl-menu-item__texts">
+                        <ui:Label text="Solo" class="dl-menu-item__label" />
+                        <ui:Label text="Lance la partie sans salle d’attente" class="dl-menu-item__desc" />
+                    </ui:VisualElement>
+                    <dl:InputPrompt action="UI/Submit" class="dl-menu-item__prompt" />
+                </ui:Button>
+                <ui:Button name="menu-multi" class="dl-menu-item">
+                    <ui:VisualElement class="dl-menu-item__texts">
+                        <ui:Label text="Multijoueur" class="dl-menu-item__label" />
+                        <ui:Label text="Héberger ou rejoindre une partie" class="dl-menu-item__desc" />
+                    </ui:VisualElement>
+                    <dl:InputPrompt action="UI/Submit" class="dl-menu-item__prompt" />
+                </ui:Button>
+                <ui:Button name="menu-options" class="dl-menu-item">
+                    <ui:VisualElement class="dl-menu-item__texts">
+                        <ui:Label text="Options" class="dl-menu-item__label" />
+                        <ui:Label text="Commandes, manette, affichage" class="dl-menu-item__desc" />
+                    </ui:VisualElement>
+                    <dl:InputPrompt action="UI/Submit" class="dl-menu-item__prompt" />
+                </ui:Button>
+                <ui:Button name="menu-quit" class="dl-menu-item">
+                    <ui:VisualElement class="dl-menu-item__texts">
+                        <ui:Label text="Quitter" class="dl-menu-item__label" />
+                        <ui:Label text="Fermer le jeu" class="dl-menu-item__desc" />
+                    </ui:VisualElement>
+                    <dl:InputPrompt action="UI/Submit" class="dl-menu-item__prompt" />
+                </ui:Button>
+
+                <ui:VisualElement name="gauges" class="dl-panel socle-gauges">
+                    <ui:Label text="JAUGES" class="dl-section-label" />
+                    <dl:Gauge label="Vie" value="78" max="100" class="dl-gauge--life" />
+                    <dl:Gauge label="Endurance" value="60" max="100" class="dl-gauge--stamina dl-gauge--thin" />
+                    <dl:Gauge name="class-gauge" label="Rage" value="72" max="100" class="dl-gauge--rage dl-gauge--thin" />
+                    <ui:VisualElement class="socle-pills">
+                        <ui:Label text="Pastille" class="dl-pill" />
+                        <ui:Label text="× 2 potions" class="dl-pill dl-pill--gold" />
+                        <ui:Label text="Furtif · non détecté…" class="dl-pill" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- Colonne 2 : onglets et réglages -->
+            <ui:VisualElement name="col-options" class="socle-col socle-col--options">
+                <ui:VisualElement name="tabs" class="dl-tabs socle-tabs">
+                    <dl:InputPrompt action="UI/TabPrevious" />
+                    <ui:Button name="tab-jeu" text="Jeu" class="dl-tab" />
+                    <ui:Button name="tab-commandes" text="Commandes" class="dl-tab" />
+                    <ui:Button name="tab-affichage" text="Affichage" class="dl-tab" />
+                    <ui:Button name="tab-audio" text="Audio" class="dl-tab" />
+                    <dl:InputPrompt action="UI/TabNext" />
+                </ui:VisualElement>
+
+                <ui:VisualElement name="page-jeu" class="dl-panel socle-page">
+                    <ui:Label text="JEU" class="dl-section-label" />
+                    <ui:TextField name="pseudo" label="Pseudo" value="Quentin" max-length="20" class="dl-field" />
+                    <ui:VisualElement name="scale-row" class="socle-scale-row">
+                        <ui:Label text="Taille de l’interface" class="dl-text socle-scale-row__label" />
+                        <ui:VisualElement class="socle-scale-row__buttons">
+                            <ui:Button name="scale-1" text="×1" class="socle-scale-button" />
+                            <ui:Button name="scale-2" text="×2" class="socle-scale-button" />
+                            <ui:Button name="scale-3" text="×3" class="socle-scale-button" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:DropdownField name="langue" label="Langue" choices="Français,English,Español" index="0" class="dl-field" />
+                    <ui:Label text="MANETTE" class="dl-section-label socle-section-gap" />
+                    <ui:Toggle name="vibrations" label="Vibrations" value="true" class="dl-field" />
+                    <ui:Toggle name="inversion" label="Inverser l’axe vertical" value="false" class="dl-field" />
+                    <ui:Slider name="sensibilite" label="Sensibilité de la caméra" low-value="1" high-value="10" value="6" fill="true" class="dl-field" />
+                    <ui:Button name="disabled-button" text="Bouton désactivé" enabled="false" class="socle-disabled" />
+                </ui:VisualElement>
+
+                <ui:VisualElement name="page-autre" class="dl-panel socle-page">
+                    <ui:Label name="page-autre-title" text="AFFICHAGE" class="dl-section-label" />
+                    <ui:Label text="Rubrique à définir." class="dl-text dl-text--muted" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- Colonne 3 : toutes les actions et leur invite -->
+            <ui:VisualElement name="col-actions" class="dl-panel socle-col socle-col--actions">
+                <ui:VisualElement class="socle-actions-header">
+                    <ui:Label text="COMMANDES" class="dl-section-label" />
+                    <ui:Label name="actions-device" text="Clavier et souris" class="dl-text dl-text--small dl-text--muted" />
+                </ui:VisualElement>
+                <ui:VisualElement class="socle-actions">
+                    <ui:VisualElement name="actions-gameplay" class="socle-actions__col">
+                        <ui:Label text="EN JEU" class="dl-section-label socle-actions__title" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="actions-ui" class="socle-actions__col socle-actions__col--ui">
+                        <ui:Label text="DANS LES MENUS" class="dl-section-label socle-actions__title" />
+                        <ui:VisualElement name="last-action-box" class="socle-last">
+                            <ui:Label text="DERNIÈRE ACTION EN JEU" class="dl-section-label" />
+                            <ui:Label name="last-action" text="—" class="dl-heading socle-last__action" />
+                            <ui:Label name="last-history" text="Accords manette : LB + RB, L3 + R3 (délai 0,1 s)" class="dl-text dl-text--small dl-text--muted socle-last__history" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        </ui:ScrollView>
+
+        <ui:VisualElement name="prompt-bar" class="dl-prompt-bar">
+            <ui:VisualElement class="dl-prompt-bar__group">
+                <dl:InputPrompt action="UI/Submit" label="Valider" />
+                <dl:InputPrompt action="UI/Cancel" label="Retour" />
+                <dl:InputPrompt action="UI/TabPrevious" class="dl-prompt--joined" />
+                <dl:InputPrompt action="UI/TabNext" label="Onglets" />
+                <dl:InputPrompt action="UI/Reset" label="Réinitialiser" />
+            </ui:VisualElement>
+            <ui:Label name="bar-device" text="Clavier et souris" class="dl-text dl-text--small dl-text--muted" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

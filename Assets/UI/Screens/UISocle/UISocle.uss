@@ -1,0 +1,109 @@
+/* Mise en page de l'écran de démonstration du socle (les styles communs sont dans Theme/Deathless.uss). */
+
+.socle {
+    padding: 30px var(--dl-space-6) 0 var(--dl-space-6);
+}
+
+.socle-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    height: 124px;
+}
+
+.socle-header .dl-display { font-size: 72px; }
+.socle-header .dl-subtitle { font-size: var(--dl-text-body); margin-top: -4px; }
+.socle-device { align-self: flex-start; }
+
+/* Le corps défile si l'écran ne tient pas (taille ×3). À ×1 et ×2 il remplit exactement la hauteur. */
+.socle-scroll { flex-grow: 1; margin-bottom: 108px; }   /* barre d'invites (84 px) + marge */
+.socle-scroll > .unity-scroll-view__content-viewport > .unity-scroll-view__content-container { min-height: 100%; }
+
+.socle-body {
+    flex-direction: row;
+    flex-grow: 1;
+    align-items: stretch;
+}
+
+.socle-col { flex-direction: column; }
+.socle-col--menu { width: 440px; margin-right: 36px; }
+.socle-col--options { width: 600px; margin-right: 36px; }
+.socle-col--actions { flex-grow: 1; padding: var(--dl-space-3) 30px; }
+
+.socle-gauges { margin-top: auto; padding: var(--dl-space-3) 30px var(--dl-space-2) 30px; }
+
+.socle-pills { flex-direction: row; flex-wrap: wrap; margin-top: var(--dl-space-1); }
+.socle-pills > .dl-pill { margin: 0 var(--dl-space-2) var(--dl-space-2) 0; -unity-text-align: middle-center; }
+
+.socle-tabs { margin-bottom: var(--dl-space-3); justify-content: space-between; }
+.socle-tabs > .dl-tab { margin: 0; padding: 0 18px; }
+.socle-tabs > .dl-prompt { margin: 0; }
+
+.socle-page { flex-grow: 1; padding: var(--dl-space-4) 30px; }
+.socle-section-gap { margin-top: var(--dl-space-3); }
+
+.socle-scale-row {
+    flex-direction: row;
+    align-items: center;
+    min-height: var(--dl-control-height);
+    margin: 0 0 var(--dl-space-3) 0;
+    padding: 0 var(--dl-space-3);
+}
+
+.socle-scale-row__label { flex-grow: 1; flex-basis: 0; margin: 0; padding: 0; }
+.socle-scale-row__buttons { flex-direction: row; flex-grow: 1.4; flex-basis: 0; margin: 0 -6px; }
+.socle-scale-button { flex-grow: 1; margin: 0 6px; padding: 0; }
+
+.socle-disabled { margin-top: auto; }
+
+.socle-actions-header { flex-direction: row; justify-content: space-between; align-items: flex-start; }
+.socle-actions { flex-direction: row; flex-grow: 1; }
+.socle-actions__col { flex-grow: 1; flex-basis: 0; }
+.socle-actions__col--ui { margin-left: 30px; flex-grow: 0.62; }
+.socle-actions__title { margin-bottom: var(--dl-space-1); color: var(--dl-color-text-muted); }
+
+.socle-action-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 36px;
+    flex-shrink: 0;
+    border-top-width: 1px;
+    border-color: var(--dl-color-line);
+}
+
+.socle-action-row__label {
+    font-size: var(--dl-text-small);
+    color: var(--dl-color-text);
+    flex-shrink: 1;
+    margin: 0 var(--dl-space-2) 0 0;
+    padding: 0;
+    white-space: normal;
+}
+
+.socle-action-row > .dl-prompt { --dl-prompt-size: 40px; --dl-key-height: 28px; --dl-key-text: 15px; }
+
+/* Dernière action résolue (démo des accords de la manette), sous les actions des menus. */
+.socle-last {
+    margin-top: auto;
+    padding: var(--dl-space-3) 0 0 0;
+    border-top-width: 1px;
+    border-color: var(--dl-color-gold);
+}
+
+.socle-last__action { color: var(--dl-color-gold); margin-bottom: var(--dl-space-1); }
+.socle-last__history { white-space: normal; }
+
+/* ---------- Taille ×3 : réorganisation ----------
+ * Espace logique ~1422×800 : les commandes passent sous le menu et les réglages, le corps défile.
+ */
+.dl-scale-3 .socle-body { flex-wrap: wrap; }
+.dl-scale-3 .socle-col--menu { width: 520px; }
+.dl-scale-3 .socle-col--options { flex-grow: 1; width: auto; margin-right: 0; }
+.dl-scale-3 .socle-col--actions { width: 100%; margin-top: var(--dl-space-5); }
+.dl-scale-3 .socle-gauges { margin-top: var(--dl-space-3); }
+.dl-scale-3 .socle-header { height: 120px; }
+.dl-scale-3 .socle-header .dl-display { font-size: 60px; }
+.dl-scale-3 .socle-header .dl-subtitle { font-size: var(--dl-text-small); }
+.dl-scale-3 .dl-prompt-bar { padding: 0 var(--dl-space-4); }
+.dl-scale-3 .dl-prompt-bar__group > .dl-prompt { margin-right: 24px; }

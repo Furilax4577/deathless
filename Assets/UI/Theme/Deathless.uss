@@ -1,0 +1,589 @@
+/*
+ * Deathless — thème UI Toolkit (socle).
+ * Valeurs des maquettes (canevas 1280×720) multipliées par 1,5 : le panneau de référence est en 1920×1080.
+ * Préfixe des classes : dl-. Les contrôles Unity (Button, Toggle, Slider, DropdownField, TextField) sont
+ * restylés globalement : un écran n'a rien à ajouter pour qu'ils aient l'allure du jeu.
+ * USS n'a pas de text-transform : les libellés de section s'écrivent directement en capitales.
+ */
+
+:root {
+    /* Couleurs */
+    --dl-color-ink: #161a24;                    /* fond */
+    --dl-color-well: #10131b;                   /* creux des jauges */
+    --dl-color-panel: #232a3a;                  /* panneau */
+    --dl-color-panel-95: rgba(35, 42, 58, 0.95);/* panneau posé sur la scène */
+    --dl-color-panel-active: #2b3348;           /* panneau actif, élément focus */
+    --dl-color-panel-pressed: #1d2230;
+    --dl-color-chip: #3a4258;                   /* pastille neutre */
+    --dl-color-border: #3d4660;                 /* bordure */
+    --dl-color-border-strong: #56607c;          /* bordure au survol, champs */
+    --dl-color-line: #333b52;                   /* ligne fine (séparateurs de table) */
+    --dl-color-bar: rgba(16, 19, 27, 0.92);     /* barre d'invites en bas */
+    --dl-color-scrim: rgba(22, 26, 36, 0.86);
+    --dl-color-text: #f4ecd8;                   /* ivoire */
+    --dl-color-text-muted: #c3bca9;             /* texte secondaire */
+    --dl-color-text-disabled: #8a8578;
+    --dl-color-gold: #d9b264;                   /* focus, sélection, libellés de section */
+    --dl-color-key: #f4ecd8;                    /* touche dessinée */
+    --dl-color-key-text: #1f2433;
+    --dl-color-key-edge: #9a8f78;
+    --dl-color-life: #e0483e;
+    --dl-color-stamina: #f2c14e;
+    --dl-color-mana: #4a8fe0;
+    --dl-color-rage: #f07b2a;
+    --dl-color-nyxessa: #3fae5a;
+    --dl-color-shield: #4a8fe0;
+    --dl-color-shield-warn: #ff9a3c;
+
+    /* Rayons */
+    --dl-radius-sm: 9px;       /* touches, petits boutons (6 px maquette) */
+    --dl-radius-md: 15px;      /* boutons, emplacements (10 px) */
+    --dl-radius-lg: 21px;      /* panneaux (14 px) */
+    --dl-radius-pill: 999px;   /* ronds parfaits (carrés) ; pour une pastille allongée, rayon = moitié de la hauteur */
+
+    /* Bordures */
+    --dl-border: 2px;
+    --dl-border-focus: 3px;    /* bordure or du focus (2 px maquette) */
+
+    /* Tailles de texte */
+    --dl-text-caption: 18px;   /* libellés de section (12 px) */
+    --dl-text-small: 20px;     /* 13-14 px */
+    --dl-text-body: 24px;      /* 16 px */
+    --dl-text-large: 30px;     /* 20 px */
+    --dl-text-heading: 36px;   /* 24 px */
+    --dl-text-title: 51px;     /* 34 px */
+    --dl-text-display: 102px;  /* 68 px, DEATHLESS */
+
+    /* Espacements */
+    --dl-space-1: 6px;
+    --dl-space-2: 12px;
+    --dl-space-3: 18px;
+    --dl-space-4: 24px;
+    --dl-space-5: 36px;
+    --dl-space-6: 60px;
+
+    /* Hauteurs */
+    --dl-control-height: 60px;   /* bouton, champ (40 px) */
+    --dl-menu-item-height: 87px; /* entrée de menu principal (58 px) */
+    --dl-prompt-size: 48px;      /* boîte de l'icône d'invite (l'icône Kenney occupe ~70 %, soit la pastille de 26 px) */
+    --dl-key-height: 34px;       /* touche dessinée, alignée sur la taille visible des icônes */
+    --dl-key-text: 18px;
+    --dl-bar-height: 84px;       /* barre d'invites (56 px) */
+
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Regular-SDF.asset");
+    font-size: var(--dl-text-body);
+    color: var(--dl-color-text);
+}
+
+/* ---------- Graisses de Fredoka ---------- */
+.dl-font-regular { -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Regular-SDF.asset"); }
+.dl-font-medium { -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Medium-SDF.asset"); }
+.dl-font-semibold { -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); }
+.dl-font-bold { -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Bold-SDF.asset"); }
+
+/* ---------- Écran, panneaux, textes ---------- */
+.dl-screen {
+    flex-grow: 1;
+    background-color: var(--dl-color-ink);
+}
+
+.dl-panel {
+    background-color: var(--dl-color-panel-95);
+    border-width: 1px;
+    border-color: var(--dl-color-border);
+    border-radius: var(--dl-radius-lg);
+    padding: var(--dl-space-4) var(--dl-space-5);
+}
+
+.dl-panel--solid { background-color: var(--dl-color-panel); }
+.dl-panel--active { background-color: var(--dl-color-panel-active); }
+.dl-panel--scrim { background-color: var(--dl-color-scrim); }
+
+.dl-display {
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Bold-SDF.asset");
+    font-size: var(--dl-text-display);
+    letter-spacing: 4px;
+    color: var(--dl-color-text);
+    margin: 0;
+    padding: 0;
+}
+
+.dl-title {
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+    font-size: var(--dl-text-title);
+    color: var(--dl-color-text);
+    margin: 0;
+    padding: 0;
+}
+
+.dl-heading {
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+    font-size: var(--dl-text-heading);
+    margin: 0;
+    padding: 0;
+}
+
+.dl-subtitle {
+    font-size: var(--dl-text-large);
+    color: var(--dl-color-gold);
+    margin: 0;
+    padding: 0;
+}
+
+/* Libellé de section : capitales (à écrire en capitales), petit, espacé, or. */
+.dl-section-label {
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Medium-SDF.asset");
+    font-size: var(--dl-text-caption);
+    letter-spacing: 2px;
+    color: var(--dl-color-gold);
+    margin: 0 0 var(--dl-space-2) 0;
+    padding: 0;
+}
+
+.dl-text { font-size: var(--dl-text-body); color: var(--dl-color-text); white-space: normal; }
+.dl-text--muted { color: var(--dl-color-text-muted); }
+.dl-text--small { font-size: var(--dl-text-small); }
+.dl-text--large { font-size: var(--dl-text-large); }
+
+.dl-separator {
+    height: 1px;
+    background-color: var(--dl-color-line);
+    margin: var(--dl-space-2) 0;
+}
+
+/* ---------- Boutons (tous les Button) ---------- */
+.unity-button {
+    min-height: var(--dl-control-height);
+    margin: 0;
+    padding: 0 var(--dl-space-4);
+    border-width: var(--dl-border);
+    border-color: var(--dl-color-border);
+    border-radius: var(--dl-radius-md);
+    background-color: var(--dl-color-ink);
+    color: var(--dl-color-text);
+    font-size: var(--dl-text-body);
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Medium-SDF.asset");
+    -unity-text-align: middle-center;
+    transition-property: background-color, border-color;
+    transition-duration: 0.08s;
+}
+
+.unity-button:hover:enabled {
+    background-color: var(--dl-color-panel-active);
+    border-color: var(--dl-color-border-strong);
+}
+
+/* Focus manette ou clavier : bordure or + fond actif (:enabled pour passer devant le thème par défaut). */
+.unity-button:focus:enabled {
+    background-color: var(--dl-color-panel-active);
+    border-color: var(--dl-color-gold);
+    border-width: var(--dl-border-focus);
+}
+
+.unity-button:active:enabled,
+.unity-button:hover:active:enabled {
+    background-color: var(--dl-color-panel-pressed);
+    border-color: var(--dl-color-gold);
+    color: var(--dl-color-gold);
+}
+
+.unity-button:disabled {
+    background-color: var(--dl-color-ink);
+    border-color: var(--dl-color-line);
+    color: var(--dl-color-text-disabled);
+    opacity: 1;
+}
+
+/* Bouton sélectionné (ex. ×2 dans Taille de l'interface). */
+.dl-button--selected {
+    background-color: var(--dl-color-panel-active);
+    border-color: var(--dl-color-gold);
+}
+
+/* Entrée de menu (menu principal, pause) : invisible au repos, bordure or au focus, invite Valider à droite. */
+.dl-menu-item {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    min-height: var(--dl-menu-item-height);
+    padding: 0 var(--dl-space-3) 0 27px;
+    margin-bottom: var(--dl-space-2);
+    background-color: rgba(0, 0, 0, 0);
+    border-color: rgba(0, 0, 0, 0);
+    border-width: var(--dl-border-focus);
+    -unity-text-align: middle-left;
+}
+
+.dl-menu-item:hover:enabled {
+    background-color: rgba(43, 51, 72, 0.6);
+    border-color: var(--dl-color-border);
+}
+
+.dl-menu-item:focus:enabled {
+    background-color: var(--dl-color-panel-active);
+    border-color: var(--dl-color-gold);
+}
+
+.dl-menu-item__texts { flex-direction: column; flex-shrink: 1; }
+
+.dl-menu-item__label {
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+    font-size: var(--dl-text-heading);
+    color: var(--dl-color-text);
+    margin: 0;
+    padding: 0;
+}
+
+.dl-menu-item__desc {
+    font-size: var(--dl-text-small);
+    color: var(--dl-color-text-muted);
+    margin: 0;
+    padding: 0;
+}
+
+.dl-menu-item__prompt { display: none; }
+.dl-menu-item:focus .dl-menu-item__prompt { display: flex; }
+.dl-menu-item:focus .dl-menu-item__label { color: #ffffff; }
+.dl-menu-item:active .dl-menu-item__label { color: var(--dl-color-gold); }
+
+/* ---------- Onglets (pastilles) ---------- */
+.dl-tabs {
+    flex-direction: row;
+    align-items: center;
+}
+
+.dl-tab {
+    min-height: var(--dl-control-height);
+    padding: 0 27px;
+    margin: 0 0 0 9px;
+    border-radius: 30px;
+    background-color: rgba(22, 26, 36, 0.9);
+    font-size: var(--dl-text-body);
+}
+
+.dl-tab--selected {
+    background-color: var(--dl-color-panel-active);
+    border-color: var(--dl-color-gold);
+}
+
+.dl-tabs > .dl-prompt { margin: 0 var(--dl-space-2); }
+
+/* ---------- Champs : libellés communs ---------- */
+.unity-base-field {
+    margin: 0 0 var(--dl-space-3) 0;
+    min-height: var(--dl-control-height);
+    align-items: center;
+}
+
+.unity-base-field__label {
+    font-size: var(--dl-text-body);
+    color: var(--dl-color-text);
+    min-width: 0;
+    flex-grow: 1;
+    flex-basis: 0;
+    padding: 0;
+    margin: 0 var(--dl-space-3) 0 0;
+    -unity-text-align: middle-left;
+}
+
+.unity-base-field:hover:enabled > .unity-base-field__label,
+.unity-base-field:focus:enabled > .unity-base-field__label { color: #ffffff; }
+
+/* Ligne de réglage focus : fond actif et liseré or à gauche (sert de repère à la manette). */
+.dl-field {
+    padding: 0 var(--dl-space-3);
+    border-radius: var(--dl-radius-md);
+    border-width: var(--dl-border-focus);
+    border-color: rgba(0, 0, 0, 0);
+}
+
+.dl-field:focus:enabled {
+    background-color: var(--dl-color-panel-active);
+    border-color: var(--dl-color-gold);
+}
+
+/* ---------- Case à cocher ---------- */
+.unity-toggle > .unity-toggle__input { flex-grow: 0; flex-shrink: 0; flex-basis: auto; }
+
+.unity-toggle > .unity-toggle__input > .unity-toggle__checkmark {
+    width: 33px;
+    height: 33px;
+    border-width: var(--dl-border);
+    border-color: var(--dl-color-border-strong);
+    border-radius: var(--dl-radius-sm);
+    background-color: var(--dl-color-ink);
+    -unity-background-image-tint-color: rgba(0, 0, 0, 0);
+}
+
+.unity-toggle:hover:enabled > .unity-toggle__input > .unity-toggle__checkmark { border-color: var(--dl-color-text-muted); }
+.unity-toggle:focus:enabled > .unity-toggle__input > .unity-toggle__checkmark { border-color: var(--dl-color-gold); }
+
+.unity-toggle:checked > .unity-toggle__input > .unity-toggle__checkmark {
+    background-color: var(--dl-color-gold);
+    border-color: var(--dl-color-gold);
+    -unity-background-image-tint-color: var(--dl-color-ink);
+}
+
+/* ---------- Curseur ---------- */
+.unity-base-slider__input { flex-grow: 1; flex-basis: 0; }
+.unity-base-slider > .unity-base-field__label { flex-grow: 1.2; }
+.unity-base-slider--horizontal .unity-base-slider__drag-container { height: 36px; margin: 0 var(--dl-space-2); }
+
+.unity-base-slider--horizontal .unity-base-slider__tracker {
+    height: 12px;
+    margin-top: -6px;
+    border-width: 0;
+    border-radius: 6px;
+    background-color: var(--dl-color-well);
+}
+
+.unity-base-slider--horizontal .unity-base-slider__dragger {
+    width: 30px;
+    height: 30px;
+    margin-top: -15px;
+    border-width: var(--dl-border);
+    border-color: var(--dl-color-ink);
+    border-radius: var(--dl-radius-pill);
+    background-color: var(--dl-color-gold);
+}
+
+.unity-base-slider--horizontal .unity-base-slider__dragger-border {
+    width: 42px;
+    height: 42px;
+    margin-top: -21px;
+    margin-left: -6px;
+    border-width: var(--dl-border-focus);
+    border-radius: var(--dl-radius-pill);
+    border-color: rgba(0, 0, 0, 0);
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.unity-base-slider:focus .unity-base-slider__dragger-border { border-color: var(--dl-color-text); }
+.unity-base-slider:hover .unity-base-slider__dragger { background-color: #ecc97c; }
+
+/* Remplissage du curseur (fill) */
+.unity-base-slider__fill { background-color: var(--dl-color-gold); border-radius: 6px; }
+
+/* ---------- Liste déroulante ---------- */
+.unity-base-popup-field__input,
+.unity-base-text-field__input {
+    min-height: var(--dl-control-height);
+    padding: 0 var(--dl-space-3);
+    border-width: 1px;
+    border-color: var(--dl-color-border-strong);
+    border-radius: var(--dl-radius-md);
+    background-color: var(--dl-color-ink);
+    color: var(--dl-color-text);
+    font-size: var(--dl-text-body);
+}
+
+.unity-base-popup-field__input { flex-grow: 1.4; flex-basis: 0; }
+.unity-base-popup-field:hover:enabled > .unity-base-popup-field__input { border-color: var(--dl-color-text-muted); }
+
+.unity-base-popup-field:focus:enabled > .unity-base-popup-field__input {
+    border-color: var(--dl-color-gold);
+    border-width: var(--dl-border-focus);
+    background-color: var(--dl-color-panel-active);
+}
+
+/* Liste ouverte (le champ est :active pendant que le menu est affiché). */
+.unity-base-popup-field:active:enabled > .unity-base-popup-field__input,
+.unity-base-popup-field:checked:enabled > .unity-base-popup-field__input,
+.unity-base-popup-field:hover:active:enabled > .unity-base-popup-field__input {
+    background-color: var(--dl-color-panel-active);
+    border-color: var(--dl-color-gold);
+    color: var(--dl-color-text);
+}
+
+.unity-base-popup-field:active:enabled > .unity-base-popup-field__input > .unity-base-popup-field__text,
+.unity-base-popup-field:checked:enabled > .unity-base-popup-field__input > .unity-base-popup-field__text { color: var(--dl-color-text); }
+
+.dl-field.unity-base-popup-field:focus:enabled > .unity-base-popup-field__input {
+    border-color: var(--dl-color-border-strong);
+    border-width: 1px;
+}   /* dans une ligne dl-field, c'est la ligne qui porte le focus */
+
+.unity-base-popup-field__text { color: var(--dl-color-text); font-size: var(--dl-text-body); }
+.unity-base-popup-field__arrow { -unity-background-image-tint-color: var(--dl-color-gold); width: 21px; height: 21px; }
+
+/* Menu ouvert (ajouté à la racine du panneau). */
+.unity-base-dropdown__container-outer {
+    background-color: var(--dl-color-panel);
+    border-width: 1px;
+    border-color: var(--dl-color-border-strong);
+    border-radius: var(--dl-radius-md);
+    padding: 6px 0;
+}
+
+.unity-base-dropdown__container-inner { background-color: rgba(0, 0, 0, 0); border-width: 0; }
+.unity-base-dropdown__item { min-height: 54px; padding: 0 var(--dl-space-3); }
+.unity-base-dropdown__label { font-size: var(--dl-text-body); color: var(--dl-color-text); }
+.unity-base-dropdown__item:hover,
+.unity-base-dropdown__item:focus,
+.unity-base-dropdown__item:selected { background-color: var(--dl-color-panel-active); }
+.unity-base-dropdown__checkmark { -unity-background-image-tint-color: var(--dl-color-gold); }
+
+/* ---------- Champ texte ---------- */
+.unity-base-text-field:focus .unity-base-text-field__input,
+.unity-base-text-field__input:focus {
+    border-color: var(--dl-color-gold);
+    border-width: var(--dl-border-focus);
+}
+
+.unity-base-text-field__input > .unity-text-element { color: var(--dl-color-text); }
+.unity-text-element--inner-input-field-component { --unity-cursor-color: var(--dl-color-gold); --unity-selection-color: rgba(217, 178, 100, 0.4); }
+
+.dl-field--stacked { flex-direction: column; align-items: stretch; }
+.dl-field--stacked > .unity-base-field__label { margin: 0 0 var(--dl-space-1) 0; flex-basis: auto; }
+
+/* ---------- Jauges (Deathless.UI.Gauge) ---------- */
+.dl-gauge { margin-bottom: var(--dl-space-2); }
+
+.dl-gauge__header {
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: var(--dl-space-1);
+}
+
+.dl-gauge__label { font-size: var(--dl-text-small); color: var(--dl-color-text-muted); margin: 0; padding: 0; }
+.dl-gauge__value { font-size: var(--dl-text-small); color: var(--dl-color-text); margin: 0; padding: 0; }
+
+.dl-gauge__track {
+    height: 21px;
+    border-radius: 11px;
+    border-width: 1px;
+    border-color: var(--dl-color-border);
+    background-color: var(--dl-color-well);
+    overflow: hidden;
+}
+
+.dl-gauge--thin .dl-gauge__track { height: 15px; border-radius: 8px; }
+.dl-gauge--thin .dl-gauge__fill { border-radius: 7px; }
+
+.dl-gauge__fill {
+    height: 100%;
+    border-radius: 10px;
+    background-color: var(--dl-color-life);
+    transition-property: width;
+    transition-duration: 0.15s;
+}
+
+.dl-gauge--life .dl-gauge__fill { background-color: var(--dl-color-life); }
+.dl-gauge--stamina .dl-gauge__fill { background-color: var(--dl-color-stamina); }
+.dl-gauge--mana .dl-gauge__fill { background-color: var(--dl-color-mana); }
+.dl-gauge--rage .dl-gauge__fill { background-color: var(--dl-color-rage); }
+.dl-gauge--nyxessa .dl-gauge__fill { background-color: var(--dl-color-nyxessa); }
+.dl-gauge--shield .dl-gauge__fill { background-color: var(--dl-color-shield); }
+.dl-gauge--shield-warn .dl-gauge__fill { background-color: var(--dl-color-shield-warn); }
+
+/* ---------- Pastilles ---------- */
+.dl-pill {
+    flex-direction: row;
+    align-items: center;
+    align-self: flex-start;
+    height: 48px;
+    padding: 0 var(--dl-space-3);
+    border-radius: 24px;
+    border-width: 1px;
+    border-color: var(--dl-color-border);
+    background-color: rgba(16, 19, 27, 0.78);
+    font-size: var(--dl-text-small);
+    color: var(--dl-color-text);
+}
+
+.dl-pill > .unity-label { margin: 0; padding: 0; }
+.dl-pill--gold { border-color: var(--dl-color-gold); color: var(--dl-color-gold); }
+.dl-pill__icon { width: 36px; height: 36px; margin-right: var(--dl-space-2); -unity-background-scale-mode: scale-to-fit; }
+
+/* ---------- Invites de boutons (Deathless.UI.InputPrompt) ---------- */
+.dl-prompt {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.dl-prompt__icons { flex-direction: row; align-items: center; }
+
+.dl-prompt__icon {
+    width: var(--dl-prompt-size);
+    height: var(--dl-prompt-size);
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+/* Touche dessinée quand aucune icône n'existe : texte sombre dans une pastille ivoire. */
+.dl-prompt__key {
+    min-width: var(--dl-key-height);
+    height: var(--dl-key-height);
+    padding: 4px 9px 0 9px;
+    margin: 0 4px;
+    border-radius: var(--dl-radius-sm);
+    border-bottom-width: 3px;
+    border-color: var(--dl-color-key-edge);
+    background-color: var(--dl-color-key);
+    color: var(--dl-color-key-text);
+    font-size: var(--dl-key-text);
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+    -unity-text-align: middle-center;
+}
+
+.dl-prompt__plus {
+    font-size: var(--dl-text-small);
+    color: var(--dl-color-text-muted);
+    margin: 0 3px;
+    padding: 0;
+}
+
+.dl-prompt__label {
+    font-size: var(--dl-text-body);
+    color: var(--dl-color-text);
+    margin: 0 0 0 var(--dl-space-2);
+    padding: 0;
+}
+
+.dl-prompt--missing .dl-prompt__key { background-color: var(--dl-color-life); color: #ffffff; border-color: #8a2a24; }
+.dl-prompt--small { --dl-prompt-size: 40px; --dl-key-height: 28px; --dl-key-text: 15px; }
+.dl-prompt--small .dl-prompt__label { font-size: var(--dl-text-small); }
+
+/* Barre d'invites en bas d'écran */
+.dl-prompt-bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--dl-bar-height);
+    padding: 0 var(--dl-space-6);
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--dl-color-bar);
+    border-top-width: 1px;
+    border-color: var(--dl-color-border);
+}
+
+.dl-prompt-bar__group { flex-direction: row; align-items: center; }
+.dl-prompt-bar__group > .dl-prompt { margin-right: 42px; }
+.dl-prompt-bar__group > .dl-prompt--joined { margin-right: 6px; }
+
+/* ---------- Tables (commandes) ---------- */
+.dl-table-header {
+    flex-direction: row;
+    align-items: center;
+    min-height: 42px;
+}
+
+.dl-table-row {
+    flex-direction: row;
+    align-items: center;
+    min-height: 48px;
+    border-top-width: 1px;
+    border-color: var(--dl-color-line);
+}
+
+.dl-table-cell { flex-grow: 1; flex-basis: 0; margin: 0; padding: 0; white-space: normal; }
+.dl-table-cell--fixed { flex-grow: 0; flex-basis: auto; }
+
+/* ---------- Défilement ---------- */
+.unity-scroller--vertical { width: 12px; }
+.unity-scroller--vertical .unity-base-slider__tracker { background-color: var(--dl-color-well); border-width: 0; border-radius: var(--dl-radius-pill); }
+.unity-scroller--vertical .unity-base-slider__dragger { background-color: var(--dl-color-border-strong); border-width: 0; border-radius: var(--dl-radius-pill); }
+.unity-scroller .unity-repeat-button { display: none; }
