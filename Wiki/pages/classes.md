@@ -68,7 +68,7 @@ L'assassin joue **principalement à la dague**. L'arbalète et la grenade sont d
 
 - L'assassin la lance ; elle crée un nuage de fumée.
 - Elle sert à **s'extraire d'un combat**.
-- Repasser en mode furtif quand il est dans la fumée : {à confirmer}.
+- **Furtif dans la fumée** {décidé} : tant qu'il est dans le nuage, les ennemis le perdent de vue et il redevient furtif, même en combat. En sortant, il reste furtif s'il marche, ce qui lui ouvre un coup critique au retour.
 - Nombre de grenades et recharge : {à confirmer}.
 
 ## Viking
