@@ -34,8 +34,10 @@ Les rôles sont {à confirmer}. Les armes et leurs animations sont {décidé}.
 - **Visée récompensée** {décidé} : un tir plus précis rapporte davantage.
   - **Tir à la tête** : une flèche dans la tête est un **coup critique**.
   - **Arc bandé** : maintenir l'attaque bande l'arc, avec une jauge de charge. Plus l'arc est tendu, plus les dégâts sont élevés.
-  - **Charge complète** : quand l'arc est complètement bandé, la flèche brille brièvement pour l'annoncer.
-- **Flèches non magiques** {décidé} : les flèches, du rôdeur comme toutes les autres, ne brillent pas et ne laissent pas de traînée lumineuse. Seule exception, le bref éclat de la charge complète.
+  - **Cercle de charge** : pendant qu'on bande l'arc, un cercle apparaît au bout de la flèche et se réduit en accélérant. Il indique la tension.
+  - **Coup prêt** : quand le cercle atteint sa taille minimale, il se verrouille sur la pointe et la flèche brille brièvement : le tir est chargé à fond.
+  - **Traînée** : en vol, la flèche laisse une traînée d'air fine, sans lueur, non magique.
+- **Flèches non magiques** {décidé} : les flèches, du rôdeur comme toutes les autres, ne brillent pas. Elles laissent une traînée d'air, jamais lumineuse. Seule exception, le bref éclat de la charge complète.
 - Durée de charge, dégâts minimum et maximum, multiplicateur de critique : {à confirmer}.
 - Autres compétences et valeurs chiffrées : {à confirmer}.
 
