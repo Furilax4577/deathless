@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -50,6 +51,7 @@ namespace DeathlessLauncher
             Ecran.JouerDemande += OnPlay;
             Ecran.ReessayerDemande += BeginCheck;
             Ecran.QuitterDemande += Close;
+            Ecran.WikiDemande += OuvrirWiki;
             Ecran.Tache = (etat, valeur) => { Tache.ProgressState = etat; Tache.ProgressValue = valeur; };
 
             PreviewKeyDown += OnKey;
@@ -81,6 +83,7 @@ namespace DeathlessLauncher
             if (cancel != null) cancel.Cancel();
             string root = AppDomain.CurrentDomain.BaseDirectory;
             LauncherConfig config = LauncherConfig.Load(Path.Combine(root, "launcher.json"));
+            Ecran.Wiki(AdresseWeb(config.WikiUrl));
             Updater courant = new Updater(config, root);
             updater = courant;
             // Les rapports d'une vérification abandonnée (Réessayer) sont ignorés.
@@ -184,6 +187,24 @@ namespace DeathlessLauncher
             return text.Length == 0 ? "" : char.ToUpperInvariant(text[0]) + text.Substring(1) + ".";
         }
 
+        static bool AdresseWeb(string url) =>
+            !string.IsNullOrWhiteSpace(url) && Uri.TryCreate(url, UriKind.Absolute, out Uri u) && (u.Scheme == Uri.UriSchemeHttp || u.Scheme == Uri.UriSchemeHttps);
+
+        /// Wiki : la version joueur, dans le navigateur par défaut.
+        private void OuvrirWiki()
+        {
+            string url = updater?.Config.WikiUrl;
+            if (!AdresseWeb(url)) return;
+            try
+            {
+                Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+            }
+            catch (Exception e)
+            {
+                Ecran.MontrerErreurLancement("Impossible d'ouvrir le wiki (" + Explication(e) + ").");
+            }
+        }
+
         private void OnPlay()
         {
             if (!ready) return;
@@ -215,6 +236,11 @@ namespace DeathlessLauncher
                 case Key.PageDown: Ecran.DefilerPage(1); break;
                 case Key.Home: Ecran.DefilerDebut(); break;
                 case Key.End: Ecran.DefilerFin(); break;
+                case Key.N: Ecran.BasculerNotes(); break;
+                case Key.Escape:
+                    if (!Ecran.NotesDepliees) return;
+                    Ecran.Replier(true);
+                    break;
                 default: return;
             }
             e.Handled = true;
@@ -231,6 +257,8 @@ namespace DeathlessLauncher
             if (manette.Activite) Ecran.Appareil(true);
 
             if ((manette.Appuis & Manette.A) != 0) { Ecran.Valider(); return; }
+            if ((manette.Appuis & Manette.Y) != 0) Ecran.BasculerNotes();
+            if ((manette.Appuis & Manette.B) != 0 && Ecran.NotesDepliees) Ecran.Replier(true);
 
             // Croix ou stick gauche : entrée précédente ou suivante, avec répétition si on garde la direction.
             int sens = 0;

@@ -11,11 +11,12 @@
              UseLayoutRounding="True" SnapsToDevicePixels="True"
              TextOptions.TextFormattingMode="Ideal">
     <Grid x:Name="Racine" Background="{StaticResource Encre}" ClipToBounds="True">
-        <!-- Fond : la scène du menu principal (voir Docs/launcher.md, « Changer le fond »). -->
+        <!-- Fond animé (fond.mp4 à côté de l'exe), SOUS l'image fixe : il se prépare caché, puis l'image fixe (qui est
+             son image 0) est retirée. Absent ou illisible : l'image fixe reste. Voir Docs/launcher.md, « Changer le fond ». -->
+        <local:FondVideo x:Name="Video" />
+        <!-- Image fixe : l'image 0 de la vidéo (fond0.png) quand il y a une vidéo, sinon la scène du menu principal. -->
         <Image x:Name="Fond" Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center"
                RenderOptions.BitmapScalingMode="HighQuality" />
-        <!-- Fond animé (fond.mp4 à côté de l'exe), posé sur l'image fixe ; absent ou illisible : l'image fixe reste. -->
-        <local:FondVideo x:Name="Video" />
 
         <Grid x:Name="Calque">
             <!-- menu__volet : 810 px à 1080p -->
@@ -28,9 +29,10 @@
             </StackPanel>
 
             <!-- menu__liste -->
-            <StackPanel x:Name="Liste" Margin="60,250,0,0" Width="400" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <StackPanel x:Name="Liste" Margin="60,228,0,0" Width="400" HorizontalAlignment="Left" VerticalAlignment="Top">
                 <local:EntreeMenu x:Name="EntreeJouer" Libelle="Jouer" Description="Démarrage…" />
                 <local:EntreeMenu x:Name="EntreeReessayer" Libelle="Réessayer" Description="Relancer la mise à jour" Visibility="Collapsed" />
+                <local:EntreeMenu x:Name="EntreeWiki" Libelle="Wiki" Description="Règles, classes et commandes" Visibility="Collapsed" />
                 <local:EntreeMenu x:Name="EntreeQuitter" Libelle="Quitter" Description="Fermer le launcher" />
             </StackPanel>
 
@@ -44,11 +46,26 @@
                 </StackPanel>
             </Border>
 
-            <!-- Notes de version : dl-panel -->
-            <Border Style="{StaticResource PanneauDl}" Width="430" HorizontalAlignment="Right" Margin="0,48,44,84">
+            <!-- Notes de version : dl-panel. Replié par défaut (carte en haut à droite, sur les arbres : Nyxessa et le
+                 portail restent dégagés) : titre, version, étiquette et titre de la version. Déplié : toute la hauteur,
+                 liste complète. Bascule par N / Y ou un clic (EcranLauncher.xaml.cs, BasculerNotes). -->
+            <Border x:Name="PanneauNotes" Style="{StaticResource PanneauDl}" Width="430" HorizontalAlignment="Right"
+                    VerticalAlignment="Top" Margin="0,48,44,84" Cursor="Hand">
                 <DockPanel>
-                    <local:TexteEspace DockPanel.Dock="Top" Text="NOTES DE VERSION" FontSize="12" FontWeight="Medium"
-                                       Espacement="1.4" Foreground="{StaticResource Or}" Margin="0,2,0,12" />
+                    <Grid x:Name="EnteteNotes" DockPanel.Dock="Top" Margin="0,2,0,12" Background="Transparent">
+                        <local:TexteEspace Text="NOTES DE VERSION" FontSize="12" FontWeight="Medium" VerticalAlignment="Center"
+                                           Espacement="1.4" Foreground="{StaticResource Or}" />
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                            <Image x:Name="InviteNotesCarte" Width="24" Height="24" Margin="0,-6,6,-6" />
+                            <!-- Chevron low poly, or plein, bords francs : vers le bas replié, vers le haut déplié. -->
+                            <Polygon x:Name="Chevron" Points="0,0 12,0 6,7" Fill="{StaticResource Or}" VerticalAlignment="Center"
+                                     RenderTransformOrigin="0.5,0.5" Margin="0,1,0,0">
+                                <Polygon.RenderTransform>
+                                    <RotateTransform x:Name="RotationChevron" Angle="0" />
+                                </Polygon.RenderTransform>
+                            </Polygon>
+                        </StackPanel>
+                    </Grid>
                     <ScrollViewer x:Name="Defilement" Template="{StaticResource DefilementDl}"
                                   VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                                   Focusable="False" CanContentScroll="False">
@@ -69,7 +86,11 @@
                         <Image x:Name="InviteChoisir" Width="32" Height="32" />
                         <TextBlock Text="Choisir" VerticalAlignment="Center" Margin="8,0,28,0" />
                         <Image x:Name="InviteNotes" Width="32" Height="32" />
-                        <TextBlock Text="Notes de version" VerticalAlignment="Center" Margin="8,0,0,0" />
+                        <TextBlock Text="Notes de version" VerticalAlignment="Center" Margin="8,0,28,0" />
+                        <StackPanel x:Name="InviteDefilerGroupe" Orientation="Horizontal" Visibility="Collapsed">
+                            <Image x:Name="InviteDefiler" Width="32" Height="32" />
+                            <TextBlock Text="Défiler" VerticalAlignment="Center" Margin="8,0,0,0" />
+                        </StackPanel>
                     </StackPanel>
                 </DockPanel>
             </Border>

@@ -56,6 +56,8 @@
     <Resource Include="..\Assets\Art\UI\KenneyInputPrompts\Xbox Series\Double\xbox_button_color_a.png" Link="Invites\xbox_button_color_a.png" />
     <Resource Include="..\Assets\Art\UI\KenneyInputPrompts\Xbox Series\Double\xbox_dpad_vertical.png" Link="Invites\xbox_dpad_vertical.png" />
     <Resource Include="..\Assets\Art\UI\KenneyInputPrompts\Xbox Series\Double\xbox_stick_r_vertical.png" Link="Invites\xbox_stick_r_vertical.png" />
+    <Resource Include="..\Assets\Art\UI\KenneyInputPrompts\Keyboard &amp; Mouse\Double\keyboard_n.png" Link="Invites\keyboard_n.png" />
+    <Resource Include="..\Assets\Art\UI\KenneyInputPrompts\Xbox Series\Double\xbox_button_color_y.png" Link="Invites\xbox_button_color_y.png" />
     <Resource Include="$(FondLauncher)" Link="Ressources\fond.png" />
     <Resource Include="Ressources\deathless.ico" />
   </ItemGroup>
@@ -71,5 +73,12 @@
     <Compile Remove="captures\**;Outils\**" />
     <None Remove="Outils\**" />
   </ItemGroup>
+
+  <!-- Image fixe de départ quand il y a une vidéo : son image 0 exacte, extraite par le launcher lui-même (même chemin
+       de décodage que la lecture), pour que le passage de l'image à la vidéo soit invisible. Refaite si la vidéo change. -->
+  <Target Name="ImageZeroDuFond" AfterTargets="Build" Condition="Exists('$(OutDir)fond.mp4')"
+          Inputs="$(OutDir)fond.mp4" Outputs="$(OutDir)fond0.png">
+    <Exec Command="&quot;$(TargetPath)&quot; --image0 &quot;$(OutDir)fond.mp4&quot; &quot;$(OutDir)fond0.png&quot;" />
+  </Target>
 
 </Project>

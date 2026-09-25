@@ -63,8 +63,11 @@ namespace DeathlessLauncher
 
     public sealed class LauncherConfig
     {
+        public const string WikiParDefaut = "http://srv617344.hstgr.cloud/deathless/wiki/";
         public string BaseUrl = "";
         public string GameExe = "Deathless.exe";
+        /// Version joueur du wiki, ouverte par l'entrée « Wiki ». Champ absent : adresse par défaut ; champ vide : entrée masquée.
+        public string WikiUrl = WikiParDefaut;
 
         public static LauncherConfig Load(string path)
         {
@@ -75,6 +78,7 @@ namespace DeathlessLauncher
             config.BaseUrl = Json.Texte(o, "baseUrl").Trim();
             string exe = Json.Texte(o, "gameExe").Trim();
             if (exe.Length > 0) config.GameExe = exe;
+            if (o.ContainsKey("wikiUrl")) config.WikiUrl = Json.Texte(o, "wikiUrl").Trim();
             if (config.BaseUrl.Length > 0 && !config.BaseUrl.EndsWith("/")) config.BaseUrl += "/";
             return config;
         }

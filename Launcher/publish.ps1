@@ -7,7 +7,10 @@
 # 2. calcule son empreinte SHA-256 et sa taille, écrit version.json ;
 # 3. vérifie Launcher\changelog.json (ou -Changelog) et le copie à côté ;
 # 4. si -AvecLauncher est donné, zippe aussi le launcher construit (bin\Release\net48) en DeathlessLauncher.zip, avec le
-#    fond animé Assets\Screenshots\menu_nuit_boucle.mp4 copié en fond.mp4 s'il existe ;
+#    fond animé Assets\Screenshots\menu_nuit_boucle.mp4 copié en fond.mp4 s'il existe, et son image 0 (fond0.png,
+#    extraite par le launcher lui-même : l'image fixe de départ, identique à la première image de la vidéo) ;
+# 4 bis. si -AvecWiki est donné, régénère le wiki (python Wiki\build.py) et zippe sa version joueur (Wiki\public) en
+#    deathless-wiki.zip ; sur le serveur, il est décompressé dans wiki.nouveau puis échangé avec wiki/ ;
 # 5. envoie le tout par scp (clé SSH : aucun mot de passe n'est demandé ni stocké ici), version.json en dernier ;
 # 6. si -BaseUrl est donné, relit version.json et changelog.json en HTTP pour vérifier la publication.
 # Sans -Remote, rien ne part : les fichiers restent dans Builds\publish\ (hors dépôt), pour contrôle.
@@ -18,6 +21,7 @@ param(
     [string] $Notes = "",
     [string] $Changelog = (Join-Path $PSScriptRoot "changelog.json"),
     [switch] $AvecLauncher,
+    [switch] $AvecWiki,
     [string] $Remote = "",
     [string] $BaseUrl = ""
 )
@@ -92,7 +96,7 @@ if ($AvecLauncher) {
     if (-not (Test-Path (Join-Path $launcherDir "DeathlessLauncher.exe"))) { throw "Launcher non construit : dotnet build .\Launcher\DeathlessLauncher.csproj -c Release" }
     $launcherZip = Join-Path $outDir "DeathlessLauncher.zip"
     # Ce qu'un lancement depuis bin\ a pu laisser à côté de l'exe ne part pas chez les joueurs.
-    New-Zip $launcherDir $launcherZip @("changelog.cache.json", "Game/", "Game.nouveau/", "fond.mp4", "fond.png", "fond.jpg")
+    New-Zip $launcherDir $launcherZip @("changelog.cache.json", "Game/", "Game.nouveau/", "fond.mp4", "fond0.png", "fond.png", "fond.jpg")
     # Fond animé : toujours repris de la vidéo du dépôt (un fond.mp4 resté dans bin\ pourrait être ancien).
     $video = Join-Path (Split-Path -Parent $PSScriptRoot) "Assets\Screenshots\menu_nuit_boucle.mp4"
     $zip = [System.IO.Compression.ZipFile]::Open($launcherZip, [System.IO.Compression.ZipArchiveMode]::Update)
@@ -103,6 +107,13 @@ if ($AvecLauncher) {
             # Déjà compressée : stockée telle quelle.
             [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $video, "fond.mp4", [System.IO.Compression.CompressionLevel]::NoCompression) | Out-Null
             Write-Host "Fond anime : $video -> fond.mp4 ($([int]((Get-Item $video).Length / 1MB)) Mo)"
+            # Image fixe de départ : l'image 0 de cette vidéo, extraite par le launcher construit (sans fenêtre).
+            $image0 = Join-Path $outDir "fond0.png"
+            $exe = Join-Path $launcherDir "DeathlessLauncher.exe"
+            $p = Start-Process -FilePath $exe -ArgumentList @("--image0", "`"$video`"", "`"$image0`"") -Wait -PassThru -NoNewWindow
+            if ($p.ExitCode -ne 0 -or -not (Test-Path $image0)) { throw "Extraction de l'image 0 de la video echouee." }
+            [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $image0, "fond0.png", [System.IO.Compression.CompressionLevel]::NoCompression) | Out-Null
+            Write-Host "Image 0 de la video -> fond0.png"
         } else {
             Write-Warning "Pas de $video : le launcher gardera l'image de fond fixe."
         }
@@ -112,14 +123,39 @@ if ($AvecLauncher) {
     Write-Host "Launcher : $launcherZip"
 }
 
+# --- Le wiki, version joueur (facultatif) ---
+$wikiZip = ""
+if ($AvecWiki) {
+    $racine = Split-Path -Parent $PSScriptRoot
+    & python (Join-Path $racine "Wiki\build.py")
+    if ($LASTEXITCODE -ne 0) { throw "Generation du wiki echouee." }
+    $public = Join-Path $racine "Wiki\public"
+    if (-not (Test-Path (Join-Path $public "index.html"))) { throw "Wiki\public\index.html introuvable apres la generation." }
+    $wikiZip = Join-Path $outDir "deathless-wiki.zip"
+    New-Zip $public $wikiZip
+    Write-Host "Wiki joueur : $wikiZip ($((Get-ChildItem $public -Recurse -File).Count) fichiers)"
+}
+
 # --- Envoi : zip, changelog, launcher, puis version.json en dernier ---
 if ($Remote -ne "") {
     Write-Host "Envoi vers $Remote"
-    foreach ($file in @($zipPath, $changelogPath, $launcherZip, $manifestPath)) {
+    foreach ($file in @($zipPath, $changelogPath, $launcherZip, $wikiZip)) {
         if ($file -eq "") { continue }
         & scp $file "$Remote"
         if ($LASTEXITCODE -ne 0) { throw "scp a echoue pour $file." }
     }
+    if ($wikiZip -ne "") {
+        # Remote = hote:dossier ; le wiki est décompressé à côté puis échangé d'un coup (python3, rien à installer).
+        $i = $Remote.IndexOf(":")
+        $hote = $Remote.Substring(0, $i)
+        $web = $Remote.Substring($i + 1).TrimEnd("/")
+        $commande = "cd '$web' && rm -rf wiki.nouveau wiki.ancien && python3 -m zipfile -e deathless-wiki.zip wiki.nouveau && chmod -R a+rX wiki.nouveau && (if [ -d wiki ]; then mv wiki wiki.ancien; fi) && mv wiki.nouveau wiki && rm -rf wiki.ancien deathless-wiki.zip"
+        & ssh $hote $commande
+        if ($LASTEXITCODE -ne 0) { throw "Installation du wiki sur le serveur echouee." }
+        Write-Host "Wiki installe dans $web/wiki/"
+    }
+    & scp $manifestPath "$Remote"
+    if ($LASTEXITCODE -ne 0) { throw "scp a echoue pour version.json." }
     Write-Host "Publie."
 } else {
     Write-Host "Aucun -Remote : rien n'a ete envoye (fichiers dans $outDir)."
@@ -132,6 +168,14 @@ if ($BaseUrl -ne "") {
         Write-Host "Verification en ligne : OK (version $Version)."
     } else {
         Write-Warning "Le version.json en ligne ne correspond pas (version $($online.version), sha $($online.sha256))."
+    }
+    if ($wikiZip -ne "") {
+        try {
+            $page = Invoke-WebRequest -UseBasicParsing -Uri ($BaseUrl + "wiki/")
+            Write-Host "Wiki en ligne : HTTP $($page.StatusCode), $($page.Content.Length) caracteres."
+        } catch {
+            Write-Warning "Wiki illisible en ligne : $($_.Exception.Message)"
+        }
     }
     if ($changelogPath -ne "") {
         try {

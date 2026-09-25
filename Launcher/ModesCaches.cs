@@ -21,7 +21,7 @@ namespace DeathlessLauncher
         public static bool Present(string[] args, string nom) => Array.IndexOf(args, nom) >= 0;
     }
 
-    // --capture <fichier.png> [--etat …] [--manette] [--changelog <fichier>] [--largeur L --hauteur H]
+    // --capture <fichier.png> [--etat …] [--notes replie|deplie] [--manette] [--changelog <fichier>] [--largeur L --hauteur H]
     // Rend l'écran hors écran (RenderTargetBitmap, aucune fenêtre n'est créée ni affichée) avec des données d'exemple,
     // écrit le PNG et quitte. Sert aux captures de Launcher/captures/ et à vérifier l'allure sans prendre le bureau.
     static class Capture
@@ -39,6 +39,8 @@ namespace DeathlessLauncher
             JaugeVie.Animer = false;
             var ecran = new EcranLauncher();
             ecran.Appareil(Arguments.Present(args, "--manette"));
+            ecran.Wiki(true);
+            bool notesDepliees = (Arguments.Valeur(args, "--notes") ?? "").StartsWith("depli", StringComparison.OrdinalIgnoreCase);
 
             string notes = cheminNotes != null ? File.ReadAllText(cheminNotes, Encoding.UTF8) : Exemple;
             var enLigne = new Manifest { Version = "1", Nom = "0.1", Zip = "deathless-v1.zip" };
@@ -65,7 +67,7 @@ namespace DeathlessLauncher
                     break;
                 case "horsligne":
                     ecran.AfficherNotes(liste, "0.1", null);
-                    ecran.MontrerHorsLigne("0.1", "Impossible de se connecter au serveur distant");
+                    ecran.MontrerHorsLigne("0.1", "impossible de se connecter au serveur distant");
                     break;
                 case "erreur":
                     ecran.AfficherNotes(liste, null, "0.1");
@@ -80,6 +82,8 @@ namespace DeathlessLauncher
             {
                 ecran.Measure(taille);
                 ecran.Arrange(new Rect(taille));
+                ecran.UpdateLayout();
+                if (notesDepliees) ecran.Deplier(false); else ecran.Replier(false);
                 ecran.UpdateLayout();
                 ecran.ActualiserFondu();
             }

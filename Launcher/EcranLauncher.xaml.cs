@@ -20,7 +20,7 @@ namespace DeathlessLauncher
         public const double LargeurBase = 1280, HauteurBase = 720;
         const double LargeurUtile = 1180; // en dessous, on réduit pour que le volet et les notes ne se chevauchent pas
 
-        public event Action JouerDemande, ReessayerDemande, QuitterDemande;
+        public event Action JouerDemande, ReessayerDemande, QuitterDemande, WikiDemande;
         /// Avancement pour le bouton de la barre des tâches (état, valeur de 0 à 1).
         public Action<TaskbarItemProgressState, double> Tache = (s, v) => { };
 
@@ -29,6 +29,8 @@ namespace DeathlessLauncher
         bool manette;
         double cibleDefilement;
         bool defilementAbonne;
+        bool notesDepliees;
+        double hauteurRepliee = 120;
 
         static readonly ImageSource IconeEntree = Icone("keyboard_return.png");
         static readonly ImageSource IconeA = Icone("xbox_button_color_a.png");
@@ -36,14 +38,17 @@ namespace DeathlessLauncher
         static readonly ImageSource IconeCroix = Icone("xbox_dpad_vertical.png");
         static readonly ImageSource IconeMolette = Icone("mouse_scroll_vertical.png");
         static readonly ImageSource IconeStickDroit = Icone("xbox_stick_r_vertical.png");
+        static readonly ImageSource IconeN = Icone("keyboard_n.png");
+        static readonly ImageSource IconeY = Icone("xbox_button_color_y.png");
 
         public EcranLauncher()
         {
             InitializeComponent();
             Fond.Source = ChargerFond(AppDomain.CurrentDomain.BaseDirectory);
-            entrees = new List<EntreeMenu> { EntreeJouer, EntreeReessayer, EntreeQuitter };
+            entrees = new List<EntreeMenu> { EntreeJouer, EntreeReessayer, EntreeWiki, EntreeQuitter };
             EntreeJouer.Clic += () => JouerDemande?.Invoke();
             EntreeReessayer.Clic += () => ReessayerDemande?.Invoke();
+            EntreeWiki.Clic += () => WikiDemande?.Invoke();
             EntreeQuitter.Clic += () => QuitterDemande?.Invoke();
             foreach (EntreeMenu e in entrees)
             {
@@ -64,18 +69,26 @@ namespace DeathlessLauncher
             Defilement.PreviewMouseWheel += (s, e) =>
             {
                 e.Handled = true;
-                Defiler(-e.Delta * 0.75);
+                if (notesDepliees) Defiler(-e.Delta * 0.75);
             };
+            // Clic : sur la carte repliée, la déplie ; déplié, un clic sur l'en-tête la replie.
+            PanneauNotes.MouseLeftButtonUp += (s, e) =>
+            {
+                if (!notesDepliees || EnteteNotes.IsMouseOver) { BasculerNotes(); e.Handled = true; }
+            };
+            ListeNotes.SizeChanged += (s, e) => { if (!notesDepliees) Replier(false); };
+            Replier(false);
             Unloaded += (s, e) => AbonnerDefilement(false);
             NotesEnChargement();
         }
 
         // ---------- Fond, icônes, échelle ----------
 
-        /// Image de fond : fond.png (ou .jpg) posé à côté de l'exe s'il existe, sinon celle compilée dans l'exe.
+        /// Image de fond : avec une vidéo (fond.mp4), son image 0 (fond0.png) ; sinon fond.png (ou .jpg) posé à côté de
+        /// l'exe s'il existe ; sinon celle compilée dans l'exe.
         public static ImageSource ChargerFond(string dossier)
         {
-            foreach (string nom in new[] { "fond.png", "fond.jpg", "fond.jpeg" })
+            foreach (string nom in NomsDuFond(dossier))
             {
                 string chemin = System.IO.Path.Combine(dossier, nom);
                 if (!File.Exists(chemin)) continue;
@@ -91,8 +104,25 @@ namespace DeathlessLauncher
         {
             string chemin = FondVideo.Chercher(dossier);
             if (chemin == null) return;
-            Video.Echec += raison => System.Diagnostics.Trace.WriteLine("Fond animé abandonné, image fixe gardée : " + raison);
+            // L'image fixe (image 0 de la vidéo) n'est retirée qu'une fois l'image 0 de la vidéo rendue dessous.
+            Video.PremiereImage += () => Fond.Visibility = Visibility.Hidden;
+            Video.Echec += raison =>
+            {
+                Fond.Visibility = Visibility.Visible;
+                System.Diagnostics.Trace.WriteLine("Fond animé abandonné, image fixe gardée : " + raison);
+            };
             Video.Ouvrir(chemin);
+        }
+
+        static string[] NomsDuFond(string dossier) =>
+            FondVideo.Chercher(dossier) != null ? new[] { "fond0.png", "fond.png", "fond.jpg", "fond.jpeg" } : new[] { "fond.png", "fond.jpg", "fond.jpeg" };
+
+        /// D'où vient l'image de fond (pour les bancs).
+        public static string SourceDuFond(string dossier)
+        {
+            foreach (string nom in NomsDuFond(dossier))
+                if (File.Exists(System.IO.Path.Combine(dossier, nom))) return nom + " (à côté de l'exe)";
+            return "image compilée dans l'exe";
         }
 
         static ImageSource Icone(string nom) => Bitmap(new Uri("pack://application:,,,/Invites/" + nom));
@@ -125,8 +155,10 @@ namespace DeathlessLauncher
             manette = estManette;
             InviteValider.Source = estManette ? IconeA : IconeEntree;
             InviteChoisir.Source = estManette ? IconeCroix : IconeFleches;
-            InviteNotes.Source = estManette ? IconeStickDroit : IconeMolette;
             NomAppareil.Text = estManette ? "Manette Xbox" : "Clavier et souris";
+            InviteNotes.Source = estManette ? IconeY : IconeN;
+            InviteNotesCarte.Source = InviteNotes.Source;
+            InviteDefiler.Source = estManette ? IconeStickDroit : IconeMolette;
             foreach (EntreeMenu e in entrees) e.Invite = InviteValider.Source;
         }
 
@@ -162,6 +194,7 @@ namespace DeathlessLauncher
             if (!e.Active || e.Visibility != Visibility.Visible) return;
             if (e == EntreeJouer) JouerDemande?.Invoke();
             else if (e == EntreeReessayer) ReessayerDemande?.Invoke();
+            else if (e == EntreeWiki) WikiDemande?.Invoke();
             else QuitterDemande?.Invoke();
         }
 
@@ -175,20 +208,125 @@ namespace DeathlessLauncher
                 Selectionner(0);
                 EntreeJouer.Eclat();
             }
-            if (!active && selection == 0 && EntreeReessayer.Visibility == Visibility.Visible) Selectionner(1);
+            if (!active && entrees[selection] == EntreeJouer && EntreeReessayer.Visibility == Visibility.Visible) Selectionner(entrees.IndexOf(EntreeReessayer));
         }
 
         void Reessayer(bool visible)
         {
             EntreeReessayer.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
-            if (visible && !EntreeJouer.Active) Selectionner(1);
-            if (!visible && selection == 1) Selectionner(0);
+            if (visible && !EntreeJouer.Active) Selectionner(entrees.IndexOf(EntreeReessayer));
+            if (!visible && entrees[selection] == EntreeReessayer) Selectionner(0);
         }
 
         void Avertir(string texte)
         {
             Message.Text = texte ?? "";
             Message.Visibility = string.IsNullOrEmpty(texte) ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        /// Entrée Wiki : visible si une adresse est donnée (launcher.json, wikiUrl).
+        public void Wiki(bool visible)
+        {
+            EntreeWiki.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
+            if (!visible && entrees[selection] == EntreeWiki) Selectionner(0);
+        }
+
+        // ---------- Notes de version : repliées ou dépliées ----------
+
+        public bool NotesDepliees => notesDepliees;
+
+        /// N, Y ou un clic : déplie ou replie le panneau des notes.
+        public void BasculerNotes()
+        {
+            if (notesDepliees) Replier(true); else Deplier(true);
+        }
+
+        /// Déplié : exactement le panneau complet (toute la hauteur entre le haut et la barre d'invites).
+        public void Deplier(bool anime)
+        {
+            notesDepliees = true;
+            Defilement.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+            InviteDefilerGroupe.Visibility = Visibility.Visible;
+            PanneauNotes.Cursor = null;
+            EnteteNotes.Cursor = Cursors.Hand;
+            RotationChevron.Angle = 180;
+            double parent = ((FrameworkElement)PanneauNotes.Parent).ActualHeight;
+            double cible = parent - PanneauNotes.Margin.Top - PanneauNotes.Margin.Bottom;
+            Animer(cible, anime && parent > 0, () =>
+            {
+                // Une fois déplié, le panneau reprend sa mise en page souple (il suit la taille de la fenêtre).
+                PanneauNotes.Height = double.NaN;
+                PanneauNotes.VerticalAlignment = VerticalAlignment.Stretch;
+                Fondu();
+            });
+        }
+
+        /// Replié : une carte compacte en haut à droite (titre, version, étiquette, titre de la version).
+        public void Replier(bool anime)
+        {
+            notesDepliees = false;
+            Defilement.VerticalScrollBarVisibility = ScrollBarVisibility.Hidden;
+            InviteDefilerGroupe.Visibility = Visibility.Collapsed;
+            PanneauNotes.Cursor = Cursors.Hand;
+            EnteteNotes.Cursor = null;
+            RotationChevron.Angle = 0;
+            AbonnerDefilement(false);
+            cibleDefilement = 0;
+            Defilement.ScrollToVerticalOffset(0);
+            hauteurRepliee = HauteurRepliee();
+            Animer(hauteurRepliee, anime, () => Fondu());
+        }
+
+        /// Hauteur de la carte : en-tête, puis la liste jusqu'au bas du résumé de la première version (son numéro, son
+        /// étiquette et son titre ; les puces restent cachées).
+        double HauteurRepliee()
+        {
+            double resume = 22;
+            if (ListeNotes.Children.Count > 0)
+            {
+                // Entrée : en-tête (DockPanel), titre (TextBlock) éventuel, puis les puces (StackPanel).
+                FrameworkElement fin = null;
+                foreach (UIElement enfant in ListeNotes.Children)
+                {
+                    if (enfant is StackPanel) break;
+                    fin = enfant as FrameworkElement;
+                }
+                if (fin != null && fin.ActualHeight > 0)
+                    resume = fin.TranslatePoint(new Point(0, fin.ActualHeight), ListeNotes).Y + 2;
+                else if (fin != null)
+                    resume = 58;
+            }
+            Thickness p = PanneauNotes.Padding, b = PanneauNotes.BorderThickness, m = EnteteNotes.Margin;
+            double entete = EnteteNotes.ActualHeight > 0 ? EnteteNotes.ActualHeight : 15;
+            return Math.Ceiling(p.Top + p.Bottom + b.Top + b.Bottom + m.Top + m.Bottom + entete + resume);
+        }
+
+        /// Animation par la taille (hauteur), courte, sans fondu.
+        void Animer(double cible, bool anime, Action fin)
+        {
+            double depart = PanneauNotes.ActualHeight;
+            PanneauNotes.BeginAnimation(HeightProperty, null);
+            PanneauNotes.VerticalAlignment = VerticalAlignment.Top;
+            if (!anime || !JaugeVie.Animer || depart <= 0 || Math.Abs(depart - cible) < 1)
+            {
+                PanneauNotes.Height = cible;
+                fin();
+                return;
+            }
+            PanneauNotes.Height = depart;
+            var animation = new System.Windows.Media.Animation.DoubleAnimation(depart, cible, TimeSpan.FromSeconds(0.2))
+            {
+                EasingFunction = new System.Windows.Media.Animation.CubicEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut },
+                FillBehavior = System.Windows.Media.Animation.FillBehavior.Stop,
+            };
+            animation.Completed += (s, e) => { PanneauNotes.Height = cible; fin(); };
+            PanneauNotes.BeginAnimation(HeightProperty, animation);
+        }
+
+        /// Pour les captures : recalcule la carte repliée une fois la mise en page faite.
+        public void ActualiserNotes()
+        {
+            if (notesDepliees) Deplier(false); else Replier(false);
         }
 
         // ---------- États de la mise à jour ----------
@@ -300,7 +438,7 @@ namespace DeathlessLauncher
 
         public void MontrerErreurLancement(string erreur)
         {
-            Avertir("Impossible de lancer le jeu : " + erreur);
+            Avertir(erreur.StartsWith("Impossible") ? erreur : "Impossible de lancer le jeu : " + erreur);
             Tache(TaskbarItemProgressState.Error, 1);
         }
 
@@ -390,6 +528,7 @@ namespace DeathlessLauncher
 
         public void Defiler(double delta)
         {
+            if (!notesDepliees) return;
             cibleDefilement = Math.Max(0, Math.Min(Defilement.ScrollableHeight, cibleDefilement + delta));
             if (!JaugeVie.Animer) { Defilement.ScrollToVerticalOffset(cibleDefilement); return; }
             AbonnerDefilement(true);
@@ -428,7 +567,8 @@ namespace DeathlessLauncher
             // Sur le contenu seulement : la barre de défilement ne s'estompe pas.
             if (!(Defilement.Template?.FindName("PART_ScrollContentPresenter", Defilement) is UIElement contenu)) return;
             double h = Defilement.ActualHeight;
-            if (h <= 0 || Defilement.ScrollableHeight <= 0.5) { contenu.OpacityMask = null; return; }
+            // Replié : coupe franche sous le résumé, pas de fondu.
+            if (!notesDepliees || h <= 0 || Defilement.ScrollableHeight <= 0.5) { contenu.OpacityMask = null; return; }
             double f = Math.Min(0.2, 28 / h);
             bool haut = Defilement.VerticalOffset > 0.5;
             bool bas = Defilement.VerticalOffset < Defilement.ScrollableHeight - 0.5;
