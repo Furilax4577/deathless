@@ -15,7 +15,7 @@ Nyxessa réagit visiblement à ce qui se passe autour d'elle.
 
 ## Missiles magiques {décidé}
 
-Nyxessa tire des missiles en forme de crâne faits de gemmes vertes, une fois et demie plus gros que le missile du nécromancien.
+Nyxessa tire des missiles en forme de crâne faits de gemmes vertes, une fois et demie plus gros que le missile du mage squelette.
 
 - **Stock** : Nyxessa dispose d'un stock de N missiles. N dépend du **palier d'amélioration** de Nyxessa.
 - **Deux temps de recharge** :
@@ -48,7 +48,7 @@ Cinq paliers, soit environ un palier toutes les deux nuits sur une partie de 45 
 - **Portée** : 30 m, jusqu'à la lisière de la forêt. Les ennemis sous les arbres sont hors d'atteinte.
 - **Priorité des cibles** :
   - d'abord un ennemi qui frappe Nyxessa ou son bouclier ;
-  - ensuite un nécromancien ou un ennemi d'élite ;
+  - ensuite un mage lanceur de crâne, un ennemi d'élite ou un boss ;
   - sinon l'ennemi le plus proche de Nyxessa.
 - **Salves** :
   - en temps normal, un missile par cible, en gardant un missile en réserve ;

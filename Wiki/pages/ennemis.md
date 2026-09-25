@@ -21,7 +21,7 @@ Les modèles disponibles dans le pack KayKit Skeletons :
 | Voleur | Capuche, lames | {à confirmer} |
 | Sbire | Sans casque, le plus simple | {à confirmer} |
 
-Ordre d'apparition dans la partie : sbires dès la nuit 1, guerriers nuit 2, voleurs nuit 3, mages et premier élite nuit 5, nécromancien nuit 6, Golem (mini-boss) nuit 10, Nécromancien (boss final) nuit 12. Voir [Déroulé d'une partie](deroule.md) {décidé}.
+Ordre d'apparition dans la partie : sbires dès la nuit 1, guerriers nuit 2, voleurs nuit 3, mages et premier élite nuit 5, mages lanceurs de crâne nuit 6, Golem (mini-boss) nuit 10, Nécromancien (boss final) nuit 12. Voir [Déroulé d'une partie](deroule.md) {décidé}.
 
 {dev} Le casque du squelette guerrier sert aussi de modèle au heaume du rugissement du viking.
 
@@ -34,11 +34,11 @@ Ordre d'apparition dans la partie : sbires dès la nuit 1, guerriers nuit 2, vol
 
 Comportements, points de vie et attaques des boss : {à confirmer}.
 
-## Nécromancien
+## Mage lanceur de crâne
 
-- Le nécromancien tire un **missile en forme de crâne** fait de gemmes {effet validé}.
+- Le mage squelette tire un **missile en forme de crâne** fait de gemmes {effet validé}. {{dev: Il s'appelait « nécromancien » avant que ce nom ne soit réservé au boss final.}}
 - C'est le même missile que celui de Nyxessa, à taille normale ; celui de Nyxessa est une fois et demie plus gros {décidé}.
-- Son modèle, sa vie et son comportement sont {à confirmer}.
+- Modèle : le squelette mage KayKit {décidé}. Sa vie et son comportement sont {à confirmer}.
 
 ## Comportement et détection {à confirmer}
 

@@ -25,7 +25,7 @@ Deathless est un jeu d'action en coopération, vu à la troisième personne. Les
 | [Nyxessa, la relique](nyxessa.md) | La relique, ses réactions, son bouclier, ses missiles |
 | [Le portail](portail.md) | Ouverture par Nyxessa, passage, portail de retour |
 | [Classes](classes.md) | Les cinq classes, leurs armes et leurs compétences |
-| [Ennemis](ennemis.md) | Squelettes, apparition, mort, nécromancien |
+| [Ennemis](ennemis.md) | Squelettes, apparition, mort, boss |
 | [Commandes](commandes.md) | Manette Xbox, PlayStation, clavier et souris |
 | [Interface](interface.md) | Menus, HUD, icônes de boutons |
 | [Effets et couleurs](effets.md) | Palettes par thème, lumière des sorts {dev} |

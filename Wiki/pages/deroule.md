@@ -95,7 +95,7 @@ Pour un joueur :
 | 3 | 2 | 16 | Voleurs |
 | 4 | 2 | 20 | |
 | 5 | 3 | 25 | Mages, premier élite |
-| 6 | 3 | 30 | Nécromancien |
+| 6 | 3 | 30 | Mages lanceurs de crâne |
 | 7 | 3 | 34 | Deux élites par nuit |
 | 8 | 3 | 38 | |
 | 9 | 3 | 42 | Quatre vagues, points de vie +10 % |
