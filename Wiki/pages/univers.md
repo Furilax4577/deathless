@@ -12,6 +12,10 @@ La relique au cœur du village est la forme visible de Nyxessa. Tant qu'elle tie
 
 Le **Nécromancien** est l'**ancien possesseur de Nyxessa**. Il l'utilisait **seul, pour son propre pouvoir**. Il tente aujourd'hui de la récupérer, et c'est lui qui mène les squelettes contre le village.
 
+Il possède encore un **fragment de Nyxessa** : c'est de là que viennent ses **pouvoirs résiduels**, et la lueur verte de ses yeux.
+
+- Son nom : {à confirmer}.
+
 ## Ce que ça change dans le jeu {dev}
 
 - **Le vert est la couleur de Nyxessa**, partout où sa force se manifeste : la relique, sa ceinture, le portail, les missiles, et aussi la zone d'où sortent les squelettes, puisqu'ils en sont issus.
