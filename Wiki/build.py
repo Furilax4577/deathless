@@ -54,6 +54,7 @@ MENU = [
     ("interface", "Interface"),
     ("effets", "Effets et couleurs", "dev"),
     ("a-decider", "À décider", "dev"),
+    ("a-faire", "À faire", "dev"),
     ("sons", "Sons", "dev"),
     ("credits", "Crédits"),
 ]
