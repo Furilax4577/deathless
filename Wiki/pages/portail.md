@@ -12,7 +12,7 @@ Le portail mène du village au donjon. C'est un disque de gemmes vertes d'enviro
 - **Le jour**, le portail est **présent** : Nyxessa l'ouvre avec sa charge au lever du jour, et on peut passer au donjon.
 - **La nuit**, le portail est **absent** : il se referme à la tombée de la nuit, l'énergie retourne à Nyxessa, et seul le socle de pierre reste sur la place (le socle reste, confirmé).
 - Durées : 120 s de jour, 120 s de nuit, 5 s de transition entre les deux. Voir [Déroulé d'une partie](deroule.md).
-- Sort d'un joueur resté au donjon à la tombée de la nuit : {à confirmer}.
+- Un joueur resté au donjon à la tombée de la nuit est rappelé par Nyxessa. Voir [Déroulé d'une partie](deroule.md).
 
 ## Passage {décidé}
 

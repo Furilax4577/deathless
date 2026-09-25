@@ -59,6 +59,8 @@ Un cycle complet dure **4 min 10 s**. Les 5 s de crépuscule et d'aube laissent 
 
 Le donjon est **régénéré chaque nuit** : chaque jour, le portail mène à un donjon nouveau.
 
+**Butin** {décidé} : on ne rapporte du donjon que de l'**or**, versé à la caisse commune au retour par le portail.
+
 ### Rester au donjon à la tombée de la nuit {décidé}
 
 - **Alerte** : avant la fermeture du portail, les joueurs au donjon sont prévenus, à l'écran et par un son. Délai d'alerte : 15 s avant le crépuscule {à équilibrer}.
@@ -103,7 +105,7 @@ Pour un joueur :
 | 3 | 2 | 16 | Voleurs |
 | 4 | 2 | 20 | |
 | 5 | 3 | 25 | Mages, premier élite |
-| 6 | 3 | 30 | Mages lanceurs de crâne |
+| 6 | 3 | 30 | Mages plus nombreux |
 | 7 | 3 | 34 | Deux élites par nuit |
 | 8 | 3 | 38 | |
 | 9 | 3 | 42 | Quatre vagues, points de vie +10 % |
@@ -115,6 +117,7 @@ Pour un joueur :
 
 ### Règles universelles {décidé}
 
+- **Nombre de joueurs** : **4 au maximum** {décidé}.
 - **Joueurs en plus** : chaque joueur supplémentaire ajoute 60 % d'ennemis {à équilibrer}.
 - **Plafond** : 60 squelettes en même temps sur le terrain. Au-delà, on n'en ajoute plus et on augmente leurs points de vie à la place, pour la lisibilité et les performances.
 
