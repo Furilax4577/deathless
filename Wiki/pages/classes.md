@@ -1,6 +1,6 @@
 # Classes
 
-Cinq classes jouables, et bientôt le **druide** et le **mécanicien**. Chaque classe a un style d'arme, et ses compétences sont réparties sur trois emplacements au plus. Aucune classe n'a d'ultime {décidé}. Les rôles, les armes et leurs animations sont fixés {décidé}.
+Cinq classes jouables, et bientôt le **druide** et le **mécanicien**. Chaque classe a un style d'arme, et ses compétences sont réparties sur trois emplacements au plus. Aucune classe n'a d'ultime {décidé}. Les rôles, les armes et leurs animations sont fixés {décidé}. En multijoueur, **chaque classe est unique** : jamais deux joueurs sur la même classe {décidé}.
 
 | | Classe | Style d'arme | Rôle |
 |---|---|---|---|
