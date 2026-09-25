@@ -549,7 +549,7 @@ CATALOG = {
     "stealth_exit": (stealth_exit, False, 1, 800),
     "stealth_spotted": (stealth_spotted, False, 1, 801),
     "smoke_bomb_throw": (smoke_bomb_throw, False, 1, 802),
-    "burn_loop": (burn_loop, True, 1, 803),
+    "burn_loop": (burn_loop, True, 1, 804),  # graine de la version A écoutée et retenue
 }
 # Volume perçu visé quand il diffère de LOUDNESS_DB (-14 dB ; boucles : -15 dB) : événements majeurs plus forts.
 LOUD = {"critical_best": -12.5, "nyxessa_destroyed": -12.5, "victory": -12.5, "nyxessa_recall": -13.0}
