@@ -37,6 +37,28 @@ namespace Deathless.Jeu
             if (m_Camera != null) m_ChampJeu = m_Camera.fieldOfView;
         }
 
+        // Garde-fou (0.4.2) : une caméra restée dans la scène (outil de capture) et qui rend à l'écran passe par-dessus
+        // celle-ci dans le build ; c'était le « plan du menu figé » de la 0.4.1. Seule la caméra de jeu rend à l'écran :
+        // les autres caméras de la scène qui visent l'écran sont coupées au démarrage (les aperçus sur texture restent).
+        void Start()
+        {
+            foreach (var c in FindObjectsByType<Camera>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
+            {
+                if (c == m_Camera || !c.enabled || c.targetTexture != null || c.gameObject.scene != gameObject.scene) continue;
+                Debug.LogWarning("[Caméra] caméra de trop dans la scène, coupée : " + c.name);
+                c.enabled = false;
+            }
+        }
+
+        /// État pour les journaux de test : cible, mode (menu ou jeu), position, caméras qui rendent à l'écran.
+        public string Diagnostic()
+        {
+            string ecran = "";
+            foreach (var c in Camera.allCameras) if (c.targetTexture == null) ecran += (ecran.Length > 0 ? "," : "") + c.name;
+            return "caméra " + (cible == null ? "MENU (sans cible)" : "jeu, cible " + cible.name) + " à " + transform.position.ToString("F1")
+                + ", à l'écran : " + ecran;
+        }
+
         public void Suivre(Transform t)
         {
             cible = t;

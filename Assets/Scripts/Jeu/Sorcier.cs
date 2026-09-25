@@ -50,6 +50,9 @@ namespace Deathless.Jeu
             Instance = this;
             Sante = GetComponent<Sante>();
             Agent = GetComponent<NavMeshAgent>();
+            // Agent coupé dans la scène : allumé seulement à la sortie (Sortir), une fois le NavMesh chargé ; sinon le build
+            // signale « Failed to create agent because there is no valid NavMesh » au chargement du village.
+            Agent.enabled = false;
             if (animator == null) animator = GetComponentInChildren<Animator>();
             if (animator != null) m_CoucheHaut = animator.GetLayerIndex("HautDuCorps");
         }

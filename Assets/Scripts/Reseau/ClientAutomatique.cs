@@ -11,14 +11,15 @@ namespace Deathless.Reseau
     /// qu'il voit (salon, héros des autres et leur position) et quitte au bout de la durée donnée.
     ///   -deathless-rejoindre=127.0.0.1[:7777] | -deathless-code=ABC123 | -deathless-heberger
     ///   -deathless-pseudo=Bot -deathless-classe=mage -deathless-duree=60 [-deathless-profil=client2] [-deathless-direct]
+    ///   -deathless-solo : partie solo lancée aussitôt avec la classe donnée (vérification du build : caméra, héros)
     ///   [-deathless-quitter-salon=5] : quitte le salon 5 s après y être entré (test de la classe libérée), sans se déclarer prêt
     public class ClientAutomatique : MonoBehaviour
     {
         string m_Adresse, m_Code, m_Classe;
-        bool m_Heberger;
+        bool m_Heberger, m_Solo;
         float m_Duree = 60f;
         float m_QuitterSalon = -1f, m_DansSalon;
-        float m_Depuis, m_EnPartieDepuis = -1f, m_ProchainJournal, m_ProchaineAction;
+        float m_Depuis, m_EnPartieDepuis = -1f, m_EnErreur, m_ProchainJournal, m_ProchaineAction;
         bool m_Demande, m_ClasseDemandee, m_PretDemande;
         int m_Action;
         EtatLobby m_EtatVu = (EtatLobby)(-1);
@@ -38,20 +39,22 @@ namespace Deathless.Reseau
             var adresse = Arg("deathless-rejoindre");
             var code = Arg("deathless-code");
             bool heberger = Drapeau("deathless-heberger");
-            if (adresse == null && code == null && !heberger) return;
+            bool solo = Drapeau("deathless-solo");
+            if (adresse == null && code == null && !heberger && !solo) return;
             var go = new GameObject("ClientAutomatique");
             DontDestroyOnLoad(go);
             var c = go.AddComponent<ClientAutomatique>();
             c.m_Adresse = adresse;
             c.m_Code = code;
             c.m_Heberger = heberger;
+            c.m_Solo = solo;
             c.m_Classe = Arg("deathless-classe") ?? "mage";
             LobbyReseau.PseudoForce = Arg("deathless-pseudo") ?? "Bot";
             LobbyReseau.ClasseForcee = c.m_Classe;
             if (float.TryParse(Arg("deathless-quitter-salon"), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var q)) c.m_QuitterSalon = q;
             if (float.TryParse(Arg("deathless-duree"), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var d)) c.m_Duree = d;
             Application.runInBackground = true;
-            ReseauJeu.Journal("client automatique : " + (heberger ? "héberge" : adresse != null ? "rejoint " + adresse : "rejoint le code " + code)
+            ReseauJeu.Journal("client automatique : " + (solo ? "solo" : heberger ? "héberge" : adresse != null ? "rejoint " + adresse : "rejoint le code " + code)
                 + ", pseudo " + LobbyReseau.PseudoForce + ", classe " + c.m_Classe + ", " + c.m_Duree + " s");
         }
 
@@ -66,7 +69,8 @@ namespace Deathless.Reseau
             if (!m_Demande && m_Depuis > 1f)
             {
                 m_Demande = true;
-                if (m_Heberger) lobby.CreerSalon();
+                if (m_Solo) ClassesJouables.Lancer(m_Classe);
+                else if (m_Heberger) lobby.CreerSalon();
                 else if (m_Adresse != null) lobby.RejoindreParAdresse(m_Adresse);
                 else lobby.Rejoindre(m_Code);
             }
@@ -76,6 +80,10 @@ namespace Deathless.Reseau
                 ReseauJeu.Journal("[auto] lobby : " + m_EtatVu + (string.IsNullOrEmpty(lobby.Message) ? "" : " (" + lobby.Message + ")")
                     + (string.IsNullOrEmpty(lobby.CodeSalon) ? "" : " code " + lobby.CodeSalon));
             }
+
+            // Hôte parti ou connexion perdue : on ne reste pas bloqué (le poste de test se ferme au bout de 8 s d'erreur).
+            m_EnErreur = lobby.Etat == EtatLobby.Erreur ? m_EnErreur + dt : 0f;
+            if (m_EnErreur > 8f) { ReseauJeu.Journal("[auto] lobby en erreur (" + lobby.Message + "), on quitte"); enabled = false; Invoke(nameof(Fermer), 1f); return; }
 
             var salon = SalonReseau.Instance;
             if (lobby.Etat == EtatLobby.Salon && salon != null)
@@ -194,6 +202,7 @@ namespace Deathless.Reseau
                 if (Physics.Raycast(new Vector3(pos.x, 60f, pos.z), Vector3.down, out var sol, 400f, ~0, QueryTriggerInteraction.Ignore))
                     t += ", sol " + sol.collider.name + " à " + sol.point.y.ToString("F1");
                 else t += ", pas de sol sous le héros";
+                if (p.cameraJeu != null) t += " | " + p.cameraJeu.Diagnostic() + (p.cameraJeu.cible == p.HerosLocal.transform ? " (héros local)" : " (PAS le héros local)");
             }
             if (p != null && p.Etat.phase != Phase.Attente)
             {
