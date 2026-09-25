@@ -43,7 +43,7 @@ MENU = [
     ("portail", "Le portail"),
     ("classes", "Classes"),
     ("classe-paladin", "Paladin", "sous"),
-    ("classe-mage", "Mage de feu", "sous"),
+    ("classe-mage", "Mage", "sous"),
     ("classe-rodeur", "Rôdeur", "sous"),
     ("classe-assassin", "Assassin", "sous"),
     ("classe-viking", "Viking", "sous"),

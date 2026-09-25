@@ -5,7 +5,7 @@ Cinq classes jouables. Chaque classe a un style d'arme, et ses compétences sont
 | | Classe | Style d'arme | Rôle |
 |---|---|---|---|
 | {icone classe_paladin} | [Paladin](classe-paladin.md) | Épée et bouclier | Tank, une cible à la fois |
-| {icone classe_mage_feu} | [Mage de feu](classe-mage.md) | Bâton | Distance, zone |
+| {icone classe_mage_feu} | [Mage](classe-mage.md) | Bâton | Distance, zone ; style feu pour l'instant |
 | {icone classe_rodeur} | [Rôdeur](classe-rodeur.md) | Arc et carquois | Distance, précision |
 | {icone classe_assassin} | [Assassin](classe-assassin.md) | Dague, arbalète dans le dos | Furtif, coups critiques |
 | {icone classe_viking} | [Viking](classe-viking.md) | Hache à deux mains | Mêlée, zone |

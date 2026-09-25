@@ -1,8 +1,10 @@
-# Mage de feu
+# Mage
 
 {icone-grande classe_mage_feu}
 
-Il frappe de loin et en zone. Ses boules de feu explosent et laissent les ennemis en flammes, son cône de flammes balaie ceux qui approchent. Tout lui coûte du mana.
+Il frappe de loin et en zone. Pour l'instant, il maîtrise le **feu** : ses boules de feu explosent et laissent les ennemis en flammes, son cône de flammes balaie ceux qui approchent. Tout lui coûte du mana.
+
+**Styles de magie** {décidé} : la classe s'appelle simplement « Mage », sans élément dans son nom. Le feu est son premier style ; plus tard, le mage pourra **changer de style**. Autres styles et façon d'en changer : {à confirmer}.
 
 | Rôle | Arme |
 |---|---|
