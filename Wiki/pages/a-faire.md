@@ -9,7 +9,7 @@ Travaux prévus ou notés, pas encore faits. Une ligne quitte cette page quand l
 ## En cours
 
 - Launcher : mise à jour incrémentielle (seuls les fichiers modifiés), ménage des anciens téléchargements ; puis bouton Rafraîchir et vérification automatique.
-- Jeu : sentiers de pierre vers les zones d'apparition, lobby sans décalage, intérieurs des maisons et forgeron, caméra dans les petites pièces.
+- Jeu : lobby sans décalage, intérieurs des maisons et forgeron, caméra dans les petites pièces.
 - Donjon (bac à sable) : plus ouvert, 3 escaliers au plus, bassin d'eau aux genoux, sans faux butin.
 
 ## Plus tard
