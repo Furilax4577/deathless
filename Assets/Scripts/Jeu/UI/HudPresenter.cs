@@ -150,7 +150,16 @@ namespace Deathless.Jeu
         public bool EstMort => J != null && J.mort;
         public float TempsAvantReapparition => J != null ? J.reapparitionRestante : 0f;
         public IReadOnlyList<ICompetenceHud> Competences => m_Competences;
-        public string InviteInteraction => null;
+        public string InviteInteraction
+        {
+            get
+            {
+                var h = P != null ? P.HerosLocal : null;
+                if (h == null) return null;
+                PointInteraction.Courant(h, out string invite);
+                return invite;
+            }
+        }
         public bool EstPret => J != null && J.pret;
 
         // ----------------------------------------------------------------- IScoreFin

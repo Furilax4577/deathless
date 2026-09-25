@@ -46,6 +46,8 @@ namespace Deathless.Reseau
         public readonly NetworkVariable<byte> Resultat = new NetworkVariable<byte>();
         public readonly NetworkVariable<int> NuitAtteinte = new NetworkVariable<int>();
         public readonly NetworkVariable<int> OrEquipe = new NetworkVariable<int>();
+        public readonly NetworkVariable<int> PalierMissiles = new NetworkVariable<int>(1);
+        public readonly NetworkVariable<int> PalierBouclier = new NetworkVariable<int>(1);
         public readonly NetworkVariable<float> NyxPv = new NetworkVariable<float>(1f);
         public readonly NetworkVariable<float> NyxPvMax = new NetworkVariable<float>(1f);
         public readonly NetworkVariable<bool> NyxDetruite = new NetworkVariable<bool>();
@@ -87,6 +89,8 @@ namespace Deathless.Reseau
             Ecrire(Resultat, (byte)e.resultat);
             Ecrire(NuitAtteinte, e.nuitAtteinte);
             Ecrire(OrEquipe, e.orEquipe);
+            Ecrire(PalierMissiles, e.nyxessa.palierMissiles);
+            Ecrire(PalierBouclier, e.nyxessa.palierBouclier);
             Ecrire(Joueurs, Mathf.Max(1, e.joueurs.Count));
             Ecrire(Prets, p.JoueursPrets);
             if (p.nyxessa != null) { Ecrire(NyxPv, p.nyxessa.Pv); Ecrire(NyxPvMax, p.nyxessa.pvMax); }
@@ -134,6 +138,40 @@ namespace Deathless.Reseau
         void PretRpc(RpcParams p = default)
         {
             if (Partie.Instance != null) Partie.Instance.BasculerPret(Partie.IdJoueur(p.Receive.SenderClientId));
+        }
+
+        /// Achat d'un palier à la relique par un client : l'hôte décide (caisse commune) et lui répond.
+        public void DemanderAchat(byte amelioration) => AchatRpc(amelioration);
+
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        void AchatRpc(byte amelioration, RpcParams p = default)
+        {
+            var partie = Partie.Instance;
+            if (partie == null) return;
+            ulong client = p.Receive.SenderClientId;
+            string msg = partie.Acheter((Partie.Amelioration)amelioration, Partie.IdJoueur(client));
+            ReponseAchatRpc(new FixedString128Bytes(msg), RpcTarget.Single(client, RpcTargetUse.Temp));
+        }
+
+        [Rpc(SendTo.SpecifiedInParams)]
+        void ReponseAchatRpc(FixedString128Bytes message, RpcParams p = default) => ReponseAchat?.Invoke(message.ToString());
+
+        /// Client : réponse de l'hôte à sa demande d'achat.
+        public static event Action<string> ReponseAchat;
+
+        /// Hôte : un palier a été acheté ; les clients jouent le son et l'annonce.
+        public void AnnoncerPalier(byte amelioration, int palier, string qui)
+        {
+            if (IsServer) PalierRpc(amelioration, palier, new FixedString64Bytes(qui ?? ""));
+        }
+
+        [Rpc(SendTo.NotServer)]
+        void PalierRpc(byte amelioration, int palier, FixedString64Bytes qui)
+        {
+            var partie = Partie.Instance;
+            if (partie == null) return;
+            if (amelioration == 0) partie.Etat.nyxessa.palierMissiles = palier; else partie.Etat.nyxessa.palierBouclier = palier;
+            partie.SignalerPalier((Partie.Amelioration)amelioration, palier, qui.ToString());
         }
 
         // ----------------------------------------------------------------- Hôte → clients (événements)

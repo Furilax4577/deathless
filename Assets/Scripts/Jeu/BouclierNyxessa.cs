@@ -25,6 +25,8 @@ namespace Deathless.Jeu
         public event System.Action Brise;
 
         GameBalance B => GameBalance.Courant;
+        /// Palier du bouclier acheté à la relique (1 à 5).
+        int PalierActuel => Partie.Instance != null ? Partie.Instance.Etat.nyxessa.palierBouclier : 1;
         float m_DernierSon;
 
         void Awake()
@@ -51,11 +53,11 @@ namespace Deathless.Jeu
         public void Lever()
         {
             if (effet == null || effet.IsUp || effet.IsCasting) return;
-            effet.maxHealth = B.Palier(B.bouclierEncaissement);
+            effet.maxHealth = B.Palier(B.bouclierEncaissement, PalierActuel);
             effet.Lever();
             if (Deathless.Reseau.ReseauJeu.EnPartie && Deathless.Reseau.ReseauJeu.Autorite) Deathless.Reseau.PartieReseau.Instance?.BouclierLeve(effet.maxHealth);
             AudioBank.Jouer(SonsDuJeu.BouclierLeve, transform.position + Vector3.up * 2f, 0.9f);
-            Partie.Instance?.Journal("Bouclier levé par le sorcier (palier " + B.bouclierPalier + ", " + effet.maxHealth + " d'encaissement)");
+            Partie.Instance?.Journal("Bouclier levé par le sorcier (palier " + PalierActuel + ", " + effet.maxHealth + " d'encaissement)");
         }
 
         /// L'aube, ou la fin de partie : le bouclier redescend dans le sol.
@@ -82,7 +84,7 @@ namespace Deathless.Jeu
             }
             // Riposte : dégâts renvoyés à l'attaquant (Nyxessa n'est créditée d'aucun score).
             var attaquant = info.source != null ? info.source.GetComponentInParent<Sante>() : null;
-            float renvoi = B.Palier(B.bouclierRenvoi);
+            float renvoi = B.Palier(B.bouclierRenvoi, PalierActuel);
             if (attaquant != null && !attaquant.Mort && renvoi > 0f)
                 attaquant.Encaisser(new InfoDegats { montant = renvoi, equipeSource = Equipe.Relique, source = gameObject, point = attaquant.transform.position + Vector3.up, direction = (attaquant.transform.position - transform.position).normalized });
             if (!effet.IsUp)

@@ -40,6 +40,8 @@ namespace Deathless.Jeu
         public static readonly string[] BouclierBrise = { "shield_break" };
         public static readonly string[] SorcierIncantation = { "sorcier_incantation" };
         public static readonly string[] Or = { "kenney_rpg_handlecoins" };
+        public static readonly string[] PalierAchete = { "nyxessa_palier", "ui_confirmation" };
+        public static readonly string[] AchatRefuse = { "ui_refus" };
 
         public static readonly string[] PortailOuverture = { "portal_open" };
         public static readonly string[] PortailFermeture = { "portal_close" };

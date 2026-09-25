@@ -1,0 +1,63 @@
+/* Menu d'achat (relique, taverne) : panneau centré, une ligne par article, or de la caisse en haut à droite. */
+.achat {
+    position: absolute;
+    left: 50%;
+    top: 150px;
+    width: 1080px;
+    max-height: 760px;
+    translate: -50% 0;
+    padding: 42px 42px 30px 42px;
+    background-color: rgba(35, 42, 58, 0.97);
+    border-radius: 24px;
+}
+
+.achat__entete { flex-direction: row; align-items: flex-start; justify-content: space-between; margin-bottom: var(--dl-space-4); }
+.achat__titres { flex-shrink: 1; }
+.achat__titre { margin: 0; }
+.achat__aide { margin: 6px 0 0 0; white-space: normal; }
+.achat__or { flex-direction: row; align-items: center; flex-shrink: 0; margin-left: var(--dl-space-4); padding: 9px 21px; border-radius: 30px; background-color: rgba(16, 19, 27, 0.8); }
+.achat__piece { width: 33px; height: 33px; margin-right: 12px; }
+.achat__or-valeur {
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+    font-size: var(--dl-text-heading);
+    color: var(--dl-color-gold);
+    margin: 0 12px 0 0;
+    padding: 0;
+}
+.achat__or-legende { margin: 0; padding: 0; }
+
+.achat__defile { flex-shrink: 1; }
+.achat__articles { }
+
+/* Ligne d'article : bouton (focus manette), nom et niveau à gauche, description dessous, prix à droite. */
+.achat__ligne { min-height: 108px; padding-top: 12px; padding-bottom: 12px; }
+.achat__ligne-textes { flex-direction: column; flex-grow: 1; flex-shrink: 1; }
+.achat__ligne-haut { flex-direction: row; align-items: center; }
+.achat__nom { margin: 0 18px 0 0; }
+.achat__niveau { color: var(--dl-color-gold); margin: 0; padding: 0; font-size: var(--dl-text-small); }
+.achat__desc { white-space: normal; margin: 6px 0 0 0; }
+.achat__prix { flex-direction: row; align-items: center; flex-shrink: 0; margin-left: var(--dl-space-4); }
+.achat__prix-piece { width: 27px; height: 27px; margin-right: 9px; }
+.achat__prix-valeur {
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+    font-size: var(--dl-text-large);
+    color: var(--dl-color-text);
+    margin: 0;
+    padding: 0;
+    min-width: 72px;
+    -unity-text-align: middle-right;
+}
+.achat__ligne .dl-menu-item__prompt { margin-left: var(--dl-space-3); }
+
+/* Trop cher, moment non permis ou palier maximal : ligne atténuée (toujours focalisable, pour lire). */
+.achat__ligne--indisponible .achat__nom { color: var(--dl-color-text-muted); }
+.achat__ligne--indisponible .achat__prix-valeur { color: var(--dl-color-text-disabled); }
+.achat__ligne--max .achat__prix { display: none; }
+
+/* Message (achat fait, refus) : place réservée en permanence, comme dans le lobby. */
+.achat__message { margin: var(--dl-space-3) 0 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--dl-color-text-muted); }
+.achat__message--vide { color: rgba(0, 0, 0, 0); }
+.achat__message--refus { color: #ff8a70; }
+.achat__message--ok { color: var(--dl-color-gold); }
+
+.dl-scale-3 .achat { top: 60px; width: 1320px; max-height: 660px; padding: 30px; }

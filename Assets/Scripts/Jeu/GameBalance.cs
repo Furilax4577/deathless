@@ -101,14 +101,18 @@ namespace Deathless.Jeu
         public int necroInvoquesMax = 12;
         public float necroEchelle = 0.92f;
 
-        [Header("Nyxessa (wiki : nyxessa, palier 1)")]
+        [Header("Nyxessa (wiki : nyxessa ; missiles par palier, achetés à la relique)")]
         public float nyxessaPV = 2000f;
         [Tooltip("Part des PV rendue à l'aube (0 : aucune, le wiki n'en parle pas).")]
         public float nyxessaRegenAube = 0f;
-        public int missilesStock = 2;
-        public float missileRegeneration = 12f;
-        public float missileIntervalle = 1.5f;
-        public float missileDegats = 40f;
+        [Tooltip("Stock de missiles par palier (1 à 5).")]
+        public int[] missilesStockPaliers = { 2, 3, 4, 6, 8 };
+        [Tooltip("Régénération d'un missile par palier (s).")]
+        public float[] missileRegenerationPaliers = { 12f, 10f, 8f, 6.5f, 5f };
+        [Tooltip("Intervalle minimal entre deux tirs par palier (s).")]
+        public float[] missileIntervallePaliers = { 1.5f, 1.2f, 1f, 0.8f, 0.6f };
+        [Tooltip("Dégâts d'un missile par palier.")]
+        public float[] missileDegatsPaliers = { 40f, 55f, 75f, 100f, 130f };
         public float missilePortee = 30f;
         public float missileVitesse = 18f;
         public float missileGuidage = 180f;
@@ -120,9 +124,7 @@ namespace Deathless.Jeu
         [Tooltip("Délai entre la destruction de Nyxessa et l'écran de score (s).")]
         public float delaiScoreDefaite = 3f;
 
-        [Header("Bouclier du sorcier (wiki : nyxessa, Bouclier ; 5 paliers, achat à venir)")]
-        [Tooltip("Palier en jeu (1 à 5) ; les paliers s'achèteront à la relique quand l'or servira.")]
-        [Range(1, 5)] public int bouclierPalier = 1;
+        [Header("Bouclier du sorcier (wiki : nyxessa, Bouclier ; 5 paliers, achetés à la relique)")]
         [Tooltip("Dégâts absorbés par palier (1 à 5).")]
         public float[] bouclierEncaissement = { 150f, 260f, 370f, 480f, 600f };
         [Tooltip("Dégâts renvoyés à l'attaquant, à chaque coup, par palier (1 à 5).")]
@@ -154,7 +156,19 @@ namespace Deathless.Jeu
         public int orMorgrim = 150;
         public int orNyxar = 300;
 
-        public float Palier(float[] valeurs) => valeurs == null || valeurs.Length == 0 ? 0f : valeurs[Mathf.Clamp(bouclierPalier, 1, valeurs.Length) - 1];
+        [Header("Achats à la relique (wiki : nyxessa, Paliers ; 26/09/2026)")]
+        [Tooltip("Prix des paliers 2 à 5 (or de la caisse commune), pour les missiles comme pour le bouclier.")]
+        public int[] prixPaliers = { 100, 200, 350, 550 };
+        [Tooltip("Distance horizontale au centre de Nyxessa pour ouvrir le menu d'achat (m) : le plateau et ses abords.")]
+        public float achatDistance = 9f;
+
+        public const int PalierMax = 5;
+
+        /// Valeur d'un tableau par palier (1 à 5 ; bornée aux extrémités).
+        public static T AuPalier<T>(T[] valeurs, int palier) => valeurs == null || valeurs.Length == 0 ? default : valeurs[Mathf.Clamp(palier, 1, valeurs.Length) - 1];
+        public float Palier(float[] valeurs, int palier) => AuPalier(valeurs, palier);
+        /// Prix du palier suivant (depuis `palier`), ou -1 au palier maximal.
+        public int PrixPalierSuivant(int palier) => palier >= 1 && palier < PalierMax && palier - 1 < prixPaliers.Length ? prixPaliers[palier - 1] : -1;
 
         [Header("Paladin")]
         public float herosPV = 150f;

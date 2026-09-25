@@ -240,6 +240,7 @@ MonoBehaviour:
   choixClasse: {fileID: 9197481963319205126, guid: a2296fe7ea520de468909b9646944035, type: 3}
   saisie: {fileID: 9197481963319205126, guid: f04995d8bf6b2de47b2f0b01d413cdff, type: 3}
   lobby: {fileID: 9197481963319205126, guid: 4cb2743db4b176044b246d1f903716f0, type: 3}
+  achat: {fileID: 9197481963319205126, guid: a6561cbfc46156546a77b9a228ee993c, type: 3}
 --- !u!114 &431349937
 MonoBehaviour:
   m_ObjectHideFlags: 0

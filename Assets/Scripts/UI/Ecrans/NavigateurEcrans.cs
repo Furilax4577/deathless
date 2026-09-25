@@ -30,6 +30,8 @@ namespace Deathless.UI.Ecrans
         public VisualTreeAsset choixClasse;
         public VisualTreeAsset saisie;
         public VisualTreeAsset lobby;
+        [Tooltip("Menu d'achat (relique, taverne) : Assets/UI/Screens/Achat/Achat.uxml.")]
+        public VisualTreeAsset achat;
 
         public EcranMenuPrincipal MenuPrincipal { get; private set; }
         public EcranOptions Options { get; private set; }
@@ -40,6 +42,7 @@ namespace Deathless.UI.Ecrans
         public EcranChoixClasse ChoixClasse { get; private set; }
         public EcranSaisie Saisie { get; private set; }
         public EcranLobby Lobby { get; private set; }
+        public EcranAchat Achat { get; private set; }
 
         readonly List<Ecran> m_Pile = new List<Ecran>();
         readonly List<Ecran> m_Tous = new List<Ecran>();
@@ -73,6 +76,7 @@ namespace Deathless.UI.Ecrans
             ChoixClasse = Creer(new EcranChoixClasse(), choixClasse, conteneur);
             Lobby = Creer(new EcranLobby(), lobby, conteneur);
             Saisie = Creer(new EcranSaisie(), saisie, conteneur);
+            Achat = Creer(new EcranAchat(), achat, conteneur);
 
             UINavigation.SetupScreen(m_Racine);
             UIScale.TagRoot(m_Racine);
@@ -93,12 +97,14 @@ namespace Deathless.UI.Ecrans
             }
 
             DonneesUI.Changees += EvaluerEcranDeBase;
+            DonneesUI.MenuAchatDemande += OuvrirAchat;
             EvaluerEcranDeBase();
         }
 
         void OnDisable()
         {
             DonneesUI.Changees -= EvaluerEcranDeBase;
+            DonneesUI.MenuAchatDemande -= OuvrirAchat;
             Suivre(null);
             UIScale.Changed -= OnEchelle;
             InputDeviceWatcher.Changed -= OnAppareil;
@@ -270,6 +276,14 @@ namespace Deathless.UI.Ecrans
         {
             if (BasculeRecente) return;
             if (Sommet == Hud) Ouvrir(Pause);
+        }
+
+        /// Le jeu demande un menu d'achat (interaction) : ouvert par-dessus le HUD seulement.
+        void OuvrirAchat(IMenuAchat menu)
+        {
+            if (menu == null || achat == null || Sommet != Hud || BasculeRecente) return;
+            Achat.Afficher(menu);
+            Ouvrir(Achat);
         }
 
         void OnEchelle(int _) => UIScale.TagRoot(m_Racine);

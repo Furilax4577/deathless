@@ -257,7 +257,7 @@ namespace Deathless.Jeu
             H.TraverserEnnemis(false);
             var b = B;
             Vector3 point = transform.position + m_DirSaut * 1f;
-            EffetSaut(point, m_DirSaut);
+            EffetSautPercutant(point, m_DirSaut);
             Diffuser(E_Saut, point, m_DirSaut);
             int n = 0;
             foreach (var s in Combat.Ennemis(point, m_DirSaut, b.sautRayon, 180f))
@@ -270,7 +270,7 @@ namespace Deathless.Jeu
             if (H.Partie != null) H.Partie.Journal("Saut percutant : " + Vector3.Distance(m_DepartSaut, transform.position).ToString("F1") + " m, " + n + " touchés");
         }
 
-        void EffetSaut(Vector3 point, Vector3 dir)
+        void EffetSautPercutant(Vector3 point, Vector3 dir)
         {
             var fx = EffetsJeu.Instance;
             if (fx != null && fx.prefabOndeSaut != null)
@@ -302,7 +302,7 @@ namespace Deathless.Jeu
                 case E_TournanteFin: FinTournante(); break;
                 case E_RugirVfx: if (m_Rugissement != null) m_Rugissement.Jouer(); break;
                 case E_RugirCri: AudioBank.Jouer(SonsDuJeu.Rugissement, transform.position + Vector3.up * 1.6f, 1f); break;
-                case E_Saut: EffetSaut(a, b); break;
+                case E_Saut: EffetSautPercutant(a, b); break;
                 default: base.EffetDistant(effet, a, b, v); break;
             }
         }

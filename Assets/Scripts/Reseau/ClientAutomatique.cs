@@ -12,6 +12,8 @@ namespace Deathless.Reseau
     ///   -deathless-rejoindre=127.0.0.1[:7777] | -deathless-code=ABC123 | -deathless-heberger
     ///   -deathless-pseudo=Bot -deathless-classe=mage -deathless-duree=60 [-deathless-profil=client2] [-deathless-direct]
     ///   -deathless-attendre=2 : ne se déclare prêt qu'une fois 2 joueurs dans le salon (hôte construit)
+    ///   -deathless-or=250 : hôte ou solo, caisse commune remplie au lancement (test des achats)
+    ///   -deathless-achat : achète le palier 2 des missiles à la relique (l'hôte décide)
     ///   -deathless-competences : le héros enchaîne toutes ses compétences (effets vus par les autres postes)
     ///   -deathless-solo : partie solo lancée aussitôt avec la classe donnée (vérification du build : caméra, héros)
     ///   [-deathless-quitter-salon=5] : quitte le salon 5 s après y être entré (test de la classe libérée), sans se déclarer prêt
@@ -51,6 +53,8 @@ namespace Deathless.Reseau
             c.m_Heberger = heberger;
             c.m_Solo = solo;
             c.m_Competences = Drapeau("deathless-competences");
+            c.m_Achat = Drapeau("deathless-achat");
+            if (int.TryParse(Arg("deathless-or"), out var or)) c.m_Or = or;
             if (int.TryParse(Arg("deathless-attendre"), out var att)) c.m_Attendre = att;
             c.m_Classe = Arg("deathless-classe") ?? "mage";
             LobbyReseau.PseudoForce = Arg("deathless-pseudo") ?? "Bot";
@@ -119,9 +123,15 @@ namespace Deathless.Reseau
             var p = Partie.Instance;
             if (p != null && p.EnCours && p.HerosLocal != null)
             {
-                if (m_EnPartieDepuis < 0f) { m_EnPartieDepuis = 0f; ReseauJeu.Journal("[auto] en partie avec " + p.HerosLocal.name); }
+                if (m_EnPartieDepuis < 0f)
+                {
+                    m_EnPartieDepuis = 0f;
+                    ReseauJeu.Journal("[auto] en partie avec " + p.HerosLocal.name);
+                    if (m_Or > 0 && ReseauJeu.Autorite) { p.Etat.orEquipe = m_Or; ReseauJeu.Journal("[auto] caisse commune : " + m_Or + " or (test)"); }
+                }
                 m_EnPartieDepuis += dt;
-                Piloter(p.HerosLocal, m_EnPartieDepuis);
+                if (m_Achat && Achat(p, m_EnPartieDepuis)) { }
+                else Piloter(p.HerosLocal, m_EnPartieDepuis);
                 if (m_EnPartieDepuis >= m_Duree)
                 {
                     ReseauJeu.Journal("[auto] fin du test, on quitte");
@@ -219,7 +229,40 @@ namespace Deathless.Reseau
             }
         }
 
-        bool m_Competences;
+        bool m_Competences, m_Achat;
+        int m_Or;
+        int m_EtapeAchat;
+
+        /// Test des achats à la relique (-deathless-achat) : vers 6 s, le héros va près de Nyxessa, ouvre le menu (touche
+        /// Interagir) et achète le palier 2 des missiles ; l'hôte décide, le journal donne sa réponse et les paliers.
+        bool Achat(Partie p, float t)
+        {
+            var h = p.HerosLocal;
+            if (m_EtapeAchat == 0 && t > 6f)
+            {
+                m_EtapeAchat = 1;
+                h.Entrees.DeplacementTest = Vector2.zero;
+                h.Teleporter(p.nyxessa.transform.position + new Vector3(0f, 0.1f, -7.5f));
+                PartieReseau.ReponseAchat += m => ReseauJeu.Journal("[auto] réponse de l'hôte : " + m);
+                return true;
+            }
+            if (m_EtapeAchat == 1 && t > 7f)
+            {
+                m_EtapeAchat = 2;
+                PointInteraction.Courant(h, out string invite);
+                bool ok = PointInteraction.InteragirIci(h);
+                ReseauJeu.Journal("[auto] invite « " + invite + " », menu ouvert : " + ok + ", or " + p.Etat.orEquipe + ", paliers " + p.Etat.nyxessa.palierMissiles + "/" + p.Etat.nyxessa.palierBouclier);
+                var a = p.nyxessa.GetComponent<AchatRelique>();
+                if (a != null) { a.Acheter(0); ReseauJeu.Journal("[auto] achat des missiles demandé : " + a.Message); }
+                return true;
+            }
+            if (m_EtapeAchat == 2 && t > 10f)
+            {
+                m_EtapeAchat = 3;
+                ReseauJeu.Journal("[auto] après l'achat : or " + p.Etat.orEquipe + ", paliers " + p.Etat.nyxessa.palierMissiles + "/" + p.Etat.nyxessa.palierBouclier);
+            }
+            return m_EtapeAchat < 3;
+        }
         int m_Attendre = 1;
         float m_GardeJusqua, m_AttaqueJusqua;
 

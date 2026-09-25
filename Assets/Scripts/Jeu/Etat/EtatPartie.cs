@@ -52,6 +52,8 @@ namespace Deathless.Jeu
         public float depuisDernierTir = 99f;
         public float dernierCoup = -99f; // Time.time du dernier coup reçu
         public bool detruite;
+        public int palierMissiles = 1;   // paliers achetés à la relique (1 à 5)
+        public int palierBouclier = 1;
     }
 
     [Serializable]

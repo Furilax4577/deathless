@@ -1,0 +1,30 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:dl="Deathless.UI" editor-extension-mode="False">
+    <Style src="../V01.uss" />
+    <Style src="Achat.uss" />
+    <ui:VisualElement class="v01-plein v01-voile achat-fond">
+        <ui:VisualElement class="dl-panel achat">
+            <ui:VisualElement class="achat__entete">
+                <ui:VisualElement class="achat__titres">
+                    <ui:Label name="achat-titre" text="Nyxessa" class="dl-title achat__titre" />
+                    <ui:Label name="achat-sous-titre" text="Améliorations de la relique, payées par la caisse commune." class="dl-text dl-text--muted achat__aide" />
+                </ui:VisualElement>
+                <ui:VisualElement class="achat__or">
+                    <dl:PieceOr class="achat__piece" />
+                    <ui:Label name="achat-or" text="0" class="achat__or-valeur" />
+                    <ui:Label name="achat-legende" text="caisse commune" class="dl-text dl-text--small dl-text--muted achat__or-legende" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:ScrollView name="achat-defile" class="achat__defile">
+                <ui:VisualElement name="achat-articles" class="achat__articles" />
+            </ui:ScrollView>
+            <ui:Label name="achat-message" text="Message" class="dl-text achat__message achat__message--vide" />
+        </ui:VisualElement>
+        <ui:VisualElement class="dl-prompt-bar">
+            <ui:VisualElement class="dl-prompt-bar__group">
+                <dl:InputPrompt action="UI/Submit" label="Acheter" />
+                <dl:InputPrompt action="UI/Cancel" label="Fermer" />
+            </ui:VisualElement>
+            <ui:Label text="Clavier et souris" class="dl-text dl-text--small dl-text--muted dl-device-name" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

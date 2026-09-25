@@ -2,8 +2,9 @@ using UnityEngine;
 
 namespace Deathless.Jeu
 {
-    /// Missiles de Nyxessa, palier 1 fixe dans la 0.1 (wiki : nyxessa) : stock 2, un missile régénéré toutes les 12 s,
-    /// 1,5 s au moins entre deux tirs, 40 dégâts, portée 30 m.
+    /// Missiles de Nyxessa (wiki : nyxessa) : stock, régénération, intervalle et dégâts selon le palier acheté à la relique
+    /// (EtatNyxessa.palierMissiles ; palier 1 : stock 2, un missile toutes les 12 s, 1,5 s entre deux tirs, 40 dégâts),
+    /// portée 30 m.
     /// Cible : d'abord un ennemi qui frappe Nyxessa ; ensuite le Nécromancien ou un élite ; sinon l'ennemi le plus proche.
     /// Salves : un missile par cible en gardant un missile en réserve ; contre un groupe de trois ennemis ou plus, ou un
     /// élite (boss compris), tirs jusqu'à vider le stock sauf un ; si Nyxessa vient d'être frappée, elle vide tout.
@@ -27,7 +28,7 @@ namespace Deathless.Jeu
         void Start()
         {
             var e = E;
-            if (e != null) e.stock = B.missilesStock;
+            if (e != null) e.stock = GameBalance.AuPalier(B.missilesStockPaliers, e.palierMissiles);
             m_Sante.Touche += OnTouche;
             m_Sante.Tue += _ => Detruire();
             m_Sante.invulnerable = B.nyxessaInvincible;
@@ -54,14 +55,15 @@ namespace Deathless.Jeu
             float dt = Time.deltaTime;
             e.pv = m_Sante.Pv;
             e.pvMax = m_Sante.pvMax;
-            if (e.stock < b.missilesStock)
+            int palier = e.palierMissiles;
+            if (e.stock < GameBalance.AuPalier(b.missilesStockPaliers, palier))
             {
                 e.regeneration += dt;
-                if (e.regeneration >= b.missileRegeneration) { e.regeneration = 0f; e.stock++; }
+                if (e.regeneration >= GameBalance.AuPalier(b.missileRegenerationPaliers, palier)) { e.regeneration = 0f; e.stock++; }
             }
             else e.regeneration = 0f;
             e.depuisDernierTir += dt;
-            if (e.depuisDernierTir < b.missileIntervalle || e.stock <= 0) return;
+            if (e.depuisDernierTir < GameBalance.AuPalier(b.missileIntervallePaliers, palier) || e.stock <= 0) return;
             var dv = DirecteurVagues.Instance;
             if (dv == null || dv.Vivants.Count == 0) return;
 
@@ -139,7 +141,7 @@ namespace Deathless.Jeu
             e.stock--;
             e.depuisDernierTir = 0f;
             var b = B;
-            MissileCrane.Tirer(Centre, s.Sante, b.missileDegats, b.missileVitesse, b.missileGuidage, Equipe.Relique, gameObject, true);
+            MissileCrane.Tirer(Centre, s.Sante, GameBalance.AuPalier(b.missileDegatsPaliers, E != null ? E.palierMissiles : 1), b.missileVitesse, b.missileGuidage, Equipe.Relique, gameObject, true);
             p.Journal("Nyxessa tire sur " + s.type + (s.elite ? " (élite)" : "") + (s.SurNyxessa ? " qui la frappe" : "") + ", stock " + e.stock);
         }
 

@@ -117,10 +117,30 @@ MonoBehaviour:
   necroEchelle: 0.92
   nyxessaPV: 2000
   nyxessaRegenAube: 0
-  missilesStock: 2
-  missileRegeneration: 12
-  missileIntervalle: 1.5
-  missileDegats: 40
+  missilesStockPaliers:
+  - 2
+  - 3
+  - 4
+  - 6
+  - 8
+  missileRegenerationPaliers:
+  - 12
+  - 10
+  - 8
+  - 6.5
+  - 5
+  missileIntervallePaliers:
+  - 1.5
+  - 1.2
+  - 1
+  - 0.8
+  - 0.6
+  missileDegatsPaliers:
+  - 40
+  - 55
+  - 75
+  - 100
+  - 130
   missilePortee: 30
   missileVitesse: 18
   missileGuidage: 180
@@ -128,7 +148,6 @@ MonoBehaviour:
   groupeRayon: 4
   frappeeRecente: 2
   delaiScoreDefaite: 3
-  bouclierPalier: 1
   bouclierEncaissement:
   - 150
   - 260

@@ -69,6 +69,8 @@ namespace Deathless.Jeu
         {
             if (nyxessa != null)
             {
+                // Achats des paliers à la relique (touche Interagir, de jour).
+                if (nyxessa.GetComponent<AchatRelique>() == null) nyxessa.gameObject.AddComponent<AchatRelique>();
                 nyxessa.equipe = Equipe.Relique;
                 nyxessa.Initialiser(B.nyxessaPV);
                 nyxessa.Touche += OnNyxessaTouchee;
@@ -379,6 +381,8 @@ namespace Deathless.Jeu
             Etat.dureePhase = r.DureePhase.Value;
             Etat.comptePret = r.ComptePret.Value;
             Etat.orEquipe = r.OrEquipe.Value;
+            Etat.nyxessa.palierMissiles = r.PalierMissiles.Value;
+            Etat.nyxessa.palierBouclier = r.PalierBouclier.Value;
             if (nyxessa != null)
             {
                 nyxessa.Fixer(r.NyxPv.Value, r.NyxPvMax.Value);
@@ -503,6 +507,52 @@ namespace Deathless.Jeu
             m_ChuteDepuis = 0f;
             Journal("Nyxessa est détruite (nuit " + Etat.nuit + ")");
             NyxessaDetruite?.Invoke();
+        }
+
+        // ----------------------------------------------------------------- Achats à la relique (wiki : nyxessa, Paliers)
+
+        public enum Amelioration { Missiles, Bouclier }
+
+        /// Un palier vient d'être acheté (tous les postes) : amélioration, nouveau palier, pseudo de l'acheteur.
+        public event Action<Amelioration, int, string> PalierAchete;
+
+        public int PalierDe(Amelioration a) => a == Amelioration.Missiles ? Etat.nyxessa.palierMissiles : Etat.nyxessa.palierBouclier;
+
+        /// Achat du palier suivant de `a`, payé par la caisse commune, de jour. L'autorité (hôte, ou ce poste en solo)
+        /// décide ; un client transmet sa demande à l'hôte. Renvoie le message à montrer à l'acheteur.
+        public string Acheter(Amelioration a, int joueurId)
+        {
+            if (ClientReseau) { PartieReseau.Instance?.DemanderAchat((byte)a); return "Achat demandé à l’hôte…"; }
+            string refus = RefusAchat(a, out int prix);
+            if (refus != null) return refus;
+            Etat.orEquipe -= prix;
+            int palier = PalierDe(a) + 1;
+            if (a == Amelioration.Missiles) Etat.nyxessa.palierMissiles = palier; else Etat.nyxessa.palierBouclier = palier;
+            var j = Joueur(joueurId);
+            string qui = j != null ? j.nom : "Joueur";
+            Journal("Achat à la relique : " + NomAmelioration(a) + " palier " + palier + " (" + prix + " or, par " + qui + ")");
+            SignalerPalier(a, palier, qui);
+            if (ReseauJeu.EnPartie) PartieReseau.Instance?.AnnoncerPalier((byte)a, palier, qui);
+            return NomAmelioration(a) + " : palier " + palier + " acheté (" + prix + " or).";
+        }
+
+        /// Raison pour laquelle l'achat est impossible (null s'il est possible) et son prix.
+        public string RefusAchat(Amelioration a, out int prix)
+        {
+            prix = B.PrixPalierSuivant(PalierDe(a));
+            if (Etat.phase != Phase.Jour) return "Les achats se font de jour.";
+            if (prix < 0) return "Palier maximal atteint.";
+            if (Etat.orEquipe < prix) return "Pas assez d’or dans la caisse commune.";
+            return null;
+        }
+
+        public static string NomAmelioration(Amelioration a) => a == Amelioration.Missiles ? "Missiles de Nyxessa" : "Bouclier du sorcier";
+
+        /// Tous les postes : son et événement d'un palier acheté.
+        public void SignalerPalier(Amelioration a, int palier, string qui)
+        {
+            if (nyxessa != null) AudioBank.Jouer(SonsDuJeu.PalierAchete, nyxessa.transform.position + Vector3.up * 3f, 0.9f);
+            PalierAchete?.Invoke(a, palier, qui);
         }
 
         // ----------------------------------------------------------------- Joueurs

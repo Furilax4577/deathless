@@ -268,6 +268,7 @@ namespace Deathless.Jeu
             if (!Vivant || !Partie.EnCours) return;
             switch (action)
             {
+                case "Interact": PointInteraction.InteragirIci(this); break;
                 case "Jump": Sauter(); break;
                 case "Dodge": Esquiver(); break;
                 default:

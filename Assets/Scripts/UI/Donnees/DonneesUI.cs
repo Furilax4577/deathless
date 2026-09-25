@@ -21,6 +21,15 @@ namespace Deathless.UI.Donnees
         /// Profil du joueur local (pseudo), toujours présent.
         public static IProfilJoueur Profil => ProfilJoueur.Local;
 
+        /// Le jeu demande l'ouverture d'un menu d'achat (interaction : relique, taverne) ; le navigateur d'écrans l'ouvre
+        /// par-dessus le HUD.
+        public static event Action<IMenuAchat> MenuAchatDemande;
+        public static void OuvrirMenuAchat(IMenuAchat menu) => MenuAchatDemande?.Invoke(menu);
+
+        /// Le jeu demande l'ouverture du menu du personnage (touche Tab, Y, Triangle).
+        public static event Action MenuPersonnageDemande;
+        public static void OuvrirMenuPersonnage() => MenuPersonnageDemande?.Invoke();
+
         /// Appelé à chaque enregistrement ou retrait (les écrans se réabonnent aux événements de IEtatPartie).
         public static event Action Changees;
 

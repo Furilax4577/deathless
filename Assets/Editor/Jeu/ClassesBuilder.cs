@@ -328,7 +328,7 @@ namespace Deathless.EditorTools
                 effet.transform.localPosition = Vector3.up * 0.8f;
                 var etat = effet.GetComponent<RelicShieldEtat>();
                 etat.radius = b.bouclierRayon; etat.height = b.bouclierHauteur; etat.castSeconds = b.bouclierIncantation;
-                etat.maxHealth = b.Palier(b.bouclierEncaissement);
+                etat.maxHealth = b.Palier(b.bouclierEncaissement, 1);
                 bo.AddComponent<BouclierNyxessa>().effet = etat;
                 var fx = Object.FindAnyObjectByType<EffetsJeu>();
                 if (fx != null) { RemplirEffetsClasses(fx); EditorUtility.SetDirty(fx); }
