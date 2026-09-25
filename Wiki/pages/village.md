@@ -26,8 +26,8 @@ Les portes des maisons sont à l'échelle du joueur : 2,1 m pour un personnage d
 ## Villageois
 
 - **Sorcier** {décidé} : un villageois sorcier invoque le bouclier de Nyxessa. Voir [Nyxessa](nyxessa.md).
-- **Druide** {décidé} : il vend les potions de soin le jour. {{dev: Modèle : le druide du pack KayKit Adventurers 2.0 EXTRA. Seuls sa texture et son bâton (`druid_staff`) sont présents dans Relic ; le modèle `Druid.fbx` est à récupérer depuis le pack complet.}}
-- **Mécano** {décidé} : le vendeur traditionnel. Il tiendra plus tard la **boutique** où l'on achète des **armes et des améliorations**. {{dev: Modèle : l'ingénieur (`Engineer`) du pack KayKit Adventurers 2.0 EXTRA ; comme pour le druide, seule sa texture est présente dans Relic. Pas dans la version 0.1.}}
+- **Druide** {décidé} : il vend les potions de soin le jour. {{dev: Modèle : le druide du pack KayKit Adventurers 2.0 EXTRA (`Assets/Art/KayKit/KayKit_Adventurers_2.0_EXTRA/Characters/fbx/Druid.fbx`, bâton `druid_staff`).}}
+- **Mécano** {décidé} : le vendeur traditionnel. Il tiendra plus tard la **boutique** où l'on achète des **armes et des améliorations**. {{dev: Modèle : l'ingénieur (`Engineer.fbx`, clé `engineer_Wrench`) du pack KayKit Adventurers 2.0 EXTRA. Pas dans la version 0.1.}}
 - **Forgeron** {décidé} : il améliore l'arme de chaque héros ; le mécano garde la vente des armes neuves. Modèle : le **barbare, sans son chapeau d'ours** {décidé}. {{dev: Barbare du pack KayKit Adventurers 2.0 FREE (`Barbarian.fbx`, présent dans Relic) ; le chapeau est une pièce séparée, `Barbarian_BearHat`, à masquer.}}
 - Pas d'autre villageois {décidé}.
 
