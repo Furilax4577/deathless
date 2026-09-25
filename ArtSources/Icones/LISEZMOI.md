@@ -6,6 +6,7 @@ Sources SVG des icônes du jeu. Hors de `Assets/` : on les copie dans le projet 
 
 - `Classes/classe_<classe>.svg` (5) : emblème dans un cadre hexagonal (les dalles du village), aux couleurs de la classe. Le fond de l'hexagone est coupé en deux zones par une diagonale nette « / », d'un sommet à l'autre (haut droite à bas gauche) : moitié haut gauche claire, moitié bas droite sombre, deux teintes du thème. Même direction pour les cinq classes.
 - `Competences/<classe>_<action>.svg`, `jauge_<ressource>.svg`, `commun_<action>.svg` (24) : glyphe seul sur fond transparent, sans cadre. Le HUD dessine déjà la case et le temps de recharge.
+- **Druide (classe à venir)** : `Classes/classe_druide_a.svg` (bois de cerf), `_b` (bâton noueux et ambre), `_c` (lune et feuille d'automne) sont trois variantes à choisir ; `classe_druide.svg` est une copie de la variante retenue (constante `DRUIDE_CHOIX` du script, « a » pour l'instant). Sans vert : bois et terre (Terre), ambre (Critique), os (Os), ocres (Chasse) ; cadre en os, fond terre profonde / charbon. `Competences/druide_metamorphose.svg`, `druide_ronces.svg`, `druide_soin_nature.svg` sont **provisoires** : les compétences du druide ne sont pas décidées.
 - `generer_icones.py` : génère tous les SVG et la planche de revue `Docs/icones/planche.html`.
 - `Historique/v1/` : première version des icônes modifiées depuis (commit fb1b64a). La planche les montre dans le bloc « Modifiées », avant et après côte à côte (liste `MODIFIEES` du script).
 

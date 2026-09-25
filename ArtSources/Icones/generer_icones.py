@@ -122,6 +122,15 @@ OS = [c("Os", "Os gris"), c("Os", "Os"), c("Os", "Os pâle")]
 MANA = [c("BouclierPlein", "Bleu nuit"), c("BouclierPlein", "Bleu"), c("BouclierPlein", "Bleu vif"),
         c("BouclierPlein", "Bleu pâle")]
 
+# Druide (classe à venir, 25/09/2026) : pas de palette de thème dans le jeu. Sans vert : bois et terre (Terre),
+# ambre (Critique), bois de cerf et lune (Os), ocres d'automne (Chasse). Cadre en os, fond terre profonde / charbon.
+BOIS_CLAIR = [c("Terre", "Terre claire"), c("Terre", "Sable")]
+BOIS_DRUIDE = [c("Terre", "Terre sombre"), c("Terre", "Terre claire"), c("Terre", "Sable")]
+AMBRE = [c("Critique", "Ambre"), c("Critique", "Or chaud"), c("Critique", "Or clair")]
+AUTOMNE = [c("Critique", "Ambre"), c("Chasse", "Ocre"), c("Critique", "Or chaud")]
+BOIS_CERF = [c("Terre", "Sable"), c("Os", "Os"), c("Os", "Os pâle")]
+LUNE = [c("Os", "Os gris"), c("Os", "Os"), c("Os", "Os pâle")]
+
 # Cadres des classes : rampe de la bordure (sombre -> claire, 4 niveaux), puis les deux zones du fond de
 # l'hexagone, coupé en diagonale (« / », d'un sommet à l'autre) : moitié haut gauche claire, bas droite sombre.
 CADRES = {
@@ -135,6 +144,8 @@ CADRES = {
                  c("Ombre", "Violet sombre"), c("Ombre", "Nuit")),
     "viking": ([c("Rage", "Rouge sombre"), c("Rage", "Rouge vif"), c("Rage", "Rouge vif"), c("Rage", "Rouge pâle")],
                c("Rage", "Rouge sombre"), c("Rage", "Rouge noir")),
+    "druide": ([c("Os", "Os gris"), c("Os", "Os"), c("Os", "Os"), c("Os", "Os pâle")],
+               c("Terre", "Terre profonde"), c("Feu", "Charbon")),
 }
 
 # ---------------------------------------------------------------------------------------------- géométrie
@@ -777,9 +788,135 @@ def commun_coup_critique():
     return ic
 
 
+# ---------------------------------------------------------------------------------------------- druide (à venir)
+
+def classe_druide_a():
+    ic = Icone("classe_druide_a", "druide_variantes", "Druide, variante A : bois de cerf",
+               "Deux bois de cerf ivoire et une pierre d'ambre. Cadre en os, fond terre profonde / charbon.")
+    cadre_hex(ic, "druide")
+    bois = [(58, 90), (50, 76), (42, 62), (36, 46), (36, 30), (42, 18)]
+    andouillers = [([(49, 74), (36, 72), (26, 64)], [6, 4.5, 0]), ([(41, 58), (28, 50), (22, 38)], [5.5, 4, 0]),
+                   ([(36, 42), (46, 32), (50, 20)], [5, 3.5, 0])]
+    for cote in (lambda pts: pts, miroir):
+        for chemin, larg in andouillers:
+            ic.bande(cote(chemin), larg, BOIS_CERF)
+        ic.bande(cote(bois), [10, 9, 8, 7, 5.5, 0], BOIS_CERF)
+    ic.gemme([(64, 78), (74, 90), (64, 104), (54, 90)], AMBRE, table=0.45, teinte_table=c("Critique", "Or clair"))
+    return ic
+
+
+def classe_druide_b():
+    ic = Icone("classe_druide_b", "druide_variantes", "Druide, variante B : bâton noueux",
+               "Bâton noueux (druid_staff) dont les branches tiennent une pierre d'ambre.")
+    cadre_hex(ic, "druide")
+    ic.bande([(56, 112), (61, 98), (55, 84), (63, 70), (59, 58), (64, 48)], [13, 14, 12, 14, 12, 11], BOIS_CLAIR)
+    for chemin in ([(63, 50), (50, 44), (44, 32), (48, 20), (56, 14)], [(64, 48), (78, 42), (84, 30), (80, 18), (72, 14)]):
+        ic.bande(chemin, [11, 9.5, 8, 6, 0], BOIS_CLAIR)
+    ic.bande([(58, 86), (46, 80), (38, 70)], [9, 6, 0], BOIS_CLAIR)
+    ic.gemme(regulier((64, 30), 13, 7, -90), AMBRE, table=0.5, teinte_table=c("Critique", "Or clair"))
+    return ic
+
+
+def classe_druide_c():
+    ic = Icone("classe_druide_c", "druide_variantes", "Druide, variante C : lune et feuille d'automne",
+               "Croissant de lune ivoire et feuille de chêne d'automne (ambre, ocre).")
+    cadre_hex(ic, "druide")
+    ext = [polaire((62, 62), 36, a) for a in range(60, 301, 12)]
+    p1, p2 = ext[-1], ext[0]
+    cx2 = 96.0
+    r2 = math.hypot(p1[0] - cx2, p1[1] - 62)
+    a1 = math.degrees(math.atan2(p1[1] - 62, p1[0] - cx2))
+    a2 = math.degrees(math.atan2(p2[1] - 62, p2[0] - cx2)) - 360  # par la gauche du second cercle
+    inte = [polaire((cx2, 62), r2, a1 + (a2 - a1) * i / 12) for i in range(13)]
+    ic.gemme(ext + inte[1:-1], LUNE, centre=(40, 62))
+    feuille(ic, (96, 108), (64, 50), AUTOMNE)
+    return ic
+
+
+def feuille(ic, tige, pointe, rampe):
+    """Feuille de chêne à lobes, facettée de part et d'autre de la nervure."""
+    f = repere(tige, sub(pointe, tige))
+    lg = math.hypot(*sub(pointe, tige))
+    profil = [(0.12, 4), (0.2, 11), (0.3, 16), (0.4, 10), (0.52, 17), (0.63, 11), (0.75, 15), (0.87, 8), (1.0, 0)]
+    ic.bande([f(-8, 0), f(lg * 0.14, 0)], 4, [c("Terre", "Terre claire"), c("Terre", "Sable")])
+    for signe in (1, -1):
+        bord = [f(lg * k, signe * t) for k, t in profil]
+        nerv = [f(lg * k, 0) for k, _ in profil]
+        ic.poly([nerv[0]] + bord + [nerv[-1]], rampe[0])
+        for i in range(len(profil) - 1):
+            e = sub(bord[i + 1], bord[i])
+            nn = (-e[1] * signe, e[0] * signe)
+            ic.poly([nerv[i], bord[i], bord[i + 1], nerv[i + 1]], teinte(rampe, nn))
+    ic.bande([f(lg * 0.1, 0), f(lg * 0.9, 0)], [2.6, 1.2], [c("Terre", "Terre sombre"), c("Terre", "Terre sombre")])
+
+
+# Variante retenue pour classe_druide.svg (à changer selon le choix de Quentin, puis relancer).
+DRUIDE_CHOIX = "a"
+
+
+def classe_druide():
+    ic = {"a": classe_druide_a, "b": classe_druide_b, "c": classe_druide_c}[DRUIDE_CHOIX]()
+    ic.nom, ic.famille = "classe_druide", "classes"
+    ic.titre = "Druide (à venir)"
+    ic.notes = "Variante %s en attendant le choix de Quentin." % DRUIDE_CHOIX.upper()
+    return ic
+
+
+def druide_metamorphose():
+    ic = Icone("druide_metamorphose", "druide", "Métamorphose en ours",
+               "Provisoire : le druide prend la forme d'une bête.")
+    for x in (34, 94):
+        ic.gemme(regulier((x, 34), 15, 7, -90), BOIS_DRUIDE, table=0.5, teinte_table=c("Terre", "Terre sombre"))
+    tete = [(64 + 44 * math.cos(math.radians(a)), 70 + 40 * math.sin(math.radians(a))) for a in range(-90, 270, 36)]
+    ic.gemme(tete, BOIS_DRUIDE, table=0.6, teinte_table=c("Terre", "Terre claire"))
+    ic.gemme([(64 + 20 * math.cos(math.radians(a)), 90 + 15 * math.sin(math.radians(a))) for a in range(-90, 270, 45)],
+             [c("Terre", "Sable"), c("Os", "Os pâle")], table=0.5, teinte_table=c("Terre", "Sable"))
+    sombre = c("Terre", "Terre profonde")
+    ic.poly([(56, 80), (72, 80), (64, 88)], sombre)
+    for x in (46, 82):
+        ic.poly([(x - 6, 64), (x, 58), (x + 6, 64), (x, 68)], sombre)
+    return ic
+
+
+def druide_ronces():
+    ic = Icone("druide_ronces", "druide", "Ronces", "Provisoire : ronces qui entravent les ennemis.")
+    tiges = [
+        [(10, 104), (30, 86), (50, 88), (66, 70), (84, 58), (104, 56), (118, 42)],
+        [(18, 30), (36, 36), (50, 52), (60, 76), (78, 94), (100, 100), (116, 116)],
+    ]
+    for chemin in tiges:
+        n = len(chemin)
+        ic.bande(chemin, [7 + 5 * math.sin(math.pi * (i + 0.5) / n) for i in range(n)], BOIS_DRUIDE)
+        for i in range(1, n - 1):
+            a, b = chemin[i], chemin[i + 1]
+            m = mul(add(a, b), 0.5)
+            d = norm(sub(b, a))
+            nr = (-d[1], d[0]) if i % 2 else (d[1], -d[0])
+            base1 = add(m, mul(d, -4))
+            base2 = add(m, mul(d, 4))
+            bout = add(add(m, mul(nr, 13)), mul(d, 4))
+            ic.poly([add(base1, mul(nr, 3)), add(base2, mul(nr, 3)), bout], c("Terre", "Sable"))
+    return ic
+
+
+def druide_soin_nature():
+    ic = Icone("druide_soin_nature", "druide", "Soin de nature",
+               "Provisoire : fleur de lumière, en blanc chaud et or comme les autres soins.")
+    cen = (62, 66)
+    for i in range(6):
+        a = -90 + i * 60
+        ic.bande([polaire(cen, 10, a), polaire(cen, 28, a), polaire(cen, 50, a)], [6, 24, 0], SOIN[1:])
+    ic.gemme(regulier(cen, 14, 7, -90), AMBRE, table=0.5, teinte_table=c("Critique", "Or clair"))
+    for (x, y, r) in ((108, 22, 6), (116, 42, 4)):
+        ic.gemme([(x, y - r * 1.5), (x + r, y), (x, y + r * 1.5), (x - r, y)], [c("Sacre", "Or"), SOIN_BLANC])
+    return ic
+
+
 # ---------------------------------------------------------------------------------------------- catalogue
 
-CLASSES = [classe_paladin, classe_mage_feu, classe_rodeur, classe_assassin, classe_viking]
+CLASSES = [classe_paladin, classe_mage_feu, classe_rodeur, classe_assassin, classe_viking, classe_druide]
+DRUIDE_VARIANTES = [classe_druide_a, classe_druide_b, classe_druide_c]
+DRUIDE_COMPETENCES = [druide_metamorphose, druide_ronces, druide_soin_nature]
 COMPETENCES = [
     paladin_epee, paladin_garde, paladin_charge_belier, paladin_soin,
     mage_boule_de_feu, mage_cone_de_flammes, mage_brulure, jauge_mana,
@@ -790,7 +927,8 @@ COMPETENCES = [
 ]
 
 NOMS_CLASSES = {"paladin": "Paladin", "mage_feu": "Mage de feu", "rodeur": "Rôdeur", "assassin": "Assassin",
-                "viking": "Viking", "communes": "Communes"}
+                "viking": "Viking", "communes": "Communes",
+                "druide": "Druide"}
 
 # Barre de compétences du HUD (RT, LT, LB, RB) : (icône ou None, invite, état) ; état = "", "active", "recharge:N:f".
 BARRES = {
@@ -817,14 +955,8 @@ A_TRANCHER = [
 # Icônes modifiées depuis la version 1 (commit fb1b64a), avec la raison ; l'ancienne version, gardée dans
 # Historique/v1/, est montrée à côté de la nouvelle en tête de la planche.
 MODIFIEES = [
-    ("classe_paladin", "Fond coupé en diagonale : acier / nuit."),
-    ("classe_mage_feu", "Fond coupé en diagonale : braise / charbon."),
-    ("classe_rodeur", "Refaite : arc bandé debout qui remplit l'hexagone, branches plus épaisses et plus claires, "
-                      "flèche encochée bien visible. Fond terre sombre / terre profonde."),
-    ("classe_assassin", "Fond coupé en diagonale : violet sombre / nuit."),
-    ("classe_viking", "Fond coupé en diagonale : rouge sombre / rouge noir ; manche éclairci pour ressortir."),
-    ("paladin_soin", "Soin en blanc chaud et or (plus de menthe)."),
-    ("commun_potion_soin", "Liquide or et croix blanc chaud (plus de menthe)."),
+    # (nom, raison) : icônes changées depuis la dernière version validée. Vide : la v2 (diagonale, soin blanc et or,
+    # rôdeur refait) est validée et commitée.
 ]
 HISTORIQUE = ICI / "Historique" / "v1"
 
@@ -865,6 +997,8 @@ p.intro, p.note, ul.note { color:var(--texte-2); max-width:880px; line-height:1.
 .carte svg { display:block; }
 .carte .nom { font-weight:600; font-size:17px; margin-top:10px; }
 .carte .fichier { font-family:ui-monospace, Consolas, monospace; font-size:12px; color:var(--texte-off); }
+.provisoire { display:inline-block; margin-left:8px; padding:1px 8px; border-radius:10px; border:1.5px solid var(--or);
+  color:var(--or); font-size:11px; font-weight:600; letter-spacing:.5px; vertical-align:middle; }
 .carte .quoi { font-size:13px; color:var(--texte-2); margin-top:3px; line-height:1.35; }
 .bande { border-radius:14px; padding:16px; display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin-bottom:10px; }
 .bande.ardoise { background:var(--ardoise); }
@@ -923,10 +1057,11 @@ def _use(nom, taille):
             % (taille, taille, html.escape(nom), nom))
 
 
-def carte(ic):
-    return ('<div class="carte"><div class="tailles">%s%s%s</div><div class="nom">%s</div>'
+def carte(ic, provisoire=False):
+    etiquette = '<span class="provisoire">provisoire</span>' if provisoire or ic.famille == "druide" else ""
+    return ('<div class="carte"><div class="tailles">%s%s%s</div><div class="nom">%s%s</div>'
             '<div class="fichier">%s.svg</div><div class="quoi">%s</div></div>'
-            % (_use(ic.nom, 128), _use(ic.nom, 64), _use(ic.nom, 40), html.escape(ic.titre), ic.nom,
+            % (_use(ic.nom, 128), _use(ic.nom, 64), _use(ic.nom, 40), html.escape(ic.titre), etiquette, ic.nom,
                html.escape(ic.notes)))
 
 
@@ -980,7 +1115,22 @@ def bloc_modifiees(par_nom):
         lignes.append('<div class="modif">%s%s<div class="txt"><div class="nom">%s</div>'
                       '<div class="fichier">%s.svg</div><div class="quoi">%s</div></div></div>'
                       % (avant, apres, html.escape(ic.titre), nom, html.escape(pourquoi)))
+    if not lignes:
+        return ""
     return '<h2>Modifiées</h2><div class="modifs">%s</div>' % "".join(lignes)
+
+
+def bloc_druide(par_nom):
+    variantes = "".join(carte(par_nom[f.__name__]) for f in DRUIDE_VARIANTES)
+    comps = "".join(carte(par_nom[f.__name__], provisoire=True) for f in DRUIDE_COMPETENCES)
+    return ('<h2>Druide (classe à venir)</h2>'
+            '<p class="note">Arme, rôle et compétences pas encore définis (wiki : « bientôt »). Identité sans vert : '
+            'bois et terre, ambre, bois de cerf et lune en os, ocres d\'automne. Cadre en os, fond coupé en '
+            'diagonale terre profonde / charbon. Trois variantes d\'emblème : le choix de Quentin deviendra '
+            '<code>classe_druide.svg</code> (aujourd\'hui la variante %s).</p>'
+            '<div class="grille">%s</div>'
+            '<p class="note">Compétences plausibles, <strong>provisoires</strong> : rien n\'est décidé.</p>'
+            '<div class="grille">%s</div>' % (DRUIDE_CHOIX.upper(), variantes, comps))
 
 
 def planche(classes, competences):
@@ -999,10 +1149,12 @@ def planche(classes, competences):
                  'Gemmes low poly : polygones à bords nets, lumière unique en haut à gauche, couleurs lues dans les '
                  'palettes de thème du jeu. Les classes ont un cadre hexagonal, les compétences sont un glyphe seul '
                  '(le HUD dessine le cadre et la recharge).</p>')
+    corps.append(bloc_druide(par_nom))
     corps.append(bloc_modifiees(par_nom))
     corps.append('<h2>À trancher</h2><ul class="note">%s</ul>' % "".join("<li>%s</li>" % html.escape(t) for t in A_TRANCHER))
-    corps.append('<h2>Classes</h2><div class="grille">%s</div>' % "".join(carte(ic) for ic in classes))
-    for famille in ("paladin", "mage_feu", "rodeur", "assassin", "viking", "communes"):
+    corps.append('<h2>Classes</h2><div class="grille">%s</div>'
+                 % "".join(carte(ic) for ic in classes if ic.famille == "classes"))
+    for famille in ("paladin", "mage_feu", "rodeur", "assassin", "viking", "communes", "druide"):
         liste = [ic for ic in competences if ic.famille == famille]
         corps.append('<h2>%s</h2><div class="grille">%s</div>'
                      % (NOMS_CLASSES[famille], "".join(carte(ic) for ic in liste)))
@@ -1040,12 +1192,12 @@ def main():
     SORTIE_CLASSES.mkdir(parents=True, exist_ok=True)
     SORTIE_COMPETENCES.mkdir(parents=True, exist_ok=True)
     PLANCHE.parent.mkdir(parents=True, exist_ok=True)
-    classes = [f() for f in CLASSES]
-    competences = [f() for f in COMPETENCES]
+    classes = [f() for f in CLASSES] + [f() for f in DRUIDE_VARIANTES]
+    competences = [f() for f in COMPETENCES] + [f() for f in DRUIDE_COMPETENCES]
     total = 0
     for ic in classes + competences:
         verifier(ic)
-        dossier = SORTIE_CLASSES if ic.famille == "classes" else SORTIE_COMPETENCES
+        dossier = SORTIE_CLASSES if ic.famille in ("classes", "druide_variantes") else SORTIE_COMPETENCES
         texte = ic.svg()
         (dossier / (ic.nom + ".svg")).write_text(texte, encoding="utf-8", newline="\n")
         total += len(texte.encode("utf-8"))
