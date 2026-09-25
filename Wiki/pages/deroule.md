@@ -61,7 +61,9 @@ Un cycle complet dure **4 min 10 s**. Les 5 s de crépuscule et d'aube laissent 
 
 Le donjon est **régénéré chaque nuit** : chaque jour, le portail mène à un donjon nouveau.
 
-**Taille unique** {décidé} : tous les donjons ont la même taille. Elle respecte une consigne : un aller-retour complet, de l'arrivée par le portail au retour au village, est **faisable en 90 secondes** (le jour dure 120 s). **Forme** {décidé} : plutôt **ouvert**, sur **2 à 3 étages** reliés par des escaliers. Quand on entre dans une pièce sous un étage, **l'étage du dessus disparaît** pour qu'on voie bien dedans (chaque joueur pour lui-même). Peu de couloirs : de **grandes salles ouvertes et lisibles**, pas un labyrinthe.
+**Taille unique** {décidé} : tous les donjons ont la même taille. Elle respecte une consigne : un aller-retour complet, de l'arrivée par le portail au retour au village, est **faisable en 90 secondes** (le jour dure 120 s). **Forme** {décidé} : plutôt **ouvert**, sur **2 à 3 étages** reliés par des escaliers. Quand on entre dans une pièce sous un étage, **l'étage du dessus disparaît** pour qu'on voie bien dedans (chaque joueur pour lui-même). Peu de couloirs : de **grandes salles ouvertes et lisibles**, pas un labyrinthe. Des balcons et mezzanines longent les murs ; **3 escaliers au plus**, en pierre ou en bois.
+
+**Eau** {décidé} : un demi-niveau peut être rempli d'**eau jusqu'aux genoux**, bordé de murets, où l'on descend par un escalier. **L'eau ralentit les déplacements** (héros comme squelettes). Eau bleue, jamais verte. Ralentissement {à équilibrer}.
 
 **Pas de faux butin** {décidé} : dans le décor, rien ne ressemble à du butin (tas d'or, pièces, coffres, sacs) s'il ne rapporte rien. Seul le vrai butin en a l'allure, pour ne pas tromper le jugement des joueurs. Mesure exacte et contenu du donjon : {à confirmer}.
 
