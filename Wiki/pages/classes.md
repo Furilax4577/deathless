@@ -10,7 +10,7 @@ Cinq classes jouables, et bientôt le **druide** et le **mécanicien**. Chaque c
 | {icone classe_assassin} | [Assassin](classe-assassin.md) | Dague, arbalète dans le dos | Furtif, coups critiques |
 | {icone classe_viking} | [Viking](classe-viking.md) | Hache à deux mains | Mêlée, zone |
 | {icone classe_druide} | [Druide](classe-druide.md) | **Bientôt** | Prochaine version |
-|  | [Mécanicien](classe-mecanicien.md) | **Bientôt** | Prochaine version |
+| {icone classe_mecanicien} | [Mécanicien](classe-mecanicien.md) | **Bientôt** | Prochaine version |
 
 Chaque classe a sa page : présentation, actions et touches, règles détaillées.
 
