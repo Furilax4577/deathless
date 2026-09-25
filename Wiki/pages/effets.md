@@ -7,7 +7,7 @@ Chaque effet prend ses couleurs dans la palette de son thème. Changer une coule
 | Thème | Couleurs, du plus sombre au plus clair | Effets |
 |---|---|---|
 | Feu | {couleur #4a1206} {couleur #cc1f08} {couleur #ff610a} {couleur #ffe666} | Boule de feu, cône de flammes, brûlure |
-| Nyxessa | {couleur #145032} {couleur #1e5a32} {couleur #3fae5a} {couleur #9fe870} | Relique, ceinture, portail, téléportation, missile magique |
+| Nyxessa | {couleur #145032} {couleur #1e5a32} {couleur #3fae5a} {couleur #9fe870} | Relique, ceinture, portail, téléportation, missile magique. **Vert à approfondir** (émeraude plus saturée, décision du 25/09/2026) : nouvelles teintes {à confirmer} |
 | Terre | {couleur #3a281a} {couleur #5b3f2a} {couleur #8a6a48} {couleur #b8966c} | Saut percutant, charge bélier à l'impact, sortie de terre des squelettes |
 | Rage | {couleur #3a0a08} {couleur #6e1410} {couleur #b3261e} {couleur #ff7359} | Rugissement et sorts du viking |
 | Sacré | {couleur #1e2a3a} {couleur #b8903a} {couleur #e8c872} {couleur #f4e2a8} | Charge bélier du paladin |
@@ -34,6 +34,10 @@ Validés le 25/09/2026 pour les nouvelles compétences :
 - Une **légère brume au sol** couvre la forêt et les bords du village, sans masquer les squelettes.
 - Le vert de Nyxessa et du portail ressort sur ce fond violet ; les lanternes restent chaudes.
 - Rendu : {à confirmer}.
+
+## Brillance la nuit {décidé}
+
+La nuit, un **léger éclat** fait briller les vraies sources de lumière (cristal de Nyxessa, portail, lanternes, fenêtres), pour le style, **sans éblouir**. Le jour, il reste discret.
 
 ## Fin des effets {décidé}
 
