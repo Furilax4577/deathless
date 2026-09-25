@@ -19,6 +19,10 @@ Aucune maison n'est posée dans l'axe d'une clairière d'apparition : les ennemi
 
 Ces éléments ont été essayés puis retirés du village le 25/09/2026 : l'enceinte et ses portes, la scierie, la mine, le marchand, les tours, les garnisons, le poste de construction, les couloirs fermés, les sentiers de terre dans la forêt.
 
+## Sentiers vers la forêt {décidé}
+
+Un **sentier de pierre** part du village vers **chacune des trois zones** d'où sortent les squelettes. Entretenu à la sortie du village, il se **dégrade** à mesure qu'on s'enfonce dans la forêt : dalles espacées, cassées, envahies d'herbe, puis quelques pierres éparses. Une ou deux **lanternes**, au sol ou sur poteau, jalonnent chaque sentier.
+
 ## Taille des maisons {décidé} {dev}
 
 Les portes des maisons sont à l'échelle du joueur : 2,1 m pour un personnage de 2 m. Les maisons font donc 6 à 6,5 m de large.
