@@ -61,6 +61,8 @@ Un cycle complet dure **4 min 10 s**. Les 5 s de crépuscule et d'aube laissent 
 
 Le donjon est **régénéré chaque nuit** : chaque jour, le portail mène à un donjon nouveau.
 
+**Taille unique** {décidé} : tous les donjons ont la même taille. Elle respecte une consigne : un aller-retour complet, de l'arrivée par le portail au retour au village, est **faisable en 90 secondes** (le jour dure 120 s). Mesure exacte et contenu du donjon : {à confirmer}.
+
 **Butin** {décidé} : on ne rapporte du donjon que de l'**or**, versé à la caisse commune au retour par le portail.
 
 **Or des vagues, en attendant le donjon** {décidé} : tant que le donjon n'existe pas, chaque squelette tué pendant les vagues rapporte de l'or à la caisse commune (montants dans [Ennemis](ennemis.md)). Règle provisoire, à réajuster quand le donjon arrivera.

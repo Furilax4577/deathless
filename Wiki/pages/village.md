@@ -38,6 +38,10 @@ Les portes des maisons sont à l'échelle du joueur : 2,1 m pour un personnage d
 - Prix et soin rendu : {à équilibrer}.
 - **Le druide** les vend {décidé}. Voir Villageois.
 
+## Intérieurs {décidé}
+
+Les maisons des villageois ont un **intérieur** où l'on entre par la porte : la boutique du druide, celle du mécano, la forge du forgeron et la maison du sorcier. Aménagement : {à confirmer}.
+
 ## Rôle des maisons {décidé}
 
 Le druide, le mécano et le forgeron ont **chacun leur maison**, qui leur sert de boutique : on y entre le jour pour acheter. Le sorcier a aussi sa maison, où il passe la journée ; il ne vend rien. Les autres maisons restent du décor.
