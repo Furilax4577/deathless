@@ -5,7 +5,7 @@ Ce qui reste ouvert. Une ligne quitte cette page quand la règle est tranchée e
 | Sujet | Question | Page |
 |---|---|---|
 | Déroulé d'une partie | Délai de réapparition des joueurs, ce qu'on garde entre deux parties, nombre de joueurs maximum, contenu du butin, catégories de score en plus | [Déroulé d'une partie](deroule.md) |
-| Ennemis d'élite et boss | Ce qui distingue un élite, le mini-boss de la nuit 10 et le boss final de la nuit 12 | [Ennemis](ennemis.md) |
+| Ennemis d'élite et boss | Ce qui distingue un élite ; comportements et attaques du Golem et du Nécromancien ; nuit 6 : nécromancien ordinaire ou mage lanceur de crâne, maintenant que le Nécromancien est le boss final ; couleur des yeux du Nécromancien (cyan d'origine ou vert Nyxessa) | [Ennemis](ennemis.md) |
 | Nyxessa | Coût de base des paliers, équilibrage des valeurs en jeu | [Nyxessa](nyxessa.md) |
 | Bouclier | Signe visuel de l'amélioration (gemmes plus intenses ou plus nombreuses), paliers, encaissement, dégâts renvoyés, moment de l'invocation | [Nyxessa](nyxessa.md) |
 | Rôdeur | Durée de charge de l'arc, dégâts minimum et maximum, multiplicateur de critique | [Classes](classes.md) |

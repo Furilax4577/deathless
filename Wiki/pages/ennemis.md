@@ -21,9 +21,18 @@ Les modèles disponibles dans le pack KayKit Skeletons :
 | Voleur | Capuche, lames | {à confirmer} |
 | Sbire | Sans casque, le plus simple | {à confirmer} |
 
-Ordre d'apparition dans la partie : sbires dès la nuit 1, guerriers nuit 2, voleurs nuit 3, mages et premier élite nuit 5, nécromancien nuit 6, mini-boss nuit 10, boss final nuit 12. Voir [Déroulé d'une partie](deroule.md) {décidé}.
+Ordre d'apparition dans la partie : sbires dès la nuit 1, guerriers nuit 2, voleurs nuit 3, mages et premier élite nuit 5, nécromancien nuit 6, Golem (mini-boss) nuit 10, Nécromancien (boss final) nuit 12. Voir [Déroulé d'une partie](deroule.md) {décidé}.
 
 {dev} Le casque du squelette guerrier sert aussi de modèle au heaume du rugissement du viking.
+
+## Boss {décidé}
+
+| Nuit | Boss | Allure |
+|---|---|---|
+| 10 | **Golem**, mini-boss | Grand squelette massif, hache géante |
+| 12 | **Nécromancien**, boss final | Couronne à crâne, robe violette, grimoire, grande faux et faucille |
+
+Comportements, points de vie et attaques des boss : {à confirmer}.
 
 ## Nécromancien
 

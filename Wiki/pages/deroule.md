@@ -34,7 +34,7 @@ L'écran rappelle aussi le résultat de l'équipe : victoire ou nuit atteinte, d
 
 ## Victoire {décidé}
 
-La partie est **gagnée en survivant à la nuit 12** et à son boss final, à l'aube. Une partie gagnée dure donc 12 cycles, soit environ 50 minutes. La plupart des parties perdues s'arrêtent entre la nuit 8 et la nuit 11.
+La partie est **gagnée en survivant à la nuit 12** et à son boss final, le Nécromancien, à l'aube. Une partie gagnée dure donc 12 cycles, soit environ 50 minutes. La plupart des parties perdues s'arrêtent entre la nuit 8 et la nuit 11.
 
 ## Le cycle {décidé}
 
@@ -99,9 +99,9 @@ Pour un joueur :
 | 7 | 3 | 34 | Deux élites par nuit |
 | 8 | 3 | 38 | |
 | 9 | 3 | 42 | Quatre vagues, points de vie +10 % |
-| 10 | 3 | 44 | Mini-boss |
+| 10 | 3 | 44 | Mini-boss : le **Golem** |
 | 11 | 3 | 46 | Points de vie +20 % |
-| 12 | 3 | 48 | Boss final, victoire à l'aube |
+| 12 | 3 | 48 | Boss final : le **Nécromancien**, victoire à l'aube |
 
 - **Nuits 1 à 3** : apprentissage. **Nuits 4 à 7** : pression, pendant qu'on monte les paliers de Nyxessa (un palier toutes les deux nuits environ). **À partir de la nuit 8** : difficile.
 
