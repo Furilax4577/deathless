@@ -21,8 +21,34 @@ MonoBehaviour:
     image: {fileID: 7388822144124034973, guid: 0f1b851836a5f564590bd3e0a15b3524, type: 3}
   - id: assassin_furtif
     image: {fileID: 7388822144124034973, guid: 2e8156b248d993743b585ed687bc12a9, type: 3}
+  - id: barde_accord_dissonant
+    image: {fileID: 7388822144124034973, guid: f3b34c39681fd4f4b91158cda0adb2ad, type: 3}
+  - id: barde_ballade_entrainante
+    image: {fileID: 7388822144124034973, guid: 0f1ee4439fa58a3418a257a1001241e0, type: 3}
+  - id: barde_coup_de_luth
+    image: {fileID: 7388822144124034973, guid: 52c771ae31952834fb0e14ad0265f88d, type: 3}
+  - id: barde_jauge_inspiration
+    image: {fileID: 7388822144124034973, guid: 8f5034dd4f095144fbb9a6f883835c6e, type: 3}
+  - id: barde_jouer
+    image: {fileID: 7388822144124034973, guid: a773250e955d6ea4a8592eb26a9eb16d, type: 3}
+  - id: bavaroise_charge_du_tonneau
+    image: {fileID: 7388822144124034973, guid: 0fb519292b7147c429f698585f181870, type: 3}
+  - id: bavaroise_coups_de_chopes
+    image: {fileID: 7388822144124034973, guid: 28c373fc21c1f1f4bad017b73bd1bc20, type: 3}
+  - id: bavaroise_jauge_ivresse
+    image: {fileID: 7388822144124034973, guid: c49627a6ee7fdbc42a81e27a132b5225, type: 3}
+  - id: bavaroise_tournee_generale
+    image: {fileID: 7388822144124034973, guid: e71e3d5ccb15e3e428c7469ac82d1821, type: 3}
+  - id: bavaroise_trinquer
+    image: {fileID: 7388822144124034973, guid: 608fc447b57f73c46adfed734846bfc2, type: 3}
   - id: classe_assassin
     image: {fileID: 7388822144124034973, guid: ae1a5055bb37e8c499440834fbc6116e, type: 3}
+  - id: classe_barde
+    image: {fileID: 7388822144124034973, guid: cf5056bca92d934499c117e2387aa2f9, type: 3}
+  - id: classe_bavaroise
+    image: {fileID: 7388822144124034973, guid: a6981507af13d254a9b66715bd5e1d07, type: 3}
+  - id: classe_clochard
+    image: {fileID: 7388822144124034973, guid: c33aad2d0ab355c4397286929b3c7183, type: 3}
   - id: classe_druide
     image: {fileID: 7388822144124034973, guid: b9e21ac8faa78a748a865da71b7a80a7, type: 3}
   - id: classe_mage_feu
@@ -35,6 +61,18 @@ MonoBehaviour:
     image: {fileID: 7388822144124034973, guid: 10a3850a36590f144aa38bbbdf6398f6, type: 3}
   - id: classe_viking
     image: {fileID: 7388822144124034973, guid: 95fac20e118d38d4792d3dfa00fdc6b0, type: 3}
+  - id: clochard_coup_de_bouteille
+    image: {fileID: 7388822144124034973, guid: 7356ab8d1d5f4814aa11036206d79909, type: 3}
+  - id: clochard_debrouille
+    image: {fileID: 7388822144124034973, guid: 1d4b2f04498246346aad5b96e4302351, type: 3}
+  - id: clochard_jauge_gaz
+    image: {fileID: 7388822144124034973, guid: b668a1fc1aea4c942a21db2c67be9867, type: 3}
+  - id: clochard_nuage_pestilentiel
+    image: {fileID: 7388822144124034973, guid: 38ba38fad9a705e4d813912105c2e356, type: 3}
+  - id: clochard_pet_de_defense
+    image: {fileID: 7388822144124034973, guid: 5104afec04b047648b1e0472f9c6774c, type: 3}
+  - id: clochard_pet_propulsion
+    image: {fileID: 7388822144124034973, guid: 60fc511cf93e2ec44bd25415a385c857, type: 3}
   - id: commun_coup_critique
     image: {fileID: 7388822144124034973, guid: 1c48d69886e9c76478c9f824937cc9b0, type: 3}
   - id: commun_esquive

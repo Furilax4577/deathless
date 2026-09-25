@@ -99,7 +99,7 @@ namespace Deathless.Jeu
             var cibles = Combat.Ennemis(transform.position, transform.forward, B.epeePortee, B.epeeDemiAngle);
             for (int i = 0; i < cibles.Count && i < B.epeeCiblesParCoup; i++)
             {
-                H.Frapper(cibles[i], B.epeeDegats);
+                H.Frapper(cibles[i], B.epeeDegats * Facteur(0));
                 AudioBank.Jouer(SonsDuJeu.EpeeImpact, cibles[i].transform.position + Vector3.up, 0.9f);
                 Diffuser(E_Impact, cibles[i].transform.position + Vector3.up);
             }
@@ -137,7 +137,7 @@ namespace Deathless.Jeu
             }
             m_Action = Action.ChargeAnticipation;
             m_Depuis = 0f;
-            m_RechargeCharge = b.chargeRecharge;
+            m_RechargeCharge = b.chargeRecharge * Facteur(2);
             m_Repousses.Clear();
             m_ParcouruCharge = 0f;
             if (Anim != null) H.Declencher(P_Charge);
@@ -192,7 +192,7 @@ namespace Deathless.Jeu
                     if (!m_SoinDonne && m_Depuis >= b.soinIncantation)
                     {
                         m_SoinDonne = true;
-                        H.Sante.Soigner(H.Sante.pvMax * b.soinPart);
+                        H.Sante.Soigner(H.Sante.pvMax * b.soinPart * Facteur(3));
                         if (aura != null) aura.Jouer();
                         Diffuser(E_Aura);
                     }
@@ -297,7 +297,7 @@ namespace Deathless.Jeu
                 if (sq != null) sq.Etourdir(B.paradeEtourdi, H.Id);
                 return Interception.Pare;
             }
-            float cout = info.montant * B.gardeCoutParDegat;
+            float cout = info.montant * B.gardeCoutParDegat * Facteur(1);
             if (H.Depenser(cout)) return Interception.Bloque;
             // Garde brisée : le coup passe et le héros est déséquilibré.
             H.ViderEndurance();
@@ -341,7 +341,7 @@ namespace Deathless.Jeu
             {
                 case 0: return m_Action == Action.Attaque ? EtatEmplacement.Actif : EtatEmplacement.Pret;
                 case 1: return m_Garde ? EtatEmplacement.Actif : H.Endurance <= 0f ? EtatEmplacement.Indisponible : EtatEmplacement.Pret;
-                case 2: return Recharge(m_RechargeCharge, B.chargeRecharge, out restant, out total, m_Action == Action.Charge || m_Action == Action.ChargeAnticipation);
+                case 2: return Recharge(m_RechargeCharge, B.chargeRecharge * Facteur(2), out restant, out total, m_Action == Action.Charge || m_Action == Action.ChargeAnticipation);
                 case 3: return Recharge(m_RechargeSoin, B.soinRecharge, out restant, out total, m_Action == Action.Soin);
                 default: return EtatEmplacement.Vide;
             }

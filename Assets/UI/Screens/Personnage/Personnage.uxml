@@ -1,0 +1,51 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:dl="Deathless.UI" editor-extension-mode="False">
+    <Style src="../V01.uss" />
+    <Style src="Personnage.uss" />
+    <ui:VisualElement class="v01-plein v01-voile v01-voile--fort perso-fond">
+        <ui:VisualElement class="perso">
+            <ui:VisualElement class="perso__entete">
+                <ui:Label text="Personnage" class="dl-title perso__titre" />
+                <ui:Label text="La partie continue pendant que ce menu est ouvert." class="dl-text dl-text--muted perso__aide" />
+            </ui:VisualElement>
+            <ui:ScrollView name="perso-defile" mode="Vertical" horizontal-scroller-visibility="Hidden" class="perso__defile">
+                <ui:VisualElement class="perso__colonnes">
+                    <!-- Le personnage -->
+                    <ui:VisualElement class="dl-panel perso__carte perso__fiche">
+                        <ui:Label text="PERSONNAGE" class="dl-section-label" />
+                        <ui:VisualElement class="perso__identite">
+                            <ui:VisualElement name="perso-embleme" class="dl-icone perso__embleme" />
+                            <ui:VisualElement class="perso__noms">
+                                <ui:Label name="perso-nom" text="Quentin" class="dl-heading perso__nom" />
+                                <ui:Label name="perso-classe" text="Paladin" class="dl-text perso__classe" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                        <ui:VisualElement name="perso-carac" class="perso__carac" />
+                    </ui:VisualElement>
+                    <!-- Les compétences -->
+                    <ui:VisualElement class="dl-panel perso__carte perso__competences">
+                        <ui:VisualElement class="perso__competences-entete">
+                            <ui:Label text="COMPÉTENCES" class="dl-section-label" />
+                            <ui:Label name="perso-points" text="1 point à dépenser" class="perso__points" />
+                        </ui:VisualElement>
+                        <ui:Label text="1 point de compétence par jour survécu, gagné à l’aube." class="dl-text dl-text--small dl-text--muted perso__regle" />
+                        <ui:VisualElement name="perso-ameliorations" class="perso__ameliorations" />
+                    </ui:VisualElement>
+                    <!-- L'inventaire (vide pour l'instant) -->
+                    <ui:VisualElement class="dl-panel perso__carte perso__inventaire">
+                        <ui:Label text="INVENTAIRE" class="dl-section-label" />
+                        <ui:VisualElement name="perso-cases" class="perso__cases" />
+                        <ui:Label text="Vide pour l’instant." class="dl-text dl-text--muted perso__vide" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:ScrollView>
+            <ui:Label name="perso-message" text="Message" class="dl-text perso__message perso__message--vide" />
+        </ui:VisualElement>
+        <ui:VisualElement class="dl-prompt-bar">
+            <ui:VisualElement class="dl-prompt-bar__group">
+                <dl:InputPrompt action="UI/Submit" label="Améliorer" />
+                <dl:InputPrompt action="UI/Cancel" label="Fermer" />
+            </ui:VisualElement>
+            <ui:Label text="Clavier et souris" class="dl-text dl-text--small dl-text--muted dl-device-name" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

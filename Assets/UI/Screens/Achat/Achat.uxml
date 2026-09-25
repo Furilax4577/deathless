@@ -14,7 +14,7 @@
                     <ui:Label name="achat-legende" text="caisse commune" class="dl-text dl-text--small dl-text--muted achat__or-legende" />
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:ScrollView name="achat-defile" class="achat__defile">
+            <ui:ScrollView name="achat-defile" mode="Vertical" horizontal-scroller-visibility="Hidden" class="achat__defile">
                 <ui:VisualElement name="achat-articles" class="achat__articles" />
             </ui:ScrollView>
             <ui:Label name="achat-message" text="Message" class="dl-text achat__message achat__message--vide" />

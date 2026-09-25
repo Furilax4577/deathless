@@ -317,6 +317,9 @@
 }
 
 .hud-interaction { position: absolute; top: 678px; left: 50%; translate: -50% 0; height: 60px; border-radius: 30px; background-color: rgba(16, 19, 27, 0.82); }
+.hud-points { position: absolute; left: 48px; bottom: 232px; height: 54px; display: none; border-width: 2px; border-color: var(--dl-color-gold); }
+.hud-points__texte { font-size: var(--dl-text-body); color: var(--dl-color-gold); margin: 0 12px 0 0; padding: 0; -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); }
+.dl-scale-3 .hud-points { left: 24px; bottom: 215px; }
 .hud-interaction__texte { font-size: var(--dl-text-body); margin: 0 0 0 12px; padding: 0; }
 
 /* ---------- Mort ---------- */

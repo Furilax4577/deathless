@@ -25,6 +25,8 @@ namespace Deathless.Jeu
         /// (NetworkTransform, NetworkAnimator) ; ni entrées, ni caméra, ni logique de classe, ni déplacement ici.
         public bool Distant { get; private set; }
         public int Id => m_Etat != null ? m_Etat.id : 0;
+        /// État du joueur de ce héros (points et rangs de compétence…).
+        public EtatJoueur EtatJoueur => m_Etat;
         public bool Vivant => !Sante.Mort && m_EtatCourant != Etat.Mort && m_EtatCourant != Etat.Reapparition;
         public Etat EtatCourant => m_EtatCourant;
         public bool AuSol => m_AuSol;
@@ -265,6 +267,7 @@ namespace Deathless.Jeu
         {
             if (Partie == null) return;
             if (action == "Ready") { Partie.BasculerPret(Id); return; }
+            if (action == "CharacterMenu") { if (Partie.EnCours) (Deathless.UI.Donnees.DonneesUI.Personnage as MenuPersonnage)?.Ouvrir(); return; }
             if (!Vivant || !Partie.EnCours) return;
             switch (action)
             {

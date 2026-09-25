@@ -163,7 +163,7 @@ namespace Deathless.Jeu
                 Vector3 point = s.transform.position + Vector3.up * 1.1f;
                 Vector3 dir = (s.transform.position - transform.position).normalized;
                 if (critique) Critique(point, -dir, furtif && dos);
-                H.Frapper(s, b.dagueDegats * mult, critique, point, dir);
+                H.Frapper(s, b.dagueDegats * Facteur(0) * mult, critique, point, dir);
                 AudioBank.Jouer(SonsDuJeu.Dague, point, 0.9f);
                 Diffuser(E_Dague, point);
                 if (H.Partie != null && critique) H.Partie.Journal("Dague : " + (furtif && dos ? "meilleur critique ×" : "critique ×") + mult + (dos ? " (dos)" : "") + (furtif ? " (furtif)" : ""));
@@ -180,7 +180,7 @@ namespace Deathless.Jeu
             var b = B;
             m_Action = Action.Tir;
             m_Depuis = 0f;
-            m_RechargeArbalete = b.arbaleteRecharge;
+            m_RechargeArbalete = b.arbaleteRecharge * Facteur(1);
             m_DernierCombat = Time.time;
             SortirFurtif();
             if (Anim != null) H.Declencher(P_Shoot);
@@ -213,7 +213,7 @@ namespace Deathless.Jeu
             if (d.magnitude < 2f) p = transform.position + H.AvantCamera * 3.5f;
             if (Physics.Raycast(p + Vector3.up * 5f, Vector3.down, out var hit, 20f, ~0, QueryTriggerInteraction.Ignore)) p = hit.point;
             m_CibleGrenade = p;
-            m_RechargeGrenade = b.grenadeRecharge;
+            m_RechargeGrenade = b.grenadeRecharge * Facteur(2);
             m_Action = Action.Grenade;
             m_Depuis = 0f;
             m_GrenadeTenue = m_GrenadeLancee = false;
@@ -332,8 +332,8 @@ namespace Deathless.Jeu
             switch (i)
             {
                 case 0: return m_Action == Action.Dague ? EtatEmplacement.Actif : EtatEmplacement.Pret;
-                case 1: return Recharge(m_RechargeArbalete, B.arbaleteRecharge, out restant, out total, m_Arbalete && m_RechargeArbalete <= 0f);
-                case 2: return Recharge(m_RechargeGrenade, B.grenadeRecharge, out restant, out total, m_Action == Action.Grenade);
+                case 1: return Recharge(m_RechargeArbalete, B.arbaleteRecharge * Facteur(1), out restant, out total, m_Arbalete && m_RechargeArbalete <= 0f);
+                case 2: return Recharge(m_RechargeGrenade, B.grenadeRecharge * Facteur(2), out restant, out total, m_Action == Action.Grenade);
                 default: return EtatEmplacement.Vide;
             }
         }

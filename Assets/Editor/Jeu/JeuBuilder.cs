@@ -706,6 +706,7 @@ namespace Deathless.EditorTools
             nav.saisie = Uxml("Saisie");
             nav.lobby = Uxml("Lobby");
             nav.achat = Uxml("Achat");
+            nav.personnage = Uxml("Personnage");
 
             // NavMesh (géométrie : colliders physiques ; les feuillages ne bloquent pas).
             var navGo = new GameObject("NavMesh");

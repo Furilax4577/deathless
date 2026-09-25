@@ -22,7 +22,11 @@ namespace Deathless.Jeu
         EtatJoueur J => P != null ? P.JoueurLocal : null;
         Heros H => P != null ? P.HerosLocal : null;
 
-        void OnEnable() { DonneesUI.Enregistrer(null, null, null, this); }
+        void OnEnable()
+        {
+            DonneesUI.Enregistrer(null, null, null, this);
+            DonneesUI.Personnage = new MenuPersonnage();   // menu du personnage (Tab / Y)
+        }
 
         void Start()
         {
@@ -31,6 +35,7 @@ namespace Deathless.Jeu
             if (P == null) return;
             P.PartieLancee += () => { ConstruireEmplacements(); DonneesUI.Enregistrer(this, this, this, this); };
             P.NuitCommencee += n => NuitCommencee?.Invoke(n);
+            P.PointCompetenceGagne += n => AudioBank.Jouer2D(SonsDuJeu.PointGagne, 0.7f);
             P.NyxessaTouchee += (d, p) => NyxessaFrappee?.Invoke();
             P.PartieTerminee += () => PartieTerminee?.Invoke();
             m_Lignes = new List<ILigneScore> { new Ligne(this) };

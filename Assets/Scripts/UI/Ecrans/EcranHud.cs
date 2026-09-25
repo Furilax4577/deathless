@@ -39,7 +39,8 @@ namespace Deathless.UI.Ecrans
         string m_ClasseBarre;
         JaugeClasse m_JaugeAffichee = (JaugeClasse)(-1);
         VisualElement m_Barre;
-        VisualElement m_Interaction;
+        VisualElement m_Interaction, m_PointsCompetence;
+        Label m_PointsTexte;
         Label m_InteractionTexte;
         VisualElement m_Reticule;
         VisualElement m_Mort;
@@ -108,6 +109,8 @@ namespace Deathless.UI.Ecrans
             IconesUI.Poser(Racine.Q("potion-icone"), IconesUI.Potion);
             m_Barre = Racine.Q("competences");
             m_Interaction = Racine.Q("interaction");
+            m_PointsCompetence = Racine.Q("points-competence");
+            m_PointsTexte = Racine.Q<Label>("points-texte");
             m_InteractionTexte = Racine.Q<Label>("interaction-texte");
             m_Reticule = Racine.Q("reticule");
             m_Mort = Racine.Q("mort");
@@ -361,6 +364,14 @@ namespace Deathless.UI.Ecrans
             var mort = joueur.EstMort;
             m_Mort.style.display = mort ? DisplayStyle.Flex : DisplayStyle.None;
             if (mort) m_MortTexte.text = "Réapparition dans " + Mathf.CeilToInt(joueur.TempsAvantReapparition) + " s";
+
+            // Points de compétence à dépenser : pastille et invite du menu du personnage (Tab / Y).
+            int points = DonneesUI.Personnage != null ? DonneesUI.Personnage.Points : 0;
+            if (m_PointsCompetence != null)
+            {
+                m_PointsCompetence.style.display = points > 0 ? DisplayStyle.Flex : DisplayStyle.None;
+                if (points > 0) m_PointsTexte.text = points == 1 ? "1 point de compétence" : points + " points de compétence";
+            }
 
             var invite = mort ? null : joueur.InviteInteraction;
             m_Interaction.style.display = string.IsNullOrEmpty(invite) ? DisplayStyle.None : DisplayStyle.Flex;

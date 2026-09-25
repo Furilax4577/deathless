@@ -40,6 +40,9 @@ namespace Deathless.Jeu
         public string classeId = "paladin";
         public float jauge, jaugeMax;    // mana du mage, rage du viking (0 : pas de jauge)
         public bool furtif;              // assassin en mode furtif
+        public int nuitsSurvecues;
+        public int pointsCompetence;     // 1 par jour survécu (crédité à l'aube), dépensés dans le menu du personnage
+        public int[] rangs = new int[4]; // rangs des améliorations de compétence (ArbreCompetences), par index
         public ScoreJoueur score = new ScoreJoueur();
     }
 

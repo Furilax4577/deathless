@@ -108,7 +108,7 @@ namespace Deathless.Jeu
         {
             if (!H.PeutAgir || m_RechargeRugir > 0f || m_Rage < B.rugissementRage) return;
             m_Rage -= B.rugissementRage;
-            m_RechargeRugir = B.rugissementRecharge;
+            m_RechargeRugir = B.rugissementRecharge * Facteur(2);
             m_Action = Action.Rugissement;
             m_Depuis = 0f;
             m_Crie = m_VfxCri = false;
@@ -160,7 +160,7 @@ namespace Deathless.Jeu
                         bool touche = false;
                         foreach (var s in Combat.Ennemis(transform.position, transform.forward, b.hachePortee, b.hacheDemiAngle))
                         {
-                            H.Frapper(s, b.hacheDegats);
+                            H.Frapper(s, b.hacheDegats * Facteur(0));
                             touche = true;
                         }
                         if (touche) { AudioBank.Jouer(SonsDuJeu.Hache, transform.position + transform.forward + Vector3.up, 1f); Diffuser(E_Hache); }
@@ -168,7 +168,7 @@ namespace Deathless.Jeu
                     if (m_Depuis >= b.hacheIntervalle) m_Action = Action.Aucune;
                     break;
                 case Action.Tournante:
-                    m_Rage -= b.tournanteRage * dt;
+                    m_Rage -= b.tournanteRage * Facteur(1) * dt;
                     if (!m_VfxTournante && m_Depuis >= 0.35f && m_Tournante != null && teteHache != null) { m_Tournante.Commencer(transform, teteHache); m_VfxTournante = true; Diffuser(E_TournanteVfx); }
                     if (m_Depuis >= 0.35f && Time.time >= m_ProchainTic)
                     {
@@ -262,7 +262,7 @@ namespace Deathless.Jeu
             int n = 0;
             foreach (var s in Combat.Ennemis(point, m_DirSaut, b.sautRayon, 180f))
             {
-                H.Frapper(s, b.sautDegats);
+                H.Frapper(s, b.sautDegats * Facteur(3));
                 var sq = s.GetComponent<Squelette>();
                 if (sq != null && sq.Vivant) sq.Etourdir(b.sautEtourdi, H.Id);
                 n++;
@@ -323,7 +323,7 @@ namespace Deathless.Jeu
                 case 1: return m_Action == Action.Tournante ? EtatEmplacement.Actif : m_Rage < B.tournanteRageMin ? EtatEmplacement.Indisponible : EtatEmplacement.Pret;
                 case 2:
                 {
-                    var e = Recharge(m_RechargeRugir, B.rugissementRecharge, out restant, out total, m_Action == Action.Rugissement);
+                    var e = Recharge(m_RechargeRugir, B.rugissementRecharge * Facteur(2), out restant, out total, m_Action == Action.Rugissement);
                     return e == EtatEmplacement.Pret && m_Rage < B.rugissementRage ? EtatEmplacement.Indisponible : e;
                 }
                 case 3:

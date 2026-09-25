@@ -75288,6 +75288,7 @@ MonoBehaviour:
   saisie: {fileID: 9197481963319205126, guid: f04995d8bf6b2de47b2f0b01d413cdff, type: 3}
   lobby: {fileID: 9197481963319205126, guid: 4cb2743db4b176044b246d1f903716f0, type: 3}
   achat: {fileID: 9197481963319205126, guid: a6561cbfc46156546a77b9a228ee993c, type: 3}
+  personnage: {fileID: 9197481963319205126, guid: 08ddcb95706c2f44d89ef6ecc5262bd4, type: 3}
 --- !u!114 &864476794
 MonoBehaviour:
   m_ObjectHideFlags: 0

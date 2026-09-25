@@ -23,6 +23,16 @@ namespace Deathless.Jeu
 
         public virtual void Initialiser(Heros heros) { H = heros; }
 
+        /// Rang (0 à 3) de l'amélioration de compétence `index` (ArbreCompetences), achetée avec les points de compétence.
+        protected int Rang(int index)
+        {
+            var e = H != null ? H.EtatJoueur : null;
+            return e != null && e.rangs != null && index >= 0 && index < e.rangs.Length ? e.rangs[index] : 0;
+        }
+
+        /// Facteur de l'amélioration `index` à son rang actuel (1 sans amélioration ; nombre ajouté pour un ajout).
+        protected float Facteur(int index) => ArbreCompetences.Facteur(Id, index, Rang(index));
+
         // ----------------------------------------------------------------- Déplacement demandé à Heros
 
         /// Une action de classe est en cours : pas de saut, pas de sprint, pas d'autre action.

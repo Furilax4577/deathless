@@ -121,7 +121,7 @@ namespace Deathless.Jeu
             if (m_Cercle != null) m_Cercle.Annuler();
             Vector3 cible = Combat.PointVise(H.CameraJeu, transform, b.arcPortee, out _);
             Vector3 depart = m_Encochee != null ? m_Encochee.transform.position : transform.position + Vector3.up * 1.4f + transform.forward * 0.5f;
-            float degats = Mathf.Lerp(b.arcDegatsMin, b.arcDegatsMax, charge);
+            float degats = Mathf.Lerp(b.arcDegatsMin, b.arcDegatsMax, charge) * Facteur(0);
             // Vitesse selon la charge : tir rapide lent (retombe vite), charge complète rapide (file loin et tendu).
             TirerFleche(depart, cible, Mathf.Lerp(b.arcVitesseMin, b.arcVitesseMax, charge), degats, b.arcTete);
             AudioBank.Jouer(charge >= 0.999f ? SonsDuJeu.ArcTirCharge : SonsDuJeu.ArcTir, depart, 0.9f);
@@ -149,7 +149,7 @@ namespace Deathless.Jeu
             if (d.magnitude > b.nueePortee) p = transform.position + d.normalized * b.nueePortee;
             if (Physics.Raycast(p + Vector3.up * 5f, Vector3.down, out var hit, 20f, ~0, QueryTriggerInteraction.Ignore)) p = hit.point;
             m_CentreNuee = p;
-            m_RechargeNuee = b.nueeRecharge;
+            m_RechargeNuee = b.nueeRecharge * Facteur(2);
             m_Action = Action.Nuee;
             m_Depuis = 0f;
             m_NueeLancee = false;
@@ -194,9 +194,10 @@ namespace Deathless.Jeu
             Vector3 cible = Combat.PointVise(H.CameraJeu, transform, b.arcPortee, out _);
             Vector3 depart = transform.position + Vector3.up * 1.3f + avant * 0.4f;
             Vector3 axe = cible - depart;
-            for (int i = 0; i < b.salveFleches; i++)
+            int fleches = b.salveFleches + Mathf.RoundToInt(Facteur(3));
+            for (int i = 0; i < fleches; i++)
             {
-                float a = b.salveFleches > 1 ? Mathf.Lerp(-b.salveEcart, b.salveEcart, i / (float)(b.salveFleches - 1)) : 0f;
+                float a = fleches > 1 ? Mathf.Lerp(-b.salveEcart, b.salveEcart, i / (float)(fleches - 1)) : 0f;
                 Vector3 dir = Quaternion.AngleAxis(a, Vector3.up) * axe;
                 TirerFleche(depart, depart + dir, b.salveVitesse, b.salveDegats, b.arcTete);
             }
@@ -220,7 +221,7 @@ namespace Deathless.Jeu
             switch (m_Action)
             {
                 case Action.Bander:
-                    m_Charge = Mathf.Clamp01(m_Depuis / b.arcCharge);
+                    m_Charge = Mathf.Clamp01(m_Depuis / (b.arcCharge * Facteur(1)));
                     if (m_Cercle != null) m_Cercle.Charge = m_Charge;
                     if (!m_Visee) Reposer();                               // visée lâchée : pas de tir
                     else if (!H.Entrees.AttaqueMaintenue) Lacher();
@@ -299,7 +300,7 @@ namespace Deathless.Jeu
             {
                 case 0: return m_Action == Action.Bander ? EtatEmplacement.Actif : EtatEmplacement.Pret;
                 case 1: return m_Visee ? EtatEmplacement.Actif : EtatEmplacement.Pret;
-                case 2: return Recharge(m_RechargeNuee, B.nueeRecharge, out restant, out total, m_Action == Action.Nuee);
+                case 2: return Recharge(m_RechargeNuee, B.nueeRecharge * Facteur(2), out restant, out total, m_Action == Action.Nuee);
                 case 3: return Recharge(m_RechargeRoulade, B.rouladeRecharge, out restant, out total);
                 default: return EtatEmplacement.Vide;
             }

@@ -68,6 +68,12 @@
         <!-- Gauche, à mi-hauteur : vie des autres joueurs (multijoueur, jusqu'à 3 ; vide en solo ; construite par EcranHud) -->
         <ui:VisualElement name="allies" class="hud-allies" picking-mode="Ignore" />
 
+        <!-- Bas, à gauche, au-dessus du joueur : points de compétence à dépenser (menu du personnage) -->
+        <ui:VisualElement name="points-competence" class="hud-pastille hud-points" picking-mode="Ignore">
+            <ui:Label name="points-texte" text="1 point de compétence" class="hud-points__texte" />
+            <dl:InputPrompt action="Gameplay/CharacterMenu" class="hud-points__invite" />
+        </ui:VisualElement>
+
         <!-- Bas, à gauche : portrait, vie, endurance -->
         <ui:VisualElement class="hud-joueur">
             <ui:VisualElement name="portrait" class="hud-joueur__portrait">

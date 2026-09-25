@@ -105,11 +105,11 @@ namespace Deathless.Jeu
             if (fx != null && fx.gemmes != null) ExplosionFeu.Jouer(point, 2.5f, fx.gemmes);
             AudioBank.Jouer(SonsDuJeu.BouleExplosion, point, 1f);
             int n = 0;
-            if (direct != null && !direct.Mort) { Toucher(direct, b.bouleDegats, point, dir); n++; }
+            if (direct != null && !direct.Mort) { Toucher(direct, b.bouleDegats * Facteur(0), point, dir); n++; }
             foreach (var s in Combat.Ennemis(point, dir, b.bouleRayon, 180f))
             {
                 if (s == direct) continue;
-                Toucher(s, b.bouleDegatsZone, point, dir);
+                Toucher(s, b.bouleDegatsZone * Facteur(0), point, dir);
                 n++;
             }
             if (H.Partie != null) H.Partie.Journal("Boule de feu : explose à " + Vector3.Distance(transform.position, point).ToString("F1") + " m" + (direct != null ? ", coup direct" : "") + ", " + n + " touchés, mana " + m_Mana.ToString("F0"));
@@ -124,7 +124,7 @@ namespace Deathless.Jeu
 
         public override void Temps(float dt)
         {
-            if (m_Action != Action.Cone) m_Mana = Mathf.Min(B.manaMax, m_Mana + B.manaRegen * dt);
+            if (m_Action != Action.Cone) m_Mana = Mathf.Min(B.manaMax, m_Mana + B.manaRegen * Facteur(2) * dt);
         }
 
         public override void Maj(float dt, Vector3 dir)
@@ -140,7 +140,7 @@ namespace Deathless.Jeu
                     if (m_Depuis >= Mathf.Min(b.bouleIntervalle, 0.7f)) m_Action = Action.Aucune;
                     break;
                 case Action.Cone:
-                    m_Mana -= b.coneMana * dt;
+                    m_Mana -= b.coneMana * Facteur(1) * dt;
                     if (pointeBaton != null && m_ConeGo != null)
                     {
                         // Le cône part de la pointe vers la visée (horizontale).

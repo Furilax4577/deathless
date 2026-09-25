@@ -1,0 +1,70 @@
+/* Menu du personnage (Tab / Y) : trois cartes côte à côte (personnage, compétences, inventaire). Conçu pour ×2. */
+.perso {
+    position: absolute;
+    left: 102px;
+    right: 102px;
+    top: 54px;
+    bottom: 120px;
+}
+
+.perso__entete { margin-bottom: var(--dl-space-3); }
+.perso__titre { margin: 0; }
+.perso__aide { margin: 3px 0 0 0; }
+
+.perso__defile { flex-grow: 1; flex-shrink: 1; }
+.perso__colonnes { flex-direction: row; align-items: stretch; margin: 0 -12px; }
+.perso__carte { margin: 0 12px; padding: 30px 30px 24px 30px; background-color: rgba(35, 42, 58, 0.97); }
+.perso__fiche { width: 440px; flex-shrink: 0; }
+.perso__inventaire { width: 380px; flex-shrink: 0; }
+.perso__competences { flex-grow: 1; flex-shrink: 1; flex-basis: 0; min-width: 560px; }
+
+/* Personnage */
+.perso__identite { flex-direction: row; align-items: center; margin: 12px 0 18px 0; }
+.perso__embleme { width: 96px; height: 96px; margin-right: 18px; }
+.perso__noms { flex-shrink: 1; }
+.perso__nom { margin: 0; }
+.perso__classe { margin: 3px 0 0 0; color: var(--dl-color-gold); }
+.perso__carac-ligne { flex-direction: row; justify-content: space-between; padding: 9px 0; border-bottom-width: 1px; border-bottom-color: var(--dl-color-line); }
+.perso__carac-libelle { margin: 0; padding: 0; color: var(--dl-color-text-muted); }
+.perso__carac-valeur { margin: 0; padding: 0; -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); }
+
+/* Inventaire : cases vides */
+.perso__cases { flex-direction: row; flex-wrap: wrap; margin: 12px -6px 6px -6px; }
+.perso__case { width: 96px; height: 96px; margin: 6px; border-radius: var(--dl-radius-md); border-width: 2px; border-color: var(--dl-color-border); background-color: rgba(16, 19, 27, 0.6); }
+.perso__vide { margin: 6px 0 0 0; }
+
+/* Compétences */
+.perso__competences-entete { flex-direction: row; align-items: center; justify-content: space-between; }
+.perso__points {
+    margin: 0; padding: 6px 18px; border-radius: 21px;
+    background-color: rgba(16, 19, 27, 0.8);
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+    font-size: var(--dl-text-body); color: var(--dl-color-text-muted);
+}
+.perso__points--dispo { color: var(--dl-color-gold); border-width: 2px; border-color: var(--dl-color-gold); }
+.perso__regle { margin: 6px 0 12px 0; white-space: normal; }
+.perso__ligne { min-height: 96px; padding-top: 9px; padding-bottom: 9px; padding-left: 18px; }
+.perso__ligne-icone { width: 60px; height: 60px; margin-right: 18px; flex-shrink: 0; }
+.perso__ligne-textes { flex-direction: column; flex-grow: 1; flex-shrink: 1; }
+.perso__ligne-haut { flex-direction: row; align-items: center; }
+.perso__ligne-nom { margin: 0 18px 0 0; font-size: var(--dl-text-large); }
+.perso__rangs { flex-direction: row; align-items: center; }
+.perso__rang { width: 18px; height: 18px; margin-right: 6px; border-radius: 4px; rotate: 45deg; border-width: 2px; border-color: var(--dl-color-gold); background-color: rgba(0, 0, 0, 0); }
+.perso__rang--plein { background-color: var(--dl-color-gold); }
+.perso__ligne-desc { white-space: normal; margin: 6px 0 0 0; }
+.perso__ligne--impossible .perso__ligne-nom { color: var(--dl-color-text-muted); }
+.perso__ligne .dl-menu-item__prompt { margin-left: var(--dl-space-3); }
+
+/* Message : place réservée en permanence */
+.perso__message { margin: var(--dl-space-3) 0 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--dl-color-text-muted); }
+.perso__message--vide { color: rgba(0, 0, 0, 0); }
+.perso__message--refus { color: #ff8a70; }
+.perso__message--ok { color: var(--dl-color-gold); }
+
+/* ×3 : on réorganise (personnage et compétences côte à côte, inventaire dessous), le contenu défile */
+.dl-scale-3 .perso { left: 30px; right: 30px; top: 24px; bottom: 96px; }
+.dl-scale-3 .perso__aide { display: none; }
+.dl-scale-3 .perso__colonnes { flex-wrap: wrap; }
+.dl-scale-3 .perso__fiche { width: 380px; margin-bottom: 18px; }
+.dl-scale-3 .perso__competences { min-width: 0; margin-bottom: 18px; }
+.dl-scale-3 .perso__inventaire { width: 100%; }

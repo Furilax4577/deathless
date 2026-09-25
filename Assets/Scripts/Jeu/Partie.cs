@@ -453,6 +453,14 @@ namespace Deathless.Jeu
                 Etat.comptePret = false;
                 foreach (var j in Etat.joueurs) j.pret = false;
             }
+            if (nouvelle == Phase.Aube && m_Local != null && ancienne == Phase.Nuit)
+            {
+                // Wiki : 1 point de compétence par jour survécu, crédité à l'aube (chaque poste crédite son joueur).
+                m_Local.pointsCompetence++;
+                m_Local.nuitsSurvecues++;
+                PointCompetenceGagne?.Invoke(m_Local.pointsCompetence);
+                Journal("Point de compétence : " + m_Local.pointsCompetence + " à dépenser");
+            }
             if (nouvelle == Phase.Aube && !ClientReseau)
             {
                 // Wiki : un joueur mort revient au début de la nouvelle journée, même si son délai n'est pas écoulé.
@@ -515,6 +523,28 @@ namespace Deathless.Jeu
 
         /// Un palier vient d'être acheté (tous les postes) : amélioration, nouveau palier, pseudo de l'acheteur.
         public event Action<Amelioration, int, string> PalierAchete;
+
+        /// Un point de compétence vient d'être gagné (joueur local) : total à dépenser.
+        public event Action<int> PointCompetenceGagne;
+
+        /// Menu du personnage : dépense d'un point pour le rang suivant de l'amélioration `index` (joueur local ; les effets
+        /// sont simulés par son poste, comme ses attaques).
+        public string AmeliorerCompetence(int index, out bool refus)
+        {
+            refus = true;
+            var j = m_Local;
+            if (j == null) return "Aucun personnage.";
+            var defs = ArbreCompetences.De(j.classeId);
+            if (index < 0 || index >= defs.Length) return "Rien à améliorer ici.";
+            if (j.rangs == null || j.rangs.Length < defs.Length) System.Array.Resize(ref j.rangs, Mathf.Max(4, defs.Length));
+            if (j.rangs[index] >= ArbreCompetences.RangMax) return "Rang maximal atteint.";
+            if (j.pointsCompetence < ArbreCompetences.CoutParRang) return "Pas de point de compétence à dépenser.";
+            j.pointsCompetence -= ArbreCompetences.CoutParRang;
+            j.rangs[index]++;
+            refus = false;
+            Journal("Compétence améliorée : " + defs[index].nom + " rang " + j.rangs[index]);
+            return defs[index].nom + " : rang " + j.rangs[index] + ".";
+        }
 
         public int PalierDe(Amelioration a) => a == Amelioration.Missiles ? Etat.nyxessa.palierMissiles : Etat.nyxessa.palierBouclier;
 

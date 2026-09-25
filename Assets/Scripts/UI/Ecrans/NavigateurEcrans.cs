@@ -32,6 +32,8 @@ namespace Deathless.UI.Ecrans
         public VisualTreeAsset lobby;
         [Tooltip("Menu d'achat (relique, taverne) : Assets/UI/Screens/Achat/Achat.uxml.")]
         public VisualTreeAsset achat;
+        [Tooltip("Menu du personnage (Tab / Y) : Assets/UI/Screens/Personnage/Personnage.uxml.")]
+        public VisualTreeAsset personnage;
 
         public EcranMenuPrincipal MenuPrincipal { get; private set; }
         public EcranOptions Options { get; private set; }
@@ -43,6 +45,7 @@ namespace Deathless.UI.Ecrans
         public EcranSaisie Saisie { get; private set; }
         public EcranLobby Lobby { get; private set; }
         public EcranAchat Achat { get; private set; }
+        public EcranPersonnage Personnage { get; private set; }
 
         readonly List<Ecran> m_Pile = new List<Ecran>();
         readonly List<Ecran> m_Tous = new List<Ecran>();
@@ -77,6 +80,7 @@ namespace Deathless.UI.Ecrans
             Lobby = Creer(new EcranLobby(), lobby, conteneur);
             Saisie = Creer(new EcranSaisie(), saisie, conteneur);
             Achat = Creer(new EcranAchat(), achat, conteneur);
+            Personnage = Creer(new EcranPersonnage(), personnage, conteneur);
 
             UINavigation.SetupScreen(m_Racine);
             UIScale.TagRoot(m_Racine);
@@ -98,6 +102,7 @@ namespace Deathless.UI.Ecrans
 
             DonneesUI.Changees += EvaluerEcranDeBase;
             DonneesUI.MenuAchatDemande += OuvrirAchat;
+            DonneesUI.MenuPersonnageDemande += OuvrirPersonnage;
             EvaluerEcranDeBase();
         }
 
@@ -105,6 +110,7 @@ namespace Deathless.UI.Ecrans
         {
             DonneesUI.Changees -= EvaluerEcranDeBase;
             DonneesUI.MenuAchatDemande -= OuvrirAchat;
+            DonneesUI.MenuPersonnageDemande -= OuvrirPersonnage;
             Suivre(null);
             UIScale.Changed -= OnEchelle;
             InputDeviceWatcher.Changed -= OnAppareil;
@@ -284,6 +290,15 @@ namespace Deathless.UI.Ecrans
             if (menu == null || achat == null || Sommet != Hud || BasculeRecente) return;
             Achat.Afficher(menu);
             Ouvrir(Achat);
+        }
+
+        /// Le jeu demande le menu du personnage (Tab / Y) : ouvert par-dessus le HUD seulement.
+        void OuvrirPersonnage()
+        {
+            var menu = DonneesUI.Personnage;
+            if (menu == null || personnage == null || Sommet != Hud || BasculeRecente) return;
+            Personnage.Afficher(menu);
+            Ouvrir(Personnage);
         }
 
         void OnEchelle(int _) => UIScale.TagRoot(m_Racine);

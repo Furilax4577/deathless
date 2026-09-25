@@ -26,6 +26,9 @@ namespace Deathless.UI.Donnees
         public static event Action<IMenuAchat> MenuAchatDemande;
         public static void OuvrirMenuAchat(IMenuAchat menu) => MenuAchatDemande?.Invoke(menu);
 
+        /// Menu du personnage (posé par le jeu en partie ; null sinon).
+        public static IMenuPersonnage Personnage { get; set; }
+
         /// Le jeu demande l'ouverture du menu du personnage (touche Tab, Y, Triangle).
         public static event Action MenuPersonnageDemande;
         public static void OuvrirMenuPersonnage() => MenuPersonnageDemande?.Invoke();
