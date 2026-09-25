@@ -148,8 +148,12 @@ public class RugissementCrane : MonoBehaviour
         }
         oeilG = poidsG > 0f ? oeilG / poidsG : new Vector3(-0.15f, 0.1f, 0.35f);
         oeilD = poidsD > 0f ? oeilD / poidsD : new Vector3(0.15f, 0.1f, 0.35f);
+        // Les orbites sont posées sur la surface du visage (la forme cuite du crâne n'a pas de creux lisibles aux yeux :
+        // sans cela le centre restait 12 cm sous la surface et l'orbite ne s'assombrissait presque pas).
+        oeilG = SurFace(pts, oeilG);
+        oeilD = SurFace(pts, oeilD);
         float yOeil = (oeilG.y + oeilD.y) * 0.5f;
-        const float rayonOrbite = 0.12f;
+        const float rayonOrbite = 0.145f;
 
         // Mandibule seule : sous un plan de coupe incliné, à la ligne des dents devant (planMachoire) et qui remonte vers
         // l'arrière jusqu'aux condyles (à hauteur des oreilles, sous les orbites) ; pivot aux condyles.
@@ -173,8 +177,10 @@ public class RugissementCrane : MonoBehaviour
             float creux = Mathf.Max(Mathf.Clamp01(1f - Vector3.Distance(p, oeilG) / rayonOrbite), Mathf.Clamp01(1f - Vector3.Distance(p, oeilD) / rayonOrbite));
             if (creux > 0f)
             {
-                c = Color.Lerp(c, Orbite, Mathf.SmoothStep(0f, 1f, creux));
-                p -= (nrm[i].sqrMagnitude > 0.5f ? nrm[i] : Vector3.forward) * 0.04f * creux;   // enfoncées
+                // Orbites nettement plus sombres (fond presque noir : ombre du thème Rage × 0,4) et plus creusées.
+                c = Color.Lerp(c, Orbite, Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(creux * 1.8f)));
+                if (creux > 0.4f) c = Color.Lerp(Orbite, Orbite * 0.4f, (creux - 0.4f) / 0.6f);
+                p -= (nrm[i].sqrMagnitude > 0.5f ? nrm[i] : Vector3.forward) * 0.09f * creux;   // enfoncées
             }
             bool bas = mandibule(pts[i]);
             Partie partie = bas ? machoire : crane;
@@ -207,11 +213,25 @@ public class RugissementCrane : MonoBehaviour
             {
                 float u = j / 9f;                     // 0 = extérieur, 1 = intérieur (près du nez)
                 float x = oeil.x + cote * Mathf.Lerp(0.16f, -0.04f, u);
-                float y = oeil.y + Mathf.Lerp(0.16f, 0.09f, u);
-                Vector3 p = new Vector3(x, y, oeil.z + 0.05f);
+                // Juste sous le bord du casque, plus bas côté nez (froncées) ; dessous sombre, arête claire au-dessus.
+                float y = oeil.y + Mathf.Lerp(0.115f, 0.05f, u);
+                Vector3 p = new Vector3(x, y, oeil.z + 0.03f);
                 Vector3 n = new Vector3(cote * 0.3f, 0.4f, 1f).normalized;
-                crane.Ajouter(p * taille, n, Dark, 1.7f, Ronde);
-                crane.Ajouter((p + new Vector3(0f, 0.035f, -0.01f)) * taille, n, Mid, 1.3f, Ronde);
+                crane.Ajouter(p * taille, n, Orbite, 2.2f, Ronde);
+                crane.Ajouter((p + new Vector3(0f, 0.04f, 0.01f)) * taille, n, Pale, 1.7f, Ronde);
+            }
+        }
+        // Lueur au fond des orbites : trois gemmes rouge pâle très claires (cœur du thème Rage, HDR), enfoncées ; lisibles
+        // de loin sans lumière supplémentaire.
+        foreach (int cote in new[] { -1, 1 })
+        {
+            Vector3 oeil = cote < 0 ? oeilG : oeilD;
+            Vector3 dedans = new Vector3(cote * 0.3f, 0.1f, 1f).normalized;
+            Color lueur = VfxPalette.Couleur(VfxTheme.Rage, VfxRole.Coeur, new Color(1f, 0.45f, 0.35f)) * 1.8f;
+            for (int j = 0; j < 3; j++)
+            {
+                Vector3 p = oeil - dedans * 0.07f + new Vector3((j - 1) * 0.022f, (j == 1 ? 0.012f : -0.006f), 0f);
+                crane.Ajouter(p * taille, dedans, lueur, 0.95f, Ronde);
             }
         }
         // Arête du nez et pommettes en relief.
@@ -230,10 +250,10 @@ public class RugissementCrane : MonoBehaviour
         float zBouche = zAvant - 0.03f;
         for (int j = 0; j < 7; j++)
         {
-            float x = Mathf.Lerp(-0.15f, 0.15f, j / 6f);
-            float zz = zBouche - 0.05f * Mathf.Abs(x / 0.15f);   // rangée légèrement arrondie
-            crane.Ajouter(new Vector3(x, planMachoire + 0.03f, zz) * taille, Vector3.forward, Ivoire, 1.35f, Dent);
-            machoire.Ajouter(new Vector3(x, planMachoire - 0.03f, zz) * taille, Vector3.forward, Ivoire, 1.25f, Dent);
+            float x = Mathf.Lerp(-0.17f, 0.17f, j / 6f);
+            float zz = zBouche + 0.02f - 0.05f * Mathf.Abs(x / 0.17f);   // rangée légèrement arrondie, un peu avancée
+            crane.Ajouter(new Vector3(x, planMachoire + 0.03f, zz) * taille, Vector3.forward, IvoireClair, 1.9f, Dent);
+            machoire.Ajouter(new Vector3(x, planMachoire - 0.03f, zz) * taille, Vector3.forward, Ivoire, 1.8f, Dent);
         }
 
         // Heaume procédural d'origine (nasal, cornes Bézier) : seulement sans heaume cuit.
@@ -301,6 +321,16 @@ public class RugissementCrane : MonoBehaviour
 
         // Lumière : VfxLumiere (thème Rage), allumée par Rugissement.Jouer() pendant la séquence.
         Refresh(0f);
+    }
+
+    // Point du visage le plus en avant autour de (x, y) de `oeil` (même x, y ; z de la surface).
+    private static Vector3 SurFace(Vector3[] pts, Vector3 oeil)
+    {
+        float z = float.NegativeInfinity;
+        foreach (Vector3 p in pts)
+            if (Mathf.Abs(p.x - oeil.x) < 0.06f && Mathf.Abs(p.y - oeil.y) < 0.06f && p.z > z)
+                z = p.z;
+        return float.IsNegativeInfinity(z) ? oeil : new Vector3(oeil.x, oeil.y, z);
     }
 
     private void Materialiser(Partie p, string nom)

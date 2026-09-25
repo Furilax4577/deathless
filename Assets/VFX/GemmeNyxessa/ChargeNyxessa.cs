@@ -7,8 +7,8 @@ using UnityEngine;
 // détruit. Utilisé par Nyxessa.EnvoyerCharge (ouverture du portail) et Nyxessa.ReprendreCharge (fermeture).
 public class ChargeNyxessa : MonoBehaviour
 {
-    private const int Gemmes = 240;
-    private const float Queue = 0.38f;       // longueur de la queue en fraction du trajet
+    private const int Gemmes = 480;
+    private const float Queue = 0.45f;       // longueur de la queue en fraction du trajet
     private const float Resorption = 0.35f;  // la queue finit d'arriver après la tête (s)
 
     private Vector3 p0, p1, p2, p3;
@@ -63,10 +63,10 @@ public class ChargeNyxessa : MonoBehaviour
         {
             float r = Random.value;
             retard[i] = r * r * Queue;              // plus de gemmes près de la tête
-            ecart[i] = Random.insideUnitSphere * Mathf.Lerp(0.08f, 0.35f, r);
+            ecart[i] = Random.insideUnitSphere * Mathf.Lerp(0.14f, 0.7f, r);
             rotation[i] = Random.rotation;
             axe[i] = Random.onUnitSphere;
-            taille[i] = Random.Range(0.07f, 0.12f);
+            taille[i] = Random.Range(0.08f, 0.14f);
         }
         vertices = new Vector3[Gemmes * LowPolyGem.VerticesPerGem];
         colors = new Color[vertices.Length];
@@ -80,7 +80,7 @@ public class ChargeNyxessa : MonoBehaviour
         mr.sharedMaterial = materiau;
         mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         mr.receiveShadows = false;
-        lumiere = VfxLumiere.Creer(transform, Vector3.zero, VfxTheme.Nyxessa, VfxTailleLumiere.Moyenne);
+        lumiere = VfxLumiere.Creer(transform, Vector3.zero, VfxTheme.Nyxessa, VfxTailleLumiere.Grande);
         Dessiner();
     }
 
@@ -121,7 +121,7 @@ public class ChargeNyxessa : MonoBehaviour
             float q = retard[i] / Queue;                          // 0 tête, 1 bout de la queue
             float presence = u <= 0f ? 0f : Mathf.Clamp01(u / 0.05f);
             if (u >= 1f) presence *= Mathf.Clamp01(1f - (u - 1f) / 0.12f);
-            float s = taille[i] * Mathf.Lerp(1.8f, 0.3f, q) * presence;
+            float s = taille[i] * Mathf.Lerp(2.6f, 0.35f, q) * presence;
             if (s <= 0.002f)
             {
                 LowPolyGem.Write(vertices, colors, i, Vector3.zero, 0f, Vector3.one, Quaternion.identity, Color.black, LowPolyGem.DefaultLight);
@@ -129,7 +129,7 @@ public class ChargeNyxessa : MonoBehaviour
             }
             // La queue ondule un peu autour de l'arc ; la tête reste serrée.
             Vector3 p = Arc(u) + ecart[i] * (0.4f + q) + Vector3.up * Mathf.Sin(t * 9f + i) * 0.04f * q;
-            Color c = q < 0.15f ? Color.Lerp(eclat, coeur, q / 0.15f) : q < 0.55f ? Color.Lerp(coeur, vif, (q - 0.15f) / 0.4f) : Color.Lerp(vif, basse, (q - 0.55f) / 0.45f);
+            Color c = q < 0.15f ? Color.Lerp(eclat * 1.35f, coeur, q / 0.15f) : q < 0.55f ? Color.Lerp(coeur, vif, (q - 0.15f) / 0.4f) : Color.Lerp(vif, basse, (q - 0.55f) / 0.45f);
             Quaternion r = Quaternion.AngleAxis(age * 420f + i * 17f, axe[i]) * rotation[i];
             LowPolyGem.Write(vertices, colors, i, p, s, new Vector3(0.7f, 1.3f, 0.7f), r, c, LowPolyGem.DefaultLight);
         }
