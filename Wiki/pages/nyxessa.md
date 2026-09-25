@@ -34,4 +34,15 @@ Nyxessa tire des missiles en forme de crâne faits de gemmes vertes, une fois et
 
 ## Bouclier
 
-Un bouclier cylindrique de gemmes peut protéger Nyxessa {effet validé}. Sa couleur indique sa solidité : bleu quand il est plein, orange quand il est entamé, rouge quand il est près de céder. Les règles (vie, recharge, qui le déclenche) sont {à confirmer}.
+Un bouclier cylindrique de gemmes en lévitation protège Nyxessa {effet validé}. Sa couleur indique sa solidité : bleu quand il est plein, orange quand il est entamé, rouge quand il est près de céder.
+
+### Règles {décidé}
+
+- **Invocation** : c'est un **villageois sorcier** qui invoque le bouclier.
+- **Encaissement** : la quantité de dégâts que le bouclier peut absorber est **améliorable**.
+- **Riposte** : quand il est frappé, le bouclier **renvoie des dégâts** à l'attaquant.
+
+### À décider
+
+- **Signe visuel de l'amélioration** {à confirmer} : un bouclier amélioré montre soit des gemmes plus **intenses** (plus lumineuses), soit des gemmes **plus nombreuses** en lévitation.
+- Paliers, valeurs d'encaissement, dégâts renvoyés, durée et moment de l'invocation : {à confirmer}.

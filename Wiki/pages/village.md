@@ -23,6 +23,11 @@ Ces éléments ont été essayés puis retirés du village le 25/09/2026 : l'enc
 
 Les portes des maisons sont à l'échelle du joueur : 2,1 m pour un personnage de 2 m. Les maisons font donc 6 à 6,5 m de large.
 
+## Villageois
+
+- **Sorcier** {décidé} : un villageois sorcier invoque le bouclier de Nyxessa. Voir [Nyxessa](nyxessa.md).
+- Autres villageois : {à confirmer}.
+
 ## Rôle des maisons {à confirmer}
 
-Les maisons n'ont pas encore de rôle de jeu.
+Les maisons n'ont pas encore de rôle de jeu. Elles pourraient abriter les villageois.
