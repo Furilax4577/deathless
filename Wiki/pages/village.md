@@ -44,7 +44,7 @@ Les portes des maisons sont à l'échelle du joueur : 2,1 m pour un personnage d
 
 ## Intérieurs {décidé}
 
-Les maisons des villageois ont un **intérieur** où l'on entre par la porte : la boutique du druide, celle du mécano, la forge du forgeron et la maison du sorcier. Aménagement : {à confirmer}.
+Les maisons des villageois ont un **intérieur** où l'on entre par la porte : la boutique du druide (fioles, herbes, chaudron), celle du mécano (établi, engrenages, armes exposées), la forge du forgeron (enclume, braises) et la maison du sorcier (pupitre et carte du village, éclat de Nyx, croquis de la relique, grimoires). Les portes restent ouvertes, le battant presque contre le mur, sur de beaux gonds. Les squelettes n'entrent pas {décidé}.
 
 ## Rôle des maisons {décidé}
 
