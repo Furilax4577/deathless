@@ -867,11 +867,11 @@
     "id": "sorcier_incantation",
     "nom": "Sorcier — incantation du bouclier (boucle)",
     "categorie": "Nyxessa et portail",
-    "usage": "Le villageois sorcier invoque le bouclier de Nyxessa (boucle de 3 s, pendant l'incantation), avant « Bouclier de Nyxessa — levée ».",
+    "usage": "Le villageois sorcier invoque le bouclier de Nyxessa : boucle jouée tant qu'il incante près de Nyxessa, la nuit.",
     "fichier": "Relic/sorcerer_cast_loop.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "disponible"
+    "statut": "utilise"
   },
   {
     "id": "nyxessa_destruction",
