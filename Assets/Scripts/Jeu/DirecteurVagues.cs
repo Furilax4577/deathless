@@ -46,17 +46,38 @@ namespace Deathless.Jeu
             {
                 case Phase.Crepuscule: Preparer(P.Etat.nuit); break;
                 case Phase.Nuit:
-                    foreach (int c in P.Etat.vagues.clairieresActives) Zone(c)?.Activer();
+                    foreach (int c in P.Etat.vagues.clairieresActives) ActionZone(c, 1);
                     break;
                 case Phase.Aube: Aube(); break;
                 case Phase.Terminee:
                     m_AFaire.Clear();
-                    foreach (var z in zones) if (z != null) z.Eteindre();
+                    for (int i = 0; i < zones.Length; i++) ActionZone(i, 3);
                     break;
             }
         }
 
         ZoneApparition Zone(int i) => zones != null && i >= 0 && i < zones.Length ? zones[i] : null;
+
+        /// Zone d'apparition : 0 annoncée, 1 active, 2 impulsion de vague, 3 éteinte. En réseau, l'hôte la joue aussi chez
+        /// les clients (PartieReseau).
+        public void ActionZone(int i, int action)
+        {
+            var z = Zone(i);
+            if (z == null) return;
+            switch (action)
+            {
+                case 0: z.Annoncer(); break;
+                case 1: z.Activer(); break;
+                case 2: z.Pulse(); break;
+                case 3: z.Eteindre(); break;
+            }
+            if (Deathless.Reseau.ReseauJeu.EnPartie && Deathless.Reseau.ReseauJeu.Autorite && Deathless.Reseau.PartieReseau.Instance != null)
+                Deathless.Reseau.PartieReseau.Instance.Zone(i, action);
+        }
+
+        /// Client : squelettes tenus par l'hôte (marionnettes), pour les classes et les vues de ce poste.
+        public void AjouterDistant(Squelette s) { if (s != null && !m_Vivants.Contains(s)) m_Vivants.Add(s); }
+        public void RetirerDistant(Squelette s) { m_Vivants.Remove(s); }
 
         /// Crépuscule : plan de la nuit et annonce des clairières actives.
         void Preparer(int nuit)
@@ -72,7 +93,7 @@ namespace Deathless.Jeu
                 v.clairieresActives.Add(toutes[k]);
                 toutes.RemoveAt(k);
             }
-            foreach (int c in v.clairieresActives) Zone(c)?.Annoncer();
+            foreach (int c in v.clairieresActives) ActionZone(c, 0);
 
             bool quatre = nuit >= b.nuitQuatreVagues;
             m_Departs = quatre ? b.departsQuatreVagues : b.departsTroisVagues;
@@ -131,7 +152,7 @@ namespace Deathless.Jeu
             {
                 m_VagueLancee++;
                 v.vague = m_VagueLancee;
-                foreach (int c in v.clairieresActives) Zone(c)?.Pulse();
+                foreach (int c in v.clairieresActives) ActionZone(c, 2);
                 AudioBank.Jouer2D(SonsDuJeu.Vague, 0.8f);
                 P.Journal("Vague " + m_VagueLancee + " / " + m_Departs.Length);
             }
@@ -168,7 +189,8 @@ namespace Deathless.Jeu
             GameObject prefab = type == TypeEnnemi.Guerrier ? prefabGuerrier : type == TypeEnnemi.Golem ? prefabGolem : type == TypeEnnemi.Necromancien ? prefabNecromancien : prefabSbire;
             if (prefab == null) return null;
             Vector3 vers = (P != null && P.nyxessa != null ? P.nyxessa.transform.position : Vector3.zero) - point; vers.y = 0f;
-            var go = Instantiate(prefab, point, vers.sqrMagnitude > 0.01f ? Quaternion.LookRotation(vers) : Quaternion.identity, conteneur);
+            bool reseau = Deathless.Reseau.ReseauJeu.EnPartie;
+            var go = Instantiate(prefab, point, vers.sqrMagnitude > 0.01f ? Quaternion.LookRotation(vers) : Quaternion.identity, reseau ? null : conteneur);
             var sq = go.GetComponent<Squelette>();
             sq.type = type;
             sq.elite = elite;
@@ -181,6 +203,13 @@ namespace Deathless.Jeu
             sq.Initialiser(stats, mult);
             sq.Retire += OnRetire;
             m_Vivants.Add(sq);
+            // Multijoueur : l'hôte le fait apparaître chez tous (position et animations répliquées, IA ici seulement).
+            var er = go.GetComponent<Deathless.Reseau.EnnemiReseau>();
+            if (reseau && er != null)
+            {
+                er.Preparer(type, elite);
+                go.GetComponent<Unity.Netcode.NetworkObject>().Spawn(true);
+            }
             if (type == TypeEnnemi.Golem || type == TypeEnnemi.Necromancien) P?.Journal("Boss : " + type + " sort de terre");
             return sq;
         }
@@ -210,7 +239,7 @@ namespace Deathless.Jeu
         void Aube()
         {
             m_AFaire.Clear();
-            foreach (var z in zones) if (z != null && z.Etat != EtatZone.Eteinte) z.Eteindre();
+            for (int i = 0; i < zones.Length; i++) if (Zone(i) != null && Zone(i).Etat != EtatZone.Eteinte) ActionZone(i, 3);
             var restants = new List<Squelette>(m_Vivants);
             float etal = Mathf.Min(B.etalementAube, B.Duree(Phase.Aube) * 0.8f);
             foreach (var s in restants)

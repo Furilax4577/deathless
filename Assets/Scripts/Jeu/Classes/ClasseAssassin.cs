@@ -94,6 +94,8 @@ namespace Deathless.Jeu
         /// Repéré par un squelette : sortie du mode furtif.
         public void Reperer()
         {
+            // Multijoueur : repéré chez l'hôte (marionnette) ; c'est son propriétaire qui sort du mode furtif.
+            if (H != null && H.Distant) { H.GetComponent<Deathless.Reseau.HerosReseau>()?.SignalerRepere(); return; }
             m_DernierCombat = Time.time;
             if (!m_Furtif) return;
             SortirFurtif();
@@ -266,12 +268,30 @@ namespace Deathless.Jeu
                         m_GrenadeLancee = true;
                         Vector3 depart = main != null ? main.position : transform.position + Vector3.up * 1.5f;
                         m_Fumigene.Lancer(depart, m_CibleGrenade, 0.6f);
+                        Deathless.Reseau.HerosReseau.Local(H)?.Fumee(depart, m_CibleGrenade, 0.6f);
                         AudioBank.Jouer(SonsDuJeu.GrenadeLancer, depart, 0.8f);
                         Invoke(nameof(SonFumee), 0.6f);
                     }
                     if (m_Depuis >= 1.1f) m_Action = Action.Aucune;
                     break;
             }
+        }
+
+        // ----------------------------------------------------------------- Multijoueur (marionnette)
+
+        /// Marionnette : mode furtif du propriétaire (visuel ici ; chez l'hôte, les squelettes en tiennent compte).
+        public void ForcerFurtifDistant(bool furtif)
+        {
+            if (furtif == m_Furtif) return;
+            if (furtif) EntrerFurtif(); else SortirFurtif();
+        }
+
+        /// Marionnette : grenade fumigène du propriétaire (le nuage cache aussi des squelettes de l'hôte).
+        public void LancerFumeeDistante(Vector3 depart, Vector3 cible, float duree)
+        {
+            if (m_Fumigene == null) return;
+            m_Fumigene.Lancer(depart, cible, duree);
+            AudioBank.Jouer(SonsDuJeu.GrenadeLancer, depart, 0.8f);
         }
 
         void SonFumee() => AudioBank.Jouer(SonsDuJeu.Fumee, m_CibleGrenade, 1f);
@@ -283,6 +303,7 @@ namespace Deathless.Jeu
                 // Esquive pendant le geste : la grenade part quand même, sous ses pieds.
                 m_GrenadeLancee = true;
                 m_Fumigene.Lancer(transform.position + Vector3.up, transform.position + transform.forward, 0.3f);
+                Deathless.Reseau.HerosReseau.Local(H)?.Fumee(transform.position + Vector3.up, transform.position + transform.forward, 0.3f);
             }
             m_Action = Action.Aucune;
         }

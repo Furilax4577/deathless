@@ -17,8 +17,25 @@ namespace Deathless.Jeu
         SkullMissileVisual m_Visuel;
         AudioSource m_Boucle;
         bool m_Fini;
+        bool m_Visuel_Seul;
+
+        /// Multijoueur (client) : le même vol que chez l'hôte, sans dégâts (l'hôte les applique).
+        public static MissileCrane TirerVisuel(Vector3 depart, Sante cible, float vitesse, float guidage, bool parNyxessa)
+        {
+            var m = Creer(depart, cible, 0f, vitesse, guidage, Equipe.Relique, null, parNyxessa);
+            m.m_Visuel_Seul = true;
+            return m;
+        }
 
         public static MissileCrane Tirer(Vector3 depart, Sante cible, float degats, float vitesse, float guidage, Equipe equipe, GameObject source, bool parNyxessa)
+        {
+            var m = Creer(depart, cible, degats, vitesse, guidage, equipe, source, parNyxessa);
+            // Multijoueur : l'hôte fait voir le même missile aux clients.
+            if (Deathless.Reseau.ReseauJeu.EnPartie && Deathless.Reseau.ReseauJeu.Autorite) Deathless.Reseau.PartieReseau.Instance?.Missile(depart, cible, vitesse, guidage, parNyxessa);
+            return m;
+        }
+
+        static MissileCrane Creer(Vector3 depart, Sante cible, float degats, float vitesse, float guidage, Equipe equipe, GameObject source, bool parNyxessa)
         {
             var go = new GameObject(parNyxessa ? "MissileNyxessa" : "MissileNecromancien");
             go.transform.position = depart;
@@ -76,7 +93,7 @@ namespace Deathless.Jeu
         void Arriver()
         {
             m_Fini = true;
-            if (m_Cible != null && !m_Cible.Mort && (m_Cible.transform.position + Vector3.up - transform.position).sqrMagnitude < 4f)
+            if (!m_Visuel_Seul && m_Cible != null && !m_Cible.Mort && (m_Cible.transform.position + Vector3.up - transform.position).sqrMagnitude < 4f)
             {
                 m_Cible.Encaisser(new InfoDegats
                 {

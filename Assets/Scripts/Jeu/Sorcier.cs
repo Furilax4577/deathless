@@ -191,6 +191,7 @@ namespace Deathless.Jeu
         void Update()
         {
             if (!m_Pret || P == null) return;
+            if (Partie.ClientReseau) { SuivreHote(); return; }
             float vitesse = 0f;
             switch (m_Etat)
             {
@@ -203,6 +204,7 @@ namespace Deathless.Jeu
                         m_Pivot = 0f;
                         // Il lève son bâton (invocation, le temps que le bouclier monte), puis incante en boucle.
                         if (animator != null) { animator.SetTrigger(P_Invoque); animator.SetBool(P_Cone, true); }
+                        Deathless.Reseau.PartieReseau.Instance?.SorcierInvoque();
                         m_Boucle = AudioBank.Boucle(SonsDuJeu.SorcierIncantation, transform, 0.35f);
                         if (P.Etat.phase == Phase.Nuit && Bouclier != null) Bouclier.Lever();
                         P.Journal("Sorcier : incante près de Nyxessa");
@@ -256,6 +258,69 @@ namespace Deathless.Jeu
             // En arrivant, il se retourne (demi-tour en un peu plus d'une seconde), puis ne bouge plus que doucement.
             transform.rotation = Quaternion.RotateTowards(transform.rotation, cible, 160f * dt);
         }
+
+        // ----------------------------------------------------------------- Client d'une partie réseau (l'hôte fait foi)
+
+        Etat m_EtatVu = Etat.Maison;
+
+        /// Client : marionnette du sorcier de l'hôte (état, position, orientation, vitesse de marche : PartieReseau).
+        void SuivreHote()
+        {
+            var r = Deathless.Reseau.PartieReseau.Instance;
+            if (r == null) return;
+            var e = (Etat)r.SorcierEtat.Value;
+            if (e != m_EtatVu)
+            {
+                var avant = m_EtatVu;
+                m_EtatVu = e;
+                m_Etat = e;
+                switch (e)
+                {
+                    case Etat.Maison:
+                        ArreterBoucle();
+                        if (animator != null) { animator.SetBool(P_Cone, false); if (avant == Etat.Mort) { animator.SetBool(P_Dead, false); animator.SetTrigger(P_Respawn); } }
+                        CancelInvoke(nameof(Dissoudre));
+                        Visible(false);
+                        break;
+                    case Etat.Sortie:
+                    case Etat.Retour:
+                        ArreterBoucle();
+                        if (animator != null) animator.SetBool(P_Cone, false);
+                        transform.position = r.SorcierPosition.Value;
+                        Visible(true);
+                        break;
+                    case Etat.Incante:
+                        Visible(true);
+                        if (animator != null) animator.SetBool(P_Cone, true);
+                        if (m_Boucle == null) m_Boucle = AudioBank.Boucle(SonsDuJeu.SorcierIncantation, transform, 0.35f);
+                        break;
+                    case Etat.Mort:
+                        ArreterBoucle();
+                        if (animator != null) { animator.SetBool(P_Cone, false); animator.SetBool(P_Dead, true); }
+                        AudioBank.Jouer(SonsDuJeu.JoueurMort, transform.position + Vector3.up, 0.8f);
+                        Invoke(nameof(Dissoudre), 1.8f);
+                        break;
+                }
+            }
+            if (m_Etat != Etat.Maison && m_Etat != Etat.Mort)
+            {
+                transform.position = Vector3.Lerp(transform.position, r.SorcierPosition.Value, 1f - Mathf.Exp(-Time.deltaTime * 12f));
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, r.SorcierLacet.Value, 0f), 1f - Mathf.Exp(-Time.deltaTime * 10f));
+            }
+            if (animator != null)
+            {
+                animator.SetFloat(P_Speed, r.SorcierVitesse.Value / Mathf.Max(0.1f, B.sorcierVitesse) * 0.62f, 0.1f, Time.deltaTime);
+                animator.SetBool(P_Grounded, true);
+                if (m_CoucheHaut >= 0)
+                {
+                    m_PoidsHaut = Mathf.MoveTowards(m_PoidsHaut, m_Etat == Etat.Incante ? 1f : 0f, Time.deltaTime * 4f);
+                    animator.SetLayerWeight(m_CoucheHaut, m_PoidsHaut);
+                }
+            }
+        }
+
+        /// Client : il lève son bâton (invocation) comme chez l'hôte.
+        public void InvoquerDistant() { if (animator != null) animator.SetTrigger(P_Invoque); }
 
         void ArreterBoucle()
         {

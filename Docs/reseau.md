@@ -2,7 +2,7 @@
 
 Jusqu'à 4 joueurs. Un joueur **héberge** (hôte = serveur + joueur), les autres le **rejoignent**. En solo, le réseau ne démarre pas : le jeu tourne exactement comme avant (aucun `NetworkManager` à l'écoute, `ReseauJeu.Autorite` vrai).
 
-État au 25/09/2026 : **étape 1** faite (lobby réel, lancement, héros de chacun, déplacements et animations vus des autres, pseudos, colonne des alliés). **Étape 2** à venir : monde tenu par l'hôte (squelettes, vagues, dégâts, Nyxessa et missiles, cycle, portail, morts et réapparitions, vote du jour, score, sorcier et bouclier, or ; +60 % d'ennemis par joueur en plus).
+État au 25/09/2026 : **étape 1** faite (lobby réel, lancement, héros de chacun, déplacements et animations vus des autres, pseudos, colonne des alliés) ; **étape 2** faite (monde tenu par l'hôte : squelettes, vagues, dégâts, Nyxessa et missiles, cycle jour / nuit et vues qui en dépendent, morts et réapparitions, vote du jour, écran de score multijoueur, sorcier et bouclier, or ; +60 % d'ennemis par joueur en plus ; tirs des autres joueurs visibles).
 
 ## Paquets et services
 
@@ -51,6 +51,34 @@ Préfabs : menu **Deathless > Jeu > 8. Réseau** (ajoute `NetworkObject`, `Netwo
 
 Réglages : `NetworkConfig` créé par code (`ReseauJeu.Assurer`) : approbation des connexions, gestion des scènes, 30 ticks/s, délai de connexion 15 s.
 
+## Étape 2 : le monde tenu par l'hôte
+
+L'hôte fait foi sur tout ce qui n'est pas le héros d'un client ; chaque client simule seulement son héros (déplacement, gestes, visée, jauges) et suit le reste.
+
+```
+Scripts/Reseau/
+  PartieReseau.cs     monde de la partie (apparu par l'hôte au lancement, détruit avec la scène) : horloge (phase, nuit,
+                      temps, envoyé 5 fois par seconde), Nyxessa (PV, détruite), caisse commune, vote (prêts / joueurs),
+                      scores et état de chaque joueur (NetworkList<ScoreReseau> : prêt, mort, délai, 7 compteurs),
+                      sorcier (état, position, orientation, vitesse) ; RPC : zones d'apparition, pièces d'or, bouclier
+                      (levé, touché, baissé), invocation du sorcier, missiles en crâne ; vote des clients (PretRpc)
+  EnnemiReseau.cs     squelette réseau : chez un client, marionnette (IA et agent coupés, PV recopiés, sortie de terre et
+                      désintégration rejouées) ; coups, étourdissements, poussées et provocations relayés vers l'hôte
+  HerosReseau.cs      + mort et délai tenus par l'hôte ; coups des squelettes de l'hôte relayés vers le propriétaire (qui
+                      garde, pare, esquive) ; tirs et fumigène du propriétaire rejoués chez les autres ; furtivité recopiée
+```
+
+- **Relais des coups** : `Sante.relais`. Sur une marionnette, un coup n'est pas appliqué : il part vers le poste qui fait foi et la fonction renvoie les dégâts estimés (jauges de rage et de mana du tireur). Client → hôte pour les squelettes (`EnnemiReseau.FrapperRpc` ; l'hôte crédite le joueur : dégâts, critiques, ennemis tués, or) ; hôte → propriétaire pour les héros (`HerosReseau.EncaisserRpc`). `Squelette.Etourdir`, `Repousser`, `Provoquer` passent aussi par l'hôte depuis un client.
+- **Client** (`Partie.ClientReseau`) : `Partie.SuivreHote` recopie l'horloge et rejoue localement les changements de phase (mêmes événements : ambiance, HUD, sons, portail, alerte avant la nuit), Nyxessa (PV, coup reçu, destruction), la caisse, le vote, la mort et le score du joueur local. `DirecteurVagues`, `DefenseNyxessa`, l'IA des squelettes et celle du sorcier ne tournent que chez l'hôte (`ReseauJeu.Autorite`).
+- **Morts et réapparitions** : le client signale sa mort (`MortRpc`) ; l'hôte compte la mort, tient le délai (8 s + 4 s par mort) et fait réapparaître (`ReapparaitreRpc`, téléportation du NetworkTransform), à l'aube aussi. Les autres voient la chute (NetworkAnimator), la dissolution et le retour.
+- **Vote** : « Prêt » d'un client → `PretRpc` ; l'hôte compte (le jour s'écourte quand tous sont prêts) ; « Rejouer » sur l'écran de score : quand tous ont voté, l'hôte recharge le village pour tous (mêmes joueurs, mêmes classes).
+- **Score** : écran de score avec une ligne par joueur (`HudPresenter.Joueurs` lit `PartieReseau.Scores`), le joueur local marqué.
+- **Squelettes** : préfabs réseau (NetworkObject, NetworkTransform et NetworkAnimator en autorité serveur, échelle synchronisée pour les élites, `EnnemiReseau`), apparus par l'hôte (`DirecteurVagues.Poser`) ; nombre par nuit × (1 + 0,6 par joueur en plus) (`GameBalance.ennemisParJoueurEnPlus`).
+- **Missiles en crâne** (Nyxessa, Nécromancien) : même vol chez les clients, sans dégâts (`MissileCrane.TirerVisuel`).
+- **Tirs des joueurs** (flèches, carreaux, boules de feu) : rejoués chez les autres (`ProjectileJeu.TirerVisuel`, même balistique, sans dégâts).
+- **Sorcier et bouclier** : l'hôte pilote ; les clients suivent (marionnette du sorcier, effet du bouclier levé, frappé, brisé, baissé).
+- Préfabs : `Deathless > Jeu > 8. Réseau` équipe aussi les 4 squelettes et crée `Resources/Reseau/PartieReseau.prefab`.
+
 ## Tests (sans fenêtre)
 
 Hôte : l'éditeur `main` en Play. Client : **l'éditeur Unity lui-même en `-batchmode -nographics`**, fenêtre cachée, sur une **copie** du projet (Assets, Packages, ProjectSettings ; sans le paquet MCP), qui entre en Play et est piloté par `ClientAutomatique`. Pas d'exécutable construit : un nouvel .exe qui écoute ferait apparaître la demande d'autorisation du pare-feu Windows, `Unity.exe` a déjà ses règles. La copie doit avoir un **chemin court** (jonction), sinon certains chemins du `PackageCache` dépassent 260 caractères. Aucun script ne doit être modifié dans `main` pendant que l'hôte est en Play (recompilation en Play : scripts perdus).
@@ -76,9 +104,13 @@ Résultats du 25/09/2026 (hôte Paladin « Quentin », client Mage « Morgane »
 | Coupure brutale d'un client (processus tué) | détectée par l'hôte en ~30 s (délai du transport), même traitement |
 | L'hôte ferme le salon / quitte la partie | le client reçoit « L’hôte a fermé le salon. », revient au menu (scène rechargée) |
 
-## Limites connues (étape 1)
+Résultats de l'étape 2 (25/09/2026, hôte Paladin, client Mage, adresse IP) : vote des deux joueurs → jour écourté, nuit chez les deux ; squelettes vus par le client, qui en tue (dégâts, tués et or crédités par l'hôte : 4 tués, 320 dégâts, 20 or) ; squelettes qui frappent le héros du client ; coup mortel porté chez l'hôte → mort chez le client, comptée par l'hôte (délai 8 s), réapparition au bout du délai ; sorcier et bouclier suivis ; victoire forcée → écran de score à deux lignes chez les deux ; « Rejouer » → nouvelle partie pour les deux ; Nyxessa détruite chez l'hôte → défaite chez le client. Aucune erreur dans les consoles.
 
-- Les clients ne voient ni squelettes, ni tirs de Nyxessa, ni projectiles et effets des autres ; chaque poste a sa propre horloge de jour et de nuit (lancée au même moment). Tout cela est l'étape 2.
+## Limites connues
+
+- Effets de compétence des autres joueurs non rejoués (cône de flammes, attaque tournante, charge, rugissement, nuée, soin, aura) : on voit leurs animations et leurs projectiles, pas ces effets. Leurs conséquences sur les squelettes (dégâts, étourdissements, poussées, provocation) passent bien par l'hôte.
+- Le penché du buste en visée (arc, arbalète) n'est pas recopié chez les autres ; l'orientation du corps l'est.
+- Chaque coup d'un client sur un squelette est un message ; les dégâts continus (cône, brûlure) en envoient beaucoup (sans gêne constatée à deux).
 - Pas d'arrivée en cours de partie ; pas de reconnexion.
 - Coupure brutale : l'hôte ne s'en aperçoit qu'au bout du délai du transport (~30 s).
 - Après une déconnexion, le message d'erreur est dans le lobby ; le menu principal s'affiche d'abord.

@@ -101,6 +101,26 @@ namespace Deathless.Jeu
             CC.enabled = actif;
         }
 
+        /// Marionnette (multijoueur) : le propriétaire vient de mourir ou de réapparaître (état tenu par l'hôte). La mort
+        /// (animation) arrive par le NetworkAnimator ; ici l'état (les squelettes ne la visent plus) et la dissolution.
+        public void MortDistante(bool mort)
+        {
+            if (!Distant) return;
+            if (mort)
+            {
+                m_EtatCourant = Etat.Mort;
+                Invoke(nameof(Dissoudre), 1.0f);
+            }
+            else
+            {
+                CancelInvoke(nameof(Dissoudre));
+                m_EtatCourant = Etat.Libre;
+                Invoke(nameof(RendreVisible), 0.35f);
+            }
+        }
+
+        void RendreVisible() { foreach (var r in GetComponentsInChildren<Renderer>(true)) r.enabled = true; }
+
         /// Déclencheur d'animation : par le NetworkAnimator en réseau (les autres postes le jouent aussi), sinon direct.
         public void Declencher(int hash)
         {

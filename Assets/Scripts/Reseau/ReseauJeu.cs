@@ -76,6 +76,13 @@ namespace Deathless.Reseau
             // Préfabs réseau : le salon et les héros des classes (mêmes listes sur tous les postes).
             var salon = Resources.Load<GameObject>("Reseau/SalonReseau");
             if (salon != null) Reseau.AddNetworkPrefab(salon);
+            var monde = Resources.Load<GameObject>("Reseau/PartieReseau");
+            if (monde != null) Reseau.AddNetworkPrefab(monde);
+            // Squelettes (étape 2), d'après le directeur des vagues du village.
+            var dv = FindAnyObjectByType<DirecteurVagues>();
+            if (dv != null)
+                foreach (var pf in new[] { dv.prefabSbire, dv.prefabGuerrier, dv.prefabGolem, dv.prefabNecromancien })
+                    if (pf != null && pf.GetComponent<NetworkObject>() != null) Reseau.AddNetworkPrefab(pf);
             var classes = ClassesJeu.Courant;
             if (classes != null) foreach (var c in classes.classes) if (c.prefab != null && c.prefab.GetComponent<NetworkObject>() != null) Reseau.AddNetworkPrefab(c.prefab);
             Reseau.ConnectionApprovalCallback = Approuver;

@@ -34,6 +34,31 @@ namespace Deathless.Jeu
         public static ProjectileJeu Tirer(Genre genre, Vector3 depart, Vector3 cible, float vitesse, float portee, Transform tireur,
             Action<Vector3, Vector3, Sante> impact)
         {
+            var p = Creer(genre, depart, cible, vitesse, portee, tireur, impact);
+            // Multijoueur : les autres postes voient le même tir (sans dégâts ; le tireur les compte et les envoie à l'hôte).
+            var hr = tireur != null ? Deathless.Reseau.HerosReseau.Local(tireur.GetComponent<Heros>()) : null;
+            if (hr != null) hr.Tir(genre, depart, cible, vitesse);
+            return p;
+        }
+
+        /// Multijoueur : tir d'un autre joueur, rejoué ici pour la vue (même trajectoire, aucun dégât).
+        public static ProjectileJeu TirerVisuel(Genre genre, Vector3 depart, Vector3 cible, float vitesse, Transform tireur)
+        {
+            return Creer(genre, depart, cible, vitesse, 200f, tireur, (point, dir, s) =>
+            {
+                var fx = EffetsJeu.Instance;
+                if (genre == Genre.BouleDeFeu)
+                {
+                    if (fx != null && fx.gemmes != null) ExplosionFeu.Jouer(point, 2.5f, fx.gemmes);
+                    AudioBank.Jouer(SonsDuJeu.BouleExplosion, point, 0.9f);
+                }
+                else AudioBank.Jouer(SonsDuJeu.FlecheImpact, point, 0.6f, 0.05f);
+            });
+        }
+
+        static ProjectileJeu Creer(Genre genre, Vector3 depart, Vector3 cible, float vitesse, float portee, Transform tireur,
+            Action<Vector3, Vector3, Sante> impact)
+        {
             var fx = EffetsJeu.Instance;
             GameObject go;
             if (genre != Genre.BouleDeFeu && fx != null && fx.modeleFleche != null)

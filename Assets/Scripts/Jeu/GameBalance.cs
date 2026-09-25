@@ -141,7 +141,7 @@ namespace Deathless.Jeu
         public float sorcierVitesse = 3.2f;
         public float sorcierPV = 60f;
         [Tooltip("Distance à Nyxessa de sa place d'incantation, du côté de sa maison (m) : sur le sommet du plateau, à l'intérieur du bouclier près de son bord, avec la place de tomber en arrière sans toucher le rocher.")]
-        public float sorcierDistanceNyxessa = 4.3f;
+        public float sorcierDistanceNyxessa = 3.6f;
         [Tooltip("Il fait face à l'extérieur, dos à Nyxessa ; il peut se tourner vers un ennemi devant lui de ce nombre de degrés au plus.")]
         public float sorcierPivotMax = 20f;
 

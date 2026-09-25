@@ -68,6 +68,7 @@ namespace Deathless.Jeu
             Sante.equipe = Equipe.Ennemis;
             Sante.Touche += OnTouche;
             Sante.Tue += OnTue;
+            m_Reseau = GetComponent<Deathless.Reseau.EnnemiReseau>();
             if (modele != null) Tete = MannequinEquip.Trouver(modele, "head");
             if (modele != null)
                 foreach (var r in modele.GetComponentsInChildren<Renderer>())
@@ -87,10 +88,19 @@ namespace Deathless.Jeu
         Heros m_Provocateur;
         float m_ProvoqueJusque;
 
+        // ----------------------------------------------------------------- Multijoueur (marionnette chez un client)
+
+        protected Deathless.Reseau.EnnemiReseau m_Reseau;
+        /// Client : ce squelette est tenu par l'hôte ; les actions des héros de ce poste lui sont envoyées.
+        protected bool Distant => m_Reseau != null && m_Reseau.Distant;
+        protected bool RelaiEtourdir(float duree, int sourceId) { if (!Distant) return false; m_Reseau.DemanderEtourdir(duree, sourceId); return true; }
+        protected bool RelaiRepousser(Vector3 deplacement, float etourdi) { if (!Distant) return false; m_Reseau.DemanderRepousser(deplacement, etourdi); return true; }
+
         /// Rugissement du viking : ce squelette le prend pour cible pendant `duree` s (priorité sur Nyxessa).
         public virtual void Provoquer(Heros h, float duree)
         {
             if (m_Etat == Etat.Mort || h == null) return;
+            if (Distant) { m_Reseau.DemanderProvoquer(duree); return; }
             m_Provocateur = h;
             m_ProvoqueJusque = Time.time + duree;
             m_Cible = h;
@@ -377,6 +387,7 @@ namespace Deathless.Jeu
         /// Étourdissement (parade, charge). Crédite au joueur les coups empêchés contre Nyxessa (score).
         public virtual void Etourdir(float duree, int sourceId = 0)
         {
+            if (RelaiEtourdir(duree, sourceId)) return;
             if (m_Etat == Etat.Mort || m_Etat == Etat.SortieDeTerre) return;
             if (sourceId > 0 && SurNyxessa && P != null) P.CompterDegatsEvites(sourceId, m_Stats.degatsNyxessa * duree / Mathf.Max(0.1f, m_Stats.intervalle));
             m_Etat = Etat.Etourdi;
@@ -389,6 +400,7 @@ namespace Deathless.Jeu
         /// Repoussé sur le côté (charge bélier) puis étourdi.
         public virtual void Repousser(Vector3 deplacement, float etourdi, int sourceId)
         {
+            if (RelaiRepousser(deplacement, etourdi)) return;
             if (m_Etat == Etat.Mort || m_Etat == Etat.SortieDeTerre) return;
             m_Pousse = deplacement; m_Pousse.y = 0f;
             m_PousseReste = 0.2f;

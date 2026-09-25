@@ -710,6 +710,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Deathless.Jeu.HerosEntrees
   actions: {fileID: 0}
+  SprintTest: 0
 --- !u!114 &1543140563581684708
 MonoBehaviour:
   m_ObjectHideFlags: 0

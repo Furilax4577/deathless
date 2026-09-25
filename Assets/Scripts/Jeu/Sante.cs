@@ -40,6 +40,11 @@ namespace Deathless.Jeu
         /// Bouclier du sorcier (Nyxessa, sorcier) : reçoit chaque coup et renvoie la part qui le traverse (0 : tout absorbé).
         public Func<InfoDegats, float> absorbeur;
 
+        /// Multijoueur : ce corps est la copie d'un objet tenu par un autre poste (squelette chez un client, héros d'un autre
+        /// joueur chez l'hôte). Le coup n'est pas appliqué ici : il part vers le poste qui fait foi, et la fonction renvoie
+        /// les dégâts estimés (pour les jauges de classe du tireur). Null : coup appliqué ici (solo, objet local).
+        public Func<InfoDegats, float> relais;
+
         public event Action<InfoDegats, float> Touche;           // coup appliqué, dégâts réels
         public event Action<InfoDegats, Interception> Intercepte; // coup bloqué ou paré
         public event Action<InfoDegats> Tue;
@@ -60,6 +65,7 @@ namespace Deathless.Jeu
         public float Encaisser(InfoDegats info)
         {
             if (Mort || !isActiveAndEnabled) return 0f;
+            if (relais != null) return info.montant > 0f ? relais(info) : 0f;
             if (info.parable && intercepteur != null)
             {
                 var r = intercepteur(info);
@@ -100,6 +106,13 @@ namespace Deathless.Jeu
             if (Mort || bonus <= 0f) return;
             pvMax += bonus;
             pv += bonus;
+        }
+
+        /// Multijoueur : PV recopiés du poste qui fait foi (sans événement).
+        public void Fixer(float valeur, float max)
+        {
+            pvMax = max;
+            pv = Mathf.Clamp(valeur, 0f, max);
         }
 
         /// Remet en vie avec tous ses PV (réapparition).

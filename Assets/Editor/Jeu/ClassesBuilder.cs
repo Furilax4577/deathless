@@ -343,6 +343,26 @@ namespace Deathless.EditorTools
         // ================================================================= Réseau (Docs/reseau.md)
 
         const string SalonReseauPath = "Assets/Jeu/Resources/Reseau/SalonReseau.prefab";
+        const string PartieReseauPath = "Assets/Jeu/Resources/Reseau/PartieReseau.prefab";
+
+        /// Squelette réseau : l'hôte fait foi (NetworkTransform et NetworkAnimator en autorité serveur ; échelle synchronisée
+        /// pour les élites) ; EnnemiReseau fait des clients des marionnettes et relaie leurs coups.
+        static void AjouterReseauEnnemi(GameObject racine)
+        {
+            if (racine.GetComponent<Unity.Netcode.NetworkObject>() == null) racine.AddComponent<Unity.Netcode.NetworkObject>();
+            var nt = racine.GetComponent<Unity.Netcode.Components.NetworkTransform>();
+            if (nt == null) nt = racine.AddComponent<Unity.Netcode.Components.NetworkTransform>();
+            nt.AuthorityMode = Unity.Netcode.Components.NetworkTransform.AuthorityModes.Server;
+            nt.SyncRotAngleX = false;
+            nt.SyncRotAngleZ = false;
+            nt.SyncScaleX = nt.SyncScaleY = nt.SyncScaleZ = true;
+            nt.Interpolate = true;
+            var na = racine.GetComponent<Unity.Netcode.Components.NetworkAnimator>();
+            if (na == null) na = racine.AddComponent<Unity.Netcode.Components.NetworkAnimator>();
+            na.Animator = racine.GetComponentInChildren<Animator>(true);
+            na.AuthorityMode = Unity.Netcode.Components.NetworkAnimator.AuthorityModes.Server;
+            if (racine.GetComponent<Deathless.Reseau.EnnemiReseau>() == null) racine.AddComponent<Deathless.Reseau.EnnemiReseau>();
+        }
 
         /// Préfabs réseau : composants réseau des héros (sans reconstruire les prefabs) et objet du salon.
         [MenuItem("Deathless/Jeu/8. Réseau (préfabs des héros et du salon)")]
@@ -359,7 +379,23 @@ namespace Deathless.EditorTools
                 PrefabUtility.UnloadPrefabContents(racine);
                 n++;
             }
+            // Squelettes (étape 2) : l'hôte les pilote ; position, échelle (élite) et animations répliquées.
+            foreach (var nom in new[] { "Squelette_Sbire", "Squelette_Guerrier", "Squelette_Golem", "Squelette_Necromancien" })
+            {
+                string chemin = PrefabDir + "/" + nom + ".prefab";
+                var racine = PrefabUtility.LoadPrefabContents(chemin);
+                if (racine == null) continue;
+                AjouterReseauEnnemi(racine);
+                PrefabUtility.SaveAsPrefabAsset(racine, chemin);
+                PrefabUtility.UnloadPrefabContents(racine);
+                n++;
+            }
             Dossier("Assets/Jeu/Resources/Reseau");
+            var monde = new GameObject("PartieReseau");
+            monde.AddComponent<Unity.Netcode.NetworkObject>();
+            monde.AddComponent<Deathless.Reseau.PartieReseau>();
+            PrefabUtility.SaveAsPrefabAsset(monde, PartieReseauPath);
+            Object.DestroyImmediate(monde);
             var salon = new GameObject("SalonReseau");
             salon.AddComponent<Unity.Netcode.NetworkObject>();
             salon.AddComponent<Deathless.Reseau.SalonReseau>();
@@ -368,7 +404,9 @@ namespace Deathless.EditorTools
             // Identifiant réseau des préfabs (GlobalObjectIdHash) : calculé par NetworkObject.OnValidate sur l'asset.
             var valider = typeof(Unity.Netcode.NetworkObject).GetMethod("OnValidate", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
             foreach (var d in s_Defs) Valider(PrefabDir + "/Heros_" + Capitale(d.id) + ".prefab", valider);
+            foreach (var nom in new[] { "Squelette_Sbire", "Squelette_Guerrier", "Squelette_Golem", "Squelette_Necromancien" }) Valider(PrefabDir + "/" + nom + ".prefab", valider);
             Valider(SalonReseauPath, valider);
+            Valider(PartieReseauPath, valider);
             AssetDatabase.SaveAssets();
             string r = "Réseau : " + n + " héros équipés (NetworkObject, NetworkTransform, NetworkAnimator, HerosReseau), salon " + SalonReseauPath;
             Debug.Log(r);

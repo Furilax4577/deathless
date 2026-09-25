@@ -143,6 +143,9 @@ namespace Deathless.Jeu
             p.Journal("Nyxessa tire sur " + s.type + (s.elite ? " (élite)" : "") + (s.SurNyxessa ? " qui la frappe" : "") + ", stock " + e.stock);
         }
 
+        /// Client d'une partie réseau : Nyxessa détruite chez l'hôte, même effet ici.
+        public void DetruireVisuel() => Detruire();
+
         void Detruire()
         {
             AudioBank.Jouer2D(SonsDuJeu.NyxessaDestruction, 1f);

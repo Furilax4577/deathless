@@ -35,7 +35,10 @@ namespace Deathless.Jeu
         readonly Dictionary<int, Heros> m_Heros = new Dictionary<int, Heros>();
         readonly Dictionary<int, EtatJoueur> m_Distants = new Dictionary<int, EtatJoueur>();
         public Heros HerosLocal { get; private set; }
-        public EtatJoueur JoueurLocal => Etat.joueurs.Count > 0 ? Etat.joueurs[0] : null;
+        EtatJoueur m_Local;
+        public EtatJoueur JoueurLocal => m_Local ?? (Etat.joueurs.Count > 0 ? Etat.joueurs[0] : null);
+        /// Client d'une partie réseau : l'hôte fait foi (horloge, monde, morts) ; ce poste suit (SuivreHote).
+        public static bool ClientReseau => ReseauJeu.EnPartie && !ReseauJeu.Autorite;
         bool m_Chute;          // Nyxessa détruite, écran de score imminent
         float m_ChuteDepuis;
         bool m_AlerteDonnee;
@@ -139,7 +142,8 @@ namespace Deathless.Jeu
         {
             var b = B;
             ClasseChoisie = j.classeId;
-            Etat.joueurs.Add(j);
+            Etat.joueurs.Insert(0, j);
+            m_Local = j;
             if (h != null)
             {
                 h.Initialiser(this, j);
@@ -169,6 +173,9 @@ namespace Deathless.Jeu
         {
             var nm = ReseauJeu.Instance != null ? ReseauJeu.Instance.Reseau : null;
             if (nm == null || !nm.IsServer) return;
+            // Le monde de la partie (horloge, Nyxessa, scores, sorcier) : tenu ici, suivi par les clients.
+            var mondePrefab = Resources.Load<GameObject>("Reseau/PartieReseau");
+            if (mondePrefab != null && PartieReseau.Instance == null) Instantiate(mondePrefab).GetComponent<Unity.Netcode.NetworkObject>().Spawn(true);
             var joueurs = new List<JoueurSalon>(ReseauJeu.JoueursPartie);
             Vector3 p0 = pointDepart != null ? pointDepart.position : PointReapparition(Vector3.zero);
             Quaternion r = pointDepart != null ? pointDepart.rotation : Quaternion.LookRotation(-new Vector3(p0.x, 0f, p0.z).normalized);
@@ -187,8 +194,7 @@ namespace Deathless.Jeu
                 Vector3 p = p0 + cote * ((i - (joueurs.Count - 1) * 0.5f) * 1.8f);
                 var go = Instantiate(def.prefab, p, r);
                 var hr = go.GetComponent<HerosReseau>();
-                hr.NomJoueur.Value = js.pseudo;
-                hr.Classe.Value = new Unity.Collections.FixedString32Bytes(classeId);
+                hr.Preparer(js.pseudo.ToString(), classeId);
                 go.GetComponent<Unity.Netcode.NetworkObject>().SpawnAsPlayerObject(js.clientId, true);
                 ReseauJeu.Journal("héros de " + js.pseudo + " (" + classeId + ") apparu pour le client " + js.clientId);
             }
@@ -212,6 +218,8 @@ namespace Deathless.Jeu
             h.Initialiser(this, j);
             m_Heros[j.id] = h;
             m_Distants[j.id] = j;
+            // L'hôte tient l'état de tous les joueurs (vote, morts, score, nombre d'ennemis).
+            if (ReseauJeu.Autorite && Joueur(j.id) == null) Etat.joueurs.Add(j);
             Journal("Héros distant : " + pseudo + " (" + classeId + ")");
         }
 
@@ -219,6 +227,8 @@ namespace Deathless.Jeu
         {
             int id = IdJoueur(clientId);
             if (m_Distants.Remove(id)) m_Heros.Remove(id);
+            var j = Joueur(id);
+            if (j != null && j != m_Local) Etat.joueurs.Remove(j);
         }
 
         /// Hôte : un joueur a quitté la partie (son héros disparaît avec lui).
@@ -231,13 +241,20 @@ namespace Deathless.Jeu
         /// Vote « prêt » (jour) ou Rejouer (écran de score).
         public void BasculerPret(int joueurId = 1)
         {
+            // Client : le vote part vers l'hôte, qui le compte (son état revient par PartieReseau).
+            if (ClientReseau) { PartieReseau.Instance?.DemanderPret(); return; }
             var j = Joueur(joueurId);
             if (j == null) return;
             if (Etat.phase == Phase.Terminee)
             {
                 j.pret = !j.pret;
                 PretChange?.Invoke(joueurId, j.pret);
-                if (TousPrets()) Recharger(true);
+                if (TousPrets())
+                {
+                    // Rejouer : en réseau, l'hôte recharge le village pour tous (mêmes joueurs, mêmes classes).
+                    if (ReseauJeu.EnPartie) ReseauJeu.Instance.LancerPartie();
+                    else Recharger(true);
+                }
                 return;
             }
             if (Etat.phase != Phase.Jour) return;
@@ -294,6 +311,7 @@ namespace Deathless.Jeu
 
         void Update()
         {
+            if (ClientReseau && Etat.phase != Phase.Attente) { SuivreHote(Time.deltaTime); return; }
             if (Etat.phase == Phase.Attente || Etat.phase == Phase.Terminee) return;
             float dt = Time.deltaTime;
             if (m_Chute)
@@ -330,6 +348,95 @@ namespace Deathless.Jeu
             }
         }
 
+        // ----------------------------------------------------------------- Client d'une partie réseau
+
+        float m_TempsHote = -1f;
+        float m_MortSignalee = -99f;
+        float m_NyxVue = -1f;
+        bool m_NyxDetruiteVue;
+
+        /// Client : l'horloge, Nyxessa, la caisse et l'état du joueur local viennent de l'hôte (PartieReseau) ; les
+        /// changements de phase rejouent ici les mêmes événements (vues, sons, HUD) sans rien décider.
+        void SuivreHote(float dt)
+        {
+            var r = PartieReseau.Instance;
+            if (r == null) return;
+            var ph = (Phase)r.Phase.Value;
+            Etat.nuit = r.Nuit.Value;
+            if (ph != Etat.phase && Etat.phase != Phase.Terminee)
+            {
+                if (ph == Phase.Terminee)
+                {
+                    Terminer((Resultat)r.Resultat.Value);
+                    Etat.nuitAtteinte = r.NuitAtteinte.Value;
+                }
+                else if (ph != Phase.Attente) Passer(ph);
+            }
+            if (Etat.phase == Phase.Terminee) { Etat.nuitAtteinte = r.NuitAtteinte.Value; LireJoueurLocal(r); return; }
+            // Temps : la dernière valeur de l'hôte, puis on avance seul jusqu'à la suivante.
+            if (r.TempsPhase.Value != m_TempsHote) { m_TempsHote = r.TempsPhase.Value; Etat.tempsPhase = m_TempsHote; Etat.duree = r.Duree.Value; }
+            else { Etat.tempsPhase += dt; Etat.duree += dt; }
+            Etat.dureePhase = r.DureePhase.Value;
+            Etat.comptePret = r.ComptePret.Value;
+            Etat.orEquipe = r.OrEquipe.Value;
+            if (nyxessa != null)
+            {
+                nyxessa.Fixer(r.NyxPv.Value, r.NyxPvMax.Value);
+                Etat.nyxessa.pv = nyxessa.Pv;
+                Etat.nyxessa.pvMax = nyxessa.pvMax;
+                if (m_NyxVue >= 0f && nyxessa.Pv < m_NyxVue - 0.01f)
+                {
+                    Etat.nyxessa.dernierCoup = Time.time;
+                    NyxessaTouchee?.Invoke(m_NyxVue - nyxessa.Pv, nyxessa.transform.position + Vector3.up * 2f);
+                }
+                m_NyxVue = nyxessa.Pv;
+            }
+            if (r.NyxDetruite.Value && !m_NyxDetruiteVue)
+            {
+                m_NyxDetruiteVue = true;
+                Etat.nyxessa.detruite = true;
+                var d = nyxessa != null ? nyxessa.GetComponent<DefenseNyxessa>() : null;
+                if (d != null) d.DetruireVisuel();
+                NyxessaDetruite?.Invoke();
+            }
+            // Alerte avant la nuit (même règle que chez l'hôte).
+            if (Etat.phase == Phase.Jour && !m_AlerteDonnee && Etat.TempsRestant <= B.alerteAvantNuit / Mathf.Max(0.01f, B.vitesseCycle) && Etat.dureePhase > B.alerteAvantNuit / Mathf.Max(0.01f, B.vitesseCycle))
+            {
+                m_AlerteDonnee = true;
+                AudioBank.Jouer2D(SonsDuJeu.AlerteNuit);
+                AlerteNuit?.Invoke();
+            }
+            LireJoueurLocal(r);
+        }
+
+        /// Client : vote, mort, délai et score du joueur local tels que l'hôte les tient ; vie et endurance restent locales.
+        void LireJoueurLocal(PartieReseau r)
+        {
+            var j = m_Local;
+            if (j == null) return;
+            if (HerosLocal != null) HerosLocal.EcrireEtat(j);
+            if (!r.ScoreDe((ulong)Mathf.Max(0, j.id - 1), out var s)) return;
+            if (j.pret != s.pret) { j.pret = s.pret; PretChange?.Invoke(j.id, j.pret); }
+            // Mort : l'hôte fait foi ; juste après la mort locale, on attend qu'il l'ait comptée avant de le suivre.
+            if (s.mort) { j.mort = true; j.reapparitionRestante = s.reapparition; }
+            else if (j.mort && Time.time - m_MortSignalee > 1.5f) { j.mort = false; j.reapparitionRestante = 0f; }
+            j.score.orRapporte = s.or; j.score.degatsInfliges = s.degats; j.score.ennemisTues = s.tues; j.score.morts = s.morts;
+            j.score.coupsCritiques = s.critiques; j.score.degatsEvitesNyxessa = s.evites; j.score.soinsProdigues = s.soins;
+        }
+
+        /// Client : l'hôte fait réapparaître le héros de ce poste (délai écoulé ou aube).
+        public void ReapparaitreLocal(Vector3 point)
+        {
+            var j = m_Local;
+            if (j != null) { j.mort = false; j.reapparitionRestante = 0f; }
+            var h = HerosLocal;
+            if (h == null) return;
+            h.Reapparaitre(point);
+            var nt = h.GetComponent<Unity.Netcode.Components.NetworkTransform>();
+            if (nt != null && nt.IsSpawned && nt.IsOwner) nt.Teleport(h.transform.position, h.transform.rotation, h.transform.localScale);
+            if (j != null) JoueurReapparu?.Invoke(j.id);
+        }
+
         void Passer(Phase nouvelle)
         {
             var ancienne = Etat.phase;
@@ -342,7 +449,7 @@ namespace Deathless.Jeu
                 Etat.comptePret = false;
                 foreach (var j in Etat.joueurs) j.pret = false;
             }
-            if (nouvelle == Phase.Aube)
+            if (nouvelle == Phase.Aube && !ClientReseau)
             {
                 // Wiki : un joueur mort revient au début de la nouvelle journée, même si son délai n'est pas écoulé.
                 foreach (var j in Etat.joueurs) if (j.mort) Reapparaitre(j);
@@ -426,6 +533,15 @@ namespace Deathless.Jeu
         {
             var j = Joueur(joueurId);
             if (j == null || j.mort) return;
+            // Client : l'hôte compte la mort et fixe le délai de réapparition.
+            if (ClientReseau)
+            {
+                j.mort = true;
+                m_MortSignalee = Time.time;
+                HerosReseau.Local(HerosLocal)?.SignalerMort();
+                JoueurMort?.Invoke(joueurId);
+                return;
+            }
             j.mort = true;
             // Wiki : chaque mort allonge le délai (8 s + 4 s par mort précédente dans la partie).
             j.reapparitionRestante = B.DelaiReapparition(j.score.morts);
@@ -440,7 +556,14 @@ namespace Deathless.Jeu
             j.mort = false;
             j.reapparitionRestante = 0f;
             var h = HerosDe(j.id);
-            if (h != null) h.Reapparaitre(PointReapparition(h.transform.position));
+            if (h != null)
+            {
+                Vector3 point = PointReapparition(h.transform.position);
+                // Héros d'un autre poste : son propriétaire le fait réapparaître (RPC) ; sinon ici.
+                if (h.Distant) h.GetComponent<HerosReseau>()?.Reapparaitre(point);
+                else if (ReseauJeu.EnPartie) ReapparaitreLocal(point);
+                else h.Reapparaitre(point);
+            }
             Journal("Joueur " + j.id + " réapparaît");
             JoueurReapparu?.Invoke(j.id);
         }
@@ -498,6 +621,7 @@ namespace Deathless.Jeu
             var j = Joueur(joueurId);
             if (j != null) j.score.orRapporte += montant;
             PieceOr.Jouer(point);
+            if (ReseauJeu.EnPartie) PartieReseau.Instance?.PieceOr(point);
             AudioBank.Jouer(SonsDuJeu.Or, point, 0.3f, 0.1f);
             OrGagne?.Invoke(montant, point);
         }

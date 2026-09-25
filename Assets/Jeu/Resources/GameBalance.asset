@@ -128,6 +128,35 @@ MonoBehaviour:
   groupeRayon: 4
   frappeeRecente: 2
   delaiScoreDefaite: 3
+  bouclierPalier: 1
+  bouclierEncaissement:
+  - 150
+  - 260
+  - 370
+  - 480
+  - 600
+  bouclierRenvoi:
+  - 5
+  - 9
+  - 12
+  - 16
+  - 20
+  bouclierIncantation: 3
+  bouclierRayon: 5.3
+  bouclierBase: 0.25
+  bouclierHauteur: 6
+  sorcierMaison: Maison_5_A
+  sorcierVitesse: 3.2
+  sorcierPV: 60
+  sorcierDistanceNyxessa: 3.6
+  sorcierPivotMax: 20
+  orSbire: 5
+  orGuerrier: 8
+  orVoleur: 8
+  orMage: 10
+  orElite: 25
+  orMorgrim: 150
+  orNyxar: 300
   herosPV: 150
   endurance: 100
   enduranceRegen: 15
@@ -188,6 +217,9 @@ MonoBehaviour:
   coneVitesse: 0.4
   brulureDegats: 5
   brulureDuree: 3
+  projectileGravite: 9.81
+  aideChuteMax: 3
+  projectileVolMax: 200
   rodeurPV: 110
   rodeurVitesse: 5
   arcCharge: 1.2
@@ -210,6 +242,7 @@ MonoBehaviour:
   salveFleches: 5
   salveEcart: 20
   salveDegats: 15
+  salveVitesse: 35
   rouladeRecharge: 8
   assassinPV: 100
   assassinVitesse: 5

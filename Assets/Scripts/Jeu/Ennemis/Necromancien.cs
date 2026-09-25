@@ -75,6 +75,6 @@ namespace Deathless.Jeu
             }
         }
 
-        public override void Repousser(Vector3 deplacement, float etourdi, int sourceId) => base.Repousser(deplacement * 0.6f, etourdi, sourceId);
+        public override void Repousser(Vector3 deplacement, float etourdi, int sourceId) { if (RelaiRepousser(deplacement, etourdi)) return; base.Repousser(deplacement * 0.6f, etourdi, sourceId); }
     }
 }

@@ -53,6 +53,7 @@ namespace Deathless.Jeu
             if (effet == null || effet.IsUp || effet.IsCasting) return;
             effet.maxHealth = B.Palier(B.bouclierEncaissement);
             effet.Lever();
+            if (Deathless.Reseau.ReseauJeu.EnPartie && Deathless.Reseau.ReseauJeu.Autorite) Deathless.Reseau.PartieReseau.Instance?.BouclierLeve(effet.maxHealth);
             AudioBank.Jouer(SonsDuJeu.BouclierLeve, transform.position + Vector3.up * 2f, 0.9f);
             Partie.Instance?.Journal("Bouclier levé par le sorcier (palier " + B.bouclierPalier + ", " + effet.maxHealth + " d'encaissement)");
         }
@@ -62,6 +63,7 @@ namespace Deathless.Jeu
         {
             if (effet == null) return;
             effet.Baisser();
+            if (Deathless.Reseau.ReseauJeu.EnPartie && Deathless.Reseau.ReseauJeu.Autorite) Deathless.Reseau.PartieReseau.Instance?.BouclierBaisse();
         }
 
         /// Coup porté à Nyxessa ou au sorcier : le bouclier levé l'encaisse et renvoie des dégâts à l'attaquant ; renvoie
@@ -72,6 +74,7 @@ namespace Deathless.Jeu
             float pris = Mathf.Min(effet.Health, info.montant);
             Vector3 point = PointSurParoi(info);
             effet.Frapper(pris, point);
+            if (Deathless.Reseau.ReseauJeu.EnPartie && Deathless.Reseau.ReseauJeu.Autorite) Deathless.Reseau.PartieReseau.Instance?.BouclierTouche(pris, point);
             if (Time.time - m_DernierSon > 0.12f)
             {
                 m_DernierSon = Time.time;
@@ -89,6 +92,24 @@ namespace Deathless.Jeu
                 Brise?.Invoke();
             }
             return info.montant - pris;
+        }
+
+        // ----------------------------------------------------------------- Client d'une partie réseau (l'hôte fait foi)
+
+        public void LeverDistant(float max)
+        {
+            if (effet == null) return;
+            effet.maxHealth = max;
+            effet.Lever();
+            AudioBank.Jouer(SonsDuJeu.BouclierLeve, transform.position + Vector3.up * 2f, 0.9f);
+        }
+
+        public void ToucherDistant(float montant, Vector3 point)
+        {
+            if (!Leve) return;
+            effet.Frapper(montant, point);
+            AudioBank.Jouer(SonsDuJeu.BouclierTouche, point, 0.7f, 0.1f);
+            if (!effet.IsUp) AudioBank.Jouer(SonsDuJeu.BouclierBrise, transform.position + Vector3.up * 2f, 1f);
         }
 
         Vector3 PointSurParoi(InfoDegats info)

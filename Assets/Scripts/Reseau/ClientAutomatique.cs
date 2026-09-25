@@ -145,8 +145,33 @@ namespace Deathless.Reseau
         }
 
         /// En rond (un tour en 12 s), sprint une seconde sur trois ; toutes les 1,5 s : saut, esquive, attaque, à tour de rôle.
+        bool m_PretEnvoye;
+        int m_PhaseVue = -1;
+
         void Piloter(Heros h, float t)
         {
+            var p = Partie.Instance;
+            // Changement de phase : journal ; le jour, un vote « prêt » (une fois par jour).
+            if ((int)p.Etat.phase != m_PhaseVue)
+            {
+                m_PhaseVue = (int)p.Etat.phase;
+                m_PretEnvoye = false;
+                ReseauJeu.Journal("[auto] phase " + p.Etat.phase + " nuit " + p.Etat.nuit);
+            }
+            if (p.Etat.phase == Phase.Jour && !m_PretEnvoye && t > 3f) { m_PretEnvoye = true; h.Entrees.SimulerAction("Ready"); ReseauJeu.Journal("[auto] vote prêt"); }
+            // Un squelette à portée : on va vers lui, on le vise (caméra) et on attaque.
+            Squelette cible = null; float dmin = 30f;
+            var dv = DirecteurVagues.Instance;
+            if (dv != null) foreach (var s in dv.Vivants) { if (s == null || !s.Vivant || s.Sante.Mort) continue; float d = Vector3.Distance(s.transform.position, h.transform.position); if (d < dmin) { dmin = d; cible = s; } }
+            if (cible != null && h.CameraEpaule != null)
+            {
+                Vector3 v = cible.transform.position - h.transform.position; v.y = 0f;
+                h.CameraEpaule.lacet = Quaternion.LookRotation(v).eulerAngles.y;
+                h.Entrees.DeplacementTest = dmin > 5f ? new Vector2(0f, 1f) : Vector2.zero;
+                h.Entrees.SprintTest = false;
+                if (t >= m_ProchaineAction) { m_ProchaineAction = t + 1.0f; h.Entrees.SimulerAction("AttackPrimary"); }
+                return;
+            }
             float a = t * Mathf.PI * 2f / 12f;
             h.Entrees.DeplacementTest = new Vector2(Mathf.Cos(a), Mathf.Sin(a));
             h.Entrees.SprintTest = Mathf.Repeat(t, 3f) < 1f;
@@ -169,6 +194,24 @@ namespace Deathless.Reseau
                 if (Physics.Raycast(new Vector3(pos.x, 60f, pos.z), Vector3.down, out var sol, 400f, ~0, QueryTriggerInteraction.Ignore))
                     t += ", sol " + sol.collider.name + " à " + sol.point.y.ToString("F1");
                 else t += ", pas de sol sous le héros";
+            }
+            if (p != null && p.Etat.phase != Phase.Attente)
+            {
+                var dv = DirecteurVagues.Instance;
+                t += " | " + p.Etat.phase + " nuit " + p.Etat.nuit + " t=" + p.Etat.tempsPhase.ToString("F0") + " nyx " + (p.nyxessa != null ? p.nyxessa.Pv.ToString("F0") : "?")
+                    + " or " + p.Etat.orEquipe + " squelettes " + (dv != null ? dv.Vivants.Count : 0);
+                var j = p.JoueurLocal;
+                if (j != null) t += " | moi pv " + j.pv.ToString("F0") + (j.mort ? " MORT " + j.reapparitionRestante.ToString("F0") + " s" : "") + (j.pret ? " prêt" : "") + " tués " + j.score.ennemisTues + " dégâts " + j.score.degatsInfliges.ToString("F0") + " or " + j.score.orRapporte;
+                var so = Sorcier.Instance;
+                if (so != null) t += " | sorcier " + so.EtatCourant;
+                var bo = BouclierNyxessa.Instance;
+                if (bo != null && bo.Leve) t += " bouclier " + bo.Vie.ToString("F0");
+            }
+            if (p != null && p.Etat.phase == Phase.Terminee && DonneesUI.Score != null)
+            {
+                var sc = DonneesUI.Score;
+                t += " | SCORE " + sc.Resultat + " nuit " + sc.NuitAtteinte + " or " + sc.OrTotal + " :";
+                foreach (var ls in sc.Joueurs) t += " [" + ls.Nom + " " + ls.Classe + (ls.EstLocal ? " moi" : "") + " or " + ls.OrRapporte + " dégâts " + ls.DegatsInfliges + " tués " + ls.EnnemisTues + " morts " + ls.Morts + "]";
             }
             foreach (var h in HerosReseau.Tous)
                 if (h != null && !h.IsOwner) t += " | " + h.Pseudo + " (" + h.ClasseId + ") " + V(h.transform.position) + " vie " + h.Vie.ToString("F0") + "/" + h.VieMax.ToString("F0");

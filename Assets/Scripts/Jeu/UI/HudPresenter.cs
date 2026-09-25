@@ -102,8 +102,10 @@ namespace Deathless.Jeu
         /// Caisse commune : or des vagues (règle provisoire sans donjon, wiki : deroule).
         public int OrEquipe => P != null ? P.Etat.orEquipe : 0;
         public bool VoteActif => P != null && P.EnCours && P.Etat.phase == Jeu.Phase.Jour;
-        public int JoueursPrets => P != null ? P.JoueursPrets : 0;
-        public int JoueursTotal => P != null ? Mathf.Max(1, P.Etat.joueurs.Count) : 1;
+        // Multijoueur : le vote est compté chez l'hôte (PartieReseau), pour tous les postes.
+        static Deathless.Reseau.PartieReseau R => Deathless.Reseau.ReseauJeu.EnPartie ? Deathless.Reseau.PartieReseau.Instance : null;
+        public int JoueursPrets => R != null ? R.Prets.Value : P != null ? P.JoueursPrets : 0;
+        public int JoueursTotal => R != null ? Mathf.Max(1, R.Joueurs.Value) : P != null ? Mathf.Max(1, P.Etat.joueurs.Count) : 1;
         public float AngleNyxessa
         {
             get
@@ -167,7 +169,38 @@ namespace Deathless.Jeu
                 return Mathf.Max(P.Etat.orEquipe, rapporte);
             }
         }
-        public IReadOnlyList<ILigneScore> Joueurs => m_Lignes;
+        readonly List<ILigneScore> m_LignesReseau = new List<ILigneScore>();
+
+        /// Solo : le joueur local ; multijoueur : tous les joueurs de la partie, tels que l'hôte les tient.
+        public IReadOnlyList<ILigneScore> Joueurs
+        {
+            get
+            {
+                var r = R;
+                if (r == null || r.Scores.Count == 0) return m_Lignes;
+                m_LignesReseau.Clear();
+                foreach (var s in r.Scores) m_LignesReseau.Add(new LigneReseau(s));
+                return m_LignesReseau;
+            }
+        }
+
+        sealed class LigneReseau : ILigneScore
+        {
+            readonly Deathless.Reseau.ScoreReseau m_S;
+            readonly IClasseJouable m_C;
+            public LigneReseau(Deathless.Reseau.ScoreReseau s) { m_S = s; m_C = ClassesJouables.Trouver(s.classeId.ToString()); }
+            public string Nom => m_S.pseudo.ToString();
+            public string Classe => m_C != null ? m_C.Nom : m_S.classeId.ToString();
+            public Color TeinteClasse => m_C != null ? m_C.Teinte : TeintePaladin;
+            public bool EstLocal => m_S.clientId == Deathless.Reseau.ReseauJeu.IdLocal;
+            public int OrRapporte => m_S.or;
+            public int DegatsInfliges => m_S.degats;
+            public int EnnemisTues => m_S.tues;
+            public int Morts => m_S.morts;
+            public int CoupsCritiques => m_S.critiques;
+            public int DegatsEvitesNyxessa => m_S.evites;
+            public int SoinsProdigues => m_S.soins;
+        }
         public bool EstPretLocal => EstPret;
 
         // ----------------------------------------------------------------- ICommandesPartie

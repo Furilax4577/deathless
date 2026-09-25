@@ -22,7 +22,7 @@ namespace Deathless.Jeu
         public override bool Repoussable => false;
         public override float FacteurEtourdissement => 0.5f;
 
-        public override void Etourdir(float duree, int sourceId = 0) => base.Etourdir(duree * FacteurEtourdissement, sourceId);
+        public override void Etourdir(float duree, int sourceId = 0) { if (RelaiEtourdir(duree, sourceId)) return; base.Etourdir(duree * FacteurEtourdissement, sourceId); }
 
         public override void Repousser(Vector3 deplacement, float etourdi, int sourceId) => Etourdir(etourdi, sourceId);
 
