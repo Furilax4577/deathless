@@ -37,6 +37,6 @@ Les portes des maisons sont à l'échelle du joueur : 2,1 m pour un personnage d
 - Prix et soin rendu : {à équilibrer}.
 - **Le druide** les vend {décidé}. Voir Villageois.
 
-## Rôle des maisons {à confirmer}
+## Rôle des maisons {décidé}
 
-Les maisons n'ont pas encore de rôle de jeu. Elles pourraient abriter les villageois.
+Le druide et le mécano ont **chacun leur maison**, qui leur sert de boutique : on y entre le jour pour acheter. Le sorcier ne vend rien : il invoque le bouclier. Les autres maisons restent du décor.
