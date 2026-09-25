@@ -14,6 +14,7 @@ SITE = os.path.join(ICI, "site")
 MENU = [
     ("index", "Accueil"),
     ("principes", "Principes"),
+    ("deroule", "Déroulé d'une partie"),
     ("village", "Le village"),
     ("nyxessa", "Nyxessa, la relique"),
     ("portail", "Le portail"),

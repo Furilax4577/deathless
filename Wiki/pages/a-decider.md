@@ -4,7 +4,7 @@ Ce qui reste ouvert. Une ligne quitte cette page quand la règle est tranchée e
 
 | Sujet | Question | Page |
 |---|---|---|
-| Déroulé d'une partie | Durée du jour et de la nuit, vagues d'ennemis, joueur resté au donjon à la nuit, défaite | [Le portail](portail.md) |
+| Déroulé d'une partie | Vagues d'ennemis, joueur resté au donjon à la nuit, vote « prêt », défaite | [Déroulé d'une partie](deroule.md) |
 | Nyxessa | Paliers d'amélioration (stock, régénération, intervalle de tir, dégâts), choix des cibles | [Nyxessa](nyxessa.md) |
 | Bouclier | Signe visuel de l'amélioration (gemmes plus intenses ou plus nombreuses), paliers, encaissement, dégâts renvoyés, moment de l'invocation | [Nyxessa](nyxessa.md) |
 | Rôdeur | Durée de charge de l'arc, dégâts minimum et maximum, multiplicateur de critique | [Classes](classes.md) |
