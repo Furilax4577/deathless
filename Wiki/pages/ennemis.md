@@ -61,6 +61,9 @@ Invocateur qui combat à distance :
 - il **relève des squelettes** du sol autour de lui ;
 - il **fauche à la faux** ceux qui le serrent de près ;
 - ses **deux éclats de Nyx brillent**, dans le crâne de sa couronne et dans celui de son grimoire à la ceinture : ce sont ses **points faibles** {décidé}.
+  - Chaque éclat se **brise** sous les coups. Chaque éclat brisé lui retire **un tiers de sa puissance** {décidé}.
+  - Il ne peut être **tué qu'une fois ses deux éclats brisés** {décidé}.
+  - Vie des éclats et effet précis de la perte de puissance : {à équilibrer}. {{dev: Pas encore dans la version 0.1.}}
 
 Points de vie, dégâts et cadence : {à équilibrer}.
 
