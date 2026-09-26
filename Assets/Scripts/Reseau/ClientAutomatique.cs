@@ -17,6 +17,8 @@ namespace Deathless.Reseau
     ///   -deathless-achat : achète le palier 2 des missiles à la relique (l'hôte décide)
     ///   -deathless-donjon=retour|rester : entre au donjon par le portail, prend un tas d'or et un coffre, puis revient
     ///     par le portail de retour (or versé à la caisse) ou reste (rappel par Nyxessa au crépuscule)
+    ///   -deathless-capture=dossier : avec -deathless-donjon, images PNG de la caméra du jeu aux étapes des portails
+    ///     (rendues hors écran : en -batchmode sans -nographics, rien ne s'affiche et aucune fenêtre ne prend le focus)
     ///   -deathless-competences : le héros enchaîne toutes ses compétences (effets vus par les autres postes)
     ///   -deathless-solo : partie solo lancée aussitôt avec la classe donnée (vérification du build : caméra, héros)
     ///   [-deathless-quitter-salon=5] : quitte le salon 5 s après y être entré (test de la classe libérée), sans se déclarer prêt
@@ -59,6 +61,7 @@ namespace Deathless.Reseau
             c.m_Achat = Drapeau("deathless-achat") || Drapeau("deathless-taverne");
             c.m_Taverne = Drapeau("deathless-taverne");
             c.m_Donjon = Arg("deathless-donjon");
+            c.m_DossierCaptures = Arg("deathless-capture");
             if (int.TryParse(Arg("deathless-or"), out var or)) c.m_Or = or;
             if (int.TryParse(Arg("deathless-attendre"), out var att)) c.m_Attendre = att;
             c.m_Classe = Arg("deathless-classe") ?? "mage";
@@ -272,8 +275,50 @@ namespace Deathless.Reseau
         int m_EtapeAchat;
 
         // ------------------------------------------------------------ Donjon
-        string m_Donjon, m_DonjonMessage = "";
-        int m_EtapeDonjon;
+        string m_Donjon, m_DonjonMessage = "", m_DossierCaptures;
+        int m_EtapeDonjon, m_Captures;
+
+        /// Tourne le héros (et sa caméra) vers `direction`.
+        static void Regarder(Partie p, Heros h, Vector3 direction)
+        {
+            direction.y = 0f;
+            if (direction.sqrMagnitude < 0.01f) return;
+            h.transform.rotation = Quaternion.LookRotation(direction);
+            if (p.cameraJeu != null && p.cameraJeu.cible == h.transform) p.cameraJeu.lacet = h.transform.eulerAngles.y;
+        }
+
+        /// -deathless-capture : image de la caméra du jeu (1280 x 720, PNG), rendue dans une texture (pas d'écran en
+        /// -batchmode) ; l'interface (UI Toolkit) n'y figure pas.
+        void Capturer(string nom)
+        {
+            if (string.IsNullOrEmpty(m_DossierCaptures)) return;
+            var p = Partie.Instance;
+            var cam = p != null && p.cameraJeu != null ? p.cameraJeu.GetComponent<Camera>() : Camera.main;
+            if (cam == null) { ReseauJeu.Journal("[auto] capture " + nom + " : pas de caméra"); return; }
+            try
+            {
+                const int L = 1280, H = 720;
+                var rt = RenderTexture.GetTemporary(L, H, 24, RenderTextureFormat.ARGB32);
+                var avant = cam.targetTexture;
+                cam.targetTexture = rt;
+                cam.Render();
+                cam.targetTexture = avant;
+                var actif = RenderTexture.active;
+                RenderTexture.active = rt;
+                var tex = new Texture2D(L, H, TextureFormat.RGB24, false);
+                tex.ReadPixels(new Rect(0, 0, L, H), 0, 0);
+                tex.Apply();
+                RenderTexture.active = actif;
+                RenderTexture.ReleaseTemporary(rt);
+                System.IO.Directory.CreateDirectory(m_DossierCaptures);
+                string chemin = System.IO.Path.Combine(m_DossierCaptures, nom + ".png");
+                System.IO.File.WriteAllBytes(chemin, tex.EncodeToPNG());
+                Destroy(tex);
+                m_Captures++;
+                ReseauJeu.Journal("[auto] capture " + chemin);
+            }
+            catch (Exception e) { ReseauJeu.Journal("[auto] capture " + nom + " impossible : " + e.Message); }
+        }
 
         /// Test du donjon (-deathless-donjon) : entrée par le portail du village, un tas d'or, un coffre (l'hôte décide),
         /// puis retour par le portail (dépôt) ou attente du rappel. Le journal donne l'état vu par ce poste.
@@ -291,17 +336,34 @@ namespace Deathless.Reseau
                 m_EtapeDonjon = 1;
                 var pv = FindAnyObjectByType<VueCycle>().portail;
                 Vector3 n = p.nyxessa.transform.position - pv.Center; n.y = 0f;
-                h.Teleporter(new Vector3(pv.Center.x, 0.1f, pv.Center.z) + n.normalized * 0.8f);
-                ReseauJeu.Journal("[auto] donjon : vers le portail du village (" + etat + ")");
+                // Devant le portail (à 1,8 m du centre : la touche Interagir porte à 3 m), tourné vers lui.
+                h.Teleporter(new Vector3(pv.Center.x, 0.1f, pv.Center.z) + n.normalized * 1.8f);
+                Regarder(p, h, -n);
+                ReseauJeu.Journal("[auto] donjon : devant le portail du village (" + etat + ")");
             }
-            else if (m_EtapeDonjon == 1 && t > 8f)
+            else if (m_EtapeDonjon == 1 && t > 6.5f)
+            {
+                // On n'entre plus en marchant dedans : touche Interagir (Quentin, 26/09/2026).
+                m_EtapeDonjon = 11;
+                Capturer("portail_village_invite");
+                PointInteraction.Courant(h, out string invite);
+                bool ok = PointInteraction.InteragirIci(h);
+                ReseauJeu.Journal("[auto] donjon : invite « " + invite + " », interaction " + ok + ", en transit " + h.EnTransit);
+            }
+            else if (m_EtapeDonjon == 11 && t > 6.8f)
+            {
+                m_EtapeDonjon = 12;
+                Capturer("portail_village_passage");
+            }
+            else if (m_EtapeDonjon == 12 && t > 9f)
             {
                 m_EtapeDonjon = 2;
+                Capturer("portail_donjon_arrivee");
                 ReseauJeu.Journal("[auto] donjon : après le portail, position " + h.transform.position.ToString("F1") + " (" + etat + ")");
                 for (int i = 0; i < g.Butins.Length; i++)
                     if (g.Butins[i].butin == Deathless.Donjon.TypeButin.TasOr && !dj.ButinPris(i)) { h.Teleporter(g.Butins[i].transform.position + Vector3.up * 0.1f); ReseauJeu.Journal("[auto] donjon : sur le tas d'or " + i); break; }
             }
-            else if (m_EtapeDonjon == 2 && t > 10f)
+            else if (m_EtapeDonjon == 2 && t > 11.5f)
             {
                 m_EtapeDonjon = 3;
                 for (int i = 0; i < g.Butins.Length; i++)
@@ -309,13 +371,15 @@ namespace Deathless.Reseau
                     {
                         var r = g.Butins[i].transform;
                         h.Teleporter(r.position + r.forward * 1.4f + Vector3.up * 0.1f);
+                        Regarder(p, h, -r.forward);
                         ReseauJeu.Journal("[auto] donjon : devant le coffre " + i + " (" + etat + ")");
                         break;
                     }
             }
-            else if (m_EtapeDonjon == 3 && t > 11f)
+            else if (m_EtapeDonjon == 3 && t > 13f)
             {
                 m_EtapeDonjon = 4;
+                Capturer("coffre_cadenas");
                 PointInteraction.Courant(h, out string invite);
                 bool ok = PointInteraction.InteragirIci(h);
                 ReseauJeu.Journal("[auto] donjon : invite « " + invite + " », interaction " + ok);
@@ -324,11 +388,29 @@ namespace Deathless.Reseau
             {
                 m_EtapeDonjon = 5;
                 ReseauJeu.Journal("[auto] donjon : butin (" + etat + ")");
-                if (m_Donjon == "retour") { h.Teleporter(g.PortailRetour.transform.position + Vector3.up * 0.1f); ReseauJeu.Journal("[auto] donjon : vers le portail de retour"); }
+                // Devant le portail de retour, tourné vers lui (même avec « rester » : capture du portail).
+                var ret = g.PortailRetour.transform;
+                h.Teleporter(ret.position + ret.forward * 2.2f + Vector3.up * 0.1f);
+                Regarder(p, h, -ret.forward);
+                ReseauJeu.Journal("[auto] donjon : devant le portail de retour, visuel " + (g.VisuelPortailRetour != null ? "gemmes" : g.PortailRetour.visuel != null ? g.PortailRetour.visuel.name : "aucun"));
             }
-            else if (m_EtapeDonjon == 5 && t > 18f)
+            else if (m_EtapeDonjon == 5 && t > 15.5f)
+            {
+                m_EtapeDonjon = 51;
+                Capturer("portail_retour_donjon");
+                PointInteraction.Courant(h, out string invite);
+                bool ok = m_Donjon == "retour" && PointInteraction.InteragirIci(h);
+                ReseauJeu.Journal("[auto] donjon : invite « " + invite + " », interaction " + ok);
+            }
+            else if (m_EtapeDonjon == 51 && t > 15.8f)
+            {
+                m_EtapeDonjon = 52;
+                if (m_Donjon == "retour") Capturer("portail_retour_passage");
+            }
+            else if (m_EtapeDonjon == 52 && t > 18f)
             {
                 m_EtapeDonjon = 6;
+                if (m_Donjon == "retour") Capturer("portail_village_sortie");
                 ReseauJeu.Journal("[auto] donjon : " + (m_Donjon == "retour" ? "après le retour" : "on attend le rappel") + " (" + etat + ")");
             }
             else if (m_EtapeDonjon == 6 && p.Etat.phase != Phase.Jour)
@@ -336,7 +418,7 @@ namespace Deathless.Reseau
                 m_EtapeDonjon = 7;
                 ReseauJeu.Journal("[auto] donjon : phase " + p.Etat.phase + ", position " + h.transform.position.ToString("F1") + " (" + etat + ")");
             }
-            return m_EtapeDonjon < 7;
+            return m_EtapeDonjon != 7;   // étapes 11, 12, 51, 52 : intermédiaires
         }
 
         /// Test des achats à la relique (-deathless-achat) : vers 6 s, le héros va près de Nyxessa, ouvre le menu (touche

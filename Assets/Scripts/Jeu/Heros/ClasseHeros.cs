@@ -54,6 +54,9 @@ namespace Deathless.Jeu
         public virtual bool HautDuCorps => false;
         /// Vitesse de l'animation de marche quand la classe ralentit (marche discrète…).
         public virtual float FacteurAnimation => 1f;
+        /// Penché voulu du corps vers l'avant (degrés, pivot aux pieds), appliqué par Heros au modèle seul (ni caméra ni
+        /// capsule). Lu aussi sur les marionnettes : à déduire de l'état de l'Animator (répliqué), pas de la logique locale.
+        public virtual float Penche => 0f;
 
         // ----------------------------------------------------------------- Événements
 
@@ -81,8 +84,9 @@ namespace Deathless.Jeu
         protected const int EffetCritique = 200;
         public const int EffetEsquive = 201, EffetSaut = 202, EffetTransitDepart = 203, EffetTransitArrivee = 204;
 
-        /// DonjonJeu : passage d'un portail (départ, arrivée) à rejouer chez les autres, à la position donnée.
-        public void DiffuserTransit(int effet, Vector3 position) => Diffuser(effet, position);
+        /// DonjonJeu : passage d'un portail (départ, arrivée) à rejouer chez les autres, à la position donnée ; `portail` :
+        /// 0 aucun (rappel), 1 portail du village, 2 portail de retour du donjon (DonjonJeu.PortailDe).
+        public void DiffuserTransit(int effet, Vector3 position, int portail = 0) => Diffuser(effet, position, default, portail);
 
         /// Heros : effet commun (esquive, saut) à rejouer chez les autres.
         public void DiffuserCommun(int effet) => Diffuser(effet);
@@ -109,8 +113,8 @@ namespace Deathless.Jeu
             if (effet == EffetCritique) Combat.Critique(a, b, v > 0.5f);
             else if (effet == EffetEsquive) AudioBank.Jouer(SonsDuJeu.Esquive, transform.position + Vector3.up, 0.8f);
             else if (effet == EffetSaut) AudioBank.Jouer(SonsDuJeu.Saut, transform.position, 0.5f);
-            else if (effet == EffetTransitDepart) DonjonJeu.TransitDistant(H, a, false);
-            else if (effet == EffetTransitArrivee) DonjonJeu.TransitDistant(H, a, true);
+            else if (effet == EffetTransitDepart) DonjonJeu.TransitDistant(H, a, false, Mathf.RoundToInt(v));
+            else if (effet == EffetTransitArrivee) DonjonJeu.TransitDistant(H, a, true, Mathf.RoundToInt(v));
         }
 
         // ----------------------------------------------------------------- HUD

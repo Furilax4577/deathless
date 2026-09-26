@@ -98,6 +98,11 @@ public class PortalVisual : MonoBehaviour
     // Centre de la soupe dans le monde (où convergent les gemmes d'un joueur qui entre).
     public Vector3 Center => root != null ? root.position : transform.position;
 
+    // Réglages posés par le code sur une copie du prefab avant son premier Start (Deathless, 26/09/2026 : portail de
+    // retour du donjon, même prefab que celui du village, ni charge de Nyxessa ni réaction à l'ouverture).
+    public bool AlimenteParNyxessa { get => alimenteParNyxessa; set => alimenteParNyxessa = value; }
+    public bool ReagirRelique { get => reagirRelique; set => reagirRelique = value; }
+
     // Entrée d'un joueur : goutte d'eau, des anneaux partent du centre vers le bord et s'amortissent, avec un creux
     // qui rebondit au centre.
     public void Entrer()

@@ -75,8 +75,14 @@ Scripts/Reseau/
 - **Score** : écran de score avec une ligne par joueur (`HudPresenter.Joueurs` lit `PartieReseau.Scores`), le joueur local marqué.
 - **Squelettes** : préfabs réseau (NetworkObject, NetworkTransform et NetworkAnimator en autorité serveur, échelle synchronisée pour les élites, `EnnemiReseau`), apparus par l'hôte (`DirecteurVagues.Poser`) ; nombre par nuit × (1 + 0,6 par joueur en plus) (`GameBalance.ennemisParJoueurEnPlus`).
 - **Missiles en crâne** (Nyxessa, Nécromancien) : même vol chez les clients, sans dégâts (`MissileCrane.TirerVisuel`).
+- **Stock des missiles de Nyxessa** (26/09/2026, compteur du HUD) : l'hôte écrit le stock dans `PartieReseau.StockMissiles` (`NetworkVariable<int>`, envoyée seulement quand elle change) ; le palier passe déjà par `PalierMissiles`. La recharge du prochain missile n'est pas envoyée : chaque client l'extrapole dans `Partie.SuivreMissiles`, avec la règle de `DefenseNyxessa`.
+  - Stock plein : elle reste à 0.
+  - Stock qui monte : elle repart de 0.
+  - Sinon : elle avance de `dt`, bornée à la durée du palier (`missileRegenerationPaliers`). Un tir ne la remet pas à zéro, comme chez l'hôte.
+  - Vérifié le 26/09/2026 (hôte Paladin dans l'éditeur, client Mage caché ; journal du client par `ClientMissiles.cs`, fichier de test propre à la copie ; hôte forcé au palier 3, stock 1, puis un tir simulé) : le client suit le stock à la seconde près ; sa recharge a environ 0,1 s de retard, et le HUD du client affiche 1/4, 2/4, puis 3/4 avec la même charge que l'hôte.
+  - L'écart avec l'hôte ne dépasse pas la latence et se résorbe au missile suivant. Seule exception : si le client commence à suivre la partie pendant une recharge, son premier affichage peut être en retard.
 - **Tirs des joueurs** (flèches, carreaux, boules de feu) : rejoués chez les autres (`ProjectileJeu.TirerVisuel`, même balistique, sans dégâts).
-- **Effets de compétence** (26/09/2026) : chaque classe diffuse ses effets par `ClasseHeros.Diffuser(effet, a, b, v)` → `HerosReseau.EffetRpc` (propriétaire → autres postes) → `ClasseHeros.EffetDistant` sur la marionnette, qui rejoue visuel et son à la même position et dans la même orientation, sans dégâts (ils restent décidés comme avant). Paladin : élan et impact de l'épée, charge bélier et son impact, soin et aura, garde et parade ; Viking : élan, coup de hache, attaque tournante (début, effet, coups, fin), rugissement (effet et cri), saut percutant (onde) ; Mage : lancer de boule, cône de flammes (allumé, suit l'orientation du héros, éteint) ; Rôdeur : bander, tir, nuée de flèches (effet et sons), roulade, salve ; Assassin : dague, arbalète (et son rechargement), fumigène (`FumeeRpc`, avec le son du nuage) ; toutes les classes : marque de critique, esquive, saut.
+- **Effets de compétence** (26/09/2026) : chaque classe diffuse ses effets par `ClasseHeros.Diffuser(effet, a, b, v)` → `HerosReseau.EffetRpc` (propriétaire → autres postes) → `ClasseHeros.EffetDistant` sur la marionnette, qui rejoue visuel et son à la même position et dans la même orientation, sans dégâts (ils restent décidés comme avant). Paladin : élan et impact de l'épée, charge bélier et son impact, soin et aura, garde et parade ; Viking : élan, coup de hache, attaque tournante (début, effet, coups, fin), rugissement (effet et cri), saut percutant (onde) ; Mage : lancer de boule, cône de flammes (allumé, suit l'orientation du héros, éteint) ; Rôdeur : bander, tir, nuée de flèches (effet et sons), roulade, salve ; Assassin : dague, arbalète (et son rechargement), fumigène (`FumeeRpc`, avec le son du nuage) ; toutes les classes : marque de critique, esquive, saut. Les gestes passent par le `NetworkAnimator`, pas par ces effets. Exemple : la course de la charge bélier derrière le bouclier (26/09/2026). Elle utilise les déclencheurs `Charge` et `CoupBouclier`, les paramètres `Ruee` et `VitesseRuee`, et le poids de la couche haute. Le penché du corps se déduit de l'état de l'Animator sur la marionnette (`Docs/styles-d-armes.md`).
 - **Sorcier et bouclier** : l'hôte pilote ; les clients suivent (marionnette du sorcier, effet du bouclier levé, frappé, brisé, baissé).
 - Préfabs : `Deathless > Jeu > 8. Réseau` équipe aussi les 4 squelettes et crée `Resources/Reseau/PartieReseau.prefab`.
 
@@ -96,9 +102,10 @@ Arguments de `ClientAutomatique` :
 `-deathless-competences` : le héros enchaîne toutes ses compétences (saut, esquive, RT, LB, RB, LT maintenu, RT maintenu), jauge remplie, et le journal compte les effets reçus des autres (`HerosReseau.EffetsRecus`). `-deathless-attendre=2` : l'hôte construit ne se déclare prêt qu'à 2 joueurs. `-deathless-solo` : partie solo lancée aussitôt (vérification d'un build : le journal donne aussi l'état de la caméra).
 
 `-deathless-donjon=retour|rester` fait le test du donjon.
-- Le héros entre par le portail du village, marche sur un tas d'or, puis ouvre un coffre avec Interagir.
-- Avec `retour`, il revient ensuite par le portail de retour, et son or est versé à la caisse. Avec `rester`, il attend le rappel du crépuscule.
-- Le journal donne ce que voit le poste : graine, butins pris, or porté, caisse, présence au donjon.
+- Le héros se place à 1,8 m du portail du village et entre avec Interagir (invite « Entrer dans le donjon »), marche sur un tas d'or, puis ouvre un coffre avec Interagir.
+- Il se place ensuite devant le portail de retour. Avec `retour`, il revient avec Interagir (« Revenir au village »), et son or est versé à la caisse. Avec `rester`, il attend le rappel du crépuscule.
+- Le journal donne ce que voit le poste : graine, butins pris, or porté, caisse, présence au donjon, invites des portails.
+- `-deathless-capture=dossier` (26/09/2026) : images PNG de la caméra du jeu aux étapes (portail du village, passage, arrivée, cadenas du coffre, portail de retour, retour au village), rendues dans une texture. Avec `-batchmode` sans `-nographics`, un build les produit sans fenêtre ni prise de focus. L'interface n'y figure pas.
 - Script d'hôte : `scratchpad/reseau/donjon.sh`.
 
 Il rejoint, prend sa classe, se déclare prêt, puis fait marcher son héros en rond (sprint une seconde sur trois ; saut, esquive, attaque toutes les 1,5 s) et journalise toutes les 2 s le salon, sa position, le sol sous lui et les héros des autres (position, vie). Pseudo et classe imposés ne touchent pas au profil enregistré.
@@ -124,11 +131,12 @@ Résultats de l'étape 2 (25/09/2026, hôte Paladin, client Mage, adresse IP) : 
 - **Butin** : les butins pris sont un masque de bits, `PartieReseau.ButinsPris`.
   - Un client demande un butin avec `DemanderButin(index)` (RPC au serveur). L'hôte vérifie la distance et l'accorde (`DonjonJeu.Accorder`) en ajoutant l'or à `EtatJoueur.orPorte`.
   - L'or porté est répliqué dans `ScoreReseau.orPorte`.
+- **Portails** (touche Interagir, 26/09/2026) : `PassagePortail` (un `PointInteraction`) est posé par `DonjonJeu` sur le portail du village et sur le repère du portail de retour. Chaque poste décide seul du passage de **son** héros (`DonjonJeu.InvitePortail`, `Passer`) : conditions locales (jour et portail ouvert pour l'entrée, 3 m au plus), rien n'est demandé à l'hôte, sauf le dépôt de l'or.
 - **Dépôt** : au portail de retour, un client envoie `DeposerOr()`, et l'hôte verse l'or à la caisse avec `GagnerOr`.
 - **Rappel** : au crépuscule, l'hôte calcule la part gardée (`GameBalance.partGardeeRappel` au palier des missiles), puis envoie `HerosReseau.Rappeler(garde, perdu)` au propriétaire, qui se téléporte près de Nyxessa.
-- **Passages** : le propriétaire joue la téléportation (`PortalTransit`) et la diffuse avec `ClasseHeros.DiffuserTransit` (effets 203 et 204). Il saute de position avec `NetworkTransform.Teleport`, sans interpolation. Chez les autres, la marionnette est cachée entre le départ et l'arrivée.
+- **Passages** : le propriétaire joue la téléportation (`PortalTransit`) et la diffuse avec `ClasseHeros.DiffuserTransit` (effets 203 et 204). La valeur libre `v` de l'effet porte le portail (0 aucun pour le rappel, 1 village, 2 retour du donjon) : les autres postes rejouent la dissolution vers ce portail et l'arrivée depuis lui, avec les anneaux (`DonjonJeu.TransitDistant`). Il saute de position avec `NetworkTransform.Teleport`, sans interpolation. Chez les autres, la marionnette est cachée entre le départ et l'arrivée.
 - **Gardiens** : ils sont posés par l'hôte avec `DirecteurVagues.Poser` puis `Squelette.Garder(poste)`, et répliqués comme les autres squelettes.
-- **Local à chaque poste** : le masquage des étages (capteurs sur le héros local et sa caméra), l'ambiance sombre et l'animation des coffres (cadenas, couvercle).
+- **Local à chaque poste** : le masquage des étages (capteurs sur le héros local et sa caméra), l'ambiance sombre et l'animation des coffres (couvercle ; plus de cadenas depuis le 26/09/2026).
 
 ## Limites connues
 

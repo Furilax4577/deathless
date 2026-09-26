@@ -16,6 +16,8 @@ Le portail mène du village au donjon. C'est un disque de gemmes vertes d'enviro
 
 ## Passage {décidé}
 
+- **Touche Interagir** (décision de Quentin du 26/09/2026) : on passe un portail, à l'aller comme au retour, avec la touche Interagir (E, X ou Carré), à environ 3 m du portail au plus. On n'entre plus en marchant dedans. L'invite s'affiche au centre de l'écran : « Entrer dans le donjon » au portail du village, « Revenir au village » au portail de retour.
+- Pendant le passage, le joueur ne peut plus bouger : son corps part en gemmes vers le centre du portail, puis se reforme de l'autre côté.
 - Quand un joueur **entre** dans le portail, des anneaux partent du centre du disque comme une goutte tombée dans l'eau.
 - Quand un joueur **sort** d'un portail, les anneaux font le chemin inverse, du bord vers le centre.
 - Chaque passage fait réagir Nyxessa.
@@ -26,7 +28,9 @@ Le portail qui ramène du donjon au village n'est pas alimenté par Nyxessa : il
 
 ## Dans le jeu (26/09/2026)
 
-- **Entrée** : de jour, un joueur entre en passant dans le portail du village. Son corps part en gemmes vers le centre du portail, puis se reforme sur la dalle d'arrivée du donjon.
-- **Retour** : il revient en passant dans le portail de retour du donjon. Il réapparaît 5 m devant le portail du village, du côté de Nyxessa, et les gemmes jaillissent du portail. L'or qu'il porte est versé à la caisse commune.
-- **Visibilité** : les autres joueurs voient le passage : dissolution au départ, reconstitution à l'arrivée.
+- **Entrée** : de jour, près du portail du village, un joueur appuie sur Interagir (« Entrer dans le donjon »). Son corps part en gemmes vers le centre du portail, puis les gemmes jaillissent du portail de retour du donjon et le reforment sur la dalle d'arrivée, juste à côté.
+- **Retour** : près du portail de retour du donjon, il appuie sur Interagir (« Revenir au village »). Il réapparaît 5 m devant le portail du village, du côté de Nyxessa, et les gemmes jaillissent du portail. L'or qu'il porte est versé à la caisse commune.
+- **Portail de retour** : c'est le même disque de gemmes vertes que celui du village, sur son socle de pierre, contre le mur sud de la salle d'arrivée. Il est toujours ouvert et bourdonne comme celui du village. Il remplace l'anneau de bronze de la version 0.5, qui ne ressemblait pas à un portail.
+- **Visibilité** : les autres joueurs voient le passage : dissolution vers le portail de départ, reconstitution depuis le portail d'arrivée, avec les anneaux sur les deux portails.
 - **Portail fermé** : la nuit, le portail est fermé et on ne peut pas passer.
+- **Geste** : aucun clip d'entrée ou de sortie n'est prévu, ni dans le wiki ni dans les effets. Le passage n'utilise que l'effet de téléportation, les anneaux et le son du portail.

@@ -180,8 +180,9 @@ namespace Deathless.Jeu
         public int gardiensDonjon = 6;
         [Tooltip("Part de guerriers parmi les gardiens.")]
         public float partGuerriersDonjon = 0.35f;
-        [Tooltip("Distance horizontale au centre d'un portail pour le passer (m).")]
-        public float rayonPortail = 1.5f;
+        [Tooltip("Distance horizontale au centre d'un portail pour le passer avec la touche Interagir (m ; Quentin, 26/09/2026 : " +
+                 "on n'entre plus en marchant dedans).")]
+        public float distancePortail = 3f;
         [Tooltip("Distance pour ramasser un tas d'or en passant dessus (m).")]
         public float rayonTasOr = 1.4f;
         [Tooltip("Distance pour ouvrir un coffre (touche Interagir, m).")]
@@ -264,6 +265,11 @@ namespace Deathless.Jeu
         public float chargeEtourdiRepousses = 0.6f;
         public float chargeRepoussement = 2.5f;
         public float chargeRecharge = 14f;
+        [Tooltip("Penché du corps vers l'avant pendant la ruée (degrés, pivot aux pieds ; ni caméra ni capsule). Banc : 14.")]
+        public float chargePenche = 14f;
+        [Tooltip("Cadence des jambes (Running_A) pendant la ruée : vitesse réelle ÷ vitesse des pieds du clip, bornée ici.")]
+        public float chargeCadenceMin = 0.8f;
+        public float chargeCadenceMax = 3f;
         [Header("Soin sur soi")]
         public float soinPart = 0.25f;
         public float soinIncantation = 0.6f;

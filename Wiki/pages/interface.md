@@ -24,8 +24,9 @@
 | Zone | Contenu |
 |---|---|
 | Haut, au centre | Vie de Nyxessa et de son bouclier, temps restant avant la nuit ou avant l'aube |
+| Haut, au centre, à droite de la barre de Nyxessa | Missiles de Nyxessa : icône du crâne vert qui se remplit pendant la recharge du prochain missile, et le stock (par exemple « 3 / 5 ») |
 | Haut, à droite | Or de l'équipe |
 | Gauche | Vie des autres joueurs |
 | Bas, à gauche | Portrait avec l’emblème de la classe, vie, endurance, et la jauge de la classe s’il y en a une (barres sans icône) |
 | Bas, au centre | Attaques et compétences avec leur bouton et leur temps de recharge, potions |
-| Centre | Réticule de visée, et l'action possible devant soi (par exemple « Entrer dans le portail ») |
+| Centre | Réticule de visée, et l'action possible devant soi (par exemple « Entrer dans le donjon » près du portail) |

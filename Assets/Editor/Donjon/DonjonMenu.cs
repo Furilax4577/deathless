@@ -11,6 +11,7 @@ public static class DonjonMenu
 {
     public const string CheminKit = "Assets/Donjon/DonjonKit.asset";
     public const string CheminAnneau = "Assets/Donjon/Donjon_PortailRetour.mat";
+    public const string CheminPortail = "Assets/VFX/PortailDonjon/PortailDonjon.prefab";
     const string Dungeon = "Assets/Art/KayKit/KayKit_Dungeon_Pack_1.1_FREE/Assets/fbx(unity)/";
     const string Halloween = "Assets/Art/KayKit/KayKit_HalloweenBits_1.0_FREE/Assets/fbx(unity)/";
 
@@ -116,6 +117,9 @@ public static class DonjonMenu
         kit.tonneauFlottant = M(Dungeon, "barrel_large")[0];
         kit.grandCoffre = M(Dungeon, "chest_gold")[0];
         kit.coffre = M(Dungeon, "chest")[0];
+        // Coffres sans serrure (Assets/Art/Coffres, 26/09/2026 : plus de cadenas) : posés à la place des coffres KayKit.
+        kit.coffreSansSerrure = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Coffres/Prefabs/Coffre.prefab");
+        kit.grandCoffreSansSerrure = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Coffres/Prefabs/GrandCoffre.prefab");
         kit.tasOr = M(Dungeon, "coin_stack_large", "coin_stack_medium");
         // Mobilier des planches (tonneaux, caisses, tables) ; jamais rien qui ressemble à du butin (retour de Quentin) :
         // ni or, ni coffre, ni sac, ni malle. Pas de box_stacked (bouteilles vertes).
@@ -129,6 +133,8 @@ public static class DonjonMenu
         kit.colonneTorchere = M(Dungeon, "column")[0];
         kit.socle = M(Dungeon, "floor_foundation_allsides")[0];
         kit.anneau = Anneau();
+        // En jeu, le portail de retour est le même que celui du village (gemmes vertes), toujours ouvert.
+        kit.portail = AssetDatabase.LoadAssetAtPath<GameObject>(CheminPortail);
         if (nouveau) AssetDatabase.CreateAsset(kit, CheminKit);
         EditorUtility.SetDirty(kit);
         AssetDatabase.SaveAssets();

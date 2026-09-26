@@ -3,9 +3,10 @@ using UnityEngine;
 
 namespace Deathless.Jeu
 {
-    /// Coffre du donjon (grand coffre ou coffre) : touche Interagir à côté ; le cadenas s'ouvre, le couvercle bascule et
-    /// l'or passe au joueur (porté jusqu'au retour par le portail). Posé par DonjonJeu sur le repère du butin ;
-    /// l'autorité décide (DonjonJeu.Accorder).
+    /// Coffre du donjon (grand coffre ou coffre) : touche Interagir à côté ; le couvercle bascule et l'or passe au joueur
+    /// (porté jusqu'au retour par le portail). Plus de cadenas ni de clé (Quentin, 26/09/2026 : tous les coffres s'ouvrent
+    /// sans clé pour l'instant ; DonjonJeu.CadenasActifs). Posé par DonjonJeu sur le repère du butin ; l'autorité décide
+    /// (DonjonJeu.Accorder).
     public class CoffreDonjon : PointInteraction
     {
         DonjonRepere m_Repere;

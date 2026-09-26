@@ -38,6 +38,16 @@ namespace Deathless.Donjon
         public GameObject grandCoffre;
         public GameObject coffre;
         public GameObject[] tasOr;
+        [Tooltip("Modèle du grand coffre sans serrure (Assets/Art/Coffres/…) : posé à la place de grandCoffre dès qu'il est renseigné.")]
+        public GameObject grandCoffreSansSerrure;
+        [Tooltip("Modèle du coffre sans serrure (Assets/Art/Coffres/…) : posé à la place de coffre dès qu'il est renseigné.")]
+        public GameObject coffreSansSerrure;
+        [Tooltip("Fin du nom de l'enfant qui sert de couvercle (il bascule à l'ouverture) : « _lid » pour les coffres KayKit.")]
+        public string suffixeCouvercle = "_lid";
+
+        /// Modèles posés par le générateur : les coffres sans serrure quand ils sont renseignés, sinon ceux de KayKit.
+        public GameObject ModeleGrandCoffre => grandCoffreSansSerrure != null ? grandCoffreSansSerrure : grandCoffre;
+        public GameObject ModeleCoffre => coffreSansSerrure != null ? coffreSansSerrure : coffre;
 
         [Header("Décor (jamais rien qui ressemble à du butin : seul le vrai butin a l'allure du butin)")]
         public GameObject[] decorsCoin;
@@ -58,6 +68,10 @@ namespace Deathless.Donjon
 
         [Header("Portail de retour (repère, non alimenté par Nyxessa)")]
         public GameObject socle;
+        [Tooltip("Portail posé en jeu sur le repère du portail de retour : le même que celui du village " +
+                 "(Assets/VFX/PortailDonjon/PortailDonjon.prefab, gemmes vertes), toujours ouvert. Vide : anneau de bronze.")]
+        public GameObject portail;
+        [Tooltip("Anneau de bronze : ancien repère, gardé hors jeu (génération dans l'éditeur) ou sans portail.")]
         public Material anneau;
         public Color couleurPortail = new Color(1f, 0.78f, 0.45f);
         public float intensitePortail = 4f;

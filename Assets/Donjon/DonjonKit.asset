@@ -57,6 +57,9 @@ MonoBehaviour:
   tasOr:
   - {fileID: 919132149155446097, guid: 70f0b9e03d13159458afe55b0fc3ac13, type: 3}
   - {fileID: 919132149155446097, guid: 24af4a26e1c652c48a980134b40e2af6, type: 3}
+  grandCoffreSansSerrure: {fileID: 6814646210844944595, guid: 8e9cc5047b2e7274f9622f56974894df, type: 3}
+  coffreSansSerrure: {fileID: 965645262461210738, guid: f110bde8f5d855a4d81fa67e307f8577, type: 3}
+  suffixeCouvercle: _lid
   decorsCoin:
   - {fileID: 919132149155446097, guid: 455880f36d587914a8a40c9ce5437810, type: 3}
   - {fileID: 919132149155446097, guid: 46828ef6833705a4c9e47b93165818a4, type: 3}
@@ -88,6 +91,7 @@ MonoBehaviour:
   intensiteTorche: 5
   porteeTorche: 11
   socle: {fileID: 919132149155446097, guid: bd4753ea479afbd4e97cb2f7cf2c4eec, type: 3}
+  portail: {fileID: 3923246226074339096, guid: 8738e0330059a5e40a8126ea2797a3da, type: 3}
   anneau: {fileID: 2100000, guid: e0f06295ab01fd1418d16ac7cb9a3663, type: 2}
   couleurPortail: {r: 1, g: 0.78, b: 0.45, a: 1}
   intensitePortail: 4

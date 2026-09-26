@@ -65,7 +65,7 @@ namespace Deathless.Donjon
         [NonSerialized] int m_BoitesUtilisees;
         readonly List<Light> m_Lampes = new List<Light>(64);
         [NonSerialized] int m_LampesUtilisees;
-        [NonSerialized] GameObject m_Anneau;
+        [NonSerialized] GameObject m_Anneau, m_Portail;
         [NonSerialized] Transform m_DernierVisuel;
         static Mesh s_MeshAnneau;
 
@@ -200,7 +200,7 @@ namespace Deathless.Donjon
             if (m_Racine != null) return;
             Transform ancien = transform.Find("Genere");
             if (ancien != null) Detruire(ancien.gameObject);
-            m_Reserves.Clear(); m_ListeReserves.Clear(); m_Boites.Clear(); m_Lampes.Clear(); m_Anneau = null;
+            m_Reserves.Clear(); m_ListeReserves.Clear(); m_Boites.Clear(); m_Lampes.Clear(); m_Anneau = null; m_Portail = null;
             m_Racine = Enfant(transform, "Genere");
             m_Visuels = Enfant(m_Racine, "Visuels");
             m_Collisions = Enfant(m_Racine, "Collisions");
@@ -636,7 +636,7 @@ namespace Deathless.Donjon
             {
                 Pose b = m_Plan.butins[i];
                 TypeButin t = (TypeButin)b.type;
-                GameObject m = t == TypeButin.GrandCoffre ? kit.grandCoffre : t == TypeButin.Coffre ? kit.coffre : Choisir(kit.tasOr, b.variante);
+                GameObject m = t == TypeButin.GrandCoffre ? kit.ModeleGrandCoffre : t == TypeButin.Coffre ? kit.ModeleCoffre : Choisir(kit.tasOr, b.variante);
                 int g = Groupe(b.Bloc, b.niveau);
                 Vector3 p = new Vector3(b.x, b.y, b.z);
                 GameObject v = Prendre(m, g, p, b.rotY);
@@ -745,24 +745,63 @@ namespace Deathless.Donjon
             int g = Groupe(po.Bloc, 0);
             Vector3 p = new Vector3(po.x, po.y, po.z);
             GameObject socle = Prendre(kit.socle, g, p, po.rotY, new Vector3(1.45f, 0.1f, 0.55f));
-            if (m_Anneau == null)
+            GameObject visuel;
+            if (kit.portail != null && Application.isPlaying)
             {
-                m_Anneau = new GameObject("AnneauPortail");
-                m_Anneau.AddComponent<MeshFilter>().sharedMesh = MeshAnneau();
-                m_Anneau.AddComponent<MeshRenderer>();
+                // En jeu : le même portail que celui du village (gemmes vertes, PortalVisual), toujours ouvert, centre à
+                // 1,85 m comme l'ancien anneau. Le prefab garde sa pose locale (racine à 1,75 m, tournée de 90°) sous un
+                // support tourné comme le repère : le disque fait face au nord du repère, comme l'anneau.
+                if (m_Portail == null) m_Portail = CreerPortail();
+                if (m_Anneau != null && m_Anneau.activeSelf) m_Anneau.SetActive(false);
+                visuel = m_Portail;
             }
-            m_Anneau.GetComponent<MeshRenderer>().sharedMaterial = kit.anneau;
-            Transform ta = m_Anneau.transform;
+            else
+            {
+                // Hors jeu (génération dans l'éditeur, où PortalVisual ne démarre pas) ou sans prefab : anneau de bronze.
+                if (m_Anneau == null)
+                {
+                    m_Anneau = new GameObject("AnneauPortail");
+                    m_Anneau.AddComponent<MeshFilter>().sharedMesh = MeshAnneau();
+                    m_Anneau.AddComponent<MeshRenderer>();
+                }
+                m_Anneau.GetComponent<MeshRenderer>().sharedMaterial = kit.anneau;
+                if (m_Portail != null && m_Portail.activeSelf) m_Portail.SetActive(false);
+                visuel = m_Anneau;
+            }
+            Transform ta = visuel.transform;
             if (ta.parent != m_GroupesVisuels[g]) ta.SetParent(m_GroupesVisuels[g], false);
-            ta.localPosition = p + Vector3.up * 1.85f;
+            ta.localPosition = p + Vector3.up * (visuel == m_Portail ? 0.1f : 1.85f);
             ta.localRotation = Quaternion.Euler(0f, po.rotY, 0f);
             ta.localScale = Vector3.one;
-            if (!m_Anneau.activeSelf) m_Anneau.SetActive(true);
+            if (!visuel.activeSelf) visuel.SetActive(true);
             m_Masquage.Ajouter(g, ta);
             Lampe(p + Vector3.up * 1.85f + Quaternion.Euler(0f, po.rotY, 0f) * Vector3.forward * 1.2f, kit.couleurPortail, kit.intensitePortail, 7f);
-            PortailRetour.visuel = m_Anneau;
+            PortailRetour.visuel = visuel;
             Arrivee.visuel = socle;
         }
+
+        /// Portail de retour en jeu : copie du prefab du portail du village (PortalVisual) sous un support. Réglée avant
+        /// son premier Start : ni charge de Nyxessa ni réaction à l'ouverture (portail non alimenté), ouvert en permanence.
+        /// Sa boîte de collision (le joueur ne le traverse pas, comme au village) passe sur la couche Ignore Raycast :
+        /// le NavMesh du donjon (qui ignore cette couche) et la caméra ne la voient pas.
+        GameObject CreerPortail()
+        {
+            var support = new GameObject("PortailRetour_Gemmes");
+            var go = Instantiate(kit.portail, support.transform, false);
+            go.name = kit.portail.name;
+            var pv = go.GetComponentInChildren<PortalVisual>(true);
+            if (pv != null)
+            {
+                pv.AlimenteParNyxessa = false;
+                pv.ReagirRelique = false;
+                pv.ouvert = true;
+            }
+            foreach (var c in go.GetComponentsInChildren<Collider>(true)) c.gameObject.layer = 2;
+            return support;
+        }
+
+        /// Visuel du portail de retour (PortalVisual) quand c'est le portail de gemmes (en jeu), sinon null.
+        public PortalVisual VisuelPortailRetour => m_Portail != null && PortailRetour != null && PortailRetour.visuel == m_Portail ? m_Portail.GetComponentInChildren<PortalVisual>() : null;
 
         [NonSerialized] GameObject m_Eau;
         static Mesh s_MeshEau;

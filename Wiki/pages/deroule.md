@@ -69,18 +69,22 @@ Le donjon est **régénéré chaque nuit** : chaque jour, le portail mène à un
 
 **Butin** {décidé} : on ne rapporte du donjon que de l'**or**, versé à la caisse commune au retour par le portail.
 
+**Entrer et sortir par la touche Interagir** {décidé} (décision de Quentin du 26/09/2026) : on passe les portails, à l'aller comme au retour, avec la touche Interagir (E, X ou Carré), près du portail (environ 3 m). On n'entre plus en marchant dedans. Voir [Le portail](portail.md).
+
 **Dans le jeu (26/09/2026)** :
 - **Le donjon du jour** : au lever du jour, l'hôte tire une graine et construit le donjon ; les autres joueurs reçoivent la graine et construisent le même. Le donjon est dans la même scène que le village, loin de lui.
-- **Portails** : de jour, on entre en passant dans le portail du village. On arrive sur la dalle d'arrivée du donjon. Le portail de retour ramène devant le portail du village, du côté de Nyxessa. Le passage se fait avec l'effet de téléportation (le corps part en gemmes vers le portail puis se reforme), vu par tous les joueurs.
+- **Portails** : de jour, près du portail du village, l'invite « Entrer dans le donjon » s'affiche ; la touche Interagir fait passer. On arrive sur la dalle d'arrivée du donjon. À côté se trouve le portail de retour, le même disque de gemmes vertes que celui du village, toujours ouvert. Près de lui, « Revenir au village » ramène devant le portail du village, du côté de Nyxessa. Le passage se fait avec l'effet de téléportation (le corps part en gemmes vers le portail de départ, puis les gemmes jaillissent du portail d'arrivée et le reforment), vu par tous les joueurs. Pendant le passage, le joueur ne peut plus bouger.
 - **Emplacements de butin** : 7 emplacements, avec les montants suivants.
 
   | Butin | Nombre | Or | Comment on le prend |
   |---|---|---|---|
-  | Grand coffre | 1 | 120 | Touche Interagir. Il est sur le 2e étage, fermé par un cadenas d'or. |
-  | Coffre | 2 | 50 | Touche Interagir. Il est fermé par un cadenas d'acier. |
+  | Grand coffre | 1 | 120 | Touche Interagir. Il est sur le 2e étage. |
+  | Coffre | 2 | 50 | Touche Interagir. |
   | Tas d'or | 4 | 20 | On passe dessus. |
 
   **Ouvrir un coffre est gratuit** {décidé} : on ne dépense jamais d'or pour l'ouvrir. Plus tard, certains coffres pourront demander une **clé** {à confirmer}. L'invite dit seulement « Ouvrir le coffre », sans montant.
+
+  **Pas de cadenas** {décidé} (décision de Quentin du 26/09/2026) : plus aucun cadenas sur les coffres. Pour l'instant, tous les coffres du donjon s'ouvrent sans clé : à la touche Interagir, le couvercle bascule directement. Les coffres sont des modèles sans serrure (`Assets/Art/Coffres`).
 
   Un butin n'est pris qu'une fois : c'est l'hôte qui décide. Les montants augmentent de 10 % par nuit déjà passée. Tous les montants sont {à équilibrer}.
 - **Or porté** : l'or pris est **porté** par le joueur. Le HUD l'affiche sous la caisse commune (« or porté · au donjon »). Il est versé à la caisse commune au retour par le portail.

@@ -15,11 +15,14 @@ namespace Deathless.Jeu
     /// - **Un donjon neuf chaque jour** : au début du jour, l'autorité (hôte, ou ce poste en solo) tire une graine,
     ///   le construit, pose les gardiens ; la graine part aux clients (PartieReseau.GraineDonjon), qui construisent le
     ///   même donjon.
-    /// - **Portails** : le jour, le portail du village (près de Nyxessa) mène à l'arrivée ; le portail de retour ramène
-    ///   devant le portail du village. Passage avec l'effet de téléportation (PortalTransit), vu par tous.
-    /// - **Butin, de l'or seulement** : coffres (touche Interagir ; cadenas qui s'ouvre, couvercle) et tas d'or (on
-    ///   passe dessus). L'or est porté par le joueur (HUD) et versé à la caisse au retour par le portail. L'autorité
-    ///   décide (un butin n'est pris qu'une fois).
+    /// - **Portails** : le jour, le portail du village (près de Nyxessa) mène à l'arrivée ; le portail de retour (le même
+    ///   portail de gemmes vertes, toujours ouvert) ramène devant le portail du village. On passe avec la touche
+    ///   Interagir, à 3 m au plus du centre (PassagePortail ; Quentin, 26/09/2026 : plus en marchant dedans). Passage
+    ///   avec l'effet de téléportation (PortalTransit : corps en gemmes vers le portail de départ, onde d'entrée, puis
+    ///   gemmes qui jaillissent du portail d'arrivée, onde de sortie), vu par tous.
+    /// - **Butin, de l'or seulement** : coffres (touche Interagir ; le couvercle bascule, sans cadenas ni clé depuis le
+    ///   26/09/2026) et tas d'or (on passe dessus). L'or est porté par le joueur (HUD) et versé à la caisse au retour
+    ///   par le portail. L'autorité décide (un butin n'est pris qu'une fois).
     /// - **Gardiens** : quelques sbires et guerriers sur les points d'apparition proches du butin.
     /// - **Alerte et rappel** : alerte 15 s avant le crépuscule pour les joueurs au donjon ; au crépuscule, Nyxessa les
     ///   rappelle : ils perdent l'or porté, sauf la part gardée selon son palier (0 / 20 / 40 / 60 / 75 %). Même règle
@@ -36,8 +39,14 @@ namespace Deathless.Jeu
         public static DonjonJeu Instance { get; private set; }
 
         public DonjonGenerateur generateur;
-        [Tooltip("Cadenas du grand coffre (Assets/Art/Cadenas/Prefabs).")] public GameObject cadenasGrandCoffre;
-        [Tooltip("Cadenas des coffres.")] public GameObject cadenasCoffre;
+        [Tooltip("Cadenas du grand coffre (Assets/Art/Cadenas/Prefabs). Inutilisé tant que CadenasActifs est faux.")] public GameObject cadenasGrandCoffre;
+        [Tooltip("Cadenas des coffres. Inutilisé tant que CadenasActifs est faux.")] public GameObject cadenasCoffre;
+
+        /// Cadenas et clé sur les coffres : désactivés (Quentin, 26/09/2026 : plus aucun cadenas, tous les coffres du
+        /// donjon s'ouvrent sans clé pour l'instant ; le couvercle bascule directement). Le code est gardé pour plus tard
+        /// (coffres à clé, {à confirmer}) : remettre à vrai pour retrouver le cadenas posé sur la face avant, qui
+        /// s'ouvre avant le couvercle.
+        static readonly bool CadenasActifs = false;
 
         [Header("Ambiance au donjon (joueur local)")]
         public Color ambiance = new Color(0.30f, 0.26f, 0.25f);
@@ -67,6 +76,8 @@ namespace Deathless.Jeu
         float m_MessageJusqua;
         Heros m_HerosCapteur;
         VueCycle m_VueCycle;
+        PassagePortail m_PassageVillage, m_PassageRetour;
+        PortalVisual m_BourdonSur;
 
         sealed class Coffre
         {
@@ -124,6 +135,14 @@ namespace Deathless.Jeu
         }
 
         bool PortailVillageOuvert => P != null && P.EnCours && P.Etat.phase == Phase.Jour && Pret && PortailVillage != null;
+
+        /// Portail de retour du donjon (le même portail de gemmes que celui du village), ou null (anneau hors jeu).
+        PortalVisual PortailRetourVisuel => generateur != null ? generateur.VisuelPortailRetour : null;
+
+        /// Code réseau d'un portail (effets de passage 203 et 204) : 0 aucun, 1 village, 2 retour du donjon.
+        public const int AucunPortail = 0, CodeVillage = 1, CodeRetour = 2;
+        int CodeDe(PortalVisual pv) => pv == null ? AucunPortail : pv == PortailVillage ? CodeVillage : pv == PortailRetourVisuel ? CodeRetour : AucunPortail;
+        PortalVisual PortailDe(int code) => code == CodeVillage ? PortailVillage : code == CodeRetour ? PortailRetourVisuel : null;
 
         /// Sortie du portail du village : 5 m devant lui, du côté de Nyxessa (la caméra reste hors du portail).
         Vector3 SortieVillage
@@ -211,15 +230,22 @@ namespace Deathless.Jeu
             }
         }
 
-        /// Couvercle et cadenas d'un coffre (posé une fois, les coffres sont réutilisés d'un donjon à l'autre).
+        /// Couvercle (et cadenas, désactivé) d'un coffre, relevé une fois : les coffres sont réutilisés d'un donjon à
+        /// l'autre. Le modèle vient du kit (DonjonKit.ModeleGrandCoffre / ModeleCoffre : les modèles sans serrure dès
+        /// qu'ils y sont renseignés) ; le couvercle est l'enfant dont le nom finit par DonjonKit.suffixeCouvercle
+        /// (« _lid » des coffres KayKit).
         Coffre CoffreDe(GameObject visuel, bool grand)
         {
             if (visuel == null) return null;
             if (m_Coffres.TryGetValue(visuel, out var c)) return c;
             c = new Coffre();
+            var kit = generateur != null ? generateur.kit : null;
+            string suffixe = kit != null && !string.IsNullOrEmpty(kit.suffixeCouvercle) ? kit.suffixeCouvercle : "_lid";
             foreach (var t in visuel.GetComponentsInChildren<Transform>(true))
-                if (t.name.EndsWith("_lid")) { c.couvercle = t; c.ferme = t.localRotation; break; }
-            var prefab = grand ? cadenasGrandCoffre : cadenasCoffre;
+                if (t != visuel.transform && (t.name.EndsWith(suffixe, System.StringComparison.OrdinalIgnoreCase) || t.name.EndsWith("_lid")))
+                { c.couvercle = t; c.ferme = t.localRotation; break; }
+            // Cadenas : désactivé (CadenasActifs), code gardé pour les coffres à clé.
+            var prefab = !CadenasActifs ? null : grand ? cadenasGrandCoffre : cadenasCoffre;
             if (prefab != null)
             {
                 // Sur la face avant (+Z du modèle), accroché au bord du couvercle. Calcul dans le repère du modèle : le
@@ -241,7 +267,9 @@ namespace Deathless.Jeu
                 var go = Instantiate(prefab, visuel.transform, false);
                 go.name = prefab.name;
                 go.transform.localPosition = new Vector3(b.center.x, bord - 0.12f, b.max.z + 0.07f);
-                go.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
+                // Serrure (+Z du prefab, côté verrou) vers l'extérieur, pour que la clé se voie (tourné de 180° jusqu'au
+                // 26/09/2026 : la clé entrait par l'intérieur, invisible ; même pose que CadenasFaceAvant de la planche).
+                go.transform.localRotation = Quaternion.identity;
                 go.transform.localScale = Vector3.one * (grand ? 1.25f : 1f);
                 c.cadenas = go.GetComponent<CadenasOuverture>();
             }
@@ -363,7 +391,8 @@ namespace Deathless.Jeu
                 yield break;
             }
             var c = CoffreDe(r.visuel, r.butin == TypeButin.GrandCoffre);
-            if (c != null && c.cadenas != null && c.cadenas.gameObject.activeInHierarchy)
+            // Cadenas (désactivé, CadenasActifs) : il s'ouvrait avant le couvercle. Sans lui, le couvercle bascule aussitôt.
+            if (CadenasActifs && c != null && c.cadenas != null && c.cadenas.gameObject.activeInHierarchy)
             {
                 c.cadenas.Ouvrir();
                 AudioBank.Jouer(SonsDuJeu.CoffreCadenas, c.cadenas.transform.position, 0.8f);
@@ -431,7 +460,7 @@ namespace Deathless.Jeu
             var h = P != null ? P.HerosLocal : null;
             if (h == null || !AuDonjon(h) || !h.Vivant || m_Transit) return;
             Vector3 dest = P.PointReapparition(P.nyxessa != null ? P.nyxessa.transform.position : Vector3.zero);
-            StartCoroutine(Transit(h, dest, false, null));
+            StartCoroutine(Transit(h, dest, false, null, null));
             Dire(perdu > 0 || garde > 0 ? "Rappelé par Nyxessa : " + garde + " or gardés, " + perdu + " perdus" : "Rappelé par Nyxessa", 6f);
             AudioBank.Jouer2D(SonsDuJeu.NyxessaRappel, 0.9f);
         }
@@ -440,17 +469,59 @@ namespace Deathless.Jeu
 
         // ================================================================== Passage des portails (joueur local)
 
-        IEnumerator Transit(Heros h, Vector3 destination, bool versDonjon, PortalVisual portailArrivee)
+        /// Invite du portail (touche Interagir) pour ce héros, ou null : « Entrer dans le donjon » au portail du village
+        /// (le jour, portail ouvert), « Revenir au village » au portail de retour ; à `distancePortail` (3 m) au plus du
+        /// centre, horizontalement. `distance` : pour choisir le point d'interaction le plus proche.
+        public string InvitePortail(bool retour, Heros h, out float distance)
+        {
+            distance = float.MaxValue;
+            if (h == null || h.Distant || h.EnTransit || !h.Vivant || m_Transit || P == null || !P.EnCours || generateur == null) return null;
+            Vector3 ph = h.transform.position;
+            if (!retour)
+            {
+                var pv = PortailVillage;
+                if (!PortailVillageOuvert || !pv.ouvert || AuDonjon(h) || Mathf.Abs(ph.y - pv.Center.y) > 3f) return null;
+                distance = Horizontal(ph, pv.Center);
+                return distance <= B.distancePortail ? "Entrer dans le donjon" : null;
+            }
+            var ret = Pret ? generateur.PortailRetour : null;
+            if (ret == null || !AuDonjon(h) || Mathf.Abs(ph.y - ret.transform.position.y) > 2f) return null;
+            distance = Horizontal(ph, ret.transform.position);
+            return distance <= B.distancePortail ? "Revenir au village" : null;
+        }
+
+        /// Touche Interagir au portail : passage (conditions revérifiées). Retour : l'or porté est versé à la caisse
+        /// (l'hôte décide en réseau).
+        public void Passer(bool retour, Heros h)
+        {
+            if (InvitePortail(retour, h, out _) == null) return;
+            if (!retour)
+            {
+                StartCoroutine(Transit(h, PointArrivee, true, PortailVillage, PortailRetourVisuel));
+                m_AlerteJouee = false;
+                return;
+            }
+            var p = P;
+            int porte = p.JoueurLocal != null ? p.JoueurLocal.orPorte : 0;
+            StartCoroutine(Transit(h, SortieVillage, false, PortailRetourVisuel, PortailVillage));
+            if (Partie.ClientReseau) PartieReseau.Instance?.DeposerOr();
+            else Deposer(h.Id);
+            if (porte > 0) Dire(porte + " or versés à la caisse commune", 5f);
+        }
+
+        /// Passage du héros local (EnTransit : ni déplacement ni action) : le corps part en gemmes vers le centre du
+        /// portail de départ (onde d'entrée, réaction de Nyxessa) ou sur place (rappel), le héros saute à `destination`,
+        /// puis les gemmes jaillissent du portail d'arrivée (onde de sortie) ou de devant lui, et le corps se reforme.
+        /// Diffusé aux autres postes (effets 203 et 204, avec le code du portail).
+        IEnumerator Transit(Heros h, Vector3 destination, bool versDonjon, PortalVisual portailDepart, PortalVisual portailArrivee)
         {
             m_Transit = true;
             h.EnTransit = true;
             var gemmes = EffetsJeu.Gemmes;
             Bounds corps = EffetsJeu.Volume(h.gameObject);
-            var pv = PortailVillage;
-            // Départ : par le portail du village (onde, réaction de Nyxessa), sinon sur place (retour, rappel).
-            if (versDonjon && pv != null && Horizontal(h.transform.position, pv.Center) < 4f) PortalTransit.Depart(corps, pv, gemmes, 1.1f);
+            if (portailDepart != null) PortalTransit.Depart(corps, portailDepart, gemmes, 1.1f);
             else PortalTransit.Depart(corps, corps.center + Vector3.up * 0.3f, gemmes, 1.1f);
-            h.Classe?.DiffuserTransit(ClasseHeros.EffetTransitDepart, h.transform.position);
+            h.Classe?.DiffuserTransit(ClasseHeros.EffetTransitDepart, h.transform.position, CodeDe(portailDepart));
             AudioBank.Jouer(SonsDuJeu.PortailPassage, h.transform.position + Vector3.up, 0.9f);
             Visible(h, false);
             yield return new WaitForSeconds(0.55f);
@@ -471,7 +542,7 @@ namespace Deathless.Jeu
             Bounds arrivee = corps; arrivee.center += h.transform.position - avant;
             if (portailArrivee != null) PortalTransit.Arrive(arrivee, portailArrivee, gemmes, 1.0f);
             else PortalTransit.Arrive(arrivee, arrivee.center + h.transform.forward * 1.2f, gemmes, 1.0f);
-            h.Classe?.DiffuserTransit(ClasseHeros.EffetTransitArrivee, h.transform.position);
+            h.Classe?.DiffuserTransit(ClasseHeros.EffetTransitArrivee, h.transform.position, CodeDe(portailArrivee));
             yield return new WaitForSeconds(0.75f);
             Visible(h, true);
             h.EnTransit = false;
@@ -483,29 +554,56 @@ namespace Deathless.Jeu
             foreach (var r in h.GetComponentsInChildren<Renderer>(true)) r.enabled = oui;
         }
 
-        /// Autres postes : passage d'un portail par la marionnette d'un joueur (dissolution, puis arrivée).
-        public static void TransitDistant(Heros h, Vector3 position, bool arrivee)
+        /// Autres postes : passage d'un portail par la marionnette d'un joueur (dissolution vers le portail de départ,
+        /// puis arrivée depuis le portail d'arrivée ; `portail` : code de DonjonJeu, 0 = sur place).
+        public static void TransitDistant(Heros h, Vector3 position, bool arrivee, int portail = AucunPortail)
         {
             if (h == null) return;
             var gemmes = EffetsJeu.Gemmes;
             Bounds corps = new Bounds(position + Vector3.up, new Vector3(0.8f, 1.9f, 0.8f));
-            if (!arrivee) AudioBank.Jouer(SonsDuJeu.PortailPassage, position + Vector3.up, 0.9f);
+            var pv = Instance != null ? Instance.PortailDe(portail) : null;
             if (!arrivee)
             {
-                var pv = Instance != null ? Instance.PortailVillage : null;
-                if (pv != null && Horizontal(position, pv.Center) < 4f) PortalTransit.Depart(corps, pv, gemmes, 1.1f);
+                AudioBank.Jouer(SonsDuJeu.PortailPassage, position + Vector3.up, 0.9f);
+                if (pv != null) PortalTransit.Depart(corps, pv, gemmes, 1.1f);
                 else PortalTransit.Depart(corps, corps.center + Vector3.up * 0.3f, gemmes, 1.1f);
                 Visible(h, false);
             }
             else
             {
-                PortalTransit.Arrive(corps, corps.center + Vector3.forward * 1.2f, gemmes, 1.0f);
+                if (pv != null) PortalTransit.Arrive(corps, pv, gemmes, 1.0f);
+                else PortalTransit.Arrive(corps, corps.center + h.transform.forward * 1.2f, gemmes, 1.0f);
                 if (Instance != null) Instance.StartCoroutine(Instance.Montrer(h, 0.75f));
                 else Visible(h, true);
             }
         }
 
         IEnumerator Montrer(Heros h, float apres) { yield return new WaitForSeconds(apres); if (h != null) Visible(h, true); }
+
+        /// Touche Interagir sur les deux portails (posée une fois) ; bourdonnement du portail de retour, comme au village.
+        void AssurerPortails()
+        {
+            var pv = PortailVillage;
+            if (m_PassageVillage == null && pv != null)
+            {
+                m_PassageVillage = pv.GetComponent<PassagePortail>();
+                if (m_PassageVillage == null) m_PassageVillage = pv.gameObject.AddComponent<PassagePortail>();
+                m_PassageVillage.retour = false;
+            }
+            var ret = generateur != null ? generateur.PortailRetour : null;
+            if (m_PassageRetour == null && ret != null)
+            {
+                m_PassageRetour = ret.GetComponent<PassagePortail>();
+                if (m_PassageRetour == null) m_PassageRetour = ret.gameObject.AddComponent<PassagePortail>();
+                m_PassageRetour.retour = true;
+            }
+            var visuel = PortailRetourVisuel;
+            if (visuel != null && m_BourdonSur != visuel)
+            {
+                m_BourdonSur = visuel;
+                AudioBank.Boucle(SonsDuJeu.PortailBourdon, visuel.transform, 0.4f);
+            }
+        }
 
         // ================================================================== Chaque image
 
@@ -535,34 +633,14 @@ namespace Deathless.Jeu
                 if (p.Etat.phase == Phase.Jour) p.EvaluerPrets();
             }
 
+            // Portails : touche Interagir (PassagePortail), plus de passage en marchant dedans (Quentin, 26/09/2026).
+            AssurerPortails();
+
             var h = p.HerosLocal;
             if (h == null) return;
             AssurerCapteurs(h);
             if (m_Transit || !h.Vivant || !p.EnCours) return;
-            bool dedans = AuDonjon(h);
-            if (!dedans)
-            {
-                // Portail du village : le jour, on entre en passant dedans.
-                var pv = PortailVillage;
-                if (PortailVillageOuvert && pv.ouvert && Horizontal(h.transform.position, pv.Center) < B.rayonPortail && Mathf.Abs(h.transform.position.y - pv.Center.y) < 3f)
-                {
-                    StartCoroutine(Transit(h, PointArrivee, true, null));
-                    m_AlerteJouee = false;
-                }
-                return;
-            }
-            if (!Pret) return;
-            // Portail de retour.
-            var ret = generateur.PortailRetour;
-            if (ret != null && Horizontal(h.transform.position, ret.transform.position) < B.rayonPortail && Mathf.Abs(h.transform.position.y - ret.transform.position.y) < 2f)
-            {
-                int porte = p.JoueurLocal != null ? p.JoueurLocal.orPorte : 0;
-                StartCoroutine(Transit(h, SortieVillage, false, PortailVillage));
-                if (Partie.ClientReseau) PartieReseau.Instance?.DeposerOr();
-                else Deposer(h.Id);
-                if (porte > 0) Dire(porte + " or versés à la caisse commune", 5f);
-                return;
-            }
+            if (!AuDonjon(h) || !Pret) return;
             // Tas d'or : on passe dessus.
             for (int i = 0; i < generateur.Butins.Length; i++)
             {
