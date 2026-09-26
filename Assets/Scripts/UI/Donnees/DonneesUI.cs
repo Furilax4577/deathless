@@ -46,6 +46,9 @@ namespace Deathless.UI.Donnees
         /// Jauge de parade du paladin local (posée par le jeu ; null : pas de jauge).
         public static IJaugeParade Parade { get; set; }
 
+        /// Jauge de relevé du Renversé du héros local (posée par le jeu ; null : pas de jauge).
+        public static IJaugeRelevage Relevage { get; set; }
+
         /// Appelé à chaque enregistrement ou retrait (les écrans se réabonnent aux événements de IEtatPartie).
         public static event Action Changees;
 
@@ -77,6 +80,7 @@ namespace Deathless.UI.Donnees
             Lobby = null;
             RoueEmotes = null;
             Parade = null;
+            Relevage = null;
             Changees = null;
         }
     }

@@ -177,6 +177,17 @@ Posée par le jeu dans `DonneesUI.Parade` (`Deathless.Jeu.ParadeParfaite`, cré�
 - **Pourquoi sous le réticule** : en mêlée, le regard est au centre ; au-dessus de l'attaquant, la jauge bougerait avec lui et se mêlerait aux rangées de statuts des ennemis.
 - Pas encore de version factice dans le banc UIv01 (`EtatFactice`) ; vérification dans le Village avec `Deathless.Jeu.Dev.ScenariosParade`.
 
+### Jauge de relevé : `IJaugeRelevage` (`Donnees/IJaugeRelevage.cs`, 26/09/2026)
+
+Posée par le jeu dans `DonneesUI.Relevage` (`Deathless.Jeu.RelevageUI`, créée par `HudPresenter` ; lit le héros local, jamais une marionnette), lue à chaque image par `HudRelevage` : petite jauge sous le héros à terre (statut Renversé), avec l'invite de Saut à marteler. Absente : rien n'est affiché. Règles : Wiki `statuts.md`, « Renversé ».
+
+| Membre | Sens |
+|---|---|
+| `Visible` | Le héros local est Renversé : la jauge est affichée. |
+| `Position` | Point du monde sous lequel placer la jauge (pieds du héros). |
+| `Martelement` | Part du relevé gagnée en martelant Saut (0 à 1). |
+| `DernierMartelement` | Instant du dernier martelage (petite secousse). |
+
 ### Bloc joueur : maquette B (26/09/2026)
 
 Quentin a choisi la **maquette B** parmi trois essais du bloc joueur (bac à sable `sandbox-ui`, `Assets/UI/Screens/HudMaquettes/`, capture `maquette_hud_B.png`), intégrée dans le vrai HUD :
