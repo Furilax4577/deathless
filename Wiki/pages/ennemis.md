@@ -54,7 +54,27 @@ Colosse très résistant et lent, il marche droit sur Nyxessa. Chaque attaque se
 - **Coup écrasé** au sol, qui fait une onde de choc autour de lui ;
 - **Cri** qui renforce les squelettes proches.
 
-**Déclinaisons à créer** {décidé} : le mini-boss existera en **deux versions**, l'une armée d'une **massue** (boule à pointes), l'autre d'une **martache** (hache-marteau), avec des **comportements et des compétences différents**. Le pack KayKit propose aussi une texture alternative (yeux bleu glacé) qui peut les distinguer. Détail des deux versions : {à confirmer}.
+**Déclinaisons à créer** {décidé} : le mini-boss existera en **deux versions**, l'une armée d'une **massue** (boule à pointes), l'autre d'une **martache** (hache-marteau), avec des **comportements et des compétences différents**. Les yeux **bleu glacé** de la martache la distinguent de la massue (yeux jaune-orangé habituels) au premier coup d'œil. Détail des deux versions : {à confirmer}.
+
+{dev} Les deux armes existent telles quelles dans le pack KayKit Skeletons EXTRA, à l'échelle du Golem (rig Large) : `Skeleton_Mace_Large` (massue) et `Skeleton_Golem_Axe_Large` (martache — c'est déjà la hache géante du Morgrim actuel : elle porte une tête de marteau au dos de la lame en croissant, donc une vraie hache-marteau sans rien à fabriquer). Aucune arme générée. La distinction des yeux n'est pas une texture alternative du corps (les deux versions gardent `skeleton_texture_A`) mais un second matériau émissif bleu glacé pour les yeux, sur le modèle du rouge des élites (`Yeux_Elite.mat`).
+
+#### Massue : colosse qui contrôle la zone {à confirmer}
+
+Frappes larges et lentes, pense en zone plutôt qu'en cible : elle punit les groupes serrés autour de Nyxessa et les joueurs qui restent au contact.
+
+- **Fracas** : frappe la boule à pointes au sol devant lui ; onde de choc en cercle qui **étourdit** (statut [Étourdi](statuts.md)) tout joueur pris dedans. Reprend le mécanisme du coup de zone actuel du Golem (`Golem.Frapper`, `OndeDeChoc`), thème **Terre**.
+- **Tourbillon** : fait tournoyer la boule autour de lui sur 360°, dégâts continus et léger recul pour qui reste dans le rayon ; oblige à sortir de la mêlée le temps du tour. Thème **Terre**.
+- **Charge écrasante** : fonce en ligne droite sur sa cible et **renverse** (étourdit) le premier joueur touché, comme la charge bélier du [Paladin](classe-paladin.md) mais sans parade possible en cours de charge. Thème **Terre**.
+
+#### Martache : colosse qui tranche et vise juste {à confirmer}
+
+Coups plus rapides et plus précis que la massue, avec une compétence dédiée à percer la défense de Nyxessa plutôt qu'à contrôler la zone.
+
+- **Fauche** : coup en cône devant lui avec le tranchant de la hache, touche tous les joueurs dans l'arc. Thème **Rage** (accents fer, comme le rugissement du viking).
+- **Fend-sol** : saut court suivi d'une retombée qui plante l'arme droit devant lui et fend le sol en ligne ; la fissure **ralentit** (statut [Ralenti](statuts.md)) les joueurs qui restent dedans. Thème **Terre** pour la fissure (c'est le sol qui casse, pas l'arme), portée réduite par rapport au Fracas de la massue (une ligne, pas un cercle).
+- **Coup de brèche** : frappe du côté marteau de l'arme, tournée vers le bouclier de [Nyxessa](vfx.md) plutôt que vers les joueurs : inflige des dégâts renforcés à la paroi du bouclier quand il est levé (voir `Docs/vfx.md`, Bouclier de la relique). Thème **Rage**.
+
+{dev} Prototypes dans le bac à sable `sandbox-rig` (scène `Assets/Scenes/Morgrim.unity`, outils `Assets/Editor/Morgrim/MorgrimBuilder.cs` et `MorgrimCaptures.cs`) : les deux mannequins posés et équipés, poses d'attente et pose clé de chaque compétence échantillonnées sur les clips du rig Large (`Melee_2H_Slam`, `Melee_1H_Slash`, `Melee_2H_Attack` pour la massue ; `Melee_Dualwield_SlashCombo`, `Melee_1H_Stab`, `Melee_Block_Attack` pour la martache — approximations, aucun clip n'est écrit spécifiquement pour ces coups). Effets principaux prototypés dans le langage gemmes (`Assets/VFX/Morgrim/MorgrimEffets.cs`, gemmes `LowPolyGem` / shader `Relic/VertexColorUnlit`, palettes Terre et Rage). Captures : `Assets/Screenshots/morgrim_massue_*.png`, `morgrim_martache_*.png`, planche `morgrim_planche.png`. Pas encore reporté dans `main`.
 
 Points de vie et dégâts : {à équilibrer}.
 
