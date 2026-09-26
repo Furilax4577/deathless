@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Deathless.Audio;
+using Deathless.Jeu;
 using Deathless.UI.Donnees;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -341,10 +342,15 @@ namespace Deathless.UI.Ecrans
         protected override VisualElement PremierFocus => m_Retour;
     }
 
-    /// Options (0.1) : onglet Jeu (taille de l'interface), onglet Commandes (table en lecture seule) et onglet Audio
-    /// (volumes principal, musique, effets, interface : VolumesAudio).
+    /// Options (0.1) : onglet Jeu (taille de l'interface, pseudo, accessibilité), onglet Commandes (table en
+    /// lecture seule) et onglet Audio (volumes principal, musique, effets, interface : VolumesAudio). Piste A
+    /// « bandeau » choisie par Quentin le 26/09/2026 (maquettes sandbox-ui, OptionsMaquettes) : panneau unique,
+    /// onglets soudés au panneau, écran de dessous masqué (Opaque).
     public class EcranOptions : Ecran
     {
+        /// Opaque : masque le menu principal (ou le HUD sous la pause) tant qu'Options est ouvert (26/09/2026).
+        public override bool Opaque => true;
+
         static readonly (CanalAudio canal, string libelle)[] s_Volumes =
         {
             (CanalAudio.Principal, "Volume principal"),
@@ -386,6 +392,7 @@ namespace Deathless.UI.Ecrans
         int m_Onglet;
 
         Label m_PseudoValeur;
+        Button m_ReleveMarteler, m_ReleveMaintenir;
 
         public override void AuSommet() { if (m_PseudoValeur != null) m_PseudoValeur.text = DonneesUI.Profil.Pseudo; }
 
@@ -403,7 +410,7 @@ namespace Deathless.UI.Ecrans
             m_PageCommandes = Racine.Q("options-commandes");
             m_PageAudio = Racine.Q("options-audio");
             m_EnteteManette = Racine.Q<Label>("options-entete-manette");
-            Racine.Query<Button>(className: "dl-tab").ForEach(b => m_Onglets.Add(b));
+            Racine.Query<Button>(className: "options-tab").ForEach(b => m_Onglets.Add(b));
             for (var i = 0; i < m_Onglets.Count; i++)
             {
                 var index = i;
@@ -418,7 +425,13 @@ namespace Deathless.UI.Ecrans
             }
             UIScale.Changed += _ => MajTailles();
             MajTailles();
-            Racine.Q<Button>("options-retour").clicked += () => Navigateur.Fermer();
+
+            // Accessibilité : se relever du Renversé en martelant Saut (défaut) ou en le maintenant (OptionsJoueur).
+            m_ReleveMarteler = Racine.Q<Button>("releve-marteler");
+            m_ReleveMaintenir = Racine.Q<Button>("releve-maintenir");
+            m_ReleveMarteler.clicked += () => DefinirRelevage(false);
+            m_ReleveMaintenir.clicked += () => DefinirRelevage(true);
+            MajRelevage();
 
             var table = Racine.Q("options-table");
             var lignes = new List<VisualElement>();
@@ -524,13 +537,43 @@ namespace Deathless.UI.Ecrans
                 m_Tailles[i].EnableInClassList("dl-button--selected", i + UIScale.MinLevel == UIScale.Level);
         }
 
+        void DefinirRelevage(bool maintenir)
+        {
+            OptionsJoueur.RelevageMaintenir = maintenir;
+            MajRelevage();
+        }
+
+        void MajRelevage()
+        {
+            var maintenir = OptionsJoueur.RelevageMaintenir;
+            m_ReleveMarteler.EnableInClassList("dl-button--selected", !maintenir);
+            m_ReleveMaintenir.EnableInClassList("dl-button--selected", maintenir);
+        }
+
         void Onglet(int index)
         {
             m_Onglet = Mathf.Clamp(index, 0, m_Onglets.Count - 1);
-            for (var i = 0; i < m_Onglets.Count; i++) m_Onglets[i].EnableInClassList("dl-tab--selected", i == m_Onglet);
-            m_PageJeu.style.display = m_Onglet == 0 ? DisplayStyle.Flex : DisplayStyle.None;
-            m_PageCommandes.style.display = m_Onglet == 1 ? DisplayStyle.Flex : DisplayStyle.None;
-            m_PageAudio.style.display = m_Onglet == 2 ? DisplayStyle.Flex : DisplayStyle.None;
+            for (var i = 0; i < m_Onglets.Count; i++) m_Onglets[i].EnableInClassList("options-tab--selected", i == m_Onglet);
+            AfficherPage(m_PageJeu, m_Onglet == 0);
+            AfficherPage(m_PageCommandes, m_Onglet == 1);
+            AfficherPage(m_PageAudio, m_Onglet == 2);
+        }
+
+        /// Transition douce entre onglets (maquette piste A) : la page qui apparaît se fond en 0,15 s
+        /// (opacité, .options-page dans Options.uss) ; celle qui disparaît est simplement masquée.
+        static void AfficherPage(VisualElement page, bool visible)
+        {
+            if (visible)
+            {
+                page.style.display = DisplayStyle.Flex;
+                page.style.opacity = 0f;
+                page.schedule.Execute(() => page.style.opacity = 1f);
+            }
+            else
+            {
+                page.style.display = DisplayStyle.None;
+                page.style.opacity = 1f;
+            }
         }
 
         protected override VisualElement PremierFocus =>
@@ -548,11 +591,13 @@ namespace Deathless.UI.Ecrans
             UINavigation.Focus(PremierFocus);
         }
 
-        /// Réinitialiser (Y) : l'onglet affiché seulement (Jeu : taille ×2 ; Audio : volumes par défaut).
+        /// Réinitialiser (Y) : l'onglet affiché seulement (Jeu : taille ×2 et relevage par martelage ; Audio :
+        /// volumes par défaut).
         public override void Reinitialiser()
         {
-            if (m_Onglet == 2) VolumesAudio.Reinitialiser();
-            else UIScale.Level = UIScale.DefaultLevel;
+            if (m_Onglet == 2) { VolumesAudio.Reinitialiser(); return; }
+            UIScale.Level = UIScale.DefaultLevel;
+            if (m_Onglet == 0) DefinirRelevage(false);
         }
     }
 

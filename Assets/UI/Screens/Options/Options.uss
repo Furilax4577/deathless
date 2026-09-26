@@ -1,0 +1,235 @@
+/* Écran Options — piste A « bandeau » choisie par Quentin le 26/09/2026 (maquettes : sandbox-ui,
+   Assets/UI/Screens/OptionsMaquettes/, capture maquette_options_A.png). Panneau unique centré, titre et panneau
+   alignés sur la même grille, onglets en bandeau soudé au panneau (même largeur), contenu sur une grille de 8 px.
+   Jetons de Deathless.uss ; valeurs à l'échelle ×2 (référence 1920×1080). */
+
+/* ---------- Colonne : titre et panneau sur la même largeur, mêmes bords ---------- */
+.options-colonne {
+    position: absolute;
+    left: 50%;
+    top: 168px;
+    bottom: 128px;
+    width: 1408px;
+    translate: -50% 0;
+    flex-direction: column;
+}
+
+.options-entete { flex-direction: column; flex-shrink: 0; margin-bottom: 24px; }
+.options-titre { margin: 0; padding: 0; }
+.options-soustitre { margin: 4px 0 0 0; padding: 0; }
+
+/* ---------- Panneau : pas de dl-panel (son padding empêcherait les onglets d'être soudés au bord) ---------- */
+.options-panel {
+    flex-grow: 1;
+    flex-shrink: 1;
+    background-color: var(--dl-color-panel-95);
+    border-width: 1px;
+    border-color: var(--dl-color-border);
+    border-radius: var(--dl-radius-md);
+    overflow: hidden;
+    flex-direction: column;
+}
+
+/* ---------- Bandeau d'onglets : même largeur que le panneau, soudé en haut ---------- */
+.options-tabs {
+    flex-direction: row;
+    align-items: stretch;
+    flex-shrink: 0;
+    height: 72px;
+    background-color: var(--dl-color-panel);
+    border-bottom-width: 1px;
+    border-color: var(--dl-color-line);
+    padding: 0 16px;
+}
+.options-tabs__cle { align-self: center; margin: 0 12px; }
+
+.options-tabs .options-tab {
+    flex-grow: 1;
+    flex-basis: 0;
+    min-height: 0;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    border-top-width: 0;
+    border-left-width: 0;
+    border-right-width: 1px;
+    border-bottom-width: 4px;
+    border-color: var(--dl-color-line);
+    border-bottom-color: rgba(0, 0, 0, 0);
+    border-radius: 0;
+    background-color: rgba(0, 0, 0, 0);
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Medium-SDF.asset");
+    font-size: var(--dl-text-body);
+    color: var(--dl-color-text-muted);
+    transition-property: background-color, border-color, color;
+    transition-duration: 0.12s;
+}
+.options-tabs .options-tab--dernier { border-right-width: 0; }
+.options-tabs .options-tab:hover:enabled { background-color: rgba(86, 96, 124, 0.35); color: var(--dl-color-text); }
+/* Focus manette : anneau or, comme le reste de l'interface (règle des pièges UI Toolkit : passer devant le thème). */
+.options-tabs .options-tab:focus:enabled {
+    border-top-width: 3px;
+    border-left-width: 3px;
+    border-right-width: 3px;
+    border-bottom-width: 4px;
+    border-color: var(--dl-color-gold);
+    background-color: var(--dl-color-panel-active);
+    color: var(--dl-color-text);
+}
+.options-tabs .options-tab.options-tab--selected {
+    color: var(--dl-color-text);
+    border-bottom-color: var(--dl-color-gold);
+    background-color: var(--dl-color-panel-active);
+}
+
+/* ---------- Page (contenu qui change avec l'onglet) : fondu doux au changement d'onglet ---------- */
+.options-page {
+    flex-grow: 1;
+    flex-direction: column;
+    padding: 32px;
+    transition-property: opacity;
+    transition-duration: 0.15s;
+    transition-timing-function: ease-out;
+}
+.options-page--commandes { padding: 24px 32px 16px 32px; }
+
+/* ---------- Onglet Jeu : pseudo, tailles (colonne principale), relève (colonne latérale) ---------- */
+.options-pseudo {
+    flex-direction: row;
+    align-items: center;
+    min-height: var(--dl-control-height);
+    margin: 0 0 24px 0;
+    padding: 0 16px;
+    justify-content: flex-start;
+}
+.options-pseudo__libelle { width: 160px; font-size: var(--dl-text-body); margin: 0; padding: 0; -unity-text-align: middle-left; }
+.options-pseudo__valeur {
+    flex-grow: 1;
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+    font-size: var(--dl-text-large);
+    margin: 0;
+    padding: 0;
+    -unity-text-align: middle-left;
+}
+.options-pseudo__action { font-size: var(--dl-text-small); color: var(--dl-color-gold); margin: 0; padding: 0; }
+
+.options-page__corps { flex-direction: row; flex-grow: 1; }
+.options-col-principale { flex-grow: 1.6; flex-basis: 0; margin-right: 32px; }
+.options-col-aside { flex-grow: 1; flex-basis: 0; }
+
+.options-souslabel { font-size: var(--dl-text-body); color: var(--dl-color-text); margin: 0 0 12px 0; padding: 0; }
+.options-note { margin-top: 8px; }
+
+/* min-height répété sur la rangée : dans ce moteur, une rangée dont les seuls enfants imposent leur hauteur par
+   min-height + étirement (align-items: stretch) ne reprend pas cette hauteur pour elle-même (elle reste à 0, bien
+   que ses enfants s'affichent à la bonne taille) ; sans ce min-height explicite, l'élément suivant chevauche les
+   cartes (défaut trouvé en vérification, 26/09/2026). */
+.options-tailles { flex-direction: row; margin: 0 -8px 8px -8px; height: 112px; }
+.options-taille {
+    flex-grow: 1;
+    flex-basis: 0;
+    min-height: 112px;
+    margin: 0 8px;
+    border-radius: 12px;
+    flex-direction: column;
+}
+.options-taille__titre { -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); font-size: var(--dl-text-heading); margin: 0; padding: 0; }
+.options-taille__pc { font-size: var(--dl-text-small); color: var(--dl-color-text-muted); margin: 2px 0 0 0; padding: 0; }
+
+/* Se relever : marteler / maintenir — deux boutons pastille, le choisi porte dl-button--selected (thème). */
+.options-releve {
+    padding: 20px 24px;
+    border-radius: 12px;
+    background-color: rgba(16, 19, 27, 0.55);
+    border-width: 1px;
+    border-color: var(--dl-color-border);
+}
+.options-releve__aide { margin: 4px 0 0 0; }
+.options-pilltoggle { flex-direction: row; margin-top: 12px; height: 56px; }
+.options-pill {
+    flex-grow: 1;
+    flex-basis: 0;
+    min-height: 56px;
+    margin: 0 8px 0 0;
+    border-radius: 28px;
+}
+.options-pill--dernier { margin-right: 0; }
+
+/* ---------- Onglet Commandes : table dense en trois colonnes, défilement interne ---------- */
+.options-table-entete {
+    flex-direction: row;
+    align-items: center;
+    min-height: 36px;
+    padding: 0 16px;
+    border-bottom-width: 1px;
+    border-color: var(--dl-color-line);
+}
+.options-col-action { flex-grow: 2; flex-basis: 0; margin: 0; }
+.options-col-touche { flex-grow: 1.3; flex-basis: 0; margin: 0; }
+
+.options-scroll { flex-grow: 1; }
+.options-ligne {
+    flex-direction: row;
+    align-items: center;
+    min-height: 52px;
+    padding: 0 16px;
+    border-top-width: 1px;
+    border-color: var(--dl-color-line);
+    border-left-width: 3px;
+    border-left-color: rgba(0, 0, 0, 0);
+}
+.options-ligne:focus { background-color: var(--dl-color-panel-active); border-left-color: var(--dl-color-gold); }
+.options-ligne__libelle { flex-grow: 2; flex-basis: 0; font-size: var(--dl-text-body); margin: 0; padding: 0; }
+.options-ligne__invite { flex-grow: 1.3; flex-basis: 0; --dl-prompt-size: 42px; --dl-key-height: 30px; --dl-key-text: 16px; }
+
+/* ---------- Onglet Audio : curseurs avec leur valeur ---------- */
+.options-volumes { margin-top: 4px; }
+.options-volume {
+    min-height: 64px;
+    margin-bottom: 6px;
+    padding: 0 16px;
+}
+.options-volume > .unity-base-field__label { flex-grow: 1; font-size: var(--dl-text-body); }
+.options-volume > .unity-base-slider__input { flex-grow: 1.3; margin: 0 16px; }
+.options-volume__pc {
+    width: 96px;
+    margin: 0;
+    padding: 0;
+    -unity-text-align: middle-right;
+    font-size: var(--dl-text-body);
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+    color: var(--dl-color-text);
+}
+
+/* ---------- Taille ×3 : réorganiser (colonnes → empilé), jamais rétrécir le texte courant ---------- */
+.dl-scale-3 .options-colonne { top: 60px; bottom: 96px; width: 1250px; }
+.dl-scale-3 .options-entete { margin-bottom: 8px; }
+.dl-scale-3 .options-tabs { height: 48px; }
+.dl-scale-3 .options-page { padding: 10px; }
+.dl-scale-3 .options-page--commandes { padding: 10px 10px 6px 10px; }
+/* Libellés de section resserrés (seulement dans ce panneau : dl-section-label est une classe commune à tout le
+   jeu, on ne touche pas sa marge ailleurs). */
+.dl-scale-3 .options-panel .dl-section-label { margin-bottom: 6px; }
+.dl-scale-3 .options-souslabel { margin-bottom: 6px; }
+/* flex-grow/flex-basis des deux colonnes pensés pour une répartition en LARGEUR (mode ligne) : à réinitialiser en
+   colonne. Hauteur en dur (pas flex-basis: auto) : dans ce moteur, un conteneur en hauteur automatique ne reprend
+   pas la hauteur d'un enfant qui est lui-même une rangée (options-tailles, options-pilltoggle), et chevauche ou
+   masque le suivant (défaut trouvé en vérification, 26/09/2026 ; hauteurs mesurées en jeu). */
+.dl-scale-3 .options-page__corps { flex-direction: column; }
+.dl-scale-3 .options-col-principale { flex-grow: 0; flex-shrink: 0; flex-basis: 168px; height: 168px; margin-right: 0; margin-bottom: 10px; }
+.dl-scale-3 .options-col-aside { flex-grow: 0; flex-shrink: 0; flex-basis: 172px; height: 172px; }
+.dl-scale-3 .options-tailles { margin-bottom: 4px; height: 68px; }
+.dl-scale-3 .options-taille { min-height: 68px; }
+.dl-scale-3 .options-table-entete { padding: 0 8px; }
+.dl-scale-3 .options-ligne { min-height: 46px; padding: 0 8px; }
+.dl-scale-3 .options-pseudo { min-height: 44px; margin-bottom: 6px; }
+/* Même défaut que options-tailles (rangée dans un conteneur en hauteur auto) : hauteur en dur ici aussi. */
+.dl-scale-3 .options-releve { padding: 10px 16px; flex-grow: 0; flex-shrink: 0; flex-basis: 140px; height: 140px; }
+.dl-scale-3 .options-releve__aide { margin-top: 2px; }
+.dl-scale-3 .options-pilltoggle { flex-grow: 0; flex-shrink: 0; flex-basis: 44px; height: 44px; margin-top: 8px; }
+.dl-scale-3 .options-volume { min-height: 56px; }
+.dl-scale-3 .options-volume > .unity-base-field__label { flex-grow: 0.8; }
+
+/* ---------- Taille ×1 : plus spacieux, rien à réorganiser ---------- */
+.dl-scale-1 .options-colonne { width: 1320px; }

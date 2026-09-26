@@ -17,7 +17,7 @@
     "id": "ui_clic",
     "nom": "Interface — clic de validation",
     "categorie": "Interface",
-    "usage": "Valider un bouton dans un menu (A, Croix, Entrée ou clic).",
+    "usage": "Valider un bouton dans un menu (A, Croix, Entrée ou clic). Ancienne version, remplacée par `dl_interface_clic`.",
     "fichier": "Kenney/InterfaceSounds/click_002.ogg",
     "variantes": [
       "Kenney/InterfaceSounds/click_002.ogg",
@@ -25,87 +25,87 @@
     ],
     "source": "Kenney, Interface Sounds",
     "licence": "CC0",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "ui_survol",
     "nom": "Interface — survol d'un bouton",
     "categorie": "Interface",
-    "usage": "La sélection passe sur un bouton, à la souris ou à la manette.",
+    "usage": "La sélection passe sur un bouton, à la souris ou à la manette. Ancienne version, remplacée par `dl_interface_survol`.",
     "fichier": "Kenney/InterfaceSounds/tick_002.ogg",
     "source": "Kenney, Interface Sounds",
     "licence": "CC0",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "ui_retour",
     "nom": "Interface — retour",
     "categorie": "Interface",
-    "usage": "Revenir à l'écran précédent (B, Rond, Échap).",
+    "usage": "Revenir à l'écran précédent (B, Rond, Échap). Ancienne version, remplacée par `dl_interface_retour`.",
     "fichier": "Kenney/InterfaceSounds/back_001.ogg",
     "source": "Kenney, Interface Sounds",
     "licence": "CC0",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "ui_refus",
     "nom": "Interface — action refusée",
     "categorie": "Interface",
-    "usage": "Action impossible : vote « prêt » inactif, or insuffisant…",
+    "usage": "Action impossible : vote « prêt » inactif, or insuffisant… Ancienne version, remplacée par `dl_interface_refus`.",
     "fichier": "Kenney/InterfaceSounds/error_004.ogg",
     "source": "Kenney, Interface Sounds",
     "licence": "CC0",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "ui_confirmation",
     "nom": "Interface — confirmation",
     "categorie": "Interface",
-    "usage": "Action acceptée : palier de Nyxessa acheté, choix de classe validé.",
+    "usage": "Action acceptée : palier de Nyxessa acheté, choix de classe validé. Ancienne version, remplacée par `dl_interface_confirmation`.",
     "fichier": "Kenney/InterfaceSounds/confirmation_002.ogg",
     "source": "Kenney, Interface Sounds",
     "licence": "CC0",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "ui_decompte",
     "nom": "Interface — décompte",
     "categorie": "Interface",
-    "usage": "Chaque seconde du compte à rebours de 5 s quand tous les joueurs sont prêts.",
+    "usage": "Chaque seconde du compte à rebours de 5 s quand tous les joueurs sont prêts. Ancienne version, remplacée par `dl_interface_decompte`.",
     "fichier": "Kenney/InterfaceSounds/tick_001.ogg",
     "source": "Kenney, Interface Sounds",
     "licence": "CC0",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "vote_pret",
     "nom": "Vote « prêt » — joueur prêt",
     "categorie": "Interface",
-    "usage": "Un joueur se déclare prêt (F1, Vue, pavé tactile) ; le HUD affiche « Prêts 2 / 3 ».",
+    "usage": "Un joueur se déclare prêt (F1, Vue, pavé tactile) ; le HUD affiche « Prêts 2 / 3 ». Ancienne version, remplacée par `dl_interface_pret`.",
     "fichier": "Relic/vote_ready.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "vote_tous_prets",
     "nom": "Vote « prêt » — tout le monde est prêt",
     "categorie": "Interface",
-    "usage": "Tous les joueurs sont prêts : le compte à rebours de 5 s avant le crépuscule commence.",
+    "usage": "Tous les joueurs sont prêts : le compte à rebours de 5 s avant le crépuscule commence. Ancienne version, remplacée par `dl_interface_tous_prets`.",
     "fichier": "Relic/vote_all_ready.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "vote_annule",
     "nom": "Vote « prêt » — vote annulé",
     "categorie": "Interface",
-    "usage": "Un joueur annule son vote « prêt ».",
+    "usage": "Un joueur annule son vote « prêt ». Ancienne version, remplacée par `dl_interface_pret_annule`.",
     "fichier": "Relic/vote_cancel.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "player_hurt",
@@ -713,17 +713,17 @@
     "id": "relic_pulse",
     "nom": "Nyxessa — impulsion",
     "categorie": "Nyxessa et portail",
-    "usage": "Le cristal pulse : tir d'un missile magique, et ceinture qui s'élargit à l'ouverture du portail.",
+    "usage": "Le cristal pulse : tir d'un missile magique, et ceinture qui s'élargit à l'ouverture du portail. Ancienne version, remplacée par `dl_nyxessa_tir`.",
     "fichier": "Relic/relic_pulse.wav",
     "source": "Relic (généré en Python pour le projet)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "relic_hit",
     "nom": "Nyxessa — frappée",
     "categorie": "Nyxessa et portail",
-    "usage": "Un ennemi frappe Nyxessa.",
+    "usage": "Un ennemi frappe Nyxessa. Ancienne version, remplacée par `dl_nyxessa_frappee`.",
     "fichier": "Relic/relic_hit_1.wav",
     "variantes": [
       "Relic/relic_hit_1.wav",
@@ -731,7 +731,7 @@
     ],
     "source": "Relic (généré en Python pour le projet)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "shield_raise",
@@ -792,31 +792,31 @@
     "id": "nyxessa_alerte",
     "nom": "Nyxessa — alerte, relique attaquée",
     "categorie": "Nyxessa et portail",
-    "usage": "Alerte au HUD quand Nyxessa ou son bouclier sont frappés.",
+    "usage": "Alerte au HUD quand Nyxessa ou son bouclier sont frappés. Ancienne version, remplacée par `dl_nyxessa_alerte`.",
     "fichier": "Kenney/InterfaceSounds/error_008.ogg",
     "source": "Kenney, Interface Sounds",
     "licence": "CC0",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "nyxessa_charge_portail",
     "nom": "Nyxessa — charge vers le portail",
     "categorie": "Nyxessa et portail",
-    "usage": "À l'aube, Nyxessa envoie une charge d'énergie en arc jusqu'au portail ; le portail s'ouvre à son arrivée (enchaîner sur « Portail — ouverture »).",
+    "usage": "À l'aube, Nyxessa envoie une charge d'énergie en arc jusqu'au portail ; le portail s'ouvre à son arrivée (enchaîner sur « Portail — ouverture »). Ancienne version, remplacée par `dl_nyxessa_charge_portail`.",
     "fichier": "Relic/nyxessa_charge.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "nyxessa_retour_energie",
     "nom": "Nyxessa — retour de l'énergie",
     "categorie": "Nyxessa et portail",
-    "usage": "Au crépuscule, l'énergie repart du portail vers Nyxessa, puis la ceinture se resserre et la lumière baisse.",
+    "usage": "Au crépuscule, l'énergie repart du portail vers Nyxessa, puis la ceinture se resserre et la lumière baisse. Ancienne version, remplacée par `dl_nyxessa_retour_energie`.",
     "fichier": "Relic/nyxessa_charge_return.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "portail_goutte",
@@ -852,11 +852,11 @@
     "id": "nyxessa_onde_passage",
     "nom": "Nyxessa — onde de la ceinture",
     "categorie": "Nyxessa et portail",
-    "usage": "Une onde fait le tour de la ceinture à chaque passage d'un joueur dans le portail.",
+    "usage": "Une onde fait le tour de la ceinture à chaque passage d'un joueur dans le portail. Ancienne version, remplacée par `dl_nyxessa_onde`.",
     "fichier": "Relic/nyxessa_belt_wave.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "nyxessa_rappel",
@@ -872,7 +872,7 @@
     "id": "nyxessa_palier",
     "nom": "Nyxessa — palier amélioré",
     "categorie": "Nyxessa et portail",
-    "usage": "Nyxessa passe au palier suivant (missiles, part du butin sauvée).",
+    "usage": "Nyxessa passe au palier suivant (missiles, part du butin sauvée). Ancienne version, remplacée par `dl_nyxessa_palier`.",
     "fichier": "Relic/nyxessa_upgrade.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
@@ -892,11 +892,11 @@
     "id": "nyxessa_destruction",
     "nom": "Nyxessa — destruction (défaite)",
     "categorie": "Nyxessa et portail",
-    "usage": "Nyxessa est détruite : la partie est perdue, l'écran de score suit.",
+    "usage": "Nyxessa est détruite : la partie est perdue, l'écran de score suit. Ancienne version, remplacée par `dl_nyxessa_destruction`.",
     "fichier": "Relic/nyxessa_destroyed.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "skeleton_spawn",
@@ -2309,7 +2309,7 @@
     ],
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_interface_clic",
@@ -2323,7 +2323,7 @@
     ],
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_interface_retour",
@@ -2333,7 +2333,7 @@
     "fichier": "Deathless/Interface/interface_retour.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_interface_refus",
@@ -2343,7 +2343,7 @@
     "fichier": "Deathless/Interface/interface_refus.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_interface_confirmation",
@@ -2353,7 +2353,7 @@
     "fichier": "Deathless/Interface/interface_confirmation.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_interface_decompte",
@@ -2363,7 +2363,7 @@
     "fichier": "Deathless/Interface/interface_decompte.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_interface_onglet",
@@ -2373,7 +2373,7 @@
     "fichier": "Deathless/Interface/interface_onglet.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_interface_pret",
@@ -2383,7 +2383,7 @@
     "fichier": "Deathless/Interface/interface_pret.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_interface_pret_annule",
@@ -2393,7 +2393,7 @@
     "fichier": "Deathless/Interface/interface_pret_annule.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_interface_tous_prets",
@@ -2403,7 +2403,7 @@
     "fichier": "Deathless/Interface/interface_tous_prets.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_nyxessa_tir",
@@ -2418,7 +2418,8 @@
     ],
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise",
+    "portee": 60
   },
   {
     "id": "dl_nyxessa_frappee",
@@ -2433,7 +2434,8 @@
     ],
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise",
+    "portee": 40
   },
   {
     "id": "dl_nyxessa_alerte",
@@ -2443,7 +2445,7 @@
     "fichier": "Deathless/Nyxessa/nyxessa_alerte.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_nyxessa_palier",
@@ -2453,7 +2455,8 @@
     "fichier": "Deathless/Nyxessa/nyxessa_palier.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise",
+    "portee": 60
   },
   {
     "id": "dl_nyxessa_charge_portail",
@@ -2463,7 +2466,8 @@
     "fichier": "Deathless/Nyxessa/nyxessa_charge_portail.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise",
+    "portee": 60
   },
   {
     "id": "dl_nyxessa_retour_energie",
@@ -2473,7 +2477,8 @@
     "fichier": "Deathless/Nyxessa/nyxessa_retour_energie.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise",
+    "portee": 60
   },
   {
     "id": "dl_nyxessa_onde",
@@ -2483,7 +2488,8 @@
     "fichier": "Deathless/Nyxessa/nyxessa_onde.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise",
+    "portee": 40
   },
   {
     "id": "dl_nyxessa_destruction",
@@ -2493,6 +2499,7 @@
     "fichier": "Deathless/Nyxessa/nyxessa_destruction.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise",
+    "portee": 60
   }
 ]

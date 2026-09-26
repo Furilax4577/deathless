@@ -17,6 +17,11 @@ namespace Deathless.Jeu
             public string statut;
             public bool boucle;
             public AudioClip[] clips;
+
+            /// Portée en mètres (distance au-delà de laquelle on n'entend plus rien, § 3 du cahier des charges son) ;
+            /// 0 = non précisée dans le catalogue, AudioBank applique alors sa valeur par défaut (60 m pour un effet,
+            /// 45 m pour une boucle).
+            public float portee;
         }
 
         public List<Entree> entrees = new List<Entree>();

@@ -14,7 +14,8 @@ namespace Deathless.UI.Ecrans
         /// Carte d'actions active quand l'écran est au sommet : UI (menus) ou Gameplay (HUD).
         public virtual bool CarteUI => true;
 
-        /// Opaque : cache ce qui est dessous (menu principal, HUD, score). Sinon superposé (pause, options, crédits).
+        /// Opaque : cache ce qui est dessous (menu principal, HUD, score ; aussi Options depuis le 26/09/2026,
+        /// écran superposé qui masque quand même ce qu'il recouvre). Sinon superposé sans rien cacher (pause, crédits).
         public virtual bool Opaque => false;
 
         public void Initialiser(NavigateurEcrans navigateur, VisualElement racine)

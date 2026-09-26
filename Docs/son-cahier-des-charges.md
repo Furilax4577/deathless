@@ -565,10 +565,10 @@ Chaque lot fait 15 à 25 sons (identifiants ou fichiers), tient dans une session
 
 - `Assets/Audio/Deathless/Nyxessa/synth_nyxessa.py` : `nyxessa_tir_1..3`, `nyxessa_frappee_1..3`, `nyxessa_alerte`, `nyxessa_palier`, `nyxessa_charge_portail`, `nyxessa_retour_energie`, `nyxessa_onde`, `nyxessa_destruction` (12 fichiers, 8 ids).
 - `Assets/Audio/Deathless/Interface/synth_interface.py` : `interface_survol_1..2`, `interface_clic_1..2`, `interface_retour`, `interface_refus`, `interface_confirmation`, `interface_decompte`, `interface_onglet`, `interface_pret`, `interface_pret_annule`, `interface_tous_prets` (12 fichiers, 10 ids).
-- Catalogue : ids `dl_nyxessa_*` et `dl_interface_*` dans `Wiki/data/sons.json`, statut `a_ecouter`.
+- Catalogue : ids `dl_nyxessa_*` et `dl_interface_*` dans `Wiki/data/sons.json`, statut `a_ecouter` puis `utilise` une fois branchés (26/09/2026, voir ci-dessous) ; portée (§ 3.2) renseignée pour les entrées de Nyxessa.
 - Planche de contrôle : [`son-lot1-controle.md`](son-lot1-controle.md) (24 fichiers conformes : 44,1 kHz mono, crête sous -1,4 dBFS, tête sous 20 ms, niveau à la cible).
 
-**Branchement proposé** (après écoute, par l'agent local ; aucun script de jeu n'a été modifié) :
+**Branché le 26/09/2026** par l'agent local : `SonsDuJeu.cs` a les ids `dl_nyxessa_*` et `dl_interface_*` en tête des listes ; `ReglagesAudio` reçoit ses clips `interface_survol_1`, `interface_clic_1`, `interface_retour`, `interface_refus` par le menu `Deathless > Jeu > 2b. Brancher l'interface du lot 1` (à lancer avec la régénération du catalogue, `2. Importer le catalogue des sons`) ; une portée par entrée (mètres) a été ajoutée à `AudioBank`, renseignée dans `Wiki/data/sons.json` pour Nyxessa (§ 3.2). Les 18 ids passent en `utilise`, les anciens sons qu'ils remplacent en `disponible` :
 
 | Constante de `SonsDuJeu` ou réglage | Nouvel id en tête |
 |---|---|

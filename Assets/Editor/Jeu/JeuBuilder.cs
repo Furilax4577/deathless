@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Deathless.Audio;
 using Deathless.Jeu;
 using Deathless.UI;
 using Deathless.UI.Ecrans;
@@ -65,7 +66,7 @@ namespace Deathless.EditorTools
 
         // ================================================================= Sons
 
-        [System.Serializable] class SonJson { public string id, nom, categorie, usage, fichier, source, licence, statut; public string[] variantes; }
+        [System.Serializable] class SonJson { public string id, nom, categorie, usage, fichier, source, licence, statut; public string[] variantes; public float portee; }
         [System.Serializable] class ListeSons { public SonJson[] e; }
 
         [MenuItem("Deathless/Jeu/2. Importer le catalogue des sons")]
@@ -89,13 +90,47 @@ namespace Deathless.EditorTools
                     if (c != null) clips.Add(c); else absents.Add(f);
                 }
                 if (clips.Count == 0) continue;
-                cat.entrees.Add(new SonsCatalogue.Entree { id = s.id, nom = s.nom, statut = s.statut, boucle = s.fichier.Contains("_loop"), clips = clips.ToArray() });
+                cat.entrees.Add(new SonsCatalogue.Entree { id = s.id, nom = s.nom, statut = s.statut, boucle = s.fichier.Contains("_loop"), clips = clips.ToArray(), portee = s.portee });
             }
             EditorUtility.SetDirty(cat);
             AssetDatabase.SaveAssets();
             string r = "Catalogue des sons : " + cat.entrees.Count + " sons" + (absents.Count > 0 ? ", fichiers absents : " + string.Join(", ", absents) : "");
             Debug.Log(r);
             return r;
+        }
+
+        /// Branchement du lot 1 (Nyxessa, interface) dans ReglagesAudio : les sons courts joués hors catalogue
+        /// (survol, clic, retour, refus) sont des références directes à un AudioClip, pas des ids ; § 8 du cahier
+        /// des charges son (« Branchement proposé »). Les autres sons du lot 1 sont déjà branchés par id dans
+        /// SonsDuJeu (dl_nyxessa_*, dl_interface_*) : relancer aussi « 2. Importer le catalogue des sons ».
+        [MenuItem("Deathless/Jeu/2b. Brancher l'interface du lot 1 (ReglagesAudio)")]
+        public static string BrancherInterfaceLot1()
+        {
+            const string reglagesAudioPath = "Assets/Audio/Resources/DeathlessAudio.asset";
+            const string dossier = "Assets/Audio/Deathless/Interface/";
+            var r = AssetDatabase.LoadAssetAtPath<ReglagesAudio>(reglagesAudioPath);
+            if (r == null)
+            {
+                string erreur = "ReglagesAudio introuvable : " + reglagesAudioPath;
+                Debug.LogError(erreur);
+                return erreur;
+            }
+            AudioClip Charger(string fichier)
+            {
+                var c = AssetDatabase.LoadAssetAtPath<AudioClip>(dossier + fichier);
+                if (c == null) Debug.LogError("Clip introuvable : " + dossier + fichier);
+                return c;
+            }
+            r.survol = Charger("interface_survol_1.wav");
+            r.clic = Charger("interface_clic_1.wav");
+            r.retour = Charger("interface_retour.wav");
+            r.refus = Charger("interface_refus.wav");
+            EditorUtility.SetDirty(r);
+            AssetDatabase.SaveAssets();
+            string msg = "ReglagesAudio (interface) : survol=" + (r.survol != null) + " clic=" + (r.clic != null)
+                + " retour=" + (r.retour != null) + " refus=" + (r.refus != null);
+            Debug.Log(msg);
+            return msg;
         }
 
         // ================================================================= Animation

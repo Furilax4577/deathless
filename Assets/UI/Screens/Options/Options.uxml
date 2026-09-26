@@ -1,59 +1,82 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:dl="Deathless.UI" editor-extension-mode="False">
     <Style src="../V01.uss" />
-    <ui:VisualElement class="v01-plein v01-voile options">
-        <ui:VisualElement class="options__entete">
-            <ui:Label text="Options" class="dl-title options__titre" />
-            <ui:VisualElement class="dl-tabs">
-                <dl:InputPrompt action="UI/TabPrevious" />
-                <ui:Button name="onglet-jeu" text="Jeu" class="dl-tab" />
-                <ui:Button name="onglet-commandes" text="Commandes" class="dl-tab" />
-                <ui:Button name="onglet-audio" text="Audio" class="dl-tab" />
-                <dl:InputPrompt action="UI/TabNext" />
+    <Style src="Options.uss" />
+    <ui:VisualElement class="v01-plein v01-voile">
+        <ui:VisualElement class="options-colonne">
+            <ui:VisualElement class="options-entete">
+                <ui:Label text="Options" class="dl-title options-titre" />
+                <ui:Label text="Réglages du jeu, des commandes et de l’audio" class="dl-text dl-text--small dl-text--muted options-soustitre" />
+            </ui:VisualElement>
+
+            <ui:VisualElement class="options-panel">
+                <ui:VisualElement class="options-tabs">
+                    <dl:InputPrompt action="UI/TabPrevious" class="options-tabs__cle" />
+                    <ui:Button name="onglet-jeu" text="Jeu" class="options-tab" />
+                    <ui:Button name="onglet-commandes" text="Commandes" class="options-tab" />
+                    <ui:Button name="onglet-audio" text="Audio" class="options-tab options-tab--dernier" />
+                    <dl:InputPrompt action="UI/TabNext" class="options-tabs__cle" />
+                </ui:VisualElement>
+
+                <ui:VisualElement name="options-jeu" class="options-page options-page--jeu">
+                    <ui:Label text="PROFIL" class="dl-section-label" />
+                    <ui:Button name="options-pseudo" class="dl-field options-pseudo">
+                        <ui:Label text="Pseudo" class="options-pseudo__libelle" />
+                        <ui:Label name="options-pseudo-valeur" text="Joueur" class="options-pseudo__valeur" />
+                        <ui:Label text="Modifier" class="options-pseudo__action" />
+                    </ui:Button>
+
+                    <ui:VisualElement class="options-page__corps">
+                        <ui:VisualElement class="options-col-principale">
+                            <ui:Label text="AFFICHAGE" class="dl-section-label" />
+                            <ui:Label text="Taille de l’interface" class="dl-text options-souslabel" />
+                            <ui:VisualElement class="options-tailles">
+                                <ui:Button name="taille-1" class="options-taille">
+                                    <ui:Label text="×1" class="options-taille__titre" />
+                                    <ui:Label text="80 %" class="options-taille__pc" />
+                                </ui:Button>
+                                <ui:Button name="taille-2" class="options-taille">
+                                    <ui:Label text="×2" class="options-taille__titre" />
+                                    <ui:Label text="100 %" class="options-taille__pc" />
+                                </ui:Button>
+                                <ui:Button name="taille-3" class="options-taille">
+                                    <ui:Label text="×3" class="options-taille__titre" />
+                                    <ui:Label text="135 %" class="options-taille__pc" />
+                                </ui:Button>
+                            </ui:VisualElement>
+                            <ui:Label text="×3 pour lire confortablement sur une télévision." class="dl-text dl-text--small dl-text--muted options-note" />
+                        </ui:VisualElement>
+
+                        <ui:VisualElement class="options-col-aside">
+                            <ui:Label text="ACCESSIBILITÉ" class="dl-section-label" />
+                            <ui:VisualElement class="options-releve">
+                                <ui:Label text="Se relever" class="dl-text options-souslabel" />
+                                <ui:Label text="Comment relever un allié à terre (ou soi-même, une fois debout)." class="dl-text dl-text--small dl-text--muted options-releve__aide" />
+                                <ui:VisualElement class="options-pilltoggle">
+                                    <ui:Button name="releve-marteler" text="Marteler" class="options-pill" />
+                                    <ui:Button name="releve-maintenir" text="Maintenir" class="options-pill options-pill--dernier" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <ui:VisualElement name="options-commandes" class="options-page options-page--commandes">
+                    <ui:VisualElement class="options-table-entete">
+                        <ui:Label text="ACTION" class="dl-section-label options-col-action" />
+                        <ui:Label text="CLAVIER ET SOURIS" class="dl-section-label options-col-touche" />
+                        <ui:Label name="options-entete-manette" text="MANETTE XBOX" class="dl-section-label options-col-touche" />
+                    </ui:VisualElement>
+                    <ui:ScrollView name="options-table" class="options-scroll" mode="Vertical" horizontal-scroller-visibility="Hidden" />
+                    <ui:Label text="Lecture seule : la personnalisation des touches viendra plus tard." class="dl-text dl-text--small dl-text--muted options-note" />
+                </ui:VisualElement>
+
+                <ui:VisualElement name="options-audio" class="options-page options-page--audio">
+                    <ui:Label text="VOLUMES" class="dl-section-label" />
+                    <ui:VisualElement name="options-volumes" class="options-volumes" />
+                    <ui:Label text="Effets : combats, compétences, ennemis, Nyxessa, portail, ambiance. Interface : sons des menus." class="dl-text dl-text--small dl-text--muted options-note" />
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-
-        <ui:VisualElement name="options-jeu" class="dl-panel options__page options__page--jeu">
-            <ui:Label text="JEU" class="dl-section-label" />
-            <ui:Button name="options-pseudo" class="dl-field options__pseudo">
-                <ui:Label text="Pseudo" class="options__pseudo-libelle" />
-                <ui:Label name="options-pseudo-valeur" text="Joueur" class="options__pseudo-valeur" />
-                <ui:Label text="Modifier" class="options__pseudo-action" />
-            </ui:Button>
-            <ui:Label text="Taille de l’interface" class="dl-text" />
-            <ui:VisualElement class="options__tailles">
-                <ui:Button name="taille-1" class="options__taille">
-                    <ui:Label text="×1" class="options__taille-titre" />
-                    <ui:Label text="80 %" class="options__taille-pc" />
-                </ui:Button>
-                <ui:Button name="taille-2" class="options__taille">
-                    <ui:Label text="×2" class="options__taille-titre" />
-                    <ui:Label text="100 %" class="options__taille-pc" />
-                </ui:Button>
-                <ui:Button name="taille-3" class="options__taille">
-                    <ui:Label text="×3" class="options__taille-titre" />
-                    <ui:Label text="135 %" class="options__taille-pc" />
-                </ui:Button>
-            </ui:VisualElement>
-            <ui:Label text="×3 pour lire confortablement sur une télévision." class="dl-text dl-text--small dl-text--muted" />
-        </ui:VisualElement>
-
-        <ui:VisualElement name="options-commandes" class="dl-panel options__page">
-            <ui:VisualElement class="options-ligne options-ligne--entete">
-                <ui:Label text="ACTION" class="dl-section-label options-ligne__libelle" />
-                <ui:Label text="CLAVIER ET SOURIS" class="dl-section-label options-ligne__entete" />
-                <ui:Label name="options-entete-manette" text="MANETTE XBOX" class="dl-section-label options-ligne__entete" />
-            </ui:VisualElement>
-            <ui:ScrollView name="options-table" class="options__table" mode="Vertical" horizontal-scroller-visibility="Hidden" />
-            <ui:Label text="Lecture seule : la personnalisation des touches viendra plus tard." class="dl-text dl-text--small dl-text--muted options__note" />
-        </ui:VisualElement>
-
-        <ui:VisualElement name="options-audio" class="dl-panel options__page options__page--audio">
-            <ui:Label text="AUDIO" class="dl-section-label" />
-            <ui:VisualElement name="options-volumes" class="options__volumes" />
-            <ui:Label text="Effets : combats, compétences, ennemis, Nyxessa, portail, ambiance. Interface : sons des menus." class="dl-text dl-text--small dl-text--muted options__note" />
-        </ui:VisualElement>
-
-        <ui:Button name="options-retour" text="Retour" class="options__retour" />
 
         <ui:VisualElement class="dl-prompt-bar">
             <ui:VisualElement class="dl-prompt-bar__group">

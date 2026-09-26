@@ -7,9 +7,15 @@ namespace Deathless.Jeu
     /// Lecture des sons du catalogue : effets 3D (réserve de sources), sons 2D, boucles attachées, musique en fondu
     /// enchaîné. Une instance par scène (AudioBank.Instance) ; les appels statiques ne font rien sans elle.
     /// Mixer : effets, sons 2D et boucles dans le groupe Effets, musique dans le groupe Musique (VolumesAudio).
+    /// Portée : chaque entrée du catalogue peut préciser la sienne (`SonsCatalogue.Entree.portee`, en mètres,
+    /// § 3 du cahier des charges son) ; à 0 (non précisée), on retombe sur <see cref="PorteeParDefaut"/> pour un
+    /// effet ponctuel ou <see cref="PorteeBoucleParDefaut"/> pour une boucle.
     public class AudioBank : MonoBehaviour
     {
         public static AudioBank Instance { get; private set; }
+
+        const float PorteeParDefaut = 60f;
+        const float PorteeBoucleParDefaut = 45f;
 
         public SonsCatalogue catalogue;
         [Range(0f, 1f)] public float volumeEffets = 0.9f;
@@ -36,7 +42,7 @@ namespace Deathless.Jeu
                 s.spatialBlend = 1f;
                 s.rolloffMode = AudioRolloffMode.Linear;
                 s.minDistance = 3f;
-                s.maxDistance = 60f;
+                s.maxDistance = PorteeParDefaut;
                 s.dopplerLevel = 0f;
                 VolumesAudio.Router(s, CanalAudio.Effets);
                 m_Sources.Add(s);
@@ -91,6 +97,7 @@ namespace Deathless.Jeu
             libre.volume = volume * volumeEffets;
             libre.pitch = Random.Range(0.95f, 1.05f);
             libre.loop = false;
+            libre.maxDistance = e.portee > 0f ? e.portee : PorteeParDefaut;
             libre.Play();
         }
 
@@ -106,7 +113,7 @@ namespace Deathless.Jeu
             s.spatialBlend = 1f;
             s.rolloffMode = AudioRolloffMode.Linear;
             s.minDistance = 3f;
-            s.maxDistance = 45f;
+            s.maxDistance = e.portee > 0f ? e.portee : PorteeBoucleParDefaut;
             s.dopplerLevel = 0f;
             s.volume = volume * Instance.volumeEffets;
             VolumesAudio.Router(s, CanalAudio.Effets);
