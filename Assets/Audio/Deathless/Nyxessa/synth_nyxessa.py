@@ -1,24 +1,25 @@
-"""Sons de Nyxessa, la relique (Deathless, lots 1 et 2 du cahier des charges son, 26/09/2026).
+"""Sons de Nyxessa, la relique (Deathless, lots 1 et 2, regénérés sous la direction sombre le 26/09/2026 au soir).
 
-Signature de Nyxessa : le **tintement de gemme** (petite barre de cristal, partiels 1 : 2,756 : 5,404 : 8,933, chacun
-doublé d'un jumeau désaccordé de 0,6 à 3 Hz), accordé sur la gamme commune (mi mineur pentatonique), porté par une
-poussée grave (l'énergie) et des souffles d'air filtrés (la charge qui voyage). Rien de métallique, rien de militaire :
-du cristal, de l'air et une masse douce. Détail et cibles : Docs/son-cahier-des-charges.md.
+Nyxessa est une **âme captive** qui ressuscite les héros, pas une boîte à musique. Chaque son porte une **vocalise**
+(voix fantôme par formants : impulsions glottiques, formants de Klatt, souffle ; voyelles sombres « ou », « o » pour
+la plainte, « a » ouvert pour l'appel et le cri), posée sur un **bourdon** grave ou un **chœur sourd**. Le tintement
+de gemme reste la signature de la relique, mais une octave plus bas (mi4 à si5), assourdi, et jamais seul. Référence
+de caractère : l'ancien missile magique de Relic (plaintes des limbes pendant le vol, cri grave à l'éclat).
+Détail : Docs/son-cahier-des-charges.md (§ 1, § 2, § 3.2, § 8).
 
 Sons écrits (Assets/Audio/Deathless/Nyxessa/, WAV 44,1 kHz mono 16 bits, graines 1101 à 1199) :
-  nyxessa_tir_1..3          tir d'un missile : le cristal pulse, un accord de deux gemmes, l'air part (3D)
-  nyxessa_frappee_1..3      un ennemi frappe la relique : coup sourd, gemme grave qui frissonne faux (3D)
-  nyxessa_alerte            relique attaquée, rappel imminent au donjon : deux fois deux notes descendantes (2D)
-  nyxessa_palier            palier acheté : arpège montant, accord ouvert, gerbe d'étincelles (3D, événement majeur)
-  nyxessa_charge_portail    à l'aube, la charge part vers le portail : souffle et gemmes qui montent (3D)
-  nyxessa_retour_energie    au crépuscule, l'énergie revient : souffle qui retombe, gemme grave qui absorbe (3D)
-  nyxessa_onde              onde de la ceinture (passage au portail, mort d'un allié) : course de gemmes (3D)
-  nyxessa_destruction       défaite : fêlure, bris en cascade, dernier soupir grave (3D, événement majeur)
-Lot 2 (26/09/2026) :
-  nyxessa_missile_vol_boucle   vol du missile en crâne (boucle 1,5 s) : souffle qui palpite, gemme tenue (3D)
-  nyxessa_missile_eclat_1..3   le missile éclate : choc de verre, gerbe de gemmes qui monte (3D)
-  nyxessa_rappel               joueur ramené de force du donjon : accord tendu, aspiration, arrivée (2D)
-  nyxessa_reapparition         un joueur renaît près de Nyxessa : gemmes qui convergent, accord, pas (3D)
+  nyxessa_tir_1..3             tir d'un missile : appel bref qui monte, gemme sombre, poussée grave (3D)
+  nyxessa_frappee_1..3         un ennemi frappe la relique : coup sourd de peau, plainte courte qui retombe (3D)
+  nyxessa_alerte               relique attaquée, rappel au donjon : deux cris d'appel sur un battement de peau (2D)
+  nyxessa_palier               palier acheté : un chœur qui s'ouvre (« ou » → « a ») sur le bourdon (3D)
+  nyxessa_charge_portail       à l'aube : glissando de voix qui monte, chœur à l'octave, bourdon, souffle (3D)
+  nyxessa_retour_energie       au crépuscule : glissando qui redescend, la relique absorbe (peau, gemme grave) (3D)
+  nyxessa_onde                 onde de la ceinture : souffle de chœur bref, course de gemmes sombres (3D)
+  nyxessa_destruction          défaite : fêlure, long cri qui se déchire et s'éteint dans le bourdon (3D)
+  nyxessa_missile_vol_boucle   vol du missile crâne (boucle 2 s) : chœur de plaintes des limbes, os creux qui siffle
+  nyxessa_missile_eclat_1..3   éclat du missile : cri bref et déchirant, gemmes sombres, souffle (3D)
+  nyxessa_rappel               joueur ramené de force : un appel qui s'éloigne, puis une voix qui revient (2D)
+  nyxessa_reapparition         un joueur renaît : des voix lointaines se rapprochent et se posent, pas sur la pierre (3D)
 
 Usage : python -B synth_nyxessa.py [dossier_sortie] [nom ...]   (par défaut : le dossier du script, tous les sons).
 Catalogue : ids dl_nyxessa_* dans Wiki/data/sons.json.
@@ -32,192 +33,234 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 import deathless_audio as da  # noqa: E402
 
 N = da.note
-AIGU = da.penta(6, 7)          # mi6 à ré7 : les gemmes de la relique
-TRES_AIGU = da.penta(7, 8)[:6]  # étincelles
+SOMBRES = da.penta(4, 5)        # mi4 à ré6 : les gemmes de la relique, assombries
 
 
-def tir(graine, accord):
+def env(x, attaque, tenue, relache, forme=1.5):
+    return da.enveloppe(x, attaque, tenue, relache, forme)
+
+
+def appel(rng, duree, f0, f1, voyelle=("o", "a"), souffle=0.35, rauque=0.0, sous_harm=0.0, montee=0.25):
+    """Vocalise d'appel : la voix monte de f0 à f1 sur `montee` de la durée, tient, puis retombe d'un ton."""
+    def f(u):
+        if u < montee:
+            return f0 + (f1 - f0) * (u / montee) ** 0.7
+        return f1 * (1 - 0.1 * ((u - montee) / (1 - montee)) ** 1.5)
+    a, b = voyelle
+    return da.voix(rng, duree, f, lambda u: (a, b, min(1.0, u * 3)), souffle=souffle, rauque=rauque,
+                   vibrato=(5.5, 0.018), sous_harm=sous_harm)
+
+
+def cri(rng, duree, pic, octaves=((1.0, 1.0, 0.45, 0.55), (0.5, 0.8, 0.65, 0.75)), saturation=2.8, tenue=0.35):
+    """Cri déchirant (modèle du cri grave de Relic) : la voix jaillit de 120 Hz au pic en 10 % de la durée, tremble
+    en poussant, puis s'effondre de 65 % ; voyelle « o » → « a » → « o », raucité et sous-harmonique (la voix se
+    casse), deux octaves superposées, saturation douce."""
+    def contour(u):
+        if u < 0.1:
+            return 120 + (pic - 120) * (u / 0.1) ** 0.7
+        if u < tenue:
+            return pic * (1 + 0.04 * math.sin(u * 60))
+        return pic * (1 - 0.65 * ((u - tenue) / (1 - tenue)) ** 1.1)
+
+    n = da.idx(duree)
+    res = [0.0] * n
+    for octave, gain, sous, rauque in octaves:
+        v = da.voix(rng, duree, lambda u, o=octave: contour(u) * o,
+                    lambda u: ("o", "a", min(1.0, u * 5)) if u < 0.55 else ("a", "o", min(1.0, (u - 0.55) * 2.2)),
+                    souffle=0.45, rauque=rauque, gigue=0.035, vibrato=(6.5, 0.02), sous_harm=sous)
+        v = da.saturer(v, saturation)
+        v = env(v, 0.004, duree * 0.3, duree * 0.7, 0.9)
+        for i in range(n):
+            res[i] += gain * v[i]
+    return res
+
+
+def tir(graine, f_voix, accord):
     rng = random.Random(graine)
     buf = da.tampon(0.85)
-    da.sub(buf, 110.0, 52.0, 0.3, 0.2)                                   # le cristal pulse et recule
-    da.ajouter(buf, da.souffle(rng, 0.26, 700.0, 5200.0, 1.4, 0.012, 0.22, 2.0), 0.0, 0.55)  # l'éclat part
-    da.gemme(rng, buf, N(accord[0]), 0.5, 0.75, 0.002)
-    da.gemme(rng, buf, N(accord[1]), 0.34, 0.6, 0.012)
-    da.scintillement(rng, buf, 0.02, 0.16, TRES_AIGU, 5, 0.1)
+    da.ajouter(buf, env(appel(rng, 0.5, f_voix, f_voix * 1.5, montee=0.3), 0.006, 0.12, 0.37), 0.0, 0.55)
+    da.sub(buf, 90.0, 45.0, 0.45, 0.25)                                            # la relique pulse
+    da.peau(rng, buf, 62.0, 0.35, 0.0, 0.25, 1.3, 0.4)
+    da.gemme(rng, buf, N(accord[0]), 0.22, 0.5, 0.004, eclat=0.35, durete=0.3)      # gemme sombre, sous la voix
+    da.gemme(rng, buf, N(accord[1]), 0.16, 0.45, 0.015, eclat=0.35, durete=0.0)
+    da.ajouter(buf, da.souffle(rng, 0.3, 400.0, 2500.0, 1.2, 0.02, 0.26, 1.8), 0.0, 0.3)
     return buf
 
 
-def frappee(graine, base):
+def frappee(graine, f_voix):
     rng = random.Random(graine)
     buf = da.tampon(0.75)
-    da.mode(buf, 170.0 * rng.uniform(0.95, 1.05), 0.55, 0.09, 0.0, 0.0008)   # coup sourd (os, bois, pierre)
-    da.mode(buf, 320.0 * rng.uniform(0.95, 1.05), 0.25, 0.05, 0.0, 0.0008)
-    da.ajouter(buf, da.enveloppe(da.passe_bas(da.bruit(rng, da.idx(0.05)), 1800.0), 0.0008, 0.004, 0.045, 2.0),
-               0.0, 0.9)
-    f = N(base)
-    da.gemme(rng, buf, f, 0.42, 0.55, 0.004, eclat=0.8)                       # la gemme résonne…
-    da.gemme(rng, buf, f * 1.059, 0.24, 0.42, 0.004, eclat=0.6, durete=0.0)  # … un demi-ton trop haut : elle a mal
-    da.scintillement(rng, buf, 0.01, 0.12, AIGU, 4, 0.09, (0.06, 0.16))       # éclats qui sautent
+    da.peau(rng, buf, 78.0 * rng.uniform(0.9, 1.1), 0.7, 0.0, 0.2, 1.5, 1.0)        # coup sourd
+    da.os_creux(rng, buf, 380.0 * rng.uniform(0.9, 1.1), 0.25, 0.0, 0.05)
+    plainte = da.voix(rng, 0.55, lambda u: f_voix * (1 - 0.25 * u), lambda u: ("o", "ou", u),
+                      souffle=0.5, rauque=0.25, vibrato=(6.0, 0.025))
+    da.ajouter(buf, env(plainte, 0.015, 0.1, 0.43), 0.02, 0.5)
+    da.gemme(rng, buf, N("E4"), 0.14, 0.4, 0.004, eclat=0.3, durete=0.0)
+    da.gemme(rng, buf, N("F4"), 0.1, 0.35, 0.004, eclat=0.3, durete=0.0)            # un demi-ton faux : elle a mal
     return buf
 
 
 def alerte(graine):
     rng = random.Random(graine)
     buf = da.tampon(1.05)
-    for t0, force in ((0.0, 0.85), (0.4, 1.0)):
-        da.gemme(rng, buf, N("B6"), 0.5 * force, 0.4, t0, eclat=1.1)
-        da.gemme(rng, buf, N("E6"), 0.55 * force, 0.5, t0 + 0.13, eclat=1.1)
-        da.sub(buf, 82.4, 70.0, 0.28 * force, 0.16, t0)                    # battement grave : le cœur de la relique
+    for t0, (f0, f1), force in ((0.0, (294.0, 392.0), 0.85), (0.45, (330.0, 440.0), 1.0)):
+        v = appel(rng, 0.45, f0, f1, voyelle=("a", "a"), souffle=0.25, rauque=0.15, montee=0.3)
+        da.ajouter(buf, env(v, 0.004, 0.12, 0.33), t0, 0.6 * force)
+        da.peau(rng, buf, 82.4, 0.5 * force, t0, 0.3, 1.3, 0.6)                      # battement de cœur grave
+    b = da.bourdon(rng, 1.0, [N("E2"), N("B2")], 0.3, 500.0)
+    da.ajouter(buf, env(b, 0.01, 0.4, 0.59), 0.0, 0.2)
     return buf
 
 
 def palier(graine):
     rng = random.Random(graine)
     buf = da.tampon(2.5)
-    da.sub(buf, 55.0, 82.4, 0.2, 0.9)
-    for k, n in enumerate(("E6", "G6", "B6", "E7")):
-        da.gemme(rng, buf, N(n), 0.34 + 0.04 * k, 0.6, 0.09 * k)
-    for n, a in (("E6", 0.42), ("B6", 0.34), ("E7", 0.3)):
-        da.gemme(rng, buf, N(n), a, 1.7, 0.45, eclat=1.2)
-    da.ajouter(buf, da.souffle(rng, 1.3, 1500.0, 7000.0, 1.6, 0.25, 1.0, 1.8), 0.3, 0.22)
-    da.scintillement(rng, buf, 0.42, 1.4, TRES_AIGU + AIGU[-4:], 30, 0.13, (0.15, 0.45), densite=lambda u: u ** 1.7)
+    ch = da.choeur(rng, 2.3, N("E3"), lambda u: ("ou", "a", min(1.0, u * 1.6)), nombre=4, octaves=(1.0, 2.0))
+    da.ajouter(buf, env(ch, 0.25, 1.2, 0.85, 1.2), 0.0, 0.6)                       # le chœur s'ouvre
+    b = da.bourdon(rng, 2.5, [N("E1"), N("B1")], 0.25, 400.0)
+    da.ajouter(buf, env(b, 0.4, 1.3, 0.8), 0.0, 0.35)
+    da.peau(rng, buf, 55.0, 0.5, 0.0, 0.5, 1.3, 0.5)
+    for k, n in enumerate(("E4", "G4", "B4", "E5")):
+        da.gemme(rng, buf, N(n), 0.12, 0.8, 0.3 + 0.12 * k, eclat=0.4, durete=0.2)
     return buf
 
 
-def charge_portail(graine):
+def glissando(graine, f0, f1, voyelles, absorbe):
     rng = random.Random(graine)
     buf = da.tampon(1.95)
-    da.ajouter(buf, da.souffle(rng, 1.9, 300.0, 4200.0, 1.3, 1.25, 0.62, 1.4), 0.0, 0.75)
-    da.sinus_glisse(buf, 58.0, 118.0, 0.22, 1.7, 0.0, 0.3, 0.5, 1.0)
-    notes = da.penta(5, 7)
-    da.scintillement(rng, buf, 0.0, 1.55, notes, 42, 0.14, (0.1, 0.3),
-                     densite=lambda u: u ** 0.55, registre=lambda u: u)
-    da.gemme(rng, buf, N("B6"), 0.3, 0.5, 0.004)                         # départ net, pas de silence en tête
-    return buf
-
-
-def retour_energie(graine):
-    rng = random.Random(graine)
-    buf = da.tampon(1.95)
-    da.ajouter(buf, da.souffle(rng, 1.45, 4200.0, 350.0, 1.3, 0.2, 1.2, 1.2), 0.0, 0.7)
-    notes = da.penta(5, 7)
-    da.scintillement(rng, buf, 0.0, 1.3, notes, 36, 0.13, (0.1, 0.3),
-                     densite=lambda u: u ** 1.8, registre=lambda u: 1.0 - u)
-    da.gemme(rng, buf, N("B6"), 0.26, 0.4, 0.004)
-    da.gemme(rng, buf, N("E5"), 0.5, 0.9, 1.35, eclat=0.7)                 # la relique absorbe
-    da.sub(buf, 110.0, 55.0, 0.42, 0.5, 1.35)
+    courbe = (lambda u: f0 * (f1 / f0) ** (u ** 0.8))
+    v = da.voix(rng, 1.7, courbe, lambda u: (voyelles[0], voyelles[1], u), souffle=0.4, vibrato=(5.0, 0.02))
+    da.ajouter(buf, env(v, 0.01 if not absorbe else 0.02, 0.9, 0.78, 1.2), 0.0, 0.55)
+    c = da.choeur(rng, 1.7, lambda u: courbe(u) * 0.5, "ou", nombre=2, souffle=0.55)
+    da.ajouter(buf, env(c, 0.2, 0.8, 0.7), 0.0, 0.35)
+    b = da.bourdon(rng, 1.95, [N("E1"), N("B1")], 0.3, 350.0)
+    da.ajouter(buf, env(b, 0.05, 1.2, 0.7), 0.0, 0.3)
+    if absorbe:
+        da.ajouter(buf, da.souffle(rng, 1.4, 3000.0, 300.0, 1.2, 0.2, 1.2, 1.3), 0.0, 0.25)
+        da.peau(rng, buf, 55.0, 0.6, 1.4, 0.45, 1.3, 0.5)                          # la relique absorbe
+        da.gemme(rng, buf, N("E4"), 0.25, 0.5, 1.4, eclat=0.3, durete=0.2)
+    else:
+        da.ajouter(buf, da.souffle(rng, 1.6, 300.0, 3000.0, 1.2, 1.1, 0.5, 1.3), 0.0, 0.25)
+        da.peau(rng, buf, 62.0, 0.45, 0.0, 0.35, 1.4, 0.5)
     return buf
 
 
 def onde(graine):
     rng = random.Random(graine)
     buf = da.tampon(1.15)
-    notes = [f for f in da.penta(5, 7) if f >= da.note("A5")][:10]
+    c = da.choeur(rng, 0.9, N("E3"), lambda u: ("ou", "o", u), nombre=3, souffle=0.6)
+    da.ajouter(buf, env(c, 0.12, 0.2, 0.58), 0.0, 0.5)
+    notes = [f for f in SOMBRES if f >= N("A4")][:8]
     for k, f in enumerate(notes):
-        u = k / (len(notes) - 1)
-        arc = 0.55 + 0.45 * (1 - abs(2 * u - 1))                             # l'onde enfle puis passe
-        da.gemme(rng, buf, f, 0.22 * arc, 0.45, 0.045 * k, eclat=0.8, jumeau=False, durete=0.5)
-    da.ajouter(buf, da.souffle(rng, 0.55, 1800.0, 4200.0, 1.5, 0.15, 0.38, 1.5), 0.0, 0.18)
+        da.gemme(rng, buf, f, 0.12, 0.35, 0.05 * k, eclat=0.35, jumeau=False, durete=0.3)
+    da.ajouter(buf, da.souffle(rng, 0.6, 800.0, 2000.0, 1.3, 0.15, 0.42, 1.5), 0.0, 0.2)
     return buf
 
 
 def destruction(graine):
     rng = random.Random(graine)
     buf = da.tampon(3.9)
-    fele = da.passe_haut(da.bruit(rng, da.idx(0.08)), 800.0)                # la fêlure
-    da.ajouter(buf, da.enveloppe(fele, 0.0006, 0.006, 0.07, 2.5), 0.0, 1.0)
-    da.choc(rng, buf, 0.0, 0.9, 0.004, 2500.0, 0.5)
-    da.sub(buf, 92.0, 34.0, 0.6, 1.7)                                         # la masse s'effondre
-    eclats = [rng.uniform(1100.0, 6500.0) for _ in range(40)]                  # bris : hors gamme, chaotique
-    eclats.sort()
-    da.scintillement(rng, buf, 0.0, 1.7, eclats, 95, 0.2, (0.08, 0.5),
-                     densite=lambda u: u ** 2.2, registre=lambda u: 1.0 - 0.7 * u)
-    da.gemme(rng, buf, N("E4"), 0.42, 2.6, 0.9, eclat=0.6)                     # dernier soupir de la relique
-    da.gemme(rng, buf, N("B4"), 0.22, 2.2, 0.92, eclat=0.5, durete=0.0)
-    for k, n in enumerate(("B5", "G5", "E5")):
-        da.gemme(rng, buf, N(n), 0.16, 1.2, 1.8 + 0.4 * k, eclat=0.5, durete=0.2)
-    poussiere = da.passe_bas(da.bruit(rng, da.idx(2.2)), 420.0)
-    da.ajouter(buf, da.enveloppe(poussiere, 0.05, 0.2, 1.95, 1.6), 0.05, 0.5)
+    fele = da.passe_haut(da.bruit(rng, da.idx(0.08)), 700.0)
+    da.ajouter(buf, env(fele, 0.0006, 0.006, 0.07, 2.5), 0.0, 0.8)
+    da.peau(rng, buf, 48.0, 0.9, 0.0, 0.9, 1.5, 1.0)
+    da.ajouter(buf, cri(rng, 2.4, 262.0, octaves=((1.0, 1.0, 0.4, 0.5), (0.5, 0.85, 0.6, 0.7), (0.25, 0.4, 0.5, 0.9)),
+                        tenue=0.3), 0.02, 0.55)                                    # le long cri
+    eclats = sorted(rng.uniform(300.0, 2000.0) for _ in range(30))
+    da.scintillement(rng, buf, 0.0, 1.4, eclats, 45, 0.1, (0.1, 0.4), densite=lambda u: u ** 2.2,
+                     registre=lambda u: 1.0 - 0.7 * u)
+    b = da.bourdon(rng, 3.4, [N("E1"), N("E2")], 0.2, 300.0)                         # le cri s'éteint dans le bourdon
+    da.ajouter(buf, env(b, 1.2, 0.8, 1.4, 1.2), 0.5, 0.45)
+    da.gemme(rng, buf, N("E3"), 0.25, 2.2, 1.6, eclat=0.3, durete=0.0)
     return buf
 
 
-# --- Lot 2 ---------------------------------------------------------------------------------------------------------
-def missile_vol(graine, base="B5"):
-    """Boucle de 1,5 s : souffle serré qui palpite à 8 Hz (12 cycles), frisson de gemme tenu (fondamental et partiel
-    2,756 avec leurs jumeaux à 1,33 Hz, 2 battements par boucle). Pas d'attaque : le vol est continu."""
+def missile_vol(graine, f_choeur=(82.4, 98.0, 123.5), duree=2.0):
+    """Boucle : chœur grave presque immobile (trois voix « ou/o », souffle 0,5, amplitude qui respire à 0,5 Hz, un cycle
+    par boucle), plaintes des limbes (quatre glissandos de 0,6 à 0,9 s qui retombent, repliés sur la boucle), os creux
+    qui siffle (bruit en bande étroite vers 1,1 kHz, qui ondule), le tout passé sous 4,5 kHz."""
     rng = random.Random(graine)
-    duree, fondu = 1.5, 0.2
+    fondu = 0.3
     n = da.idx(duree + fondu)
-    air = da.passe_bande(da.bruit(rng, n), 2200.0, 1.3)
-    air = [v * (0.65 + 0.35 * math.sin(2 * math.pi * 8.0 * i / da.RATE)) for i, v in enumerate(air)]
-    air = da.fondre_boucle([v * 0.5 for v in air], duree, fondu)
-    chant = [0.0] * da.idx(duree)
-    f = N(base)
-    for r, a in ((1.0, 0.16), (2.756, 0.07)):
-        for ecart, ph in ((0.0, 0.0), (1.3333, 1.7)):
-            fb = round((f * r + ecart) * duree) / duree         # nombre entier de périodes : jointure exacte
-            w = 2 * math.pi * fb / da.RATE
-            for i in range(len(chant)):
-                chant[i] += a * math.sin(w * i + ph)
-    return [x + y for x, y in zip(air, chant)]
+    fond = [0.0] * n
+    for f0 in f_choeur:
+        v = da.voix(rng, duree + fondu, f0, lambda u: ("ou", "o", 0.5 + 0.5 * math.sin(u * 4)), souffle=0.5,
+                    gigue=0.01, vibrato=(4.5, 0.012))
+        for i in range(n):
+            fond[i] += 0.3 * v[i] * (0.65 + 0.35 * math.sin(2 * math.pi * 0.5 * i / da.RATE))
+    siffle = da.souffle_module(rng, duree + fondu, 1100.0, 7.0, 1.0, 0.6, 0.08)
+    fond = [a + 0.25 * b for a, b in zip(fond, siffle)]
+    fond = da.fondre_boucle(fond, duree, fondu)
+    plaintes = da.tampon(duree + 1.0)
+    for k in range(4):
+        d = rng.uniform(0.6, 0.9)
+        f0 = rng.uniform(180.0, 260.0)
+        p = da.voix(rng, d, lambda u, f=f0: f * (1 - 0.3 * u ** 1.3), lambda u: ("o", "ou", u), souffle=0.55,
+                    rauque=0.15, vibrato=(5.5, 0.03))
+        da.ajouter(plaintes, env(p, 0.08, d * 0.3, d * 0.6), k * duree / 4 + rng.uniform(0, 0.15), 0.35)
+    res = [a + b for a, b in zip(fond, da.plier(plaintes, duree))]
+    return da.circulaire(lambda x: da.passe_bas(da.passe_bas(x, 4500.0), 5500.0), res)
 
 
-def missile_eclat(graine, registre_bas):
+def missile_eclat(graine, pic):
     rng = random.Random(graine)
-    buf = da.tampon(0.6)
-    da.choc(rng, buf, 0.0, 0.8, 0.0015, 4000.0, 0.7)                        # choc de verre
-    notes = da.penta(5, 7)
-    da.scintillement(rng, buf, 0.0, 0.18, notes, 15, 0.3, (0.1, 0.25),
-                     densite=lambda u: u ** 1.6, registre=lambda u: registre_bas + (1 - registre_bas) * u)
-    da.sub(buf, 120.0, 60.0, 0.3, 0.14)
+    buf = da.tampon(0.85)
+    crac = da.passe_bande(da.bruit(rng, da.idx(0.06)), lambda u: 2800 - 1500 * u, 1.1)
+    da.ajouter(buf, [v * math.exp(-5 * i / len(crac)) for i, v in enumerate(crac)], 0.0, 0.8)   # le crâne éclate
+    da.ajouter(buf, cri(rng, 0.7, pic, tenue=0.25), 0.0, 0.6)
+    da.peau(rng, buf, 60.0, 0.45, 0.0, 0.3, 1.5, 0.4)
+    eclats = sorted(rng.uniform(350.0, 1600.0) for _ in range(12))
+    da.scintillement(rng, buf, 0.0, 0.25, eclats, 10, 0.12, (0.08, 0.25))
+    da.ajouter(buf, da.souffle(rng, 0.6, 1500.0, 300.0, 1.1, 0.02, 0.55, 1.4), 0.05, 0.3)
     return buf
 
 
 def rappel(graine):
     rng = random.Random(graine)
     buf = da.tampon(1.8)
-    da.gemme(rng, buf, N("E6"), 0.4, 0.9, 0.0)
-    da.gemme(rng, buf, N("F6"), 0.32, 0.8, 0.0, durete=0.0)                  # un demi-ton : c'est une punition
-    da.ajouter(buf, da.souffle(rng, 0.6, 500.0, 6000.0, 1.5, 0.45, 0.15, 1.5), 0.2, 0.7)   # aspiré vers la relique
-    da.scintillement(rng, buf, 0.25, 0.55, da.penta(6, 7), 18, 0.12, (0.08, 0.2),
-                     densite=lambda u: u ** 0.6, registre=lambda u: u)
-    da.gemme(rng, buf, N("E5"), 0.5, 0.8, 0.95, eclat=0.7)                   # arrivée au village
-    da.sub(buf, 110.0, 55.0, 0.35, 0.45, 0.95)
-    da.scintillement(rng, buf, 0.95, 0.35, da.penta(5, 6), 10, 0.1, (0.1, 0.3), registre=lambda u: 1 - u)
+    v = appel(rng, 0.9, 294.0, 392.0, voyelle=("a", "a"), souffle=0.3, montee=0.2)
+    v = da.passe_bas_variable(env(v, 0.005, 0.2, 0.69), lambda u: 5000.0 * (1 - 0.9 * u))  # l'appel s'éloigne
+    da.ajouter(buf, v, 0.0, 0.6)
+    da.ajouter(buf, da.souffle(rng, 0.6, 500.0, 4000.0, 1.4, 0.45, 0.15, 1.5), 0.2, 0.4)
+    r = da.voix(rng, 0.8, lambda u: 147.0 + 73.0 * u ** 0.6, lambda u: ("ou", "o", u), souffle=0.4)
+    da.ajouter(buf, env(r, 0.05, 0.3, 0.45), 0.95, 0.5)                             # une voix revient, au village
+    da.peau(rng, buf, 55.0, 0.5, 0.95, 0.4, 1.3, 0.5)
+    da.gemme(rng, buf, N("E4"), 0.2, 0.6, 0.95, eclat=0.3, durete=0.2)
     return buf
 
 
 def reapparition(graine):
     rng = random.Random(graine)
     buf = da.tampon(1.3)
-    da.ajouter(buf, da.souffle(rng, 0.8, 5000.0, 800.0, 1.4, 0.35, 0.45, 1.3), 0.0, 0.5)   # l'énergie converge
-    da.gemme(rng, buf, N("E7"), 0.18, 0.3, 0.003, eclat=0.6, jumeau=False, durete=0.4)
-    da.scintillement(rng, buf, 0.0, 0.8, da.penta(6, 7), 28, 0.13, (0.08, 0.22),
-                     densite=lambda u: u ** 0.7, registre=lambda u: 1.0 - 0.6 * u)
-    da.gemme(rng, buf, N("E5"), 0.42, 0.6, 0.8, eclat=0.8)                   # le corps est là
-    da.gemme(rng, buf, N("B5"), 0.3, 0.55, 0.8, eclat=0.8, durete=0.0)
-    da.pas_pierre(rng, buf, 0.95, 0.35)                                      # un pas sur la pierre
+    c = da.choeur(rng, 0.95, lambda u: N("E3") * (1.5 - 0.5 * u), lambda u: ("ou", "o", u), nombre=3, souffle=0.55)
+    c = da.passe_bas_variable(c, lambda u: 600.0 + 3400.0 * u)                        # des voix lointaines se rapprochent
+    c = [v * (0.15 + 0.85 * (i / len(c)) ** 1.5) for i, v in enumerate(c)]
+    da.ajouter(buf, c, 0.003, 0.7)
+    da.ajouter(buf, da.souffle(rng, 0.8, 3000.0, 600.0, 1.3, 0.3, 0.45, 1.3), 0.0, 0.3)
+    da.gemme(rng, buf, N("E4"), 0.26, 0.5, 0.85, eclat=0.35)
+    da.gemme(rng, buf, N("B4"), 0.18, 0.45, 0.85, eclat=0.35, durete=0.0)
+    da.peau(rng, buf, 70.0, 0.3, 0.85, 0.25, 1.3, 0.3)
+    da.pas_pierre(rng, buf, 0.97, 0.35)
     return buf
 
 
-# (nom du fichier, lot du plan de production, cible de niveau perçu en dB, fondu de fin en s ou None, fabrique)
+# (nom du fichier, lot du plan de production, cible de niveau perçu en dB, fondu de fin en s / None / BOUCLE, fabrique)
 SONS = [
-    ("nyxessa_tir_1", 1, -14.0, None, lambda: tir(1101, ("E6", "B6"))),
-    ("nyxessa_tir_2", 1, -14.0, None, lambda: tir(1102, ("G6", "D7"))),
-    ("nyxessa_tir_3", 1, -14.0, None, lambda: tir(1103, ("A6", "E7"))),
-    ("nyxessa_frappee_1", 1, -15.0, None, lambda: frappee(1111, "E5")),
-    ("nyxessa_frappee_2", 1, -15.0, None, lambda: frappee(1112, "D5")),
-    ("nyxessa_frappee_3", 1, -15.0, None, lambda: frappee(1113, "G5")),
+    ("nyxessa_tir_1", 1, -14.0, None, lambda: tir(1101, 196.0, ("E5", "B5"))),
+    ("nyxessa_tir_2", 1, -14.0, None, lambda: tir(1102, 220.0, ("G5", "D5"))),
+    ("nyxessa_tir_3", 1, -14.0, None, lambda: tir(1103, 247.0, ("A4", "E5"))),
+    ("nyxessa_frappee_1", 1, -15.0, None, lambda: frappee(1111, 247.0)),
+    ("nyxessa_frappee_2", 1, -15.0, None, lambda: frappee(1112, 220.0)),
+    ("nyxessa_frappee_3", 1, -15.0, None, lambda: frappee(1113, 262.0)),
     ("nyxessa_alerte", 1, -13.0, None, lambda: alerte(1121)),
     ("nyxessa_palier", 1, -12.5, None, lambda: palier(1131)),
-    ("nyxessa_charge_portail", 1, -14.0, None, lambda: charge_portail(1141)),
-    ("nyxessa_retour_energie", 1, -14.0, None, lambda: retour_energie(1151)),
+    ("nyxessa_charge_portail", 1, -14.0, None, lambda: glissando(1141, 147.0, 440.0, ("ou", "a"), False)),
+    ("nyxessa_retour_energie", 1, -14.0, None, lambda: glissando(1151, 440.0, 147.0, ("a", "ou"), True)),
     ("nyxessa_onde", 1, -17.0, None, lambda: onde(1161)),
     ("nyxessa_destruction", 1, -12.5, None, lambda: destruction(1171)),
     ("nyxessa_missile_vol_boucle", 2, -17.0, da.BOUCLE, lambda: missile_vol(1181)),
-    ("nyxessa_missile_eclat_1", 2, -15.0, None, lambda: missile_eclat(1182, 0.2)),
-    ("nyxessa_missile_eclat_2", 2, -15.0, None, lambda: missile_eclat(1183, 0.3)),
-    ("nyxessa_missile_eclat_3", 2, -15.0, None, lambda: missile_eclat(1184, 0.1)),
+    ("nyxessa_missile_eclat_1", 2, -14.0, None, lambda: missile_eclat(1182, 262.0)),
+    ("nyxessa_missile_eclat_2", 2, -14.0, None, lambda: missile_eclat(1183, 230.0)),
+    ("nyxessa_missile_eclat_3", 2, -14.0, None, lambda: missile_eclat(1184, 294.0)),
     ("nyxessa_rappel", 2, -13.0, None, lambda: rappel(1185)),
     ("nyxessa_reapparition", 2, -14.0, None, lambda: reapparition(1186)),
 ]

@@ -1,21 +1,20 @@
-"""Portail et téléportation (Deathless, lot 2 du cahier des charges son, 26/09/2026).
+"""Portail et téléportation (Deathless, lot 2, regénéré sous la direction sombre le 26/09/2026 au soir).
 
-Le portail est un disque de gemmes vertes, énergie de Nyxessa : il parle avec la **gemme** de la relique (partiels
-1 : 2,756 : 5,404 : 8,933, jumeaux désaccordés), en anneaux (courses de gemmes qui s'ouvrent ou se referment), avec
-un **bourdon de verre** tant qu'il est ouvert. Un passage est une goutte tombée dans l'eau : une goutte grave, puis
-des anneaux (souffles concentriques) ; à la sortie, les anneaux font le chemin inverse. Les arrivées (chute du ciel au
-donjon, sortie du sol au village) mêlent l'air, la pierre et la terre au dernier accord de gemmes. Détail :
-Docs/son-cahier-des-charges.md (§ 3.4).
+Le portail est une plaie ouverte dans l'énergie de Nyxessa : un **bourdon grave permanent** tant qu'il est ouvert, qui
+s'ouvre et se referme en **souffle et chœur**. Un corps qui part ou arrive est une **voix qui glisse** (vers le haut en
+partant, vers le bas en arrivant), et les arrivées au sol (chute du ciel au donjon, sortie du sol au village) sont
+faites de **peaux** et de **souffles**, de terre et de pierre. La gemme sombre ne sonne qu'à la fin, quand le corps est
+entier. Détail : Docs/son-cahier-des-charges.md (§ 3.4, § 8.2).
 
 Sons écrits (Assets/Audio/Deathless/Portail/, WAV 44,1 kHz mono 16 bits, graines 1301 à 1349) :
-  portail_ouverture         l'anneau s'ouvre (gemmes du grave vers l'aigu), souffle qui s'étale, le bourdon s'installe
-  portail_fermeture         l'anneau se referme vers le centre, souffle aspiré, gemme grave qui s'éteint
-  portail_bourdon_boucle    portail ouvert (boucle 6 s) : bourdon de verre, eau qui tourne, rares gemmes
-  portail_depart            un corps part en gemmes : goutte grave, trois anneaux qui s'élargissent, gemmes aspirées
-  portail_arrivee           les gemmes jaillissent et reforment le corps : anneaux qui convergent, accord posé
-  portail_chute_ciel        arrivée au donjon (Spawn_Air) : souffle qui descend, réception sur la pierre
-  portail_sortie_sol        retour au village (Spawn_Ground) : la terre s'ouvre, gravier qui monte, deux gemmes
-  portail_ferme_refus       Interagir près du portail fermé la nuit : gemme étouffée, toc de pierre (2D)
+  portail_ouverture         souffle qui s'ouvre, chœur qui monte (« ou » → « a »), le bourdon s'installe
+  portail_fermeture         le chœur retombe (« a » → « ou »), souffle aspiré, le bourdon s'éteint, peau grave
+  portail_bourdon_boucle    portail ouvert (boucle 6 s) : bourdon grave qui bat, souffle qui tourne, rares gemmes
+  portail_depart            un corps part : peau grave (la goutte), voix qui monte et s'éloigne, anneaux de souffle
+  portail_arrivee           un corps arrive : voix qui descend et se pose, anneaux qui convergent, gemmes graves
+  portail_chute_ciel        arrivée au donjon (Spawn_Air) : souffle qui tombe, grosse peau et pierre au contact
+  portail_sortie_sol        retour au village (Spawn_Ground) : la terre gronde et s'ouvre, gravier, voix basse
+  portail_ferme_refus       Interagir près du portail fermé la nuit : peau étouffée, souffle de voix, gemme morte (2D)
 
 Usage : python -B synth_portail.py [dossier_sortie] [nom ...]   (par défaut : le dossier du script, tous les sons).
 Catalogue : ids dl_portail_* dans Wiki/data/sons.json.
@@ -31,124 +30,106 @@ import deathless_audio as da  # noqa: E402
 N = da.note
 
 
-def bourdon_verre(duree, amp, entree=0.0):
-    """Bourdon de verre du portail : mi3, si3, mi4 et leurs partiels 2,756 (pour qu'il s'entende aussi sur de petites
-    enceintes), chacun doublé d'un jumeau à 1/3 Hz. Fréquences arrondies à un nombre entier de périodes sur `duree`
-    (la boucle se raccorde exactement) ; `entree` : montée progressive en secondes (0 : plein dès le début)."""
-    n = da.idx(duree)
-    res = [0.0] * n
-    for f, a in ((N("E3"), 0.3), (N("B3"), 0.22), (N("E4"), 0.16), (N("E3") * 2.756, 0.06), (N("E4") * 2.756, 0.05)):
-        for ecart, ph in ((0.0, 0.0), (1 / 3.0, 2.1)):
-            fb = round((f + ecart) * duree) / duree
-            w = 2 * math.pi * fb / da.RATE
-            for i in range(n):
-                res[i] += amp * a * 0.5 * math.sin(w * i + ph)
-    if entree > 0:
-        ne = da.idx(entree)
-        for i in range(min(n, ne)):
-            res[i] *= i / ne
-    return res
-
-
-def anneau(rng, buf, debut, duree, notes, amp):
-    """Course de gemmes autour du disque, dans l'ordre des notes, amplitude en arche."""
-    for k, f in enumerate(notes):
-        u = k / max(1, len(notes) - 1)
-        arc = 0.6 + 0.4 * (1 - abs(2 * u - 1))
-        da.gemme(rng, buf, f, amp * arc, 0.45, debut + duree * u, eclat=0.8, jumeau=False, durete=0.5)
+def env(x, attaque, tenue, relache, forme=1.5):
+    return da.enveloppe(x, attaque, tenue, relache, forme)
 
 
 def ouverture(graine):
     rng = random.Random(graine)
     buf = da.tampon(1.65)
-    anneau(rng, buf, 0.0, 0.6, da.penta(4, 6), 0.22)
-    da.ajouter(buf, da.souffle(rng, 1.5, 400.0, 3000.0, 0.8, 0.3, 1.2, 1.3), 0.0, 0.45)
-    bourdon = bourdon_verre(0.85, 1.0, entree=0.6)
-    da.ajouter(buf, bourdon, 0.8, 1.0)
+    da.ajouter(buf, da.souffle(rng, 1.4, 300.0, 2500.0, 0.9, 0.3, 1.1, 1.3), 0.0, 0.45)
+    c = da.choeur(rng, 1.2, lambda u: N("B2") * (1 + 0.5 * u), lambda u: ("ou", "a", u), nombre=4, octaves=(1.0, 2.0))
+    da.ajouter(buf, env(c, 0.25, 0.5, 0.45), 0.05, 0.45)
+    b = da.bourdon(rng, 1.1, [N("E1"), N("B1"), N("E2")], 0.33, 400.0)
+    da.ajouter(buf, env(b, 0.5, 0.45, 0.15, 1.0), 0.55, 0.45)
+    da.peau(rng, buf, 58.0, 0.5, 0.0, 0.4, 1.4, 0.5)
     return buf
 
 
 def fermeture(graine):
     rng = random.Random(graine)
     buf = da.tampon(1.45)
-    notes = list(reversed(da.penta(4, 6)))
-    anneau(rng, buf, 0.0, 0.5, notes, 0.2)
-    da.ajouter(buf, da.souffle(rng, 0.7, 3000.0, 300.0, 1.2, 0.08, 0.6, 1.3), 0.0, 0.55)
-    da.gemme(rng, buf, N("E4"), 0.45, 0.9, 0.55, eclat=0.5)
-    da.sub(buf, 82.4, 50.0, 0.25, 0.5, 0.55)
+    c = da.choeur(rng, 1.0, lambda u: N("E3") * (1 - 0.4 * u), lambda u: ("a", "ou", u), nombre=4, octaves=(1.0, 0.5))
+    da.ajouter(buf, env(c, 0.02, 0.35, 0.63), 0.0, 0.5)
+    da.ajouter(buf, da.souffle(rng, 0.8, 2500.0, 250.0, 1.2, 0.08, 0.7, 1.3), 0.0, 0.45)
+    b = da.bourdon(rng, 1.3, [N("E1"), N("B1")], 0.33, 400.0)
+    da.ajouter(buf, env(b, 0.005, 0.3, 1.0, 1.4), 0.0, 0.4)
+    da.peau(rng, buf, 50.0, 0.6, 0.75, 0.5, 1.3, 0.6)                                 # le portail se scelle
+    da.gemme(rng, buf, N("E3"), 0.2, 0.6, 0.75, eclat=0.2, durete=0.0)
     return buf
 
 
 def bourdon(graine):
-    """Boucle de 6 s : bourdon de verre (battements de 1/3 Hz, 2 par boucle), eau qui tourne (passe-bande dont la
-    fréquence tourne à 0,5 Hz, 3 tours par boucle, fondu à la jointure), trois gemmes rares repliées sur la boucle."""
+    """Boucle de 6 s : bourdon mi1 + si1 + mi2 (jumeaux à 1/3 Hz, fréquences arrondies : jointure exacte), souffle qui
+    tourne (0,5 Hz, trois cycles, fondu à la jointure), trois gemmes graves repliées."""
     rng = random.Random(graine)
     duree, fondu = 6.0, 0.4
-    n = da.idx(duree + fondu)
-    eau = da.passe_bande(da.bruit(rng, n),
-                         lambda u: 550.0 + 250.0 * math.sin(2 * math.pi * 0.5 * u * (duree + fondu)), 2.0)
-    eau = da.fondre_boucle([v * 0.35 for v in eau], duree, fondu)
-    evenements = da.tampon(duree + 1.0)
-    for t, n_ in ((0.7, "E6"), (2.9, "B6"), (4.6, "G6")):
-        da.gemme(rng, evenements, N(n_), 0.08, 0.6, t, eclat=0.6, durete=0.2)
-    return [a + b + c for a, b, c in zip(bourdon_verre(duree, 1.0), eau, da.plier(evenements, duree))]
+    b = da.bourdon(rng, duree, [N("E1"), N("B1"), N("E2")], 1 / 3.0, 380.0, boucle=True)
+    s = da.souffle_module(rng, duree + fondu, 500.0, 1.5, 0.5, 0.6, 0.3)
+    s = da.fondre_boucle(s, duree, fondu)
+    evenements = da.tampon(duree + 1.2)
+    for t, n_ in ((0.7, "E4"), (2.9, "B3"), (4.6, "G4")):
+        da.gemme(rng, evenements, N(n_), 0.06, 0.8, t, eclat=0.25, durete=0.1)
+    return [0.6 * a + 0.3 * b_ + c for a, b_, c in zip(b, s, da.plier(evenements, duree))]
 
 
 def depart(graine):
     rng = random.Random(graine)
     buf = da.tampon(1.1)
-    da.sinus_glisse(buf, 400.0, 140.0, 0.6, 0.07, 0.0, 0.0008, 0.06, 0.6)          # la goutte
-    for t, (f0, f1) in ((0.05, (600.0, 1500.0)), (0.2, (1000.0, 2500.0)), (0.35, (1500.0, 4000.0))):
-        da.ajouter(buf, da.souffle(rng, 0.25, f0, f1, 1.6, 0.03, 0.22, 1.6), t, 0.4)   # trois anneaux
-    da.scintillement(rng, buf, 0.2, 0.8, da.penta(5, 7), 30, 0.14, (0.08, 0.25),
-                     densite=lambda u: u ** 0.8, registre=lambda u: u)               # gemmes aspirées
+    da.peau(rng, buf, 70.0, 0.6, 0.0, 0.25, 2.0, 0.6)                                   # la goutte, grave
+    v = da.voix(rng, 0.9, lambda u: 147.0 * (3.0 ** (u ** 0.8)), lambda u: ("ou", "a", u), souffle=0.45)
+    v = da.passe_bas_variable(env(v, 0.02, 0.3, 0.58), lambda u: 4000.0 * (1 - 0.8 * u))  # la voix monte et s'éloigne
+    da.ajouter(buf, v, 0.03, 0.5)
+    for t, (f0, f1) in ((0.05, (400.0, 1000.0)), (0.2, (600.0, 1600.0)), (0.35, (900.0, 2500.0))):
+        da.ajouter(buf, da.souffle(rng, 0.25, f0, f1, 1.6, 0.03, 0.22, 1.6), t, 0.3)
     return buf
 
 
 def arrivee(graine):
     rng = random.Random(graine)
     buf = da.tampon(1.1)
-    for t, (f0, f1) in ((0.0, (4000.0, 1500.0)), (0.12, (2500.0, 1000.0)), (0.24, (1500.0, 600.0))):
-        da.ajouter(buf, da.souffle(rng, 0.25, f0, f1, 1.6, 0.03, 0.22, 1.6), t, 0.4)
-    da.gemme(rng, buf, N("E7"), 0.18, 0.25, 0.002, eclat=0.6, jumeau=False, durete=0.5)
-    da.scintillement(rng, buf, 0.0, 0.7, da.penta(5, 7), 30, 0.14, (0.08, 0.25),
-                     densite=lambda u: u ** 1.2, registre=lambda u: 1.0 - 0.7 * u)   # les gemmes retombent
-    da.gemme(rng, buf, N("E5"), 0.4, 0.5, 0.75, eclat=0.8)
-    da.gemme(rng, buf, N("B5"), 0.3, 0.45, 0.75, eclat=0.8, durete=0.0)
+    for t, (f0, f1) in ((0.0, (2500.0, 900.0)), (0.12, (1600.0, 600.0)), (0.24, (1000.0, 400.0))):
+        da.ajouter(buf, da.souffle(rng, 0.25, f0, f1, 1.6, 0.02, 0.22, 1.6), t, 0.3)
+    v = da.voix(rng, 0.8, lambda u: 440.0 * (1 / 2.25) ** (u ** 0.7), lambda u: ("a", "o", u), souffle=0.4)
+    da.ajouter(buf, env(v, 0.005, 0.3, 0.495), 0.0, 0.5)                                # la voix descend et se pose
+    da.gemme(rng, buf, N("E4"), 0.25, 0.5, 0.75, eclat=0.3)
+    da.gemme(rng, buf, N("B4"), 0.18, 0.45, 0.75, eclat=0.3, durete=0.0)
+    da.peau(rng, buf, 65.0, 0.35, 0.75, 0.3, 1.3, 0.3)
     return buf
 
 
 def chute_ciel(graine):
     rng = random.Random(graine)
     buf = da.tampon(1.3)
-    da.ajouter(buf, da.souffle(rng, 1.0, 3000.0, 500.0, 1.1, 0.3, 0.7, 1.2), 0.0, 0.55)  # la chute
-    da.gemme(rng, buf, N("B6"), 0.14, 0.3, 0.003, eclat=0.5, jumeau=False, durete=0.3)
+    da.ajouter(buf, da.souffle(rng, 1.0, 2500.0, 350.0, 1.1, 0.25, 0.75, 1.2), 0.0, 0.55)  # la chute
     contact = 1.0
-    da.sub(buf, 90.0, 45.0, 0.35, 0.22, contact)                                          # réception
-    da.pas_pierre(rng, buf, contact, 0.6)
-    da.gravier(rng, buf, contact, 0.25, 22, 0.18, densite=lambda u: u ** 1.8)
+    da.peau(rng, buf, 52.0, 0.9, contact, 0.5, 1.6, 1.2)                                  # réception : grosse peau
+    da.pas_pierre(rng, buf, contact, 0.5)
+    da.gravier(rng, buf, contact, 0.25, 22, 0.15, densite=lambda u: u ** 1.8)
     return buf
 
 
 def sortie_sol(graine):
     rng = random.Random(graine)
     buf = da.tampon(1.3)
-    gronde = da.passe_bas(da.passe_bas(da.bruit(rng, da.idx(0.35)), 220.0), 220.0)
-    da.ajouter(buf, da.enveloppe(gronde, 0.004, 0.08, 0.26, 1.5), 0.0, 1.2)             # la terre s'ouvre
-    da.sub(buf, 62.0, 40.0, 0.3, 0.35)
-    da.gravier(rng, buf, 0.05, 0.85, 70, 0.35, densite=lambda u: u ** 1.3,
-               bande=lambda u: 800.0 + 1700.0 * u)                                       # le gravier monte
-    da.gemme(rng, buf, N("E5"), 0.36, 0.5, 1.0, eclat=0.8)                               # le corps est entier
-    da.gemme(rng, buf, N("B5"), 0.3, 0.45, 1.08, eclat=0.8)
+    gronde = da.passe_bas(da.bruit_brun(rng, da.idx(0.6)), 200.0)
+    da.ajouter(buf, env(gronde, 0.005, 0.15, 0.44, 1.5), 0.0, 0.8)                         # la terre gronde
+    da.peau(rng, buf, 60.0, 0.6, 0.0, 0.5, 1.4, 0.6)
+    da.peau(rng, buf, 75.0, 0.35, 0.35, 0.35, 1.3, 0.4)
+    da.gravier(rng, buf, 0.05, 0.85, 70, 0.3, densite=lambda u: u ** 1.3, bande=lambda u: 800.0 + 1700.0 * u)
+    v = da.voix(rng, 0.4, lambda u: 110.0 * (1 + 0.2 * u), "o", souffle=0.5)
+    da.ajouter(buf, env(v, 0.03, 0.1, 0.27), 0.95, 0.3)                                    # le corps est entier
+    da.gemme(rng, buf, N("E4"), 0.2, 0.4, 1.0, eclat=0.3)
     return buf
 
 
 def ferme_refus(graine):
     rng = random.Random(graine)
-    buf = da.tampon(0.4)
-    da.gemme(rng, buf, N("E5"), 0.4, 0.25, 0.0, eclat=0.2, durete=0.2)
-    da.mode(buf, 300.0, 0.4, 0.04, 0.0, 0.0006)
-    da.choc(rng, buf, 0.0, 0.3, 0.0012, 1500.0, 0.7)
+    buf = da.tampon(0.45)
+    da.peau(rng, buf, 70.0, 0.6, 0.0, 0.15, 1.2, 0.8)
+    v = da.voix(rng, 0.3, lambda u: 147.0 * (1 - 0.15 * u), "ou", souffle=0.7)
+    da.ajouter(buf, env(v, 0.01, 0.05, 0.24), 0.0, 0.3)
+    da.gemme(rng, buf, N("E4"), 0.2, 0.2, 0.0, eclat=0.1, durete=0.1)
     return buf
 
 

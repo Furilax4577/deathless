@@ -11,7 +11,13 @@ Vérifications : 44,1 kHz, mono, crête <= -1,4 dBFS, tête <= 20 ms, niveau per
 dessous quand la crête plafonne), fin sans clic pour un son, jointure sans saut pour une boucle (le saut entre le
 dernier et le premier échantillon ne dépasse pas 4 fois l'écart type des différences d'un échantillon au suivant).
 
-Usage : python -B controle.py [N ...]   (lots à contrôler ; par défaut : tous les lots trouvés dans les scripts).
+Un script peut déclarer CANAUX = 2 (stéréo : ambiances, musiques) et MESURE = "rms" (la cible porte alors sur le
+RMS moyen du fichier, pas sur le niveau perçu).
+
+Planches : les lots listés dans PLANCHES ont une planche nommée (lots 1 et 2 regénérés sous la direction sombre,
+échantillons) ; tout autre lot N a la sienne, Docs/son-lotN-controle.md.
+
+Usage : python -B controle.py [lot ...]   (par défaut : toutes les planches).
 """
 import glob
 import importlib.util
@@ -24,6 +30,12 @@ sys.path.insert(0, ICI)
 import deathless_audio as da  # noqa: E402
 
 RACINE = os.path.abspath(os.path.join(ICI, "..", "..", ".."))
+
+# (fichier de la planche sous Docs/, titre, lots)
+PLANCHES = [
+    ("son-lots1-2-dark-controle.md", "lots 1 et 2, direction sombre", {1, 2}),
+    ("son-echantillons-controle.md", "échantillons de la direction sombre", {"echantillons"}),
+]
 
 
 def charger_script(chemin):
@@ -42,12 +54,12 @@ def jointure(chemin):
     return abs(x[0] - x[-1]) / ecart
 
 
-def ligne(chemin, cible, boucle):
+def ligne(chemin, cible, boucle, canaux=1, mesure="niveau"):
     m = da.analyser(chemin)
     problemes = []
     if m["taux"] != 44100:
         problemes.append("taux %d" % m["taux"])
-    if m["canaux"] != 1:
+    if m["canaux"] != canaux:
         problemes.append("%d canaux" % m["canaux"])
     if m["crete_db"] > -1.39:
         problemes.append("crête")
@@ -59,12 +71,13 @@ def ligne(chemin, cible, boucle):
             problemes.append("jointure (%.1f)" % saut)
     elif m["fin"] > 0.002:
         problemes.append("clic de fin")
-    if m["niveau_db"] > cible + 1.0 or (m["niveau_db"] < cible - 1.0 and m["crete_db"] < -1.6):
+    mesure_db = m["rms_db"] if mesure == "rms" else m["niveau_db"]
+    if mesure_db > cible + 1.0 or (mesure_db < cible - 1.0 and m["crete_db"] < -1.6):
         problemes.append("niveau")
     bandes = " · ".join("%d" % round(b) for b in m["bandes"])
-    return ("| `%s` | %.2f s%s | %.1f | %.1f | %.1f | %.1f | %.1f ms | %s | %s |" % (
-        os.path.basename(chemin), m["duree"], " (boucle)" if boucle else "", m["crete_db"], m["rms_db"],
-        m["niveau_db"], cible, m["tete_ms"], bandes,
+    return ("| `%s` | %.2f s%s%s | %.1f | %.1f | %.1f | %.1f%s | %.1f ms | %s | %s |" % (
+        os.path.basename(chemin), m["duree"], " (boucle)" if boucle else "", ", stéréo" if canaux == 2 else "",
+        m["crete_db"], m["rms_db"], m["niveau_db"], cible, " (RMS)" if mesure == "rms" else "", m["tete_ms"], bandes,
         "ok" if not problemes else "**" + ", ".join(problemes) + "**"), not problemes)
 
 
@@ -77,46 +90,54 @@ def main():
     familles = []   # (famille, chemin du script, module)
     for s in scripts:
         familles.append((os.path.basename(os.path.dirname(s)), s, charger_script(s)))
-    tous = sorted({lot for _, _, m in familles for _, lot, _, _, _ in m.SONS})
-    lots = [int(a) for a in sys.argv[1:]] or tous
-    for lot in lots:
+    tous = {lot for _, _, m in familles for _, lot, _, _, _ in m.SONS}
+    nommes = set().union(*(lots for _, _, lots in PLANCHES))
+    planches = [p for p in PLANCHES if p[2] & tous]
+    planches += [("son-lot%s-controle.md" % lot, "lot %s" % lot, {lot})
+                 for lot in sorted(tous - nommes, key=str)]
+    demandes = set(sys.argv[1:])
+    for fichier, titre, lots in planches:
+        if demandes and not demandes & {str(l) for l in lots}:
+            continue
         lignes = [
-            "# Planche de contrôle des sons de Deathless, lot %d" % lot,
+            "# Planche de contrôle des sons de Deathless, %s" % titre,
             "",
-            "Générée par `python -B Assets/Audio/Deathless/controle.py %d` : ne pas modifier à la main, relancer le "
+            "Générée par `python -B Assets/Audio/Deathless/controle.py` : ne pas modifier à la main, relancer le "
             "script après chaque régénération. Méthode et cibles : [cahier des charges son](son-cahier-des-charges.md), "
-            "§ 5." % lot,
+            "§ 5.",
             "",
             "Colonnes : **crête** en dBFS (plafond -1,4) ; **RMS** moyen sur tout le fichier ; **niveau** perçu = RMS "
-            "maximal sur 50 ms, en dBFS (c'est lui qui est réglé sur la **cible**) ; **tête** = temps avant le premier "
-            "échantillon au-dessus de -40 dBFS (20 ms au plus) ; **spectre** = part de l'énergie en % dans les bandes "
+            "maximal sur 50 ms, en dBFS (c'est lui qui est réglé sur la **cible**, sauf pour les ambiances et les "
+            "musiques, réglées sur le RMS moyen) ; **tête** = temps avant le premier échantillon au-dessus de -40 dBFS "
+            "(20 ms au plus) ; **spectre** = part de l'énergie en % dans les bandes "
             + ", ".join(b[2] for b in da.BANDES) + ". Une **boucle** est vérifiée à sa jointure (pas de saut entre la "
             "fin et le début) au lieu du fondu de fin.",
             "",
         ]
         total = bons = 0
         for famille, chemin_script, module in sorted(familles):
-            sons = [(nom, cible, fondu) for nom, l, cible, fondu, _ in module.SONS if l == lot]
+            sons = [(nom, cible, fondu) for nom, l, cible, fondu, _ in module.SONS if l in lots]
             if not sons:
                 continue
+            canaux = getattr(module, "CANAUX", 1)
+            mesure = getattr(module, "MESURE", "niveau")
             rel = os.path.relpath(chemin_script, RACINE).replace(os.sep, "/")
             lignes += ["## %s — `%s`" % (famille, rel), "", doc_script(module), "",
                        "| Fichier | Durée | Crête | RMS | Niveau | Cible | Tête | Spectre (%) | Contrôle |",
                        "|---|---|---|---|---|---|---|---|---|"]
             for nom, cible, fondu in sorted(sons):
                 chemin = os.path.join(os.path.dirname(chemin_script), nom + ".wav")
+                total += 1
                 if not os.path.isfile(chemin):
                     lignes.append("| `%s.wav` | | | | | %.1f | | | **fichier absent** |" % (nom, cible))
-                    total += 1
                     continue
-                texte, ok = ligne(chemin, cible, fondu == da.BOUCLE)
+                texte, ok = ligne(chemin, cible, fondu == da.BOUCLE, canaux, mesure)
                 lignes.append(texte)
-                total += 1
                 bons += ok
             lignes.append("")
         lignes.insert(6, "**%d fichiers, %d conformes.**" % (total, bons))
         lignes.insert(7, "")
-        sortie = os.path.join(RACINE, "Docs", "son-lot%d-controle.md" % lot)
+        sortie = os.path.join(RACINE, "Docs", fichier)
         with open(sortie, "w", encoding="utf-8", newline="\n") as f:
             f.write("\n".join(lignes))
         print("planche écrite :", sortie, "(%d fichiers, %d conformes)" % (total, bons))

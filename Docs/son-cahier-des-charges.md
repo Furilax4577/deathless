@@ -10,57 +10,87 @@ Tout ce qui suit est une **proposition** à valider par Quentin, sauf ce qui rep
 
 ## 1. Direction artistique sonore
 
-> **Correction de direction, Quentin, 26/09/2026 au soir, après écoute des lots 1 et 2** {décidé} : « Pour le moment les sons sont trop cristallins, enfantins. J'aimerais une vraie dimension plus **dark**. » Ce qu'il veut : des **vocalises pour Nyxessa**, dans l'esprit des plaintes des limbes de l'ancien missile magique (la relique est une âme captive qui ressuscite, pas une boîte à musique) ; **plus d'instruments et plus de variété** (bourdons graves, métal frotté, os, peaux, souffles, chœurs sourds), moins de tintements ; une gamme et des timbres sombres partout, l'humour restant réservé aux classes comiques. Les paragraphes ci-dessous (« chaleureux, lisible », « les gemmes tintent ») restent vrais pour la lisibilité et la signature, mais **le caractère de base devient sombre et organique** ; « pas de chœurs épiques » s'entend « pas de chœurs hollywoodiens », les voix fantomatiques sourdes sont au contraire recherchées. Les lots 1 et 2 sont à **regénérer** sous cette direction (mêmes identifiants), voir `Docs/briefs/cloud-son-dark.md`.
+> **Correction de direction, Quentin, 26/09/2026 au soir, après écoute des lots 1 et 2** {décidé} : « Pour le moment les sons sont trop cristallins, enfantins. J'aimerais une vraie dimension plus **dark**. » Ce qu'il veut : des **vocalises pour Nyxessa**, dans l'esprit des plaintes des limbes de l'ancien missile magique (la relique est une âme captive qui ressuscite, pas une boîte à musique) ; **plus d'instruments et plus de variété** (bourdons graves, métal frotté, os, peaux, souffles, chœurs sourds), moins de tintements ; une gamme et des timbres sombres partout, l'humour restant réservé aux classes comiques. Les lots 1 et 2 sont à **regénérer** sous cette direction (mêmes identifiants), voir `Docs/briefs/cloud-son-dark.md`.
+>
+> Ce § 1 et le § 2 ont été **réécrits** le 26/09/2026 au soir pour cette direction ; les lots 1 et 2 ont été regénérés, et un échantillon de chaque thème (musiques comprises) a été produit pour juger le bain (§ 8.3).
 
+**Le caractère : sombre et organique.** Deathless sonne comme une veillée d'armes autour d'une âme captive. Les matières sont celles du décor, mais graves et vivantes : **bois sombre** (maisons, interface), **pierre** (plateau de Nyxessa, donjon), **os creux** (squelettes), **peaux tendues** (tambours de guerre, coups sourds), **terre** (sorties de terre, sauts), **métal frotté** (le fer qui grince sous un archet, la tension), et, au-dessus de tout, **des voix** : Nyxessa gémit, appelle et crie, ses chœurs sourds portent la nuit. Les **bourdons graves** tiennent le fond, comme la relique qui respire.
 
-**Le caractère.** Deathless sonne comme il se voit : **low poly lisse, chaleureux, lisible**. Les sons sont nets, courts, avec peu de couches. Chacun dit une seule chose, et on le reconnaît du premier coup, même à 60 squelettes. Les matières sont celles du décor : **bois** (maisons, interface, tavernes), **pierre** (plateau de Nyxessa, donjon), **os** (squelettes), **terre** (sorties de terre, sauts, charges), et, au-dessus de tout, le **cristal de Nyxessa**, qui tinte.
+**La lisibilité reste la règle.** Sombre ne veut pas dire long ni boueux. Chaque son dit une seule chose et se reconnaît du premier coup, même à 60 squelettes : **attaques franches**, fins nettes, durées du § 3. Une voix de Nyxessa dure le temps d'un appel, pas d'un opéra ; un bourdon d'effet s'arrête avec l'effet. Les graves donnent le poids, le médium (voix, bois, os) porte l'information : un son doit se comprendre sur de petites enceintes, sans ses graves.
 
-**Les gemmes tintent, et seulement elles.** Le tintement de gemme est la signature de Nyxessa : la relique, sa ceinture, ses missiles, le portail, la téléportation, la réapparition, le bouclier du sorcier et les éclats de Nyxar. C'est la règle du vert, transposée à l'oreille : on n'entend ce timbre nulle part ailleurs. Le feu du mage **crépite et gronde**, il ne tinte pas. Les critiques ont un **éclat d'or bref**, métallique et chaud, pas cristallin. Les squelettes sont **os et poussière** : cliquetis creux, mâchoires, sable qui retombe, jamais de voix humaine ni de métal lourd.
+**Nyxessa est une voix.** La relique est une **âme captive** : chaque son de Nyxessa porte une **vocalise** (voix fantôme, § 2) posée sur un bourdon ou un chœur sourd. Le tir est un appel bref, le coup reçu une plainte, l'alerte un cri d'appel, le palier un chœur qui s'ouvre, la charge et le retour d'énergie des glissandos de voix, la destruction un long cri qui s'éteint dans le bourdon. Le **tintement de gemme** reste sa signature (la règle du vert, transposée à l'oreille : on ne l'entend nulle part ailleurs), mais il est **plus grave** (mi4 à si5), assourdi, et **jamais seul** : toujours mêlé à une voix ou à un bourdon.
+
+**Chaque famille a sa matière.**
+- **Squelettes** : os et poussière. Os creux, cliquetis, crécelle d'os qui s'accélère avant le coup, terre qui s'ouvre, sable qui retombe. Jamais de voix humaine ; à la mort, une seule gemme lointaine (la magie qui s'en va).
+- **Boss** : les sons les plus lourds. Morgrim crie d'une gorge d'os (voix de créature très grave, cassée), frappe en peaux énormes et en terre ; Nyxar porte des **gemmes corrompues** (désaccordées d'un quart de ton) et un chœur qui ne s'accorde pas.
+- **Héros** : corps, cuir, équipement, souffle. Pas de cri de douleur ni de voix humaine ; seul le rugissement du viking est une voix, de créature.
+- **Feu** : il gronde et crépite, il ne tinte jamais. **Flèches** : bois, corde, air, jamais magiques. **Critiques** : un éclat d'or bref, mais grave et lourd, sur une peau.
+- **Interface** : sobre et lisible, bois sombre et os ; peau tendue ou bourdon court pour les comptes à rebours, jamais de carillon.
 
 **L'humour est assumé, mais cadré.** Les classes comiques (Clochard pétomane, DJ Bob, Bavaroise, Barde) ont des sons franchement drôles : pets en plusieurs tailles, scratch, « bwoiing » du luth, chopes qui trinquent. L'humour vient du **timbre** et du **rythme**, pas du volume ni de la vulgarité, et il ne déborde pas sur le reste : un squelette qui meurt n'est pas drôle, il s'effondre en poussière.
 
+**Ce qu'on recherche désormais** : les **chœurs sourds** (voix fantômes, bouche presque fermée, soufflées, désaccordées), les **bourdons** graves qui battent lentement, les plaintes et les cris de l'âme de Nyxessa, les peaux de guerre, le métal frotté, les souffles qui respirent.
+
 **Ce qu'on évite.**
-- Le **réalisme militaire** : pas de métal épais qui racle, pas de cris de douleur, pas d'éclaboussures de sang, pas d'armures lourdes.
-- Les **nappes de cinéma** : pas de bruits de fond saturés, pas de « braaam », pas de chœurs épiques, pas de réverbération de cathédrale.
-- Les **bips électroniques** et les sons de synthé datés dans l'interface : un menu fait « toc », pas « bip ».
-- Les **clochettes enfantines** et les mélodies mièvres. Les gemmes chantent, mais dans une gamme sombre.
+- Le **cristallin enfantin** : tintements seuls, carillons, boîtes à musique, clochettes, arpèges aigus de gemmes.
+- Le **réalisme militaire** : pas de métal épais qui racle, pas de cris de douleur humains, pas de sang, pas d'armures lourdes.
+- Les **chœurs hollywoodiens** et les **nappes de cinéma** : pas de « braaam », pas de chœur épique chanté à pleine voix, pas de réverbération de cathédrale dans les effets.
+- Les **bips électroniques** et les synthés datés : un menu fait « toc », pas « bip ».
+- Le **boueux** : pas de grave qui traîne, pas de queue longue sur un effet de combat.
 
 **La place du silence.** Le silence est un outil :
 - avant une vague, les ambiances s'amincissent un instant, et le premier son de sortie de terre part sur un fond calme ;
 - les longues préparations de Morgrim se lisent à l'oreille : un grondement qui monte, puis **un creux d'un quart de seconde**, puis l'impact ;
-- la mort d'un joueur coupe presque tout pendant une demi-seconde autour de lui, puis son énergie file vers Nyxessa ;
-- la musique de jour laisse des mesures vides : on doit entendre la forge, le vent et les oiseaux.
+- la mort d'un joueur coupe presque tout pendant une demi-seconde autour de lui, puis son énergie file vers Nyxessa dans un chœur lointain ;
+- la musique de jour laisse des mesures presque vides : on doit entendre la forge, le vent et les oiseaux.
 
 **Le jour et la nuit.**
-- **Le jour est chaud et ouvert** : sol majeur, bois et cordes pincées, oiseaux, vent léger dans les feuilles, forge au loin. Le rythme est posé, on prépare.
-- **La nuit est froide et resserrée** : mi mineur, bourdon grave, percussions de bois et d'os, grillons, souffle de brume. Le rythme monte par **couches** à mesure que les vagues arrivent (§ 4).
-- **Le crépuscule et l'aube** (5 s chacun) sont des charnières sonores : un seul geste, lisible, qui accompagne le portail et l'énergie de Nyxessa.
+- **Le jour reste le moment chaud**, mais grave : sol majeur, luth (cordes pincées), tambour sur cadre, bourdon doux, chœur en nappe discrète. Le rythme est posé, on prépare.
+- **La nuit est froide et resserrée** : mi mineur avec des couleurs phrygiennes, bourdon grave, chœur sourd, toms et grosse peau, charleston d'os, métal frotté, grillons, souffle de brume. Le rythme monte par **couches** à mesure que les vagues arrivent (§ 4).
+- **Le crépuscule et l'aube** (5 s chacun) sont des charnières : le crépuscule descend d'une quinte dans le bourdon, l'aube s'éclaire de mi mineur vers sol majeur.
 
-**Une gamme commune.** Tout ce qui a une hauteur (gemmes, notes de l'interface, fanfares, musiques) est pris dans **mi mineur pentatonique** (mi, sol, la, si, ré), relatif de sol majeur pour le jour. Un tintement de Nyxessa ou un « toc » de menu ne sonne jamais faux par-dessus la musique.
+**Une gamme commune.** Tout ce qui a une hauteur (voix, gemmes, notes de l'interface, fanfares, musiques) est pris dans **mi mineur** (pentatonique pour les motifs : mi, sol, la, si, ré), relatif de sol majeur pour le jour. Les couleurs sombres (fa naturel phrygien, si majeur, quart de ton corrompu de Nyxar) sont des exceptions voulues.
 
-**Épouser le langage visuel** (`Docs/vfx.md`). Les effets apparaissent et disparaissent **par la taille**, jamais par transparence : les sons aussi ont des **attaques franches** et des fins **nettes** (décroissance naturelle d'un mode, fondu court), jamais de longs fondus flous. Une gerbe de gemmes à l'écran, c'est une gerbe de tintements à l'oreille, avec le même nombre d'éléments à peu près et la même palette réduite. Une onde de gemmes au sol, c'est un souffle qui balaie.
+**Épouser le langage visuel** (`Docs/vfx.md`). Les effets apparaissent et disparaissent **par la taille**, jamais par transparence : les sons aussi ont des **attaques franches** et des fins **nettes**. Une gerbe de gemmes à l'écran, c'est quelques gemmes sombres sous une voix ; une onde au sol, c'est un souffle qui roule.
 
 ---
 
 ## 2. Palette de timbres
 
-Sept timbres récurrents font la signature. Chacun est décrit pour qu'un script le reproduise ; les briques correspondantes sont dans `Assets/Audio/Deathless/deathless_audio.py` (lot 1) ou à ajouter au fil des lots.
+Les timbres récurrents font la signature. Chacun est décrit pour qu'un script le reproduise ; les briques sont dans `Assets/Audio/Deathless/deathless_audio.py`, avec en commentaire le modèle acoustique et ses paramètres.
 
-| Timbre | Où | Spectre | Enveloppe | Durée | Brique |
+**Timbres sombres** (26/09/2026 au soir) :
+
+| Timbre | Où | Modèle et spectre | Enveloppe | Durée | Brique |
 |---|---|---|---|---|---|
-| **Gemme** (cristal de Nyxessa) | Nyxessa, portail, bouclier, téléportation, réapparition, éclats de Nyxar | Barre de cristal libre : partiels aux rapports **1 : 2,756 : 5,404 : 8,933**, amplitudes 1 / 0,42 / 0,2 / 0,09 ; fondamental de 330 Hz (mi4, gemme lourde) à 2,6 kHz (mi7, étincelle), sur la gamme commune ; chaque partiel doublé d'un **jumeau désaccordé de 0,6 à 3 Hz** (le frisson de la gemme) | Attaque 0,4 ms avec un petit choc de verre (bruit filtré autour de 3 × f0, 1,2 ms) ; décroissance exponentielle, T60 du fondamental de 0,3 à 2,6 s, les partiels aigus 2 à 6 fois plus brefs | 0,3 à 2,6 s | `gemme`, `scintillement` |
-| **Bois sec** (interface, maisons) | Menus, votes, décompte, portes, tables, tonneaux | Lame de marimba accordée **1 : 3,93 : 9,24** (amplitudes 1 / 0,3 / 0,1) sur la gamme commune (mi5 à ré7) ; clic de bois : bruit en bande 2,6 à 4,2 kHz, 0,9 ms | Attaque 0,6 ms ; T60 de **25 à 90 ms** pour un « tic » ou un « toc », de **0,3 à 0,7 s** pour une note qui chante | 0,07 à 1 s | `bois`, `tambour_bois` |
-| **Os creux** (squelettes) | Pas, coups reçus, mort, sortie de terre, préparation | Tube court fermé : modes impairs autour de **450 à 900 Hz** (rapports 1 : 3 : 5 légèrement désaccordés), plus un cliquetis de 3 à 8 petits chocs (1,5 à 4 kHz, 1 ms chacun) espacés de 8 à 25 ms | Attaque 0,5 ms ; T60 **40 à 80 ms** (sec, sans résonance) ; le cliquetis retombe en grappe irrégulière | 0,1 à 0,6 s | à créer (lot 3) |
-| **Poussière et terre** | Mort et aube des squelettes, sortie de terre, saut percutant, chute de Morgrim | Bruit brun (bruit blanc intégré) passé en bas à 300-600 Hz pour la masse, grains de gravier (bruit en bande 1 à 3 kHz, impulsions aléatoires de 2 ms à densité décroissante) | Coup sourd de 5 à 15 ms, puis ruissellement qui s'éclaircit et s'éteint en 0,3 à 1,2 s | 0,3 à 1,5 s | `sub`, `gravier`, `pas_pierre` (lot 2) ; bruit brun à ajouter (lot 3) |
-| **Souffle** (air, énergie, mouvement) | Charge et retour de l'énergie, élans d'armes, esquives, traînée des flèches, onde de choc | Bruit blanc dans un **passe-bande** (Q 1 à 1,6) dont la fréquence centrale **balaie** : montée 300 Hz → 4-7 kHz pour ce qui part, descente pour ce qui revient ; élan d'arme : 600 Hz → 2,5 kHz en 80 à 150 ms | Attaque de 5 ms (élan) à 1,2 s (charge) ; forme de décroissance en puissance 1,2 à 2 | 0,08 à 2 s | `souffle` |
-| **Feu** | Mage, brûlure, forge, torches, pièges | Grondement : bruit brun passé en bas à 250-500 Hz, modulé lentement (2 à 6 Hz) ; crépitements : impulsions de 0,5 à 2 ms en bande 2-6 kHz, densité 8 à 40 par seconde selon l'intensité | Allumage en 30 à 80 ms, maintien en boucle, extinction en 0,2 à 0,5 s | 0,3 s à boucle | à créer (lot 7) |
-| **Éclat d'or** (critiques, or, sacré) | Coups critiques, pièces, charge bélier dorée, soin | Métal fin et clair : 3 à 5 partiels inharmoniques de **2,5 à 7 kHz** (plaque mince, rapports 1 : 1,59 : 2,14 : 2,65), plus un corps de coup (« toc » grave de l'impact) ; pièces : grappe de 4 à 20 tintements de 3 à 9 kHz, T60 de 60 à 200 ms | Attaque 0,3 ms, T60 **0,15 à 0,5 s**, jamais plus : l'or brille un instant | 0,15 à 0,6 s | `plaque` (lot 2, fer de Morgrim sur le bouclier) ; pièces à ajouter (lots 5 et 11) |
+| **Voix fantôme** (l'âme de Nyxessa, créatures) | Nyxessa (appels, plaintes, cris), missile crâne, portail, sorcier, rugissement du viking, cri de Morgrim, Nyxar | Synthèse par **formants** : impulsions glottiques de Rosenberg (ouverture 60 %), dérivées, avec **souffle** (0 : voix pleine, 1 : chuchotement) mêlé surtout quand la glotte est ouverte, **gigue** (dérive de hauteur lissée), **vibrato** lent (4 à 7 Hz, 1 à 3 %), **raucité** (modulation à 47 Hz) et **sous-harmonique** (voix cassée, cri) ; puis quatre résonateurs de Klatt en cascade (F1 à F4 : « ou » 300 / 750 / 2 300 / 3 200 Hz, « o » 450 / 820, « a » 750 / 1 150, « e », « eu »), qui glissent d'une voyelle à l'autre. Plainte : 150 à 260 Hz, « o » → « ou », qui retombe ; appel : 196 à 440 Hz, « o » → « a », qui monte ; cri : 120 Hz → pic de 230 à 330 Hz en 10 % de la durée, tremblement, effondrement de 65 %, deux octaves, saturation douce | Attaque 4 à 20 ms (cri, appel) à 0,1 s (plainte) ; relâche sur 40 à 70 % de la durée | 0,3 à 2,4 s | `voix`, `saturer`, `passe_bas_variable` (la voix qui s'éloigne) |
+| **Chœur sourd** | Palier, portail, bouclier, sorcier, crépuscule, aube, victoire, musiques | 2 à 5 voix fantômes par octave, **désaccordées** de ± 1,2 %, vibratos et gigues indépendants, souffle 0,45 à 0,6 : ça bat, ça respire, on n'entend aucune voix seule. Voyelles sombres (« ou », « o ») ; « a » quand le chœur s'ouvre | Montée de 0,1 à 0,8 s, relâche longue | 0,4 à 5 s | `choeur` |
+| **Bourdon grave** | Nyxessa (sous les voix), portail ouvert, canalisation, crépuscule, défaite, musiques | Dents de scie adoucies (10 harmoniques, 1/k × 0,85^k) lues en table, chacune doublée d'un **jumeau à 0,2 à 0,5 Hz** (battements lents), passe-bas deux fois (220 à 900 Hz). Mi1, si1, mi2 (41 à 82 Hz) pour la relique et la nuit | Montée de 5 ms à 0,6 s ; en boucle : fréquences arrondies à un nombre entier de périodes (jointure exacte) | 0,8 s à boucle | `bourdon`, `oscillateur` |
+| **Métal frotté** | Bouclier (levée, états, palier), Nyxar, musiques (tension), donjon | Archet sur une plaque : partiels inharmoniques 1 / 1,59 / 2,14 / 2,30 / 2,65 / 2,92 / 3,16 / 3,50 d'un fondamental de 100 à 250 Hz, **excités lentement** (montée de 0,1 à 1,5 s) avec une amplitude qui **tremble** (bruit lissé à 5 Hz : l'archet accroche et glisse), plus un filet de bruit d'archet vers le partiel 2,14 | Enfle, grince, s'éteint sur les 30 derniers pour cent | 0,8 à 4 s | `metal_frotte` |
+| **Os creux** | Squelettes, interface (survol, refus), riposte du bouclier, charleston d'os des musiques | Petit tube d'os fermé frappé : modes impairs 1 / 3,03 / 5,1 d'un fondamental de 300 Hz (gros os) à 2,6 kHz (petits os), plus un choc de 0,8 ms. **Cliquetis** : grappe de petits os (1,2 à 2,6 kHz, T60 15 à 30 ms) | Attaque 0,4 ms ; T60 **15 à 80 ms** (sec, creux) | 0,02 à 1 s | `os_creux`, `cliquetis` |
+| **Peau tendue** | Coups sourds (Nyxessa frappée, bouclier), décompte, votes, tambours de guerre (vague, crépuscule), impacts lourds, musiques | Membrane circulaire : fondamental dont la **hauteur retombe** (× 1,2 à 2 → f0 en 30 ms : la tension se relâche), modes 1,594 / 2,136 / 2,296 / 2,653 plus brefs, bruit de baguette passé en bas. 38 à 60 Hz : grosse peau, fracas ; 65 à 110 Hz : tambour de guerre, tom ; 110 à 150 Hz : tambour sur cadre, décompte | Attaque immédiate ; T60 0,08 à 1 s | 0,1 à 1 s | `peau` |
+| **Souffle** (air, énergie, respiration) | Charges et retours d'énergie, élans d'armes, esquives, incantation, ambiances | Bruit dans un passe-bande qui **balaie** (montée pour ce qui part, descente pour ce qui revient) ou qui **respire** (fréquence centrale qui dérive, amplitude qui ondule de 0,1 à 1 Hz) | 5 ms (élan) à 1,2 s (charge) | 0,06 s à boucle | `souffle`, `souffle_module` |
+| **Corde pincée** | Arc et arbalète, luth du barde, basse et luth des musiques | Karplus-Strong : ligne à retard d'une période remplie d'un bruit passé en bas (`brillance`), moyenne de deux échantillons, gain réglé sur le T60, lecture fractionnaire (note juste) | Attaque immédiate ; T60 0,15 à 2 s | 0,3 à 2,5 s | `corde` |
+| **Feu** | Mage, brûlure, forge, torches | Grondement : bruit brun passé en bas à 450 Hz, qui ondule (3 Hz) ; crépitements : impulsions de 0,5 à 2 ms en bande 2 à 6 kHz, 8 à 60 par seconde | Allumage en 20 à 50 ms, maintien en boucle, extinction en 0,3 à 1 s | 0,3 s à boucle | `feu`, `bruit_brun` |
 
-**Poussée grave** (complément transversal) : sinus de 35 à 120 Hz qui glisse vers le bas en 0,15 à 1,7 s. Elle donne la masse (Nyxessa qui pulse, impacts lourds, boss) sans remplir le médium. Brique `sub`. On la dose avec prudence, car beaucoup d'enceintes de télévision ne la rendent pas : le son doit rester lisible sans elle.
+**Timbres conservés** du premier essai, désormais **toujours mêlés** à un timbre sombre :
+
+| Timbre | Où | Spectre | Brique |
+|---|---|---|---|
+| **Gemme** (signature de Nyxessa) | Nyxessa, portail, bouclier, réapparition, éclats de Nyxar (corrompus : un quart de ton) | Barre de cristal libre : partiels **1 : 2,756 : 5,404 : 8,933**, chaque partiel doublé d'un jumeau désaccordé de 0,6 à 3 Hz. **Plus grave** qu'au premier essai : mi3 à si5, `eclat` bas (0,1 à 0,5 : peu d'aigus), T60 0,2 à 2,2 s | `gemme`, `scintillement` |
+| **Bois sombre** (interface, objets) | Menus, votes, chopes, coffres | Lame de marimba 1 : 3,93 : 9,24, une octave plus bas qu'au premier essai (mi4 à si4), `clarte` 0,2 à 0,35 (aigus étouffés) | `bois` |
+| **Éclat d'or** (critiques, or, fer) | Critiques, pièces, coup de brèche, parade parfaite | Plaque mince, partiels 1 : 1,59 : 2,14 : 2,65 : 3,16 ; critiques plus graves (1,3 à 2 kHz) et posés sur une peau ; pièces 2,6 à 4,6 kHz | `plaque` |
+| **Poussière et terre** | Squelettes, sauts, Morgrim, sortie du sol | Bruit brun passé en bas, grains de gravier (impulsions de 2 ms en bande 1 à 3 kHz) | `bruit_brun`, `gravier`, `pas_pierre` |
+
+**Poussée grave** (complément transversal) : sinus de 35 à 120 Hz qui glisse vers le bas en 0,15 à 1,7 s (`sub`). Elle donne la masse sans remplir le médium ; beaucoup d'enceintes de télévision ne la rendent pas : le son doit rester lisible sans elle.
+
+**Réverbération** : aucune dans les effets (l'espace vient du jeu). **Exception : les musiques** (sources 2D auxquelles le jeu ne donne aucun espace) reçoivent une petite réverbération de Schroeder calculée en boucle (`reverberation`, humide 0,22 à 0,35).
 
 ---
 
 ## 3. Inventaire des sons nécessaires
+
+> **Direction sombre** (26/09/2026 au soir) : les descriptions acoustiques ci-dessous ont été écrites pour le premier essai (gemmes claires, bois sec). **Les § 1 et 2 priment** : chaque son y prend son timbre sombre (voix et bourdon sous toute gemme, bois sombre et os pour l'interface, peaux pour les coups sourds). Les durées, variantes, espaces, portées et priorités restent valables. Les sons déjà produits sous la direction sombre sont listés au § 8.
 
 Légende :
 - **Identifiant** : nom de fichier sans le numéro de variante (`famille_evenement_N.wav`, § 5) ; l'id du catalogue est le même, préfixé de `dl_` tant que l'ancien son est encore branché. Entre parenthèses, la constante de `SonsDuJeu.cs` qui l'appellera, ou *nouveau* si le code ne l'appelle pas encore.
@@ -421,6 +451,8 @@ Le jour suit le même principe avec deux couches (village calme, puis « on se p
 
 **Code** : `AudioBank.Musique` ne joue qu'un clip à la fois, en fondu enchaîné. Les couches demandent un petit lecteur `MusiqueCouches` (N sources lancées ensemble par `AudioSource.PlayScheduled`, un volume par couche, fondus par couche). C'est une décision de code (§ 7, décision 4), hors de cette session.
 
+**Échantillons produits** (26/09/2026 au soir, § 8.3) : les **trois morceaux du jeu actuel** (jour, nuit, donjon), en boucle stéréo, pour juger le bain. Ils suivent le tableau ci-dessous, sauf deux simplifications : la nuit est livrée **toutes couches ouvertes** en un seul fichier (le découpage en quatre couches synchronisées viendra avec le lecteur `MusiqueCouches`), et le jour n'a pas encore sa couche « Préparation ». Les longueurs sont plus courtes (16 mesures pour le jour et la nuit, 12 pour le donjon, 35 à 42 s).
+
 ### 4.2 Liste des morceaux
 
 Tous en **mi mineur** (nuit, combat, donjon) ou en **sol majeur**, son relatif (jour, menu, victoire), pour que les tintements de Nyxessa et les sons d'interface restent dans la gamme. Stéréo, 44,1 kHz, 16 bits, crête -1,4 dBFS.
@@ -467,7 +499,7 @@ Tous en **mi mineur** (nuit, combat, donjon) ou en **sol majeur**, son relatif (
 | Ambiances | RMS moyen -32 à -26 dBFS | -30 | Mesurées en RMS moyen sur toute la boucle : ce sont des tapis |
 | Musiques | RMS moyen -22 à -18 dBFS | -20 | Mesurées sur la boucle entière toutes couches ouvertes ; chaque couche seule vers -26 |
 
-**Pas de réverbération dans les fichiers** : l'espace vient du jeu. Le donjon et les intérieurs demandent une réverbération de pièce dans le mixer (effet `SFX Reverb` sur un groupe, ou `AudioReverbZone`) : décision de code, § 7.
+**Pas de réverbération dans les fichiers d'effets** : l'espace vient du jeu. Exception : les **musiques** reçoivent une petite réverbération calculée en boucle (§ 2), le jeu ne donnant aucun espace à une source 2D. Le donjon et les intérieurs demandent une réverbération de pièce dans le mixer (effet `SFX Reverb` sur un groupe, ou `AudioReverbZone`) : décision de code, § 7.
 
 **Attaque et fin.** Jamais plus de **20 ms de silence en tête** (un son part au déclenchement ; mesuré : premier échantillon au-dessus de -40 dBFS). Fin sans clic (fondu en cosinus de 12 à 60 ms). Boucles : raccord sans couture (fondu enchaîné de la fin sur le début dans le script, 50 à 200 ms), longueur exacte d'un nombre entier de mesures pour les musiques.
 
@@ -478,7 +510,7 @@ Tous en **mi mineur** (nuit, combat, donjon) ou en **sol majeur**, son relatif (
 **Dossiers et scripts.**
 - `Assets/Audio/Deathless/<Famille>/` : les WAV et **un script par famille** (`synth_<famille>.py`), qui écrit tous les fichiers de la famille.
 - `Assets/Audio/Deathless/deathless_audio.py` : briques communes (timbres de la palette, filtres, mastering, analyse), importées par chaque script.
-- `Assets/Audio/Deathless/controle.py` : planches de contrôle, une par lot (`Docs/son-lotN-controle.md`, un tableau par script). Chaque script déclare ses sons dans une liste `SONS` de (nom, lot, cible en dB, fondu de fin ou `BOUCLE`, fabrique) : `controle.py` y lit le lot et la cible de chaque fichier, et `deathless_audio.produire` écrit les fichiers.
+- `Assets/Audio/Deathless/controle.py` : planches de contrôle, une par lot (`Docs/son-lotN-controle.md`, un tableau par script ; planches nommées : `son-lots1-2-dark-controle.md` pour les lots 1 et 2 regénérés sous la direction sombre, `son-echantillons-controle.md` pour les échantillons). Un script d'ambiances ou de musiques déclare `CANAUX = 2` et `MESURE = "rms"` (cible sur le RMS moyen). Chaque script déclare ses sons dans une liste `SONS` de (nom, lot, cible en dB, fondu de fin ou `BOUCLE`, fabrique) : `controle.py` y lit le lot et la cible de chaque fichier, et `deathless_audio.produire` écrit les fichiers.
 - **Boucles** : rendues sans raccord par `deathless_audio` (`plier` replie la traîne des événements sur le début, `fondre_boucle` fond le continu à puissance constante, les sinus tenus ont un nombre entier de périodes sur la boucle) ; `controle.py` vérifie qu'il n'y a pas de saut à la jointure.
 - Familles prévues : Interface, Nyxessa, Bouclier, Portail, Joueurs, Critiques, Paladin, Viking, Mage, Rodeur, Assassin, Candidats, Squelettes, Morgrim, Nyxar, Statuts, Village, JourNuit, Ambiances, Musique.
 
@@ -490,7 +522,7 @@ Tous en **mi mineur** (nuit, combat, donjon) ou en **sol majeur**, son relatif (
 ```
 python -B Assets/Audio/Deathless/Nyxessa/synth_nyxessa.py
 python -B Assets/Audio/Deathless/Interface/synth_interface.py
-python -B Assets/Audio/Deathless/controle.py        # toutes les planches ; controle.py 2 : le lot 2 seulement
+python -B Assets/Audio/Deathless/controle.py        # toutes les planches ; controle.py echantillons : une seule
 ```
 Un script accepte un dossier de sortie (pour écouter hors de `Assets/`) et une liste de noms : `python -B synth_nyxessa.py <dossier> nyxessa_tir_1 nyxessa_palier`.
 
@@ -536,6 +568,7 @@ Chaque lot fait 15 à 25 sons (identifiants ou fichiers), tient dans une session
 |---|---|---|---|
 | **1** (fait) | Nyxessa (tir, frappée, alerte, palier, charge, retour, onde, destruction) et interface (survol, clic, retour, refus, confirmation, décompte, onglet, votes) | V | 18 ids, 24 fichiers |
 | **2** (fait) | Nyxessa (suite : missile vol et éclat, rappel, réapparition), bouclier et sorcier, portail et téléportation | V et C | 22 ids, 29 fichiers |
+| *échantillons* (faits) | Un à cinq sons de chaque autre thème et les trois musiques, sous la direction sombre, pour juger le bain (§ 8.3). Les lots suivants partent de ces scripts : ils complètent la famille au lieu de la créer | — | 53 ids, 54 fichiers |
 | 3 | Squelettes : sortie, préparation, coups, touché, mort, aube, pas, mage squelette ; nouvelle brique os creux et poussière | V | 15 ids, environ 45 fichiers |
 | 4 | Joueurs : pas (4 sols), saut, réception, chutes, esquive, touché, mort, potion | V | 13 ids, environ 45 fichiers |
 | 5 | Paladin et critiques ; nouvelle brique éclat d'or | V | 15 ids |
@@ -567,12 +600,14 @@ Chaque lot fait 15 à 25 sons (identifiants ou fichiers), tient dans une session
 
 ### 8.1 Lot 1 produit
 
+> **Regénérés sous la direction sombre le 26/09/2026 au soir** (mêmes identifiants, mêmes noms de fichiers) : Nyxessa porte des vocalises sur un bourdon ou un chœur, l'interface passe au bois sombre et à l'os, avec peaux et bourdon court pour le décompte et « tous prêts ». Planche : [`son-lots1-2-dark-controle.md`](son-lots1-2-dark-controle.md) (53 fichiers conformes, lots 1 et 2). La description ci-dessous est celle du premier essai.
+
 24 fichiers, 18 identifiants, générés le 26/09/2026 :
 
 - `Assets/Audio/Deathless/Nyxessa/synth_nyxessa.py` : `nyxessa_tir_1..3`, `nyxessa_frappee_1..3`, `nyxessa_alerte`, `nyxessa_palier`, `nyxessa_charge_portail`, `nyxessa_retour_energie`, `nyxessa_onde`, `nyxessa_destruction` (12 fichiers, 8 ids).
 - `Assets/Audio/Deathless/Interface/synth_interface.py` : `interface_survol_1..2`, `interface_clic_1..2`, `interface_retour`, `interface_refus`, `interface_confirmation`, `interface_decompte`, `interface_onglet`, `interface_pret`, `interface_pret_annule`, `interface_tous_prets` (12 fichiers, 10 ids).
 - Catalogue : ids `dl_nyxessa_*` et `dl_interface_*` dans `Wiki/data/sons.json`, statut `a_ecouter` puis `utilise` une fois branchés (26/09/2026, voir ci-dessous) ; portée (§ 3.2) renseignée pour les entrées de Nyxessa.
-- Planche de contrôle : [`son-lot1-controle.md`](son-lot1-controle.md) (24 fichiers conformes : 44,1 kHz mono, crête sous -1,4 dBFS, tête sous 20 ms, niveau à la cible).
+- Planche de contrôle : [`son-lots1-2-dark-controle.md`](son-lots1-2-dark-controle.md) (la planche du premier essai, `son-lot1-controle.md`, a été retirée avec ses sons).
 
 **Branché le 26/09/2026** par l'agent local : `SonsDuJeu.cs` a les ids `dl_nyxessa_*` et `dl_interface_*` en tête des listes ; `ReglagesAudio` reçoit ses clips `interface_survol_1`, `interface_clic_1`, `interface_retour`, `interface_refus` par le menu `Deathless > Jeu > 2b. Brancher l'interface du lot 1` (à lancer avec la régénération du catalogue, `2. Importer le catalogue des sons`) ; une portée par entrée (mètres) a été ajoutée à `AudioBank`, renseignée dans `Wiki/data/sons.json` pour Nyxessa (§ 3.2). Les 18 ids passent en `utilise`, les anciens sons qu'ils remplacent en `disponible` :
 
@@ -596,6 +631,8 @@ Chaque lot fait 15 à 25 sons (identifiants ou fichiers), tient dans une session
 
 ### 8.2 Lot 2 produit
 
+> **Regénérés sous la direction sombre le 26/09/2026 au soir** (mêmes identifiants, mêmes noms de fichiers) : missile crâne en chœur de plaintes (vol, boucle de 2 s au lieu de 1,5 s) et en cri (éclat, niveau -14 dB au lieu de -15) ; bouclier en bourdon, métal frotté, peaux et os, bris en chœur qui se déchire ; sorcier en voix sourde et bourdon qui bat ; portail en bourdon grave, souffle et chœur, voix qui glissent, peaux. Planche : [`son-lots1-2-dark-controle.md`](son-lots1-2-dark-controle.md). La description ci-dessous est celle du premier essai.
+
 29 fichiers, 22 identifiants, générés le 26/09/2026 (Nyxessa, suite ; bouclier et sorcier ; portail et téléportation) :
 
 - `Assets/Audio/Deathless/Nyxessa/synth_nyxessa.py` (complété) : `nyxessa_missile_vol_boucle`, `nyxessa_missile_eclat_1..3`, `nyxessa_rappel`, `nyxessa_reapparition` (6 fichiers, 4 ids).
@@ -603,7 +640,7 @@ Chaque lot fait 15 à 25 sons (identifiants ou fichiers), tient dans une session
 - `Assets/Audio/Deathless/Portail/synth_portail.py` : `portail_ouverture`, `portail_fermeture`, `portail_bourdon_boucle`, `portail_depart`, `portail_arrivee`, `portail_chute_ciel`, `portail_sortie_sol`, `portail_ferme_refus` (8 fichiers, 8 ids).
 - Briques ajoutées à `deathless_audio.py` : `plaque` (éclat d'or et fer, § 2), `gravier` et `pas_pierre` (poussière et terre, § 2), boucles sans raccord (`plier`, `fondre_boucle`, `master_boucle`) et `produire` (écriture d'une famille). Les scripts du lot 1 déclarent désormais leurs sons dans la même liste `SONS` ; leurs 24 fichiers sont inchangés, à l'octet près.
 - Catalogue : ids `dl_nyxessa_*` (4), `dl_bouclier_*` (7), `dl_sorcier_*` (3) et `dl_portail_*` (8) dans `Wiki/data/sons.json`, statut `a_ecouter`, avec `portee` pour les sons 3D (ajoutée aussi aux sons 3D du lot 1).
-- Planche de contrôle : [`son-lot2-controle.md`](son-lot2-controle.md) (29 fichiers conformes, dont 4 boucles vérifiées à la jointure).
+- Planche de contrôle : [`son-lots1-2-dark-controle.md`](son-lots1-2-dark-controle.md) (la planche du premier essai, `son-lot2-controle.md`, a été retirée avec ses sons).
 
 **Hypothèses prises** (à confirmer en jeu) :
 - **Chute du ciel** et **sortie du sol** : le clip dure 1,3 s ; le contact avec le sol (`Spawn_Air`) et le corps entier (`Spawn_Ground`) sont placés vers **1,0 s**, faute de mesure de l'instant dans le clip. Si l'instant diffère, décaler le déclenchement du son plutôt que le fichier.
@@ -637,3 +674,48 @@ Chaque lot fait 15 à 25 sons (identifiants ou fichiers), tient dans une session
 | *nouveau* : palier du bouclier acheté (en plus de `dl_nyxessa_palier`) | `dl_bouclier_palier` |
 | *nouveau* : canalisation du sorcier (boucle tant qu'elle dure) et son éclat (`AvancerRechargeMissiles`) | `dl_sorcier_canalisation`, `dl_sorcier_canalisation_eclat` |
 | Importeur du catalogue (`JeuBuilder`) | reconnaître `_boucle` comme `_loop` |
+
+### 8.3 Échantillons de la direction sombre
+
+Produits le 26/09/2026 au soir, à la demande de Quentin (« touche à tous les thèmes de son, musiques comprises, pour qu'on juge du bain avant de traiter la totalité ») : **54 fichiers, 53 identifiants**, un à cinq sons par thème, chacun dans le dossier et le script de sa future famille (lot `echantillons` dans les listes `SONS`). Planche : [`son-echantillons-controle.md`](son-echantillons-controle.md) (54 fichiers conformes). Catalogue : ids `dl_*`, statut `a_ecouter`, nom suivi de « (direction sombre, échantillon) ».
+
+| Famille (script) | Fichiers |
+|---|---|
+| Joueurs (`Joueurs/synth_joueurs.py`) | `joueur_touche_1..2`, `esquive_1`, `joueur_mort`, `potion_boire` |
+| Critiques (`Critiques/synth_critiques.py`) | `critique_1`, `critique_meilleur` |
+| Paladin (`Paladin/synth_paladin.py`) | `epee_elan_1`, `epee_impact_1`, `blocage_1`, `parade_parfaite`, `soin` |
+| Viking (`Viking/synth_viking.py`) | `hache_elan_1`, `rugissement_1`, `saut_percutant_impact_1` |
+| Mage (`Mage/synth_mage.py`) | `boule_lancer_1`, `boule_explosion_1`, `cone_boucle` |
+| Rôdeur (`Rodeur/synth_rodeur.py`) | `arc_tir_1`, `arc_tir_charge_1`, `fleche_impact_os_1` |
+| Assassin (`Assassin/synth_assassin.py`) | `dague_elan_1`, `furtif_entree`, `fumee` |
+| Squelettes (`Squelettes/synth_squelettes.py`) | `squelette_sortie_1`, `squelette_preparation_1`, `squelette_touche_1`, `squelette_mort_1`, `squelette_aube_1` |
+| Morgrim (`Morgrim/synth_morgrim.py`) | `morgrim_cri`, `massue_fracas_1`, `massue_onde` |
+| Nyxar (`Nyxar/synth_nyxar.py`) | `nyxar_arrivee`, `nyxar_eclat_brise_1` |
+| Statuts (`Statuts/synth_statuts.py`) | `etourdi_boucle`, `brulure_boucle`, `renverse_chute`, `ivresse_debut_1` |
+| Village (`Village/synth_village.py`) | `or_caisse_1`, `coffre_ouvre_1`, `taverne_biere` |
+| Jour et nuit (`JourNuit/synth_journuit.py`) | `crepuscule`, `aube`, `vague`, `victoire`, `defaite` |
+| Ambiances (`Ambiances/synth_ambiances.py`, stéréo) | `ambiance_village_nuit_boucle`, `ambiance_donjon_boucle` (20 s chacune) |
+| Candidats (`Candidats/synth_candidats.py`) | `clochard_pet_defense_1`, `djbob_scratch_1`, `barde_bwoiing` |
+| Musique (`Musique/synth_musique.py`, stéréo) | `musique_jour_boucle` (92 BPM, sol majeur, 41,7 s), `musique_nuit_boucle` (110 BPM, mi mineur, 34,9 s), `musique_donjon_boucle` (72 BPM, mi dorien, 40 s) |
+
+Briques ajoutées à `deathless_audio.py` pour la direction sombre : `voix`, `choeur`, `saturer`, `passe_bas_variable`, `bourdon` (et `oscillateur`), `metal_frotte`, `os_creux`, `cliquetis`, `peau`, `souffle_module`, `bruit_brun`, `corde`, `feu`, `circulaire` (filtre d'une boucle sans saut), la stéréo (`panoramique`, `ajouter_stereo`, `master_stereo`, `ecrire_stereo`) et `reverberation` (musiques seulement). Correction au passage : `master` retire la composante continue **avant** le fondu de fin (un son finissait sur un petit saut).
+
+**Hypothèses** : les numéros de variante (`_1`) annoncent les variantes à produire avec la famille ; les portées suivent le § 3 ; les musiques sont des boucles complètes (§ 4.1, note) ; les ambiances sont en 2D stéréo, sans groupe Ambiances dans le mixer pour l'instant (§ 7.3).
+
+**Branchement proposé** (après écoute, par l'agent local ; aucun script de jeu n'a été modifié) : mettre l'id `dl_*` en tête de la liste existante de `SonsDuJeu`.
+
+| Constante de `SonsDuJeu` | Nouvel id en tête |
+|---|---|
+| `JoueurTouche`, `JoueurMort`, `Esquive` | `dl_joueur_touche`, `dl_joueur_mort`, `dl_esquive` |
+| `Critique`, `CritiqueMeilleur` | `dl_critique`, `dl_critique_meilleur` |
+| `EpeeElan`, `EpeeImpact`, `Blocage`, `Soin` | `dl_epee_elan`, `dl_epee_impact`, `dl_blocage`, `dl_soin` |
+| `Hache`, `Rugissement`, `SautPercutant`, `ChargeImpact` (repli) | `dl_hache_elan`, `dl_rugissement`, `dl_saut_percutant_impact` |
+| `BouleLancer`, `BouleExplosion`, `Cone`, `Brulure` | `dl_boule_lancer`, `dl_boule_explosion`, `dl_cone`, `dl_brulure` |
+| `ArcTir`, `ArcTirCharge`, `FlecheImpact` | `dl_arc_tir`, `dl_arc_tir_charge`, `dl_fleche_impact_os` |
+| `Dague`, `FurtifEntree`, `Fumee` | `dl_dague_elan`, `dl_furtif_entree`, `dl_fumee` |
+| `SqueletteSortie`, `SquelettePreparation`, `SqueletteTouche`, `SqueletteMort`, `SqueletteAube` | `dl_squelette_sortie`, `dl_squelette_preparation`, `dl_squelette_touche`, `dl_squelette_mort`, `dl_squelette_aube` |
+| `GolemCoup` | `dl_massue_fracas` |
+| `Or`, `CoffreOuvert`, `Biere` | `dl_or_caisse`, `dl_coffre_ouvre`, `dl_taverne_biere` |
+| `TombeeNuit`, `Aube`, `Vague`, `Victoire` | `dl_crepuscule`, `dl_aube`, `dl_vague`, `dl_victoire` |
+| `MusiqueJour`, `MusiqueNuit` | `dl_musique_jour`, `dl_musique_nuit` |
+| *nouveaux* : défaite, musique du donjon, ambiances, cri et onde de Morgrim, Nyxar, étourdi, renversé, ivresse, parade parfaite, potion, candidats | `dl_defaite`, `dl_musique_donjon`, `dl_ambiance_*`, `dl_morgrim_cri`, `dl_massue_onde`, `dl_nyxar_*`, `dl_etourdi`, `dl_renverse_chute`, `dl_ivresse_debut`, `dl_parade_parfaite`, `dl_potion_boire`, `dl_clochard_*`, `dl_djbob_*`, `dl_barde_*` |
