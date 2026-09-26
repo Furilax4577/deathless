@@ -73,6 +73,7 @@ namespace Deathless.Jeu
         readonly float[] m_Demande = new float[DonjonPlan.NbButins];
         int m_PrisVus;
         bool m_Transit;
+        Heros m_HerosTransit;
         Camera m_CamAmbiance;
         CameraClearFlags m_FondCamera;
         Color m_FondCouleur;
@@ -652,42 +653,67 @@ namespace Deathless.Jeu
         {
             m_Transit = true;
             h.EnTransit = true;
-            var gemmes = EffetsJeu.Gemmes;
-            Bounds corps = EffetsJeu.Volume(h.gameObject);
-            if (portailDepart != null) PortalTransit.Depart(corps, portailDepart, gemmes, DureeTransitDepart);
-            else PortalTransit.Depart(corps, corps.center + Vector3.up * 0.3f, gemmes, DureeTransitDepart);
-            h.Classe?.DiffuserTransit(ClasseHeros.EffetTransitDepart, h.transform.position, CodeDe(portailDepart));
-            AudioBank.Jouer(SonsDuJeu.PortailPassage, h.transform.position + Vector3.up, 0.9f);
-            Visible(h, false);
-            // Immobile jusqu'à la fin de l'effet de départ (Quentin, 26/09/2026) : la téléportation n'arrive qu'une fois
-            // les gemmes parties, jamais avant.
-            yield return new WaitForSeconds(DureeTransitDepart);
-            Vector3 avant = h.transform.position;
-            h.Teleporter(destination + Vector3.up * 0.05f);
-            // Regard à l'arrivée : vers l'intérieur du donjon (orientation de l'arrivée), ou vers Nyxessa au village.
-            Vector3 v = versDonjon ? generateur.Arrivee.transform.forward
-                : (P != null && P.nyxessa != null ? P.nyxessa.transform.position : destination + Vector3.forward) - destination;
-            v.y = 0f;
-            if (v.sqrMagnitude > 0.01f)
+            m_HerosTransit = h;
+            try
             {
-                h.transform.rotation = Quaternion.LookRotation(v);
-                if (P != null && P.cameraJeu != null && P.cameraJeu.cible == h.transform) P.cameraJeu.lacet = h.transform.eulerAngles.y;
+                var gemmes = EffetsJeu.Gemmes;
+                Bounds corps = EffetsJeu.Volume(h.gameObject);
+                if (portailDepart != null) PortalTransit.Depart(corps, portailDepart, gemmes, DureeTransitDepart);
+                else PortalTransit.Depart(corps, corps.center + Vector3.up * 0.3f, gemmes, DureeTransitDepart);
+                h.Classe?.DiffuserTransit(ClasseHeros.EffetTransitDepart, h.transform.position, CodeDe(portailDepart));
+                AudioBank.Jouer(SonsDuJeu.PortailPassage, h.transform.position + Vector3.up, 0.9f);
+                Visible(h, false);
+                // Immobile jusqu'à la fin de l'effet de départ (Quentin, 26/09/2026) : la téléportation n'arrive qu'une fois
+                // les gemmes parties, jamais avant.
+                yield return new WaitForSeconds(DureeTransitDepart);
+                if (h == null) yield break;
+                Vector3 avant = h.transform.position;
+                h.Teleporter(destination + Vector3.up * 0.05f);
+                // Regard à l'arrivée : vers l'intérieur du donjon (orientation de l'arrivée), ou vers Nyxessa au village.
+                Vector3 v = versDonjon ? generateur.Arrivee.transform.forward
+                    : (P != null && P.nyxessa != null ? P.nyxessa.transform.position : destination + Vector3.forward) - destination;
+                v.y = 0f;
+                if (v.sqrMagnitude > 0.01f)
+                {
+                    h.transform.rotation = Quaternion.LookRotation(v);
+                    if (P != null && P.cameraJeu != null && P.cameraJeu.cible == h.transform) P.cameraJeu.lacet = h.transform.eulerAngles.y;
+                }
+                // Réseau : saut de position sans interpolation chez les autres.
+                var nt = h.GetComponent<Unity.Netcode.Components.NetworkTransform>();
+                if (nt != null && nt.IsSpawned && nt.IsOwner) nt.Teleport(h.transform.position, h.transform.rotation, h.transform.localScale);
+                Bounds arrivee = corps; arrivee.center += h.transform.position - avant;
+                if (portailArrivee != null) PortalTransit.Arrive(arrivee, portailArrivee, gemmes, DureeTransitArriveeGemmes);
+                else PortalTransit.Arrive(arrivee, arrivee.center + h.transform.forward * 1.2f, gemmes, DureeTransitArriveeGemmes);
+                h.Classe?.DiffuserTransit(ClasseHeros.EffetTransitArrivee, h.transform.position, CodeDe(portailArrivee));
+                yield return new WaitForSeconds(DureeTransitArriveeGemmes);
+                if (h == null) yield break;
+                // Corps reformé : le clip d'arrivée prend le relais dès sa première image (Spawn_Air commence en l'air),
+                // joué en entier, toujours sans contrôle.
+                Visible(h, true);
+                h.DeclencherPortail(versDonjon);
+                yield return new WaitForSeconds(PortailAnim.DureeClip);
             }
-            // Réseau : saut de position sans interpolation chez les autres.
-            var nt = h.GetComponent<Unity.Netcode.Components.NetworkTransform>();
-            if (nt != null && nt.IsSpawned && nt.IsOwner) nt.Teleport(h.transform.position, h.transform.rotation, h.transform.localScale);
-            Bounds arrivee = corps; arrivee.center += h.transform.position - avant;
-            if (portailArrivee != null) PortalTransit.Arrive(arrivee, portailArrivee, gemmes, DureeTransitArriveeGemmes);
-            else PortalTransit.Arrive(arrivee, arrivee.center + h.transform.forward * 1.2f, gemmes, DureeTransitArriveeGemmes);
-            h.Classe?.DiffuserTransit(ClasseHeros.EffetTransitArrivee, h.transform.position, CodeDe(portailArrivee));
-            yield return new WaitForSeconds(DureeTransitArriveeGemmes);
-            // Corps reformé : le clip d'arrivée prend le relais dès sa première image (Spawn_Air commence en l'air),
-            // joué en entier, toujours sans contrôle.
-            Visible(h, true);
-            h.DeclencherPortail(versDonjon);
-            yield return new WaitForSeconds(PortailAnim.DureeClip);
-            h.EnTransit = false;
+            finally { FinTransit(h); }
+        }
+
+        /// Fin du passage, même interrompu (exception, héros détruit, coroutine arrêtée) : le héros redevient visible
+        /// et reprend le contrôle, et les portails se rouvrent. Sans cela, un passage coupé en route bloquait le héros
+        /// (EnTransit) et tous les portails (m_Transit) jusqu'au rechargement de la scène.
+        void FinTransit(Heros h)
+        {
+            if (h != null)
+            {
+                Visible(h, true);
+                h.EnTransit = false;
+            }
             m_Transit = false;
+            m_HerosTransit = null;
+        }
+
+        /// Coroutine arrêtée avec le composant (désactivation) : son bloc finally ne s'exécute pas.
+        void OnDisable()
+        {
+            if (m_Transit) FinTransit(m_HerosTransit);
         }
 
         static void Visible(Heros h, bool oui)
