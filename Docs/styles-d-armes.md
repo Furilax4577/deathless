@@ -22,6 +22,35 @@ Source : bac à sable `sandbox-rig` (scène `RigTest.unity`, fiches détaillées
 | **Hache à deux mains** (viking) | `axe_2handed` → `handslot.r` (0,0,0)/**(0,0,0)** (double fer ±X ; la direction du manche est dictée par l'idle 2H) | `Melee_2H_Idle_Loop` / `Walking_A` / `Running_A` | `Melee_2H_Attack_Chop` (trigger `Attack`), `Melee_2H_Attack_Slice` (trigger `Attack2`) ; dispo : `_Stab`, `_Spin`, `_Spinning` | `Melee_Blocking_Loop` (geste de bouclier, faute de garde 2H) | — | `Axe2H.controller` / `.asset` |
 | **Arc + carquois** (archer) | `bow_withString` → `handslot.l` (0,0,0)/**(286,183,357)** au repos, **(0,0,180)** en visée ; `arrow_bow` → `handslot.r` (0.163,0.523,−0.047)/(288,106,75), visible seulement en visée ; `quiver` → `chest` (0.06,0,−0.33)/(0,0,−45) | `Idle_A` / `Walking_A` / `Running_HoldingBow` | `Ranged_Bow_Draw` → `Ranged_Bow_Release` (trigger `Shoot`) | `Aiming_Idle` = `Ranged_Bow_Aiming_Idle_Loop` (bool `Aiming`) ; blendshape `Draw` de l'arc : monte pendant `Draw`, 100 en `Aiming_Idle`, 0 sinon | `BowStance` (bool `Aiming`, 0.15 s) | `BowQuiver.controller` / `.asset` |
 
+## Charge bélier en jeu : courir derrière le bouclier (26/09/2026)
+
+Demande de Quentin : « La charge bélier doit courir derrière le bouclier ». Le jeu reprend le rendu du banc des effets (`VfxBench.PosteCharge`) avec l'Animator du Paladin. Le contrôleur `Assets/Jeu/Animation/Paladin_Jeu.controller` est généré par `JeuBuilder.ControleurPaladin` : menus `Deathless > Jeu > 3. Contrôleurs d'animation` ou `7. Classes`.
+
+- **Anticipation** (`chargeAnticipation`, 0,18 s) :
+  - le déclencheur `Charge` fait passer la couche de base à l'état `ChargeRuee` (`Running_A`, étiquette `Ruee`), en fondu sur toute l'anticipation ;
+  - la cadence `VitesseRuee` reste à 0 : la course est tenue sur sa première image ;
+  - le booléen `Ruee` passe la couche `HautDuCorps` (masque `chest`) en `ChargeGarde` (`Melee_Blocking_Loop`) ;
+  - le poids de cette couche monte (`ClassePaladin.HautDuCorps`).
+- **Ruée** :
+  - `ClassePaladin.CadenceCourse` écrit `VitesseRuee` = vitesse de la ruée ÷ vitesse des pieds de `Running_A`, bornée par `chargeCadenceMin` / `chargeCadenceMax` (×0,8 à ×3) ;
+  - la vitesse des pieds est mesurée par le builder : pied d'appui sur le Knight, à l'échelle du jeu. Elle est rangée dans la valeur par défaut du paramètre `CourseNaturelle` ;
+  - le coup de bouclier (déclencheur `CoupBouclier`, état `CoupBouclier` de la couche haute, `Melee_Block_Attack`) part pour que son impact tombe à l'arrivée ;
+  - l'instant d'impact est mesuré par le builder : main gauche la plus en avant, ≈ 0,47 s comme au banc. Il est rangé dans le paramètre `ImpactCoupBouclier`. Si la ruée est plus courte que cet instant, le coup part dès le début.
+- **Arrivée** (`FinCharge`, ou arrêt contre le décor) :
+  - `Ruee` repasse à faux ;
+  - la couche de base passe à `ChargeCoup` : `Melee_Block_Attack` en corps entier à partir de l'instant d'impact, puis retour à la locomotion. Ce geste utilise une copie rognée par le builder, `Assets/Jeu/Animation/Clips/Melee_Block_Attack_DepuisImpact.anim` ;
+  - le poids de la couche haute redescend.
+- **Penché** (`chargePenche`, 14°) :
+  - `Heros.AppliquerPenche` fait tourner le seul enfant `Modele` autour des pieds, tant que l'état courant (ou visé) de la couche de base porte l'étiquette `Ruee` (`ClassePaladin.Penche`) ;
+  - le mouvement est lissé à 90°/s ;
+  - la capsule (`CharacterController`) et la caméra suivent la racine : elles ne bougent pas.
+- **Réseau** : rien de nouveau à diffuser. Le `NetworkAnimator` du propriétaire transmet aux autres postes :
+  - les déclencheurs (`Charge`, `CoupBouclier`, par `Heros.Declencher` / `Heros.AnnulerDeclencheur`) ;
+  - les paramètres (`Ruee`, `VitesseRuee`) ;
+  - le poids des couches.
+
+  Le penché se déduit de l'état de l'Animator : la marionnette penche d'elle-même. La bulle et l'impact passent déjà par `Diffuser(E_Charge…)`.
+
 ## Pièce articulée : visière du casque (Knight)
 
 `Knight_HelmetVisor` est un SkinnedMeshRenderer séparé, skinné à 100 % sur `head`, modélisé relevé. Script `HelmetVisor` (bool `open`, 0.2 s) : charnière `VisorHinge` (enfant de `head`) substituée à `head` dans `bones`, pivot **(0, 0.566, 0.068)** dans `head` (= (0, 1.79, 0.07) modèle, rivets des tempes), axe X, relevée 0°, **abaissée 41°**. Même mécanisme que `HeadGear.cs` de Relic.
@@ -32,4 +61,4 @@ Source : bac à sable `sandbox-rig` (scène `RigTest.unity`, fiches détaillées
 - **Arc** : **bascule repos ↔ visée obligatoire** (`BowStance`) : deux eulers, flèche visible seulement en visée, blendshape `Draw` à synchroniser. Le bug d'orientation de Relic venait de son euler de repos (0, 270, 285.2).
 - **Dague / arbalète** : switch par reparentage (`AltWeaponSwitch`) ; le cooldown du switch reste à faire côté jeu. Relic portait la dague lame vers le bas (285.2, 180, 270) : remplacé par (0, 180, 0).
 - **Écarts avec Relic à reporter dans ses assets si Relic est repris** : hache 1H (0,0,65) → (0,180,0) ; dague (285.2,180,270) → (0,180,0) ; arbalète (0,273,0) → (0,271,0) ; fourreau `hips` → dos `chest` ; arc repos (0,270,285.2) → (286,183,357) ; flèche avec position locale non nulle.
-- Non traités : livre du mage, variantes futures (griffes, épées de feu), armures, cooldowns, réseau.
+- Non traités : livre du mage, variantes futures (griffes, épées de feu), armures, cooldowns. Réseau : voir la charge bélier ci-dessus et `Docs/reseau.md`.

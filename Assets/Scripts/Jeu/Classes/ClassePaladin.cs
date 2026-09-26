@@ -31,6 +31,11 @@ namespace Deathless.Jeu
         readonly HashSet<Squelette> m_Repousses = new HashSet<Squelette>();
         bool m_SoinDonne;
         float m_PasReste;
+        // Animation de la charge (contrôleur Paladin_Jeu, JeuBuilder.ControleurPaladin) : jambes en course, haut du corps
+        // en garde puis coup de bouclier calé sur l'arrivée, corps penché. Mesures faites par le builder sur les clips.
+        bool m_AnimCharge;
+        bool m_CoupLance;
+        float m_CourseNaturelle = 5f, m_ImpactCoup = 0.47f;
 
         static readonly int P_Guard = Animator.StringToHash("Guard");
         static readonly int P_Attack1 = Animator.StringToHash("Attack1");
@@ -38,6 +43,12 @@ namespace Deathless.Jeu
         static readonly int P_Charge = Animator.StringToHash("Charge");
         static readonly int P_Heal = Animator.StringToHash("Heal");
         static readonly int P_BlockHit = Animator.StringToHash("BlockHit");
+        static readonly int P_Ruee = Animator.StringToHash("Ruee");
+        static readonly int P_VitesseRuee = Animator.StringToHash("VitesseRuee");
+        static readonly int P_CoupBouclier = Animator.StringToHash("CoupBouclier");
+        static readonly int P_CourseNaturelle = Animator.StringToHash("CourseNaturelle");
+        static readonly int P_ImpactCoupBouclier = Animator.StringToHash("ImpactCoupBouclier");
+        const string TagRuee = "Ruee";
 
         public bool EnGarde => m_Garde;
 
@@ -48,6 +59,7 @@ namespace Deathless.Jeu
         {
             base.Initialiser(heros);
             if (aura == null) aura = GetComponentInChildren<AuraSoin>(true);
+            LireMesuresCharge();
             var fx = EffetsJeu.Instance;
             if (fx != null && fx.prefabChargeBelier != null)
             {
@@ -64,7 +76,33 @@ namespace Deathless.Jeu
         public override float FacteurVitesse => m_Action == Action.Attaque ? B.epeeVitesse : m_Action == Action.Soin ? 0f : m_Garde ? B.gardeVitesse : 1f;
         public override bool BloqueSprint => m_Garde;
         public override bool FaceVisee => m_Garde;
-        public override bool HautDuCorps => m_Garde || m_Action == Action.ChargeAnticipation;
+        public override bool HautDuCorps => m_Garde || m_Action == Action.ChargeAnticipation || m_Action == Action.Charge;
+
+        /// Penché de la ruée : déduit de l'état de l'Animator (étiquette « Ruee »), donc identique sur les marionnettes.
+        public override float Penche
+        {
+            get
+            {
+                if (!m_AnimCharge || Anim == null || !Anim.isActiveAndEnabled) return 0f;
+                var e = Anim.IsInTransition(0) ? Anim.GetNextAnimatorStateInfo(0) : Anim.GetCurrentAnimatorStateInfo(0);
+                return e.IsTag(TagRuee) ? B.chargePenche : 0f;
+            }
+        }
+
+        /// Le contrôleur porte les paramètres de la charge (sinon : ancien contrôleur, rien n'est piloté) et, en valeurs
+        /// par défaut, les mesures faites par le builder : vitesse des pieds de Running_A (m/s, échelle du jeu) et instant
+        /// du coup de bouclier dans Melee_Block_Attack (s).
+        void LireMesuresCharge()
+        {
+            m_AnimCharge = false;
+            if (Anim == null || Anim.runtimeAnimatorController == null) return;
+            foreach (var p in Anim.parameters)
+            {
+                if (p.nameHash == P_Ruee) m_AnimCharge = true;
+                else if (p.nameHash == P_CourseNaturelle && p.defaultFloat > 0.1f) m_CourseNaturelle = p.defaultFloat;
+                else if (p.nameHash == P_ImpactCoupBouclier && p.defaultFloat > 0f) m_ImpactCoup = p.defaultFloat;
+            }
+        }
 
         public override void SurAction(string action)
         {
@@ -140,6 +178,13 @@ namespace Deathless.Jeu
             m_RechargeCharge = b.chargeRecharge * Facteur(2);
             m_Repousses.Clear();
             m_ParcouruCharge = 0f;
+            m_CoupLance = false;
+            if (Anim != null && m_AnimCharge)
+            {
+                H.AnnulerDeclencheur(P_CoupBouclier);
+                Anim.SetFloat(P_VitesseRuee, 0f);   // anticipation : la course est tenue sur sa première image
+                Anim.SetBool(P_Ruee, true);
+            }
             if (Anim != null) H.Declencher(P_Charge);
             EffetCharge(m_Dir);
             Diffuser(E_Charge, m_Dir);
@@ -187,6 +232,10 @@ namespace Deathless.Jeu
                     break;
                 case Action.ChargeAnticipation:
                     if (m_Depuis >= b.chargeAnticipation) { m_Action = Action.Charge; m_Depuis = 0f; m_DepartCharge = transform.position; TraverserEnnemis(true); }
+                    CoupDeBouclier();
+                    break;
+                case Action.Charge:
+                    CoupDeBouclier();
                     break;
                 case Action.Soin:
                     if (!m_SoinDonne && m_Depuis >= b.soinIncantation)
@@ -199,6 +248,27 @@ namespace Deathless.Jeu
                     if (m_Depuis >= b.soinIncantation + 0.5f) m_Action = Action.Aucune;
                     break;
             }
+        }
+
+        /// Coup de bouclier sur le haut du corps, lancé pour que son instant d'impact tombe à l'arrivée de la ruée (comme le
+        /// banc des effets, VfxBench.PosteCharge). Ruée trop courte : lancé dès que possible.
+        void CoupDeBouclier()
+        {
+            if (m_CoupLance || !m_AnimCharge || Anim == null) return;
+            var b = B;
+            float ecoule = (m_Action == Action.Charge ? b.chargeAnticipation : 0f) + m_Depuis;
+            float arrivee = b.chargeAnticipation + b.chargeDuree * m_DistanceCharge / b.chargeDistance;
+            if (ecoule < arrivee - m_ImpactCoup) return;
+            m_CoupLance = true;
+            H.Declencher(P_CoupBouclier);
+        }
+
+        /// Cadence des jambes : vitesse de la ruée ÷ vitesse des pieds du clip de course, bornée (pieds sans patinage).
+        void CadenceCourse(float vitesse)
+        {
+            if (!m_AnimCharge || Anim == null) return;
+            float cadence = Mathf.Clamp(vitesse / Mathf.Max(0.5f, m_CourseNaturelle), B.chargeCadenceMin, B.chargeCadenceMax);
+            Anim.SetFloat(P_VitesseRuee, cadence);
         }
 
         public override bool DeplacementImpose(float dt, out Vector3 vitesse)
@@ -220,6 +290,7 @@ namespace Deathless.Jeu
             float voulu = m_DistanceCharge * (1f - (1f - k) * (1f - k) * (1f - 0.3f * k));   // départ franc, léger freinage
             m_ParcouruCharge = Vector3.Dot(transform.position - m_DepartCharge, m_Dir);
             vitesse = m_Dir * Mathf.Max(0f, voulu - m_ParcouruCharge) / Mathf.Max(dt, 0.001f);
+            CadenceCourse(vitesse.magnitude);
             var dv = DirecteurVagues.Instance;
             if (dv != null)
                 foreach (var s in dv.Vivants)
@@ -263,9 +334,18 @@ namespace Deathless.Jeu
             else if (p != null) p.Journal("Charge : " + m_ParcouruCharge.ToString("F1") + " m sans cible, " + m_Repousses.Count + " repoussés");
             EffetChargeImpact(force);
             Diffuser(E_ChargeImpact, default, default, force);
+            FinAnimCharge();
             TraverserEnnemis(false);
             m_Action = Action.Aucune;
             m_CibleCharge = null;
+        }
+
+        /// Fin de ruée : l'Animator passe au coup de bouclier du corps entier, pris à son instant d'impact.
+        void FinAnimCharge()
+        {
+            if (!m_AnimCharge || Anim == null) return;
+            Anim.SetBool(P_Ruee, false);
+            if (!m_CoupLance) H.AnnulerDeclencheur(P_CoupBouclier);
         }
 
         void EffetChargeImpact(float force)
@@ -279,6 +359,7 @@ namespace Deathless.Jeu
         public override void Interrompre()
         {
             if (m_Action == Action.Charge) FinCharge();
+            else if (m_Action == Action.ChargeAnticipation) FinAnimCharge();
             m_Action = Action.Aucune;
             m_Garde = false;
             if (Anim != null) Anim.SetBool(P_Guard, false);

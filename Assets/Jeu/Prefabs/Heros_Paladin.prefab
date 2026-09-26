@@ -1084,6 +1084,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Deathless.Jeu.HerosEntrees
   actions: {fileID: 0}
   SprintTest: 0
+  GardeTest: 0
+  AttaqueTest: 0
 --- !u!114 &1174372150299507364
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1208,6 +1210,20 @@ MonoBehaviour:
     TransitionDuration: 0.1
     TriggerNameHash: 657687027
     TransitionIndex: 0
+  - IsCrossFadeExit: 0
+    Layer: 1
+    OriginatingState: -1267907399
+    DestinationState: 478876429
+    TransitionDuration: 0.05
+    TriggerNameHash: 478876429
+    TransitionIndex: 2
+  - IsCrossFadeExit: 0
+    Layer: 1
+    OriginatingState: 1462630011
+    DestinationState: 478876429
+    TransitionDuration: 0.05
+    TriggerNameHash: 478876429
+    TransitionIndex: 0
   AnimatorParameterEntries:
     ParameterEntries:
     - name: Speed
@@ -1262,6 +1278,34 @@ MonoBehaviour:
       NameHash: 657687027
       Synchronize: 1
       ParameterType: 9
+    - name: Ruee
+      NameHash: 925415611
+      Synchronize: 1
+      ParameterType: 4
+    - name: CoupBouclier
+      NameHash: 478876429
+      Synchronize: 1
+      ParameterType: 9
+    - name: VitesseRuee
+      NameHash: -189620364
+      Synchronize: 1
+      ParameterType: 1
+    - name: CourseNaturelle
+      NameHash: -1697241766
+      Synchronize: 1
+      ParameterType: 1
+    - name: ImpactCoupBouclier
+      NameHash: -1916659892
+      Synchronize: 1
+      ParameterType: 1
+    - name: Emote
+      NameHash: -1434604862
+      Synchronize: 1
+      ParameterType: 9
+    - name: EmoteNum
+      NameHash: 209318632
+      Synchronize: 1
+      ParameterType: 3
   AnimatorParametersExpanded: 0
 --- !u!114 &2714206848385117356
 MonoBehaviour:

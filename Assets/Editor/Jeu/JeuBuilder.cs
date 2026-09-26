@@ -229,9 +229,29 @@ namespace Deathless.EditorTools
             var tl = j2.AddTransition(j3); tl.hasExitTime = false; tl.duration = 0.05f; tl.AddCondition(AnimatorConditionMode.If, 0, "Grounded");
             Sortie(j3, loco, 0.6f);
 
-            var charge = Etat(sm, "Charge", Clip(AnimPack + "Rig_Medium_CombatMelee.fbx", "Melee_Block_Attack"), new Vector3(400, 240), 1.2f);
-            DeNimporte(sm, charge, 0.05f).AddCondition(AnimatorConditionMode.If, 0, "Charge");
-            Sortie(charge, loco, 0.9f);
+            // Charge bélier (comme le banc des effets, VfxBench.PosteCharge) : les jambes courent (course du style, cadence
+            // « VitesseRuee » écrite par ClassePaladin = vitesse de la ruée ÷ vitesse des pieds du clip), le haut du corps
+            // tient la garde puis donne le coup de bouclier (couche HautDuCorps, plus bas) ; à l'arrivée (Ruee faux), le corps
+            // entier finit le coup de bouclier depuis son instant d'impact. Étiquette « Ruee » : le corps penche (Heros).
+            var coupClip = Clip(AnimPack + "Rig_Medium_CombatMelee.fbx", "Melee_Block_Attack");
+            MesurerCharge(style.run, coupClip, out float courseNaturelle, out float impactCoup);
+            c.AddParameter("Ruee", AnimatorControllerParameterType.Bool);
+            c.AddParameter("CoupBouclier", AnimatorControllerParameterType.Trigger);
+            c.AddParameter(new AnimatorControllerParameter { name = "VitesseRuee", type = AnimatorControllerParameterType.Float, defaultFloat = 1f });
+            // Mesures lues par ClassePaladin (valeurs par défaut, jamais écrites en jeu).
+            c.AddParameter(new AnimatorControllerParameter { name = "CourseNaturelle", type = AnimatorControllerParameterType.Float, defaultFloat = courseNaturelle });
+            c.AddParameter(new AnimatorControllerParameter { name = "ImpactCoupBouclier", type = AnimatorControllerParameterType.Float, defaultFloat = impactCoup });
+            var ruee = Etat(sm, "ChargeRuee", style.run, new Vector3(400, 240));
+            ruee.tag = "Ruee";
+            ruee.speedParameterActive = true;
+            ruee.speedParameter = "VitesseRuee";
+            // L'entrée dure l'anticipation : le corps passe de la locomotion à la première image de la course (cadence 0).
+            DeNimporte(sm, ruee, Mathf.Max(0.05f, b.chargeAnticipation)).AddCondition(AnimatorConditionMode.If, 0, "Charge");
+            // Fin du geste : copie de Melee_Block_Attack qui commence à l'instant d'impact (le pack n'est pas modifié).
+            var finClip = coupClip != null ? Rogner(coupClip, impactCoup, "Melee_Block_Attack_DepuisImpact") : null;
+            var chargeFin = Etat(sm, "ChargeCoup", finClip, new Vector3(600, 240));
+            var tf = ruee.AddTransition(chargeFin); tf.hasExitTime = false; tf.duration = 0.1f; tf.AddCondition(AnimatorConditionMode.IfNot, 0, "Ruee");
+            Sortie(chargeFin, loco, 0.85f, 0.2f);
 
             var soinClip = Clip(AnimPack + "Rig_Medium_CombatRanged.fbx", "Ranged_Magic_Raise");
             var soin = Etat(sm, "Soin", soinClip, new Vector3(400, 300));
@@ -264,8 +284,116 @@ namespace Deathless.EditorTools
             var touche = Etat(sh, "Touche", Clip(AnimPack + "Rig_Medium_General.fbx", "Hit_A"), new Vector3(450, 160), 1.3f);
             var th = sh.AddAnyStateTransition(touche); th.duration = 0.05f; th.hasExitTime = false; th.AddCondition(AnimatorConditionMode.If, 0, "Hit");
             Sortie(touche, vide, 0.85f);
+            // Charge bélier, haut du corps : garde derrière le bouclier pendant l'anticipation et la ruée, puis coup de
+            // bouclier (déclencheur CoupBouclier, lancé par ClassePaladin pour que l'impact tombe à l'arrivée).
+            var chargeGarde = Etat(sh, "ChargeGarde", style.guard, new Vector3(700, -80));
+            foreach (var de in new[] { vide, garde })
+            {
+                var t = de.AddTransition(chargeGarde); t.hasExitTime = false; t.duration = 0.1f; t.AddCondition(AnimatorConditionMode.If, 0, "Ruee");
+            }
+            var coupHaut = Etat(sh, "CoupBouclier", coupClip, new Vector3(700, 40));
+            var tc = chargeGarde.AddTransition(coupHaut); tc.hasExitTime = false; tc.duration = 0.05f; tc.AddCondition(AnimatorConditionMode.If, 0, "CoupBouclier");
+            var tcv = vide.AddTransition(coupHaut); tcv.hasExitTime = false; tcv.duration = 0.05f;
+            tcv.AddCondition(AnimatorConditionMode.If, 0, "CoupBouclier"); tcv.AddCondition(AnimatorConditionMode.If, 0, "Ruee");
+            var tgv = chargeGarde.AddTransition(vide); tgv.hasExitTime = false; tgv.duration = 0.1f; tgv.AddCondition(AnimatorConditionMode.IfNot, 0, "Ruee");
+            Sortie(coupHaut, vide, 0.95f, 0.1f);
             EditorUtility.SetDirty(c);
+            Debug.Log("Paladin_Jeu : charge bélier, pieds de " + (style.run != null ? style.run.name : "?") + " à " + courseNaturelle.ToString("F2")
+                + " m/s (échelle du jeu), impact du coup de bouclier à " + impactCoup.ToString("F2") + " s");
+            AjouterEmotes(c);   // roue à emotes : sous-machine commune (EmotesBuilder.cs)
             return c;
+        }
+
+        /// Copie d'un clip à partir de `debut` (s), ramenée à 0 et rééchantillonnée à sa cadence (le pack n'est jamais modifié).
+        static AnimationClip Rogner(AnimationClip source, float debut, string nom)
+        {
+            string path = AnimDir + "/Clips/" + nom + ".anim";
+            Dossier(AnimDir + "/Clips");
+            float fps = source.frameRate > 0f ? source.frameRate : 30f;
+            debut = Mathf.Clamp(debut, 0f, Mathf.Max(0f, source.length - 1f / fps));
+            float duree = source.length - debut;
+            int n = Mathf.Max(1, Mathf.CeilToInt(duree * fps));
+            var clip = new AnimationClip { name = nom, frameRate = fps };
+            foreach (var bnd in AnimationUtility.GetCurveBindings(source))
+            {
+                var courbe = AnimationUtility.GetEditorCurve(source, bnd);
+                var cles = new Keyframe[n + 1];
+                for (int i = 0; i <= n; i++)
+                {
+                    float t = Mathf.Min(duree, i / fps);
+                    cles[i] = new Keyframe(t, courbe.Evaluate(debut + t));
+                }
+                var nouvelle = new AnimationCurve(cles);
+                for (int i = 0; i <= n; i++) AnimationUtility.SetKeyLeftTangentMode(nouvelle, i, AnimationUtility.TangentMode.Linear);
+                for (int i = 0; i <= n; i++) AnimationUtility.SetKeyRightTangentMode(nouvelle, i, AnimationUtility.TangentMode.Linear);
+                AnimationUtility.SetEditorCurve(clip, bnd, nouvelle);
+            }
+            clip.EnsureQuaternionContinuity();
+            var existant = AssetDatabase.LoadAssetAtPath<AnimationClip>(path);
+            if (existant != null) { EditorUtility.CopySerialized(clip, existant); Object.DestroyImmediate(clip); return existant; }
+            AssetDatabase.CreateAsset(clip, path);
+            return clip;
+        }
+
+        /// Mesures de la charge bélier sur le Knight, clips échantillonnés hors jeu (même méthode que VfxBench.MesurerInstants) :
+        /// vitesse des pieds de la course (pied d'appui, le plus bas, qui recule sous le corps ; m/s à l'échelle du jeu) et
+        /// instant du coup de bouclier (main gauche, handslot.l, la plus en avant dans Melee_Block_Attack).
+        static void MesurerCharge(AnimationClip course, AnimationClip coup, out float vitesseCourse, out float instantCoup)
+        {
+            vitesseCourse = 5f;
+            instantCoup = 0.47f;
+            var modele = AssetDatabase.LoadAssetAtPath<GameObject>(KnightPath);
+            if (modele == null) return;
+            var go = Object.Instantiate(modele);
+            go.hideFlags = HideFlags.HideAndDontSave;
+            try
+            {
+                go.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+                go.transform.localScale = Vector3.one;
+                Transform piedG = null, piedD = null, main = null;
+                foreach (var t in go.GetComponentsInChildren<Transform>(true))
+                {
+                    if (t.name == "foot.l") piedG = t;
+                    else if (t.name == "foot.r") piedD = t;
+                    else if (t.name == "handslot.l") main = t;
+                }
+                if (course != null && piedG != null && piedD != null && course.length > 0f)
+                {
+                    const int n = 120;
+                    float dt = course.length / n;
+                    var g = new Vector3[n + 1];
+                    var d = new Vector3[n + 1];
+                    float sol = float.MaxValue;
+                    for (int i = 0; i <= n; i++)
+                    {
+                        course.SampleAnimation(go, i * dt);
+                        g[i] = go.transform.InverseTransformPoint(piedG.position);
+                        d[i] = go.transform.InverseTransformPoint(piedD.position);
+                        sol = Mathf.Min(sol, Mathf.Min(g[i].y, d[i].y));
+                    }
+                    float recul = 0f, appui = 0f;
+                    for (int i = 0; i < n; i++)
+                    {
+                        bool gauche = g[i].y <= d[i].y;
+                        Vector3 a = gauche ? g[i] : d[i], z = gauche ? g[i + 1] : d[i + 1];
+                        if (Mathf.Max(a.y, z.y) > sol + 0.02f) continue;   // pied levé (roulé du pied, phase de vol) : hors appui
+                        recul += a.z - z.z;
+                        appui += dt;
+                    }
+                    if (appui > 0.05f && recul > 0.05f) vitesseCourse = recul / appui * GameBalance.Courant.echellePersonnages;
+                }
+                if (coup != null && main != null)
+                {
+                    float meilleur = float.NegativeInfinity;
+                    for (float t = 0f; t <= coup.length; t += 1f / 120f)
+                    {
+                        coup.SampleAnimation(go, t);
+                        float z = go.transform.InverseTransformPoint(main.position).z;
+                        if (z > meilleur) { meilleur = z; instantCoup = t; }
+                    }
+                }
+            }
+            finally { Object.DestroyImmediate(go); }
         }
 
         static AvatarMask MasqueHautDuCorps()
@@ -707,6 +835,7 @@ namespace Deathless.EditorTools
             nav.lobby = Uxml("Lobby");
             nav.achat = Uxml("Achat");
             nav.personnage = Uxml("Personnage");
+            nav.roueEmotes = Uxml("RoueEmotes");
 
             // NavMesh (géométrie : colliders physiques ; les feuillages ne bloquent pas).
             var navGo = new GameObject("NavMesh");

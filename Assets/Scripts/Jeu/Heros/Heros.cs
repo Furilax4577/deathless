@@ -19,6 +19,8 @@ namespace Deathless.Jeu
         public Sante Sante { get; private set; }
         public ClasseHeros Classe { get; private set; }
         public HerosEntrees Entrees { get; private set; }
+        /// Roue à emotes et emotes (composant ajouté dans Awake, sur tous les héros).
+        public EmotesHeros Emotes { get; private set; }
         public CharacterController CC { get; private set; }
         public Partie Partie { get; private set; }
         /// Multijoueur : héros d'un autre poste (marionnette). Position et animations arrivent par le réseau
@@ -62,6 +64,10 @@ namespace Deathless.Jeu
         bool m_Aligne;
         float m_AligneDepuis = -99f;
         Transform m_Buste;
+        // Penché du corps entier (charge bélier…) : rotation du modèle (enfant) autour des pieds, capsule et caméra intactes.
+        Transform m_Modele;
+        Quaternion m_RotModele;
+        float m_Penche;
 
         static readonly int P_Speed = Animator.StringToHash("Speed");
         static readonly int P_Grounded = Animator.StringToHash("Grounded");
@@ -80,11 +86,14 @@ namespace Deathless.Jeu
             Sante = GetComponent<Sante>();
             Sante.equipe = Equipe.Heros;
             Classe = GetComponent<ClasseHeros>();
+            Emotes = GetComponent<EmotesHeros>();
+            if (Emotes == null) Emotes = gameObject.AddComponent<EmotesHeros>();
             if (animator == null) animator = GetComponentInChildren<Animator>();
             if (visiere == null) visiere = GetComponentInChildren<HelmetVisor>();
             if (animator != null) m_CoucheHaut = animator.GetLayerIndex("HautDuCorps");
             m_AnimReseau = GetComponent<Unity.Netcode.Components.NetworkAnimator>();
             if (animator != null) foreach (var t in animator.GetComponentsInChildren<Transform>(true)) if (t.name == "chest") { m_Buste = t; break; }
+            if (animator != null && animator.transform != transform) { m_Modele = animator.transform; m_RotModele = m_Modele.localRotation; }
         }
 
         /// Multijoueur : ce héros appartient à un autre poste (avant Initialiser).
@@ -134,6 +143,14 @@ namespace Deathless.Jeu
         }
 
         public void Declencher(string nom) => Declencher(Animator.StringToHash(nom));
+
+        /// Annule un déclencheur resté armé (pas encore consommé), ici et chez les autres postes.
+        public void AnnulerDeclencheur(int hash)
+        {
+            if (animator == null) return;
+            if (m_AnimReseau != null && m_AnimReseau.IsSpawned) m_AnimReseau.ResetTrigger(hash);
+            else animator.ResetTrigger(hash);
+        }
 
         public void Initialiser(Partie partie, EtatJoueur etat)
         {
@@ -272,6 +289,7 @@ namespace Deathless.Jeu
             if (EnTransit) return;
             if (action == "CharacterMenu") { if (Partie.EnCours) (Deathless.UI.Donnees.DonneesUI.Personnage as MenuPersonnage)?.Ouvrir(); return; }
             if (!Vivant || !Partie.EnCours) return;
+            if (Emotes != null && Emotes.SurAction(action)) return;   // roue à emotes ; toute autre action l'interrompt
             switch (action)
             {
                 case "Interact": PointInteraction.InteragirIci(this); break;
@@ -388,7 +406,7 @@ namespace Deathless.Jeu
                 Teleporter(Partie.PointReapparition(transform.position) + Vector3.up * 0.1f);
             }
 
-            if (m_Camera != null && m_EtatCourant != Etat.Mort) { Vector2 r = Entrees.Regard(); m_Camera.Tourner(r.x, r.y); }
+            if (m_Camera != null && m_EtatCourant != Etat.Mort && (Emotes == null || !Emotes.RoueOuverte)) { Vector2 r = Entrees.Regard(); m_Camera.Tourner(r.x, r.y); }
 
             if (m_EtatCourant == Etat.Mort || m_EtatCourant == Etat.Reapparition || !CC.enabled)
             {
@@ -398,6 +416,7 @@ namespace Deathless.Jeu
 
             bool enJeu = EnJeu;
             Vector3 dir = enJeu ? DirectionEntree() : Vector3.zero;
+            if (Emotes != null && m_EtatCourant == Etat.Libre) dir = Emotes.FiltrerDeplacement(dir);   // emote : immobile, se relève
             Vector3 deplacement = Vector3.zero;
             float vitesseAnim = 0f;
             bool impose = false;
@@ -480,6 +499,7 @@ namespace Deathless.Jeu
         /// lacet (utilisé par Update au tour suivant) et penche le buste pour que l'arme suive le tangage de la visée.
         void LateUpdate()
         {
+            AppliquerPenche();
             if (Distant || Classe == null) return;
             float k = 1f - Mathf.Exp(-Time.deltaTime * 14f);
             Vector3 o = Vector3.zero, axe = Vector3.zero;
@@ -512,6 +532,17 @@ namespace Deathless.Jeu
                 Vector3 droite = Vector3.Cross(Vector3.up, d).normalized;
                 m_Buste.rotation = Quaternion.AngleAxis(-m_PencheBuste, droite) * m_Buste.rotation;
             }
+        }
+
+        /// Penché voulu par la classe (ClasseHeros.Penche), lissé, appliqué au modèle autour de ses pieds. Aussi sur les
+        /// marionnettes : la classe le déduit de l'état de l'Animator, répliqué par le NetworkAnimator.
+        void AppliquerPenche()
+        {
+            if (m_Modele == null) return;
+            float voulu = Classe != null && Vivant ? Classe.Penche : 0f;
+            if (voulu == 0f && m_Penche == 0f) return;
+            m_Penche = Mathf.MoveTowards(m_Penche, voulu, Time.deltaTime * 90f);
+            m_Modele.localRotation = m_RotModele * Quaternion.Euler(m_Penche, 0f, 0f);
         }
 
         void MajAnimation(float vitesse)
