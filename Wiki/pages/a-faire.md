@@ -8,7 +8,6 @@ Travaux prévus ou notés, pas encore faits. Une ligne quitte cette page quand l
 
 {jauge-kaykit}
 
-- **Revoir le menu des options de jeu.** (noté le 25/09/2026) ; y ajouter la case « Se relever : marteler / maintenir » (aujourd'hui un simple réglage enregistré).
 - **Bande-annonce Steam** : v1 tournée le 26/09/2026 (`Docs/trailer-storyboard.md`, outil `Assets/Scripts/Dev/Tournage/`), 39 s, à **écouter et valider** par Quentin ; à retourner quand le décor aura quitté KayKit.
 
 ## En attente de validation (Quentin)
@@ -20,6 +19,13 @@ Travaux prévus ou notés, pas encore faits. Une ligne quitte cette page quand l
 - **Arbre et sol** (preuves de concept dans `sandbox-ui`) : jugés pas assez KayKit, à refaire avec le guide.
 - **Maisons la nuit** : entrer seulement le jour ? Reconduire dehors au crépuscule ? (voir [À décider](a-decider.md)).
 - **Renversé** : pas d'invulnérabilité pendant la chute (choix par défaut, à confirmer).
+
+## Avant la sortie (performance)
+
+- **Mesurer au profileur** ce que la caméra rend vraiment (triangles, objets, temps par image) sur deux vues : la place de nuit avec les vagues, et la forêt en pleine course. Cible : rester sous environ 1,5 million de triangles rendus par image et 60 images par seconde sur une carte d'entrée de gamme.
+- **Ombres** : régler distance et résolution des ombres (les arbres hors champ qui projettent une ombre sont rendus une seconde fois ; c'est souvent le premier poste).
+- **Occlusion culling** : à activer seulement là où ça rapporte (intérieurs des maisons, village si la mesure le montre) ; pas pour le donjon, généré à chaque jour donc impossible à cuire ; y étendre plutôt le masquage des étages aux salles hors de vue. Noté par Quentin, 26/09/2026.
+- À refaire après l'intégration de la nouvelle forêt (arbres plus riches, moins nombreux).
 
 ## Plus tard
 
