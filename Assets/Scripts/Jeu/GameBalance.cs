@@ -88,6 +88,49 @@ namespace Deathless.Jeu
         public float golemIntervalle = 4f;
         public float golemEchelle = 0.8f;
 
+        [Header("Morgrim (deux versions du mini-boss, nuit 10 ; wiki : ennemis.md, Morgrim ; décidé 26/09/2026, valeurs à équilibrer)")]
+        [Tooltip("Rayon dans lequel un joueur compte comme « proche » pour le choix de compétence.")]
+        public float morgrimJoueursProchesRayon = 6f;
+        [Tooltip("Fracas (Massue) : onde de choc au sol qui étourdit, reprend le coup de zone actuel du Golem, thème Terre.")]
+        public float morgrimMassueFracasRayon = 3.5f;
+        public float morgrimMassueFracasDegats = 45f;
+        public float morgrimMassueFracasDegatsNyxessa = 60f;
+        public float morgrimMassueFracasEtourdi = 1.2f;
+        public float morgrimMassueFracasPreparation = 1.6f;
+        [Tooltip("Tourbillon (Massue) : dégâts continus à 360° tant qu'un joueur reste dans le rayon, thème Terre.")]
+        public float morgrimMassueTourbillonRayon = 3f;
+        public float morgrimMassueTourbillonDegatsParSeconde = 18f;
+        public float morgrimMassueTourbillonDuree = 1.8f;
+        public float morgrimMassueTourbillonPreparation = 1f;
+        public float morgrimMassueTourbillonRecharge = 10f;
+        [Tooltip("Charge écrasante (Massue) : fonce en ligne droite et renverse (Étourdi) le premier joueur touché, thème Terre.")]
+        public float morgrimMassueChargeDistance = 8f;
+        public float morgrimMassueChargeVitesse = 9f;
+        public float morgrimMassueChargeLargeur = 1.6f;
+        public float morgrimMassueChargeDegats = 50f;
+        public float morgrimMassueChargeEtourdi = 1.5f;
+        public float morgrimMassueChargePreparation = 1.4f;
+        public float morgrimMassueChargeRecharge = 12f;
+        [Tooltip("Fauche (Martache) : coup en cône devant lui, thème Rage.")]
+        public float morgrimMartacheFaucheRayon = 3.2f;
+        public float morgrimMartacheFaucheAngle = 110f;
+        public float morgrimMartacheFaucheDegats = 42f;
+        public float morgrimMartacheFaucheDegatsNyxessa = 56f;
+        public float morgrimMartacheFauchePreparation = 1.3f;
+        [Tooltip("Fend-sol (Martache) : ligne qui ralentit (Ralenti) les joueurs restés dedans, thème Terre (c'est le sol qui casse).")]
+        public float morgrimMartacheFendSolLongueur = 5f;
+        public float morgrimMartacheFendSolLargeur = 1.4f;
+        public float morgrimMartacheFendSolDegats = 28f;
+        public float morgrimMartacheFendSolRalentiDuree = 3f;
+        [Range(0f, 0.9f)] public float morgrimMartacheFendSolRalentiForce = 0.4f;
+        public float morgrimMartacheFendSolPreparation = 1.5f;
+        public float morgrimMartacheFendSolRecharge = 9f;
+        [Tooltip("Coup de brèche (Martache) : vise le bouclier de Nyxessa, dégâts renforcés contre lui, thème Rage.")]
+        public float morgrimMartacheBrecheDegats = 70f;
+        public float morgrimMartacheBrecheMultiplicateurBouclier = 2f;
+        public float morgrimMartacheBrechePreparation = 1.2f;
+        public float morgrimMartacheBrecheRecharge = 8f;
+
         [Header("Nécromancien (boss final, nuit 12)")]
         public float necroPV = 1200f;
         public float necroVitesse = 2.6f;
