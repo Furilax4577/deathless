@@ -284,7 +284,9 @@ namespace Deathless.Jeu
         /// HerosReseau.RenverserRpc quand l'hôte l'a décidé pour ce joueur.
         public void RenverserLocal()
         {
-            if (!Vivant) return;
+            // Invulnérable (réapparition, joueurInvincible) : ni dégâts ni chute, même pour l'onde du Fracas qui ignore
+            // la parade et la roulade (elle renversait un héros qui ne prenait pourtant aucun dégât).
+            if (!Vivant || Sante.invulnerable) return;
             if (Classe != null) Classe.Interrompre();
             var b = B;
             m_EtatCourant = Etat.Renverse;
