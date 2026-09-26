@@ -204,13 +204,16 @@ namespace Deathless.Jeu
                 case Etat.Marche: MajMarche(dt); break;
                 case Etat.Poursuite: MajPoursuite(dt); break;
                 case Etat.Preparation: MajPreparation(); break;
-                case Etat.Recuperation: if (m_EtatDepuis >= RecuperationDuree) Reprendre(); else Tourner(CiblePosition()); break;
+                case Etat.Recuperation: if (m_EtatDepuis >= RecuperationDuree) Reprendre(); else if (!OrientationFigee) Tourner(CiblePosition()); break;
                 case Etat.Etourdi:
                     m_Etourdi -= dt;
                     if (m_Etourdi <= 0f) { if (animator != null) animator.SetBool(P_Stun, false); Reprendre(); }
                     break;
             }
         }
+
+        /// Vrai pendant un coup qui garde sa direction (Charge écrasante de Morgrim massue) : pas de pivot vers la cible.
+        protected virtual bool OrientationFigee => false;
 
         protected virtual float RecuperationDuree => Mathf.Max(0.2f, m_Stats.intervalle - m_Stats.preparation);
 
