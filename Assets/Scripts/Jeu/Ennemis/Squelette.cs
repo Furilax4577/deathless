@@ -37,6 +37,10 @@ namespace Deathless.Jeu
         public bool SurNyxessa => m_Etat != Etat.Mort && ((m_Etat == Etat.Preparation && m_CibleNyxessa) || Time.time - m_DernierCoupNyxessa < GameBalance.Courant.surNyxessaDepuis);
         public float DegatsNyxessa => m_Stats.degatsNyxessa;
         public float Intervalle => m_Stats.intervalle;
+        /// Progression du coup en préparation (0 hors préparation, vers 1 à l'instant de l'impact). Lisibilité du coup
+        /// (piste « yeux qui s'intensifient », prototype temps 1, PreparationLisible.cs) : purement visuel, ne change
+        /// rien à l'équité ou au réseau (Frapper reste seul juge de l'impact).
+        public float PreparationProgress => m_Etat == Etat.Preparation ? Mathf.Clamp01(m_EtatDepuis / Mathf.Max(0.01f, m_Stats.preparation)) : 0f;
         public event Action<Squelette> Retire;     // désintégré (mort ou aube)
 
         protected StatsSquelette m_Stats = new StatsSquelette();
