@@ -22,6 +22,8 @@ Clips utilisables pour une roue à emotes : 11 candidats, de quoi remplir une ro
 | **Faire le mort** | `Death_B` | détournement de la mort lente ; se relever avec `Lie_StandUp` |
 | **Gonflette** | `Large_Flexing` | rig Large seulement : clip à refaire pour le rig Medium |
 
+**Roue à emotes** {décidé} (26/09/2026, validée par Quentin) : 8 emotes retenues. Salut (`Waving`), Acclamation (`Cheering`), Provocation (`Skeletons_Taunt`), S'asseoir (`Sit_Floor_Down`, puis `Sit_Floor_Idle` en boucle, puis `Sit_Floor_StandUp`), Se reposer (`Lie_Down`, `Lie_Idle` en boucle, `Lie_StandUp`), Pompes (`Push_Ups` en boucle), Boire un coup (`Use_Item`, avec une chope KayKit pleine puis vide) et Faire le mort (`Death_B`, puis `Lie_StandUp`). Écartées : Grande provocation (doublon), Abdos (doublon des pompes), Gonflette (rig Large seulement). Commande et roue : voir Interface.
+
 ## Déplacements (13)
 
 {video media/animations/Idle_A.mp4} **Attente** | `Idle_A` | Arme : aucune | boucle · 1,07 s
