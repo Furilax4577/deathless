@@ -6,6 +6,7 @@ using UnityEngine;
 // - lanternes et bougies : léger scintillement, plus fortes la nuit (l'intérieur reste lisible) ;
 // - vitres vues de l'intérieur : claires le jour (la lumière entre), bleu nuit la nuit ;
 // - braises : pulsation lente de l'émission.
+// La lumière Feu_Forge et les braises de la forge n'y sont plus : ForgeFeu (feu vivant) les pilote (ForgeronBuilder).
 // Toutes les lumières sont ponctuelles, chaudes, sans ombre ; aucune allocation par image.
 public class InterieursAmbiance : MonoBehaviour
 {

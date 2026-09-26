@@ -685,6 +685,14 @@ MonoBehaviour:
     boucle: 1
     clips:
     - {fileID: 8300000, guid: 51c2475f390028d419ebdda92e3f6a8d, type: 3}
+  - id: forge_enclume
+    nom: "Forge \u2014 marteau sur l'enclume"
+    statut: disponible
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 50712ed10e2f2b4479477b2017295429, type: 3}
+    - {fileID: 8300000, guid: 198056329ad8e1440881a7f7fea6706d, type: 3}
+    - {fileID: 8300000, guid: 73a997555e796344c914b62829632129, type: 3}
   - id: kenney_rpg_belthandle
     nom: "Ceinture \u2014 manipulation"
     statut: disponible

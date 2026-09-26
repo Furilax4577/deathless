@@ -326,6 +326,14 @@ Une paire prefab + script par effet sous `Assets/VFX/<Effet>/`, matériau `Porta
 - **Banc** : `Postes/GemmeNyxessa/AllieMort` (mannequin sans arme, en (−21 ; 0 ; 25)) : il tombe (`Death_A`), se dissout, son énergie rejoint la relique, puis il réapparaît près de la relique (`VfxBench.pointReapparition` = (−26,5 ; 0 ; 23)) et revient à pied. Captures : `VfxBench_mort_dissolution.png`, `VfxBench_mort_energie.png`, `VfxBench_reapparition.png`.
 - **Flux allégé** (25/09/2026, agent gameplay) : `ChargeNyxessa.Lancer(…, hauteur, echelle = 1)` a un paramètre d'échelle (1 = charge du portail : 480 gemmes, lumière grande ; en dessous : 480 × échelle gemmes, 40 au moins, gemmes et écart à l'arc × √échelle, lumière moyenne sous 0,6). `MortAllie.echelleFlux` = **0,35** (≈ 170 gemmes) pour la mort et la réapparition d'un allié.
 
+### Feu vivant de la forge du village (créé dans Deathless, 26/09/2026)
+- **Script** : `Assets/Scripts/Interieurs/ForgeFeu.cs` (objet `Forge_FeuVivant` de `Interieur_Forgeron`, matériau `PortalVoxel.mat`), posé sur le lit de braises de la forge par `ForgeronBuilder` (menu Deathless > Niveau > Forgeron, relancé par Intérieurs). Aucune API : il tourne seul, jour et nuit, chaque poste pour lui (rien sur le réseau).
+- **Rendu** (un maillage de 54 gemmes au plus) : 34 langues de flamme qui naissent pleines sur le lit, montent en dansant (balancement qui grandit avec la hauteur) et s'effilent, jaune au pied, orange puis rouge à la pointe ; 6 étincelles blanc chaud ; 14 braises vives posées sur le lit qui palpitent chacune à son rythme (rouge → orange → jaune) ; l'émission du lit de braises (`Interieur_Braises.mat`, instance par rendu) respire lentement. Hauteur des flammes et lumière suivent le même souffle.
+- **Lumière** : la lumière ponctuelle `Feu_Forge` de l'intérieur (3, portée 5,5 m, sans ombre), vacillement de ±10 %, part de jour 0,75 comme les autres feux ; `InterieursAmbiance` ne la pilote plus (ni ces braises).
+- **Palette** : thème **Feu** (braise, rouge, orange, jaune, accent « Blanc chaud »), relue quand la palette change ; jamais de vert.
+- **Coût** : maillage mis à jour seulement s'il est vu et à moins de 30 m de la caméra ; aucune allocation par image.
+- Capture : `Assets/Screenshots/forge_feu.png`.
+
 ## Banc `VfxBench`
 
 Scène `Assets/Scenes/VfxBench.unity` : sol (`RigTest_Ground.mat`), lumière directionnelle, caméra en surplomb, trois rangées de postes avec un label TextMesh au sol. Fond : effets de Relic sans personnage (gemme + missile tiré par la relique vers un squelette, portail, téléportation, bouclier, désintégration, sortie de terre). Milieu : un geste de personnage par effet, synchronisé avec l'effet. **Troisième rangée (z = −14, 25/09/2026)** : compétences de classe (arc bandé, nuée de flèches, coup dans le dos avec mode furtif, grenade fumigène, arbalète, attaque tournante) ; instance `Postes/Critique` du prefab `Critique`.

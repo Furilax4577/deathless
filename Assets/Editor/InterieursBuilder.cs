@@ -1038,7 +1038,9 @@ public static class InterieursBuilder
         if (m == null) { m = new Material(Shader.Find("Universal Render Pipeline/Lit")); AssetDatabase.CreateAsset(m, path); m = AssetDatabase.LoadAssetAtPath<Material>(path); }
         m.SetColor("_BaseColor", baseCol); m.SetFloat("_Smoothness", 0.15f); m.SetFloat("_Metallic", 0f);
         m.SetColor("_EmissionColor", emission);
-        m.globalIlluminationFlags = MaterialGlobalIlluminationFlags.None;
+        // Drapeau GI RealtimeEmissive (comme VillageBuilder et LanterneAssets) : avec None, URP (BaseShaderGUI.SetMaterialKeywords)
+        // retire le mot-clé _EMISSION à la première validation du matériau (import, enregistrement), quelle que soit la couleur.
+        m.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
         m.EnableKeyword("_EMISSION");   // après la création de l'asset (sinon le mot-clé est perdu à l'import)
         EditorUtility.SetDirty(m);
         return m;
@@ -1350,6 +1352,19 @@ public static class InterieursBuilder
     // ---------------- Forgeron : forge ----------------
     // Forge de pierre à braises chaudes sous la cheminée (arrière gauche), enclume sur billot face à la porte (le forgeron
     // entre l'enclume et la forge), râtelier d'armes contre le mur droit, boucliers, meule, lingots et bois.
+    // Feu de la forge : lit de braises (maillage Braises), lumière Feu_Forge ; les flammes sont vivantes (ForgeFeu, posé
+    // par ForgeronBuilder), plus de flammes fixes sur la forge.
+    // Enclume (retour de Quentin, 26/09/2026 : « le marteau doit frapper l'enclume et pas rentrer dedans, réduis la taille
+    // de celle-ci et replace-la ») : anvil KayKit à 0,42 (0,7 × l'ancienne 0,6) sur un billot bas de 10 cm, table à
+    // 0,44 m du plancher, à hauteur de la main du forgeron (barbare KayKit à 0,8 : main à 0,43 m au repos, épaules à
+    // 0,95 m) ; placée devant sa main droite quand il se tient à son ancre (Ancre_Villageois_Forgeron). L'ancienne, à 0,96 m,
+    // lui arrivait aux épaules. ForgeronBuilder cale ensuite le geste sur la table.
+    public const float EnclumeEchelle = 0.42f;     // anvil.fbx : 0,8 unité de haut, table plate de 1,2 × 0,7 unité
+    public const float BillotHauteur = 0.10f, BillotRayon = 0.26f;
+    public static readonly Vector3 EnclumeBillot = new Vector3(-0.42f, 0f, -0.27f);   // pied du billot (repère de la pièce, au plancher)
+    public static float EnclumeDessus { get { return BillotHauteur + 0.8f * EnclumeEchelle; } }
+    // Tenailles debout dans le seau de trempe (bucket_metal à (0,05 ; -1,05), échelle 0,5 : 0,36 m de haut, 0,2 m de rayon).
+    static Vector3 TenailleSeau(float y) { return new Vector3(0.03f, y + 0.44f, -1.03f); }
     static void MeublerForgeron(Contexte c)
     {
         Piece p = c.p; MB mb = c.meubles; float y = p.yF;
@@ -1362,7 +1377,6 @@ public static class InterieursBuilder
         mb.BoxMinMax(new Vector3(fx1 - 0.15f, y + fh, fz0 + 0.15f), new Vector3(fx1, y + fh + 0.1f, fz1 - 0.15f), Pierre);
         mb.BoxMinMax(new Vector3(fx0 + 0.15f, y + fh - 0.01f, fz0 + 0.15f), new Vector3(fx1 - 0.15f, y + fh + 0.01f, fz1 - 0.15f), Suie, 1);
         Braises(c, new Vector3(fx0 + 0.2f, y + fh, fz0 + 0.2f), new Vector3(fx1 - 0.2f, y + fh + 0.1f, fz1 - 0.2f), 60, 0.09f);
-        for (int i = 0; i < 4; i++) Flamme(c.flammes, new Vector3(-1.9f + i * 0.28f, y + fh + 0.06f, -1.95f + 0.15f * (i % 2)), 0.28f + 0.1f * (i % 2), 0.07f);
         ColBox(c, "Meuble_Forge", new Vector3(fx0, y, fz0), new Vector3(fx1, y + fh + 0.1f, fz1));
         mb.BoxMinMax(new Vector3(fx0, y + 2.2f, fz0), new Vector3(fx1 + 0.05f, y + 2.6f, fz1 + 0.05f), PierreSombre);
         mb.BoxMinMax(new Vector3(fx0, y + 2.1f, fz1 - 0.08f), new Vector3(fx1 + 0.05f, y + 2.22f, fz1 + 0.07f), Fer);
@@ -1376,13 +1390,13 @@ public static class InterieursBuilder
         Poser(c, ResDir + "Iron_Bars_Stack_Small", new Vector3(-2.1f, y, -1.06f), 90f, 0.6f, true);
         Poser(c, ResDir + "Wood_Log_Stack", new Vector3(-2.08f, y, -0.4f), 0f, 0.55f, true);   // hors du débattement du battant
         Poser(c, ResDir + "Stone_Chunks_Small", new Vector3(-1.35f, y, -1.05f), 30f, 0.35f, false);
-        // enclume sur billot
-        Vector3 ab = new Vector3(-0.9f, y, -0.2f);
-        Souche(mb, ab, 0.3f, 0.48f);
-        Poser(c, ToolsDir + "anvil", ab + Vector3.up * 0.48f, 0f, 0.6f, false);
-        ColBox(c, "Meuble_Enclume", ab + new Vector3(-0.45f, 0, -0.33f), ab + new Vector3(0.56f, 0.96f, 0.33f));
-        Poser(c, ToolsDir + "hammer", ab + new Vector3(0.2f, 0.97f, 0.06f), new Vector3(90, 60, 0), 0.45f, false);
-        Poser(c, ToolsDir + "tongs", ab + new Vector3(0.36f, 0.62f, 0.2f), new Vector3(0, 0, 20), 0.55f, false);
+        // enclume sur billot bas (voir EnclumeEchelle)
+        Vector3 ab = EnclumeBillot + Vector3.up * y; float de = EnclumeDessus;
+        Souche(mb, ab, BillotRayon, BillotHauteur);
+        Poser(c, ToolsDir + "anvil", ab + Vector3.up * BillotHauteur, 0f, EnclumeEchelle, false);
+        ColBox(c, "Meuble_Enclume", ab + new Vector3(-0.31f, 0, -0.29f), ab + new Vector3(0.39f, de, 0.29f));
+        Poser(c, ToolsDir + "hammer", ab + new Vector3(0.12f, de + 0.01f, 0.04f), new Vector3(90, 60, 0), 0.45f, false);   // repris par ForgeronBuilder (dans sa main)
+        Poser(c, ToolsDir + "tongs", TenailleSeau(y), new Vector3(0, 0, 12), 0.55f, false);   // dans le seau de trempe
         // râtelier d'armes contre le mur droit
         var kr = new Cadre(new Vector3(p.xi, y, 0.05f), Vector3.left);   // u vers +z : de 0,05 à 1,45
         kr.Box(mb, 0, 0, 0.0f, 1.4f, 0.12f, 0.45f, BoisBrun);
@@ -1412,7 +1426,7 @@ public static class InterieursBuilder
         Lumiere(c, "Lampe_Ratelier", new Vector3(p.xi - 0.5f, y + 2.5f, 0.62f), new Color(1f, 0.72f, 0.42f), 1.2f, 4.5f, false);
         Tapis(c, new Vector3(-0.9f, y + 0.002f, 0.75f), 0.7f, BoisSombre, Rouge);
         Ancre(c, "Villageois", new Vector3(-0.9f, y, -0.85f), 0f);
-        Ancre(c, "Echange", new Vector3(-0.9f, y + 0.96f, -0.2f), 0f);
+        Ancre(c, "Echange", ab + Vector3.up * de, 0f);
     }
 
     // ---------------- Sorcier : maison du gardien de Nyxessa (il y passe la journée ; la nuit, il protège la relique) ----------------

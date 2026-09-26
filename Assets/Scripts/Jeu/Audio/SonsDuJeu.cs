@@ -45,6 +45,7 @@ namespace Deathless.Jeu
         public static readonly string[] PointDepense = { "ui_confirmation" };
         public static readonly string[] Repas = { "kenney_rpg_metalpot" };
         public static readonly string[] Biere = { "kenney_rpg_metalclick" };
+        public static readonly string[] ForgeEnclume = { "forge_enclume" };   // forgeron : marteau sur l'enclume (3 variantes)
         public static readonly string[] PointGagne = { "vote_tous_prets", "ui_confirmation" };
 
         public static readonly string[] PortailOuverture = { "portal_open" };

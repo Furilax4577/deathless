@@ -1174,6 +1174,21 @@
     "statut": "disponible"
   },
   {
+    "id": "forge_enclume",
+    "nom": "Forge — marteau sur l'enclume",
+    "categorie": "Village",
+    "usage": "Le forgeron bat le fer dans sa forge, jour et nuit : à chaque contact du marteau sur l'enclume, un des 3 coups tiré au hasard (son 3D). Clang métallique à l'attaque très sèche, partiels inharmoniques de 1,5 à 5 kHz qui s'éteignent en 0,6 à 1,2 s, bref bruit de choc au début.",
+    "fichier": "Forge/enclume_1.wav",
+    "variantes": [
+      "Forge/enclume_1.wav",
+      "Forge/enclume_2.wav",
+      "Forge/enclume_3.wav"
+    ],
+    "source": "Généré pour Deathless (Forge/synth_enclume.py)",
+    "licence": "Aucune : créé pour le projet",
+    "statut": "disponible"
+  },
+  {
     "id": "kenney_rpg_belthandle",
     "nom": "Ceinture — manipulation",
     "categorie": "Kenney divers : objets",
