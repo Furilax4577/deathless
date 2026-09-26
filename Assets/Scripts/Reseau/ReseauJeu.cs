@@ -78,10 +78,10 @@ namespace Deathless.Reseau
             if (salon != null) Reseau.AddNetworkPrefab(salon);
             var monde = Resources.Load<GameObject>("Reseau/PartieReseau");
             if (monde != null) Reseau.AddNetworkPrefab(monde);
-            // Squelettes (étape 2), d'après le directeur des vagues du village.
+            // Squelettes (étape 2) et les deux variantes de Morgrim, d'après le directeur des vagues du village.
             var dv = FindAnyObjectByType<DirecteurVagues>();
             if (dv != null)
-                foreach (var pf in new[] { dv.prefabSbire, dv.prefabGuerrier, dv.prefabGolem, dv.prefabNecromancien })
+                foreach (var pf in new[] { dv.prefabSbire, dv.prefabGuerrier, dv.prefabGolem, dv.prefabNecromancien, dv.prefabMorgrimMassue, dv.prefabMorgrimMartache })
                     if (pf != null && pf.GetComponent<NetworkObject>() != null) Reseau.AddNetworkPrefab(pf);
             var classes = ClassesJeu.Courant;
             if (classes != null) foreach (var c in classes.classes) if (c.prefab != null && c.prefab.GetComponent<NetworkObject>() != null) Reseau.AddNetworkPrefab(c.prefab);
