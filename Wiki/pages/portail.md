@@ -30,7 +30,7 @@ Le portail qui ramène du donjon au village n'est pas alimenté par Nyxessa : il
 
 - **Entrée** : de jour, près du portail du village, un joueur appuie sur Interagir (« Entrer dans le donjon »). Son corps part en gemmes vers le centre du portail, puis les gemmes jaillissent du portail de retour du donjon et le reforment sur la dalle d'arrivée, juste à côté.
 - **Retour** : près du portail de retour du donjon, il appuie sur Interagir (« Revenir au village »). Il réapparaît 5 m devant le portail du village, du côté de Nyxessa, et les gemmes jaillissent du portail. L'or qu'il porte est versé à la caisse commune.
-- **Portail de retour** : c'est le même disque de gemmes vertes que celui du village, sur son socle de pierre, contre le mur sud de la salle d'arrivée. Il est toujours ouvert et bourdonne comme celui du village. Il remplace l'anneau de bronze de la version 0.5, qui ne ressemblait pas à un portail.
+- **Portail de retour** {décidé} : c'est le même disque de gemmes vertes que celui du village (les portails sont verts partout, énergie de Nyxessa ; Quentin, 26/09/2026), sur son socle de pierre, contre le mur sud de la salle d'arrivée. Il est toujours ouvert et bourdonne comme celui du village. Il remplace l'anneau de bronze de la version 0.5, qui ne ressemblait pas à un portail.
 - **Visibilité** : les autres joueurs voient le passage : dissolution vers le portail de départ, reconstitution depuis le portail d'arrivée, avec les anneaux sur les deux portails.
 - **Portail fermé** : la nuit, le portail est fermé et on ne peut pas passer.
 - **Geste** : aucun clip d'entrée ou de sortie n'est prévu, ni dans le wiki ni dans les effets. Le passage n'utilise que l'effet de téléportation, les anneaux et le son du portail.

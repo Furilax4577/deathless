@@ -19,7 +19,7 @@ Le jeu se joue à la manette Xbox ou PlayStation, ou au clavier et à la souris.
 | Compétence 3 | LB + RB | L1 + R1 | F | {décidé} |
 | Sprinter | L3 | L3 | Maj | {décidé} |
 | Boire une potion | Croix directionnelle haut | Croix directionnelle haut | 1 | {décidé} |
-| Roue à emotes (maintenir, pointer, relâcher ; voir [Interface](interface.md)) | Croix directionnelle bas | Croix directionnelle bas | B | {à confirmer} |
+| Roue à emotes (maintenir, pointer, relâcher ; voir [Interface](interface.md)) | Croix directionnelle bas | Croix directionnelle bas | B | {décidé} |
 | Se déclarer prêt (jour, voir [Déroulé d'une partie](deroule.md)) | Vue | Pavé tactile ou Create | F1 | {décidé} |
 | Pause | Menu | Options | Échap | {décidé} |
 

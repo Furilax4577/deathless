@@ -43,7 +43,7 @@ Liste des statuts, effets et durées : [Statuts](statuts.md).
 
 ## Roue à emotes {décidé}
 
-- **Ouvrir** : maintenir la croix directionnelle bas (manette) ou B (clavier) {à confirmer}. La roue s'affiche au centre de l'écran, par-dessus le HUD.
+- **Ouvrir** : maintenir la croix directionnelle bas (manette) ou B (clavier) {décidé}. La roue s'affiche au centre de l'écran, par-dessus le HUD.
 - **Choisir** : pointer une emote avec le stick droit ou la souris, depuis le centre. La caméra ne tourne pas tant que la roue est ouverte.
 - **Lancer** : relâcher la touche lance l'emote pointée. Relâcher au centre annule.
 - **Roue** : huit secteurs autour du centre, chacun avec son icône et son nom. Le secteur pointé passe en or, et son nom s'affiche au centre avec l'invite de la touche. La roue suit la taille de l'interface (×1, ×2, ×3).

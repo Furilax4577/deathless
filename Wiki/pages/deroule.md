@@ -91,9 +91,9 @@ Le donjon est **régénéré chaque nuit** : chaque jour, le portail mène à un
 - **Gardiens** : 6 squelettes gardent le butin, dont 35 % de guerriers et le reste de sbires {à équilibrer}. Ils apparaissent au lever du jour sur les points d'apparition les plus proches du butin. Ils restent à leur poste et poursuivent les joueurs qui approchent. Ils n'attaquent pas Nyxessa, ne rapportent pas d'or et disparaissent au crépuscule.
 - **Ambiance** : pour le joueur au donjon, le lieu est sombre, éclairé par les torches, sans ciel.
 - **Eau** : ralentissement ×0,6, pour les héros comme pour les squelettes {à équilibrer}.
-- **Mort au donjon** : un joueur qui meurt au donjon perd l'or qu'il portait, comme un joueur rappelé (Nyxessa en garde la part de son palier). Il réapparaît au village {à confirmer}.
+- **Mort au donjon** {décidé} (26/09/2026) : un **sac** tombe là où le joueur est mort ; il matérialise tout l'or qu'il portait. N'importe quel joueur peut le **ramasser** tant que le donjon est ouvert ; s'il ne l'est pas, il est **perdu à la fermeture** du donjon. Le joueur réapparaît au village.
 
-**Or des vagues** {décidé} : chaque squelette tué pendant les vagues rapporte de l'or à la caisse commune (montants dans [Ennemis](ennemis.md)). Cette règle était prévue en attendant le donjon. Elle **reste en place** maintenant que le donjon est arrivé, jusqu'à ce que Quentin décide de la réajuster.
+**Or des vagues** {décidé} : chaque squelette tué pendant les vagues rapporte de l'or à la caisse commune (montants dans [Ennemis](ennemis.md)). Cette règle était prévue en attendant le donjon. Elle **reste en place** maintenant que le donjon est arrivé, le temps d'introduire les **ingrédients pour le craft** (décision de Quentin, 26/09/2026) ; elle sera revue à ce moment-là.
 
 ### Rester au donjon à la tombée de la nuit {décidé}
 
