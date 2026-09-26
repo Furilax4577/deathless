@@ -1,6 +1,19 @@
 {
   "versions": [
     {
+      "version": "0.5.4",
+      "date": "2026-09-26",
+      "titre": "Le Roi des os",
+      "notes": [
+        "Morgrim, le Roi des os (nuit 10) : deux versions tirées au hasard. À la massue, il frappe le sol, tourbillonne et charge. À la martache, il fauche, fend le sol et brise le bouclier de Nyxessa. Ses coups sont annoncés au sol.",
+        "Portail : le départ en gemmes se joue en entier ; on tombe du plafond en arrivant au donjon, on sort du sol en revenant au village.",
+        "Donjon : un joueur qui meurt laisse un sac avec son or ; n'importe qui peut le ramasser avant la fermeture du portail.",
+        "Forêt : les arbres entre la caméra et ton héros s'estompent.",
+        "Boire un coup : la chope monte enfin jusqu'à la bouche.",
+        "Charge bélier : les jambes suivent la ruée."
+      ]
+    },
+    {
       "version": "0.5.3",
       "date": "2026-09-26",
       "titre": "Statuts et nouveau HUD",
