@@ -23,6 +23,9 @@ namespace Deathless.Reseau
         readonly NetworkVariable<bool> m_Furtif = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         readonly NetworkVariable<float> m_Reapparition = new NetworkVariable<float>(0f);
         readonly NetworkVariable<bool> m_Mort = new NetworkVariable<bool>(false);
+        // Soins reçus cumulés, écrits par le propriétaire (le seul à voir Sante.Soigne) : l'hôte crédite la différence
+        // au score du joueur (Partie.CompterSoins), sinon les soins d'un client restaient à 0 sur l'écran de score.
+        readonly NetworkVariable<float> m_Soins = new NetworkVariable<float>(0f, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
         /// Héros réseau présents (tous les postes), dans l'ordre d'apparition.
         public static readonly List<HerosReseau> Tous = new List<HerosReseau>();
@@ -59,6 +62,8 @@ namespace Deathless.Reseau
             }
             Tous.Add(this);
             BrancherStatuts();
+            if (IsOwner && !IsServer) Heros.Sante.Soigne += OnSoigne;
+            else if (IsServer && !IsOwner) m_Soins.OnValueChanged += OnSoinsChange;
             name = "Heros_" + Classe.Value + "_" + NomJoueur.Value + (IsOwner ? " (local)" : "");
             var p = Partie.Instance;
             if (p == null) { ReseauJeu.Journal("héros réseau sans Partie : " + name); return; }
@@ -78,9 +83,18 @@ namespace Deathless.Reseau
 
         public override void OnNetworkDespawn()
         {
+            if (Heros != null && Heros.Sante != null) Heros.Sante.Soigne -= OnSoigne;
+            m_Soins.OnValueChanged -= OnSoinsChange;
             DebrancherStatuts();
             Tous.Remove(this);
             if (Partie.Instance != null) Partie.Instance.DetacherHeros(OwnerClientId);
+        }
+
+        void OnSoigne(float reel) { if (reel > 0f) m_Soins.Value += reel; }
+
+        void OnSoinsChange(float avant, float apres)
+        {
+            if (apres > avant && Partie.Instance != null) Partie.Instance.CompterSoins(Partie.IdJoueur(OwnerClientId), apres - avant);
         }
 
         void Update()
