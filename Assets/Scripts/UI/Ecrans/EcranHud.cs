@@ -457,16 +457,17 @@ namespace Deathless.UI.Ecrans
 
         void MajJoueur(IEtatJoueur joueur, IEtatPartie partie)
         {
-            m_Portrait.style.backgroundColor = joueur.TeinteClasse;
             if (m_ClasseEmbleme != joueur.Classe)
             {
-                // Emblème hexagonal de la classe (table IconesUI) ; l'initiale reste en repli s'il manque.
+                // Emblème hexagonal de la classe (table IconesUI), posé sans rond derrière lui (Quentin, 26/09/2026) ;
+                // l'initiale sur fond teinté reste en repli s'il manque.
                 m_ClasseEmbleme = joueur.Classe;
                 var embleme = ClassesJouables.TrouverParNom(joueur.Classe)?.Embleme;
                 bool avecEmbleme = m_Embleme != null && !string.IsNullOrEmpty(embleme) && IconesUI.Poser(m_Embleme, embleme);
                 if (m_Embleme != null && !avecEmbleme) m_Embleme.style.display = DisplayStyle.None;
                 m_Initiale.text = string.IsNullOrEmpty(joueur.Classe) ? "?" : joueur.Classe.Substring(0, 1);
                 m_Initiale.style.display = avecEmbleme ? DisplayStyle.None : DisplayStyle.Flex;
+                m_Portrait.style.backgroundColor = avecEmbleme ? Color.clear : joueur.TeinteClasse;
             }
             // Vie (maquette B) : large barre à embouts de gemme, seule à afficher son chiffre (pas de « / max »).
             var vieRatio = joueur.VieMax > 0f ? Mathf.Clamp01(joueur.Vie / joueur.VieMax) : 0f;

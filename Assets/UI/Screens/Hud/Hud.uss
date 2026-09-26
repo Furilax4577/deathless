@@ -261,16 +261,14 @@
 .hud-joueur__portrait-emplacement { position: relative; width: 132px; height: 132px; margin-right: 21px; flex-shrink: 0; }
 .hud-joueur__anneau { position: absolute; left: 0; top: 0; right: 0; bottom: 0; display: none; }
 
+/* Pas de rond derrière l'emblème (Quentin, 26/09/2026 : « l'hexa est déjà super propre ») : l'emblème hexagonal
+   est posé tel quel dans l'anneau de mana/rage ; le fond teinté ne sert qu'au repli sur l'initiale. */
 .hud-joueur__portrait {
     position: absolute;
     left: 14px;
     top: 14px;
     right: 14px;
     bottom: 14px;
-    border-radius: 52px;
-    border-width: 4px;
-    border-color: var(--dl-color-ink);
-    background-color: var(--dl-color-gold);
     align-items: center;
     justify-content: center;
 }
@@ -284,7 +282,7 @@
 }
 
 /* Emblème hexagonal de la classe dans le portrait (Quentin, 26/09/2026) ; l'initiale ne sert plus que de repli. */
-.hud-joueur__embleme { width: 82%; height: 82%; display: none; }
+.hud-joueur__embleme { width: 100%; height: 100%; display: none; }
 
 .hud-joueur__furtif { position: absolute; right: -15px; top: -15px; width: 54px; height: 54px; border-radius: 27px; background-color: #2b1840; border-width: 2px; border-color: #5b3a8a; display: none; align-items: center; justify-content: center; }
 .hud-joueur__furtif-icone { width: 40px; height: 40px; }
@@ -467,7 +465,7 @@
 .dl-scale-3 .hud-or__legende { display: none; }
 .dl-scale-3 .hud-joueur { left: 24px; bottom: 24px; }
 .dl-scale-3 .hud-joueur__portrait-emplacement { width: 100px; height: 100px; margin-right: 15px; }
-.dl-scale-3 .hud-joueur__portrait { left: 11px; top: 11px; right: 11px; bottom: 11px; border-radius: 39px; }
+.dl-scale-3 .hud-joueur__portrait { left: 11px; top: 11px; right: 11px; bottom: 11px; }
 .dl-scale-3 .hud-joueur__vie-piste, .dl-scale-3 .hud-joueur__endurance-piste { width: 170px; }
 .dl-scale-3 .hud-competences { bottom: 24px; left: auto; right: 24px; translate: 0 0; }
 .dl-scale-3 .hud-interaction { top: 480px; }

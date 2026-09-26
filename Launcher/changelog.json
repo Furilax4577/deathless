@@ -1,6 +1,16 @@
 {
   "versions": [
     {
+      "version": "0.5.6",
+      "date": "2026-09-26",
+      "titre": "Mieux voir venir",
+      "notes": [
+        "Caméra plus haute et plus reculée (22°, 5,5 m) pour mieux lire la mêlée autour de toi ; dans les maisons, elle reste au plus près des murs.",
+        "Les yeux des squelettes s'allument puis pulsent juste avant leur coup, même à contre-jour de Nyxessa.",
+        "HUD : l'emblème hexagonal de ta classe est posé tel quel dans l'anneau de mana ou de rage, sans rond derrière."
+      ]
+    },
+    {
       "version": "0.5.5",
       "date": "2026-09-26",
       "titre": "Parade parfaite",
