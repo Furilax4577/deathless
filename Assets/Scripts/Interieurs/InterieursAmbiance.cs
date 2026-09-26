@@ -5,7 +5,7 @@ using UnityEngine;
 // - foyers (forge, âtre, chaudron) : scintillement marqué, un peu plus forts la nuit ;
 // - lanternes et bougies : léger scintillement, plus fortes la nuit (l'intérieur reste lisible) ;
 // - vitres vues de l'intérieur : claires le jour (la lumière entre), bleu nuit la nuit ;
-// - braises : pulsation lente de l'émission.
+// - braises : pulsation lente de l'émission, teinte vive du thème Feu (palette, jamais en dur ; comme ForgeFeu).
 // La lumière Feu_Forge et les braises de la forge n'y sont plus : ForgeFeu (feu vivant) les pilote (ForgeronBuilder).
 // Toutes les lumières sont ponctuelles, chaudes, sans ombre ; aucune allocation par image.
 public class InterieursAmbiance : MonoBehaviour
@@ -21,9 +21,12 @@ public class InterieursAmbiance : MonoBehaviour
     [ColorUsage(false, true)] public Color vitreJour = new Color(0.62f, 0.74f, 0.9f) * 0.9f;
     [ColorUsage(false, true)] public Color vitreNuit = new Color(0.03f, 0.04f, 0.1f);
     public Renderer[] braises;
-    [ColorUsage(false, true)] public Color braisesCouleur = new Color(1f, 0.32f, 0.08f) * 2.2f;
+    [Tooltip("Éclat (HDR) de l'émission des braises, tiré de la teinte vive du thème Feu.")]
+    public float eclatBraises = 2.2f;
 
     MaterialPropertyBlock m_Bloc;
+    Color m_Braises;
+    int m_Version = -1;
     static readonly int EmissionId = Shader.PropertyToID("_EmissionColor");
 
     void Start()
@@ -61,7 +64,12 @@ public class InterieursAmbiance : MonoBehaviour
             }
         if (m_Bloc == null) return;
         Poser(vitres, Color.Lerp(vitreJour, vitreNuit, nuit));
-        Poser(braises, braisesCouleur * (0.8f + 0.2f * Mathf.PerlinNoise(t * 1.3f, 2f)));
+        if (m_Version != VfxPalette.Version)
+        {
+            m_Version = VfxPalette.Version;
+            m_Braises = VfxPalette.Lueur(VfxPalette.Couleur(VfxTheme.Feu, VfxRole.Vif, new Color(1f, 0.38f, 0.04f)), eclatBraises);
+        }
+        Poser(braises, m_Braises * (0.8f + 0.2f * Mathf.PerlinNoise(t * 1.3f, 2f)));
     }
 
     void Poser(Renderer[] rs, Color c)
