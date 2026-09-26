@@ -214,8 +214,13 @@ namespace Deathless.UI.Ecrans
             return true;
         }
 
-        /// Y : valider.
-        public override void Reinitialiser() => Valider();
+        /// Y : valider. UI/Reset est aussi lié à Suppr au clavier : là, c'est une touche d'édition du champ, pas une
+        /// validation (Entrée valide au clavier).
+        public override void Reinitialiser()
+        {
+            if (InputDeviceWatcher.Current == InputFamily.KeyboardMouse) return;
+            Valider();
+        }
     }
 
     /// Lobby multijoueur (Wiki : interface.md) : entrée (créer un salon, rejoindre par code ou adresse IP), puis salon
