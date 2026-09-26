@@ -411,6 +411,8 @@ namespace Deathless.Jeu
 
         public override Interception Intercepter(InfoDegats info)
         {
+            // Attaque à distance (crâne du Nécromancien) : jamais parée, seulement bloquée par la garde (Quentin, 26/09/2026).
+            if (info.aDistance) return Bloquer(info);
             // Parade parfaite lancée contre cet attaquant : son coup est paré, garde levée ou non (coup de bouclier).
             if (m_Parade != null && info.source != null && m_Parade.Couvre(info.source))
             {
@@ -435,6 +437,21 @@ namespace Deathless.Jeu
                 EtourdirAttaquant(info.source);
                 return Interception.Pare;
             }
+            return Bloquer(info);
+        }
+
+        /// Garde levée face au coup : il est bloqué contre de l'endurance ; sans assez d'endurance, la garde est brisée.
+        Interception Bloquer(InfoDegats info)
+        {
+            if (!m_Garde) return Interception.Passe;
+            // Projectile : jugé d'après sa direction d'arrivée (un crâne à tête chercheuse peut contourner), pas d'après
+            // la position du tireur.
+            Vector3 vers;
+            if (info.aDistance) vers = -info.direction;
+            else if (info.source != null) vers = info.source.transform.position - transform.position;
+            else return Interception.Passe;
+            vers.y = 0f;
+            if (Vector3.Angle(transform.forward, vers) > B.gardeDemiAngle) return Interception.Passe;
             float cout = info.montant * B.gardeCoutParDegat * Facteur(1);
             if (H.Depenser(cout)) return Interception.Bloque;
             // Garde brisée : le coup passe et le héros est déséquilibré.
@@ -443,18 +460,11 @@ namespace Deathless.Jeu
             return Interception.Passe;
         }
 
-        /// Distance au-delà de laquelle une parade n'étourdit pas l'attaquant : un projectile paré (crâne du Nécromancien)
-        /// a son tireur pour source, tenu à 12-18 m (necroDistance). Couvre les coups au corps à corps les plus longs
-        /// (Fend-sol de Morgrim martache, 5 m).
-        const float DistanceEtourdissementParade = 6f;
-
-        /// Parade réussie : étourdit l'attaquant s'il est au contact (pas le tireur d'un projectile paré de loin).
+        /// Parade réussie (coup au corps à corps seulement) : étourdit l'attaquant.
         void EtourdirAttaquant(GameObject source)
         {
             var sq = source != null ? source.GetComponent<Squelette>() : null;
-            if (sq == null) return;
-            Vector3 d = sq.transform.position - transform.position; d.y = 0f;
-            if (d.magnitude <= DistanceEtourdissementParade) sq.Etourdir(B.paradeEtourdi, H.Id);
+            if (sq != null) sq.Etourdir(B.paradeEtourdi, H.Id);
         }
 
         public override void SurIntercepte(InfoDegats info, Interception r)
