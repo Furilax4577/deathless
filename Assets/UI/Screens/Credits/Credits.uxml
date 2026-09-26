@@ -28,6 +28,11 @@
                 <ui:Label text="Kenney" class="credits-ligne__qui" />
                 <ui:Label text="CC0" class="credits-ligne__licence" />
             </ui:VisualElement>
+            <ui:VisualElement class="credits-ligne">
+                <ui:Label text="Souffle de la hache du viking (GDC Game Audio Bundle : 344 Audio, David Dumais Audio)" class="credits-ligne__quoi" />
+                <ui:Label text="Sonniss.com" class="credits-ligne__qui" />
+                <ui:Label text="Licence Sonniss GDC" class="credits-ligne__licence" />
+            </ui:VisualElement>
 
             <ui:Label text="POLICE" class="dl-section-label credits__section" />
             <ui:VisualElement class="credits-ligne">
