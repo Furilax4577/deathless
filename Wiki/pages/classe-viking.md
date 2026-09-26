@@ -47,7 +47,7 @@ Les deux coups alternent.
 
 ### Rugissement
 
-{video media/animations/Skeletons_Taunt_Longer.mp4} **Rugissement** | {dev} `Skeletons_Taunt_Longer` | Arme : aucune (en jeu : hache à deux mains) | une fois · 3,00 s | {dev} emprunté au pack Skeletons, vitesse ×1,6 ; version dédiée en attente dans `sandbox-rig`
+{video media/animations/Skeletons_Taunt_Longer.mp4} **Rugissement** | {dev} `Skeletons_Taunt_Longer` | Arme : aucune (en jeu : hache à deux mains) | une fois · 3,00 s | {dev} emprunté au pack Skeletons, vitesse ×1,6 ; geste gardé (V2 écartée par Quentin, 26/09/2026)
 
 ### Saut percutant
 

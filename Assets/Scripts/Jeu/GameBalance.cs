@@ -276,7 +276,7 @@ namespace Deathless.Jeu
         public float chargePenche = 14f;
         [Tooltip("Cadence des jambes (Running_A) pendant la ruée : vitesse réelle ÷ vitesse des pieds du clip, bornée ici.")]
         public float chargeCadenceMin = 0.8f;
-        public float chargeCadenceMax = 3f;
+        public float chargeCadenceMax = 8f;   // jambes très rapides, effet cartoon (Quentin, 26/09/2026 : plutôt que des pieds qui glissent)
         [Header("Soin sur soi")]
         public float soinPart = 0.25f;
         public float soinIncantation = 0.6f;

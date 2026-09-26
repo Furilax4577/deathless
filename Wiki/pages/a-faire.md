@@ -28,4 +28,3 @@ Travaux prévus ou notés, pas encore faits. Une ligne quitte cette page quand l
 - Réseau : penché du buste en visée, arrivée en cours de partie.
 - Régénérer les icônes après le nouveau vert de Nyxessa.
 - Mettre à jour la copie de `CycleJourNuit` du bac à sable du village.
-- Rugissement V2 du Viking : en attente de validation (bac à sable des rigs).
