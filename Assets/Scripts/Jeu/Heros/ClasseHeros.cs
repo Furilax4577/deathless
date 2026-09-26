@@ -72,7 +72,7 @@ namespace Deathless.Jeu
         /// Coup reçu (dégâts réels).
         public virtual void SurTouche(InfoDegats info, float reel) { }
         /// Dégâts infligés par ce héros (réels) : rage du viking, mana du mage…
-        public virtual void SurCoupDonne(Sante cible, float reel, bool parBoule) { }
+        public virtual void SurCoupDonne(Sante cible, float reel, bool parBoule, bool continu) { }
         /// Esquive, mort, étourdissement : l'action en cours s'arrête proprement (effets, sons, animation).
         public virtual void Interrompre() { }
         /// Heros a heurté le décor sur le côté pendant un déplacement imposé.

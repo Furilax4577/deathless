@@ -327,7 +327,7 @@ namespace Deathless.Jeu
             if (reel > 0f)
             {
                 if (Partie != null) Partie.CompterDegats(Id, reel, critique);
-                if (Classe != null) Classe.SurCoupDonne(s, reel, parBoule);
+                if (Classe != null) Classe.SurCoupDonne(s, reel, parBoule, continu);
             }
             return reel;
         }
