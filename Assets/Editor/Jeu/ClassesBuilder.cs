@@ -163,8 +163,12 @@ namespace Deathless.EditorTools
         const string BatonSorcier = "Assets/Art/KayKit/KayKit_FantasyWeaponsBits_1.0_FREE/Assets/fbx(unity)/staff_B.fbx";
         const string BatonTexture = "Assets/Art/KayKit/KayKit_FantasyWeaponsBits_1.0_FREE/Assets/fbx(unity)/weapons_bits_texture.png";
 
-        /// Contrôleur du sorcier : socle commun (marche, mort vers l'arrière Death_A) et, sur le haut du corps, l'invocation
-        /// (Ranged_Magic_Summon, bâton levé, calée sur la durée de l'incantation) puis le sort en boucle (Spellcasting).
+        /// Contrôleur du sorcier : socle commun (marche, mort vers l'arrière Death_A, et sur le haut du corps l'état
+        /// « Touche » du coup reçu, Hit_A sur le déclencheur « Hit » commun à toutes les classes, Socle) et, sur ce même
+        /// haut du corps, l'invocation (Ranged_Magic_Summon, bâton levé, calée sur la durée de l'incantation) puis le sort
+        /// en boucle (Spellcasting). Réaction de coup (Quentin, retour 0.5.2) : le bouclier frappé déclenche ce « Hit »
+        /// (Sorcier.JouerReactionCoup, fréquence limitée) ; la Touche du Socle revient à Vide, qui repart aussitôt vers
+        /// Cone tant que le bouclier tient (transition déjà posée ci-dessous) : il ne perd donc sa pose qu'un instant.
         static RuntimeAnimatorController ControleurSorcier()
         {
             var style = Style("Staff");

@@ -64,6 +64,7 @@ MENU = [
     ("classe-bavaroise", "Bavaroise (bientôt)", "sous"),
     ("classe-clochard", "Clochard pétomane (bientôt)", "sous"),
     ("ennemis", "Ennemis"),
+    ("statuts", "Statuts"),
     ("commandes", "Commandes"),
     ("interface", "Interface"),
     ("effets", "Effets et couleurs", "dev"),
@@ -100,9 +101,9 @@ def inline(txt):
 
 def icone(m):
     """{icone nom} : petite icône en ligne ; {icone-grande nom} : grande icône (en-tête d'une page de classe).
-    Le SVG est pris dans ArtSources/Icones/Classes ou ArtSources/Icones/Competences, puis copié dans <version>/icones/."""
+    Le SVG est pris dans ArtSources/Icones/Classes, Competences, Nyxessa ou Statuts, puis copié dans <version>/icones/."""
     nom = m.group(2)
-    for sous in ("Classes", "Competences", "Nyxessa"):
+    for sous in ("Classes", "Competences", "Nyxessa", "Statuts"):
         if os.path.exists(os.path.join(ICONES, sous, nom + ".svg")):
             ICONES_COPIEES.add((sous, nom))
             return '<img class="icone%s" src="icones/%s.svg" alt="">' % (" grande" if m.group(1) else "", nom)

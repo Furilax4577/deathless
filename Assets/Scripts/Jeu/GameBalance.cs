@@ -136,6 +136,11 @@ namespace Deathless.Jeu
         [Tooltip("Hauteur de la base du bouclier : dessus de la marche du bas du plateau (m).")]
         public float bouclierBase = 0.25f;
         public float bouclierHauteur = 6f;
+        [Tooltip("Palier du bouclier à partir duquel le sorcier canalise l'énergie de Nyxessa (wiki : palier 4, décidé).")]
+        public int bouclierCanalisationPalier = 4;
+        [Tooltip("Canalisation (palier 4+) : dégâts encaissés par le bouclier pour 1 s de recharge du prochain missile de "
+            + "Nyxessa {à équilibrer}.")]
+        public float bouclierDegatsParSecondeRecharge = 20f;
 
         [Header("Sorcier (villageois ; wiki : village)")]
         [Tooltip("Nom de sa maison (objet sous Maisons) : il y passe le jour.")]
@@ -146,6 +151,8 @@ namespace Deathless.Jeu
         public float sorcierDistanceNyxessa = 3.6f;
         [Tooltip("Il fait face à l'extérieur, dos à Nyxessa ; il peut se tourner vers un ennemi devant lui de ce nombre de degrés au plus.")]
         public float sorcierPivotMax = 20f;
+        [Tooltip("Intervalle minimal entre deux réactions de coup du sorcier quand le bouclier est frappé (s), pour qu'il ne tremble pas en continu sous une pluie de coups.")]
+        public float sorcierReactionCoupIntervalle = 0.4f;
 
         [Header("Or des vagues (règle provisoire sans donjon ; wiki : ennemis, deroule)")]
         public int orSbire = 5;
@@ -392,6 +399,18 @@ namespace Deathless.Jeu
         public float sautRayon = 3.5f;
         public float sautDegats = 45f;
         public float sautEtourdi = 1f;
+
+        [Header("Chute (wiki : statuts.md ; valeurs à équilibrer)")]
+        [Tooltip("Hauteur de chute sans dégâts (m) : un saut sur place monte à 1,2 m ; un niveau du donjon fait 4 m.")]
+        public float chuteSeuil = 3.5f;
+        [Tooltip("Dégâts par mètre de chute au-delà du seuil.")]
+        public float chuteDegatsParMetre = 12f;
+        [Tooltip("Dégâts maximaux d'une chute.")]
+        public float chuteDegatsMax = 80f;
+        [Tooltip("Durée du statut Ralenti après une chute au-delà du seuil (s).")]
+        public float chuteRalentiDuree = 3f;
+        [Tooltip("Part de vitesse retirée par ce Ralenti (0,4 = −40 %).")]
+        [Range(0f, 0.9f)] public float chuteRalentiForce = 0.4f;
 
         [Header("Mort et réapparition (wiki : deroule)")]
         public float reapparitionBase = 8f;

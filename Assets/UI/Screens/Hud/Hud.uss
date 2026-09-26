@@ -379,9 +379,9 @@
 .dl-scale-3 .hud-or-porte { right: 24px; top: 88px; }
 .dl-scale-3 .hud-donjon-alerte { top: 120px; }
 .dl-scale-3 .hud-donjon-message { top: 188px; }
-.hud-points { position: absolute; left: 48px; bottom: 232px; height: 54px; display: none; border-width: 2px; border-color: var(--dl-color-gold); }
+.hud-points { position: absolute; left: 48px; bottom: 306px; height: 54px; display: none; border-width: 2px; border-color: var(--dl-color-gold); }
 .hud-points__texte { font-size: var(--dl-text-body); color: var(--dl-color-gold); margin: 0 12px 0 0; padding: 0; -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); }
-.dl-scale-3 .hud-points { left: 24px; bottom: 215px; }
+.dl-scale-3 .hud-points { left: 24px; bottom: 290px; }
 .hud-interaction__texte { font-size: var(--dl-text-body); margin: 0 0 0 12px; padding: 0; }
 
 /* ---------- Mort ---------- */
@@ -419,3 +419,45 @@
 .dl-scale-3 .hud-allies { left: 24px; top: 34%; width: 272px; }
 .dl-scale-3 .hud-allie { height: 54px; padding: 0 15px 0 6px; margin-bottom: 6px; }
 .dl-scale-3 .hud-allie__embleme { width: 39px; height: 39px; margin-right: 9px; }
+
+/* ---------- Statuts (HudStatuts.cs, 26/09/2026) ----------
+   Rangée du joueur au-dessus du portrait et des barres (la pastille des points de compétence est au-dessus d'elle) ;
+   pour la déplacer (maquette B : juste au-dessus de la barre de vie), changer seulement .hud-statuts. Petites rangées au-dessus des ennemis, placées comme les pseudos.
+   Liseré rouge : affliction ; or : bienfait. Jauge de durée en bas de la case ; secondes dans la pastille (joueur). */
+.hud-statuts { position: absolute; left: 48px; bottom: 232px; flex-direction: row; align-items: flex-end; display: none; }
+.dl-scale-3 .hud-statuts { left: 24px; bottom: 215px; }
+.statut {
+    width: 60px;
+    height: 60px;
+    margin-right: 12px;
+    border-radius: 12px;
+    border-width: 2px;
+    border-color: var(--dl-color-life);
+    background-color: rgba(16, 19, 27, 0.85);
+}
+.statut--bienfait { border-color: var(--dl-color-gold); }
+.statut__icone { position: absolute; left: 6px; top: 4px; right: 6px; bottom: 10px; }
+.statut__jauge { position: absolute; left: 7px; right: 7px; bottom: 4px; height: 5px; border-radius: 3px; background-color: var(--dl-color-well); overflow: hidden; }
+.statut__jauge-remplie { height: 100%; width: 100%; background-color: var(--dl-color-text); }
+.statut__temps {
+    position: absolute;
+    right: -9px;
+    top: -12px;
+    min-width: 27px;
+    height: 27px;
+    margin: 0;
+    padding: 0 6px;
+    border-radius: 14px;
+    border-width: 1px;
+    border-color: var(--dl-color-border-strong);
+    background-color: var(--dl-color-ink);
+    -unity-text-align: middle-center;
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+    font-size: var(--dl-text-caption);
+    color: var(--dl-color-text);
+}
+.hud-statuts-ennemis { position: absolute; left: 0; top: 0; right: 0; bottom: 0; }
+.hud-statuts-ennemi { position: absolute; translate: -50% -100%; flex-direction: row; align-items: flex-end; }
+.statut--petit { width: 36px; height: 36px; margin: 0 2px; border-radius: 8px; background-color: rgba(16, 19, 27, 0.78); }
+.statut--petit .statut__icone { left: 3px; top: 2px; right: 3px; bottom: 6px; }
+.statut--petit .statut__jauge { left: 4px; right: 4px; bottom: 2px; height: 3px; border-radius: 2px; }

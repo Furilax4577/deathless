@@ -58,6 +58,8 @@ namespace Deathless.UI.Ecrans
         float m_TempsPopMissile = -1f, m_TempsTirMissile = -1f;
 
         readonly List<Emplacement> m_Emplacements = new List<Emplacement>();
+        /// Statuts du joueur et des ennemis (classe à part : HudStatuts.cs).
+        HudStatuts m_Statuts;
 
         /// Autres joueurs affichés (colonne de gauche) : trois au plus (salon de quatre).
         public const int AlliesMax = 3;
@@ -143,6 +145,7 @@ namespace Deathless.UI.Ecrans
             var plein = Racine.Q("missiles-plein");
             if (plein != null) IconesUI.Poser(plein, IconesUI.MissileNyxessa);
             ConstruireAllies();
+            m_Statuts = new HudStatuts(Racine);
         }
 
         void ConstruireAllies()
@@ -218,6 +221,7 @@ namespace Deathless.UI.Ecrans
             if (partie != null) MajPartie(partie, dt);
             if (joueur != null) MajJoueur(joueur, partie);
             MajEquipe(partie as IEtatEquipe);
+            m_Statuts?.Maj(joueur == null || joueur.EstMort);
         }
 
         /// Colonne de gauche : un allié par ligne (emblème de classe, pseudo, barre de vie fine ; mort : ligne grisée et

@@ -75,17 +75,40 @@ Scripts/Reseau/
 - **Score** : écran de score avec une ligne par joueur (`HudPresenter.Joueurs` lit `PartieReseau.Scores`), le joueur local marqué.
 - **Squelettes** : préfabs réseau (NetworkObject, NetworkTransform et NetworkAnimator en autorité serveur, échelle synchronisée pour les élites, `EnnemiReseau`), apparus par l'hôte (`DirecteurVagues.Poser`) ; nombre par nuit × (1 + 0,6 par joueur en plus) (`GameBalance.ennemisParJoueurEnPlus`).
 - **Missiles en crâne** (Nyxessa, Nécromancien) : même vol chez les clients, sans dégâts (`MissileCrane.TirerVisuel`).
-- **Stock des missiles de Nyxessa** (26/09/2026, compteur du HUD) : l'hôte écrit le stock dans `PartieReseau.StockMissiles` (`NetworkVariable<int>`, envoyée seulement quand elle change) ; le palier passe déjà par `PalierMissiles`. La recharge du prochain missile n'est pas envoyée : chaque client l'extrapole dans `Partie.SuivreMissiles`, avec la règle de `DefenseNyxessa`.
+- **Stock des missiles de Nyxessa** (26/09/2026, compteur du HUD) : l'hôte écrit le stock dans `PartieReseau.StockMissiles` (`NetworkVariable<int>`, envoyée seulement quand elle change) ; le palier passe déjà par `PalierMissiles`. La recharge du prochain missile voyage dans `PartieReseau.MissileRegeneration`, 5 fois par seconde (comme `TempsPhase`) ; chaque client complète seul entre deux envois et se recale dès qu'une nouvelle valeur arrive (`Partie.SuivreMissiles`).
   - Stock plein : elle reste à 0.
-  - Stock qui monte : elle repart de 0.
-  - Sinon : elle avance de `dt`, bornée à la durée du palier (`missileRegenerationPaliers`). Un tir ne la remet pas à zéro, comme chez l'hôte.
+  - Sinon : elle avance de `dt` jusqu'au prochain envoi de l'hôte, qui la recale (borne : durée du palier, `missileRegenerationPaliers`). Un tir ne la remet pas à zéro, comme chez l'hôte.
+  - Depuis la canalisation du bouclier (27/09/2026, `BouclierNyxessa.Absorber`), un coup encaissé peut faire **bondir** la recharge sans faire monter le stock : une simple extrapolation en `dt` ne suffisait plus à la suivre, d'où l'envoi périodique de sa valeur (avant le 27/09/2026, seul le stock voyageait et la recharge n'était qu'extrapolée).
   - Vérifié le 26/09/2026 (hôte Paladin dans l'éditeur, client Mage caché ; journal du client par `ClientMissiles.cs`, fichier de test propre à la copie ; hôte forcé au palier 3, stock 1, puis un tir simulé) : le client suit le stock à la seconde près ; sa recharge a environ 0,1 s de retard, et le HUD du client affiche 1/4, 2/4, puis 3/4 avec la même charge que l'hôte.
-  - L'écart avec l'hôte ne dépasse pas la latence et se résorbe au missile suivant. Seule exception : si le client commence à suivre la partie pendant une recharge, son premier affichage peut être en retard.
+  - L'écart avec l'hôte ne dépasse pas la latence (au plus l'intervalle d'envoi, 0,2 s) et se résorbe au missile suivant. Seule exception : si le client commence à suivre la partie pendant une recharge, son premier affichage peut être en retard.
 - **Tirs des joueurs** (flèches, carreaux, boules de feu) : rejoués chez les autres (`ProjectileJeu.TirerVisuel`, même balistique, sans dégâts).
 - **Effets de compétence** (26/09/2026) : chaque classe diffuse ses effets par `ClasseHeros.Diffuser(effet, a, b, v)` → `HerosReseau.EffetRpc` (propriétaire → autres postes) → `ClasseHeros.EffetDistant` sur la marionnette, qui rejoue visuel et son à la même position et dans la même orientation, sans dégâts (ils restent décidés comme avant). Paladin : élan et impact de l'épée, charge bélier et son impact, soin et aura, garde et parade ; Viking : élan, coup de hache, attaque tournante (début, effet, coups, fin), rugissement (effet et cri), saut percutant (onde) ; Mage : lancer de boule, cône de flammes (allumé, suit l'orientation du héros, éteint) ; Rôdeur : bander, tir, nuée de flèches (effet et sons), roulade, salve ; Assassin : dague, arbalète (et son rechargement), fumigène (`FumeeRpc`, avec le son du nuage) ; toutes les classes : marque de critique, esquive, saut. Les gestes passent par le `NetworkAnimator`, pas par ces effets. Exemple : la course de la charge bélier derrière le bouclier (26/09/2026). Elle utilise les déclencheurs `Charge` et `CoupBouclier`, les paramètres `Ruee` et `VitesseRuee`, et le poids de la couche haute. Le penché du corps se déduit de l'état de l'Animator sur la marionnette (`Docs/styles-d-armes.md`).
 - **Emotes** (26/09/2026, roue à emotes) : rien de nouveau à diffuser. Le propriétaire écrit l'entier `EmoteNum` et lance le déclencheur `Emote` par `Heros.Declencher` ; son `NetworkAnimator` les transmet, et la marionnette joue la même sous-machine « Emotes ». Si le déclencheur arrive avant l'entier, il reste armé jusqu'à l'arrivée de l'entier ; à la fin d'une emote, le propriétaire remet `EmoteNum` à 0 (fin douce) ou -1 (fin brusque) et annule un déclencheur non consommé (`Heros.AnnulerDeclencheur`). La chope de « Boire un coup » (pleine, puis vide) se déduit de l'état `Boire` de l'Animator sur chaque poste (`EmotesHeros.LateUpdate`), comme le penché de la charge.
-- **Sorcier et bouclier** : l'hôte pilote ; les clients suivent (marionnette du sorcier, effet du bouclier levé, frappé, brisé, baissé).
+- **Sorcier et bouclier** : l'hôte pilote ; les clients suivent (marionnette du sorcier, effet du bouclier levé, frappé, brisé, baissé). Réaction de coup du sorcier (27/09/2026, quand le bouclier encaisse un coup) : `PartieReseau.SorcierTouche` (RPC vers les clients, `Sorcier.ToucherDistant`), fréquence limitée côté hôte.
 - Préfabs : `Deathless > Jeu > 8. Réseau` équipe aussi les 4 squelettes et crée `Resources/Reseau/PartieReseau.prefab`.
+
+## Statuts (26/09/2026)
+
+Brûlure, ralenti, étourdi, ivresse, provoqué : liste, règles et icônes dans le wiki (`statuts.md`) ; code dans `Scripts/Jeu/Statuts/` (`Statuts`, un composant par personnage ; `CatalogueStatuts`) et `Scripts/Reseau/StatutsReseau.cs`.
+
+- **L'hôte fait foi.** Il tient la liste de chaque personnage (squelettes et héros), applique les règles de cumul et les fins, et fait les dégâts de la brûlure (crédités au joueur qui l'a posée).
+- **Synchronisation économe.** Chaque personnage a une `NetworkList<StatutReseau>` dans `EnnemiReseau` et `HerosReseau` (15 octets par statut : type, origine, joueur source, intensité, durée, fin en temps serveur).
+  - L'hôte l'écrit seulement quand sa liste change (événement `Statuts.Change`) : ajout, retrait, fin, ou fin déplacée de plus de 0,5 s (`StatutsReseau.Tolerance`). NGO n'envoie que les éléments modifiés.
+  - Rien n'est envoyé à chaque image : chaque client fait défiler les durées lui-même à partir de la fin en temps serveur. Un cône de flammes qui rafraîchit une brûlure 4 fois par seconde produit au plus 2 petits messages par seconde et par ennemi, et plus rien ensuite.
+  - Les statuts de zone (eau du donjon) ne sont pas envoyés : chaque poste les calcule d'après la position.
+- **Demandes des clients.** `Statuts.Ajouter` chez un client devient une demande à l'hôte (`relais`), au plus une toutes les 0,4 s par type. L'hôte la vérifie (`StatutsReseau.Valider`).
+  - Sur un squelette (`EnnemiReseau.StatutRpc`) : la brûlure du mage, avec les valeurs de l'hôte et créditée au joueur qui la demande. Avant, le client faisait lui-même les dégâts de la brûlure et envoyait un coup par tic.
+  - L'étourdissement et la provocation passent toujours par leurs relais (`EtourdirRpc`, `ProvoquerRpc`) : l'hôte pose le statut en même temps que l'effet.
+  - Sur son propre héros (`HerosReseau.StatutRpc`, propriétaire seulement) : ralenti de la chute, étourdi de la garde brisée, ivresse de la taverne.
+- **Prédiction du propriétaire.** Le client qui demande un statut pour son héros l'applique aussitôt chez lui (le ralenti agit sans attendre l'aller-retour). Quand la liste de l'hôte revient, elle remplace la prédiction ; une prédiction absente de la liste de l'hôte est gardée 1,5 s au plus (`Statuts.GracePrediction`), puis elle s'éteint à sa fin.
+- **Effets.** L'effet reste là où il agit : l'étourdissement et l'IA des squelettes chez l'hôte ; le déplacement du héros (ralenti) et la caméra (ivresse) chez son propriétaire. Les flammèches de la brûlure s'allument sur tous les postes d'après la liste.
+- **Vérifié le 26/09/2026** (hôte Paladin dans l'éditeur, client Mage caché, adresse IP, script `scratchpad/reseau/statuts.sh`) :
+  - trois squelettes posés près du mage client et étourdis par l'hôte ; ses boules de feu les brûlent ;
+  - chez l'hôte, la brûlure porte la source « joueur 2 » (le client) ; chez le client, 3 ennemis affectés (Brûlure ×1, Étourdi ×3) ;
+  - environ une liste reçue et une demande envoyée par seconde ;
+  - tournée lancée par l'hôte : l'ivresse du héros client figure chez l'hôte, et chez le client elle est déjà confirmée (plus « prédite ») au premier relevé ;
+  - aucune erreur dans les deux consoles.
+- **Tests.** `ClientAutomatique` journalise les ennemis affectés vus par le client, les listes reçues (`Statuts.ListesRecues`), les demandes envoyées (`Statuts.DemandesEnvoyees`) et les statuts de son héros (marqués « prédit » tant que l'hôte n'a pas répondu).
 
 ## Tests (sans fenêtre)
 
@@ -143,7 +166,7 @@ Résultats de l'étape 2 (25/09/2026, hôte Paladin, client Mage, adresse IP) : 
 
 - Pose de l'arc des autres rôdeurs (flèche encochée, corde tendue) et cercle de charge : visibles seulement par le tireur.
 - Le penché du buste en visée (arc, arbalète) n'est pas recopié chez les autres ; l'orientation du corps l'est.
-- Chaque coup d'un client sur un squelette est un message ; les dégâts continus (cône, brûlure) en envoient beaucoup (sans gêne constatée à deux).
+- Chaque coup d'un client sur un squelette est un message ; le cône de flammes en envoie beaucoup (sans gêne constatée à deux). La brûlure n'en envoie plus : l'hôte fait ses dégâts (« Statuts »).
 - Pas d'arrivée en cours de partie ; pas de reconnexion.
 - Coupure brutale : l'hôte ne s'en aperçoit qu'au bout du délai du transport (~30 s).
 - Après une déconnexion, le message d'erreur est dans le lobby ; le menu principal s'affiche d'abord.

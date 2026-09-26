@@ -3,6 +3,8 @@
     <ui:VisualElement name="hud" class="hud" picking-mode="Ignore">
         <!-- Pseudos des autres joueurs au-dessus de leur tête (multijoueur ; construits par EcranHud) -->
         <ui:VisualElement name="pseudos" class="hud-pseudos" picking-mode="Ignore" />
+        <!-- Statuts au-dessus des ennemis affectés (placés chaque image par HudStatuts) -->
+        <ui:VisualElement name="statuts-ennemis" class="hud-statuts-ennemis" picking-mode="Ignore" />
 
         <!-- Mort : voile et compte à rebours (sous le reste du HUD) -->
         <ui:VisualElement name="mort" class="hud-mort" picking-mode="Ignore">
@@ -93,6 +95,9 @@
         <ui:VisualElement name="donjon-message" class="hud-pastille hud-donjon-message" picking-mode="Ignore">
             <ui:Label name="donjon-message-texte" text="Message" class="hud-donjon-message__texte" />
         </ui:VisualElement>
+
+        <!-- Bas, à gauche, au-dessus du portrait et des barres : statuts du joueur (brûlure, ralenti… ; HudStatuts) -->
+        <ui:VisualElement name="statuts" class="hud-statuts" picking-mode="Ignore" />
 
         <!-- Bas, à gauche, au-dessus du joueur : points de compétence à dépenser (menu du personnage) -->
         <ui:VisualElement name="points-competence" class="hud-pastille hud-points" picking-mode="Ignore">

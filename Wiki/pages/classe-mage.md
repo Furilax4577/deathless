@@ -48,7 +48,7 @@ Les gestes joués en jeu pour chaque action, dans l'ordre où ils s'enchaînent.
 
 - Bâton. L'attaque de base est une **boule de feu** qui explose à l'impact, puis laisse une fumée à facettes qui se dissipe {effet validé}.
 - **Cône de flammes** maintenu devant le mage {effet validé}.
-- **Brûlure** : les ennemis touchés brûlent pendant un moment {effet validé}.
+- **Brûlure** : les ennemis touchés brûlent pendant un moment {effet validé}. C'est un [statut](statuts.md) : son icône s'affiche au-dessus de l'ennemi, et chaque nouveau coup de feu relance sa durée.
 - **Mana** {décidé} : jauge de 100. Elle remonte d'environ 1 par seconde, plus un bonus à chaque ennemi touché par la boule de feu. Les compétences coûtent du mana ; le cône de flammes en consomme tant qu'il est maintenu. Valeurs {à équilibrer}.
 - **Pas d'ultime** {décidé} : le mage garde la boule de feu, le cône de flammes et la brûlure.
 - **Compétences LB et RB** : vides pour l'instant {décidé}. Le mage joue avec la boule de feu (attaque principale) et le cône de flammes (attaque secondaire maintenue). Ses compétences : {à confirmer}.

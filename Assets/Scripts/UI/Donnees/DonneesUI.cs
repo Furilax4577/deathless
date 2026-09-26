@@ -40,6 +40,9 @@ namespace Deathless.UI.Donnees
         /// navigateur d'écrans en calque du HUD tant qu'elle est ouverte.
         public static IRoueEmotes RoueEmotes { get; set; }
 
+        /// Statuts du joueur local et des ennemis affectés (posé par le jeu ; null : rien n'est affiché).
+        public static IEtatStatuts Statuts { get; set; }
+
         /// Appelé à chaque enregistrement ou retrait (les écrans se réabonnent aux événements de IEtatPartie).
         public static event Action Changees;
 

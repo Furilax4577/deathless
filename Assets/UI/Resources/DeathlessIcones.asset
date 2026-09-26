@@ -127,6 +127,16 @@ MonoBehaviour:
     image: {fileID: 7388822144124034973, guid: 24d831211db7c5643ba45418debbb41d, type: 3}
   - id: rodeur_visee
     image: {fileID: 7388822144124034973, guid: f497effde1d5451429a3d0abea25b18b, type: 3}
+  - id: statut_brulure
+    image: {fileID: 7388822144124034973, guid: 59292cb6183f7e846a2fe827dac22107, type: 3}
+  - id: statut_etourdi
+    image: {fileID: 7388822144124034973, guid: a806ef817e6239248882860f486bc9bb, type: 3}
+  - id: statut_ivresse
+    image: {fileID: 7388822144124034973, guid: e845a4bb5e951c74ca680deccf600bc1, type: 3}
+  - id: statut_provoque
+    image: {fileID: 7388822144124034973, guid: 2e9ffd1fe3a76ae4a85ae8f0ca165102, type: 3}
+  - id: statut_ralenti
+    image: {fileID: 7388822144124034973, guid: a84569a2fee92364fbe4a2366f26f769, type: 3}
   - id: viking_attaque_tournante
     image: {fileID: 7388822144124034973, guid: 0966b98e095ddcf4bb96f01681947083, type: 3}
   - id: viking_hache

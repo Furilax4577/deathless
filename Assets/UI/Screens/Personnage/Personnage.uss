@@ -28,6 +28,43 @@
 .perso__carac-libelle { margin: 0; padding: 0; color: var(--dl-color-text-muted); }
 .perso__carac-valeur { margin: 0; padding: 0; -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); }
 
+/* Afflictions : statuts actifs du joueur (liseré rouge ; or pour un bienfait), infobulle au survol ou au focus */
+.perso__afflictions-titre { margin-top: 24px; }
+.perso__afflictions { flex-direction: row; flex-wrap: wrap; margin: 6px -6px 0 -6px; }
+.perso__afflictions-vide { margin: 9px 0 0 0; }
+.perso__affliction {
+    width: 84px;
+    height: 99px;
+    min-height: 0;
+    margin: 6px;
+    padding: 6px 0 0 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    border-radius: var(--dl-radius-md);
+    border-width: 2px;
+    border-color: var(--dl-color-life);
+    background-color: rgba(16, 19, 27, 0.6);
+}
+.perso__affliction--bienfait { border-color: var(--dl-color-gold); }
+.perso__affliction-icone { width: 54px; height: 54px; }
+.perso__affliction-jauge { width: 60px; height: 5px; margin-top: 3px; border-radius: 3px; background-color: var(--dl-color-well); overflow: hidden; }
+.perso__affliction-jauge-remplie { height: 100%; width: 100%; background-color: var(--dl-color-text); }
+.perso__affliction-temps { margin: 3px 0 0 0; padding: 0; font-size: var(--dl-text-caption); color: var(--dl-color-text-muted); }
+.perso__bulle {
+    position: absolute;
+    width: 480px;
+    padding: 18px 21px;
+    background-color: rgba(35, 42, 58, 0.98);
+    border-width: 2px;
+    border-color: var(--dl-color-border-strong);
+}
+.perso__bulle-nom { margin: 0 0 6px 0; padding: 0; font-size: var(--dl-text-large); color: #ff8a70; -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); }
+.perso__bulle-nom--bienfait { color: var(--dl-color-gold); }
+.perso__bulle-effet { margin: 0 0 12px 0; padding: 0; white-space: normal; }
+.perso__bulle-ligne { margin: 3px 0 0 0; padding: 0; color: var(--dl-color-text-muted); }
+.dl-scale-3 .perso__bulle { width: 420px; }
+
 /* Inventaire : cases vides */
 .perso__cases { flex-direction: row; flex-wrap: wrap; margin: 12px -6px 6px -6px; }
 .perso__case { width: 96px; height: 96px; margin: 6px; border-radius: var(--dl-radius-md); border-width: 2px; border-color: var(--dl-color-border); background-color: rgba(16, 19, 27, 0.6); }

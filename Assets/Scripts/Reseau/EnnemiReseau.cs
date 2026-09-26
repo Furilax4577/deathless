@@ -18,10 +18,13 @@ namespace Deathless.Reseau
         readonly NetworkVariable<byte> m_Type = new NetworkVariable<byte>(0);
 
         public Squelette Squelette { get; private set; }
+        /// Statuts du squelette, tenus par l'hôte (Docs/reseau.md, « Statuts ») : envoyés seulement quand ils changent.
+        NetworkList<StatutReseau> m_Statuts;
+        Statuts m_StatutsJeu;
         /// Marionnette (client) : l'IA tourne chez l'hôte.
         public bool Distant => IsSpawned && !IsServer;
 
-        void Awake() { Squelette = GetComponent<Squelette>(); }
+        void Awake() { Squelette = GetComponent<Squelette>(); m_Statuts = new NetworkList<StatutReseau>(); }
 
         /// Hôte, avant l'apparition : type et élite (l'échelle de l'élite suit par le NetworkTransform).
         public void Preparer(TypeEnnemi type, bool elite)
@@ -42,6 +45,7 @@ namespace Deathless.Reseau
                 m_Elite.Value = m_ElitePrepare;
                 m_Pv.Value = Squelette.Sante.Pv;
                 m_PvMax.Value = Squelette.Sante.pvMax;
+                BrancherStatuts();
                 return;
             }
             var sq = Squelette;
@@ -52,12 +56,14 @@ namespace Deathless.Reseau
             if (sq.Agent != null) sq.Agent.enabled = false;
             sq.Sante.relais = Relayer;
             sq.Sante.Fixer(m_Pv.Value, m_PvMax.Value);
+            BrancherStatuts();
             DirecteurVagues.Instance?.AjouterDistant(sq);
             StartCoroutine(SortieVisuelle());
         }
 
         public override void OnNetworkDespawn()
         {
+            DebrancherStatuts();
             if (IsServer || Squelette == null) return;
             DirecteurVagues.Instance?.RetirerDistant(Squelette);
             // Désintégration (mort ou aube) : mêmes gemmes que chez l'hôte.
@@ -144,6 +150,46 @@ namespace Deathless.Reseau
         {
             var h = Partie.Instance != null ? Partie.Instance.HerosDe(Partie.IdJoueur(p.Receive.SenderClientId)) : null;
             if (h != null) Squelette.Provoquer(h, duree);
+        }
+
+        // ----------------------------------------------------------------- Statuts (l'hôte fait foi)
+
+        void BrancherStatuts()
+        {
+            m_StatutsJeu = Statuts.De(Squelette);
+            if (IsServer)
+            {
+                m_StatutsJeu.Change += EcrireStatuts;
+                EcrireStatuts();
+                return;
+            }
+            m_StatutsJeu.Autorite = false;
+            m_StatutsJeu.relais = DemanderStatut;
+            m_Statuts.OnListChanged += StatutsRecus;
+            StatutsReseau.Lire(m_Statuts, m_StatutsJeu, NetworkManager);
+        }
+
+        void DebrancherStatuts()
+        {
+            if (m_StatutsJeu == null) return;
+            m_StatutsJeu.Change -= EcrireStatuts;
+            m_StatutsJeu.relais = null;
+            if (m_Statuts != null) m_Statuts.OnListChanged -= StatutsRecus;
+        }
+
+        void EcrireStatuts() { if (IsServer && IsSpawned) StatutsReseau.Ecrire(m_Statuts, m_StatutsJeu, NetworkManager); }
+
+        void StatutsRecus(NetworkListEvent<StatutReseau> e) => StatutsReseau.Lire(m_Statuts, m_StatutsJeu, NetworkManager);
+
+        /// Client : un héros de ce poste pose un statut (brûlure du mage…) ; l'hôte le vérifie et le pose.
+        void DemanderStatut(Statut s) => StatutRpc((byte)s.type, s.duree, s.intensite, (byte)s.origine);
+
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        void StatutRpc(byte type, float duree, float intensite, byte origine, RpcParams p = default)
+        {
+            if (Squelette == null || Squelette.Sante.Mort) return;
+            var s = StatutsReseau.Valider((TypeStatut)type, duree, intensite, (OrigineStatut)origine, Partie.IdJoueur(p.Receive.SenderClientId), false);
+            if (s.type != TypeStatut.Aucun) Statuts.De(Squelette).AjouterDemande(s);
         }
     }
 }

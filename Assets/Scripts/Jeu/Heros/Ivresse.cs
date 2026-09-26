@@ -16,11 +16,19 @@ namespace Deathless.Jeu
             float t = Time.time;
             if (t > s_Fin) s_Debut = t;
             s_Fin = Mathf.Max(s_Fin, t + duree);
+            // Statut Ivresse du héros local (HUD, menu du personnage ; chez un client, demandé à l'hôte qui le diffuse).
+            var h = Partie.Instance != null ? Partie.Instance.HerosLocal : null;
+            if (h != null && h.Statuts != null) h.Statuts.Ajouter(TypeStatut.Ivresse, duree, 1f, OrigineStatut.Taverne);
             Partie.Instance?.Journal("Ivresse : " + duree.ToString("0") + " s");
         }
 
         /// Arrêt immédiat (mort, fin de partie).
-        public static void Arreter() { s_Fin = Mathf.Min(s_Fin, Time.time); }
+        public static void Arreter()
+        {
+            s_Fin = Mathf.Min(s_Fin, Time.time);
+            var h = Partie.Instance != null ? Partie.Instance.HerosLocal : null;
+            if (h != null && h.Statuts != null) h.Statuts.Retirer(TypeStatut.Ivresse);
+        }
 
         /// 0 à 1 : force de l'ivresse maintenant.
         public static float Force

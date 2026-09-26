@@ -101,6 +101,7 @@ namespace Deathless.UI.Dev
                 m_Accords.Triggered += OnAction;
             }
             if (DonneesUI.Lobby == null) DonneesUI.Lobby = gameObject.AddComponent<LobbyFactice>();   // lobby factice du banc
+            if (DonneesUI.Statuts == null) DonneesUI.Statuts = m_Statuts;                                 // statuts factices du banc
             DonneesUI.Enregistrer(null, null, null, this);
         }
 
@@ -108,8 +109,14 @@ namespace Deathless.UI.Dev
         {
             m_Accords?.Dispose();
             m_Accords = null;
+            if (ReferenceEquals(DonneesUI.Statuts, m_Statuts)) DonneesUI.Statuts = null;
             DonneesUI.Retirer();
         }
+
+        readonly StatutsFactices m_Statuts = new StatutsFactices();
+
+        /// Statuts factices (joueur : brûlure, ralenti, ivresse ; deux ennemis fictifs devant la caméra) : affichés ou non.
+        public void ForcerStatuts(bool actif) => m_Statuts.Actif = actif;
 
         // ================================================================== Simulation
 

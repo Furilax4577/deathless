@@ -21,6 +21,8 @@ namespace Deathless.Jeu
         public HerosEntrees Entrees { get; private set; }
         /// Roue à emotes et emotes (composant ajouté dans Awake, sur tous les héros).
         public EmotesHeros Emotes { get; private set; }
+        /// Statuts du héros (ralenti, étourdi, ivresse… ; Statuts.cs) : l'hôte fait foi, le propriétaire prédit.
+        public Statuts Statuts { get; private set; }
         public CharacterController CC { get; private set; }
         public Partie Partie { get; private set; }
         /// Multijoueur : héros d'un autre poste (marionnette). Position et animations arrivent par le réseau
@@ -85,6 +87,7 @@ namespace Deathless.Jeu
             Entrees = GetComponent<HerosEntrees>();
             Sante = GetComponent<Sante>();
             Sante.equipe = Equipe.Heros;
+            Statuts = Statuts.De(this);
             Classe = GetComponent<ClasseHeros>();
             Emotes = GetComponent<EmotesHeros>();
             if (Emotes == null) Emotes = gameObject.AddComponent<EmotesHeros>();
@@ -110,6 +113,7 @@ namespace Deathless.Jeu
             CC.enabled = false;
             transform.position = point;
             m_VitesseY = 0f;
+            m_SommetChute = point.y;   // une téléportation n'est pas une chute
             Physics.SyncTransforms();
             CC.enabled = actif;
         }
@@ -228,6 +232,7 @@ namespace Deathless.Jeu
             if (Classe != null) Classe.Interrompre();
             m_EtatCourant = Etat.Etourdi;
             m_Etourdi = duree;
+            if (Statuts != null) Statuts.Ajouter(TypeStatut.Etourdi, duree, 1f, OrigineStatut.Ennemi);
         }
 
         /// Applique un coup du héros : dégâts, score, retour à la classe (rage, mana). Renvoie les dégâts réels.
@@ -410,6 +415,7 @@ namespace Deathless.Jeu
 
             if (m_EtatCourant == Etat.Mort || m_EtatCourant == Etat.Reapparition || !CC.enabled)
             {
+                m_SommetChute = transform.position.y;
                 MajAnimation(0f);
                 return;
             }
@@ -435,8 +441,11 @@ namespace Deathless.Jeu
                     float facteur = Classe != null ? Classe.FacteurVitesse : 1f;
                     bool occupe = Classe != null && Classe.Occupe;
                     m_Sprint = Entrees.SprintMaintenu && dir.sqrMagnitude > 0.01f && m_Endurance > 0f && !occupe && facteur >= 0.99f && (Classe == null || !Classe.BloqueSprint);
+                    // Statut Ralenti (chute…) : vitesse et cadence de marche réduites.
+                    float ralenti = Statuts != null ? Statuts.FacteurVitesse : 1f;
                     float vitesse = (Classe != null ? Classe.Vitesse : b.vitesse) * (m_Sprint ? b.sprintMultiplicateur : 1f) * facteur
-                        * Deathless.Donjon.ZoneEau.FacteurEn(transform.position + Vector3.up * 0.2f);   // eau du donjon : × 0,6
+                        * Deathless.Donjon.ZoneEau.FacteurEn(transform.position + Vector3.up * 0.2f)   // eau du donjon : × 0,6
+                        * ralenti;
                     if (m_Sprint) { m_Endurance = Mathf.Max(0f, m_Endurance - b.sprintCout * dt); m_EnduranceUtilisee = Time.time; }
                     deplacement = dir * vitesse;
                     Vector3 face = Classe != null && Classe.FaceVisee ? FaceDeVisee() : dir;
@@ -444,6 +453,7 @@ namespace Deathless.Jeu
                         transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(face), 720f * dt);
                     vitesseAnim = dir.magnitude * (m_Sprint ? 1f : 0.62f) * (Classe != null ? Classe.FacteurAnimation : 1f);
                     if (facteur < 0.99f) vitesseAnim *= Mathf.Max(0.5f, facteur);
+                    if (ralenti < 0.99f) vitesseAnim *= Mathf.Max(0.5f, ralenti);
                     break;
                 }
                 case Etat.Esquive:
@@ -471,6 +481,7 @@ namespace Deathless.Jeu
             if (impose) m_VitesseY = Mathf.Min(m_VitesseY, -2f);
             var flags = CC.Move((deplacement + Vector3.up * m_VitesseY) * dt);
             m_AuSol = (flags & CollisionFlags.Below) != 0 || CC.isGrounded;
+            SuivreChute(etaitAuSol, impose || EnTransit);
             if (m_AuSol && !etaitAuSol && m_VitesseY < -6f) AudioBank.Jouer(SonsDuJeu.Reception, transform.position, 0.6f);
             if (impose && (flags & CollisionFlags.Sides) != 0 && Classe != null) Classe.SurCollisionCote();
 
@@ -484,6 +495,39 @@ namespace Deathless.Jeu
         }
 
         public bool Sprinte => m_Sprint;
+
+        // ----------------------------------------------------------------- Chute (wiki : statuts.md)
+
+        float m_SommetChute = float.NegativeInfinity;   // point le plus haut depuis le dernier contact avec le sol
+
+        /// Hauteur de chute : du point le plus haut atteint en l'air jusqu'au sol. Au-delà de GameBalance.chuteSeuil,
+        /// dégâts proportionnels à la hauteur, puis statut Ralenti quelques secondes. Un saut sur place (1,2 m) reste bien
+        /// en dessous. Une téléportation (Teleporter, réapparition, portail) et un déplacement imposé par la classe (ruée,
+        /// bond du saut percutant) remettent la mesure à zéro.
+        void SuivreChute(bool etaitAuSol, bool ignorer)
+        {
+            float y = transform.position.y;
+            if (ignorer) { m_SommetChute = y; return; }
+            if (!m_AuSol) { m_SommetChute = Mathf.Max(m_SommetChute, y); return; }
+            if (!etaitAuSol)
+            {
+                float h = m_SommetChute - y;
+                if (h > B.chuteSeuil) Chuter(h);
+            }
+            m_SommetChute = y;
+        }
+
+        /// Chute au-delà du seuil (propriétaire du héros) : dégâts, puis Ralenti (demandé à l'hôte en réseau, appliqué ici
+        /// tout de suite).
+        void Chuter(float hauteur)
+        {
+            var b = B;
+            float degats = Mathf.Min(b.chuteDegatsMax, (hauteur - b.chuteSeuil) * b.chuteDegatsParMetre);
+            if (Partie != null) Partie.Journal("Chute de " + hauteur.ToString("F1") + " m : " + degats.ToString("F0") + " dégâts, ralenti " + b.chuteRalentiDuree.ToString("F1") + " s");
+            if (degats > 0f)
+                Sante.Encaisser(new InfoDegats { montant = degats, equipeSource = Equipe.Ennemis, point = transform.position + Vector3.up * 0.2f, direction = Vector3.down });
+            if (Vivant && Statuts != null) Statuts.Ajouter(TypeStatut.Ralenti, b.chuteRalentiDuree, b.chuteRalentiForce, OrigineStatut.Chute);
+        }
 
         /// Direction du corps en visée : vers la visée, corrigée du décalage de lacet de la pose de tir (l'arme regarde le
         /// réticule, pas le nez du personnage).

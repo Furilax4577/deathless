@@ -20,6 +20,10 @@
                             </ui:VisualElement>
                         </ui:VisualElement>
                         <ui:VisualElement name="perso-carac" class="perso__carac" />
+                        <!-- Statuts actifs : survol ou focus = infobulle (AfflictionsPersonnage.cs) -->
+                        <ui:Label text="AFFLICTIONS" class="dl-section-label perso__afflictions-titre" />
+                        <ui:VisualElement name="perso-afflictions" class="perso__afflictions" />
+                        <ui:Label name="perso-afflictions-vide" text="Aucune affliction." class="dl-text dl-text--muted perso__afflictions-vide" />
                     </ui:VisualElement>
                     <!-- Les compétences -->
                     <ui:VisualElement class="dl-panel perso__carte perso__competences">

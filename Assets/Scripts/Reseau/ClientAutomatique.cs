@@ -480,6 +480,20 @@ namespace Deathless.Reseau
                 if (so != null) t += " | sorcier " + so.EtatCourant;
                 var bo = BouclierNyxessa.Instance;
                 if (bo != null && bo.Leve) t += " bouclier " + bo.Vie.ToString("F0");
+                // Statuts : ennemis affectés vus par ce poste, listes reçues de l'hôte, demandes envoyées, statuts du héros local.
+                int affectes = 0;
+                var parType = new System.Collections.Generic.SortedDictionary<string, int>();
+                foreach (var st in Statuts.Actifs)
+                {
+                    if (st == null || st.Nombre == 0 || st.GetComponent<Squelette>() == null) continue;
+                    affectes++;
+                    foreach (var s in st.Liste) { parType.TryGetValue(s.type.ToString(), out int c); parType[s.type.ToString()] = c + 1; }
+                }
+                t += " | statuts : " + affectes + " ennemis";
+                foreach (var kv in parType) t += " " + kv.Key + "x" + kv.Value;
+                t += ", listes reçues " + Statuts.ListesRecues + ", demandes " + Statuts.DemandesEnvoyees;
+                if (p.HerosLocal != null && p.HerosLocal.Statuts != null)
+                    foreach (var s in p.HerosLocal.Statuts.Liste) t += ", moi " + s.type + (s.predit ? " (prédit)" : "") + " " + s.Restant.ToString("F1") + " s";
             }
             if (p != null && p.Etat.phase == Phase.Terminee && DonneesUI.Score != null)
             {

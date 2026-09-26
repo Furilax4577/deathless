@@ -28,11 +28,14 @@ namespace Deathless.Reseau
         public static readonly List<HerosReseau> Tous = new List<HerosReseau>();
 
         public Heros Heros { get; private set; }
+        /// Statuts du héros, tenus par l'hôte (Docs/reseau.md, « Statuts ») : envoyés seulement quand ils changent.
+        NetworkList<StatutReseau> m_Statuts;
+        Statuts m_StatutsJeu;
         /// Hauteur de l'étiquette du pseudo au-dessus des pieds.
         public float hauteurPseudo = 2.35f;
         bool m_MortVue;
 
-        void Awake() { Heros = GetComponent<Heros>(); }
+        void Awake() { Heros = GetComponent<Heros>(); m_Statuts = new NetworkList<StatutReseau>(); }
 
         /// Le héros local de ce poste, s'il est en partie réseau (sinon null).
         public static HerosReseau Local(Heros h)
@@ -55,6 +58,7 @@ namespace Deathless.Reseau
                 Classe.Value = new FixedString32Bytes(m_ClassePreparee);
             }
             Tous.Add(this);
+            BrancherStatuts();
             name = "Heros_" + Classe.Value + "_" + NomJoueur.Value + (IsOwner ? " (local)" : "");
             var p = Partie.Instance;
             if (p == null) { ReseauJeu.Journal("héros réseau sans Partie : " + name); return; }
@@ -74,6 +78,7 @@ namespace Deathless.Reseau
 
         public override void OnNetworkDespawn()
         {
+            DebrancherStatuts();
             Tous.Remove(this);
             if (Partie.Instance != null) Partie.Instance.DetacherHeros(OwnerClientId);
         }
@@ -194,6 +199,48 @@ namespace Deathless.Reseau
 
         [Rpc(SendTo.Owner)]
         void RepereRpc() { if (Heros.Classe is ClasseAssassin a) a.Reperer(); }
+
+        // ----------------------------------------------------------------- Statuts (l'hôte fait foi, le propriétaire prédit)
+
+        void BrancherStatuts()
+        {
+            if (Heros == null) return;
+            m_StatutsJeu = Statuts.De(Heros);
+            if (IsServer)
+            {
+                m_StatutsJeu.Change += EcrireStatuts;
+                EcrireStatuts();
+                return;
+            }
+            m_StatutsJeu.Autorite = false;
+            if (IsOwner) { m_StatutsJeu.relais = DemanderStatut; m_StatutsJeu.predire = true; }
+            m_Statuts.OnListChanged += StatutsRecus;
+            StatutsReseau.Lire(m_Statuts, m_StatutsJeu, NetworkManager);
+        }
+
+        void DebrancherStatuts()
+        {
+            if (m_StatutsJeu == null) return;
+            m_StatutsJeu.Change -= EcrireStatuts;
+            m_StatutsJeu.relais = null;
+            if (m_Statuts != null) m_Statuts.OnListChanged -= StatutsRecus;
+        }
+
+        void EcrireStatuts() { if (IsServer && IsSpawned) StatutsReseau.Ecrire(m_Statuts, m_StatutsJeu, NetworkManager); }
+
+        void StatutsRecus(NetworkListEvent<StatutReseau> e) => StatutsReseau.Lire(m_Statuts, m_StatutsJeu, NetworkManager);
+
+        /// Propriétaire (client) : statut de son héros (chute, garde brisée, ivresse) ; déjà appliqué ici, l'hôte le pose
+        /// et le diffuse.
+        void DemanderStatut(Statut s) => StatutRpc((byte)s.type, s.duree, s.intensite, (byte)s.origine);
+
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
+        void StatutRpc(byte type, float duree, float intensite, byte origine)
+        {
+            if (Heros == null || Heros.Sante.Mort) return;
+            var s = StatutsReseau.Valider((TypeStatut)type, duree, intensite, (OrigineStatut)origine, Partie.IdJoueur(OwnerClientId), true);
+            if (s.type != TypeStatut.Aucun) Statuts.De(Heros).AjouterDemande(s);
+        }
 
         // ----------------------------------------------------------------- IAllie
 

@@ -127,6 +127,35 @@ La rangée du haut est élargie pour que la barre de Nyxessa garde sa longueur :
 
 Vérifié en Play le 26/09/2026. Captures (`Assets/Screenshots/`) : village en solo, palier 3, 2 missiles sur 4, recharge en cours : `hud_missiles_village_x1.png`, `_x2.png`, `_x3.png` ; missile gagné : `hud_missiles_village_pop.png` ; missile tiré : `hud_missiles_village_tir.png` ; banc (3 sur 5) : `hud_missiles_banc_x1.png`, `_x2.png`, `_x3.png`.
 
+### Statuts : `IEtatStatuts`, `IStatutAffiche`, `IEnnemiAffecte` (`Donnees/IStatuts.cs`, 26/09/2026)
+
+Posée par le jeu dans `DonneesUI.Statuts` (`Deathless.Jeu.StatutsUI`, créée par `HudPresenter`), lue à chaque image par le HUD et le menu du personnage. Absente : rien n'est affiché. Règles : Wiki `statuts.md` et `interface.md`, « Statuts ».
+
+| Membre | Sens |
+|---|---|
+| `StatutsJoueur` | Statuts du joueur local (`IStatutAffiche` : `Nom`, `Icone` « statut_<id> », `Effet` en clair avec ses valeurs, `Source`, `Restant` en s ou négatif sans durée, `Duree`, `Nefaste`). L'eau du donjon y figure comme un « Ralenti » sans durée. |
+| `EnnemisAffectes` | Ennemis vivants avec au moins un statut (`IEnnemiAffecte` : `PositionTete` au-dessus du crâne, `Visible` si ses rendus sont affichés, `Statuts`). |
+
+- **HUD** (`Ecrans/HudStatuts.cs`, classe à part : `EcranHud` ne fait que la créer et l'appeler) :
+  - Rangée du joueur `statuts` (`.hud-statuts`), en bas à gauche, au-dessus du portrait et des barres. La pastille des points de compétence passe au-dessus d'elle (bottom 306 px, 290 px à ×3).
+  - Six cases de 60 px au plus : icône, liseré rouge (affliction) ou or (bienfait), jauge de durée en bas de la case, secondes dans une pastille. Masquée quand le joueur est mort.
+  - Pour déplacer la rangée (refonte des barres) : seulement les règles `.hud-statuts` de `Hud.uss`.
+- **Au-dessus des ennemis** : calque `statuts-ennemis`, placé chaque image en espace écran comme les pseudos. Une petite rangée par ennemi affecté et visible : quatre cases de 36 px au plus, jauge de 3 px, sans secondes.
+  - Seulement dans le champ de la caméra et à moins de 30 m (`HudStatuts.DistanceEnnemis`) ; elle s'estompe sur les 6 derniers mètres. 24 rangées au plus.
+  - Aucune allocation d'image en image : cases et rangées réutilisées.
+- **Menu du personnage** : section « AFFLICTIONS » sous les caractéristiques (`perso-afflictions`, `Ecrans/AfflictionsPersonnage.cs`).
+  - Un bouton par statut : icône, jauge, secondes. « Aucune affliction. » sinon.
+  - Le survol à la souris ou le focus à la manette montre une infobulle sous le bouton (au-dessus s'il manque de place, sans cacher les statuts voisins ; `perso__bulle`) : nom, effet, durée restante, source.
+  - Navigation : gauche et droite d'un statut à l'autre ; à droite du dernier, la première amélioration ; à gauche d'une amélioration, le dernier statut visité. Si le statut qui a le focus s'achève, le focus revient à la première amélioration.
+- **Banc UIv01** : `EtatFactice` pose des statuts factices (`Dev/StatutsFactices.cs`), si le jeu n'en a pas déjà posé. Le joueur est brûlé, ralenti et ivre ; deux ennemis fictifs devant la caméra sont brûlé et ralenti, étourdi et provoqué. Les durées tournent en boucle ; `ForcerStatuts(false)` masque le tout.
+- Vérifié en Play le 26/09/2026. Captures (`Assets/Screenshots/`) :
+  - `statuts_village_hud_ennemis.png` : Village, mage ralenti et ivre, un squelette brûlé, étourdi et ralenti, un autre étourdi et provoqué ;
+  - `statuts_village_hud_x3.png` : même scène à ×3 ;
+  - `statuts_menu_afflictions_infobulle.png` : menu du personnage, focus sur « Ralenti » ;
+  - `statuts_banc_uiv01.png` : banc UIv01.
+  - Chute testée : 8 m donnent 53 dégâts et Ralenti −40 % pendant 3 s ; un saut sur place ne donne rien.
+- Icônes : `ArtSources/Icones/generer_statuts.py` → `Statuts/`, copiées dans `Assets/UI/Icones/Statuts/` par la synchronisation des icônes (menu 6).
+
 ### Roue à emotes : `IRoueEmotes`, `IEmoteRoue` (`Donnees/IRoueEmotes.cs`, 26/09/2026)
 
 Posée par le jeu dans `DonneesUI.RoueEmotes` (le composant `Deathless.Jeu.EmotesHeros` du héros local), lue à chaque image. Le jeu tient tout (ouverture, secteur pointé, lancement) ; l'UI ne fait qu'afficher. Règles : Wiki `interface.md`, « Roue à emotes ».

@@ -27,6 +27,8 @@ namespace Deathless.UI.Ecrans
         readonly List<Ligne> m_Lignes = new List<Ligne>();
         readonly List<(Label libelle, Label valeur)> m_LignesCarac = new List<(Label, Label)>();
         string m_EmblemePose;
+        /// Section « Afflictions » (statuts actifs, infobulle ; AfflictionsPersonnage.cs).
+        SectionAfflictions m_Afflictions;
 
         protected override void Construire()
         {
@@ -37,6 +39,8 @@ namespace Deathless.UI.Ecrans
             m_Classe = Racine.Q<Label>("perso-classe");
             m_Points = Racine.Q<Label>("perso-points");
             m_Message = Racine.Q<Label>("perso-message");
+            var afflictions = Racine.Q("perso-afflictions");
+            if (afflictions != null) m_Afflictions = new SectionAfflictions(afflictions, Racine.Q<Label>("perso-afflictions-vide"), Racine);
             var cases = Racine.Q("perso-cases");
             for (int i = 0; i < CasesInventaire; i++)
             {
@@ -79,6 +83,7 @@ namespace Deathless.UI.Ecrans
                 m_Lignes.Add(l);
             }
             UINavigation.ChainerVerticalement(m_Lignes.ConvertAll(x => (VisualElement)x.bouton));
+            if (m_Afflictions != null) { m_Afflictions.Reinitialiser(); m_Afflictions.Lier(m_Lignes.ConvertAll(x => (VisualElement)x.bouton)); }
             Rafraichir();
         }
 
@@ -144,6 +149,8 @@ namespace Deathless.UI.Ecrans
             m_Message.EnableInClassList("perso__message--vide", vide);
             m_Message.EnableInClassList("perso__message--refus", !vide && m.MessageRefus);
             m_Message.EnableInClassList("perso__message--ok", !vide && !m.MessageRefus);
+
+            if (m_Afflictions != null) m_Afflictions.Maj(DonneesUI.Statuts != null ? DonneesUI.Statuts.StatutsJoueur : null);
         }
     }
 }

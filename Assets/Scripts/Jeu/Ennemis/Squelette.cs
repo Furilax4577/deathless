@@ -28,6 +28,8 @@ namespace Deathless.Jeu
 
         public int Id { get; private set; }
         public Etat EtatCourant => m_Etat;
+        /// Statuts (brûlure, étourdissement, ralenti, provocation ; Statuts.cs), sur tous les postes.
+        public Statuts Statuts { get; private set; }
         public Sante Sante { get; private set; }
         public NavMeshAgent Agent { get; private set; }
         public bool Vivant => m_Etat != Etat.Mort;
@@ -70,6 +72,7 @@ namespace Deathless.Jeu
         {
             Id = ++s_Ids;
             Sante = GetComponent<Sante>();
+            Statuts = Statuts.De(this);
             Agent = GetComponent<NavMeshAgent>();
             if (animator == null) animator = GetComponentInChildren<Animator>();
             Sante.equipe = Equipe.Ennemis;
@@ -83,6 +86,8 @@ namespace Deathless.Jeu
         }
 
         Renderer m_RenduTete;
+        /// Rendu du crâne (null si absent) : la rangée des statuts n'est montrée que s'il est affiché.
+        public Renderer RenduTete => m_RenduTete;
 
         /// Os de la tête (base du crâne) ; le centre et le rayon de la zone de tête (tirs à la tête du rôdeur et de
         /// l'arbalète) viennent du maillage de la tête (gros crâne des squelettes KayKit).
@@ -110,6 +115,7 @@ namespace Deathless.Jeu
             if (Distant) { m_Reseau.DemanderProvoquer(duree); return; }
             m_Provocateur = h;
             m_ProvoqueJusque = Time.time + duree;
+            if (Statuts != null) Statuts.Ajouter(TypeStatut.Provoque, duree, 1f, OrigineStatut.Joueur, h.Id);
             m_Cible = h;
             m_SansFrapper = 0f;
             if (m_Etat == Etat.Marche) m_Etat = Etat.Poursuite;
@@ -175,7 +181,9 @@ namespace Deathless.Jeu
                 m_PousseReste -= k;
             }
             // Eau du donjon (bassin) : ralentit (le NavMesh la contourne déjà quand c'est plus court en temps).
-            if (Agent.enabled && m_Stats.vitesse > 0f) Agent.speed = m_Stats.vitesse * Deathless.Donjon.ZoneEau.FacteurEn(transform.position + Vector3.up * 0.2f);
+            // Statut Ralenti : même facteur, par-dessus l'eau.
+            if (Agent.enabled && m_Stats.vitesse > 0f) Agent.speed = m_Stats.vitesse * Deathless.Donjon.ZoneEau.FacteurEn(transform.position + Vector3.up * 0.2f)
+                * (Statuts != null ? Statuts.FacteurVitesse : 1f);
             if (animator != null) animator.SetFloat(P_Speed, Agent.enabled && !Agent.isStopped ? Mathf.Clamp01(Agent.velocity.magnitude / Mathf.Max(0.1f, m_Stats.vitesse)) * 0.5f : 0f);
             if (P != null && (P.Etat.phase == Phase.Terminee || P.Etat.nyxessa.detruite) && m_Etat != Etat.Mort)
             {
@@ -402,6 +410,7 @@ namespace Deathless.Jeu
             m_Etat = Etat.Etourdi;
             m_EtatDepuis = 0f;
             m_Etourdi = Mathf.Max(m_Etourdi, duree);
+            if (Statuts != null) Statuts.Ajouter(TypeStatut.Etourdi, m_Etourdi, 1f, sourceId > 0 ? OrigineStatut.Joueur : OrigineStatut.Inconnue, sourceId);
             if (Agent.enabled) Agent.isStopped = true;
             if (animator != null) { animator.SetTrigger(P_Hit); animator.SetBool(P_Stun, true); }
         }
@@ -447,6 +456,7 @@ namespace Deathless.Jeu
             if (m_Etat == Etat.Mort) return;
             bool surNyx = SurNyxessa;
             m_Etat = Etat.Mort;
+            if (Statuts != null) Statuts.Vider();
             // Or des vagues (règle provisoire sans donjon) : à la caisse commune, attribué à qui porte le coup fatal.
             if (P != null) P.GagnerOr(OrRapporte, info.sourceId, transform.position + Vector3.up * 1.6f);
             if (info.sourceId > 0 && P != null)

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+<!-- Deathless : statut_provoque (Provoqué). Généré par ArtSources/Icones/generer_icones.py -->
+<polygon fill="#6e1410" points="83.5,110 81,81 110,83.5 110,66.5 69,69 66.5,110"/>
+<polygon fill="#6e1410" points="75,110 75,75 81,81 83.5,110"/>
+<polygon fill="#ff7359" points="75,110 75,75 69,69 66.5,110"/>
+<polygon fill="#6e1410" points="75,75 110,75 110,83.5 81,81"/>
+<polygon fill="#ff7359" points="75,75 110,75 110,66.5 69,69"/>
+<polygon fill="#6e1410" points="66.5,18 69,59 110,61.5 110,44.5 81,47 83.5,18"/>
+<polygon fill="#ff7359" points="75,18 75,53 69,59 66.5,18"/>
+<polygon fill="#6e1410" points="75,18 75,53 81,47 83.5,18"/>
+<polygon fill="#6e1410" points="75,53 110,53 110,61.5 69,59"/>
+<polygon fill="#ff7359" points="75,53 110,53 110,44.5 81,47"/>
+<polygon fill="#6e1410" points="61.5,110 59,69 18,66.5 18,83.5 47,81 44.5,110"/>
+<polygon fill="#6e1410" points="53,110 53,75 59,69 61.5,110"/>
+<polygon fill="#ff7359" points="53,110 53,75 47,81 44.5,110"/>
+<polygon fill="#ff7359" points="53,75 18,75 18,66.5 59,69"/>
+<polygon fill="#6e1410" points="53,75 18,75 18,83.5 47,81"/>
+<polygon fill="#6e1410" points="44.5,18 47,47 18,44.5 18,61.5 59,59 61.5,18"/>
+<polygon fill="#ff7359" points="53,18 53,53 47,47 44.5,18"/>
+<polygon fill="#6e1410" points="53,18 53,53 59,59 61.5,18"/>
+<polygon fill="#ff7359" points="53,53 18,53 18,44.5 47,47"/>
+<polygon fill="#6e1410" points="53,53 18,53 18,61.5 59,59"/>
+</svg>

@@ -61,4 +61,4 @@ Une des maisons (celle du nord-est de la place) est la **taverne** : comptoir, t
 - **Boire une bière** : la tête tourne quelques secondes (8 s, 5 or) ;
 - **Payer une tournée** : **tous les joueurs** sont ivres quelques secondes (15 s, 30 or).
 
-**Ivresse** {décidé} : la caméra tangue doucement et la démarche hésite, sans rien de handicapant pour le combat (la visée, les attaques et les compétences ne changent pas). Prix, soin et durées : {à équilibrer}. Des **breuvages** viendront plus tard {à confirmer}. En multijoueur, l'hôte décide des achats. {{dev: (`Taverne`, `Ivresse`, `Partie.PayerTaverne` ; intérieur par `InterieursBuilder`, tavernier par `TavernierBuilder`)}}
+**Ivresse** {décidé} (un [statut](statuts.md), affiché dans le HUD) : la caméra tangue doucement et la démarche hésite, sans rien de handicapant pour le combat (la visée, les attaques et les compétences ne changent pas). Prix, soin et durées : {à équilibrer}. Des **breuvages** viendront plus tard {à confirmer}. En multijoueur, l'hôte décide des achats. {{dev: (`Taverne`, `Ivresse`, `Partie.PayerTaverne` ; intérieur par `InterieursBuilder`, tavernier par `TavernierBuilder`)}}
