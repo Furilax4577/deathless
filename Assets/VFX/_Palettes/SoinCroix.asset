@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: SoinCroix
   m_EditorClassIdentifier: Assembly-CSharp::VfxPalette
   theme: 13
+  intensiteEmission: 1.4
   usage: "Croix du soin du Paladin, qui montent de l'aura : elles restent vertes
     (exception d\xE9cid\xE9e par Quentin, 26/09/2026 ; l'aura elle-m\xEAme est blanc
     chaud et or, palette Soin)."

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Soin
   m_EditorClassIdentifier: Assembly-CSharp::VfxPalette
   theme: 5
+  intensiteEmission: 1.5
   usage: "Soins : aura de soin du Paladin (paillettes en gemmes, lumi\xE8re), blanc
     chaud et or, lumi\xE8re sacr\xE9e (ic\xF4ne paladin_soin : Or sombre, Or, Or
     clair de Sacre, Blanc chaud de Critique). Les croix qui montent restent vertes

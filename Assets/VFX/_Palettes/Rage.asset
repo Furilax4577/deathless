@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Rage
   m_EditorClassIdentifier: Assembly-CSharp::VfxPalette
   theme: 3
+  intensiteEmission: 1.6
   usage: "Sorts du viking : rugissement (cr\xE2ne, onde). Accents ivoire (dents,
     cornes) et fer (heaume)."
   teintes:

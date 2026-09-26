@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Os
   m_EditorClassIdentifier: Assembly-CSharp::VfxPalette
   theme: 6
+  intensiteEmission: 1.3
   usage: "Th\xE8me ajout\xE9 : d\xE9sint\xE9gration des ennemis \xE0 l'aube (poussi\xE8re
     d'os, GemBurst.Rise). Ni \xE9l\xE9ment ni relique ; l'accent vert est la magie
     Nyxessa qui quitte le squelette."

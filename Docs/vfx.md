@@ -118,6 +118,38 @@ Demande de Quentin : nuit plus sombre, tirée vers un bleu-violet (pas magenta),
 - **Brume au sol** : `GroundMist` (déjà présent dans Village, script repris de Relic) : nappes basses faites du maillage facetté de la boule de feu, aplaties et à moitié enterrées (dômes de 0,35 à 0,6 m : chevilles, genoux), matériau URP Lit transparent instancié (une seule copie de matériau, instanciation GPU, aucune ombre), opacité qui suit `DayCycle.Night`. Réglages de la scène : couleur (0,40 ; 0,36 ; 0,60), lueur (0,06 ; 0,04 ; 0,13), opacité de nuit 0,20, 110 bancs de 5 nappes, dans l'anneau de 11 à 62 m autour de Nyxessa (la place reste dégagée, la brume est surtout en bordure du village et en forêt). Ce n'est pas un effet à gemmes : la transparence d'un voile de brume est admise.
 - La copie de `CycleJourNuit.cs` dans le bac à sable du village doit recevoir les mêmes changements (valeur par défaut de `solCielNuit`, drapeau `portailForceOuvert`).
 
+## Luminance de nuit (26/09/2026)
+
+Retour de Quentin (capture de nuit depuis la forêt vers le village) : la lune était plus brillante que Nyxessa et le bouclier, et les sorts manquaient de « magie ». Objectif : **Nyxessa est la source de lumière la plus brillante du village la nuit**, les effets magiques (bouclier, missiles, portails, filet de canalisation, éclats) rayonnent (bloom `LueurNuit`, pas seulement une couleur), et la lune redevient un disque discret sans écraser le reste. Mesures avant / après (luminance moyenne 0-255 d'un patch de pixels, Play, nuit forcée, même cadrages) :
+
+| Source | Avant | Après |
+|---|---|---|
+| Lune (disque) | 230 | 106 (surface du halo nettement réduite) |
+| Fenêtre de maison | 170 | 104 |
+| Cristal de Nyxessa | 122 | **229** |
+| Missile en vol (corps) | 82 | 111 (pic HDR 254, absent avant) |
+| Bouclier (éclat de gemme) | 118 (pic 234, jamais saturé) | pic saturé 255, gemmes plus grandes et plus lisibles |
+
+Nyxessa dépasse maintenant la lune et les fenêtres, comme demandé. Captures : `Assets/Screenshots/luminance_foret_avant.png` / `_apres.png` (vue forêt → village), `luminance_place_avant.png` / `_apres.png` (place, 8 m de Nyxessa), `lune_avant.png` / `_apres.png`, `missile_vol_avant.png` / `_apres.png`, `bouclier_pres_avant.png` / `_apres.png`, et un contrôle de jour `luminance_place_jour_verif.png` (rien ne blanchit).
+
+**Hiérarchie des sources (nuit)**, du plus fort au plus discret :
+1. **Nyxessa** (cristal, ceinture, missiles, portails, filet, éclats de gemmes) — thème `Nyxessa`, `intensiteEmission` 2,5.
+2. **Bouclier de la relique** (`BouclierPlein` / `Entame` / `Critique`) — 2,0.
+3. **Sorts de classe** (Feu, Rage, Sacre 1,6 ; Terre, Soin 1,5 ; Critique, Chasse, Ombre, SoinCroix 1,4 ; Os 1,3).
+4. **Fenêtres et lanternes** (chaudes, discrètes, sous Nyxessa).
+5. **Lune** (disque réduit, rôle de lumière directionnelle froide conservé pour éclairer la forêt).
+
+**Mécanisme** : `VfxPalette` porte un nouveau champ par thème `intensiteEmission` (défaut 1) et l'accès statique `VfxPalette.Intensite(theme, défaut)` (`Assets/VFX/_Palettes/VfxPalette.cs`). Le shader `Relic/VertexColorUnlit` laissait déjà passer les couleurs par sommet au-delà de 1 sans les couper (vérifié dans le code du shader) : pas de changement de shader nécessaire, seulement des couleurs plus fortes.
+- **Cristal et ceinture** (`RelicGem.cs`, `RelicBelt.cs`) : émission multipliée par `VfxPalette.Intensite(Nyxessa)`, mais seulement proportionnellement à `DayCycle.Night` (×1 le jour, jusqu'à ×2,5 la nuit) — le cristal ne change pas d'aspect de jour.
+- **Missile** (`SkullMissileVisual.cs`) : la teinte claire (« Pale ») était volontairement gardée sous 1 (« le Bloom ne le délave pas en blanc ») ; elle passe maintenant par `VfxPalette.Intensite(Nyxessa)`, HDR en permanence (effet transitoire, pas besoin de fondu jour/nuit).
+- **Portails** (`PortalVisual.cs`), **éclats et gerbes** (`GemBurst.cs`), **filet de canalisation** (`FiletEnergie.cs`) : mêmes remplacements des anciens multiplicateurs fixes (×1,25, ×1,6) par `VfxPalette.Intensite(Nyxessa)`.
+- **Bouclier** (`RelicShieldVisual.cs`) : l'ancien reflet en dur (`× 1,2`) devient `VfxPalette.Intensite(thème Bouclier*)` (2,0), par palier de vie.
+- **Fenêtres** (`CycleJourNuit.fenetres`) : réduites de ×1,8 à ×1,3 (encore HDR, encore chaudes, mais sous Nyxessa).
+- **Lune** : nouveau champ `sunSize` sur `Ambiance.Preset` (`Assets/VFX/_RelicCommun/Ambiance.cs`), lu par `DayCycle.Apply()` (`_SunSize` du skybox procédural). Jour 0,04 (défaut du shader, inchangé) ; nuit 0,014 dans `Assets/VFX/_Ambiance/AmbianceVillage.asset` (disque bien plus petit, moins de surface à faire fleurir au Bloom). L'intensité de la lumière directionnelle (`sunIntensity` 0,25 la nuit) n'a pas été touchée : elle garde son rôle d'éclairage froid de la forêt.
+- **Bloom `LueurNuit`** : seuils inchangés (jour 1,25 / nuit 0,9, intensité 0,12 / 0,7) — avec les nouvelles émissions HDR ci-dessus, Nyxessa, le bouclier et les sorts dépassent nettement ces seuils la nuit sans qu'il faille les baisser davantage ; les fenêtres (HDR modéré, ×1,3) restent proches du seuil, donc discrètes.
+
+Palette : table des `intensiteEmission` par thème dans `Assets/VFX/_Palettes/*.asset` (voir la table des thèmes ci-dessus pour les couleurs ; le champ d'intensité est un réglage à part, pas une teinte).
+
 ## Fiches
 
 ### Gemme Nyxessa + ceinture (Relic)

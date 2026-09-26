@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: BouclierEntame
   m_EditorClassIdentifier: Assembly-CSharp::VfxPalette
   theme: 8
+  intensiteEmission: 2.0
   usage: "Th\xE8me ajout\xE9 : bouclier de la relique entam\xE9 (vie 15-40 %)."
   teintes:
   - nom: Ambre sombre

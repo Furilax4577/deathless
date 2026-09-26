@@ -10,12 +10,13 @@
 // Purement visuel et local ; shader Relic/VertexColorUnlit (matériau PortalVoxel).
 public class GemBurst : MonoBehaviour
 {
+    // HDR (26/09/2026, luminance de nuit) : l'éclat (dernière teinte) rayonne, intensité du thème Nyxessa.
     private static Color[] Palette => VfxPalette.Cache("GemBurst.Nyxessa", () => new[]
     {
         VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Base, new Color(0.07f, 0.38f, 0.05f)),
         VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Vif, new Color(0.25f, 0.7f, 0.08f)),
         VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Coeur, new Color(0.55f, 0.95f, 0.2f)),
-        VfxPalette.Accent(VfxTheme.Nyxessa, "Éclat", new Color(0.76f, 1f, 0.44f)) * 1.25f,
+        VfxPalette.Accent(VfxTheme.Nyxessa, "Éclat", new Color(0.76f, 1f, 0.44f)) * VfxPalette.Intensite(VfxTheme.Nyxessa, 2.5f),
     });
 
     private Mesh mesh;

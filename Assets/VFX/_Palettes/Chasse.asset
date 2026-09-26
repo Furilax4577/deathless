@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Chasse
   m_EditorClassIdentifier: Assembly-CSharp::VfxPalette
   theme: 11
+  intensiteEmission: 1.4
   usage: "Th\xE8me ajout\xE9 : r\xF4deur (arc band\xE9, nu\xE9e de fl\xE8ches). Verts
     for\xEAt tirant sur l'olive et ocres, distincts du vert \xE9meraude de Nyxessa."
   teintes:

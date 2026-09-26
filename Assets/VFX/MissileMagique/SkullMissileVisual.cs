@@ -12,7 +12,9 @@ public class SkullMissileVisual : MonoBehaviour
     // Du plus sombre (orbites, dents) au plus pâle (os), vert Nyxessa.
     private static Color Dark => VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Ombre, new Color(0.03f, 0.23f, 0.07f)) * 0.3f;
     private static Color Mid => VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Vif, new Color(0.18f, 0.6f, 0.1f));
-    private static Color Pale => VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Coeur, new Color(0.5f, 0.95f, 0.38f));   // sous 1 : le Bloom ne le délave pas en blanc
+    // HDR (26/09/2026, luminance de nuit) : le missile est un sort de Nyxessa, il doit rayonner en vol, pas seulement
+    // porter une couleur ; intensité du thème Nyxessa (VfxPalette.intensiteEmission, la plus forte).
+    private static Color Pale => VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Coeur, new Color(0.5f, 0.95f, 0.38f)) * VfxPalette.Intensite(VfxTheme.Nyxessa, 2.5f);
 
     private const float GemSize = 0.021f;
     private float echelle = 1f;

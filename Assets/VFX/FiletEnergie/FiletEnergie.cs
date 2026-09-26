@@ -119,7 +119,9 @@ public class FiletEnergie : MonoBehaviour
             float voyage = Mathf.Pow(1f - Mathf.Abs(phase - 0.5f) * 2f, 6f);   // pic étroit qui parcourt 0..1 en boucle
             float taille = (0.028f + 0.02f * Mathf.Sin(k * 37f + i)) * (0.55f + 0.45f * voyage) * m_Presence;
             Color c = Color.Lerp(baseC, vif, 0.4f + 0.6f * (i % 3) / 2f);
-            c = Color.Lerp(c, coeur * 1.6f, voyage) * (1f + eclat * 1.4f);
+            // HDR (26/09/2026, luminance de nuit) : le pic qui voyage sur le lien rayonne, intensité du thème Nyxessa
+            // (remplace l'ancien ×1,6 en dur).
+            c = Color.Lerp(c, coeur * VfxPalette.Intensite(VfxTheme.Nyxessa, 2.5f), voyage) * (1f + eclat * 1.4f);
             Quaternion r = Quaternion.LookRotation(dirAxe, vertical);
             LowPolyGem.Write(m_Vertices, m_Colors, i, position, taille, new Vector3(0.6f, 0.6f, 1.4f), r, c, LowPolyGem.DefaultLight);
         }

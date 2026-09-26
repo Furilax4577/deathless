@@ -126,12 +126,16 @@ public class RelicGem : MonoBehaviour
     {
         Vector3 light = LowPolyGem.DefaultLight;
         float boost = 1f + nightBoost * night;
+        // Luminance de nuit (26/09/2026) : Nyxessa doit être la source la plus brillante du village. Émission HDR
+        // (au-delà de 1, le Bloom LueurNuit la fait rayonner) qui monte avec la nuit (VfxPalette.intensiteEmission du
+        // thème Nyxessa, la plus forte) ; le jour reste inchangé (×1) pour ne pas blanchir le cristal.
+        float hdr = Mathf.Lerp(1f, VfxPalette.Intensite(VfxTheme.Nyxessa, 2.5f), night);
         for (int f = 0; f < faceNormals.Length; f++)
         {
             Vector3 world = transform.TransformDirection(faceNormals[f]).normalized;
             // Vert plus profond (Quentin, 26/09/2026) : facettes sombres plus sombres, la plus claire garde sa lecture.
             float shade = 0.36f + 0.66f * Mathf.Abs(Vector3.Dot(world, light));
-            Color c = faceColors[f] * shade * boost;
+            Color c = faceColors[f] * shade * boost * hdr;
             c.a = 1f;
             colors[f * 3] = colors[f * 3 + 1] = colors[f * 3 + 2] = c;
         }

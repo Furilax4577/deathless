@@ -39,27 +39,29 @@ public class RelicShieldVisual : MonoBehaviour
     [Tooltip("Dessiner hors Play (vitrine du banc : à utiliser avec RelicShieldEtat.figer).")]
     public bool apercuEdition;
 
-    // Trois teintes par palier, du plus sombre au plus clair, plus un reflet (index 3).
+    // Trois teintes par palier, du plus sombre au plus clair, plus un reflet (index 3, HDR : VfxPalette.intensiteEmission
+    // du thème, deuxième derrière Nyxessa dans la hiérarchie de luminance de nuit du 26/09/2026 — remplace l'ancien
+    // ×1,2 en dur, réglable par thème dans la palette).
     private static Color[] BluePalette => VfxPalette.Cache("Bouclier.Plein", () => new[]
     {
         VfxPalette.Couleur(VfxTheme.BouclierPlein, VfxRole.Ombre, Color.white),
         VfxPalette.Couleur(VfxTheme.BouclierPlein, VfxRole.Base, Color.white),
         VfxPalette.Couleur(VfxTheme.BouclierPlein, VfxRole.Vif, Color.white),
-        VfxPalette.Couleur(VfxTheme.BouclierPlein, VfxRole.Coeur, Color.white) * 1.2f,
+        VfxPalette.Couleur(VfxTheme.BouclierPlein, VfxRole.Coeur, Color.white) * VfxPalette.Intensite(VfxTheme.BouclierPlein, 2f),
     });
     private static Color[] OrangePalette => VfxPalette.Cache("Bouclier.Entame", () => new[]
     {
         VfxPalette.Couleur(VfxTheme.BouclierEntame, VfxRole.Ombre, Color.white),
         VfxPalette.Couleur(VfxTheme.BouclierEntame, VfxRole.Base, Color.white),
         VfxPalette.Couleur(VfxTheme.BouclierEntame, VfxRole.Vif, Color.white),
-        VfxPalette.Couleur(VfxTheme.BouclierEntame, VfxRole.Coeur, Color.white) * 1.2f,
+        VfxPalette.Couleur(VfxTheme.BouclierEntame, VfxRole.Coeur, Color.white) * VfxPalette.Intensite(VfxTheme.BouclierEntame, 2f),
     });
     private static Color[] RedPalette => VfxPalette.Cache("Bouclier.Critique", () => new[]
     {
         VfxPalette.Couleur(VfxTheme.BouclierCritique, VfxRole.Ombre, Color.white),
         VfxPalette.Couleur(VfxTheme.BouclierCritique, VfxRole.Base, Color.white),
         VfxPalette.Couleur(VfxTheme.BouclierCritique, VfxRole.Vif, Color.white),
-        VfxPalette.Couleur(VfxTheme.BouclierCritique, VfxRole.Coeur, Color.white) * 1.2f,
+        VfxPalette.Couleur(VfxTheme.BouclierCritique, VfxRole.Coeur, Color.white) * VfxPalette.Intensite(VfxTheme.BouclierCritique, 2f),
     });
     private static Color BlueGlow => VfxPalette.Accent(VfxTheme.BouclierPlein, "Lueur", new Color(0.35f, 0.65f, 1f));
     private static Color OrangeGlow => VfxPalette.Accent(VfxTheme.BouclierEntame, "Lueur", new Color(1f, 0.6f, 0.2f));

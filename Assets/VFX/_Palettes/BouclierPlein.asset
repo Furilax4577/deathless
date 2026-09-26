@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: BouclierPlein
   m_EditorClassIdentifier: Assembly-CSharp::VfxPalette
   theme: 7
+  intensiteEmission: 2.0
   usage: "Th\xE8me ajout\xE9 : bouclier de la relique, \xE9tat plein (vie > 40 %).
     Les trois th\xE8mes Bouclier* codent la vie restante, pas un \xE9l\xE9ment. Le
     c\u0153ur est pouss\xE9 \xD71,2 en HDR par le script."

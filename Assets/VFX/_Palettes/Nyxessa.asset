@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Nyxessa
   m_EditorClassIdentifier: Assembly-CSharp::VfxPalette
   theme: 1
+  intensiteEmission: 2.5
   usage: "Relique et son \xE9nergie uniquement : gemme Nyxessa et ceinture, portail,
     t\xE9l\xE9portation, missile cr\xE2ne tir\xE9 par la relique, gerbes de gemmes
     (GemBurst, GemTrail)."

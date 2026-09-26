@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Ombre
   m_EditorClassIdentifier: Assembly-CSharp::VfxPalette
   theme: 12
+  intensiteEmission: 1.4
   usage: "Th\xE8me ajout\xE9 : assassin (mode furtif, grenade fumig\xE8ne, carreau).
     Violets sombres et gris fum\xE9e."
   teintes:

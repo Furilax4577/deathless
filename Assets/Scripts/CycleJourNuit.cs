@@ -42,7 +42,8 @@ public class CycleJourNuit : MonoBehaviour
     public GameObject[] flammes;
     [Tooltip("Rendus des maisons (matériau à émission : fenêtres).")]
     public Renderer[] maisons;
-    [ColorUsage(false, true)] public Color fenetres = new Color(1f, 0.55f, 0.22f) * 1.8f;
+    // Réduit de ×1,8 à ×1,3 (26/09/2026, luminance de nuit) : les fenêtres restent chaudes mais discrètes, sous Nyxessa.
+    [ColorUsage(false, true)] public Color fenetres = new Color(1f, 0.55f, 0.22f) * 1.3f;
     public ParticleSystem lucioles;
     public float luciolesParSeconde = 5f;
     [Header("Crépuscule et aube (teinte chaude au milieu de la transition)")]

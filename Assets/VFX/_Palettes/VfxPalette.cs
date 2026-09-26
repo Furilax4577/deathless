@@ -39,6 +39,11 @@ public class VfxPalette : ScriptableObject
     public Teinte[] teintes;
     [Tooltip("Matériaux Lit (particules, croix...) recolorés par l'outil Appliquer les palettes.")]
     public CibleMateriau[] materiaux;
+    [Tooltip("Multiplicateur d'émission HDR des effets en gemmes de ce thème (Relic/VertexColorUnlit : au-delà de 1, " +
+        "le Bloom LueurNuit les fait rayonner). Hiérarchie voulue (26/09/2026, luminance de nuit) : Nyxessa la plus " +
+        "forte (relique, ceinture, bouclier, missiles, portails, filet, éclats), puis les sorts de classe, puis le " +
+        "reste (accents décoratifs). 1 = pas de renfort (matériaux Lit hors de ce mécanisme).")]
+    public float intensiteEmission = 1f;
 
     // Version : incrémentée à chaque modification (les caches des scripts se reconstruisent).
     public static int Version { get; private set; }
@@ -76,6 +81,15 @@ public class VfxPalette : ScriptableObject
     public static Color Accent(VfxTheme theme, string nom, Color defaut)
     {
         return Couleur(theme, VfxRole.Accent, defaut, nom);
+    }
+
+    // Multiplicateur d'émission HDR du thème (champ `intensiteEmission` de la palette), `defaut` si le registre ou la
+    // palette manque. Sert aux effets en gemmes (Relic/VertexColorUnlit laisse passer les couleurs au-delà de 1, le
+    // Bloom LueurNuit les fait rayonner) pour rester au-dessus de 1 sans valeur en dur dans chaque script.
+    public static float Intensite(VfxTheme theme, float defaut = 1f)
+    {
+        VfxPalette p = De(theme);
+        return p != null && p.intensiteEmission > 0f ? p.intensiteEmission : defaut;
     }
 
     private static readonly Dictionary<string, Color[]> caches = new Dictionary<string, Color[]>();

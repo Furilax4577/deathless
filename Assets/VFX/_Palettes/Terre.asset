@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Terre
   m_EditorClassIdentifier: Assembly-CSharp::VfxPalette
   theme: 2
+  intensiteEmission: 1.5
   usage: "Ondes de choc au sol (saut percutant, charge b\xE9lier), gerbe de terre
     de la sortie de terre."
   teintes:

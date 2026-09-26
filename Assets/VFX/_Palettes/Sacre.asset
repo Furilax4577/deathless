@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Sacre
   m_EditorClassIdentifier: Assembly-CSharp::VfxPalette
   theme: 4
+  intensiteEmission: 1.6
   usage: "Chevalier / paladin : charge b\xE9lier (bulle en t\xEAte de b\xE9lier,
     tra\xEEn\xE9e, \xE9clat)."
   teintes:

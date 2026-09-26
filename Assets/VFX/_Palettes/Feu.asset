@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Feu
   m_EditorClassIdentifier: Assembly-CSharp::VfxPalette
   theme: 0
+  intensiteEmission: 1.6
   usage: "Sorts de feu du mage : boule de feu (r\xE9f\xE9rence Relic), c\xF4ne de
     flammes, flamm\xE8ches du burn, explosion, fum\xE9e."
   teintes:

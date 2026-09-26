@@ -109,6 +109,10 @@ public class DayCycle : MonoBehaviour
             sky.SetColor("_SkyTint", Color.Lerp(a.skyTint, b.skyTint, t));
             sky.SetFloat("_Exposure", Mathf.Lerp(a.skyExposure, b.skyExposure, t));
             sky.SetFloat("_AtmosphereThickness", Mathf.Lerp(a.atmosphereThickness, b.atmosphereThickness, t));
+            // Taille du disque du soleil / de la lune (26/09/2026, luminance de nuit) : la lune doit être un disque
+            // discret, pas un halo qui écrase Nyxessa et le bouclier au Bloom.
+            if (sky.HasProperty("_SunSize"))
+                sky.SetFloat("_SunSize", Mathf.Lerp(a.sunSize, b.sunSize, t));
         }
     }
 }

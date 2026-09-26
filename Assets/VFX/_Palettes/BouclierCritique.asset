@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: BouclierCritique
   m_EditorClassIdentifier: Assembly-CSharp::VfxPalette
   theme: 9
+  intensiteEmission: 2.0
   usage: "Th\xE8me ajout\xE9 : bouclier de la relique critique (vie < 15 %)."
   teintes:
   - nom: Rouge sombre

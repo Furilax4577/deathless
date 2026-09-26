@@ -24,6 +24,8 @@ public class Ambiance : ScriptableObject
         public Color skyTint = new Color(0.42f, 0.6f, 0.9f);
         public float skyExposure = 1.25f;
         public float atmosphereThickness = 0.85f;
+        [Tooltip("Taille du disque du soleil / de la lune (Skybox/Procedural, _SunSize). Défaut du shader : 0,04.")]
+        public float sunSize = 0.04f;
     }
 
     [Tooltip("Répit, salle d'attente, menu.")]
@@ -43,6 +45,9 @@ public class Ambiance : ScriptableObject
         skyTint = new Color(0.8f, 0.42f, 0.55f),
         skyExposure = 0.95f,
         atmosphereThickness = 1.35f,
+        // Lune plus discrète (26/09/2026, luminance de nuit) : disque nettement plus petit que le soleil du jour, pour
+        // qu'elle ne bloome plus en un gros halo qui écrase Nyxessa et le bouclier.
+        sunSize = 0.014f,
     };
 
     [Tooltip("Durée du fondu entre jour et crépuscule (s).")]

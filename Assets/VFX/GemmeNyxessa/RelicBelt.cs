@@ -176,6 +176,9 @@ public class RelicBelt : MonoBehaviour
     {
         Vector3 center = crystal.position;
         float innerEdge = ringRadius - bandWidth;
+        // Luminance de nuit (26/09/2026) : la ceinture rayonne avec le cristal, HDR au-delà de 1 la nuit (Bloom
+        // LueurNuit), inchangée le jour (comme RelicGem.Shade).
+        float hdr = Mathf.Lerp(1f, VfxPalette.Intensite(VfxTheme.Nyxessa, 2.5f), DayCycle.Night);
         for (int i = 0; i < gems; i++)
         {
             float a = angle0[i] + tempsRotation * speed[i];
@@ -218,7 +221,7 @@ public class RelicBelt : MonoBehaviour
             float shade = Mathf.Clamp01(0.5f + 0.5f * blot + bright * 0.6f);
             float slot = shade * (Palette.Length - 1);
             int k = Mathf.Min(Palette.Length - 2, (int)slot);
-            Color color = Color.Lerp(Palette[k], Palette[k + 1], slot - k);
+            Color color = Color.Lerp(Palette[k], Palette[k + 1], slot - k) * hdr;
 
             Vector3 position = center + new Vector3(Mathf.Cos(a) * r, h, Mathf.Sin(a) * r);
             Quaternion rotation = Quaternion.AngleAxis(t * (90f + 60f * Mathf.Sin(p)) + p * 36f, spinAxis[i]) * rotation0[i];

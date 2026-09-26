@@ -4,6 +4,8 @@
 
 Nyxessa est une force mystérieuse, celle dont sont issus les squelettes et qu'utilisent les héros (voir [L'univers](univers.md)). Au centre du village, elle prend la forme d'une gemme verte à facettes qui flotte et tourne au-dessus d'un rocher, entourée d'une ceinture de petites gemmes en orbite.
 
+**Luminance de nuit {effet validé, 26/09/2026}** : la nuit, Nyxessa est la source de lumière la plus brillante du village (avant la lune et les fenêtres des maisons) ; le bouclier, les missiles, les portails et le filet de canalisation rayonnent aussi nettement plus qu'avant (bloom, pas seulement une couleur). Détails techniques et mesures dans `Docs/vfx.md`, section « Luminance de nuit ».
+
 ## Vie
 
 - **2 000 points de vie**, sans régénération à l'aube {à équilibrer}. Quand elle est détruite, la partie est perdue.

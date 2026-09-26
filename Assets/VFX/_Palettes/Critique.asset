@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Critique
   m_EditorClassIdentifier: Assembly-CSharp::VfxPalette
   theme: 10
+  intensiteEmission: 1.4
   usage: "Th\xE8me ajout\xE9 : coup critique, commun \xE0 toutes les classes. Or
     / blanc chaud, plus clair et plus blanc que Sacr\xE9 (qui est la couleur du paladin)
     pour se lire sur n'importe quelle classe ; accent rouge-orang\xE9 r\xE9serv\xE9
