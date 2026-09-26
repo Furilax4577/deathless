@@ -5,6 +5,9 @@ Travaux prévus ou notés, pas encore faits. Une ligne quitte cette page quand l
 ## Noté par Quentin
 
 - **Cap : sortir de KayKit** {décidé} (26/09/2026) : à terme, remplacer tout ce qui vient de KayKit par des assets propres à Deathless, pour se différencier et avoir plus de liberté. Premières étapes : arbres, sol, bâtiments, personnages générés. Les animations (squelette Rig_Medium) viendront en dernier.
+
+{jauge-kaykit}
+
 - **Revoir le menu des options de jeu.** (noté le 25/09/2026)
 - **Roue à emotes** (faite le 26/09/2026, voir [Interface](interface.md)) : touche confirmée (croix bas, B). « Boire un coup » : le clip `Use_Item` lève la chope devant la poitrine sans la porter à la bouche ; un vrai geste de boire serait à créer. Pas de danse, rire ni applaudissement dans les packs : à créer pour de futures emotes.
 - **Idées de personnages** (classes jouables possibles, noté le 25/09/2026) :

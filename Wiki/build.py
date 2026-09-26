@@ -28,7 +28,8 @@
 # Images : une ligne qui commence par {image chemin} (chemin relatif à Wiki/, ex. media/classes/clochard/face.png) devient
 # une carte image carrée (même légende et mêmes règles {dev} / {à confirmer} que les vidéos, un clic ouvre l'image entière) ;
 # les lignes {video} et {image} consécutives forment une même grille. Le fichier est copié dans <version>/images/.
-import html, io, json, os, re, datetime, shutil, unicodedata, urllib.parse
+import html, io, json, os, re, datetime, shutil, sys, unicodedata, urllib.parse
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 ICI = os.path.dirname(os.path.abspath(__file__))
 PAGES = os.path.join(ICI, "pages")
@@ -360,7 +361,27 @@ def sons_a_ecouter():
             % (len(sons), lignes)), [(2, "À écouter", "a-ecouter")]
 
 
-BALISES = {"{catalogue sons}": catalogue_sons, "{sons à créer}": sons_a_creer, "{sons à écouter}": sons_a_ecouter}
+def jauge_kaykit():
+    """{jauge-kaykit} : part des assets encore issus des packs KayKit, par famille (Wiki/jauge_kaykit.py, recalculée à
+    chaque génération). Le cap est 0 % (décision de Quentin, 26/09/2026)."""
+    import jauge_kaykit as jk
+    d = jk.ecrire()
+    def barre(pct, k, t):
+        return ('<div class="jauge"><div class="jauge__piste"><div class="jauge__remplissage" style="width:%.1f%%"></div></div>'
+                '<span class="jauge__valeur">%.1f %%</span><small>%d / %d</small></div>') % (pct, pct, k, t)
+    lignes = "".join('<tr><td>%s</td><td>%s</td></tr>' % (html.escape(f["nom"]), barre(f["pourcent"], f["kaykit"], f["total"]))
+                     for f in d["familles"])
+    bloc = ('<div class="jauge-kaykit"><p class="jauge-kaykit__titre">Part de KayKit dans les assets du jeu : '
+            '<strong>%.1f %%</strong> <small>(%d fichiers sur %d, mesuré le %s)</small></p>%s'
+            '<table class="jauge-kaykit__table"><tbody>%s</tbody></table>'
+            '<p class="jauge-kaykit__note">Compte les modèles, textures, animations, matériaux et sons sous <code>Assets/</code> '
+            '(hors interface, icônes, éditeur et captures) ; est KayKit tout fichier rangé dans un dossier KayKit. '
+            'Objectif : 0 %%.</p></div>') % (d["pourcent"], d["kaykit"], d["total"], d["date"], barre(d["pourcent"], d["kaykit"], d["total"]), lignes)
+    return bloc, []
+
+
+BALISES = {"{catalogue sons}": catalogue_sons, "{sons à créer}": sons_a_creer, "{sons à écouter}": sons_a_ecouter,
+           "{jauge-kaykit}": jauge_kaykit}
 
 
 def copier_sons():
@@ -589,6 +610,11 @@ table.sons audio{display:block;width:210px;height:32px}
 .carte-video img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;background:#1c1f26}
 .carte-video code{font-size:12px;word-break:break-all}.carte-video .badge{margin-left:0}
 .badge.emote{background:var(--tune-fond);color:var(--tune)}
+.jauge-kaykit{margin:12px 0 18px;padding:12px 14px;background:var(--surface);border:1px solid var(--ligne);border-radius:12px}
+.jauge-kaykit__titre{margin:0 0 8px}.jauge-kaykit__note{margin:8px 0 0;font-size:12px;color:var(--doux)}
+.jauge-kaykit__table{width:100%;border-collapse:collapse}.jauge-kaykit__table td{padding:4px 8px 4px 0;font-size:13px}.jauge-kaykit__table td:first-child{width:11em;color:var(--doux)}
+.jauge{display:flex;align-items:center;gap:8px}.jauge__piste{flex:1;height:10px;border-radius:5px;background:var(--code);overflow:hidden}
+.jauge__remplissage{height:100%;background:var(--wait);border-radius:5px}.jauge__valeur{min-width:4em;font-weight:600}.jauge small{color:var(--doux);font-size:12px}
 @media (max-width:760px){.cadre{grid-template-columns:minmax(0,1fr)}nav{position:static;height:auto;border-right:0;border-bottom:1px solid var(--ligne)}}
 """
 

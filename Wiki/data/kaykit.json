@@ -1,0 +1,38 @@
+{
+  "date": "2026-09-26",
+  "pourcent": 75.3,
+  "kaykit": 1251,
+  "total": 1661,
+  "familles": [
+    {
+      "nom": "Modèles 3D",
+      "kaykit": 1155,
+      "total": 1158,
+      "pourcent": 99.7
+    },
+    {
+      "nom": "Textures",
+      "kaykit": 96,
+      "total": 112,
+      "pourcent": 85.7
+    },
+    {
+      "nom": "Animations",
+      "kaykit": 0,
+      "total": 31,
+      "pourcent": 0.0
+    },
+    {
+      "nom": "Matériaux et shaders",
+      "kaykit": 0,
+      "total": 75,
+      "pourcent": 0.0
+    },
+    {
+      "nom": "Sons",
+      "kaykit": 0,
+      "total": 285,
+      "pourcent": 0.0
+    }
+  ]
+}
