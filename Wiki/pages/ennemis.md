@@ -38,7 +38,8 @@ Un élite est un squelette ordinaire **plus fort**, sans éclat de Nyx (décisio
 - environ **1,3 fois plus grand** ;
 - **trois fois plus de points de vie** et des dégâts plus forts ;
 - une portée d'attaque un peu plus longue (+0,3 m) {à équilibrer} ; {{dev: (codé en dur dans `DirecteurVagues.Poser`, pas dans `GameBalance`)}}
-- **yeux rouges** et légère **aura rouge**, pour les distinguer.
+- **yeux rouges** et légère **aura rouge**, pour les distinguer ;
+- une **barre de vie toujours visible** au-dessus de la tête, là où les squelettes ordinaires ne la montrent que blessés (voir [Interface](interface.md#barres-de-vie-des-ennemis), 26/09/2026).
 
 Valeurs exactes : {à équilibrer}.
 
@@ -48,6 +49,8 @@ Valeurs exactes : {à équilibrer}.
 |---|---|---|
 | 10 | **Morgrim, le Roi des os**, mini-boss (le Golem) | Grand squelette massif, hache géante |
 | 12 | **Nyxar, le Nécromancien**, boss final, ancien possesseur de Nyxessa (voir [L'univers](univers.md)) | Couronne à crâne, robe violette, grimoire, grande faux et faucille, **yeux verts** qui brillent de la force de Nyxessa |
+
+Un boss a sa **méga barre de vie dans le HUD**, sous celle de Nyxessa, avec son nom et ses statuts ; elle se déploie à son entrée en scène (voir [Interface](interface.md#barres-de-vie-des-ennemis), 26/09/2026).
 
 ### Morgrim, le Roi des os {décidé}
 

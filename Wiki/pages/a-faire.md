@@ -8,6 +8,7 @@ Travaux prévus ou notés, pas encore faits. Une ligne quitte cette page quand l
 
 {jauge-kaykit}
 
+- **Barres de vie des ennemis** {décidé} (26/09/2026, règles dans [Interface](interface.md#barres-de-vie-des-ennemis)) : barre fine sous les statuts des ennemis blessés (toujours visible sur un élite), méga barre du boss sous celle de Nyxessa ; **chiffres de dégâts** flottants et option « Afficher les dégâts » (onglet Jeu, `OptionsJoueur`), même page du wiki. Maquette dans `sandbox-ui` d'abord, capture à valider par Quentin, puis intégration au HUD et au jeu.
 - **Bande-annonce Steam** : v1 tournée le 26/09/2026 (`Docs/trailer-storyboard.md`, outil `Assets/Scripts/Dev/Tournage/`), 39 s, à **écouter et valider** par Quentin ; à retourner quand le décor aura quitté KayKit.
 
 ## En attente de validation (Quentin)
