@@ -692,6 +692,7 @@ namespace Deathless.Jeu
                 Bounds arrivee = corps; arrivee.center += h.transform.position - avant;
                 if (portailArrivee != null) PortalTransit.Arrive(arrivee, portailArrivee, gemmes, DureeTransitArriveeGemmes);
                 else PortalTransit.Arrive(arrivee, arrivee.center + h.transform.forward * 1.2f, gemmes, DureeTransitArriveeGemmes);
+                AudioBank.Jouer(SonsDuJeu.PortailArrivee, arrivee.center, 0.9f);
                 h.Classe?.DiffuserTransit(ClasseHeros.EffetTransitArrivee, h.transform.position, CodeDe(portailArrivee));
                 yield return new WaitForSeconds(DureeTransitArriveeGemmes);
                 if (h == null) yield break;
@@ -699,7 +700,12 @@ namespace Deathless.Jeu
                 // joué en entier, toujours sans contrôle.
                 Visible(h, true);
                 h.DeclencherPortail(versDonjon);
-                yield return new WaitForSeconds(PortailAnim.DureeClip);
+                // Réception (lot 2, § 8.2 : chute du ciel / sortie du sol), placée vers 1 s dans le clip de 1,3 s faute
+                // de mesure exacte de l'instant de contact (hypothèse à confirmer en jeu, cahier des charges son § 8.2).
+                float avantReception = Mathf.Min(1.0f, PortailAnim.DureeClip);
+                yield return new WaitForSeconds(avantReception);
+                if (h != null) AudioBank.Jouer(versDonjon ? SonsDuJeu.PortailChuteCiel : SonsDuJeu.PortailSortieSol, h.transform.position, 0.9f);
+                yield return new WaitForSeconds(PortailAnim.DureeClip - avantReception);
             }
             finally { FinTransit(h); }
         }
@@ -751,6 +757,7 @@ namespace Deathless.Jeu
             {
                 if (pv != null) PortalTransit.Arrive(corps, pv, gemmes, DureeTransitArriveeGemmes);
                 else PortalTransit.Arrive(corps, corps.center + h.transform.forward * 1.2f, gemmes, DureeTransitArriveeGemmes);
+                AudioBank.Jouer(SonsDuJeu.PortailArrivee, corps.center, 0.9f);
                 if (Instance != null) Instance.StartCoroutine(Instance.Montrer(h, DureeTransitArriveeGemmes));
                 else Visible(h, true);
             }

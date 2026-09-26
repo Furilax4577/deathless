@@ -16,7 +16,8 @@ MonoBehaviour:
   groupeMusique: {fileID: 3334393702570242783, guid: 75d511586a74db0469e259cfc0b2c42b, type: 2}
   groupeEffets: {fileID: -8139486541471880038, guid: 75d511586a74db0469e259cfc0b2c42b, type: 2}
   groupeInterface: {fileID: 7055238058104291052, guid: 75d511586a74db0469e259cfc0b2c42b, type: 2}
-  survol: {fileID: 8300000, guid: c6a8dc3072244084fb6a260334aadd05, type: 3}
-  clic: {fileID: 8300000, guid: 603dae63f659ecd40bffb9bb3945f30d, type: 3}
-  retour: {fileID: 8300000, guid: 0c7fc15692d4d2d4a90f097148b66635, type: 3}
+  survol: {fileID: 8300000, guid: 576e5686f536f8a43bdaccf8360324a4, type: 3}
+  clic: {fileID: 8300000, guid: 1265d0a3557864c41b2ae1275a6f8e3d, type: 3}
+  retour: {fileID: 8300000, guid: ac92ae763af43a548b45355ca0e794ed, type: 3}
+  refus: {fileID: 8300000, guid: 8b6bd61d2dab06442b9fb785a7ef3ba6, type: 3}
   apercuEffets: {fileID: 8300000, guid: c1b7204f347e5d7498815c22dfb494a1, type: 3}

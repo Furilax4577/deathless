@@ -136,11 +136,11 @@
     "id": "respawn",
     "nom": "Joueur — réapparition",
     "categorie": "Joueurs",
-    "usage": "Un joueur mort réapparaît, tant que Nyxessa tient.",
+    "usage": "Un joueur mort réapparaît, tant que Nyxessa tient. Ancienne version, remplacée par `dl_nyxessa_reapparition`.",
     "fichier": "Relic/respawn.wav",
     "source": "Relic (généré en Python pour le projet)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "dodge",
@@ -673,41 +673,41 @@
     "id": "portal_open",
     "nom": "Portail — ouverture",
     "categorie": "Nyxessa et portail",
-    "usage": "À l'aube, le portail s'ouvre à l'arrivée de la charge de Nyxessa.",
+    "usage": "À l'aube, le portail s'ouvre à l'arrivée de la charge de Nyxessa. Ancienne version, remplacée par `dl_portail_ouverture`.",
     "fichier": "Relic/portal_open.wav",
     "source": "Relic (généré en Python pour le projet)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "portal_close",
     "nom": "Portail — fermeture",
     "categorie": "Nyxessa et portail",
-    "usage": "Au crépuscule, le portail se referme et disparaît.",
+    "usage": "Au crépuscule, le portail se referme et disparaît. Ancienne version, remplacée par `dl_portail_fermeture`.",
     "fichier": "Relic/portal_close.wav",
     "source": "Relic (généré en Python pour le projet)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "portal_hum_loop",
     "nom": "Portail — bourdonnement (boucle)",
     "categorie": "Nyxessa et portail",
-    "usage": "Portail ouvert, audible de près seulement (boucle 3D, environ 12 m).",
+    "usage": "Portail ouvert, audible de près seulement (boucle 3D, environ 12 m). Ancienne version, remplacée par `dl_portail_bourdon`.",
     "fichier": "Relic/portal_hum_loop.wav",
     "source": "Relic (généré en Python pour le projet)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "portal_pass",
     "nom": "Portail — entrée d'un joueur",
     "categorie": "Nyxessa et portail",
-    "usage": "Un joueur entre dans le portail : son corps se défait en gemmes aspirées (1,1 s).",
+    "usage": "Un joueur entre dans le portail : son corps se défait en gemmes aspirées (1,1 s). Ancienne version, remplacée par `dl_portail_depart`.",
     "fichier": "Relic/portal_pass.wav",
     "source": "Relic (généré en Python pour le projet)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "relic_pulse",
@@ -737,17 +737,17 @@
     "id": "shield_raise",
     "nom": "Bouclier de Nyxessa — levée",
     "categorie": "Nyxessa et portail",
-    "usage": "Le bouclier de gemmes se lève après l'incantation du sorcier.",
+    "usage": "Le bouclier de gemmes se lève après l'incantation du sorcier. Ancienne version, remplacée par `dl_bouclier_leve`.",
     "fichier": "Relic/shield_raise.wav",
     "source": "Relic (généré en Python pour le projet)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "shield_hit",
     "nom": "Bouclier de Nyxessa — coup encaissé",
     "categorie": "Nyxessa et portail",
-    "usage": "Un coup frappe le bouclier (qui renvoie des dégâts à l'attaquant).",
+    "usage": "Un coup frappe le bouclier (qui renvoie des dégâts à l'attaquant). Ancienne version, remplacée par `dl_bouclier_touche`.",
     "fichier": "Relic/shield_hit_1.wav",
     "variantes": [
       "Relic/shield_hit_1.wav",
@@ -756,17 +756,17 @@
     ],
     "source": "Relic (généré en Python pour le projet)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "shield_break",
     "nom": "Bouclier de Nyxessa — rupture",
     "categorie": "Nyxessa et portail",
-    "usage": "Le bouclier cède.",
+    "usage": "Le bouclier cède. Ancienne version, remplacée par `dl_bouclier_brise`.",
     "fichier": "Relic/shield_break.wav",
     "source": "Relic (généré en Python pour le projet)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "skull_flight_loop",
@@ -842,7 +842,7 @@
     "id": "portail_arrivee",
     "nom": "Portail — arrivée d'un joueur",
     "categorie": "Nyxessa et portail",
-    "usage": "Les gemmes jaillissent du portail de sortie et reconstituent le corps (village ou donjon).",
+    "usage": "Les gemmes jaillissent du portail de sortie et reconstituent le corps (village ou donjon). Ancienne version, remplacée par `dl_portail_arrivee`.",
     "fichier": "Relic/portal_arrive.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
@@ -862,7 +862,7 @@
     "id": "nyxessa_rappel",
     "nom": "Nyxessa — rappel forcé",
     "categorie": "Nyxessa et portail",
-    "usage": "Un joueur encore au donjon au crépuscule est ramené de force au village et perd tout ou partie de son butin.",
+    "usage": "Un joueur encore au donjon au crépuscule est ramené de force au village et perd tout ou partie de son butin. Ancienne version, remplacée par `dl_nyxessa_rappel`.",
     "fichier": "Relic/nyxessa_recall.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
@@ -882,11 +882,11 @@
     "id": "sorcier_incantation",
     "nom": "Sorcier — incantation du bouclier (boucle)",
     "categorie": "Nyxessa et portail",
-    "usage": "Le villageois sorcier invoque le bouclier de Nyxessa : boucle jouée tant qu'il incante près de Nyxessa, la nuit.",
+    "usage": "Le villageois sorcier invoque le bouclier de Nyxessa : boucle jouée tant qu'il incante près de Nyxessa, la nuit. Ancienne version, remplacée par `dl_sorcier_incantation`.",
     "fichier": "Relic/sorcerer_cast_loop.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "nyxessa_destruction",
@@ -2419,8 +2419,7 @@
     "portee": 60,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "utilise",
-    "portee": 60
+    "statut": "utilise"
   },
   {
     "id": "dl_nyxessa_frappee",
@@ -2436,8 +2435,7 @@
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "utilise",
-    "portee": 40
+    "statut": "utilise"
   },
   {
     "id": "dl_nyxessa_alerte",
@@ -2458,8 +2456,7 @@
     "portee": 60,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "utilise",
-    "portee": 60
+    "statut": "utilise"
   },
   {
     "id": "dl_nyxessa_charge_portail",
@@ -2470,8 +2467,7 @@
     "portee": 60,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "utilise",
-    "portee": 60
+    "statut": "utilise"
   },
   {
     "id": "dl_nyxessa_retour_energie",
@@ -2482,8 +2478,7 @@
     "portee": 60,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "utilise",
-    "portee": 60
+    "statut": "utilise"
   },
   {
     "id": "dl_nyxessa_onde",
@@ -2494,8 +2489,7 @@
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "utilise",
-    "portee": 40
+    "statut": "utilise"
   },
   {
     "id": "dl_nyxessa_destruction",
@@ -2506,7 +2500,7 @@
     "portee": 60,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_nyxessa_missile_vol",
@@ -2543,7 +2537,7 @@
     "fichier": "Deathless/Nyxessa/nyxessa_rappel.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_nyxessa_reapparition",
@@ -2554,7 +2548,7 @@
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_bouclier_leve",
@@ -2565,7 +2559,7 @@
     "portee": 60,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_bouclier_touche",
@@ -2582,7 +2576,7 @@
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_bouclier_etat_entame",
@@ -2593,7 +2587,7 @@
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_bouclier_etat_critique",
@@ -2604,7 +2598,7 @@
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_bouclier_brise",
@@ -2615,7 +2609,7 @@
     "portee": 60,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_bouclier_breche",
@@ -2630,7 +2624,7 @@
     "portee": 60,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_bouclier_palier",
@@ -2641,7 +2635,7 @@
     "portee": 60,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_sorcier_incantation",
@@ -2652,7 +2646,7 @@
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_sorcier_canalisation",
@@ -2663,7 +2657,7 @@
     "portee": 20,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_sorcier_canalisation_eclat",
@@ -2678,7 +2672,7 @@
     "portee": 20,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_portail_ouverture",
@@ -2689,7 +2683,7 @@
     "portee": 60,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_portail_fermeture",
@@ -2700,7 +2694,7 @@
     "portee": 60,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_portail_bourdon",
@@ -2711,7 +2705,7 @@
     "portee": 20,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_portail_depart",
@@ -2722,7 +2716,7 @@
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_portail_arrivee",
@@ -2733,7 +2727,7 @@
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_portail_chute_ciel",
@@ -2744,7 +2738,7 @@
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_portail_sortie_sol",
@@ -2755,7 +2749,7 @@
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "dl_portail_ferme_refus",

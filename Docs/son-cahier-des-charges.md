@@ -602,7 +602,7 @@ Chaque lot fait 15 à 25 sons (identifiants ou fichiers), tient dans une session
 - `Assets/Audio/Deathless/Bouclier/synth_bouclier.py` : `bouclier_leve`, `bouclier_touche_1..4`, `bouclier_etat_entame`, `bouclier_etat_critique`, `bouclier_brise`, `bouclier_breche_1..2`, `bouclier_palier`, `sorcier_incantation_boucle`, `sorcier_canalisation_boucle`, `sorcier_canalisation_eclat_1..2` (15 fichiers, 10 ids).
 - `Assets/Audio/Deathless/Portail/synth_portail.py` : `portail_ouverture`, `portail_fermeture`, `portail_bourdon_boucle`, `portail_depart`, `portail_arrivee`, `portail_chute_ciel`, `portail_sortie_sol`, `portail_ferme_refus` (8 fichiers, 8 ids).
 - Briques ajoutées à `deathless_audio.py` : `plaque` (éclat d'or et fer, § 2), `gravier` et `pas_pierre` (poussière et terre, § 2), boucles sans raccord (`plier`, `fondre_boucle`, `master_boucle`) et `produire` (écriture d'une famille). Les scripts du lot 1 déclarent désormais leurs sons dans la même liste `SONS` ; leurs 24 fichiers sont inchangés, à l'octet près.
-- Catalogue : ids `dl_nyxessa_*` (4), `dl_bouclier_*` (7), `dl_sorcier_*` (3) et `dl_portail_*` (8) dans `Wiki/data/sons.json`, statut `a_ecouter`, avec `portee` pour les sons 3D (ajoutée aussi aux sons 3D du lot 1).
+- Catalogue : ids `dl_nyxessa_*` (4), `dl_bouclier_*` (7), `dl_sorcier_*` (3) et `dl_portail_*` (8) dans `Wiki/data/sons.json`, statut `a_ecouter` puis `utilise` au branchement (26/09/2026, voir ci-dessous), sauf `dl_nyxessa_missile_vol` et `dl_nyxessa_missile_eclat` qui restent `a_ecouter` (non branchés, Quentin n'a pas encore validé le missile crâne) ; `portee` renseignée pour les sons 3D (ajoutée aussi aux sons 3D du lot 1).
 - Planche de contrôle : [`son-lot2-controle.md`](son-lot2-controle.md) (29 fichiers conformes, dont 4 boucles vérifiées à la jointure).
 
 **Hypothèses prises** (à confirmer en jeu) :
@@ -612,12 +612,12 @@ Chaque lot fait 15 à 25 sons (identifiants ou fichiers), tient dans une session
 - **Réapparition** : un seul fichier, joué au point de réapparition près de Nyxessa.
 - **Boucles** : `nyxessa_missile_vol_boucle` 1,5 s, `sorcier_incantation_boucle` 3 s, `sorcier_canalisation_boucle` 4 s, `portail_bourdon_boucle` 6 s ; cibles -17 à -20 dB, sous la plage des événements de la famille (ce sont des sons de présence, entendus de près).
 
-**Branchement proposé** (après écoute, par l'agent local ; aucun script de jeu n'a été modifié) :
+**Branché le 26/09/2026** par l'agent local, à l'exception du missile crâne (Quentin valide le reste du lot 2, pas encore le vol et l'éclat du missile : `MissileVol`/`MissileEclat` gardent leurs anciens ids, `dl_nyxessa_missile_vol`/`dl_nyxessa_missile_eclat` restent `a_ecouter`) :
 
 | Constante de `SonsDuJeu` ou réglage | Nouvel id en tête |
 |---|---|
-| `MissileVol` | `dl_nyxessa_missile_vol` (pour Nyxessa ; le mage squelette garde `skull_flight_loop` jusqu'au lot 3) |
-| `MissileEclat` | `dl_nyxessa_missile_eclat` |
+| ~~`MissileVol`~~ | non branché (`dl_nyxessa_missile_vol` à l'écoute) |
+| ~~`MissileEclat`~~ | non branché (`dl_nyxessa_missile_eclat` à l'écoute) |
 | `NyxessaRappel` | `dl_nyxessa_rappel` |
 | `Reapparition` | `dl_nyxessa_reapparition` |
 | `BouclierLeve` | `dl_bouclier_leve` |
@@ -628,12 +628,13 @@ Chaque lot fait 15 à 25 sons (identifiants ou fichiers), tient dans une session
 | `PortailFermeture` | `dl_portail_fermeture` |
 | `PortailBourdon` | `dl_portail_bourdon` |
 | `PortailPassage` | `dl_portail_depart` |
-| *nouveau* : arrivée par le portail (`PortalTransit.Arrive`) | `dl_portail_arrivee` |
-| *nouveau* : clip `Spawn_Air` (arrivée au donjon) | `dl_portail_chute_ciel` |
-| *nouveau* : clip `Spawn_Ground` (retour au village, rappel) | `dl_portail_sortie_sol` |
-| *nouveau* : Interagir au portail fermé | `dl_portail_ferme_refus` |
-| *nouveau* : bouclier sous 40 % et sous 15 % (changement de thème de `RelicShieldVisual`) | `dl_bouclier_etat_entame`, `dl_bouclier_etat_critique` |
-| *nouveau* : coup de brèche de Morgrim martache sur le bouclier | `dl_bouclier_breche` |
-| *nouveau* : palier du bouclier acheté (en plus de `dl_nyxessa_palier`) | `dl_bouclier_palier` |
-| *nouveau* : canalisation du sorcier (boucle tant qu'elle dure) et son éclat (`AvancerRechargeMissiles`) | `dl_sorcier_canalisation`, `dl_sorcier_canalisation_eclat` |
-| Importeur du catalogue (`JeuBuilder`) | reconnaître `_boucle` comme `_loop` |
+| *nouveau* : arrivée par le portail (`PortalTransit.Arrive`, `DonjonJeu.Transit`/`TransitDistant`) | `dl_portail_arrivee` |
+| *nouveau* : réception du clip d'arrivée (`Heros.DeclencherPortail`, vers 1 s dans le clip de 1,3 s, hypothèse § 8.2 ci-dessus) — chute du ciel au donjon (`Spawn_Air`) ou sortie du sol au village et au rappel (`Spawn_Ground`) ; joué seulement côté propriétaire, pas encore chez les autres postes (`TransitDistant` ne connaît pas air/sol) | `dl_portail_chute_ciel`, `dl_portail_sortie_sol` |
+| *nouveau, pas encore branché à un appel de jeu* : Interagir au portail fermé — `PassagePortail.Invite()` renvoie `null` pour un portail fermé, donc jamais sélectionné par `PointInteraction.Courant` ; la constante `SonsDuJeu.PortailFermeRefus` existe, brancher l'appel demande de faire remonter un état « fermé » distinct de « absent » dans `PassagePortail`/`PointInteraction` (hors de cette session) | `dl_portail_ferme_refus` |
+| *nouveau* : bouclier sous 40 % et sous 15 % (`RelicShieldEtat.warnRatio`/`criticalRatio`, `BouclierNyxessa.SuivreEtatVie`) | `dl_bouclier_etat_entame`, `dl_bouclier_etat_critique` |
+| *nouveau* : coup de brèche de Morgrim martache sur le bouclier levé (`MorgrimMartache.FaireBreche`) | `dl_bouclier_breche` |
+| *nouveau* : palier du bouclier acheté, en plus de `dl_nyxessa_palier` (`Partie.SignalerPalier`) | `dl_bouclier_palier` |
+| *nouveau* : lien d'énergie bâton-relique tant que la canalisation dure (boucle, `BouclierNyxessa.SuivreCanalisation`) et son éclat à chaque coup qui avance la recharge d'un missile (`AvancerRechargeMissiles`) | `dl_sorcier_canalisation`, `dl_sorcier_canalisation_eclat` |
+| Importeur du catalogue (`JeuBuilder.ImporterSons`) | reconnaît maintenant `_boucle` comme `_loop` (26/09/2026 : les scripts du lot 2 nomment leurs boucles `..._boucle`, le champ `SonsCatalogue.Entree.boucle` les ratait ; sans effet sur la lecture elle-même, `AudioBank.Boucle` force déjà `loop = true` au point d'appel) |
+
+Vérifié en Play (`Assets/Scenes/Village.unity`) : bouclier levé, touché, passé au rouge (`dl_bouclier_etat_critique`) et brisé jouent chacun le bon clip avec la portée attendue (`AudioSource.maxDistance`) ; portail d'ouverture et d'arrivée idem ; interface (`ReglagesAudio`) joue ses nouveaux clips lot 1. Console propre. Canalisation et brèche non testées en Play (montage de scénario trop long pour cette session : palier 4 du bouclier et frappe précise de Morgrim martache) — revérifiées à la lecture du code seulement.

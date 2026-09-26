@@ -90,7 +90,8 @@ namespace Deathless.EditorTools
                     if (c != null) clips.Add(c); else absents.Add(f);
                 }
                 if (clips.Count == 0) continue;
-                cat.entrees.Add(new SonsCatalogue.Entree { id = s.id, nom = s.nom, statut = s.statut, boucle = s.fichier.Contains("_loop"), clips = clips.ToArray(), portee = s.portee });
+                bool boucle = s.fichier.Contains("_loop") || s.fichier.Contains("_boucle");
+                cat.entrees.Add(new SonsCatalogue.Entree { id = s.id, nom = s.nom, statut = s.statut, boucle = boucle, clips = clips.ToArray(), portee = s.portee });
             }
             EditorUtility.SetDirty(cat);
             AssetDatabase.SaveAssets();

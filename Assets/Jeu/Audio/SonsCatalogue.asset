@@ -103,7 +103,7 @@ MonoBehaviour:
     portee: 0
   - id: respawn
     nom: "Joueur \u2014 r\xE9apparition"
-    statut: utilise
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 8ad5291a69901e74087d3cf6c6649f09, type: 3}
@@ -373,6 +373,15 @@ MonoBehaviour:
     clips:
     - {fileID: 8300000, guid: 172940dd60d25ef4e9465aebb8b80dc0, type: 3}
     portee: 0
+  - id: hache_vent
+    nom: "Viking \u2014 attaque tournante, souffle de la hache"
+    statut: utilise
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: d220735433cb3b846ab306656fb1fd96, type: 3}
+    - {fileID: 8300000, guid: 96b81a66e4202724ba681dc0cdaa72ae, type: 3}
+    - {fileID: 8300000, guid: d4b53f9f2e487d7439023fae3a6d2c4d, type: 3}
+    portee: 0
   - id: arrow_rain
     nom: "R\xF4deur \u2014 nu\xE9e de fl\xE8ches"
     statut: utilise
@@ -445,28 +454,28 @@ MonoBehaviour:
     portee: 0
   - id: portal_open
     nom: "Portail \u2014 ouverture"
-    statut: utilise
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: e6f0fd128854bd4468423531ffdad0a1, type: 3}
     portee: 0
   - id: portal_close
     nom: "Portail \u2014 fermeture"
-    statut: utilise
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 51a9024733a4bc4408046cd712a127d2, type: 3}
     portee: 0
   - id: portal_hum_loop
     nom: "Portail \u2014 bourdonnement (boucle)"
-    statut: utilise
+    statut: disponible
     boucle: 1
     clips:
     - {fileID: 8300000, guid: 6d3c97d9b54ce7344b93cf4590d1e660, type: 3}
     portee: 0
   - id: portal_pass
     nom: "Portail \u2014 entr\xE9e d'un joueur"
-    statut: utilise
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 786f06cf6527a4e4d9ebb18f9fa1bac3, type: 3}
@@ -488,14 +497,14 @@ MonoBehaviour:
     portee: 0
   - id: shield_raise
     nom: "Bouclier de Nyxessa \u2014 lev\xE9e"
-    statut: utilise
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 47277d6e167941345b2a5a67bb59533b, type: 3}
     portee: 0
   - id: shield_hit
     nom: "Bouclier de Nyxessa \u2014 coup encaiss\xE9"
-    statut: utilise
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 475c7f1ed77bb7a408274f3dc3be1bbb, type: 3}
@@ -504,7 +513,7 @@ MonoBehaviour:
     portee: 0
   - id: shield_break
     nom: "Bouclier de Nyxessa \u2014 rupture"
-    statut: utilise
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 79d55293147f47541972eb1cef3599f2, type: 3}
@@ -588,7 +597,7 @@ MonoBehaviour:
     portee: 0
   - id: sorcier_incantation
     nom: "Sorcier \u2014 incantation du bouclier (boucle)"
-    statut: utilise
+    statut: disponible
     boucle: 1
     clips:
     - {fileID: 8300000, guid: 615e084e724896b4cb3d52b4420c9407, type: 3}
@@ -1676,7 +1685,7 @@ MonoBehaviour:
     portee: 40
   - id: dl_nyxessa_destruction
     nom: "Nyxessa \u2014 destruction (identit\xE9 Deathless)"
-    statut: a_ecouter
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: fccbab8da941a7c41ba773baff9d88f7, type: 3}
@@ -1684,7 +1693,7 @@ MonoBehaviour:
   - id: dl_nyxessa_missile_vol
     nom: "Missile en cr\xE2ne \u2014 vol, boucle (identit\xE9 Deathless)"
     statut: a_ecouter
-    boucle: 0
+    boucle: 1
     clips:
     - {fileID: 8300000, guid: dcd8077da6024a049b35b3d639664e63, type: 3}
     portee: 40
@@ -1699,28 +1708,28 @@ MonoBehaviour:
     portee: 40
   - id: dl_nyxessa_rappel
     nom: "Nyxessa \u2014 rappel forc\xE9 (identit\xE9 Deathless)"
-    statut: a_ecouter
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 74d5d2ace03ab80448ba6d985449e2af, type: 3}
     portee: 0
   - id: dl_nyxessa_reapparition
     nom: "Nyxessa \u2014 r\xE9apparition d'un joueur (identit\xE9 Deathless)"
-    statut: a_ecouter
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: f2138ec8dd4e3fd4ba8b2241a3996c1e, type: 3}
     portee: 40
   - id: dl_bouclier_leve
     nom: "Bouclier de Nyxessa \u2014 lev\xE9e (identit\xE9 Deathless)"
-    statut: a_ecouter
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: e8fcfec5b250a714cafb9387634744e5, type: 3}
     portee: 60
   - id: dl_bouclier_touche
     nom: "Bouclier de Nyxessa \u2014 coup encaiss\xE9 (identit\xE9 Deathless)"
-    statut: a_ecouter
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 3d47b131be4e0d64d8af450487161006, type: 3}
@@ -1730,28 +1739,28 @@ MonoBehaviour:
     portee: 40
   - id: dl_bouclier_etat_entame
     nom: "Bouclier de Nyxessa \u2014 entam\xE9 (identit\xE9 Deathless)"
-    statut: a_ecouter
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 314e4e8d04040984598add6a620e4ae2, type: 3}
     portee: 40
   - id: dl_bouclier_etat_critique
     nom: "Bouclier de Nyxessa \u2014 pr\xE8s de c\xE9der (identit\xE9 Deathless)"
-    statut: a_ecouter
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 35b32d2274818b342bbeb98853c83bfe, type: 3}
     portee: 40
   - id: dl_bouclier_brise
     nom: "Bouclier de Nyxessa \u2014 rupture (identit\xE9 Deathless)"
-    statut: a_ecouter
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 0232b152e1ddb0c4ab417ad87a848b77, type: 3}
     portee: 60
   - id: dl_bouclier_breche
     nom: "Bouclier de Nyxessa \u2014 coup de br\xE8che (identit\xE9 Deathless)"
-    statut: a_ecouter
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: d4bebb51eb3997a4a8b45f4c9146702b, type: 3}
@@ -1759,28 +1768,28 @@ MonoBehaviour:
     portee: 60
   - id: dl_bouclier_palier
     nom: "Bouclier de Nyxessa \u2014 palier (identit\xE9 Deathless)"
-    statut: a_ecouter
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 55ef69e57f41ba64fbd10919640f2a6c, type: 3}
     portee: 60
   - id: dl_sorcier_incantation
     nom: "Sorcier \u2014 incantation du bouclier, boucle (identit\xE9 Deathless)"
-    statut: a_ecouter
-    boucle: 0
+    statut: utilise
+    boucle: 1
     clips:
     - {fileID: 8300000, guid: dbc6ffd6d1dcb6943a6b374f63cdd7ee, type: 3}
     portee: 40
   - id: dl_sorcier_canalisation
     nom: "Sorcier \u2014 canalisation, boucle (identit\xE9 Deathless)"
-    statut: a_ecouter
-    boucle: 0
+    statut: utilise
+    boucle: 1
     clips:
     - {fileID: 8300000, guid: eaf0c8223c2f1ae4aadc4c82ae34f3a7, type: 3}
     portee: 20
   - id: dl_sorcier_canalisation_eclat
     nom: "Sorcier \u2014 \xE9clat de la canalisation (identit\xE9 Deathless)"
-    statut: a_ecouter
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 774ee7cd98a53b54eb0e983f62e8832a, type: 3}
@@ -1788,49 +1797,49 @@ MonoBehaviour:
     portee: 20
   - id: dl_portail_ouverture
     nom: "Portail \u2014 ouverture (identit\xE9 Deathless)"
-    statut: a_ecouter
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 88047994546d09f4eb30ce087c6b9247, type: 3}
     portee: 60
   - id: dl_portail_fermeture
     nom: "Portail \u2014 fermeture (identit\xE9 Deathless)"
-    statut: a_ecouter
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 234f6853923fb6b41b27d6ac562862c3, type: 3}
     portee: 60
   - id: dl_portail_bourdon
     nom: "Portail \u2014 bourdon, boucle (identit\xE9 Deathless)"
-    statut: a_ecouter
-    boucle: 0
+    statut: utilise
+    boucle: 1
     clips:
     - {fileID: 8300000, guid: 3cd56421d4428a1458c579cfd1ebde10, type: 3}
     portee: 20
   - id: dl_portail_depart
     nom: "Portail \u2014 d\xE9part d'un joueur (identit\xE9 Deathless)"
-    statut: a_ecouter
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: d390a8fe6759d6e40a3a9a8ff554e80d, type: 3}
     portee: 40
   - id: dl_portail_arrivee
     nom: "Portail \u2014 arriv\xE9e d'un joueur (identit\xE9 Deathless)"
-    statut: a_ecouter
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 22d64a9abdd0f6f4e821cd3c1cdeb84b, type: 3}
     portee: 40
   - id: dl_portail_chute_ciel
     nom: "Portail \u2014 chute du ciel, arriv\xE9e au donjon (identit\xE9 Deathless)"
-    statut: a_ecouter
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: dda1276465a20d542b55b63b064838ee, type: 3}
     portee: 40
   - id: dl_portail_sortie_sol
     nom: "Portail \u2014 sortie du sol, retour au village (identit\xE9 Deathless)"
-    statut: a_ecouter
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 3c30fbdf118795c488775116d0e2d586, type: 3}

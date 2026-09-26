@@ -18,7 +18,7 @@ namespace Deathless.Jeu
         public static readonly string[] Pas = { "kenney_rpg_footstep" };
         public static readonly string[] JoueurTouche = { "player_hurt" };
         public static readonly string[] JoueurMort = { "player_death" };
-        public static readonly string[] Reapparition = { "respawn" };
+        public static readonly string[] Reapparition = { "dl_nyxessa_reapparition", "respawn" };
 
         public static readonly string[] SqueletteSortie = { "skeleton_spawn" };
         public static readonly string[] SquelettePreparation = { "kenney_rpg_drawknife" };
@@ -35,10 +35,22 @@ namespace Deathless.Jeu
         public static readonly string[] NyxessaAlerte = { "dl_nyxessa_alerte", "nyxessa_alerte" };
         public static readonly string[] NyxessaDestruction = { "dl_nyxessa_destruction", "nyxessa_destruction", "shield_break" };
 
-        public static readonly string[] BouclierLeve = { "shield_raise" };
-        public static readonly string[] BouclierTouche = { "shield_hit" };
-        public static readonly string[] BouclierBrise = { "shield_break" };
-        public static readonly string[] SorcierIncantation = { "sorcier_incantation" };
+        public static readonly string[] BouclierLeve = { "dl_bouclier_leve", "shield_raise" };
+        public static readonly string[] BouclierTouche = { "dl_bouclier_touche", "shield_hit" };
+        public static readonly string[] BouclierBrise = { "dl_bouclier_brise", "shield_break" };
+        // Nouveau (lot 2, § 8.2) : le bouclier passe à l'orange (40 %) ou au rouge (15 %) — RelicShieldEtat.warnRatio
+        // / criticalRatio, § BouclierNyxessa.SuivreEtatVie.
+        public static readonly string[] BouclierEtatEntame = { "dl_bouclier_etat_entame" };
+        public static readonly string[] BouclierEtatCritique = { "dl_bouclier_etat_critique" };
+        // Nouveau (lot 2) : coup de brèche de Morgrim martache sur la paroi (MorgrimMartache.FaireBreche).
+        public static readonly string[] BouclierBreche = { "dl_bouclier_breche" };
+        // Nouveau (lot 2) : palier du bouclier acheté, en plus de PalierAchete (Partie.SignalerPalier).
+        public static readonly string[] BouclierPalier = { "dl_bouclier_palier" };
+        public static readonly string[] SorcierIncantation = { "dl_sorcier_incantation", "sorcier_incantation" };
+        // Nouveau (lot 2) : lien d'énergie bâton-relique tant que la canalisation dure (boucle), et son éclat à chaque
+        // coup qui avance la recharge d'un missile (BouclierNyxessa.SuivreCanalisation / AvancerRechargeMissiles).
+        public static readonly string[] SorcierCanalisation = { "dl_sorcier_canalisation" };
+        public static readonly string[] SorcierCanalisationEclat = { "dl_sorcier_canalisation_eclat" };
         public static readonly string[] Or = { "kenney_rpg_handlecoins" };
         public static readonly string[] PalierAchete = { "dl_nyxessa_palier", "nyxessa_palier", "ui_confirmation" };
         public static readonly string[] AchatRefuse = { "dl_interface_refus", "ui_refus" };
@@ -48,13 +60,25 @@ namespace Deathless.Jeu
         public static readonly string[] ForgeEnclume = { "forge_enclume" };   // forgeron : marteau sur l'enclume (3 variantes)
         public static readonly string[] PointGagne = { "dl_interface_tous_prets", "vote_tous_prets", "ui_confirmation" };
 
-        public static readonly string[] PortailOuverture = { "portal_open" };
-        public static readonly string[] PortailFermeture = { "portal_close" };
-        public static readonly string[] PortailBourdon = { "portal_hum_loop" };
-        public static readonly string[] PortailPassage = { "portal_pass", "portail_goutte" };
+        public static readonly string[] PortailOuverture = { "dl_portail_ouverture", "portal_open" };
+        public static readonly string[] PortailFermeture = { "dl_portail_fermeture", "portal_close" };
+        public static readonly string[] PortailBourdon = { "dl_portail_bourdon", "portal_hum_loop" };
+        public static readonly string[] PortailPassage = { "dl_portail_depart", "portal_pass", "portail_goutte" };
+        // Nouveau (lot 2) : arrivée par le portail (PortalTransit.Arrive, DonjonJeu.Transit / TransitDistant).
+        public static readonly string[] PortailArrivee = { "dl_portail_arrivee" };
+        // Nouveau (lot 2) : réception du clip d'arrivée (Heros.DeclencherPortail), vers 1 s dans le clip de 1,3 s —
+        // chute du ciel au donjon (Spawn_Air) ou sortie du sol au village et au rappel (Spawn_Ground). Joué seulement
+        // côté propriétaire (DonjonJeu.Transit) : les autres postes voient le clip par le NetworkAnimator (comme les
+        // emotes) mais n'entendent pas encore cette réception (TransitDistant ne connaît pas air/sol).
+        public static readonly string[] PortailChuteCiel = { "dl_portail_chute_ciel" };
+        public static readonly string[] PortailSortieSol = { "dl_portail_sortie_sol" };
+        // Nouveau (lot 2) : interagir près du portail fermé la nuit — pas encore branché à un appel de jeu (Invite()
+        // renvoie null pour un portail fermé, donc jamais sélectionné par PointInteraction.Courant ; brancher demande
+        // de faire remonter un état « fermé » distinct de « absent » dans PassagePortail/PointInteraction).
+        public static readonly string[] PortailFermeRefus = { "dl_portail_ferme_refus" };
         public static readonly string[] CoffreCadenas = { "kenney_rpg_metallatch", "kenney_rpg_metalclick" };
         public static readonly string[] CoffreOuvert = { "chest_open", "kenney_rpg_dooropen" };
-        public static readonly string[] NyxessaRappel = { "nyxessa_rappel", "dl_nyxessa_onde", "nyxessa_onde_passage" };
+        public static readonly string[] NyxessaRappel = { "dl_nyxessa_rappel", "nyxessa_rappel", "dl_nyxessa_onde", "nyxessa_onde_passage" };
 
         // "dl_interface_decompte" est un repli de dl_nyxessa_alerte / donjon_alerte_nuit ici : chaque seconde du
         // compte à rebours de l'alerte au donjon (§ 8 du cahier des charges son, table « Branchement proposé »).

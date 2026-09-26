@@ -665,10 +665,15 @@ namespace Deathless.Jeu
 
         public static string NomAmelioration(Amelioration a) => a == Amelioration.Missiles ? "Missiles de Nyxessa" : "Bouclier du sorcier";
 
-        /// Tous les postes : son et événement d'un palier acheté.
+        /// Tous les postes : son et événement d'un palier acheté. Le bouclier a en plus son propre son (lot 2, § 8.2 :
+        /// « palier du bouclier acheté, en plus de dl_nyxessa_palier »).
         public void SignalerPalier(Amelioration a, int palier, string qui)
         {
-            if (nyxessa != null) AudioBank.Jouer(SonsDuJeu.PalierAchete, nyxessa.transform.position + Vector3.up * 3f, 0.9f);
+            if (nyxessa != null)
+            {
+                AudioBank.Jouer(SonsDuJeu.PalierAchete, nyxessa.transform.position + Vector3.up * 3f, 0.9f);
+                if (a == Amelioration.Bouclier) AudioBank.Jouer(SonsDuJeu.BouclierPalier, nyxessa.transform.position + Vector3.up * 3f, 0.9f);
+            }
             PalierAchete?.Invoke(a, palier, qui);
         }
 

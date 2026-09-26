@@ -153,7 +153,8 @@ namespace Deathless.Jeu
             float montant = b.morgrimMartacheBrecheDegats * (leve ? b.morgrimMartacheBrecheMultiplicateurBouclier : 1f);
             Vector3 impact = NyxessaImpact();
             Impact(impact, VfxTheme.Rage, 1.6f, transform.forward, 90f);
-            AudioBank.Jouer(SonsDuJeu.GolemCoup, impact, 1f);
+            // Fer sur verre quand le bouclier encaisse le coup de brèche (lot 2, § 8.2) ; sinon le coup sourd habituel.
+            AudioBank.Jouer(leve ? SonsDuJeu.BouclierBreche : SonsDuJeu.GolemCoup, impact, 1f);
             if (P == null || P.nyxessa == null) return;
             m_DernierCoupNyxessa = Time.time;
             P.nyxessa.Encaisser(new InfoDegats { montant = montant, equipeSource = Equipe.Ennemis, source = gameObject, point = impact, direction = transform.forward });

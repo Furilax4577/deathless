@@ -31,6 +31,8 @@ namespace Deathless.Jeu
         FiletEnergie m_Filet;
         Transform m_AncrageBaton;
         bool m_CanaliseVu;
+        AudioSource m_SonCanalisation;
+        float m_DernierRatioVie = 1f;
 
         /// Le bouclier vient d'être brisé (le sorcier meurt).
         public event System.Action Brise;
@@ -59,6 +61,7 @@ namespace Deathless.Jeu
         {
             if (m_Visuel != null) m_Visuel.palierQuantite = Mathf.Clamp(PalierActuel, 1, 5);
             SuivreCanalisation();
+            SuivreEtatVie();
         }
 
         void SuivreCanalisation()
@@ -66,7 +69,12 @@ namespace Deathless.Jeu
             bool actif = Canalise;
             if (actif == m_CanaliseVu) return;
             m_CanaliseVu = actif;
-            if (!actif) { if (m_Filet != null) m_Filet.Desactiver(); return; }
+            if (!actif)
+            {
+                if (m_Filet != null) m_Filet.Desactiver();
+                if (m_SonCanalisation != null) { Destroy(m_SonCanalisation); m_SonCanalisation = null; }
+                return;
+            }
             var sorcier = Sorcier.Instance;
             var nyxessa = Nyxessa.Instance;
             if (sorcier == null || nyxessa == null) { m_CanaliseVu = false; return; }   // réessaie au prochain changement
@@ -89,6 +97,22 @@ namespace Deathless.Jeu
                 m_Filet.DefinirMateriau(EffetsJeu.Gemmes);
             }
             m_Filet.Activer(m_AncrageBaton, nyxessa.Cristal);
+            // Lien d'énergie audible tant que la canalisation dure (lot 2, § 8.2) : boucle attachée au point d'ancrage.
+            if (m_SonCanalisation == null) m_SonCanalisation = AudioBank.Boucle(SonsDuJeu.SorcierCanalisation, m_AncrageBaton, 0.5f);
+        }
+
+        /// Bouclier passé à l'orange (40 %) ou au rouge (15 %, RelicShieldEtat.warnRatio/criticalRatio) : un seul son au
+        /// franchissement du seuil vers le bas (lot 2, § 8.2 : « nouveau »), pas à la remontée (le bouclier ne se soigne
+        /// pas en cours de nuit) ni tant qu'il est baissé.
+        void SuivreEtatVie()
+        {
+            if (effet == null || !effet.IsUp) { m_DernierRatioVie = 1f; return; }
+            float ratio = effet.LifeRatio;
+            if (m_DernierRatioVie > effet.criticalRatio && ratio <= effet.criticalRatio)
+                AudioBank.Jouer(SonsDuJeu.BouclierEtatCritique, transform.position + Vector3.up * 2f, 0.8f);
+            else if (m_DernierRatioVie > effet.warnRatio && ratio <= effet.warnRatio)
+                AudioBank.Jouer(SonsDuJeu.BouclierEtatEntame, transform.position + Vector3.up * 2f, 0.8f);
+            m_DernierRatioVie = ratio;
         }
 
         void Start()
@@ -179,8 +203,12 @@ namespace Deathless.Jeu
             while (n.stock < max && n.regeneration >= duree) { n.regeneration -= duree; n.stock++; }
             if (n.stock >= max) n.regeneration = 0f;
             // Signe visuel (Wiki nyxessa.md : « s'illumine brièvement ») : la recharge d'un missile a effectivement
-            // avancé le stock, le filet d'énergie brille un instant.
-            if (n.stock > avant && m_Filet != null) m_Filet.Pulse();
+            // avancé le stock, le filet d'énergie brille un instant, et un éclat sonore l'accompagne (lot 2, § 8.2).
+            if (n.stock > avant)
+            {
+                if (m_Filet != null) m_Filet.Pulse();
+                AudioBank.Jouer(SonsDuJeu.SorcierCanalisationEclat, transform.position + Vector3.up * 2f, 0.6f);
+            }
         }
 
         // ----------------------------------------------------------------- Client d'une partie réseau (l'hôte fait foi)

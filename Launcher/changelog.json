@@ -1,6 +1,18 @@
 {
   "versions": [
     {
+      "version": "0.5.7",
+      "date": "2026-09-26",
+      "titre": "La nuit de Nyxessa",
+      "notes": [
+        "Nuit : Nyxessa, ses missiles, le bouclier et les portails rayonnent enfin ; la lune et les fenêtres ne les écrasent plus.",
+        "Options : nouvel écran, un seul panneau avec ses onglets, le menu principal masqué derrière, et le réglage « Se relever : marteler / maintenir ».",
+        "Sons : premiers sons faits pour Deathless (interface, Nyxessa, bouclier, sorcier, portails). Le missile crâne garde son ancien cri.",
+        "Viking : la tournante rend +2 rage par ennemi touché à chaque tic ; elle ne se paie que dans une foule.",
+        "Quinze corrections : héros en double après Rejouer, soins des clients dans le score, compétence qui partait derrière un menu, Suppr qui validait le pseudo, cône du mage qui restait allumé, charge de Morgrim guidée, Nécromancien étourdi à distance par une parade, sorcier blessé d'une nuit à l'autre, ivresse après Rejouer, entrée au donjon dans la dernière seconde du jour, et d'autres."
+      ]
+    },
+    {
       "version": "0.5.6",
       "date": "2026-09-26",
       "titre": "Mieux voir venir",
