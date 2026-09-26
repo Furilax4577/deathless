@@ -2,6 +2,10 @@
 
 Tous les sons du projet s'écoutent dans le wiki, page **Sons** (`Wiki/pages/sons.md`, générée depuis `Wiki/data/sons.json`). Ils ont été copiés de Relic le 25/09/2026 (mêmes noms de fichiers, mêmes `.meta`, donc mêmes GUID), puis complétés le même jour par 35 fichiers créés pour Deathless (arc et arbalète refaits par modélisation physique, et tous les sons qui étaient « à créer »). Aucun n'est encore branché dans le jeu : le statut « utilisé » du catalogue veut dire « a un usage clair dans Deathless ».
 
+## Identité sonore de Deathless (depuis le 26/09/2026)
+
+Tous les sons et musiques doivent être **régénérés avec une identité propre** : direction artistique, palette de timbres (gemme de Nyxessa, bois sec de l'interface, os creux des squelettes…), inventaire complet des sons nécessaires, musiques à couches, niveaux cibles, nommage et plan de production en lots dans **`Docs/son-cahier-des-charges.md`**. Les nouveaux sons vivent dans `Assets/Audio/Deathless/<Famille>/` (un script `synth_<famille>.py` par famille, briques communes dans `Assets/Audio/Deathless/deathless_audio.py`, crête -1,4 dBFS, niveau perçu réglé sur une cible par son), entrent au catalogue sous un id `dl_*` en `a_ecouter`, et sont mesurés par `python -B Assets/Audio/Deathless/controle.py` (planche `Docs/son-lot1-controle.md`). Lot 1 fait : Nyxessa et interface. Ce qui suit décrit les sons existants, qu'ils remplaceront peu à peu.
+
 ## Organisation de `Assets/Audio/`
 
 | Dossier | Contenu | Licence |

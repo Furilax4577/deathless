@@ -2296,5 +2296,203 @@
     "source": "Kenney, Interface Sounds",
     "licence": "CC0",
     "statut": "disponible"
+  },
+  {
+    "id": "dl_interface_survol",
+    "nom": "Interface — survol d'un bouton (identité Deathless)",
+    "categorie": "Interface",
+    "usage": "La sélection passe sur un bouton, à la souris ou à la manette : tic de bois aigu, 70 ms. Remplacera `ui_survol`.",
+    "fichier": "Deathless/Interface/interface_survol_1.wav",
+    "variantes": [
+      "Deathless/Interface/interface_survol_1.wav",
+      "Deathless/Interface/interface_survol_2.wav"
+    ],
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_interface_clic",
+    "nom": "Interface — clic de validation (identité Deathless)",
+    "categorie": "Interface",
+    "usage": "Valider un bouton (A, Croix, Entrée ou clic) : toc de bois clair. Remplacera `ui_clic`.",
+    "fichier": "Deathless/Interface/interface_clic_1.wav",
+    "variantes": [
+      "Deathless/Interface/interface_clic_1.wav",
+      "Deathless/Interface/interface_clic_2.wav"
+    ],
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_interface_retour",
+    "nom": "Interface — retour (identité Deathless)",
+    "categorie": "Interface",
+    "usage": "Revenir à l'écran précédent (B, Rond, Échap) : deux tocs qui descendent. Remplacera `ui_retour`.",
+    "fichier": "Deathless/Interface/interface_retour.wav",
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_interface_refus",
+    "nom": "Interface — action refusée (identité Deathless)",
+    "categorie": "Interface",
+    "usage": "Action impossible (or insuffisant, vote inactif…) : double toc étouffé, un demi-ton faux. Remplacera `ui_refus`.",
+    "fichier": "Deathless/Interface/interface_refus.wav",
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_interface_confirmation",
+    "nom": "Interface — confirmation (identité Deathless)",
+    "categorie": "Interface",
+    "usage": "Action acceptée (point de compétence dépensé, choix validé) : toc puis quinte de marimba qui monte. Remplacera `ui_confirmation`.",
+    "fichier": "Deathless/Interface/interface_confirmation.wav",
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_interface_decompte",
+    "nom": "Interface — décompte (identité Deathless)",
+    "categorie": "Interface",
+    "usage": "Chaque seconde d'un compte à rebours (tous prêts, alerte de nuit) : bloc de bois net. Remplacera `ui_decompte`.",
+    "fichier": "Deathless/Interface/interface_decompte.wav",
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_interface_onglet",
+    "nom": "Interface — changement d'onglet (identité Deathless)",
+    "categorie": "Interface",
+    "usage": "Onglet précédent ou suivant (LB / RB, Q / E) : frottement bref et tic. Nouveau.",
+    "fichier": "Deathless/Interface/interface_onglet.wav",
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_interface_pret",
+    "nom": "Vote « prêt » — joueur prêt (identité Deathless)",
+    "categorie": "Interface",
+    "usage": "Un joueur se déclare prêt : toc et quinte de marimba ensemble. Remplacera `vote_pret`.",
+    "fichier": "Deathless/Interface/interface_pret.wav",
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_interface_pret_annule",
+    "nom": "Vote « prêt » — vote annulé (identité Deathless)",
+    "categorie": "Interface",
+    "usage": "Un joueur annule son vote « prêt » : deux notes qui retombent. Remplacera `vote_annule`.",
+    "fichier": "Deathless/Interface/interface_pret_annule.wav",
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_interface_tous_prets",
+    "nom": "Vote « prêt » — tout le monde est prêt (identité Deathless)",
+    "categorie": "Interface",
+    "usage": "Tous les joueurs sont prêts : tambour de bois et arpège montant. Remplacera `vote_tous_prets`.",
+    "fichier": "Deathless/Interface/interface_tous_prets.wav",
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_nyxessa_tir",
+    "nom": "Nyxessa — tir d'un missile (identité Deathless)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Le cristal pulse et tire un missile : poussée grave, accord de deux gemmes, l'air part (3D). Remplacera `relic_pulse`.",
+    "fichier": "Deathless/Nyxessa/nyxessa_tir_1.wav",
+    "variantes": [
+      "Deathless/Nyxessa/nyxessa_tir_1.wav",
+      "Deathless/Nyxessa/nyxessa_tir_2.wav",
+      "Deathless/Nyxessa/nyxessa_tir_3.wav"
+    ],
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_nyxessa_frappee",
+    "nom": "Nyxessa — frappée (identité Deathless)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Un ennemi frappe la relique : coup sourd, gemme grave qui frissonne un demi-ton faux, éclats (3D). Remplacera `relic_hit`.",
+    "fichier": "Deathless/Nyxessa/nyxessa_frappee_1.wav",
+    "variantes": [
+      "Deathless/Nyxessa/nyxessa_frappee_1.wav",
+      "Deathless/Nyxessa/nyxessa_frappee_2.wav",
+      "Deathless/Nyxessa/nyxessa_frappee_3.wav"
+    ],
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_nyxessa_alerte",
+    "nom": "Nyxessa — alerte (identité Deathless)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Relique attaquée (HUD) et rappel imminent au donjon : deux fois deux notes de gemme qui descendent, battement grave (2D). Remplacera `nyxessa_alerte`.",
+    "fichier": "Deathless/Nyxessa/nyxessa_alerte.wav",
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_nyxessa_palier",
+    "nom": "Nyxessa — palier amélioré (identité Deathless)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Un palier de Nyxessa ou du bouclier est acheté : arpège montant, accord ouvert, gerbe d'étincelles (3D, événement majeur). Remplacera `nyxessa_palier`.",
+    "fichier": "Deathless/Nyxessa/nyxessa_palier.wav",
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_nyxessa_charge_portail",
+    "nom": "Nyxessa — charge vers le portail (identité Deathless)",
+    "categorie": "Nyxessa et portail",
+    "usage": "À l'aube, la charge part vers le portail : souffle et gemmes qui montent (3D). Remplacera `nyxessa_charge_portail`.",
+    "fichier": "Deathless/Nyxessa/nyxessa_charge_portail.wav",
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_nyxessa_retour_energie",
+    "nom": "Nyxessa — retour de l'énergie (identité Deathless)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Au crépuscule, l'énergie revient du portail : souffle qui retombe, gemmes qui descendent, la relique absorbe (3D). Remplacera `nyxessa_retour_energie`.",
+    "fichier": "Deathless/Nyxessa/nyxessa_retour_energie.wav",
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_nyxessa_onde",
+    "nom": "Nyxessa — onde de la ceinture (identité Deathless)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Une onde fait le tour de la ceinture (passage d'un joueur au portail, énergie d'un allié mort qui revient) : course de gemmes (3D). Remplacera `nyxessa_onde_passage`.",
+    "fichier": "Deathless/Nyxessa/nyxessa_onde.wav",
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_nyxessa_destruction",
+    "nom": "Nyxessa — destruction (identité Deathless)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Nyxessa est détruite, la partie est perdue : fêlure, bris en cascade, dernier soupir grave (3D, événement majeur). Remplacera `nyxessa_destruction`.",
+    "fichier": "Deathless/Nyxessa/nyxessa_destruction.wav",
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
   }
 ]
