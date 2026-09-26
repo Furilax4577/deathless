@@ -1,6 +1,11 @@
 # Sons
 
-Tous les sons du projet s'écoutent dans le wiki, page **Sons** (`Wiki/pages/sons.md`, générée depuis `Wiki/data/sons.json`). Ils ont été copiés de Relic le 25/09/2026 (mêmes noms de fichiers, mêmes `.meta`, donc mêmes GUID), puis complétés le même jour par 35 fichiers créés pour Deathless (arc et arbalète refaits par modélisation physique, et tous les sons qui étaient « à créer »). Aucun n'est encore branché dans le jeu : le statut « utilisé » du catalogue veut dire « a un usage clair dans Deathless ».
+Tous les sons du projet s'écoutent dans le wiki, page **Sons** (`Wiki/pages/sons.md`, générée depuis `Wiki/data/sons.json`). Ils ont été copiés de Relic le 25/09/2026 (mêmes noms de fichiers, mêmes `.meta`, donc mêmes GUID), puis complétés le même jour par 35 fichiers créés pour Deathless (arc et arbalète refaits par modélisation physique, et tous les sons qui étaient « à créer »). Depuis, ils sont branchés dans le jeu (statut « utilisé » du catalogue : le jeu le joue) :
+
+- **`SonsDuJeu`** (`Assets/Scripts/Jeu/Audio/SonsDuJeu.cs`) associe chaque événement sonore du jeu (coup d'épée, tir d'arc, coffre ouvert, tombée de la nuit…) à une liste d'ids du catalogue par ordre de préférence : le premier id présent dans le catalogue importé joue. Les ids « à créer » ou d'identité Deathless (`dl_*`) sont en tête, suivis d'un repli qui existe ; un son créé prend donc sa place sans toucher au code.
+- **`AudioBank`** (`Assets/Scripts/Jeu/Audio/AudioBank.cs`) joue ces ids : `Jouer` (son 3D à une position), `Jouer2D`, `Boucle` (boucle attachée à un objet), `Musique` (fondu enchaîné entre deux sources) ; une variante tirée au hasard quand un son en a plusieurs.
+- **`SonsCatalogue.asset`** (`Assets/Jeu/Audio/`) est la copie du catalogue lue en jeu (id, statut, clips, boucle, portée), générée depuis `Wiki/data/sons.json` par le menu **Deathless > Jeu > 2. Importer le catalogue des sons** (`Assets/Editor/Jeu/JeuBuilder.cs`) ; les sons `a_creer` et sans fichier sont sautés. À relancer après chaque modification de `sons.json`.
+- **Mixer** `Assets/Audio/Deathless.mixer` : groupe Master et trois sous-groupes Musique, Effets, Interface, volumes exposés en dB et réglés dans les options (`VolumesAudio`). Effets, sons 2D et boucles passent par Effets, la musique par Musique. Les réglages (mixer, groupes, clips courts des menus : survol, clic, retour, refus) sont dans `Assets/Audio/Resources/DeathlessAudio.asset` (`ReglagesAudio`) ; le menu **Deathless > Jeu > 2b. Brancher l'interface du lot 1 (ReglagesAudio)** y met les sons `dl_interface_*`.
 
 ## Identité sonore de Deathless (depuis le 26/09/2026)
 
@@ -15,6 +20,11 @@ Tous les sons et musiques doivent être **régénérés avec une identité propr
 | `Relic/Sources/` | Scripts de synthèse : ceux de Relic (`synth_sounds2.py` à `synth_sounds7.py`, `synth_b_fix2.py`, `synth_music.py`) et ceux de Deathless (`synth_physique.py`, `synth_deathless.py`) ; Unity ignore les `.py` | Aucune |
 | `Kenney/RPGAudio/` | 51 sons d'objets (pas, pièces, portes, livres, cuir, lames, métal) | CC0, `License.txt` |
 | `Kenney/InterfaceSounds/` | 100 sons d'interface (clics, tics, confirmations, erreurs, gong…) | CC0, `License.txt` |
+| `Deathless/` | Sons de l'identité propre de Deathless, un sous-dossier par famille (`Nyxessa/`, `Interface/`, `Bouclier/`, `Portail/`), scripts `synth_<famille>.py`, briques `deathless_audio.py`, mesure `controle.py` (voir `Docs/son-cahier-des-charges.md`) | Aucune : créés pour le projet |
+| `Sonniss/` | `hache_vent_1.wav` à `hache_vent_3.wav` : souffle de la hache à chaque tour de l'attaque tournante du viking (id `hache_vent`), montés à partir d'extraits du GDC Game Audio Bundle | Sonniss GDC Game Audio Bundle : libre de droits pour les jeux (crédits) |
+| `Forge/` | `enclume_1.wav` à `enclume_3.wav` : marteau du forgeron sur l'enclume (id `forge_enclume`), et leur script `synth_enclume.py` | Aucune : créés pour le projet |
+| `Resources/` | `DeathlessAudio.asset` (`ReglagesAudio`, chargé par `Resources`) : mixer, groupes et sons courts de l'interface | — |
+| `Deathless.mixer` | Mixer du jeu : Master, Musique, Effets, Interface (volumes exposés) | — |
 
 Conventions héritées de Relic : noms de fichiers en anglais, en minuscules ; variantes d'un même son numérotées `_1`, `_2`… (tirées au hasard en jeu) ; boucles suffixées `_loop`. Les `.wav`, `.ogg` et `.mp3` sont suivis par Git LFS (`.gitattributes`).
 
@@ -30,8 +40,8 @@ Les références de `Relic/LISEZMOI.md` à l'éditeur de Relic (menu **Relic > S
    - `usage` : quand il joue dans Deathless (ou « Piste : … » s'il n'a pas d'usage décidé) ;
    - `fichier` : chemin sous `Assets/Audio/` ; `variantes` : liste de tous les fichiers si plusieurs forment le même son (le premier est aussi dans `fichier`) ;
    - `source`, `licence` ;
-   - `statut` : `a_ecouter` (créé, pas encore validé à l'écoute par Quentin), `utilise`, `disponible` ou `a_creer` (pour un son à créer : `fichier` à `null`).
-3. Quand un son « à créer » existe enfin, remplir `fichier`, `source`, `licence` et passer son statut à `a_ecouter` ; une fois validé à l'écoute, à `utilise`. Une ancienne version remplacée reste au catalogue en `disponible`, nommée « … (ancienne version) », pour comparer. L'encart en haut de la page Sons (balise `{sons à écouter}`, ancre `#a-ecouter`) liste tous les sons `a_ecouter`.
+   - `statut` : `a_ecouter` (créé, pas encore validé à l'écoute par Quentin ; il peut déjà être joué en jeu), `utilise` (joué par le jeu : premier id présent d'une liste de `SonsDuJeu` appelée par le code, ou clip de `ReglagesAudio`), `disponible` (dans le projet mais pas joué : sans usage décidé, usage prévu pas encore branché — « Prévu : … Pas encore branché », ancienne version remplacée, ou repli masqué par un id placé avant lui dans `SonsDuJeu`) ou `a_creer` (id attendu par `SonsDuJeu` ou son nécessaire qui n'existe pas encore : `fichier` à `null`, le repli qui joue en attendant est cité dans `usage`).
+3. Quand un son « à créer » existe enfin, remplir `fichier`, `source`, `licence` et passer son statut à `a_ecouter` ; une fois validé à l'écoute, à `utilise` s'il est joué par le jeu (son id dans `SonsDuJeu`, catalogue réimporté), sinon à `disponible` avec son usage prévu. Une ancienne version remplacée reste au catalogue en `disponible`, nommée « … (ancienne version) », pour comparer. L'encart en haut de la page Sons (balise `{sons à écouter}`, ancre `#a-ecouter`) liste tous les sons `a_ecouter`.
 4. `python Wiki/build.py` : la page Sons se régénère et le fichier est copié dans `Wiki/site/sons/`. Un fichier absent est signalé dans la console et dans la page (« fichier absent »).
 
 ## Générer un nouveau son

@@ -197,7 +197,7 @@
     "id": "kenney_rpg_handlesmallleather",
     "nom": "Potion — sortie de la sacoche",
     "categorie": "Joueurs",
-    "usage": "Boire une potion (bruit de cuir, emprunté par Relic).",
+    "usage": "Prévu : boire une potion (bruit de cuir, emprunté par Relic). Pas encore branché.",
     "fichier": "Kenney/RPGAudio/handleSmallLeather.ogg",
     "variantes": [
       "Kenney/RPGAudio/handleSmallLeather.ogg",
@@ -205,7 +205,7 @@
     ],
     "source": "Kenney, RPG Audio",
     "licence": "CC0",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "water_step",
@@ -235,7 +235,7 @@
     ],
     "source": "Généré pour Deathless (synth_physique.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "disponible"
+    "statut": "utilise"
   },
   {
     "id": "bow_shot_v2",
@@ -260,7 +260,7 @@
     "fichier": "Relic/bow_shot_v3_charged.wav",
     "source": "Généré pour Deathless (synth_physique.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "disponible"
+    "statut": "utilise"
   },
   {
     "id": "bow_shot_charged",
@@ -289,7 +289,7 @@
     ],
     "source": "Généré pour Deathless (synth_physique.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "disponible"
+    "statut": "utilise"
   },
   {
     "id": "crossbow_shot",
@@ -373,7 +373,7 @@
     ],
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "disponible"
+    "statut": "utilise"
   },
   {
     "id": "coup_critique_meilleur",
@@ -383,7 +383,7 @@
     "fichier": "Relic/critical_best.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "disponible"
+    "statut": "utilise"
   },
   {
     "id": "arbalete_recharge",
@@ -393,7 +393,7 @@
     "fichier": "Relic/crossbow_reload.wav",
     "source": "Généré pour Deathless (synth_physique.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "disponible"
+    "statut": "utilise"
   },
   {
     "id": "fireball_cast",
@@ -459,11 +459,11 @@
     "id": "brulure",
     "nom": "Brûlure — crépitement (boucle)",
     "categorie": "Sorts du mage",
-    "usage": "Un ennemi touché par le feu brûle pendant un moment : braises qui crépitent au hasard, sans souffle (boucle de 4 s sur l'ennemi).",
+    "usage": "Un ennemi touché par le feu brûle pendant un moment (repli de `burn_loop`, à créer) : braises qui crépitent au hasard, sans souffle (boucle de 4 s sur l'ennemi).",
     "fichier": "Relic/burn_loop.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "disponible"
+    "statut": "utilise"
   },
   {
     "id": "shield_block",
@@ -607,7 +607,7 @@
     "fichier": "Relic/bow_draw.wav",
     "source": "Généré pour Deathless (synth_physique.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "disponible"
+    "statut": "utilise"
   },
   {
     "id": "arc_charge_complete",
@@ -617,7 +617,7 @@
     "fichier": "Relic/bow_full_charge.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "disponible"
+    "statut": "utilise"
   },
   {
     "id": "nuee_marqueur",
@@ -627,7 +627,7 @@
     "fichier": "Relic/arrow_rain_marker.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "disponible"
+    "statut": "utilise"
   },
   {
     "id": "assassin_furtif",
@@ -637,7 +637,7 @@
     "fichier": "Relic/stealth_enter.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "disponible"
+    "statut": "utilise"
   },
   {
     "id": "assassin_furtif_sortie",
@@ -647,7 +647,7 @@
     "fichier": "Relic/stealth_exit.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "disponible"
+    "statut": "utilise"
   },
   {
     "id": "assassin_repere",
@@ -657,17 +657,17 @@
     "fichier": "Relic/stealth_spotted.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "disponible"
+    "statut": "utilise"
   },
   {
     "id": "grenade_lancer",
     "nom": "Grenade fumigène — lancer",
     "categorie": "Assassin et rôdeur",
-    "usage": "L'assassin lance la grenade (animation Throw) ; l'impact existe déjà.",
+    "usage": "L'assassin lance la grenade fumigène (animation Throw).",
     "fichier": "Relic/smoke_bomb_throw.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "disponible"
+    "statut": "utilise"
   },
   {
     "id": "portal_open",
@@ -990,11 +990,11 @@
     "id": "necro_summon",
     "nom": "Nécromancien — invocation",
     "categorie": "Ennemis",
-    "usage": "Incantation d'invocation du nécromancien de Relic (3 s). Comportement du nécromancien à confirmer.",
+    "usage": "Le nécromancien invoque ses sbires (repli de `necromancien_invocation`, à créer) : incantation d'invocation du nécromancien de Relic (3 s).",
     "fichier": "Relic/necro_summon.wav",
     "source": "Relic (généré en Python pour le projet)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "disponible"
+    "statut": "utilise"
   },
   {
     "id": "necro_heal_loop",
@@ -1040,11 +1040,11 @@
     "id": "donjon_alerte_nuit",
     "nom": "Donjon — alerte avant la nuit",
     "categorie": "Jour et nuit",
-    "usage": "15 s avant le crépuscule, les joueurs encore au donjon sont prévenus à l'écran et par un son.",
+    "usage": "15 s avant le crépuscule, les joueurs encore au donjon sont prévenus à l'écran et par un son. Ancienne version : en jeu, c'est `dl_nyxessa_alerte` qui joue (premier id de `SonsDuJeu.AlerteNuit`).",
     "fichier": "Relic/night_warning.wav",
     "source": "Généré pour Deathless (synth_deathless.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "partie_victoire",
@@ -1080,21 +1080,21 @@
     "id": "musique_dedans_donjon",
     "nom": "Musique — donjon",
     "categorie": "Musique",
-    "usage": "Exploration du donjon.",
+    "usage": "Prévue : exploration du donjon. Pas encore branchée : le jeu ne joue que les musiques de jour et de nuit (`VueCycle`).",
     "fichier": "Relic/Musique/musique_dedans_donjon.wav",
     "source": "Relic (généré en Python pour le projet)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "chest_open",
     "nom": "Coffre — ouverture",
     "categorie": "Donjon et défenses",
-    "usage": "Couvercle d'un coffre du donjon de Relic. Piste : butin du donjon.",
+    "usage": "Donjon : le couvercle d'un coffre s'ouvre (butin).",
     "fichier": "Relic/chest_open.wav",
     "source": "Relic (généré en Python pour le projet)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "disponible"
+    "statut": "utilise"
   },
   {
     "id": "crystal_light",
@@ -1201,7 +1201,7 @@
     ],
     "source": "Généré pour Deathless (Forge/synth_enclume.py)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "disponible"
+    "statut": "utilise"
   },
   {
     "id": "kenney_rpg_belthandle",
@@ -1271,7 +1271,7 @@
     "id": "kenney_rpg_cloth",
     "nom": "Tissu — froissement",
     "categorie": "Kenney divers : objets",
-    "usage": "",
+    "usage": "Un héros saute (repli de `jump`, à créer).",
     "fichier": "Kenney/RPGAudio/cloth1.ogg",
     "variantes": [
       "Kenney/RPGAudio/cloth1.ogg",
@@ -1281,7 +1281,7 @@
     ],
     "source": "Kenney, RPG Audio",
     "licence": "CC0",
-    "statut": "disponible"
+    "statut": "utilise"
   },
   {
     "id": "kenney_rpg_clothbelt",
@@ -1356,27 +1356,27 @@
     "id": "kenney_rpg_metalclick",
     "nom": "Métal — clic",
     "categorie": "Kenney divers : objets",
-    "usage": "",
+    "usage": "Taverne : un héros boit une bière, ou une tournée est offerte à tous (ivresse). Repli du cadenas de coffre.",
     "fichier": "Kenney/RPGAudio/metalClick.ogg",
     "source": "Kenney, RPG Audio",
     "licence": "CC0",
-    "statut": "disponible"
+    "statut": "utilise"
   },
   {
     "id": "kenney_rpg_metallatch",
     "nom": "Métal — loquet",
     "categorie": "Kenney divers : objets",
-    "usage": "",
+    "usage": "Donjon : le cadenas d'un coffre s'ouvre, juste avant le couvercle.",
     "fichier": "Kenney/RPGAudio/metalLatch.ogg",
     "source": "Kenney, RPG Audio",
     "licence": "CC0",
-    "statut": "disponible"
+    "statut": "utilise"
   },
   {
     "id": "kenney_rpg_metalpot",
     "nom": "Métal — casserole heurtée",
     "categorie": "Kenney divers : objets",
-    "usage": "",
+    "usage": "Taverne : un héros mange un repas (soin).",
     "fichier": "Kenney/RPGAudio/metalPot1.ogg",
     "variantes": [
       "Kenney/RPGAudio/metalPot1.ogg",
@@ -1385,7 +1385,7 @@
     ],
     "source": "Kenney, RPG Audio",
     "licence": "CC0",
-    "statut": "disponible"
+    "statut": "utilise"
   },
   {
     "id": "kenney_ui_back_002",
@@ -2359,21 +2359,21 @@
     "id": "dl_interface_decompte",
     "nom": "Interface — décompte (identité Deathless)",
     "categorie": "Interface",
-    "usage": "Chaque seconde d'un compte à rebours (tous prêts, alerte de nuit) : bloc de bois net. Remplacera `ui_decompte`.",
+    "usage": "Prévu : chaque seconde d'un compte à rebours (tous prêts, alerte de nuit) : bloc de bois net. Remplacera `ui_decompte`. Pas encore branché : aucun tic par seconde n'est joué (dans `SonsDuJeu.AlerteNuit`, il n'est qu'un repli derrière `dl_nyxessa_alerte`).",
     "fichier": "Deathless/Interface/interface_decompte.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "dl_interface_onglet",
     "nom": "Interface — changement d'onglet (identité Deathless)",
     "categorie": "Interface",
-    "usage": "Onglet précédent ou suivant (LB / RB, Q / E) : frottement bref et tic. Nouveau.",
+    "usage": "Prévu : onglet précédent ou suivant (LB / RB, Q / E) : frottement bref et tic. Validé à l'écoute, pas encore branché.",
     "fichier": "Deathless/Interface/interface_onglet.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "utilise"
+    "statut": "disponible"
   },
   {
     "id": "dl_interface_pret",
@@ -2755,11 +2755,91 @@
     "id": "dl_portail_ferme_refus",
     "nom": "Portail — fermé, refus (identité Deathless)",
     "categorie": "Nyxessa et portail",
-    "usage": "Interagir près du portail fermé la nuit (2D) : gemme étouffée, toc de pierre. Nouveau.",
+    "usage": "Prévu : interagir près du portail fermé la nuit (2D) : gemme étouffée, toc de pierre. Validé à l'écoute, pas encore branché.",
     "fichier": "Deathless/Portail/portail_ferme_refus.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "utilise",
+    "statut": "disponible",
     "portee": 60
+  },
+  {
+    "id": "epee_elan",
+    "nom": "Épée — élan",
+    "categorie": "Armes",
+    "usage": "Élan d'une attaque au corps à corps (`SonsDuJeu.EpeeElan`) : coup d'épée du paladin (deux tailles alternées), élan de la hache du viking, coup de dague de l'assassin qui ne touche rien. Souffle de lame court et fin. En attendant : `kenney_rpg_knifeslice`.",
+    "fichier": null,
+    "statut": "a_creer"
+  },
+  {
+    "id": "epee_coup",
+    "nom": "Épée — coup",
+    "categorie": "Armes",
+    "usage": "Second choix de `SonsDuJeu.EpeeElan` si `epee_elan` n'existe pas : coup d'épée complet. En attendant : `kenney_rpg_knifeslice`.",
+    "fichier": null,
+    "statut": "a_creer"
+  },
+  {
+    "id": "epee_impact",
+    "nom": "Épée — impact",
+    "categorie": "Armes",
+    "usage": "L'épée du paladin touche un ennemi : os creux frappé et tranchant bref. En attendant : `skeleton_hit`.",
+    "fichier": null,
+    "statut": "a_creer"
+  },
+  {
+    "id": "dague_coup",
+    "nom": "Dague — coup",
+    "categorie": "Armes",
+    "usage": "La dague de l'assassin touche un ennemi. En attendant : `kenney_rpg_knifeslice`.",
+    "fichier": null,
+    "statut": "a_creer"
+  },
+  {
+    "id": "hache_coup",
+    "nom": "Hache — coup",
+    "categorie": "Armes",
+    "usage": "La hache du viking touche (attaque principale, et chaque touche de l'attaque tournante). En attendant : `kenney_rpg_chop`.",
+    "fichier": null,
+    "statut": "a_creer"
+  },
+  {
+    "id": "jump",
+    "nom": "Joueur — saut",
+    "categorie": "Joueurs",
+    "usage": "Un héros saute (impulsion). En attendant : `kenney_rpg_cloth`.",
+    "fichier": null,
+    "statut": "a_creer"
+  },
+  {
+    "id": "knight_charge_impact",
+    "nom": "Paladin — impact de la charge",
+    "categorie": "Paladin",
+    "usage": "La charge du paladin percute : fin de la charge et ennemi percuté. En attendant : `viking_leap_land`.",
+    "fichier": null,
+    "statut": "a_creer"
+  },
+  {
+    "id": "burn_loop",
+    "nom": "Brûlure — boucle",
+    "categorie": "Sorts du mage",
+    "usage": "Un ennemi touché par le feu brûle (boucle sur l'ennemi). En attendant : `brulure`.",
+    "fichier": null,
+    "statut": "a_creer"
+  },
+  {
+    "id": "golem_coup",
+    "nom": "Golem — coup",
+    "categorie": "Ennemis",
+    "usage": "Coup lourd du golem et des Morgrim (martache, massue) : impact au sol. En attendant : `viking_leap_land`.",
+    "fichier": null,
+    "statut": "a_creer"
+  },
+  {
+    "id": "necromancien_invocation",
+    "nom": "Nécromancien — invocation",
+    "categorie": "Ennemis",
+    "usage": "Le nécromancien invoque ses sbires. En attendant : `necro_summon` (Relic).",
+    "fichier": null,
+    "statut": "a_creer"
   }
 ]
