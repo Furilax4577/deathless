@@ -1534,7 +1534,7 @@ def exporter_nyxessa():
 
 # ---------------------------------------------------------------------------------------------- Nyxessa (HUD)
 # Missile de Nyxessa (compteur du HUD, en haut à droite de sa barre) : le crâne en gemmes vertes du jeu (MissileCrane)
-# filant vers le haut à droite, courte traînée en diagonale derrière lui. Glyphe seul, sans cadre (comme jauge_mana),
+# seul, de face et droit, sans traînée. Glyphe seul, sans cadre (comme jauge_mana),
 # formes larges pour rester lisible à 30 px. Version éteinte en ardoise (teintes des bordures de l'interface), sous la
 # version allumée que le HUD découpe du bas vers le haut pendant la recharge du prochain missile.
 
@@ -1560,15 +1560,9 @@ def crane_nyxessa(ic, f):
 
 def nyxessa_missile():
     ic = Icone("nyxessa_missile", "nyxessa", "Missile de Nyxessa",
-               "HUD (compteur en haut) : crâne en gemmes vertes, courte traînée ; allumé quand un missile est prêt.")
-    sombre, emeraude, vif, clair, eclat = NYX
-    # Traînée : trois filets effilés vers le bas à gauche (sous le crâne), deux éclats.
-    ic.bande([(62, 68), (38, 92), (12, 118)], [28, 15, 0], [emeraude, vif, clair])
-    ic.bande([(50, 54), (32, 72), (16, 88)], [11, 6, 0], [vif, clair])
-    ic.bande([(76, 82), (60, 98), (46, 112)], [11, 6, 0], [vif, clair])
-    for (x, y, r) in ((26, 100, 4.5), (46, 116, 3.5)):
-        ic.poly([(x, y - r * 1.4), (x + r, y), (x, y + r * 1.4), (x - r, y)], eclat)
-    crane_nyxessa(ic, tr(78, 49, 1.2, 14))
+               "HUD (compteur en haut) : crâne en gemmes vertes seul, droit ; allumé quand un missile est prêt.")
+    # Crâne seul, de face, sans traînée (Quentin, 26/09/2026 : la traînée nuisait à la lisibilité à petite taille).
+    crane_nyxessa(ic, tr(64, 72, 1.5, 0))
     return ic
 
 
