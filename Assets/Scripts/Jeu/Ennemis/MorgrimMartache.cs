@@ -16,11 +16,15 @@ namespace Deathless.Jeu
         Competence m_Competence;
         float m_ProchainFendSol = -99f, m_ProchaineBreche = -99f;
 
-        public override void Initialiser(StatsSquelette stats, float multiplicateurPV)
+        /// S'arrête à la longueur du Fend-sol seulement quand c'est lui qui partira (mêmes conditions que Choisir) ;
+        /// sinon avance jusqu'à la portée de la Fauche, qui ne touche qu'au contact.
+        protected override float PorteeEngagement(Heros cible)
         {
-            base.Initialiser(stats, multiplicateurPV);
-            // Porte d'engagement élargie pour Fend-sol (portée en ligne, plus longue que la Fauche au contact).
-            m_Stats.portee = Mathf.Max(m_Stats.portee, B.morgrimMartacheFendSolLongueur);
+            var b = B;
+            if (cible != null && Time.time >= m_ProchainFendSol
+                && (JoueursProches(b.morgrimJoueursProchesRayon) >= 2 || Distance(cible.transform.position) > b.morgrimMartacheFaucheRayon * 1.3f))
+                return b.morgrimMartacheFendSolLongueur;
+            return Mathf.Min(m_Stats.portee, b.morgrimMartacheFaucheRayon);
         }
 
         protected override void CommencerAttaque(Heros cible)

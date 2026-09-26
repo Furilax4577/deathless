@@ -16,12 +16,16 @@ namespace Deathless.Jeu
         Competence m_Competence;
         float m_ProchainTourbillon = -99f, m_ProchaineCharge = -99f;
 
-        public override void Initialiser(StatsSquelette stats, float multiplicateurPV)
+        /// Distance d'arrêt selon la compétence qui partira (mêmes conditions que Choisir) : la Charge écrasante se
+        /// déclenche sur une cible encore loin, le Tourbillon et le Fracas au contact.
+        protected override float PorteeEngagement(Heros cible)
         {
-            base.Initialiser(stats, multiplicateurPV);
-            // Porte d'engagement élargie pour laisser la Charge écrasante se déclencher sur une cible encore loin ;
-            // la compétence réellement choisie a sa propre portée (Choisir/Telegraphier ci-dessous).
-            m_Stats.portee = Mathf.Max(m_Stats.portee, B.morgrimMassueChargeDistance);
+            var b = B;
+            if (JoueursProches(b.morgrimJoueursProchesRayon) >= 2 && Time.time >= m_ProchainTourbillon)
+                return Mathf.Min(m_Stats.portee, b.morgrimMassueTourbillonRayon);
+            if (cible != null && Time.time >= m_ProchaineCharge && Distance(cible.transform.position) > b.morgrimMassueFracasRayon * 1.4f)
+                return b.morgrimMassueChargeDistance;
+            return m_Stats.portee;
         }
 
         protected override void CommencerAttaque(Heros cible)
