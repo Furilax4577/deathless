@@ -29,6 +29,8 @@ Ordre d'apparition dans la partie : sbires dès la nuit 1, guerriers nuit 2, vol
 
 Les squelettes ordinaires ont les **yeux jaune-orangé lumineux**, comme les modèles KayKit. Les **élites** ont les **yeux rouges**. **Nyxar** a les **yeux verts** : il porte des éclats de Nyx.
 
+**Coup en préparation** {décidé, 26/09/2026} : pendant qu'un squelette prépare son coup, ses **yeux s'intensifient** (émission ×1 à ×3,2), avec une légère **pulsation** dans le dernier tiers pour marquer l'instant de l'impact — pour tous les squelettes, **Morgrim compris**. La teinte des yeux ne change pas (jaune-orangé, rouge élite, bleu glacé Morgrim martache) : c'est l'intensité seule qui monte, jamais de vert. {dev} `PreparationLisible.cs`, posé automatiquement par `Squelette.Awake` sur chaque squelette ; lu depuis `Squelette.PreparationProgress`.
+
 ## Élites {décidé}
 
 Un élite est un squelette ordinaire **plus fort**, sans éclat de Nyx (décision du 25/09/2026) :

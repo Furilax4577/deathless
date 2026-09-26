@@ -513,9 +513,15 @@ namespace Deathless.Jeu
         public float surNyxessaDepuis = 3f;
 
         [Header("Caméra")]
-        public float cameraDistance = 4.5f;
+        [Tooltip("Recul derrière l'épaule (m). 5,5 : caméra plus haute et reculée pour la lisibilité des coups ennemis " +
+            "(décision de Quentin, 26/09/2026, planche lisibilite_cam_planche.png). Le recul contre les murs (CameraEpaule.Recul) " +
+            "borne déjà la distance réelle dans les petites pièces (SphereCast jusqu'au premier mur) : pas de valeur séparée pour les intérieurs.")]
+        public float cameraDistance = 5.5f;
         public float cameraEpaule = 0.6f;
         public float cameraHauteur = 1.6f;
+        [Tooltip("Tangage appliqué au début de la partie (CameraEpaule.Suivre), plus robuste que la valeur de scène. " +
+            "22° : caméra plus haute (décision de Quentin, 26/09/2026, au lieu de 12° par défaut).")]
+        public float cameraTangageDefaut = 22f;
         public Vector2 cameraTangage = new Vector2(-30f, 60f);
         public float sensibiliteSouris = 0.12f;
         public float sensibiliteManette = 180f;

@@ -388,9 +388,10 @@ MonoBehaviour:
   reapparitionInvulnerable: 2
   fenetreDegatsEvites: 10
   surNyxessaDepuis: 3
-  cameraDistance: 5
+  cameraDistance: 5.5
   cameraEpaule: 0.85
   cameraHauteur: 1.9
+  cameraTangageDefaut: 22
   cameraTangage: {x: -30, y: 60}
   sensibiliteSouris: 0.12
   sensibiliteManette: 180

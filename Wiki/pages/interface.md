@@ -1,5 +1,11 @@
 # Interface
 
+## Caméra {décidé, 26/09/2026}
+
+Caméra à l'épaule, en troisième personne (voir [Principes](principes.md)). Suite au retour « les ennemis sont durs à lire », la caméra est **plus haute et plus reculée** : tangage par défaut **22°** (au lieu de 12°) et recul **5,5 m** (au lieu de 4,5 m), pour voir un plus grand rayon autour du héros. Épaule et champ de vision inchangés. Décision prise sur la planche de comparaison `Assets/Screenshots/lisibilite_cam_planche.png` (chantier lisibilité-caméra).
+
+{dev} `GameBalance.cameraDistance` (5,5 m) et `GameBalance.cameraTangageDefaut` (22°, appliqué par `CameraEpaule.Suivre` au début de la partie, plus robuste qu'une valeur de scène). Le recul contre les murs (`CameraEpaule.Recul`, SphereCast) borne déjà la distance réelle dans les petites pièces : pas de valeur séparée pour les intérieurs.
+
 ## Principes {décidé}
 
 - L'interface se navigue entièrement à la manette comme au clavier et à la souris.

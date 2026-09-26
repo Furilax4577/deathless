@@ -15,7 +15,8 @@ namespace Deathless.Jeu
     {
         public Transform cible;
         public float lacet;
-        public float tangage = 12f;
+        [Tooltip("Valeur de repli avant que Suivre() applique GameBalance.cameraTangageDefaut (au démarrage de la partie).")]
+        public float tangage = 22f;
         [Tooltip("Visée demandée par la classe (rôdeur : LT) : 0 normale, 1 serrée (épaule plus proche, champ réduit).")]
         public float viseeVoulue;
         float m_Visee;
@@ -66,7 +67,14 @@ namespace Deathless.Jeu
         public void Suivre(Transform t)
         {
             cible = t;
-            if (t != null) lacet = t.eulerAngles.y;
+            if (t != null)
+            {
+                lacet = t.eulerAngles.y;
+                // Tangage par défaut au démarrage de la partie (GameBalance.cameraTangageDefaut), plus robuste que la
+                // valeur de scène (décision de Quentin, 26/09/2026) : ne touche pas au tangage déjà choisi par le joueur
+                // en cours de partie (Tourner), seulement au début, quand la caméra se met à suivre un héros.
+                tangage = GameBalance.Courant.cameraTangageDefaut;
+            }
         }
 
         /// Rotation demandée par les entrées (degrés).

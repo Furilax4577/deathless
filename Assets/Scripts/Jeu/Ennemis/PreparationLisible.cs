@@ -33,7 +33,13 @@ namespace Deathless.Jeu
         bool m_A;
         static readonly int EmissionId = Shader.PropertyToID("_EmissionColor");
 
-        void Awake()
+        // En Start (pas Awake) : posé automatiquement par Squelette.Awake (AddComponent), donc son propre Awake tournerait
+        // avant que le poste ait fini d'équiper le squelette -- élite (Squelette.MarquerElite, yeux rouges) ou Morgrim
+        // Martache (yeux bleu glacé posés sur le prefab) changent le matériau des yeux après l'Instantiate, dans le même
+        // appel que celui-ci (DirecteurVagues.Poser : Instantiate -> MarquerElite -> Initialiser), avant que Start ne
+        // s'exécute. Lire l'émission de base en Start capture donc la bonne teinte (rouge élite, bleu glacé Martache,
+        // jaune-orangé ordinaire) au lieu de celle du matériau posé sur le prefab avant l'échange.
+        void Start()
         {
             m_Squelette = GetComponent<Squelette>();
             var liste = new List<Renderer>();
@@ -50,6 +56,7 @@ namespace Deathless.Jeu
         void Update()
         {
             if (!m_A || m_Squelette == null || m_Yeux.Length == 0) return;
+            if (m_Bloc == null) m_Bloc = new MaterialPropertyBlock();   // garde-fou : rechargement de domaine en cours de Play
             float k = m_Squelette.PreparationProgress;
             float facteur = 1f;
             if (k > 0f)

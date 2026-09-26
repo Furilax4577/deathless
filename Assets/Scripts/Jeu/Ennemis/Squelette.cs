@@ -87,6 +87,10 @@ namespace Deathless.Jeu
             if (modele != null)
                 foreach (var r in modele.GetComponentsInChildren<Renderer>())
                     if (r.name.EndsWith("_Head")) m_RenduTete = r;
+            // Yeux qui s'intensifient pendant la préparation du coup (lisibilité, décidé le 26/09/2026, planche
+            // lisibilite_cam_planche.png) : posé en code pour couvrir tous les squelettes (sbire, guerrier, élite, Golem,
+            // Necromancien, Morgrim) sans éditer chaque prefab à la main ; purement visuel (PreparationLisible.cs).
+            if (GetComponent<PreparationLisible>() == null) gameObject.AddComponent<PreparationLisible>();
         }
 
         Renderer m_RenduTete;
