@@ -371,6 +371,7 @@ namespace Deathless.UI.Ecrans
             ("Gameplay/Skill3", "Compétence 3"),
             ("Gameplay/Sprint", "Sprinter"),
             ("Gameplay/DrinkPotion", "Boire une potion"),
+            ("Gameplay/Emote", "Roue à emotes (maintenir)"),
             ("Gameplay/Ready", "Se déclarer prêt"),
             ("Gameplay/Pause", "Pause"),
         };
