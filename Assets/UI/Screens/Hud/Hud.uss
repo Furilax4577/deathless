@@ -256,21 +256,28 @@
     align-items: flex-end;
 }
 
+/* Emplacement du portrait : la boîte du dessous accueille l'anneau de jauge de classe (mana/rage), qui déborde
+   légèrement autour du portrait. Pas de classe sans jauge : l'anneau reste masqué (EcranHud.MajClasse). */
+.hud-joueur__portrait-emplacement { position: relative; width: 132px; height: 132px; margin-right: 21px; flex-shrink: 0; }
+.hud-joueur__anneau { position: absolute; left: 0; top: 0; right: 0; bottom: 0; display: none; }
+
 .hud-joueur__portrait {
-    width: 108px;
-    height: 108px;
-    border-radius: 54px;
+    position: absolute;
+    left: 14px;
+    top: 14px;
+    right: 14px;
+    bottom: 14px;
+    border-radius: 52px;
     border-width: 4px;
-    border-color: var(--dl-color-text);
+    border-color: var(--dl-color-ink);
     background-color: var(--dl-color-gold);
     align-items: center;
     justify-content: center;
-    margin-right: 21px;
 }
 
 .hud-joueur__initiale {
     -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Bold-SDF.asset");
-    font-size: 45px;
+    font-size: 40px;
     color: var(--dl-color-ink);
     margin: 0;
     padding: 0;
@@ -281,18 +288,64 @@
 
 .hud-joueur__furtif { position: absolute; right: -15px; top: -15px; width: 54px; height: 54px; border-radius: 27px; background-color: #2b1840; border-width: 2px; border-color: #5b3a8a; display: none; align-items: center; justify-content: center; }
 .hud-joueur__furtif-icone { width: 40px; height: 40px; }
-.hud-joueur__jauge-classe .dl-gauge__label { flex-grow: 1; }
 .hud-potion { align-items: center; margin-left: 15px; display: none; }
 .hud-potion__case { width: 72px; height: 72px; border-radius: 15px; border-width: 3px; border-color: var(--dl-color-border-strong); background-color: var(--dl-color-panel); align-items: center; justify-content: center; margin-bottom: 9px; }
 .hud-potion__icone { position: absolute; left: 9px; top: 9px; right: 9px; bottom: 9px; }
 .hud-potion__nombre { position: absolute; right: 3px; bottom: 0; margin: 0; padding: 0 3px; -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Bold-SDF.asset"); font-size: 24px; color: #ffffff; -unity-text-outline-width: 1px; -unity-text-outline-color: var(--dl-color-ink); }
 .hud-potion--vide .hud-potion__icone { opacity: 0.35; }
-.hud-joueur__jauge-classe { display: none; }
 .hud-emplacement--vide .hud-emplacement__case { border-color: var(--dl-color-line); background-color: rgba(16, 19, 27, 0.5); }
 .hud-emplacement--vide .hud-emplacement__abrev { color: var(--dl-color-text-disabled); }
 .hud-emplacement--vide .hud-emplacement__invite { opacity: 0.35; }
-.hud-joueur__jauges { width: 420px; padding: 12px 18px 6px 18px; border-radius: 18px; background-color: rgba(16, 19, 27, 0.78); }
-.hud-joueur__jauges > .dl-gauge { margin-bottom: 6px; }
+
+/* Colonne à droite du portrait : statuts, vie (large, embouts de gemme, seule à afficher son chiffre), endurance
+   (filet qui ne s'éclaire vraiment que sous 70 %, EcranHud.MajJoueur). Pas de libellé « Vie »/« Endurance »/« Mana »,
+   pas d'icône à côté des barres (maquette B). */
+.hud-joueur__colonne { align-items: flex-start; }
+
+.hud-joueur__vie-ligne { flex-direction: row; align-items: center; }
+.hud-joueur__gemme {
+    width: 15px;
+    height: 15px;
+    rotate: 45deg;
+    border-radius: 3px;
+    background-color: var(--dl-color-gold);
+    flex-shrink: 0;
+}
+.hud-joueur__vie-piste {
+    width: 226px;
+    height: 21px;
+    margin: 0 10px;
+    border-radius: 11px;
+    border-width: 1px;
+    border-color: var(--dl-color-border);
+    background-color: var(--dl-color-well);
+    overflow: hidden;
+}
+.hud-joueur__vie-remplissage { height: 100%; width: 100%; border-radius: 11px; background-color: var(--dl-color-life); }
+.hud-joueur__vie-valeur {
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+    font-size: 22px;
+    color: var(--dl-color-text);
+    margin: 0 0 0 3px;
+    padding: 1px 8px;
+    border-radius: 9px;
+    background-color: rgba(0, 0, 0, 0.32);
+}
+
+.hud-joueur__endurance-piste {
+    width: 226px;
+    height: 6px;
+    margin-top: 6px;
+    margin-left: 25px;
+    border-radius: 3px;
+    background-color: rgba(16, 19, 27, 0.4);
+    overflow: hidden;
+    opacity: 0.3;
+    transition-property: opacity;
+    transition-duration: 0.25s;
+}
+.hud-joueur__endurance-piste--active { opacity: 1; }
+.hud-joueur__endurance-remplissage { height: 100%; width: 100%; border-radius: 3px; background-color: var(--dl-color-stamina); }
 
 /* ---------- Compétences (bas, au centre) ---------- */
 .hud-competences {
@@ -379,9 +432,11 @@
 .dl-scale-3 .hud-or-porte { right: 24px; top: 88px; }
 .dl-scale-3 .hud-donjon-alerte { top: 120px; }
 .dl-scale-3 .hud-donjon-message { top: 188px; }
-.hud-points { position: absolute; left: 48px; bottom: 306px; height: 54px; display: none; border-width: 2px; border-color: var(--dl-color-gold); }
+/* Au-dessus du bloc joueur (portrait 132 px + marge, maquette B) ; la rangée de statuts est maintenant dans le
+   bloc, au-dessus de la barre de vie, donc la hauteur du bloc ne varie plus avec elle (HudStatuts.cs). */
+.hud-points { position: absolute; left: 48px; bottom: 189px; height: 54px; display: none; border-width: 2px; border-color: var(--dl-color-gold); }
 .hud-points__texte { font-size: var(--dl-text-body); color: var(--dl-color-gold); margin: 0 12px 0 0; padding: 0; -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); }
-.dl-scale-3 .hud-points { left: 24px; bottom: 290px; }
+.dl-scale-3 .hud-points { left: 24px; bottom: 142px; }
 .hud-interaction__texte { font-size: var(--dl-text-body); margin: 0 0 0 12px; padding: 0; }
 
 /* ---------- Mort ---------- */
@@ -411,8 +466,9 @@
 .dl-scale-3 .hud-or { right: 24px; top: 20px; }
 .dl-scale-3 .hud-or__legende { display: none; }
 .dl-scale-3 .hud-joueur { left: 24px; bottom: 24px; }
-.dl-scale-3 .hud-joueur__jauges { width: 320px; }
-.dl-scale-3 .hud-joueur__portrait { width: 84px; height: 84px; border-radius: 42px; }
+.dl-scale-3 .hud-joueur__portrait-emplacement { width: 100px; height: 100px; margin-right: 15px; }
+.dl-scale-3 .hud-joueur__portrait { left: 11px; top: 11px; right: 11px; bottom: 11px; border-radius: 39px; }
+.dl-scale-3 .hud-joueur__vie-piste, .dl-scale-3 .hud-joueur__endurance-piste { width: 170px; }
 .dl-scale-3 .hud-competences { bottom: 24px; left: auto; right: 24px; translate: 0 0; }
 .dl-scale-3 .hud-interaction { top: 480px; }
 .dl-scale-3 .hud-banniere { top: 150px; }
@@ -420,12 +476,12 @@
 .dl-scale-3 .hud-allie { height: 54px; padding: 0 15px 0 6px; margin-bottom: 6px; }
 .dl-scale-3 .hud-allie__embleme { width: 39px; height: 39px; margin-right: 9px; }
 
-/* ---------- Statuts (HudStatuts.cs, 26/09/2026) ----------
-   Rangée du joueur au-dessus du portrait et des barres (la pastille des points de compétence est au-dessus d'elle) ;
-   pour la déplacer (maquette B : juste au-dessus de la barre de vie), changer seulement .hud-statuts. Petites rangées au-dessus des ennemis, placées comme les pseudos.
+/* ---------- Statuts (HudStatuts.cs, 26/09/2026 ; déplacés dans le bloc joueur le 26/09/2026, maquette B) ----------
+   Rangée du joueur dans la colonne du bloc joueur, juste au-dessus de la barre de vie (la pastille des points de
+   compétence reste au-dessus de tout le bloc, .hud-points). Pour la déplacer, changer seulement .hud-statuts.
+   Petites rangées au-dessus des ennemis, placées comme les pseudos (calque à part, inchangé).
    Liseré rouge : affliction ; or : bienfait. Jauge de durée en bas de la case ; secondes dans la pastille (joueur). */
-.hud-statuts { position: absolute; left: 48px; bottom: 232px; flex-direction: row; align-items: flex-end; display: none; }
-.dl-scale-3 .hud-statuts { left: 24px; bottom: 215px; }
+.hud-statuts { flex-direction: row; align-items: flex-end; margin-bottom: 9px; display: none; }
 .statut {
     width: 60px;
     height: 60px;

@@ -142,6 +142,63 @@ namespace Deathless.UI
         }
     }
 
+    /// Anneau de jauge de classe (mana ou rage) dessiné autour du portrait du joueur (maquette B, 26/09/2026 ;
+    /// porté du bac à sable `sandbox-ui`, `Dev/FormesMaquetteHud.cs`). Départ en haut (12 h), balayage horaire
+    /// jusqu'à `value` (0 à 1), comme IconeJourNuit. `couleur` : hex ARGB/RGB (« #4a8fe0 » mana, « #ff8c1a » rage).
+    [UxmlElement]
+    public partial class AnneauJauge : FormeHud
+    {
+        float m_Value = 1f;
+        string m_Couleur = "#4a8fe0";
+        float m_Epaisseur = 6f;
+
+        [UxmlAttribute("value")]
+        public float value
+        {
+            get => m_Value;
+            set { m_Value = value; MarkDirtyRepaint(); }
+        }
+
+        [UxmlAttribute("couleur")]
+        public string couleur
+        {
+            get => m_Couleur;
+            set { m_Couleur = value; MarkDirtyRepaint(); }
+        }
+
+        [UxmlAttribute("epaisseur")]
+        public float epaisseur
+        {
+            get => m_Epaisseur;
+            set { m_Epaisseur = value; MarkDirtyRepaint(); }
+        }
+
+        protected override void Dessiner(Painter2D p, Rect r)
+        {
+            if (r.width <= 0f || r.height <= 0f) return;
+            var centre = r.center;
+            var rayon = Mathf.Min(r.width, r.height) * 0.5f - m_Epaisseur * 0.5f;
+            p.lineWidth = m_Epaisseur;
+            p.lineCap = LineCap.Round;
+
+            // Piste vide (fond de l'anneau).
+            p.strokeColor = new Color(1f, 1f, 1f, 0.14f);
+            p.BeginPath();
+            p.Arc(centre, rayon, -90f, 270f);
+            p.Stroke();
+
+            // Portion remplie, du haut vers la droite (sens horaire).
+            var v = Mathf.Clamp01(m_Value);
+            if (v > 0.003f)
+            {
+                p.strokeColor = Hex(m_Couleur);
+                p.BeginPath();
+                p.Arc(centre, rayon, -90f, -90f + v * 360f);
+                p.Stroke();
+            }
+        }
+    }
+
     /// Flèche pleine (triangle) pointant dans la direction « angle », en degrés à l'écran :
     /// 0 = droite, 90 = bas, 180 = gauche, 270 = haut.
     [UxmlElement]

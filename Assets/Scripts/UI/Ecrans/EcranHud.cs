@@ -39,7 +39,9 @@ namespace Deathless.UI.Ecrans
         Label m_Initiale;
         VisualElement m_Embleme;
         string m_ClasseEmbleme;
-        Gauge m_Vie, m_Endurance, m_JaugeClasse;
+        VisualElement m_VieRemplissage, m_EndurancePiste, m_EnduranceRemplissage;
+        Label m_VieValeur;
+        AnneauJauge m_Anneau;
         VisualElement m_Furtif, m_Potion;
         Label m_PotionNombre;
         string m_ClasseBarre;
@@ -111,9 +113,11 @@ namespace Deathless.UI.Ecrans
             m_Portrait = Racine.Q("portrait");
             m_Initiale = Racine.Q<Label>("portrait-initiale");
             m_Embleme = Racine.Q("portrait-embleme");
-            m_Vie = Racine.Q<Gauge>("joueur-vie");
-            m_Endurance = Racine.Q<Gauge>("joueur-endurance");
-            m_JaugeClasse = Racine.Q<Gauge>("joueur-jauge");
+            m_Anneau = Racine.Q<AnneauJauge>("joueur-anneau");
+            m_VieRemplissage = Racine.Q("joueur-vie");
+            m_VieValeur = Racine.Q<Label>("joueur-vie-valeur");
+            m_EndurancePiste = Racine.Q("joueur-endurance-piste");
+            m_EnduranceRemplissage = Racine.Q("joueur-endurance");
             m_Furtif = Racine.Q("furtif");
             IconesUI.Poser(Racine.Q("furtif-icone"), IconesUI.Furtif);
             m_Potion = Racine.Q("potion");
@@ -456,8 +460,16 @@ namespace Deathless.UI.Ecrans
                 m_Initiale.text = string.IsNullOrEmpty(joueur.Classe) ? "?" : joueur.Classe.Substring(0, 1);
                 m_Initiale.style.display = avecEmbleme ? DisplayStyle.None : DisplayStyle.Flex;
             }
-            m_Vie.SetValue(joueur.Vie, joueur.VieMax);
-            m_Endurance.SetValue(joueur.Endurance, joueur.EnduranceMax);
+            // Vie (maquette B) : large barre à embouts de gemme, seule à afficher son chiffre (pas de « / max »).
+            var vieRatio = joueur.VieMax > 0f ? Mathf.Clamp01(joueur.Vie / joueur.VieMax) : 0f;
+            m_VieRemplissage.style.width = Length.Percent(vieRatio * 100f);
+            m_VieValeur.text = Mathf.RoundToInt(joueur.Vie).ToString();
+
+            // Endurance : filet presque invisible, qui ne s'éclaire vraiment que sous 70 % environ.
+            var enduranceRatio = joueur.EnduranceMax > 0f ? Mathf.Clamp01(joueur.Endurance / joueur.EnduranceMax) : 0f;
+            m_EnduranceRemplissage.style.width = Length.Percent(enduranceRatio * 100f);
+            m_EndurancePiste.EnableInClassList("hud-joueur__endurance-piste--active", enduranceRatio < 0.7f);
+
             MajClasse(joueur as IEtatJoueurClasse);
             MajPotions(joueur as IEtatJoueurPotions);
 
@@ -506,20 +518,18 @@ namespace Deathless.UI.Ecrans
             m_Barre.EnableInClassList("hud-competences--mort", mort);
         }
 
-        /// Jauge de classe (mana, rage) sous l'endurance et œil barré du mode furtif : seulement si la source du joueur
-        /// implémente IEtatJoueurClasse (facultatif).
+        /// Jauge de classe (mana, rage) en anneau plein autour du portrait (maquette B) et œil barré du mode furtif :
+        /// seulement si la source du joueur implémente IEtatJoueurClasse (facultatif). Pas d'anneau sans jauge.
         void MajClasse(IEtatJoueurClasse classe)
         {
             var jauge = classe != null ? classe.Jauge : JaugeClasse.Aucune;
             if (jauge != m_JaugeAffichee)
             {
                 m_JaugeAffichee = jauge;
-                m_JaugeClasse.style.display = jauge == JaugeClasse.Aucune ? DisplayStyle.None : DisplayStyle.Flex;
-                m_JaugeClasse.label = jauge == JaugeClasse.Rage ? "Rage" : "Mana";
-                m_JaugeClasse.EnableInClassList("dl-gauge--mana", jauge == JaugeClasse.Mana);
-                m_JaugeClasse.EnableInClassList("dl-gauge--rage", jauge == JaugeClasse.Rage);
+                m_Anneau.style.display = jauge == JaugeClasse.Aucune ? DisplayStyle.None : DisplayStyle.Flex;
+                m_Anneau.couleur = jauge == JaugeClasse.Rage ? "#ff8c1a" : "#4a8fe0";
             }
-            if (jauge != JaugeClasse.Aucune) m_JaugeClasse.SetValue(classe.ValeurJauge, Mathf.Max(1f, classe.JaugeMax));
+            if (jauge != JaugeClasse.Aucune) m_Anneau.value = classe.ValeurJauge / Mathf.Max(1f, classe.JaugeMax);
             m_Furtif.style.display = classe != null && classe.Furtif ? DisplayStyle.Flex : DisplayStyle.None;
         }
 

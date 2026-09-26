@@ -1,6 +1,18 @@
 {
   "versions": [
     {
+      "version": "0.5.3",
+      "date": "2026-09-26",
+      "titre": "Statuts et nouveau HUD",
+      "notes": [
+        "Nouveau bloc joueur : la mana (ou la rage) en anneau autour du portrait, une grande barre de vie avec son chiffre, l'endurance discrète qui s'éclaire quand elle baisse.",
+        "Statuts : brûlure, ralenti, étourdi, provoqué, ivresse. Ils s'affichent au-dessus des ennemis et au-dessus de ta barre de vie ; dans le menu du personnage (Tab), survole une affliction pour la détailler.",
+        "Chute : au-delà de 3,5 m, une chute blesse puis ralentit quelques secondes.",
+        "Nyxessa : elle tire enfin son dernier missile quand son bouclier est attaqué (le compteur disait vrai, elle le gardait en réserve).",
+        "Dès le palier 4 du bouclier, les coups encaissés rechargent les missiles de Nyxessa ; le sorcier réagit à chaque coup sur le bouclier."
+      ]
+    },
+    {
       "version": "0.5.2",
       "date": "2026-09-26",
       "titre": "Portails, emotes et forge",

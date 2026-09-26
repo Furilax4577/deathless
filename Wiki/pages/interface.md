@@ -27,8 +27,8 @@
 | Haut, au centre, à droite de la barre de Nyxessa | Missiles de Nyxessa : icône du crâne vert qui se remplit pendant la recharge du prochain missile, et le stock (par exemple « 3 / 5 ») |
 | Haut, à droite | Or de l'équipe |
 | Gauche | Vie des autres joueurs |
-| Bas, à gauche | Portrait avec l’emblème de la classe, vie, endurance, et la jauge de la classe s’il y en a une (barres sans icône) |
-| Bas, à gauche, au-dessus du portrait et des barres | Statuts du joueur (brûlure, ralenti…) : icône, jauge de durée, secondes restantes |
+| Bas, à gauche | Portrait avec l’emblème de la classe et, s’il y en a une, la jauge de la classe en anneau plein autour du portrait (mana ou rage) ; vie en large barre à embouts de gemme (seule à afficher son chiffre) ; endurance en filet fin qui ne s’éclaire vraiment que sous 70 % environ. Ni libellé ni icône sur les barres |
+| Bas, à gauche, juste au-dessus de la barre de vie | Statuts du joueur (brûlure, ralenti…) : icône, jauge de durée, secondes restantes |
 | Au-dessus des ennemis | Statuts de chaque ennemi affecté : petites icônes et jauge de durée discrète |
 | Bas, au centre | Attaques et compétences avec leur bouton et leur temps de recharge, potions |
 | Centre | Réticule de visée, et l'action possible devant soi (par exemple « Entrer dans le donjon » près du portail) |
@@ -37,7 +37,7 @@
 
 Liste des statuts, effets et durées : [Statuts](statuts.md).
 
-- **HUD du joueur** : en bas à gauche, juste au-dessus du portrait et des barres, une case par statut actif (six au plus) : l'icône, une jauge de durée en bas de la case et les secondes restantes dans une pastille. Liseré rouge pour une affliction, or pour un bienfait (l'ivresse). Sans durée (dans l'eau du donjon), ni jauge ni secondes. La pastille des points de compétence est au-dessus de cette rangée. La rangée suit la taille de l'interface (×1, ×2, ×3).
+- **HUD du joueur** : en bas à gauche, juste au-dessus de la barre de vie, une case par statut actif (six au plus) : l'icône, une jauge de durée en bas de la case et les secondes restantes dans une pastille. Liseré rouge pour une affliction, or pour un bienfait (l'ivresse). Sans durée (dans l'eau du donjon), ni jauge ni secondes. La pastille des points de compétence reste au-dessus de tout le bloc joueur. La rangée suit la taille de l'interface (×1, ×2, ×3).
 - **Au-dessus des ennemis** : une rangée de petites icônes au-dessus de la tête de l'ennemi affecté (quatre au plus), chacune avec une fine jauge de durée. Elle n'apparaît que tant qu'il est affecté, s'il est à l'écran et à moins de 30 m, et s'estompe en approchant de cette limite.
 - **Menu du personnage** (Tab, Y, Triangle) : section « Afflictions » sous les caractéristiques, un bouton par statut (icône, jauge, secondes), ou « Aucune affliction. ». Le **survol à la souris** ou le **focus à la manette** ouvre une infobulle : nom, effet, durée restante et source. À la manette : gauche et droite passent d'un statut à l'autre ; à droite du dernier, on arrive aux compétences ; à gauche d'une compétence, on revient aux statuts.
 

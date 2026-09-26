@@ -96,28 +96,38 @@
             <ui:Label name="donjon-message-texte" text="Message" class="hud-donjon-message__texte" />
         </ui:VisualElement>
 
-        <!-- Bas, à gauche, au-dessus du portrait et des barres : statuts du joueur (brûlure, ralenti… ; HudStatuts) -->
-        <ui:VisualElement name="statuts" class="hud-statuts" picking-mode="Ignore" />
-
         <!-- Bas, à gauche, au-dessus du joueur : points de compétence à dépenser (menu du personnage) -->
         <ui:VisualElement name="points-competence" class="hud-pastille hud-points" picking-mode="Ignore">
             <ui:Label name="points-texte" text="1 point de compétence" class="hud-points__texte" />
             <dl:InputPrompt action="Gameplay/CharacterMenu" class="hud-points__invite" />
         </ui:VisualElement>
 
-        <!-- Bas, à gauche : portrait, vie, endurance -->
+        <!-- Bas, à gauche : portrait (anneau de mana/rage), statuts, vie, endurance (maquette B, 26/09/2026) -->
         <ui:VisualElement class="hud-joueur">
-            <ui:VisualElement name="portrait" class="hud-joueur__portrait">
-                <ui:VisualElement name="portrait-embleme" class="dl-icone hud-joueur__embleme" />
-                <ui:Label name="portrait-initiale" text="P" class="hud-joueur__initiale" />
-                <ui:VisualElement name="furtif" class="hud-joueur__furtif" tooltip="Furtif">
-                    <ui:VisualElement name="furtif-icone" class="dl-icone hud-joueur__furtif-icone" />
+            <ui:VisualElement name="portrait-emplacement" class="hud-joueur__portrait-emplacement">
+                <dl:AnneauJauge name="joueur-anneau" value="1" couleur="#4a8fe0" epaisseur="7" class="hud-joueur__anneau" />
+                <ui:VisualElement name="portrait" class="hud-joueur__portrait">
+                    <ui:VisualElement name="portrait-embleme" class="dl-icone hud-joueur__embleme" />
+                    <ui:Label name="portrait-initiale" text="P" class="hud-joueur__initiale" />
+                    <ui:VisualElement name="furtif" class="hud-joueur__furtif" tooltip="Furtif">
+                        <ui:VisualElement name="furtif-icone" class="dl-icone hud-joueur__furtif-icone" />
+                    </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement class="hud-joueur__jauges">
-                <dl:Gauge name="joueur-vie" label="Vie" value="100" max="100" class="dl-gauge--life" />
-                <dl:Gauge name="joueur-endurance" label="Endurance" value="100" max="100" class="dl-gauge--stamina dl-gauge--thin" />
-                <dl:Gauge name="joueur-jauge" label="Mana" value="100" max="100" class="dl-gauge--mana dl-gauge--thin hud-joueur__jauge-classe" />
+            <ui:VisualElement class="hud-joueur__colonne">
+                <!-- Statuts du joueur (brûlure, ralenti… ; HudStatuts), juste au-dessus de la barre de vie -->
+                <ui:VisualElement name="statuts" class="hud-statuts" picking-mode="Ignore" />
+                <ui:VisualElement class="hud-joueur__vie-ligne">
+                    <ui:VisualElement class="hud-joueur__gemme" />
+                    <ui:VisualElement class="hud-joueur__vie-piste">
+                        <ui:VisualElement name="joueur-vie" class="hud-joueur__vie-remplissage" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="hud-joueur__gemme" />
+                    <ui:Label name="joueur-vie-valeur" text="100" class="hud-joueur__vie-valeur" />
+                </ui:VisualElement>
+                <ui:VisualElement name="joueur-endurance-piste" class="hud-joueur__endurance-piste">
+                    <ui:VisualElement name="joueur-endurance" class="hud-joueur__endurance-remplissage" />
+                </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="potion" class="hud-potion" picking-mode="Ignore">
                 <ui:VisualElement class="hud-potion__case">
