@@ -13,7 +13,7 @@ namespace Deathless.Jeu
     /// (Origine), avec le générateur (Deathless > Donjon > Placer dans le village).
     ///
     /// - **Un donjon neuf chaque jour** : au début du jour, l'autorité (hôte, ou ce poste en solo) tire une graine,
-    ///   le construit, pose les gardiens ; la graine part aux clients (PartieReseau.GraineDonjon), qui construisent le
+    ///   le construit, pose les gardiens ; la graine et l'essai retenu partent aux clients (PartieReseau.GraineDonjon, EssaiDonjon), qui construisent le
     ///   même donjon.
     /// - **Portails** : le jour, le portail du village (près de Nyxessa) mène à l'arrivée ; le portail de retour (le même
     ///   portail de gemmes vertes, toujours ouvert) ramène devant le portail du village. On passe avec la touche
@@ -56,6 +56,9 @@ namespace Deathless.Jeu
 
         /// Graine du donjon construit (0 : aucun).
         public int GraineCourante { get; private set; }
+        /// Essai du plan retenu par l'autorité pour cette graine (PartieReseau.EssaiDonjon) : les clients le
+        /// construisent tel quel, sans refaire la vérification NavMesh qui pourrait trancher autrement chez eux.
+        public int EssaiCourant { get; private set; }
         /// Butins déjà pris (un bit par emplacement).
         public int Pris { get; private set; }
         public bool Pret => GraineCourante != 0 && generateur != null && generateur.Arrivee != null;
@@ -210,15 +213,17 @@ namespace Deathless.Jeu
             PoserGardiens();
         }
 
-        /// Tous les postes : construit le donjon de cette graine (butins remis en place).
-        void Construire(int graine)
+        /// Tous les postes : construit le donjon de cette graine (butins remis en place). `essai` ≥ 0 : plan imposé
+        /// par l'hôte (clients) ; -1 : l'autorité choisit elle-même l'essai.
+        void Construire(int graine, int essai = -1)
         {
             if (generateur == null || graine == GraineCourante) return;
             RetirerGardiens();
             ViderSacsLocal();
             if (ReseauJeu.Autorite) PartieReseau.Instance?.ViderSacs();
             float t0 = Time.realtimeSinceStartup;
-            bool ok = generateur.Generer(graine);
+            bool ok = generateur.Generer(graine, essai);
+            EssaiCourant = generateur.EssaiRetenu;
             GraineCourante = graine;
             Pris = 0; m_PrisVus = 0;
             for (int i = 0; i < m_Demande.Length; i++) m_Demande[i] = 0f;
@@ -761,7 +766,7 @@ namespace Deathless.Jeu
                 var r = PartieReseau.Instance;
                 if (r != null)
                 {
-                    if (r.GraineDonjon.Value != 0 && r.GraineDonjon.Value != GraineCourante) Construire(r.GraineDonjon.Value);
+                    if (r.GraineDonjon.Value != 0 && r.GraineDonjon.Value != GraineCourante) Construire(r.GraineDonjon.Value, r.EssaiDonjon.Value);
                     if (r.GraineDonjon.Value == GraineCourante) Pris = r.ButinsPris.Value;
                     SuivreSacsReseau(r.Sacs);
                 }

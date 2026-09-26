@@ -79,14 +79,18 @@ namespace Deathless.Donjon
 
         // ================================================================== Génération
         /// Génère et construit le donjon de la graine. Renvoie false si le plan n'a pas pu respecter la consigne.
-        public bool Generer(int graineDonjon)
+        /// `essaiImpose` ≥ 0 (clients) : construit directement le plan à partir de cet essai, celui que l'hôte a
+        /// retenu (EssaiRetenu), sans relancer sur la vérification NavMesh locale, pour que tous les postes aient le
+        /// même donjon.
+        public bool Generer(int graineDonjon, int essaiImpose = -1)
         {
             graine = graineDonjon;
             long alloc0 = GC.GetTotalMemory(false);
             var chrono = System.Diagnostics.Stopwatch.StartNew();
             bool ok = false;
             float plan = 0f, pieces = 0f, nav = 0f;
-            int premier = 0;
+            bool impose = essaiImpose >= 0;
+            int premier = impose ? Mathf.Min(essaiImpose, DonjonPlan.MaxEssais - 1) : 0;
             // Le plan garantit la consigne sur sa grille ; le NavMesh construit la vérifie en vrai (escaliers dans les
             // deux sens, chaque butin atteignable depuis l'arrivée). S'il refuse, on passe à l'essai suivant de la même
             // graine : tout reste déterministe, et le serveur peut transmettre (graine, essai) pour trancher.
@@ -103,18 +107,24 @@ namespace Deathless.Donjon
                 chrono.Restart();
                 ConstruireNavMesh();
                 nav += (float)chrono.Elapsed.TotalMilliseconds;
+                if (impose) break;
                 bool escaliersOk = VerifierEscaliers(), butinsOk = VerifierButins();
                 if (escaliersOk && butinsOk) break;
                 ok = false;
                 if (relance == 5) Debug.LogError("Donjon graine " + graineDonjon + " : " + DefautsEscaliers + DefautsButins);
                 premier = m_Plan.essais;
+                if (premier >= DonjonPlan.MaxEssais) break;
             }
-            Relances = premier == 0 ? 0 : 1;
+            EssaiRetenu = Mathf.Max(0, m_Plan.essais - 1);
+            Relances = impose || premier == 0 ? 0 : 1;
             DernierTempsPlanMs = plan; DernierTempsConstructionMs = pieces; DernierTempsNavMeshMs = nav;
             DerniereAllocationOctets = GC.GetTotalMemory(false) - alloc0;
             if (Genere != null) Genere(this);
             return ok;
         }
+
+        /// Essai du plan construit à la dernière génération (à transmettre aux clients avec la graine).
+        public int EssaiRetenu { get; private set; }
 
         /// 1 si le NavMesh a fait refaire le plan à la dernière génération.
         public int Relances { get; private set; }

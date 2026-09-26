@@ -179,7 +179,7 @@ Résultats de l'étape 2 (25/09/2026, hôte Paladin, client Mage, adresse IP) : 
 
 `Assets/Scripts/Jeu/Donjon/DonjonJeu.cs` est posé sur l'objet « Donjon » de Village.unity, à (1000, 0, 0), par le menu Deathless > Donjon > Placer dans le village. `CoffreDonjon.cs` complète le dispositif.
 
-- **Graine** : l'hôte (ou le poste solo) tire la graine au début du jour (`NouveauDonjon`) et la publie dans `PartieReseau.GraineDonjon`. Chaque client construit le donjon de cette graine (`DonjonGenerateur.Generer`, déterministe, avec son propre NavMesh).
+- **Graine** : l'hôte (ou le poste solo) tire la graine au début du jour (`NouveauDonjon`) et la publie dans `PartieReseau.GraineDonjon`, avec l'essai du plan qu'il a retenu après sa vérification NavMesh (`PartieReseau.EssaiDonjon`, écrit dans le même tick). Chaque client construit le donjon de cette graine à partir de cet essai (`DonjonGenerateur.Generer(graine, essai)`, déterministe, avec son propre NavMesh, sans refaire la vérification qui pourrait trancher autrement chez lui).
 - **Butin** : les butins pris sont un masque de bits, `PartieReseau.ButinsPris`.
   - Un client demande un butin avec `DemanderButin(index)` (RPC au serveur). L'hôte vérifie la distance et l'accorde (`DonjonJeu.Accorder`) en ajoutant l'or à `EtatJoueur.orPorte`.
   - L'or porté est répliqué dans `ScoreReseau.orPorte`.

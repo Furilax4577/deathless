@@ -70,8 +70,10 @@ namespace Deathless.Reseau
         // extrapolation en dt ne peut plus suivre.
         public readonly NetworkVariable<int> StockMissiles = new NetworkVariable<int>();
         public readonly NetworkVariable<float> MissileRegeneration = new NetworkVariable<float>();
-        // Donjon : graine du jour (tirée par l'hôte, 0 = aucun) et butins déjà pris (un bit par emplacement).
+        // Donjon : graine du jour (tirée par l'hôte, 0 = aucun), essai du plan retenu par l'hôte (écrit dans le même
+        // tick que la graine) et butins déjà pris (un bit par emplacement).
         public readonly NetworkVariable<int> GraineDonjon = new NetworkVariable<int>();
+        public readonly NetworkVariable<int> EssaiDonjon = new NetworkVariable<int>();
         public readonly NetworkVariable<int> ButinsPris = new NetworkVariable<int>();
         // Sacs des joueurs morts au donjon (DonjonJeu.m_Sacs en fait foi côté hôte) : un ajout à la création, un
         // retrait à la prise ou à la fermeture (Vider, un seul événement pour tous les sacs restants).
@@ -121,7 +123,7 @@ namespace Deathless.Reseau
             Ecrire(PalierMissiles, e.nyxessa.palierMissiles);
             Ecrire(StockMissiles, e.nyxessa.stock);
             var dj = DonjonJeu.Instance;
-            if (dj != null) { Ecrire(GraineDonjon, dj.GraineCourante); Ecrire(ButinsPris, dj.Pris); }
+            if (dj != null) { Ecrire(EssaiDonjon, dj.EssaiCourant); Ecrire(GraineDonjon, dj.GraineCourante); Ecrire(ButinsPris, dj.Pris); }
             Ecrire(PalierBouclier, e.nyxessa.palierBouclier);
             Ecrire(Joueurs, Mathf.Max(1, e.joueurs.Count));
             Ecrire(Prets, p.JoueursPrets);
