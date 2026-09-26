@@ -1,6 +1,20 @@
 {
   "versions": [
     {
+      "version": "0.5.0",
+      "date": "2026-09-26",
+      "titre": "Le donjon",
+      "notes": [
+        "Donjon : chaque jour, le portail du village mène à un nouveau donjon sur plusieurs étages, gardé par des squelettes.",
+        "Tas d'or (on marche dessus) et coffres à cadenas (Interagir) : l'or porté est versé à la caisse commune au retour.",
+        "Au crépuscule, Nyxessa rappelle ceux qui sont encore au donjon : une part de l'or porté est perdue selon le palier. Alerte 15 s avant la fermeture du portail ; on ne peut pas se déclarer prêt tant que quelqu'un est au donjon.",
+        "Achats à la relique : E près de Nyxessa pour renforcer ses missiles et son bouclier avec l'or de la caisse.",
+        "Points de compétence : 1 par jour survécu, à dépenser dans le menu du personnage (Tab).",
+        "Taverne : le tavernier sert repas et bière ; la tournée générale enivre tous les joueurs.",
+        "Nouvelle icône de Nyxessa."
+      ]
+    },
+    {
       "version": "0.4.5",
       "date": "2026-09-25",
       "titre": "Tous les effets pour tous",
