@@ -159,6 +159,7 @@ namespace Deathless.Jeu
         IEnumerator FaireCharge()
         {
             var b = B;
+            m_EnCharge = true;
             AudioBank.Jouer(SonsDuJeu.GolemCoup, transform.position, 1f);
             float duree = Mathf.Max(0.1f, b.morgrimMassueChargeDistance / Mathf.Max(0.1f, b.morgrimMassueChargeVitesse));
             float t = 0f;
@@ -188,6 +189,12 @@ namespace Deathless.Jeu
                 }
                 yield return null;
             }
+            m_EnCharge = false;
         }
+
+        /// Pendant la charge, Squelette.Update ne le fait plus pivoter vers sa cible (il pivotait à 540°/s et la charge,
+        /// qui avance selon transform.forward, devenait guidée) : elle part tout droit, comme le veut le wiki.
+        bool m_EnCharge;
+        protected override bool OrientationFigee => m_EnCharge;
     }
 }
