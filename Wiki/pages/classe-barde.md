@@ -1,5 +1,7 @@
 # Barde
 
+> **Candidat au [personnage du mois](classes.md)** {décidé} : cette classe est une proposition ; si elle est retenue, elle arrivera comme personnage du mois.
+
 {video media/classes/barde/rotation.mp4} **Rendu 3D** {à confirmer} | Proposition en attente de validation, luth au dos | {dev} prefab `Barde.prefab` (`BardeBuilder`), clip `Idle_A` ; rendu par `RendusClasses` (`sandbox-rig`)
 {image media/classes/barde/portrait.png} **Portrait** {à confirmer} | De 3/4 face (le luth est au dos)
 

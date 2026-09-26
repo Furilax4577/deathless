@@ -1,5 +1,7 @@
 # Clochard pétomane
 
+> **Candidat au [personnage du mois](classes.md)** {décidé} : cette classe est une proposition ; si elle est retenue, elle arrivera comme personnage du mois.
+
 {video media/classes/clochard/rotation.mp4} **Rendu 3D** {à confirmer} | Proposition en attente de validation, bouteille en main | {dev} prefab `Clochard.prefab` (`ClochardBuilder`), clip `Idle_A` ; rendu par `ClochardTournage` (`sandbox-ui`)
 {image media/classes/clochard/portrait.png} **Portrait** {à confirmer} | De 3/4 face, bouteille en main
 {image media/classes/clochard/face.png} **Clochard pétomane** | Aperçu de face : son design est encore en cours

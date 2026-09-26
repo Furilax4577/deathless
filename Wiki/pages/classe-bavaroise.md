@@ -1,5 +1,7 @@
 # Bavaroise
 
+> **Candidat au [personnage du mois](classes.md)** {décidé} : cette classe est une proposition ; si elle est retenue, elle arrivera comme personnage du mois.
+
 {video media/classes/bavaroise/rotation.mp4} **Rendu 3D** {à confirmer} | Proposition en attente de validation, une chope dans chaque main | {dev} prefab `Bavaroise.prefab` (`BavaroiseBuilder`), clip `Idle_A` ; rendu par `RendusClasses` (`sandbox-rig`)
 {image media/classes/bavaroise/portrait.png} **Portrait** {à confirmer} | De 3/4 face
 

@@ -11,9 +11,13 @@ Cinq classes jouables, et bientôt le **druide** et le **mécanicien**. Chaque c
 | {icone classe_viking} | [Viking](classe-viking.md) | Hache à deux mains | Mêlée, zone |
 | {icone classe_druide} | [Druide](classe-druide.md) | **Bientôt** | Prochaine version |
 | {icone classe_mecanicien} | [Mécanicien](classe-mecanicien.md) | **Bientôt** | Prochaine version |
-| {icone classe_barde} | [Barde](classe-barde.md) | **Bientôt** | Soutien, luth |
-| {icone classe_bavaroise} | [Bavaroise](classe-bavaroise.md) | **Bientôt** | Mêlée, chopes de bière |
-| {icone classe_clochard} | [Clochard pétomane](classe-clochard.md) | **Bientôt** | Contrôle, bouteille et gaz |
+| {icone classe_barde} | [Barde](classe-barde.md) | **Candidat du mois** | Soutien, luth |
+| {icone classe_bavaroise} | [Bavaroise](classe-bavaroise.md) | **Candidat du mois** | Mêlée, chopes de bière |
+| {icone classe_clochard} | [Clochard pétomane](classe-clochard.md) | **Candidat du mois** | Contrôle, bouteille et gaz |
+
+## Personnage du mois {décidé}
+
+Un **personnage du mois** viendra s'ajouter aux classes : chaque mois, une classe nouvelle est mise à l'honneur et devient jouable. Le **Barde**, la **Bavaroise** et le **Clochard pétomane** sont des **candidats** : leurs pages montrent un kit et un design proposés, pas encore définitifs. Le rythme exact, et ce que devient le personnage du mois une fois le mois passé, sont {à confirmer}.
 
 Chaque classe a sa page : présentation, actions et touches, règles détaillées.
 
