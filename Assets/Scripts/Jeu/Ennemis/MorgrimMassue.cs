@@ -117,6 +117,9 @@ namespace Deathless.Jeu
             P.nyxessa.Encaisser(new InfoDegats { montant = b.morgrimMassueFracasDegatsNyxessa, equipeSource = Equipe.Ennemis, source = gameObject, point = impact + Vector3.up * 1.5f, direction = transform.forward });
         }
 
+        /// Mort ou étourdi pendant le Tourbillon ou la Charge : la compétence s'arrête (plus de dégâts ni de déplacement).
+        bool Interrompu => m_Etat == Etat.Mort || m_Etat == Etat.Etourdi;
+
         /// Fait tournoyer la boule à pointes autour de lui : dégâts continus et léger recul pour qui reste dans le rayon.
         IEnumerator FaireTourbillon()
         {
@@ -124,7 +127,7 @@ namespace Deathless.Jeu
             AudioBank.Jouer(SonsDuJeu.GolemCoup, transform.position, 1f);
             float duree = b.morgrimMassueTourbillonDuree;
             float t = 0f, prochainEclat = 0f;
-            while (t < duree)
+            while (t < duree && !Interrompu)
             {
                 float dt = Time.deltaTime;
                 t += dt;
@@ -160,7 +163,7 @@ namespace Deathless.Jeu
             float duree = Mathf.Max(0.1f, b.morgrimMassueChargeDistance / Mathf.Max(0.1f, b.morgrimMassueChargeVitesse));
             float t = 0f;
             bool touche = false;
-            while (t < duree && !touche)
+            while (t < duree && !touche && !Interrompu)
             {
                 float dt = Time.deltaTime;
                 t += dt;
