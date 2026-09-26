@@ -80,6 +80,8 @@ Le donjon est **régénéré chaque nuit** : chaque jour, le portail mène à un
   | Coffre | 2 | 50 | Touche Interagir. Il est fermé par un cadenas d'acier. |
   | Tas d'or | 4 | 20 | On passe dessus. |
 
+  **Ouvrir un coffre est gratuit** {décidé} : on ne dépense jamais d'or pour l'ouvrir. Plus tard, certains coffres pourront demander une **clé** {à confirmer}. L'invite dit seulement « Ouvrir le coffre », sans montant.
+
   Un butin n'est pris qu'une fois : c'est l'hôte qui décide. Les montants augmentent de 10 % par nuit déjà passée. Tous les montants sont {à équilibrer}.
 - **Or porté** : l'or pris est **porté** par le joueur. Le HUD l'affiche sous la caisse commune (« or porté · au donjon »). Il est versé à la caisse commune au retour par le portail.
 - **Gardiens** : 6 squelettes gardent le butin, dont 35 % de guerriers et le reste de sbires {à équilibrer}. Ils apparaissent au lever du jour sur les points d'apparition les plus proches du butin. Ils restent à leur poste et poursuivent les joueurs qui approchent. Ils n'attaquent pas Nyxessa, ne rapportent pas d'or et disparaissent au crépuscule.

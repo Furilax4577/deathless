@@ -23,7 +23,9 @@ namespace Deathless.Jeu
             d.y = 0f;
             distance = d.magnitude;
             if (distance > GameBalance.Courant.distanceCoffre) return null;
-            return (r.butin == TypeButin.GrandCoffre ? "Ouvrir le grand coffre" : "Ouvrir le coffre") + " (" + dj.MontantButin(r.index) + " or)";
+            // Ouverture gratuite (Quentin, 26/09/2026 : jamais d'or pour ouvrir ; plus tard, peut-être une clé). Pas de
+            // montant dans l'invite : « (120 or) » se lisait comme un prix.
+            return r.butin == TypeButin.GrandCoffre ? "Ouvrir le grand coffre" : "Ouvrir le coffre";
         }
 
         public override void Interagir(Heros h)
