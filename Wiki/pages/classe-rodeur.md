@@ -1,5 +1,8 @@
 # Rôdeur
 
+{video media/classes/rodeur/rotation.mp4} **Rendu 3D** | Rotation en attente, arc en main, carquois au dos | {dev} modèle `Ranger`, style `BowQuiver` (flèche encochée masquée au repos), clip `Idle_A` ; rendu par `RendusClasses` (`sandbox-rig`)
+{image media/classes/rodeur/portrait.png} **Portrait** | De 3/4 face
+
 {icone-grande classe_rodeur}
 
 L'archer. Plus il vise juste et bande fort, plus il fait mal : une flèche chargée dans la tête est un coup critique. Il couvre une zone de sa nuée de flèches et roule en arrière pour garder ses distances.

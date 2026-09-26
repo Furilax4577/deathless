@@ -1,5 +1,8 @@
 # Mage
 
+{video media/classes/mage/rotation.mp4} **Rendu 3D** | Rotation en attente, bâton en main | {dev} modèle `Mage`, style `Staff`, clip `Idle_A` ; rendu par `RendusClasses` (`sandbox-rig`)
+{image media/classes/mage/portrait.png} **Portrait** | De 3/4 face
+
 {icone-grande classe_mage_feu}
 
 Il frappe de loin et en zone. Pour l'instant, il maîtrise le **feu** : ses boules de feu explosent et laissent les ennemis en flammes, son cône de flammes balaie ceux qui approchent. Tout lui coûte du mana.

@@ -1,5 +1,8 @@
 # Bavaroise
 
+{video media/classes/bavaroise/rotation.mp4} **Rendu 3D** {à confirmer} | Proposition en attente de validation, une chope dans chaque main | {dev} prefab `Bavaroise.prefab` (`BavaroiseBuilder`), clip `Idle_A` ; rendu par `RendusClasses` (`sandbox-rig`)
+{image media/classes/bavaroise/portrait.png} **Portrait** {à confirmer} | De 3/4 face
+
 {icone-grande classe_bavaroise}
 
 **Bientôt.** Une classe jouable à venir. Le kit ci-dessous est une **proposition** à valider {à confirmer}.

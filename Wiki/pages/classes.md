@@ -13,9 +13,22 @@ Cinq classes jouables, et bientôt le **druide** et le **mécanicien**. Chaque c
 | {icone classe_mecanicien} | [Mécanicien](classe-mecanicien.md) | **Bientôt** | Prochaine version |
 | {icone classe_barde} | [Barde](classe-barde.md) | **Bientôt** | Soutien, luth |
 | {icone classe_bavaroise} | [Bavaroise](classe-bavaroise.md) | **Bientôt** | Mêlée, chopes de bière |
-| {icone classe_clochard} | [Clochard](classe-clochard.md) | **Bientôt** | Contrôle, bouteille et gaz |
+| {icone classe_clochard} | [Clochard pétomane](classe-clochard.md) | **Bientôt** | Contrôle, bouteille et gaz |
 
 Chaque classe a sa page : présentation, actions et touches, règles détaillées.
+
+Les personnages en 3D ; chaque page de classe les montre aussi en rotation.
+
+{image media/classes/paladin/portrait.png} [Paladin](classe-paladin.md)
+{image media/classes/mage/portrait.png} [Mage](classe-mage.md)
+{image media/classes/rodeur/portrait.png} [Rôdeur](classe-rodeur.md)
+{image media/classes/assassin/portrait.png} [Assassin](classe-assassin.md)
+{image media/classes/viking/portrait.png} [Viking](classe-viking.md)
+{image media/classes/druide/portrait.png} [Druide](classe-druide.md) | Modèle pressenti, design provisoire
+{image media/classes/mecanicien/portrait.png} [Mécanicien](classe-mecanicien.md) | Modèle pressenti, design provisoire
+{image media/classes/barde/portrait.png} [Barde](classe-barde.md) {à confirmer} | Proposition en attente de validation
+{image media/classes/bavaroise/portrait.png} [Bavaroise](classe-bavaroise.md) {à confirmer} | Proposition en attente de validation
+{image media/classes/clochard/portrait.png} [Clochard pétomane](classe-clochard.md) {à confirmer} | Proposition en attente de validation
 
 ## Projectiles {décidé}
 

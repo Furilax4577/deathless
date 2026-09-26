@@ -25,6 +25,9 @@
 # grille. Le fichier est copié dans <version>/videos/ (site/ et public/). Dans la version joueur, une partie de légende
 # qui porte {dev} est retirée (ex. le nom technique du clip), et toute la carte si {dev} est dans sa première partie ;
 # une carte {à confirmer} y est retirée comme toute ligne {à confirmer}.
+# Images : une ligne qui commence par {image chemin} (chemin relatif à Wiki/, ex. media/classes/clochard/face.png) devient
+# une carte image carrée (même légende et mêmes règles {dev} / {à confirmer} que les vidéos, un clic ouvre l'image entière) ;
+# les lignes {video} et {image} consécutives forment une même grille. Le fichier est copié dans <version>/images/.
 import html, io, json, os, re, datetime, shutil, unicodedata, urllib.parse
 
 ICI = os.path.dirname(os.path.abspath(__file__))
@@ -37,6 +40,7 @@ SITE_SONS = os.path.join(SITE, "sons")
 ICONES = os.path.normpath(os.path.join(ICI, "..", "ArtSources", "Icones"))
 ICONES_COPIEES = set()  # icônes SVG référencées par {icone nom}, copiées dans <version>/icones/
 VIDEOS_COPIEES = set()  # vidéos référencées par {video chemin} (chemins relatifs à media/), copiées dans <version>/videos/
+IMAGES_COPIEES = set()  # images référencées par {image chemin} (chemins relatifs à media/), copiées dans <version>/images/
 
 # Ordre du menu : (fichier sans extension, libellé court[, options]). Options, séparées par des espaces : "dev" si la page
 # est réservée à la version développeur, "sous" pour une sous-page (affichée en retrait sous la page qui la précède).
@@ -58,7 +62,7 @@ MENU = [
     ("classe-mecanicien", "Mécanicien (bientôt)", "sous"),
     ("classe-barde", "Barde (bientôt)", "sous"),
     ("classe-bavaroise", "Bavaroise (bientôt)", "sous"),
-    ("classe-clochard", "Clochard (bientôt)", "sous"),
+    ("classe-clochard", "Clochard pétomane (bientôt)", "sous"),
     ("ennemis", "Ennemis"),
     ("commandes", "Commandes"),
     ("interface", "Interface"),
@@ -115,6 +119,8 @@ def copier_icones(dossier):
 # ------------------------------------------------------------------ vidéos ({video chemin}, les deux versions)
 
 RE_VIDEO = re.compile(r"^\{video ([^}]+)\}\s*(.*)$")
+RE_IMAGE = re.compile(r"^\{image ([^}]+)\}\s*(.*)$")
+RE_MEDIA = re.compile(r"^\{(video|image) ([^}]+)\}\s*(.*)$")
 
 
 def carte_video(m):
@@ -134,6 +140,25 @@ def carte_video(m):
     return '<figure class="carte-video">%s<figcaption>%s</figcaption></figure>' % (video, legende)
 
 
+def carte_image(m):
+    """{image chemin} légende | ligne 2 | ... : carte avec une image carrée (chargée paresseusement) qui ouvre l'image
+    entière. Le fichier est copié plus tard dans <version>/images/."""
+    chemin = m.group(1).strip().replace("\\", "/")
+    rel = chemin[len("media/"):] if chemin.startswith("media/") else chemin
+    parts = [p.strip() for p in m.group(2).split(" | ") if p.strip()]
+    alt = re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", parts[0]) if parts else ""  # liens -> texte
+    alt = html.escape(re.sub(r"\{[^}]*\}|\*\*|`", "", alt).strip(), quote=True)
+    if not os.path.isfile(os.path.join(ICI, chemin)):
+        print("Attention : image absente : Wiki/%s" % chemin)
+        image = '<span class="manque">image absente : %s</span>' % html.escape(chemin)
+    else:
+        IMAGES_COPIEES.add(rel)
+        src = html.escape("images/" + urllib.parse.quote(rel), quote=True)
+        image = '<a href="%s"><img src="%s" loading="lazy" alt="%s"></a>' % (src, src, alt)
+    legende = "".join("<span>%s</span>" % inline(p) for p in parts)
+    return '<figure class="carte-video carte-image">%s<figcaption>%s</figcaption></figure>' % (image, legende)
+
+
 JS_VIDEOS = """
 (function(){
   var vs=document.querySelectorAll('video[data-src]');
@@ -150,9 +175,18 @@ JS_VIDEOS = """
 
 def copier_videos(dossier):
     """Copie dans <dossier>/videos/ les vidéos référencées (seulement celles qui ont changé) et retire les autres."""
-    cible = os.path.join(dossier, "videos")
+    copier_medias(dossier, "videos", VIDEOS_COPIEES, "Vidéos")
+
+
+def copier_images(dossier):
+    """Copie dans <dossier>/images/ les images référencées (seulement celles qui ont changé) et retire les autres."""
+    copier_medias(dossier, "images", IMAGES_COPIEES, "Images")
+
+
+def copier_medias(dossier, sous, fichiers, libelle):
+    cible = os.path.join(dossier, sous)
     copies = 0
-    for rel in VIDEOS_COPIEES:
+    for rel in fichiers:
         src, dst = os.path.join(ICI, "media", rel), os.path.join(cible, rel)
         a = os.stat(src)
         if os.path.exists(dst):
@@ -162,15 +196,15 @@ def copier_videos(dossier):
         os.makedirs(os.path.dirname(dst), exist_ok=True)
         shutil.copy2(src, dst)
         copies += 1
-    gardes = {os.path.normcase(os.path.join(cible, r)) for r in VIDEOS_COPIEES}
+    gardes = {os.path.normcase(os.path.join(cible, r)) for r in fichiers}
     for dp, dn, fn in os.walk(cible, topdown=False):
         for f in fn:
             if os.path.normcase(os.path.join(dp, f)) not in gardes:
                 os.remove(os.path.join(dp, f))
         if dp != cible and not os.listdir(dp):
             os.rmdir(dp)
-    if VIDEOS_COPIEES:
-        print("Vidéos : %d fichiers dans %s (%d copiés)" % (len(VIDEOS_COPIEES), os.path.relpath(cible, ICI), copies))
+    if fichiers:
+        print("%s : %d fichiers dans %s (%d copiés)" % (libelle, len(fichiers), os.path.relpath(cible, ICI), copies))
 
 
 def options(e):
@@ -372,11 +406,11 @@ def filtrer(md, public):
                 continue
         elif saut is not None:
             continue
-        mv = RE_VIDEO.match(l.strip())
-        if public and mv:  # carte vidéo : parties de légende {dev} retirées ({dev} dans la 1re partie : carte retirée plus bas)
-            parts = mv.group(2).split(" | ")
+        mv = RE_MEDIA.match(l.strip())
+        if public and mv:  # carte vidéo ou image : parties de légende {dev} retirées ({dev} dans la 1re partie : carte retirée plus bas)
+            parts = mv.group(3).split(" | ")
             if "{dev}" not in parts[0]:
-                l = ("{video %s} %s" % (mv.group(1), " | ".join(p for p in parts if "{dev}" not in p))).rstrip()
+                l = ("{%s %s} %s" % (mv.group(1), mv.group(2), " | ".join(p for p in parts if "{dev}" not in p))).rstrip()
         if l.startswith("|"):
             cells = l.strip().strip("|").split("|")
             if table_cols is None:  # ligne d'en-tête du tableau
@@ -446,10 +480,11 @@ def convertir(md):
             titres.extend(sous)
             i += 1
             continue
-        if RE_VIDEO.match(l.strip()):
+        if RE_MEDIA.match(l.strip()):
             cartes = []
-            while i < len(lignes) and RE_VIDEO.match(lignes[i].strip()):
-                cartes.append(carte_video(RE_VIDEO.match(lignes[i].strip())))
+            while i < len(lignes) and RE_MEDIA.match(lignes[i].strip()):
+                x = lignes[i].strip()
+                cartes.append(carte_video(RE_VIDEO.match(x)) if RE_VIDEO.match(x) else carte_image(RE_IMAGE.match(x)))
                 i += 1
             out.append('<div class="grille-videos">%s</div>' % "".join(cartes))
             continue
@@ -494,7 +529,7 @@ def convertir(md):
             out.append('<aside class="note">%s</aside>' % inline(" ".join(bloc)))
             continue
         para = []
-        while i < len(lignes) and lignes[i].strip() and not re.match(r"^(#{1,3} |- |\||> |\{video )", lignes[i]):
+        while i < len(lignes) and lignes[i].strip() and not re.match(r"^(#{1,3} |- |\||> |\{video |\{image )", lignes[i]):
             para.append(lignes[i].strip())
             i += 1
         out.append("<p>%s</p>" % inline(" ".join(para)))
@@ -550,6 +585,7 @@ table.sons audio{display:block;width:210px;height:32px}
 .carte-video video{display:block;width:100%;aspect-ratio:1/1;background:#1c1f26}
 .carte-video figcaption{padding:8px 10px 10px;display:flex;flex-direction:column;gap:3px;font-size:13px;line-height:1.4;color:var(--doux)}
 .carte-video figcaption span:first-child{color:var(--encre);font-size:14px}
+.carte-video img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;background:#1c1f26}
 .carte-video code{font-size:12px;word-break:break-all}.carte-video .badge{margin-left:0}
 .badge.emote{background:var(--tune-fond);color:var(--tune)}
 @media (max-width:760px){.cadre{grid-template-columns:minmax(0,1fr)}nav{position:static;height:auto;border-right:0;border-bottom:1px solid var(--ligne)}}
@@ -578,6 +614,7 @@ def generer(public):
     SONS_COPIES.clear()
     ICONES_COPIEES.clear()
     VIDEOS_COPIEES.clear()
+    IMAGES_COPIEES.clear()
     os.makedirs(dossier, exist_ok=True)
     menu_ok = [e for e in MENU if not (public and "dev" in options(e)) and os.path.exists(os.path.join(PAGES, e[0] + ".md"))]
     PAGES_PRESENTES = {e[0] for e in menu_ok}
@@ -617,6 +654,7 @@ def generer(public):
     copier_sons()
     copier_icones(dossier)
     copier_videos(dossier)
+    copier_images(dossier)
     print("Wiki %s : %d pages dans %s" % ("joueur" if public else "développeur", len(pages), dossier))
 
 

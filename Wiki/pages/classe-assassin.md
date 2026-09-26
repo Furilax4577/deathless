@@ -1,5 +1,8 @@
 # Assassin
 
+{video media/classes/assassin/rotation.mp4} **Rendu 3D** | Rotation en attente, dague en main, arbalète dans le dos | {dev} modèle `Rogue_Hooded`, style `DaggerCrossbow`, clip `Idle_A` ; rendu par `RendusClasses` (`sandbox-rig`)
+{image media/classes/assassin/portrait.png} **Portrait** | De 3/4 face
+
 {icone-grande classe_assassin}
 
 Il frappe fort quand on ne le voit pas. Furtif en marchant, il porte ses meilleurs coups dans le dos d'un ennemi qui ne l'a pas repéré, puis disparaît dans la fumée.

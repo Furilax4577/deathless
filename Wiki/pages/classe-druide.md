@@ -1,5 +1,8 @@
 # Druide
 
+{video media/classes/druide/rotation.mp4} **Rendu 3D** | Modèle pressenti : le design n'est pas final | {dev} {à confirmer} modèle `Druid`, bâton `druid_staff` dans `handslot.r` comme à l'écran de choix, clip `Idle_A` ; rendu par `RendusClasses` (`sandbox-rig`)
+{image media/classes/druide/portrait.png} **Portrait** | De 3/4 face, design provisoire | {dev} {à confirmer}
+
 {icone-grande classe_druide}
 
 **Bientôt.** Le druide sera une classe jouable dans une prochaine version.

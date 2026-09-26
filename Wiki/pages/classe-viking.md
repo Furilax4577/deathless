@@ -1,5 +1,8 @@
 # Viking
 
+{video media/classes/viking/rotation.mp4} **Rendu 3D** | Rotation en garde, hache à deux mains | {dev} modèle `Barbarian`, style `Axe2H`, clip `Melee_2H_Idle_Loop` ; rendu par `RendusClasses` (`sandbox-rig`)
+{image media/classes/viking/portrait.png} **Portrait** | De 3/4 face
+
 {icone-grande classe_viking}
 
 La force brute. Sa hache à deux mains frappe tout autour de lui, et plus il frappe, plus sa rage monte. Il attire les squelettes d'un rugissement et bondit dans la mêlée.

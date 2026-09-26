@@ -1,5 +1,8 @@
 # Barde
 
+{video media/classes/barde/rotation.mp4} **Rendu 3D** {à confirmer} | Proposition en attente de validation, luth au dos | {dev} prefab `Barde.prefab` (`BardeBuilder`), clip `Idle_A` ; rendu par `RendusClasses` (`sandbox-rig`)
+{image media/classes/barde/portrait.png} **Portrait** {à confirmer} | De 3/4 face (le luth est au dos)
+
 {icone-grande classe_barde}
 
 **Bientôt.** Une classe jouable à venir. Le kit ci-dessous est une **proposition** à valider {à confirmer}.

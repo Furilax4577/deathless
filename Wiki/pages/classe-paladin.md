@@ -1,5 +1,8 @@
 # Paladin
 
+{video media/classes/paladin/rotation.mp4} **Rendu 3D** | Rotation en attente, épée et bouclier en main | {dev} modèle `Knight`, style `SwordShield`, clip `Idle_A` ; rendu par `RendusClasses` (`sandbox-rig`)
+{image media/classes/paladin/portrait.png} **Portrait** | De 3/4 face
+
 {icone-grande classe_paladin}
 
 Le rempart du village. Il tient la ligne au bouclier, charge pour ouvrir un passage et se soigne seul. Son épée frappe devant lui, jusqu'à trois ennemis en face.
@@ -42,7 +45,11 @@ Les deux tailles alternent à chaque coup.
 
 ### Charge bélier
 
-{video media/animations/Melee_Block_Attack.mp4} **Charge bélier : coup de bouclier** | {dev} `Melee_Block_Attack` | Arme : épée et bouclier | une fois · 1,07 s | {dev} vitesse ×1,2, joué pendant toute la ruée : pas de clip de course
+Le paladin court derrière son bouclier, penché en avant : les jambes courent, le haut du corps tient la garde, puis le coup de bouclier porte à l'arrivée.
+
+{video media/animations/Running_A.mp4} **Charge bélier : course (jambes)** | {dev} `Running_A` | Arme : aucune (en jeu : épée et bouclier) | boucle · 0,80 s | {dev} couche de base, figée sur sa première image pendant l'anticipation ; cadence = vitesse de la ruée ÷ vitesse des pieds du clip (mesurée par le builder), bornée de ×0,8 à ×3 (`chargeCadenceMin` / `chargeCadenceMax`)
+{video media/animations/Melee_Blocking.mp4} **Charge bélier : garde (haut du corps)** | {dev} `Melee_Blocking` | Arme : épée et bouclier | boucle · 1,07 s | {dev} haut du corps, copie bouclante `Melee_Blocking_Loop`, pendant l'anticipation et la ruée
+{video media/animations/Melee_Block_Attack.mp4} **Charge bélier : coup de bouclier** | {dev} `Melee_Block_Attack` | Arme : épée et bouclier | une fois · 1,07 s | {dev} haut du corps, lancé pour que l'impact (main gauche la plus en avant) tombe à l'arrivée ; à l'arrivée, le corps entier finit le geste depuis l'impact
 
 ### Soin sur soi
 
@@ -54,6 +61,7 @@ Les deux tailles alternent à chaque coup.
 - **Épée plus mobile** {décidé} (26/09/2026) : un peu plus de portée, et un **angle d'attaque vers l'avant** qui touche plusieurs ennemis en face, **moins large que la hache du Viking**. Chaque attaque **avance d'un pas** (sauf s'il y a déjà un ennemi au contact), et le paladin **se déplace plus vite en garde**.
 - **Garde et parade** : l'attaque secondaire lève le bouclier. Déclenchée au bon moment face à un coup, la garde devient une parade {décidé}.
 - **Charge bélier** : le paladin s'élance d'environ 7 m, enveloppé d'une tête de bélier en gemmes dorées qui le précède, et percute à l'arrivée {effet validé}.
+  - **Il court derrière son bouclier** {décidé} (26/09/2026) : jambes en course, bouclier levé, corps penché en avant, coup de bouclier à l'arrivée (comme le banc des effets). Les autres joueurs voient le même geste.
   - **Au bout de la trajectoire** : la cible percutée est **étourdie longuement** {décidé}.
   - **Sur le chemin** : les ennemis traversés sont **repoussés sur les côtés** et brièvement étourdis {décidé}.
   - **Dégâts à l'impact** : **proportionnels à la distance parcourue** : une charge courte fait peu de dégâts, une charge complète fait le maximum {décidé}.
