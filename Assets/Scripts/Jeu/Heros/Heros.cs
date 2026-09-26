@@ -447,6 +447,7 @@ namespace Deathless.Jeu
         void OnTue(InfoDegats info)
         {
             if (Classe != null) Classe.Interrompre();
+            if (!Distant) Ivresse.Arreter();   // l'ivresse (joueur local) s'arrête à la mort
             m_EtatCourant = Etat.Mort;
             m_EtatDepuis = 0f;
             CC.enabled = false;

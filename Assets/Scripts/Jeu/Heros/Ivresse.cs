@@ -30,6 +30,10 @@ namespace Deathless.Jeu
             if (h != null && h.Statuts != null) h.Statuts.Retirer(TypeStatut.Ivresse);
         }
 
+        /// Nouvelle partie (Partie.Awake) : l'état est statique et Time.time continue d'une scène à l'autre, donc une
+        /// tournée bue juste avant « Rejouer » se prolongeait dans la partie suivante.
+        public static void Reinitialiser() { s_Debut = s_Fin = -99f; }
+
         /// 0 à 1 : force de l'ivresse maintenant.
         public static float Force
         {
