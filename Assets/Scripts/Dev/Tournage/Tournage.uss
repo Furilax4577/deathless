@@ -1,0 +1,163 @@
+/*
+ * Habillage de la bande-annonce (HabillageTrailer) : textes gros et lisibles, sans son, dès la première image.
+ * Jetons du thème Deathless (Assets/UI/Theme/Deathless.uss) : ivoire, or, encre ; police Fredoka.
+ * Pas de vert : le vert est réservé à Nyxessa (il apparaît à l'image, jamais dans l'habillage).
+ */
+
+.tr-racine {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.tr-voile {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgb(0, 0, 0);
+}
+
+/* Ouverture : très gros, ivoire, contour encre. */
+.tr-centre {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    padding-left: 90px;
+    padding-right: 90px;
+    -unity-text-align: middle-center;
+    white-space: normal;
+    font-size: 150px;
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Bold-SDF.asset");
+    color: var(--dl-color-text);
+    -unity-text-outline-width: 4px;
+    -unity-text-outline-color: var(--dl-color-ink);
+    text-shadow: 0 8px 24px rgba(0, 0, 0, 0.85);
+    -unity-paragraph-spacing: 0;
+    letter-spacing: 2px;
+}
+
+.tr-centre--haut {
+    -unity-text-align: upper-center;
+    padding-top: 70px;
+}
+
+.tr-centre--or {
+    color: var(--dl-color-gold);
+}
+
+/* Cartons du milieu du film : bas de cadre, gros. */
+.tr-bas {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 96px;
+    padding-left: 80px;
+    padding-right: 80px;
+    -unity-text-align: middle-center;
+    white-space: normal;
+    font-size: 92px;
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Bold-SDF.asset");
+    color: var(--dl-color-text);
+    -unity-text-outline-width: 4px;
+    -unity-text-outline-color: var(--dl-color-ink);
+    text-shadow: 0 6px 20px rgba(0, 0, 0, 0.9);
+    letter-spacing: 1px;
+}
+
+.tr-bas--or {
+    color: var(--dl-color-gold);
+}
+
+/* HUD visible : au-dessus de la barre des compétences et des jauges. */
+.tr-bas--hud {
+    bottom: 190px;
+}
+
+/* Gag (taverne) : plus petit, doré. */
+.tr-bas--petit {
+    font-size: 64px;
+    bottom: 64px;
+    color: var(--dl-color-gold);
+}
+
+.tr-bas--petit.tr-bas--hud {
+    bottom: 190px;
+}
+
+/* Par-dessus une interface chargée (lobby) : bandeau d'encre derrière le texte. */
+.tr-bas--bandeau {
+    left: 220px;
+    right: 220px;
+    bottom: 60px;
+    padding-top: 14px;
+    padding-bottom: 18px;
+    font-size: 64px;
+    background-color: rgba(16, 19, 27, 0.9);
+    border-radius: var(--dl-radius-lg);
+    border-width: var(--dl-border-focus);
+    border-color: var(--dl-color-gold);
+}
+
+/* Écran final. */
+.tr-final {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    padding-bottom: 70px;
+}
+
+.tr-final__titre {
+    font-size: 210px;
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Bold-SDF.asset");
+    color: var(--dl-color-text);
+    -unity-text-outline-width: 5px;
+    -unity-text-outline-color: var(--dl-color-ink);
+    text-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
+    letter-spacing: 18px;
+    margin-bottom: -6px;
+}
+
+.tr-final__accroche {
+    font-size: 64px;
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+    color: var(--dl-color-gold);
+    -unity-text-outline-width: 3px;
+    -unity-text-outline-color: var(--dl-color-ink);
+    text-shadow: 0 6px 18px rgba(0, 0, 0, 0.9);
+    letter-spacing: 4px;
+    margin-bottom: 26px;
+}
+
+.tr-final__coop {
+    font-size: 46px;
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+    color: var(--dl-color-text);
+    -unity-text-outline-width: 2px;
+    -unity-text-outline-color: var(--dl-color-ink);
+    letter-spacing: 3px;
+    margin-bottom: 18px;
+}
+
+.tr-final__appel {
+    font-size: 44px;
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Bold-SDF.asset");
+    color: var(--dl-color-key-text);
+    background-color: var(--dl-color-gold);
+    border-radius: var(--dl-radius-md);
+    padding-left: 36px;
+    padding-right: 36px;
+    padding-top: 10px;
+    padding-bottom: 12px;
+    letter-spacing: 2px;
+}
