@@ -30,6 +30,18 @@
                         <ui:VisualElement name="nyx-bouclier" class="hud-nyx__bouclier" />
                     </ui:VisualElement>
                 </ui:VisualElement>
+                <!-- Missiles de Nyxessa : icône éteinte, icône allumée découpée du bas vers le haut selon la recharge, « 3 / 5 » -->
+                <ui:VisualElement name="missiles" class="hud-missiles" picking-mode="Ignore">
+                    <ui:VisualElement name="missiles-icone" class="hud-missiles__icone" picking-mode="Ignore">
+                        <ui:VisualElement name="missiles-onde" class="hud-missiles__onde" picking-mode="Ignore" />
+                        <ui:VisualElement name="missiles-eteint" class="dl-icone hud-missiles__eteint" picking-mode="Ignore" />
+                        <ui:VisualElement name="missiles-charge" class="hud-missiles__charge" picking-mode="Ignore">
+                            <ui:VisualElement name="missiles-plein" class="dl-icone hud-missiles__plein" picking-mode="Ignore" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:Label name="missiles-nombre" text="3" class="hud-missiles__nombre" />
+                    <ui:Label name="missiles-max" text="/ 5" class="hud-missiles__max" />
+                </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement class="hud-pastille hud-temps">
                 <dl:IconeJourNuit name="temps-icone" class="hud-temps__icone" />

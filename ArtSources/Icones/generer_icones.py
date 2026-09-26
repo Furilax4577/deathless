@@ -1532,6 +1532,54 @@ def exporter_nyxessa():
     return icones, apercus
 
 
+# ---------------------------------------------------------------------------------------------- Nyxessa (HUD)
+# Missile de Nyxessa (compteur du HUD, en haut à droite de sa barre) : le crâne en gemmes vertes du jeu (MissileCrane)
+# filant vers le haut à droite, courte traînée en diagonale derrière lui. Glyphe seul, sans cadre (comme jauge_mana),
+# formes larges pour rester lisible à 30 px. Version éteinte en ardoise (teintes des bordures de l'interface), sous la
+# version allumée que le HUD découpe du bas vers le haut pendant la recharge du prochain missile.
+
+NYX_ETEINT = {NYX[0]: "#262d3e", NYX[1]: "#353e55", NYX[2]: "#454f6a", NYX[3]: "#56607c", NYX[4]: "#7a849e"}
+
+
+def crane_nyxessa(ic, f):
+    """Crâne de face dans le repère local f (voir tr) : mâchoire et dents, calotte à table, orbites, nez, yeux vifs."""
+    sombre, emeraude, vif, clair, eclat = NYX
+    ic.gemme(_t(f, [(-18, 6), (18, 6), (17, 23), (9, 30), (-9, 30), (-17, 23)]), [emeraude, vif, clair],
+             table=0.5, teinte_table=vif)
+    for x in (-7, 0, 7):
+        ic.poly(_t(f, [(x - 1.6, 13), (x + 1.6, 13), (x + 1.3, 26), (x - 1.3, 26)]), sombre)
+    calotte = [(-31, -4), (-30, -22), (-19, -36), (0, -41), (19, -36), (30, -22), (31, -4), (24, 10), (-24, 10)]
+    ic.gemme(_t(f, calotte), [emeraude, vif, clair, eclat], table=0.55, teinte_table=clair, decalage=0.08)
+    orbite = [(-24, -14), (-18, -22), (-7, -20), (-3, -9), (-10, -2), (-21, -5)]
+    ic.poly(_t(f, orbite), sombre)
+    ic.poly(_t(f, [(-x, y) for x, y in orbite]), sombre)
+    ic.poly(_t(f, [(0, -6), (5, 4), (-5, 4)]), sombre)
+    for x in (-13, 13):
+        ic.poly(_t(f, [(x, -16), (x + 3.2, -12), (x, -8), (x - 3.2, -12)]), eclat)
+
+
+def nyxessa_missile():
+    ic = Icone("nyxessa_missile", "nyxessa", "Missile de Nyxessa",
+               "HUD (compteur en haut) : crâne en gemmes vertes, courte traînée ; allumé quand un missile est prêt.")
+    sombre, emeraude, vif, clair, eclat = NYX
+    # Traînée : trois filets effilés vers le bas à gauche (sous le crâne), deux éclats.
+    ic.bande([(62, 68), (38, 92), (12, 118)], [28, 15, 0], [emeraude, vif, clair])
+    ic.bande([(50, 54), (32, 72), (16, 88)], [11, 6, 0], [vif, clair])
+    ic.bande([(76, 82), (60, 98), (46, 112)], [11, 6, 0], [vif, clair])
+    for (x, y, r) in ((26, 100, 4.5), (46, 116, 3.5)):
+        ic.poly([(x, y - r * 1.4), (x + r, y), (x, y + r * 1.4), (x - r, y)], eclat)
+    crane_nyxessa(ic, tr(78, 49, 1.2, 14))
+    return ic
+
+
+def nyxessa_missile_eteint():
+    ic = nyxessa_missile()
+    ic.nom, ic.titre = "nyxessa_missile_eteint", "Missile de Nyxessa (éteint)"
+    ic.notes = "HUD : même crâne en ardoise, sous l'icône allumée qui monte pendant la recharge du prochain missile."
+    ic.formes = [(pts, NYX_ETEINT.get(col, col)) for pts, col in ic.formes]
+    return ic
+
+
 # ---------------------------------------------------------------------------------------------- catalogue
 
 CLASSES = [classe_paladin, classe_mage_feu, classe_rodeur, classe_assassin, classe_viking, classe_druide,
@@ -1546,10 +1594,11 @@ COMPETENCES = [
     assassin_dague, assassin_arbalete, assassin_fumigene, assassin_furtif,
     viking_hache, viking_attaque_tournante, viking_rugissement, viking_saut_percutant, jauge_rage,
     commun_esquive, commun_potion_soin, commun_coup_critique,
+    nyxessa_missile, nyxessa_missile_eteint,
 ]
 
 NOMS_CLASSES = {"paladin": "Paladin", "mage_feu": "Mage de feu", "rodeur": "Rôdeur", "assassin": "Assassin",
-                "viking": "Viking", "communes": "Communes",
+                "viking": "Viking", "communes": "Communes", "nyxessa": "Nyxessa (HUD)",
                 "druide": "Druide", "barde": "Barde", "bavaroise": "Bavaroise", "clochard": "Clochard"}
 
 # Barre de compétences du HUD (RT, LT, LB, RB) : (icône ou None, invite, état) ; état = "", "active", "recharge:N:f".
@@ -1878,7 +1927,7 @@ def planche(classes, competences, nyx, apercus):
     corps.append('<h2>À trancher</h2><ul class="note">%s</ul>' % "".join("<li>%s</li>" % html.escape(t) for t in A_TRANCHER))
     corps.append('<h2>Classes</h2><div class="grille">%s</div>'
                  % "".join(carte(ic) for ic in classes if ic.famille == "classes"))
-    for famille in ("paladin", "mage_feu", "rodeur", "assassin", "viking", "communes", "druide"):
+    for famille in ("paladin", "mage_feu", "rodeur", "assassin", "viking", "communes", "nyxessa", "druide"):
         liste = [ic for ic in competences if ic.famille == famille]
         corps.append('<h2>%s</h2><div class="grille">%s</div>'
                      % (NOMS_CLASSES[famille], "".join(carte(ic) for ic in liste)))

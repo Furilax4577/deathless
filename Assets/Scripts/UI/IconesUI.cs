@@ -19,6 +19,9 @@ namespace Deathless.UI
         public const string Potion = "commun_potion_soin";
         public const string Esquive = "commun_esquive";
         public const string CoupCritique = "commun_coup_critique";
+        /// Missile de Nyxessa (crâne en gemmes vertes) : allumé, et sa version éteinte (ardoise) pour la recharge.
+        public const string MissileNyxessa = "nyxessa_missile";
+        public const string MissileNyxessaEteint = "nyxessa_missile_eteint";
         /// Emblème de repli d'une classe dont le SVG n'est pas encore là (hexagone vide, Assets/UI/Icones/Repli/).
         public const string RepliClasse = "repli_classe";
 

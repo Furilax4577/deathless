@@ -47,6 +47,8 @@ namespace Deathless.Reseau
         public readonly NetworkVariable<int> NuitAtteinte = new NetworkVariable<int>();
         public readonly NetworkVariable<int> OrEquipe = new NetworkVariable<int>();
         public readonly NetworkVariable<int> PalierMissiles = new NetworkVariable<int>(1);
+        // Missiles de Nyxessa : stock seul ; la recharge est extrapolée chez chaque client (Partie.SuivreMissiles).
+        public readonly NetworkVariable<int> StockMissiles = new NetworkVariable<int>();
         // Donjon : graine du jour (tirée par l'hôte, 0 = aucun) et butins déjà pris (un bit par emplacement).
         public readonly NetworkVariable<int> GraineDonjon = new NetworkVariable<int>();
         public readonly NetworkVariable<int> ButinsPris = new NetworkVariable<int>();
@@ -93,6 +95,7 @@ namespace Deathless.Reseau
             Ecrire(NuitAtteinte, e.nuitAtteinte);
             Ecrire(OrEquipe, e.orEquipe);
             Ecrire(PalierMissiles, e.nyxessa.palierMissiles);
+            Ecrire(StockMissiles, e.nyxessa.stock);
             var dj = DonjonJeu.Instance;
             if (dj != null) { Ecrire(GraineDonjon, dj.GraineCourante); Ecrire(ButinsPris, dj.Pris); }
             Ecrire(PalierBouclier, e.nyxessa.palierBouclier);

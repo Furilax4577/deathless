@@ -22,7 +22,7 @@
     position: absolute;
     top: 30px;
     left: 50%;
-    width: 780px;
+    width: 900px;   /* 780 avant le compteur de missiles : la barre de Nyxessa garde sa longueur */
     translate: -50% 0;
     align-items: center;
 }
@@ -46,6 +46,60 @@
 .hud-nyx__bouclier { height: 100%; width: 100%; background-color: var(--dl-color-shield); }
 .hud-nyx__bouclier--entame { background-color: var(--dl-color-shield-warn); }
 .hud-nyx__bouclier--critique { background-color: var(--dl-color-life); }
+
+/* Missiles de Nyxessa (à droite de la barre) : l'icône allumée monte du bas vers le haut pendant la recharge du
+   prochain missile, par-dessus sa version éteinte ; stock plein : icône entière et liseré vert. Vert permis : Nyxessa. */
+.hud-missiles {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    height: 42px;
+    margin-left: 15px;
+    padding: 0 15px 0 3px;
+    border-radius: 21px;
+    border-width: 1px;
+    border-color: var(--dl-color-border);
+    background-color: rgba(16, 19, 27, 0.78);
+    display: none;
+}
+.hud-missiles--plein { border-color: rgba(63, 174, 90, 0.75); }
+.hud-missiles__icone { width: 42px; height: 42px; flex-shrink: 0; }
+.hud-missiles__eteint { position: absolute; left: 0; top: 0; right: 0; bottom: 0; }
+.hud-missiles__charge {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    overflow: hidden;
+    border-top-width: 2px;
+    border-top-color: rgba(164, 236, 144, 0.6);
+}
+.hud-missiles__charge--pleine { border-top-width: 0; }
+/* Taille fixe, ancrée en bas : l'icône ne se déforme pas quand la découpe rétrécit. */
+.hud-missiles__plein { position: absolute; left: 0; bottom: 0; width: 42px; height: 42px; }
+/* Onde d'un tir : anneau qui s'élargit et s'efface (opacité et échelle posées par EcranHud). */
+.hud-missiles__onde {
+    position: absolute;
+    left: 3px;
+    top: 3px;
+    width: 36px;
+    height: 36px;
+    border-radius: 18px;
+    border-width: 3px;
+    border-color: #a4ec90;
+    opacity: 0;
+}
+.hud-missiles__nombre {
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+    font-size: var(--dl-text-body);
+    color: var(--dl-color-text);
+    margin: 0 0 0 9px;
+    padding: 0;
+}
+.hud-missiles__max { font-size: var(--dl-text-small); color: var(--dl-color-text-muted); margin: 0 0 0 6px; padding: 0; }
+.hud-missiles--vide .hud-missiles__nombre { color: var(--dl-color-text-disabled); }
+.hud-missiles--tir .hud-missiles__nombre { color: #a4ec90; }
 
 .hud-temps__icone { width: 27px; height: 27px; margin-right: 15px; }
 .hud-temps__texte { font-size: var(--dl-text-body); margin: 0; padding: 0; }
@@ -353,7 +407,7 @@
 .hud-mort__aide { font-size: var(--dl-text-body); }
 
 /* ---------- Taille ×3 : le HUD tient dans ~1422 × 800 ---------- */
-.dl-scale-3 .hud-haut { width: 620px; top: 20px; }
+.dl-scale-3 .hud-haut { width: 720px; top: 20px; }   /* 620 avant le compteur de missiles */
 .dl-scale-3 .hud-or { right: 24px; top: 20px; }
 .dl-scale-3 .hud-or__legende { display: none; }
 .dl-scale-3 .hud-joueur { left: 24px; bottom: 24px; }

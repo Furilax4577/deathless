@@ -9,7 +9,7 @@ namespace Deathless.Jeu
     /// IEtatJoueur, IScoreFin et ICommandesPartie en lisant Partie.Etat (aucune logique de jeu ici) et s'enregistre dans
     /// DonneesUI. Au chargement : commandes seules (menu principal) ; partie lancée : toutes les sources (HUD) ; fin :
     /// Phase = Terminee puis PartieTerminee (écran de score). Gère aussi le curseur (caché et verrouillé en jeu).
-    public class HudPresenter : MonoBehaviour, IEtatPartie, IEtatJoueur, IEtatJoueurClasse, IScoreFin, ICommandesPartie, IClassesJouables, IEtatEquipe
+    public class HudPresenter : MonoBehaviour, IEtatPartie, IEtatJoueur, IEtatJoueurClasse, IScoreFin, ICommandesPartie, IClassesJouables, IEtatEquipe, IEtatMissiles
     {
         public static readonly Color TeintePaladin = new Color32(0xd9, 0xb2, 0x64, 0xff);
 
@@ -126,6 +126,21 @@ namespace Deathless.Jeu
         public event Action<int> NuitCommencee;
         public event Action NyxessaFrappee;
         public event Action PartieTerminee;
+
+        // ----------------------------------------------------------------- IEtatMissiles (compteur du HUD)
+
+        /// Missiles de Nyxessa : stock (chez un client, recopié de l'hôte par Partie.SuivreHote, recharge extrapolée).
+        public int MissilesDisponibles => P != null ? P.Etat.nyxessa.stock : 0;
+        public int MissilesMax => P != null && P.B != null ? GameBalance.AuPalier(P.B.missilesStockPaliers, P.Etat.nyxessa.palierMissiles) : 0;
+        public float ChargeProchainMissile
+        {
+            get
+            {
+                if (P == null || P.B == null || MissilesDisponibles >= MissilesMax) return 1f;
+                float duree = GameBalance.AuPalier(P.B.missileRegenerationPaliers, P.Etat.nyxessa.palierMissiles);
+                return duree > 0f ? Mathf.Clamp01(P.Etat.nyxessa.regeneration / duree) : 1f;
+            }
+        }
 
         // ----------------------------------------------------------------- IEtatEquipe (multijoueur)
 

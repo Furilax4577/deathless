@@ -29,6 +29,7 @@ Nyxessa tire des missiles en forme de crâne faits de gemmes vertes, une fois et
   - **Intervalle de tir** : le temps minimum entre deux tirs.
 - **Dégâts** : ils dépendent aussi du palier d'amélioration, comme les deux temps de recharge.
 - **Décision de tir** : Nyxessa choisit elle-même quand tirer et combien de missiles envoyer, selon le stock disponible.
+- **Compteur dans le HUD** {décidé} : en haut, à droite de la barre de Nyxessa, une icône de crâne vert et le stock (« 3 / 5 »). L'icône se remplit de bas en haut pendant la régénération du prochain missile ; elle est entièrement allumée quand le stock est plein. Un missile gagné la fait grossir un instant, un missile tiré fait un bref éclat vert. Voir [Interface](interface.md).
 
 ### Paliers {à équilibrer}
 

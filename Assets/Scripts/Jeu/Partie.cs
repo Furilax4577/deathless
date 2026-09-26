@@ -401,6 +401,7 @@ namespace Deathless.Jeu
             Etat.orEquipe = r.OrEquipe.Value;
             Etat.nyxessa.palierMissiles = r.PalierMissiles.Value;
             Etat.nyxessa.palierBouclier = r.PalierBouclier.Value;
+            SuivreMissiles(r.StockMissiles.Value, dt);
             if (nyxessa != null)
             {
                 nyxessa.Fixer(r.NyxPv.Value, r.NyxPvMax.Value);
@@ -429,6 +430,23 @@ namespace Deathless.Jeu
                 AlerteNuit?.Invoke();
             }
             LireJoueurLocal(r);
+        }
+
+        int m_StockMissilesVu = -1;
+
+        /// Client : stock des missiles de Nyxessa tel que l'hôte le tient (PartieReseau.StockMissiles) ; la recharge du
+        /// prochain missile n'est pas envoyée, elle est extrapolée ici avec la règle de DefenseNyxessa : elle repart de 0
+        /// quand le stock monte, reste à 0 stock plein, sinon avance de dt, bornée à la durée du palier (HUD).
+        void SuivreMissiles(int stock, float dt)
+        {
+            var n = Etat.nyxessa;
+            int max = GameBalance.AuPalier(B.missilesStockPaliers, n.palierMissiles);
+            float duree = GameBalance.AuPalier(B.missileRegenerationPaliers, n.palierMissiles);
+            if (stock >= max) n.regeneration = 0f;
+            else if (m_StockMissilesVu >= 0 && stock > m_StockMissilesVu) n.regeneration = 0f;
+            else n.regeneration = Mathf.Min(n.regeneration + dt, duree);
+            n.stock = stock;
+            m_StockMissilesVu = stock;
         }
 
         /// Client : vote, mort, délai et score du joueur local tels que l'hôte les tient ; vie et endurance restent locales.

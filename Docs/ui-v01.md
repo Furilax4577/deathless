@@ -104,6 +104,29 @@ Cette interface est enregistrée dans `DonneesUI.Donjon` et implémentée par `D
 - **`AvantRappel`** : s'il vaut 0 ou plus et que le joueur est au donjon, une alerte rouge pulsée s'affiche (`donjon-alerte`), avec le texte « Le portail se ferme dans N s : rentrez au village ! ». Elle remplace l'alerte de la tombée de la nuit.
 - **`Message`** : une pastille (`donjon-message`) affiche par exemple « 140 or versés à la caisse commune » ou « Rappelé par Nyxessa : 88 or gardés, 132 perdus ».
 
+### Missiles de Nyxessa : `IEtatMissiles` (`Donnees/IEtatMissiles.cs`, 26/09/2026)
+
+Interface facultative, à implémenter par l'objet enregistré comme `IEtatPartie` (le HUD la trouve par `DonneesUI.Partie as IEtatMissiles`). Sans elle, ou avec `MissilesMax = 0`, le compteur est masqué. Implémentée par `HudPresenter` (jeu) et `EtatFactice` (banc).
+
+| Membre | Type | Sens |
+|---|---|---|
+| `MissilesDisponibles` | int | Missiles prêts à partir (stock de Nyxessa). |
+| `MissilesMax` | int | Stock maximal du palier acheté à la relique. |
+| `ChargeProchainMissile` | float (0 à 1) | Recharge du prochain missile. Sans objet quand le stock est plein (1 par convention). |
+
+Côté jeu, `HudPresenter` lit `Partie.Etat.nyxessa` (`stock`, `regeneration`, `palierMissiles`) et `GameBalance` (`missilesStockPaliers`, `missileRegenerationPaliers`). Chez un client réseau, le stock vient de l'hôte et la recharge est extrapolée sur place (`reseau.md`).
+
+**Compteur du HUD** (`missiles`, dans la rangée `hud-nyx`, juste à droite de la barre de Nyxessa) : une pastille sombre avec l'icône du missile (crâne en gemmes vertes, `IconesUI.MissileNyxessa`) et « 3 / 5 » (nombre en Fredoka SemiBold ivoire, « / 5 » en petit et atténué).
+- **Recharge** : l'icône éteinte (`nyxessa_missile_eteint`, en ardoise) est dessous. L'icône allumée est dessus, dans un conteneur `overflow: hidden` ancré en bas, dont la hauteur suit `ChargeProchainMissile` : elle monte du bas vers le haut (d'abord la traînée, puis le crâne). Un filet vert clair marque le niveau.
+- **Stock plein** : l'icône est entièrement allumée, et la pastille prend un liseré vert.
+- **Missile gagné** : l'icône, entièrement allumée le temps de l'animation, fait un « pop » d'échelle (×1,3, 0,3 s, `EcranHud.DureePopMissile`). La recharge du suivant reprend ensuite à zéro.
+- **Missile tiré** : un anneau vert s'élargit et s'efface, et le nombre passe en vert un instant (0,35 s, `DureeTirMissile`).
+- **Stock vide** : le nombre est grisé.
+
+La rangée du haut est élargie pour que la barre de Nyxessa garde sa longueur : `hud-haut` passe de 780 à 900 px (à ×3, de 620 à 720 px).
+
+Vérifié en Play le 26/09/2026. Captures (`Assets/Screenshots/`) : village en solo, palier 3, 2 missiles sur 4, recharge en cours : `hud_missiles_village_x1.png`, `_x2.png`, `_x3.png` ; missile gagné : `hud_missiles_village_pop.png` ; missile tiré : `hud_missiles_village_tir.png` ; banc (3 sur 5) : `hud_missiles_banc_x1.png`, `_x2.png`, `_x3.png`.
+
 ### Classes : `IClassesJouables`, `IClasseJouable`, `IEtatJoueurClasse` (`Donnees/IClasses.cs`, 25/09/2026)
 
 Cinq classes jouables (Wiki `classes.md`, `commandes.md`). Tout est **facultatif et rétrocompatible** : un jeu qui n'implémente rien de nouveau garde son comportement (choix affiché depuis le catalogue, `LancerSolo()` appelé).
@@ -185,7 +208,7 @@ public class PartieUI : MonoBehaviour, IEtatPartie, IEtatJoueur, IScoreFin, ICom
 | Choix de classe | `ChoixClasse/ChoixClasse.uxml`, `V01.uss` | `EcranChoixClasse` | Trois colonnes : les cinq classes à gauche (emblème, nom, rôle, étiquette « Dernière »), le personnage en 3D au centre, la fiche à droite (emblème, nom, rôle, arme, description, jauge, cinq actions : icône de l'action, invite du bouton de l'appareil actif, nom ; emplacement vide grisé). À ×3 : colonnes resserrées, étiquette « Dernière » et aide masquées. Dernière classe jouée présélectionnée ; la fiche suit le focus (manette, clavier) et le survol (souris). Valider (A, Entrée, clic) : retient la classe et lance la partie ; Retour (B, Échap) : menu principal. Captures : `UI01_choix_classe_3d_<id>.png` (une par classe, Village) ; avant les icônes et la 3D : `UI01_choix_classe*.png`. |
 | Options | `Options/Options.uxml` | `EcranOptions` | Onglets Jeu / Commandes / Audio (LB, RB). Jeu : taille ×1 (80 %), ×2 (100 %), ×3 (135 %). Commandes : table en lecture seule (clavier et manette, la colonne manette suit la dernière manette), lignes focusables et défilantes. Audio : volumes principal, musique, effets spéciaux, interface (voir « Audio »). Réinitialiser (Y) : réglages de l'onglet affiché (taille ×2, ou volumes par défaut). |
 | Crédits | `Credits/Credits.uxml` | `EcranCredits` | Contenu de `Wiki/pages/credits.md`. |
-| HUD | `Hud/Hud.uxml`, `Hud/Hud.uss` | `EcranHud` | Nyxessa (barre verte) et bouclier (bleu → orange → rouge, masqué sans bouclier), temps avec icône jour ou nuit (« Jour · 1:42 avant la nuit », « Nuit 3 · 2:10 avant l'aube », « Crépuscule · la nuit 3 tombe », « Aube · le jour se lève »), « Prêts 1 / 1 » et invite de `Gameplay/Ready`, **alerte avant la nuit** (pastille orange qui clignote, 15 s), **bannière « NUIT N »**, indicateur de bord « Nyxessa attaquée », or, portrait + vie + endurance, barre de compétences avec invites et **temps de recharge**, réticule, invite d'interaction, **écran de mort**. |
+| HUD | `Hud/Hud.uxml`, `Hud/Hud.uss` | `EcranHud` | Nyxessa (barre verte) et bouclier (bleu → orange → rouge, masqué sans bouclier), compteur de missiles de Nyxessa (`IEtatMissiles`), temps avec icône jour ou nuit (« Jour · 1:42 avant la nuit », « Nuit 3 · 2:10 avant l'aube », « Crépuscule · la nuit 3 tombe », « Aube · le jour se lève »), « Prêts 1 / 1 » et invite de `Gameplay/Ready`, **alerte avant la nuit** (pastille orange qui clignote, 15 s), **bannière « NUIT N »**, indicateur de bord « Nyxessa attaquée », or, portrait + vie + endurance, barre de compétences avec invites et **temps de recharge**, réticule, invite d'interaction, **écran de mort**. |
 | Pause | `Pause/Pause.uxml` | `EcranPause` | « La partie continue » ; Reprendre, Options, Quitter la partie, Quitter le jeu. Le HUD reste visible et vivant dessous. |
 | Achat | `Achat/Achat.uxml`, `Achat/Achat.uss` | `EcranAchat` | Menu d'achat ouvert par une interaction du jeu (`DonneesUI.OuvrirMenuAchat(IMenuAchat)`, par-dessus le HUD) : titre, aide, or de la caisse commune ; une ligne focalisable par article (nom, niveau, ce qu'apporte le suivant, prix ; atténuée si l'achat est impossible) ; message réservé en permanence (achat fait en or, refus en rouge). Valider achète, Retour ferme ; se ferme seul quand `IMenuAchat.Ouvert` devient faux. Utilisé pour les achats à la relique (`AchatRelique`). Captures : `achat_relique_menu*.png`. |
 | Personnage | `Personnage/Personnage.uxml`, `Personnage/Personnage.uss` | `EcranPersonnage` | Menu du personnage (touche Tab, Y ; `DonneesUI.Personnage` : `IMenuPersonnage`, ouvert par `DonneesUI.OuvrirMenuPersonnage()`, par-dessus le HUD) : carte du personnage (emblème, nom, classe, caractéristiques), carte des compétences (points à dépenser, une ligne focalisable par amélioration : icône, nom, rangs en losanges, effet par rang et actuel ; Valider améliore), carte de l'inventaire (9 cases vides). À ×3 : l'inventaire passe dessous, le contenu défile. Le HUD affiche « N points de compétence » et l'invite de `Gameplay/CharacterMenu` au-dessus du portrait. Captures : `personnage_*.png`. |
@@ -244,7 +267,9 @@ Partie accélérée (×4 par défaut : jour de 120 s en 30 s), bouclier à parti
 
 Classes : `EtatFactice` implémente `IClassesJouables` et `IEtatJoueurClasse` ; `LancerSolo(id)` joue la classe choisie (le Paladin garde sa simulation complète ; les autres classes ont leur barre d'actions, vides comprises, une jauge simulée : mana +3/s, -8 par attaque, -12/s cône maintenu ; rage +12 par attaque, -1,5/s hors combat, compétences à 30 ; assassin furtif hors combat et hors nuit). Captures du HUD : `UI01_hud_mage_mana.png`, `UI01_hud_viking_rage.png`, `UI01_hud_assassin_furtif.png`.
 
-Méthodes de test : `Forcer(phase, nuit, reste)`, `ForcerNyxessa(vie01, bouclier01)`, `Frapper(angle)`, `ForcerJoueur(vie, endurance, rechargeCharge, rechargeSoin, garde)`, `ForcerMort(s)`, `ForcerScore(or, dégâts, tués, morts, critiques, évités, soins)`, `ForcerFin(résultat, nuit, durée)`, `ForcerPret(bool)`, `ForcerJoueursDeTest(bool)` (deux joueurs fictifs pour tester la table du score), `LancerSolo(classeId)`, `ForcerJauge(0-100)`, `ForcerFurtif(bool?)`, champ `figer`.
+Missiles de Nyxessa (`IEtatMissiles`) : stock de 5 (`missilesMax`), un missile toutes les 8 s de jeu (`missileRecharge`) ; la nuit, un tir toutes les 4 à 12 s en gardant un missile en réserve, et une fois sur quatre une salve de tout le stock sauf un.
+
+Méthodes de test : `ForcerMissiles(disponibles, charge01)`, `Forcer(phase, nuit, reste)`, `ForcerNyxessa(vie01, bouclier01)`, `Frapper(angle)`, `ForcerJoueur(vie, endurance, rechargeCharge, rechargeSoin, garde)`, `ForcerMort(s)`, `ForcerScore(or, dégâts, tués, morts, critiques, évités, soins)`, `ForcerFin(résultat, nuit, durée)`, `ForcerPret(bool)`, `ForcerJoueursDeTest(bool)` (deux joueurs fictifs pour tester la table du score), `LancerSolo(classeId)`, `ForcerJauge(0-100)`, `ForcerFurtif(bool?)`, champ `figer`.
 
 ## Vérifié en Play (manette simulée)
 

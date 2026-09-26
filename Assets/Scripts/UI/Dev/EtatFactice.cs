@@ -14,7 +14,7 @@ namespace Deathless.UI.Dev
     /// réapparition ; fin de partie. Les entrées de jeu (carte Gameplay, via InputChordResolver) déclenchent
     /// les compétences et le vote prêt, comme le ferait le vrai jeu.
     /// Les méthodes Forcer… servent aux tests et aux captures.
-    public class EtatFactice : MonoBehaviour, IEtatPartie, IEtatJoueur, IScoreFin, ICommandesPartie, IClassesJouables, IEtatJoueurClasse, IEtatJoueurPotions, IEtatEquipe
+    public class EtatFactice : MonoBehaviour, IEtatPartie, IEtatJoueur, IScoreFin, ICommandesPartie, IClassesJouables, IEtatJoueurClasse, IEtatJoueurPotions, IEtatEquipe, IEtatMissiles
     {
         public InputActionAsset actions;
 
@@ -35,6 +35,12 @@ namespace Deathless.UI.Dev
         [Tooltip("Gèle la simulation (captures).")]
         public bool figer;
 
+        [Header("Missiles de Nyxessa (compteur du HUD)")]
+        [Tooltip("Stock maximal simulé.")]
+        public int missilesMax = 5;
+        [Tooltip("Recharge d'un missile (secondes de jeu).")]
+        public float missileRecharge = 8f;
+
         // --- Partie
         bool m_EnCours;
         PhasePartie m_Phase = PhasePartie.Jour;
@@ -47,6 +53,8 @@ namespace Deathless.UI.Dev
         float m_Duree;
         float m_ProchainCoup, m_ProchainKill, m_ProchainDegat;
         bool m_MortCetteNuit;
+        int m_Missiles;
+        float m_RegenMissile, m_ProchainTir;
 
         // --- Joueur
         float m_Vie = 100f, m_Endurance = 100f;
@@ -125,6 +133,7 @@ namespace Deathless.UI.Dev
             foreach (var c in m_Competences) c.Avancer(dt);
             if (!EstPaladin) foreach (var c in m_CompetencesClasse) c.Avancer(dt);
             SimulerJauge(dt);
+            SimulerMissiles(dt);
             m_Garde.etat = m_Garde.finActive > m_Duree || (m_Accords != null && actions != null && m_Accords.IsHeld(actions.FindAction("Gameplay/AttackSecondary")))
                 ? EtatCompetence.Active : EtatCompetence.Prete;
             m_Attaque.etat = m_Attaque.finActive > m_Duree ? EtatCompetence.Active : EtatCompetence.Prete;
@@ -200,6 +209,23 @@ namespace Deathless.UI.Dev
                 else if (m_Vie < 70f && m_Soin.EstPrete) Utiliser(m_Soin, 15f);
                 else m_Garde.finActive = m_Duree + 4f;
             }
+        }
+
+        /// Missiles de Nyxessa : recharge continue (comme DefenseNyxessa) ; la nuit, un tir de temps en temps en gardant un
+        /// missile en réserve, parfois une salve de tout le stock sauf un.
+        void SimulerMissiles(float dt)
+        {
+            if (m_Missiles < missilesMax)
+            {
+                m_RegenMissile += dt;
+                if (m_RegenMissile >= missileRecharge) { m_RegenMissile = 0f; m_Missiles++; }
+            }
+            else m_RegenMissile = 0f;
+            if (m_Phase != PhasePartie.Nuit) return;
+            m_ProchainTir -= dt;
+            if (m_ProchainTir > 0f || m_Missiles < 2) return;
+            m_ProchainTir = Random.Range(4f, 12f);
+            m_Missiles -= Random.value < 0.25f ? m_Missiles - 1 : 1;
         }
 
         void PhaseSuivante()
@@ -414,6 +440,9 @@ namespace Deathless.UI.Dev
             ConstruireCompetencesClasse();
             m_ValeurJauge = m_Classe.Jauge == JaugeClasse.Mana ? 100f : 0f;
             m_DerniereAttaque = -99f;
+            m_Missiles = missilesMax;
+            m_RegenMissile = 0f;
+            m_ProchainTir = 2f;
             DefinirPhase(PhasePartie.Jour, dureeJour);
             DonneesUI.Enregistrer(this, this, this, this);
         }
@@ -483,6 +512,13 @@ namespace Deathless.UI.Dev
 
         public void ForcerPret(bool pret) => m_Pret = pret;
 
+        /// Tests et captures : stock de missiles et recharge du suivant (0-1).
+        public void ForcerMissiles(int disponibles, float charge01)
+        {
+            m_Missiles = Mathf.Clamp(disponibles, 0, missilesMax);
+            m_RegenMissile = m_Missiles >= missilesMax ? 0f : missileRecharge * Mathf.Clamp01(charge01);
+        }
+
         /// Test de mise en page du score : ajoute (ou retire) deux joueurs fictifs (la 0.1 est solo).
         public void ForcerJoueursDeTest(bool actif)
         {
@@ -541,6 +577,12 @@ namespace Deathless.UI.Dev
         public event Action<int> NuitCommencee;
         public event Action NyxessaFrappee;
         public event Action PartieTerminee;
+
+        // ================================================================== IEtatMissiles
+
+        public int MissilesDisponibles => m_Missiles;
+        public int MissilesMax => missilesMax;
+        public float ChargeProchainMissile => m_Missiles >= missilesMax || missileRecharge <= 0f ? 1f : Mathf.Clamp01(m_RegenMissile / missileRecharge);
 
         // ================================================================== IEtatJoueur
 

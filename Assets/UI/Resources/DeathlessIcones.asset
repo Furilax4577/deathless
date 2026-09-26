@@ -89,6 +89,10 @@ MonoBehaviour:
     image: {fileID: 7388822144124034973, guid: 39cf60dd4dac8b14f9a9e4f811e574ca, type: 3}
   - id: mage_cone_de_flammes
     image: {fileID: 7388822144124034973, guid: d955bb1540ef3704fb7bdfa9efc73d27, type: 3}
+  - id: nyxessa_missile
+    image: {fileID: 7388822144124034973, guid: b1f506490ff14a439624d3d6c724b891, type: 3}
+  - id: nyxessa_missile_eteint
+    image: {fileID: 7388822144124034973, guid: be60a21e837245c6aab9183aaecbeecf, type: 3}
   - id: paladin_charge_belier
     image: {fileID: 7388822144124034973, guid: 26548fc9380bdca4fb9bd11c9c9b23cf, type: 3}
   - id: paladin_epee

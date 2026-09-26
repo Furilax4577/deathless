@@ -20,6 +20,10 @@ namespace Deathless.UI.Ecrans
         /// Durée de la bannière « NUIT N ».
         public static float DureeBanniere = 3.5f;
 
+        /// Missiles de Nyxessa : durée du « pop » d'un missile gagné et de l'onde d'un missile tiré.
+        public static float DureePopMissile = 0.3f;
+        public static float DureeTirMissile = 0.35f;
+
         public override bool CarteUI => false;
         public override bool Opaque => true;
 
@@ -48,6 +52,10 @@ namespace Deathless.UI.Ecrans
         VisualElement m_Reticule;
         VisualElement m_Mort;
         Label m_MortTexte;
+        VisualElement m_Missiles, m_MissilesIcone, m_MissilesCharge, m_MissilesOnde;
+        Label m_MissilesNombre, m_MissilesMax;
+        int m_MissilesVus = -1;
+        float m_TempsPopMissile = -1f, m_TempsTirMissile = -1f;
 
         readonly List<Emplacement> m_Emplacements = new List<Emplacement>();
 
@@ -124,6 +132,16 @@ namespace Deathless.UI.Ecrans
             m_Reticule = Racine.Q("reticule");
             m_Mort = Racine.Q("mort");
             m_MortTexte = Racine.Q<Label>("mort-texte");
+            m_Missiles = Racine.Q("missiles");
+            m_MissilesIcone = Racine.Q("missiles-icone");
+            m_MissilesCharge = Racine.Q("missiles-charge");
+            m_MissilesOnde = Racine.Q("missiles-onde");
+            m_MissilesNombre = Racine.Q<Label>("missiles-nombre");
+            m_MissilesMax = Racine.Q<Label>("missiles-max");
+            var eteint = Racine.Q("missiles-eteint");
+            if (eteint != null) IconesUI.Poser(eteint, IconesUI.MissileNyxessaEteint);
+            var plein = Racine.Q("missiles-plein");
+            if (plein != null) IconesUI.Poser(plein, IconesUI.MissileNyxessa);
             ConstruireAllies();
         }
 
@@ -180,6 +198,8 @@ namespace Deathless.UI.Ecrans
             }
             m_TempsBanniere = -1f;
             m_TempsAttaque = -1f;
+            m_MissilesVus = -1;
+            m_TempsPopMissile = m_TempsTirMissile = -1f;
         }
 
         void OnNuit(int nuit)
@@ -301,6 +321,9 @@ namespace Deathless.UI.Ecrans
             // Or.
             m_Or.text = Milliers(partie.OrEquipe);
 
+            // Missiles de Nyxessa (facultatif : IEtatMissiles sur la source de la partie).
+            MajMissiles(partie as IEtatMissiles, dt);
+
             // Bannière NUIT N.
             if (m_TempsBanniere >= 0f)
             {
@@ -320,6 +343,64 @@ namespace Deathless.UI.Ecrans
             var attaque = m_TempsAttaque >= 0f;
             m_Attaque.style.display = attaque ? DisplayStyle.Flex : DisplayStyle.None;
             if (attaque) PlacerAttaque(partie.AngleNyxessa);
+        }
+
+        /// Compteur des missiles de Nyxessa, à droite de sa barre : « 3 / 5 » et icône qui se charge (l'icône allumée,
+        /// découpée du bas vers le haut, suit ChargeProchainMissile ; stock plein : entière). Missile gagné : « pop »
+        /// d'échelle de l'icône ; missile tiré : onde verte et nombre en vert un instant. Masqué sans IEtatMissiles.
+        void MajMissiles(IEtatMissiles missiles, float dt)
+        {
+            if (m_Missiles == null) return;
+            var max = missiles != null ? missiles.MissilesMax : 0;
+            m_Missiles.style.display = max > 0 ? DisplayStyle.Flex : DisplayStyle.None;
+            if (max <= 0)
+            {
+                m_MissilesVus = -1;
+                return;
+            }
+            var dispo = Mathf.Clamp(missiles.MissilesDisponibles, 0, max);
+            var plein = dispo >= max;
+            if (m_MissilesVus >= 0 && dispo > m_MissilesVus) m_TempsPopMissile = 0f;
+            else if (m_MissilesVus >= 0 && dispo < m_MissilesVus) m_TempsTirMissile = 0f;
+            m_MissilesVus = dispo;
+
+            m_MissilesNombre.text = dispo.ToString();
+            m_MissilesMax.text = "/ " + max;
+            m_Missiles.EnableInClassList("hud-missiles--plein", plein);
+            m_Missiles.EnableInClassList("hud-missiles--vide", dispo == 0);
+            // Missile gagné : l'icône grossit puis revient (demi-sinus).
+            var echelle = 1f;
+            if (m_TempsPopMissile >= 0f)
+            {
+                m_TempsPopMissile += dt;
+                var t = m_TempsPopMissile / DureePopMissile;
+                if (t >= 1f) m_TempsPopMissile = -1f;
+                else echelle = 1f + 0.3f * Mathf.Sin(t * Mathf.PI);
+            }
+            m_MissilesIcone.style.scale = new StyleScale(new Scale(new Vector3(echelle, echelle, 1f)));
+
+            // Charge du prochain missile ; pendant le pop, l'icône arrivée reste entièrement allumée.
+            var charge = plein || m_TempsPopMissile >= 0f ? 1f : Mathf.Clamp01(missiles.ChargeProchainMissile);
+            m_MissilesCharge.style.height = Length.Percent(charge * 100f);
+            m_MissilesCharge.EnableInClassList("hud-missiles__charge--pleine", charge >= 1f);
+
+            // Missile tiré : anneau vert qui s'élargit et s'efface ; nombre en vert.
+            var onde = 0f;
+            var ondeEchelle = 1f;
+            if (m_TempsTirMissile >= 0f)
+            {
+                m_TempsTirMissile += dt;
+                var t = m_TempsTirMissile / DureeTirMissile;
+                if (t >= 1f) m_TempsTirMissile = -1f;
+                else
+                {
+                    onde = 1f - t;
+                    ondeEchelle = Mathf.Lerp(0.8f, 1.7f, t);
+                }
+            }
+            m_MissilesOnde.style.opacity = onde;
+            m_MissilesOnde.style.scale = new StyleScale(new Scale(new Vector3(ondeEchelle, ondeEchelle, 1f)));
+            m_Missiles.EnableInClassList("hud-missiles--tir", m_TempsTirMissile >= 0f);
         }
 
         /// Place l'indicateur au bord : devant (±35°) en haut, derrière (±145°) en bas, sinon à gauche ou à droite.
