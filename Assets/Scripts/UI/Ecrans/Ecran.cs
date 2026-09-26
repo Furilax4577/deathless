@@ -80,5 +80,9 @@ namespace Deathless.UI.Ecrans
         public virtual void OngletPrecedent() { }
         public virtual void OngletSuivant() { }
         public virtual void Reinitialiser() { }
+
+        /// Fin de vie de l'écran (NavigateurEcrans.OnDisable, rechargement de scène) : retirer ici les abonnements aux
+        /// événements statiques pris dans Construire, sinon l'écran reste retenu et ses rappels touchent un arbre détaché.
+        public virtual void Detruire() { }
     }
 }

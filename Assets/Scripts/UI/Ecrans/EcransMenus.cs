@@ -393,14 +393,30 @@ namespace Deathless.UI.Ecrans
 
         Label m_PseudoValeur;
         Button m_ReleveMarteler, m_ReleveMaintenir;
+        IProfilJoueur m_Profil;
 
         public override void AuSommet() { if (m_PseudoValeur != null) m_PseudoValeur.text = DonneesUI.Profil.Pseudo; }
+
+        void OnPseudo(string pseudo) => m_PseudoValeur.text = pseudo;
+        void OnEchelle(int _) => MajTailles();
+        void OnAppareil(InputFamily _) => MajManette();
+        void OnVolume(CanalAudio _, float __) => MajVolumes();
+
+        public override void Detruire()
+        {
+            if (m_Profil != null) m_Profil.PseudoChange -= OnPseudo;
+            m_Profil = null;
+            UIScale.Changed -= OnEchelle;
+            InputDeviceWatcher.Changed -= OnAppareil;
+            VolumesAudio.Changed -= OnVolume;
+        }
 
         protected override void Construire()
         {
             m_PseudoValeur = Racine.Q<Label>("options-pseudo-valeur");
             m_PseudoValeur.text = DonneesUI.Profil.Pseudo;
-            DonneesUI.Profil.PseudoChange += p => m_PseudoValeur.text = p;
+            m_Profil = DonneesUI.Profil;
+            m_Profil.PseudoChange += OnPseudo;
             Racine.Q<Button>("options-pseudo").clicked += () =>
             {
                 Navigateur.Saisie.ConfigurerPseudo(false, () => Navigateur.Fermer());
@@ -423,7 +439,7 @@ namespace Deathless.UI.Ecrans
                 b.clicked += () => UIScale.Level = niveau;
                 m_Tailles.Add(b);
             }
-            UIScale.Changed += _ => MajTailles();
+            UIScale.Changed += OnEchelle;
             MajTailles();
 
             // Accessibilité : se relever du Renversé en martelant Saut (défaut) ou en le maintenant (OptionsJoueur).
@@ -454,7 +470,7 @@ namespace Deathless.UI.Ecrans
                 lignes.Add(ligne);
             }
             UINavigation.ChainerVerticalement(lignes);
-            InputDeviceWatcher.Changed += _ => MajManette();
+            InputDeviceWatcher.Changed += OnAppareil;
             MajManette();
             ConstruireVolumes();
             Onglet(0);
@@ -490,7 +506,7 @@ namespace Deathless.UI.Ecrans
                 lignes.Add(curseur);
             }
             UINavigation.ChainerVerticalement(lignes);
-            VolumesAudio.Changed += (_, __) => MajVolumes();
+            VolumesAudio.Changed += OnVolume;
             MajVolumes();
         }
 
