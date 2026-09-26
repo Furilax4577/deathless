@@ -138,18 +138,18 @@ namespace Deathless.Reseau
             ulong source = 0;
             var no = info.source != null ? info.source.GetComponentInParent<NetworkObject>() : null;
             if (no != null && no.IsSpawned) source = no.NetworkObjectId;
-            EncaisserRpc(info.montant, info.parable, info.continu, info.point, info.direction, source, info.source != null && no == null);
+            EncaisserRpc(info.montant, info.parable, info.aDistance, info.continu, info.point, info.direction, source, info.source != null && no == null);
             return info.montant;
         }
 
         [Rpc(SendTo.Owner)]
-        void EncaisserRpc(float montant, bool parable, bool continu, Vector3 point, Vector3 direction, ulong source, bool sourceNyxessa)
+        void EncaisserRpc(float montant, bool parable, bool aDistance, bool continu, Vector3 point, Vector3 direction, ulong source, bool sourceNyxessa)
         {
             GameObject go = null;
             if (source != 0 && NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(source, out var no)) go = no.gameObject;
             Heros.Sante.Encaisser(new InfoDegats
             {
-                montant = montant, equipeSource = Equipe.Ennemis, source = go, parable = parable, continu = continu, point = point, direction = direction
+                montant = montant, equipeSource = Equipe.Ennemis, source = go, parable = parable, aDistance = aDistance, continu = continu, point = point, direction = direction
             });
         }
 

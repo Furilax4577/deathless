@@ -97,7 +97,7 @@ namespace Deathless.Jeu
             {
                 m_Cible.Encaisser(new InfoDegats
                 {
-                    montant = m_Degats, equipeSource = m_Equipe, source = m_Source, parable = m_Parable,
+                    montant = m_Degats, equipeSource = m_Equipe, source = m_Source, parable = m_Parable, aDistance = true,
                     point = transform.position, direction = transform.forward
                 });
             }

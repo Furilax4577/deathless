@@ -13,6 +13,8 @@ namespace Deathless.Jeu
         public Vector3 point;
         public Vector3 direction;
         public bool parable;
+        /// Attaque à distance (projectile) : la garde peut la bloquer, jamais la parer (ni étourdir le tireur).
+        public bool aDistance;
         public bool critique;
         /// Dégâts continus (brûlure, tournante) : pas de réaction « touché » (son, animation) à chaque tic.
         public bool continu;
