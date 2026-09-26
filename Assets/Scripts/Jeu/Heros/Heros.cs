@@ -276,6 +276,24 @@ namespace Deathless.Jeu
         /// contrôle) : charge écrasante de Morgrim massue, onde de choc non sautée, grosse chute. Ne s'applique que sur
         /// le vrai héros du propriétaire (Heros.Update ne tourne que là) : chez l'hôte, pour le héros d'un autre poste,
         /// la demande part par HerosReseau (RPC hôte → propriétaire) plutôt que de changer l'état localement ici.
+        /// Poussée amortie (recul du Tourbillon de Morgrim massue) : vitesse horizontale ajoutée au déplacement puis
+        /// ramenée à zéro en quelques dixièmes de seconde. Comme Renverser, appliquée par le propriétaire du héros :
+        /// chez l'hôte, pour le héros d'un autre poste, elle part par HerosReseau.
+        public void Pousser(Vector3 vitesse)
+        {
+            vitesse.y = 0f;
+            if (m_ReseauHeros != null && m_ReseauHeros.IsSpawned && !m_ReseauHeros.IsOwner) { m_ReseauHeros.Pousser(vitesse); return; }
+            PousserLocal(vitesse);
+        }
+
+        public void PousserLocal(Vector3 vitesse)
+        {
+            if (!Vivant || Sante.invulnerable) return;
+            if (vitesse.sqrMagnitude > m_Poussee.sqrMagnitude) m_Poussee = vitesse;
+        }
+
+        Vector3 m_Poussee;
+
         public void Renverser()
         {
             if (m_ReseauHeros != null && m_ReseauHeros.IsSpawned && !m_ReseauHeros.IsOwner) { m_ReseauHeros.Renverser(); return; }
@@ -605,6 +623,11 @@ namespace Deathless.Jeu
             if (m_AuSol && m_VitesseY < 0f) m_VitesseY = -2f;
             m_VitesseY -= b.gravite * dt;
             if (impose) m_VitesseY = Mathf.Min(m_VitesseY, -2f);
+            if (m_Poussee.sqrMagnitude > 0.0001f)
+            {
+                deplacement += m_Poussee;
+                m_Poussee = Vector3.MoveTowards(m_Poussee, Vector3.zero, 10f * dt);
+            }
             var flags = CC.Move((deplacement + Vector3.up * m_VitesseY) * dt);
             m_AuSol = (flags & CollisionFlags.Below) != 0 || CC.isGrounded;
             SuivreChute(etaitAuSol, impose || EnTransit);

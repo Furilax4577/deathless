@@ -126,11 +126,13 @@ namespace Deathless.Jeu
             var b = B;
             AudioBank.Jouer(SonsDuJeu.GolemCoup, transform.position, 1f);
             float duree = b.morgrimMassueTourbillonDuree;
-            float t = 0f, prochainEclat = 0f;
+            float t = 0f, prochainEclat = 0f, prochainRecul = 0f;
             while (t < duree && !Interrompu)
             {
                 float dt = Time.deltaTime;
                 t += dt;
+                bool recul = t >= prochainRecul;
+                if (recul) prochainRecul = t + Mathf.Max(0.05f, b.morgrimMassueTourbillonReculIntervalle);
                 if (t >= prochainEclat)
                 {
                     prochainEclat = t + 0.15f;
@@ -148,6 +150,8 @@ namespace Deathless.Jeu
                             montant = b.morgrimMassueTourbillonDegatsParSeconde * dt, equipeSource = Equipe.Ennemis, source = gameObject,
                             point = h.transform.position + Vector3.up, direction = d.normalized, continu = true
                         });
+                        // Léger recul vers l'extérieur, par impulsions (pas un message réseau par image).
+                        if (recul && d.sqrMagnitude > 0.0001f) h.Pousser(d.normalized * b.morgrimMassueTourbillonRecul);
                     }
                 }
                 yield return null;
