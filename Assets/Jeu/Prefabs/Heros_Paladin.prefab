@@ -1125,16 +1125,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 3966146585
+  GlobalObjectIdHash: 2330154169
   InScenePlacedSourceGlobalObjectIdHash: 0
   m_InScenePlacedDisabledByDefault: 0
   DeferredDespawnTick: 0
   Ownership: 1
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
-  m_InScenePlaced: 0
+  m_InScenePlaced: 1
   ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
+  SceneMigrationSynchronization: 0
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
@@ -1254,6 +1254,10 @@ MonoBehaviour:
       NameHash: 1353639306
       Synchronize: 1
       ParameterType: 9
+    - name: DodgeBack
+      NameHash: -1143018866
+      Synchronize: 1
+      ParameterType: 9
     - name: Jump
       NameHash: 125937960
       Synchronize: 1
@@ -1278,6 +1282,10 @@ MonoBehaviour:
       NameHash: 657687027
       Synchronize: 1
       ParameterType: 9
+    - name: DodgeDir
+      NameHash: 2082679728
+      Synchronize: 1
+      ParameterType: 3
     - name: Ruee
       NameHash: 925415611
       Synchronize: 1
@@ -1306,6 +1314,26 @@ MonoBehaviour:
       NameHash: 209318632
       Synchronize: 1
       ParameterType: 3
+    - name: PortailArrivee
+      NameHash: 77375896
+      Synchronize: 1
+      ParameterType: 9
+    - name: PortailAir
+      NameHash: 1912628463
+      Synchronize: 1
+      ParameterType: 4
+    - name: RenverseChute
+      NameHash: -1745948685
+      Synchronize: 1
+      ParameterType: 9
+    - name: RenverseRelevage
+      NameHash: 1658173589
+      Synchronize: 1
+      ParameterType: 9
+    - name: RenverseVitesse
+      NameHash: 1155780896
+      Synchronize: 1
+      ParameterType: 1
   AnimatorParametersExpanded: 0
 --- !u!114 &2714206848385117356
 MonoBehaviour:
