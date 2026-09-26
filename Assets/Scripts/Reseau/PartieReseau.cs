@@ -29,6 +29,23 @@ namespace Deathless.Reseau
             && morts == o.morts && critiques == o.critiques && evites == o.evites && soins == o.soins && orPorte == o.orPorte;
     }
 
+    /// Sac de butin tombé à la mort d'un joueur au donjon (DonjonJeu.CreerSac) : posé jusqu'à ce qu'il soit ramassé ou
+    /// perdu à la fermeture du donjon (crépuscule). Un identifiant par sac : plusieurs morts donnent plusieurs sacs.
+    public struct SacReseau : INetworkSerializable, IEquatable<SacReseau>
+    {
+        public int id;
+        public Vector3 position;
+        public int montant;
+        public FixedString64Bytes nom;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> s) where T : IReaderWriter
+        {
+            s.SerializeValue(ref id); s.SerializeValue(ref position); s.SerializeValue(ref montant); s.SerializeValue(ref nom);
+        }
+
+        public bool Equals(SacReseau o) => id == o.id && position == o.position && montant == o.montant && nom.Equals(o.nom);
+    }
+
     /// Monde de la partie réseau (Docs/reseau.md, étape 2), possédé par l'hôte qui fait foi : horloge (phase, nuit, temps),
     /// Nyxessa, caisse commune, scores et état des joueurs (vote prêt, mort, réapparition), sorcier et bouclier. Les clients
     /// suivent (Partie.SuivreHote, Sorcier.SuivreHote, BouclierNyxessa) ; les événements ponctuels (zones, missiles, pièces
@@ -56,6 +73,9 @@ namespace Deathless.Reseau
         // Donjon : graine du jour (tirée par l'hôte, 0 = aucun) et butins déjà pris (un bit par emplacement).
         public readonly NetworkVariable<int> GraineDonjon = new NetworkVariable<int>();
         public readonly NetworkVariable<int> ButinsPris = new NetworkVariable<int>();
+        // Sacs des joueurs morts au donjon (DonjonJeu.m_Sacs en fait foi côté hôte) : un ajout à la création, un
+        // retrait à la prise ou à la fermeture (Vider, un seul événement pour tous les sacs restants).
+        public NetworkList<SacReseau> Sacs;
         public readonly NetworkVariable<int> PalierBouclier = new NetworkVariable<int>(1);
         public readonly NetworkVariable<float> NyxPv = new NetworkVariable<float>(1f);
         public readonly NetworkVariable<float> NyxPvMax = new NetworkVariable<float>(1f);
@@ -71,7 +91,7 @@ namespace Deathless.Reseau
 
         float m_EnvoiTemps;
 
-        void Awake() { Scores = new NetworkList<ScoreReseau>(); }
+        void Awake() { Scores = new NetworkList<ScoreReseau>(); Sacs = new NetworkList<SacReseau>(); }
 
         public override void OnNetworkSpawn() { Instance = this; }
         public override void OnNetworkDespawn() { if (Instance == this) Instance = null; }
@@ -169,6 +189,27 @@ namespace Deathless.Reseau
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         void DeposerRpc(RpcParams p = default) => DonjonJeu.Instance?.Deposer(Partie.IdJoueur(p.Receive.SenderClientId));
+
+        /// Donjon : un client demande le sac `id` (marché dessus) ; l'hôte vérifie (distance, sac encore là) et l'accorde.
+        public void DemanderSac(int id) => SacRpc(id);
+
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        void SacRpc(int id, RpcParams p = default) => DonjonJeu.Instance?.RamasserSac(id, Partie.IdJoueur(p.Receive.SenderClientId));
+
+        /// Hôte seulement : un sac tombe (mort au donjon), un sac est pris, ou les sacs restants disparaissent à la
+        /// fermeture (un seul événement réseau, `Sacs.Clear`, plutôt qu'un par sac).
+        public void CreerSacReseau(int id, Vector3 position, int montant, string nom)
+        {
+            if (IsServer) Sacs.Add(new SacReseau { id = id, position = position, montant = montant, nom = new FixedString64Bytes(nom ?? "") });
+        }
+
+        public void RetirerSacReseau(int id)
+        {
+            if (!IsServer) return;
+            for (int i = 0; i < Sacs.Count; i++) if (Sacs[i].id == id) { Sacs.RemoveAt(i); return; }
+        }
+
+        public void ViderSacs() { if (IsServer && Sacs.Count > 0) Sacs.Clear(); }
 
         /// Achat d'un palier à la relique par un client : l'hôte décide (caisse commune) et lui répond.
         public void DemanderAchat(byte amelioration) => AchatRpc(amelioration);

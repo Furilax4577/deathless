@@ -41,6 +41,7 @@ namespace Deathless.Jeu
         public DonjonGenerateur generateur;
         [Tooltip("Cadenas du grand coffre (Assets/Art/Cadenas/Prefabs). Inutilisé tant que CadenasActifs est faux.")] public GameObject cadenasGrandCoffre;
         [Tooltip("Cadenas des coffres. Inutilisé tant que CadenasActifs est faux.")] public GameObject cadenasCoffre;
+        [Tooltip("Sac d'un joueur mort au donjon (KayKit, Assets/Art/KayKit/.../decoration/props/sack.fbx).")] public GameObject modeleSac;
 
         /// Cadenas et clé sur les coffres : désactivés (Quentin, 26/09/2026 : plus aucun cadenas, tous les coffres du
         /// donjon s'ouvrent sans clé pour l'instant ; le couvercle bascule directement). Le code est gardé pour plus tard
@@ -86,6 +87,13 @@ namespace Deathless.Jeu
             public CadenasOuverture cadenas;
         }
         readonly Dictionary<GameObject, Coffre> m_Coffres = new Dictionary<GameObject, Coffre>();
+
+        /// Sac d'un joueur mort au donjon (26/09/2026) : voir les méthodes « Sacs des joueurs morts » plus bas.
+        struct Sac { public int id; public Vector3 position; public int montant; public string nom; }
+        readonly List<Sac> m_Sacs = new List<Sac>();
+        readonly Dictionary<int, GameObject> m_VisuelsSacs = new Dictionary<int, GameObject>();
+        readonly Dictionary<int, float> m_DemandeSac = new Dictionary<int, float>();
+        int m_ProchainSacId;
 
         void Awake()
         {
@@ -184,7 +192,7 @@ namespace Deathless.Jeu
         {
             if (!ReseauJeu.Autorite) return;
             if (apres == Phase.Jour) NouveauDonjon();
-            else if (apres == Phase.Crepuscule) { RappelerTous(); RetirerGardiens(); }
+            else if (apres == Phase.Crepuscule) { RappelerTous(); RetirerGardiens(); FermerSacs(); }
         }
 
         /// Autorité : nouvelle graine, construction, gardiens.
@@ -201,6 +209,8 @@ namespace Deathless.Jeu
         {
             if (generateur == null || graine == GraineCourante) return;
             RetirerGardiens();
+            ViderSacsLocal();
+            if (ReseauJeu.Autorite) PartieReseau.Instance?.ViderSacs();
             float t0 = Time.realtimeSinceStartup;
             bool ok = generateur.Generer(graine);
             GraineCourante = graine;
@@ -467,6 +477,123 @@ namespace Deathless.Jeu
 
         void Dire(string texte, float duree) { m_Message = texte; m_MessageJusqua = Time.time + duree; }
 
+        // ================================================================== Sacs des joueurs morts au donjon
+
+        /// Autorité, à la mort d'un joueur au donjon (Update) : un sac tombe à `position` avec tout l'or qu'il portait.
+        /// N'importe quel joueur peut le ramasser tant que le donjon est ouvert (Wiki : deroule.md, Mort au donjon).
+        void CreerSac(EtatJoueur j, Vector3 position)
+        {
+            if (j == null || j.orPorte <= 0) return;
+            int id = ++m_ProchainSacId;
+            int montant = j.orPorte;
+            string nom = j.nom;
+            j.orPorte = 0;
+            m_Sacs.Add(new Sac { id = id, position = position, montant = montant, nom = nom });
+            if (ReseauJeu.EnPartie) PartieReseau.Instance?.CreerSacReseau(id, position, montant, nom);
+            P?.Journal("Donjon : " + nom + " meurt au donjon, un sac tombe (" + montant + " or)");
+        }
+
+        /// Autorité : le sac `id` va au joueur `joueurId`, s'il est encore là et que le joueur est à côté (marché dessus).
+        public void RamasserSac(int id, int joueurId)
+        {
+            if (P == null) return;
+            int idx = m_Sacs.FindIndex(s => s.id == id);
+            if (idx < 0) return;
+            var sac = m_Sacs[idx];
+            var h = P.HerosDe(joueurId);
+            var j = P.Joueur(joueurId);
+            if (h == null || j == null || !h.Vivant || Horizontal(h.transform.position, sac.position) > B.rayonTasOr + 1f) return;
+            m_Sacs.RemoveAt(idx);
+            if (ReseauJeu.EnPartie) PartieReseau.Instance?.RetirerSacReseau(id);
+            j.orPorte += sac.montant;
+            P.Journal("Donjon : " + j.nom + " ramasse le sac de " + sac.nom + " (" + sac.montant + " or ; porté : " + j.orPorte + ")");
+        }
+
+        /// Ce poste demande le sac `id` pour son joueur (marché dessus) ; message local optimiste, comme le dépôt à la caisse.
+        void DemanderSac(int id)
+        {
+            if (m_DemandeSac.TryGetValue(id, out float t) && Time.time < t) return;
+            m_DemandeSac[id] = Time.time + 1f;
+            var h = P != null ? P.HerosLocal : null;
+            int idx = m_Sacs.FindIndex(s => s.id == id);
+            if (h == null || idx < 0) return;
+            var sac = m_Sacs[idx];
+            Dire("Tu ramasses le sac de " + sac.nom + " : " + sac.montant + " or", 5f);
+            if (Partie.ClientReseau) PartieReseau.Instance?.DemanderSac(id);
+            else RamasserSac(id, h.Id);
+        }
+
+        /// Autorité, au crépuscule : les sacs encore au sol sont perdus (un seul événement réseau pour tous).
+        void FermerSacs()
+        {
+            if (m_Sacs.Count == 0) return;
+            int n = m_Sacs.Count, total = 0;
+            foreach (var s in m_Sacs) total += s.montant;
+            m_Sacs.Clear();
+            PartieReseau.Instance?.ViderSacs();
+            P?.Journal("Donjon : le portail se ferme, " + n + " sac(s) perdu(s) (" + total + " or)");
+            if (AuDonjonLocal) Dire(n == 1 ? "Le sac oublié au donjon est perdu" : n + " sacs oubliés au donjon sont perdus", 5f);
+        }
+
+        /// Client : la liste des sacs suit celle de l'hôte (comme Pris suit ButinsPris).
+        void SuivreSacsReseau(Unity.Netcode.NetworkList<SacReseau> distants)
+        {
+            for (int i = m_Sacs.Count - 1; i >= 0; i--)
+            {
+                int id = m_Sacs[i].id;
+                bool present = false;
+                foreach (var s in distants) if (s.id == id) { present = true; break; }
+                if (!present) m_Sacs.RemoveAt(i);
+            }
+            foreach (var s in distants)
+            {
+                if (m_Sacs.Exists(x => x.id == s.id)) continue;
+                m_Sacs.Add(new Sac { id = s.id, position = s.position, montant = s.montant, nom = s.nom.ToString() });
+            }
+        }
+
+        /// Tous les postes : le visuel (posé au sol, recalé sur le NavMesh) suit m_Sacs, comme les coffres suivent Pris.
+        void SuivreSacsVisuels()
+        {
+            foreach (var s in m_Sacs)
+                if (!m_VisuelsSacs.ContainsKey(s.id)) m_VisuelsSacs[s.id] = CreerVisuelSac(s);
+            if (m_VisuelsSacs.Count == 0) return;
+            List<int> disparus = null;
+            foreach (var kv in m_VisuelsSacs)
+                if (!m_Sacs.Exists(x => x.id == kv.Key)) (disparus ??= new List<int>()).Add(kv.Key);
+            if (disparus == null) return;
+            foreach (int id in disparus)
+            {
+                if (m_VisuelsSacs.TryGetValue(id, out var go) && go != null)
+                {
+                    PieceOr.Jouer(go.transform.position + Vector3.up * 0.4f);
+                    AudioBank.Jouer(SonsDuJeu.Or, go.transform.position, 0.6f);
+                    Destroy(go);
+                }
+                m_VisuelsSacs.Remove(id);
+            }
+        }
+
+        GameObject CreerVisuelSac(Sac s)
+        {
+            Vector3 p = s.position;
+            if (NavMesh.SamplePosition(p + Vector3.up * 0.5f, out var hit, 2f, NavMesh.AllAreas)) p = hit.position;
+            GameObject go = modeleSac != null ? Instantiate(modeleSac, p, Quaternion.Euler(0f, Random.Range(0f, 360f), 0f)) : GameObject.CreatePrimitive(PrimitiveType.Cube);
+            go.name = "SacDonjon_" + s.id;
+            go.transform.position = p;
+            foreach (var c in go.GetComponentsInChildren<Collider>()) Destroy(c); // ramassage par distance (comme le tas d'or), pas de physique
+            go.AddComponent<SacDonjon>();
+            return go;
+        }
+
+        /// Retire les visuels de sacs sans toucher au réseau (nouveau donjon, ou nettoyage défensif).
+        void ViderSacsLocal()
+        {
+            foreach (var go in m_VisuelsSacs.Values) if (go != null) Destroy(go);
+            m_VisuelsSacs.Clear();
+            m_Sacs.Clear();
+        }
+
         // ================================================================== Passage des portails (joueur local)
 
         /// Invite du portail (touche Interagir) pour ce héros, ou null : « Entrer dans le donjon » au portail du village
@@ -619,17 +746,23 @@ namespace Deathless.Jeu
                 {
                     if (r.GraineDonjon.Value != 0 && r.GraineDonjon.Value != GraineCourante) Construire(r.GraineDonjon.Value);
                     if (r.GraineDonjon.Value == GraineCourante) Pris = r.ButinsPris.Value;
+                    SuivreSacsReseau(r.Sacs);
                 }
             }
             // Autorité : premier jour déjà commencé avant que ce composant écoute les phases.
             else if (ReseauJeu.Autorite && p.EnCours && p.Etat.phase == Phase.Jour && GraineCourante == 0) NouveauDonjon();
-            if (Pret) SuivreButins();
+            if (Pret) { SuivreButins(); SuivreSacsVisuels(); }
 
-            // Autorité : or porté d'un joueur mort au donjon ; vote « prêt » réévalué au retour de l'équipe.
+            // Autorité : mort au donjon avec de l'or porté → un sac tombe (perdu ailleurs, comme avant) ; vote « prêt »
+            // réévalué au retour de l'équipe.
             if (ReseauJeu.Autorite && p.EnCours)
             {
                 foreach (var j in p.Etat.joueurs)
-                    if (j.mort && j.orPorte > 0) Perdre(j, out _, out _, "mort au donjon");
+                {
+                    if (!j.mort || j.orPorte <= 0) continue;
+                    var hj = p.HerosDe(j.id);
+                    if (AuDonjon(hj)) CreerSac(j, hj.transform.position); else Perdre(j, out _, out _, "mort au donjon");
+                }
                 if (p.Etat.phase == Phase.Jour) p.EvaluerPrets();
             }
 
@@ -647,6 +780,12 @@ namespace Deathless.Jeu
                 var r = generateur.Butins[i];
                 if (r == null || r.butin != TypeButin.TasOr || ButinPris(i)) continue;
                 if (Horizontal(h.transform.position, r.transform.position) < B.rayonTasOr && Mathf.Abs(h.transform.position.y - r.transform.position.y) < 1.5f) DemanderButin(i);
+            }
+            // Sacs des joueurs morts au donjon : on passe dessus aussi (à l'envers : DemanderSac peut en retirer un).
+            for (int i = m_Sacs.Count - 1; i >= 0; i--)
+            {
+                var s = m_Sacs[i];
+                if (Horizontal(h.transform.position, s.position) < B.rayonTasOr && Mathf.Abs(h.transform.position.y - s.position.y) < 1.5f) DemanderSac(s.id);
             }
             // Alerte avant le rappel (le son de l'alerte de la nuit est joué pour tous ; ici, celui de Nyxessa en plus).
             if (AvantRappel >= 0f && !m_AlerteJouee) { m_AlerteJouee = true; AudioBank.Jouer2D(SonsDuJeu.NyxessaAlerte, 0.8f); }

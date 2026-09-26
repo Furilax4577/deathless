@@ -26,6 +26,8 @@ public static class DonjonJeuMenu
         jeu.generateur = g;
         jeu.cadenasGrandCoffre = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Cadenas/Prefabs/Cadenas_Or.prefab");
         jeu.cadenasCoffre = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Cadenas/Prefabs/Cadenas_Acier.prefab");
+        if (jeu.modeleSac == null) jeu.modeleSac = AssetDatabase.LoadAssetAtPath<GameObject>(
+            "Assets/Art/KayKit/KayKit_Medieval_Hexagon_Pack_1.0_FREE/Assets/fbx(unity)/decoration/props/sack.fbx");
         Vider(go);
         EditorUtility.SetDirty(go);
         EditorSceneManager.MarkSceneDirty(go.scene);

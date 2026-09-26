@@ -92,6 +92,7 @@ Le donjon est **régénéré chaque nuit** : chaque jour, le portail mène à un
 - **Ambiance** : pour le joueur au donjon, le lieu est sombre, éclairé par les torches, sans ciel.
 - **Eau** : ralentissement ×0,6, pour les héros comme pour les squelettes {à équilibrer}.
 - **Mort au donjon** {décidé} (26/09/2026) : un **sac** tombe là où le joueur est mort ; il matérialise tout l'or qu'il portait. N'importe quel joueur peut le **ramasser** tant que le donjon est ouvert ; s'il ne l'est pas, il est **perdu à la fermeture** du donjon. Le joueur réapparaît au village.
+  Le sac est un modèle KayKit (`sack.fbx`, pack Hexagon), posé au sol et recalé sur le NavMesh, avec quelques pièces d'or qui scintillent dessus pour qu'on le repère (palette de l'or, jamais vert). Il se ramasse **en marchant dessus**, comme un tas d'or : « Tu ramasses le sac de X : N or » s'affiche à celui qui le prend. Plusieurs morts donnent plusieurs sacs. C'est l'hôte qui décide (création, ramassage, disparition à la fermeture) ; tous les postes voient le sac apparaître et disparaître.
 
 **Or des vagues** {décidé} : chaque squelette tué pendant les vagues rapporte de l'or à la caisse commune (montants dans [Ennemis](ennemis.md)). Cette règle était prévue en attendant le donjon. Elle **reste en place** maintenant que le donjon est arrivé, le temps d'introduire les **ingrédients pour le craft** (décision de Quentin, 26/09/2026) ; elle sera revue à ce moment-là.
 

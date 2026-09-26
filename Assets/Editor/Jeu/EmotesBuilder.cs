@@ -8,7 +8,9 @@ namespace Deathless.EditorTools
 {
     /// Emotes des héros (roue à emotes, EmotesHeros) : sous-machine « Emotes » commune à toutes les classes jouables,
     /// ajoutée à la couche de base de chaque contrôleur par les builders (ControleurPaladin, ControleurMage…), et
-    /// catalogue Assets/Jeu/Resources/Emotes.asset (chope de « Boire un coup », instants mesurés dans Use_Item).
+    /// catalogue Assets/Jeu/Resources/Emotes.asset (chope de « Boire un coup », instants mesurés dans Use_Item_Boire,
+    /// copie retouchée de Use_Item — Assets/Jeu/Animation/Clips/Use_Item_Boire.anim — le bras porte la chope à la
+    /// bouche et la tête se renverse un peu).
     /// Menu 11 : met à jour le catalogue et les contrôleurs existants sur place (GUID gardés, prefabs intacts).
     public static partial class JeuBuilder
     {
@@ -16,6 +18,9 @@ namespace Deathless.EditorTools
         const string CatalogueEmotesPath = "Assets/Jeu/Resources/Emotes.asset";
         const string ChopesDir = "Assets/Art/KayKit/KayKit_Adventurers_2.0_EXTRA/Assets/fbx(unity)/";
         const string SousMachineEmotes = "Emotes";
+        /// Copie retouchée de Use_Item pour « Boire un coup » (26/09/2026) : le bras porte la chope jusqu'à la bouche
+        /// et la tête se renverse un peu. Remplace Use_Item pour le geste joué et pour la mesure de la chope vide.
+        const string ClipBoire = AnimDir + "/Clips/Use_Item_Boire.anim";
         static readonly string[] s_ControleursHeros = { "Paladin_Jeu", "Mage_Jeu", "Rodeur_Jeu", "Assassin_Jeu", "Viking_Jeu" };
 
         /// Pose de la chope dans le socket de la main (à régler en jeu : position en m dans le socket, euler en degrés).
@@ -61,7 +66,7 @@ namespace Deathless.EditorTools
             cat.echelle = hPerso > 0.01f && hChope > 0.001f ? ChopeHauteurRelative * hPerso / hChope : 1f;
             Debug.Log("Emotes : chope de " + hChope.ToString("F3") + " (unités du modèle), personnage de " + hPerso.ToString("F2")
                 + " : échelle " + cat.echelle.ToString("F2"));
-            MesurerBoire(Clip(General, "Use_Item"), out bool gauche, out float vide);
+            MesurerBoire(AssetDatabase.LoadAssetAtPath<AnimationClip>(ClipBoire), out bool gauche, out float vide);
             cat.mainGauche = gauche;
             cat.instantVide = vide;
             EditorUtility.SetDirty(cat);
@@ -91,7 +96,7 @@ namespace Deathless.EditorTools
             var coucheBoucle = BoucleSi(Clip(Simulation, "Lie_Idle"), "Lie_Idle_Loop");
             var coucheRelever = Clip(Simulation, "Lie_StandUp");
             var pompes = BoucleSi(Clip(Simulation, "Push_Ups"), "Push_Ups_Loop");
-            var boire = Clip(General, "Use_Item");
+            var boire = AssetDatabase.LoadAssetAtPath<AnimationClip>(ClipBoire);
             var mort = Clip(General, "Death_B");
 
             // Gestes joués une fois : retour à la locomotion à la fin, ou dès que EmoteNum change (déplacement, coup…).
