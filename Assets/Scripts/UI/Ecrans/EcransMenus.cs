@@ -504,11 +504,23 @@ namespace Deathless.UI.Ecrans
             }
         }
 
+        /// Le navigateur cache tous les écrans non visibles à chaque changement de pile : on n'enregistre les volumes
+        /// (PlayerPrefs.Save, écriture disque) que si les options étaient réellement affichées.
+        public override void Montrer()
+        {
+            base.Montrer();
+            m_Affiche = true;
+        }
+
         public override void Cacher()
         {
             base.Cacher();
+            if (!m_Affiche) return;
+            m_Affiche = false;
             VolumesAudio.Enregistrer();
         }
+
+        bool m_Affiche;
 
         /// La colonne manette suit la dernière manette utilisée (Xbox par défaut au clavier).
         void MajManette()
