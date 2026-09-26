@@ -458,6 +458,8 @@ namespace Deathless.Jeu
         public float tournanteRage = 20f;
         public float tournanteRageMin = 15f;
         public float tournanteIntervalle = 0.3f;
+        [Tooltip("Rage rendue par un tic de la tournante, par ennemi touché (à équilibrer) : à 2, elle se paie à partir de 3 ennemis.")]
+        public float tournanteRageParTic = 2f;
         public float tournanteRayon = 2.3f;
         public float tournanteDegats = 12f;
         public float tournanteVitesse = 0.6f;

@@ -67,7 +67,7 @@ Les deux coups alternent.
 |---|---|
 | Vie | 140 |
 | Hache | 38 dégâts, touche tous les ennemis de l'arc ; +8 rage par ennemi touché |
-| Attaque tournante | 20 rage par seconde |
+| Attaque tournante | 20 rage par seconde ; chaque tic rend +2 rage par ennemi touché {à équilibrer} : elle ne se paie qu’à partir de 3 ennemis (décidé le 26/09/2026) |
 | Rugissement | 25 rage, recharge 12 s |
 | Saut percutant | 35 rage, 45 dégâts, recharge 8 s |
 

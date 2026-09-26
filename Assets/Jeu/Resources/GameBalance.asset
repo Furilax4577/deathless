@@ -364,6 +364,7 @@ MonoBehaviour:
   rageDelaiBaisse: 4
   tournanteRage: 20
   tournanteRageMin: 15
+  tournanteRageParTic: 2
   tournanteIntervalle: 0.3
   tournanteRayon: 2.3
   tournanteDegats: 12

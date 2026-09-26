@@ -142,10 +142,10 @@ namespace Deathless.Jeu
         public override void SurCoupDonne(Sante cible, float reel, bool parBoule, bool continu)
         {
             m_DernierCoup = Time.time;
-            // Les tics de l'attaque tournante (continu) ne rendent pas de rage : sinon, au contact d'un seul ennemi,
-            // elle en regagnerait plus qu'elle n'en coûte et ne s'arrêterait jamais (wiki : classe-viking.md).
-            if (continu) return;
-            m_Rage = Mathf.Min(B.rageMax, m_Rage + B.rageParTouche);
+            // Les tics de l'attaque tournante (continu) rendent une petite rage (tournanteRageParTic par ennemi touché,
+            // toutes les 0,3 s) : seul contre un ennemi elle perd de la rage et s'arrête vite, contre trois ennemis ou
+            // plus elle se paie toute seule (compétence de foule ; Quentin, 26/09/2026, entre-deux après la PR #5).
+            m_Rage = Mathf.Min(B.rageMax, m_Rage + (continu ? B.tournanteRageParTic : B.rageParTouche));
         }
 
         public override void Maj(float dt, Vector3 dir)
