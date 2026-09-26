@@ -3,9 +3,10 @@ using UnityEngine;
 
 namespace Deathless.Jeu
 {
-    /// Rôdeur (arc et carquois) : visée (LT / clic droit maintenu, sans zoom de caméra) ; pendant la visée, bander et tirer
+    /// Rôdeur (arc et carquois) : visée (LT / clic droit maintenu) avec zoom de caméra (épaule serrée) ; bander et tirer
     /// (RT / clic gauche maintenu puis relâché : charge 1,2 s, 10 à 40 dégâts, tir à la tête ×2 et critique) ; lâcher la
-    /// visée pendant qu'il bande repose la flèche sans tirer (wiki : classe-rodeur, Viser puis bander, 26/09/2026) ;
+    /// sont indépendants de la visée : on peut bander sans viser, viser sans tirer, ou les deux (Quentin, 26/09/2026 :
+    /// « le zoom et le tir sont deux actions distinctes, utilisables ou non ensemble ») ;
     /// nuée de flèches (LB), roulade arrière et salve (RB). Flèches non magiques (modèle
     /// KayKit, traînée d'air) ; cercle de charge et éclat à 100 % par l'effet ArcBande. Arc repos / visée, flèche encochée
     /// et blendshape `Draw` pilotés ici (mêmes valeurs que BowStance).
@@ -92,7 +93,7 @@ namespace Deathless.Jeu
         {
             switch (action)
             {
-                case "AttackPrimary": if (m_Visee) Bander(); break;   // RT ne bande que pendant la visée
+                case "AttackPrimary": Bander(); break;   // RT bande, visée ou non
                 case "Skill1": Nuee(); break;
                 case "Skill2": Roulade(); break;
             }
@@ -211,7 +212,7 @@ namespace Deathless.Jeu
             m_RechargeRoulade = Mathf.Max(0f, m_RechargeRoulade - dt);
             AppliquerPose();
             m_Visee = H.Vivant && H.EnJeu && H.Entrees.GardeMaintenue;
-            if (H.CameraEpaule != null) H.CameraEpaule.viseeVoulue = 0f;   // visée sans zoom (décision de Quentin, 26/09/2026)
+            if (H.CameraEpaule != null) H.CameraEpaule.viseeVoulue = m_Visee ? 1f : 0f;   // zoom pendant la visée (Quentin, 26/09/2026)
         }
 
         public override void Maj(float dt, Vector3 dir)
@@ -223,12 +224,11 @@ namespace Deathless.Jeu
                 case Action.Bander:
                     m_Charge = Mathf.Clamp01(m_Depuis / (b.arcCharge * Facteur(1)));
                     if (m_Cercle != null) m_Cercle.Charge = m_Charge;
-                    if (!m_Visee) Reposer();                               // visée lâchée : pas de tir
-                    else if (!H.Entrees.AttaqueMaintenue) Lacher();
+                    if (!H.Entrees.AttaqueMaintenue) Lacher();              // relâcher RT tire, visée ou non
                     break;
                 case Action.Aucune:
-                    // RT déjà maintenu quand la visée commence : il bande aussitôt.
-                    if (m_Visee && H.Entrees.AttaqueMaintenue && Time.time - m_DernierTir >= b.arcIntervalle + 0.15f) Bander();
+                    // RT maintenu après un tir : il rebande dès que l'intervalle est passé.
+                    if (H.Entrees.AttaqueMaintenue && Time.time - m_DernierTir >= b.arcIntervalle + 0.15f) Bander();
                     break;
                 case Action.Lacher:
                     if (m_Depuis >= 0.3f) m_Action = Action.Aucune;

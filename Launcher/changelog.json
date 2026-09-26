@@ -1,6 +1,20 @@
 {
   "versions": [
     {
+      "version": "0.5.5",
+      "date": "2026-09-26",
+      "titre": "Parade parfaite",
+      "notes": [
+        "Rôdeur : le clic droit vise avec un zoom de la caméra, le clic gauche bande et tire ; les deux sont indépendants, avec ou sans visée.",
+        "Paladin : une jauge sous le réticule montre le moment du coup ennemi. Parer dans la fenêtre d'or déclenche une parade parfaite : coup de bouclier qui repousse et étourdit. Fenêtre de parade élargie à 0,35 s.",
+        "Morgrim à la massue : son coup au sol lance une onde lente, impossible à parer ou à esquiver : sautez par-dessus. Ceux qui la prennent sont renversés.",
+        "Nouveau statut Renversé (charge de Morgrim, onde, grosse chute) : martelez Saut pour vous relever plus vite.",
+        "Esquive directionnelle : avant, arrière, gauche ou droite selon le stick, sans se retourner.",
+        "Éclat doré à la parade, souffle de hache à chaque tour de l'attaque tournante, bouclier de Nyxessa plus dense à chaque palier, filet d'énergie du sorcier au palier 4.",
+        "Lobby : le compte à rebours « Tous prêts » s'affiche par-dessus les cartes ; plus rien sous la barre des boutons sur les écrans larges."
+      ]
+    },
+    {
       "version": "0.5.4",
       "date": "2026-09-26",
       "titre": "Le Roi des os",

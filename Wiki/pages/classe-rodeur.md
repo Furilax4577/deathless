@@ -17,8 +17,8 @@ L'archer. Plus il vise juste et bande fort, plus il fait mal : une flèche charg
 
 | | Touche | Action |
 |---|---|---|
-| {icone rodeur_visee} | LT / clic droit maintenu | Viser (sans zoom) |
-| {icone rodeur_tir} | RT / clic gauche | Bander l'arc pendant la visée, relâcher pour tirer |
+| {icone rodeur_visee} | LT / clic droit maintenu | Viser (zoom de la caméra) |
+| {icone rodeur_tir} | RT / clic gauche | Bander l'arc, relâcher pour tirer (avec ou sans visée) |
 | {icone rodeur_nuee_de_fleches} | LB | Nuée de flèches |
 | {icone rodeur_roulade_salve} | RB | Roulade arrière avec salve |
 
@@ -56,7 +56,7 @@ Les gestes joués en jeu pour chaque action, dans l'ordre où ils s'enchaînent.
 - **Compétence 2 : Roulade arrière** {décidé} : le rôdeur roule en arrière pour reprendre ses distances et tire en même temps une **salve de flèches devant lui**. Nombre de flèches, écart et dégâts {à équilibrer}.
 - **Visée récompensée** {décidé} : un tir plus précis rapporte davantage.
   - **Tir à la tête** : une flèche dans la tête est un **coup critique**.
-  - **Viser puis bander** {décidé} : on **maintient le clic droit** (LT) pour viser, **sans zoom** ; le **clic gauche** (RT) bande l'arc, avec une jauge de charge. Plus l'arc est tendu, plus les dégâts sont élevés.
+  - **Viser et tirer, deux actions distinctes** {décidé} (Quentin, 26/09/2026) : on **maintient le clic droit** (LT) pour viser, **avec un zoom** de la caméra (épaule serrée, champ réduit) ; le **clic gauche** (RT) bande l'arc, avec une jauge de charge, **que l'on vise ou non** ; relâcher tire. Les deux se combinent librement. Plus l'arc est tendu, plus la flèche part vite et loin.
   - **Cercle de charge** : pendant qu'on bande l'arc, un cercle apparaît au bout de la flèche et se réduit en accélérant. Il indique la tension.
   - **Coup prêt** : quand le cercle atteint sa taille minimale, il se verrouille sur la pointe et la flèche brille brièvement : le tir est chargé à fond.
   - **Traînée** : en vol, la flèche laisse une traînée d'air fine, sans lueur, non magique.
