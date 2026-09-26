@@ -161,7 +161,10 @@ namespace Deathless.Jeu
                     if (m_Etat == Etat.Sortie || m_Etat == Etat.Incante) Retour();
                     break;
                 case Phase.Jour:
+                    // Mort : il réapparaît chez lui ; blessé mais vivant : il repart aussi de ses PV pleins, sinon il
+                    // gardait ses blessures d'une nuit à l'autre.
                     if (m_Etat == Etat.Mort) Reapparaitre();
+                    else Sante.Remplir();
                     break;
                 case Phase.Terminee:
                     if (Bouclier != null) Bouclier.Baisser();
