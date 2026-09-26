@@ -27,6 +27,7 @@ namespace Deathless.Jeu
             DonneesUI.Enregistrer(null, null, null, this);
             DonneesUI.Personnage = new MenuPersonnage();   // menu du personnage (Tab / Y)
             DonneesUI.Statuts = new StatutsUI();           // statuts du joueur et des ennemis (HUD, menu du personnage)
+            DonneesUI.Relevage = new RelevageUI();         // jauge de relevé du Renversé (héros local)
         }
 
         void Start()
