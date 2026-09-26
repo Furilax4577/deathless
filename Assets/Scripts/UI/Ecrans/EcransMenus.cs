@@ -552,7 +552,8 @@ namespace Deathless.UI.Ecrans
         public override void Reinitialiser()
         {
             if (m_Onglet == 2) VolumesAudio.Reinitialiser();
-            else UIScale.Level = UIScale.DefaultLevel;
+            else if (m_Onglet == 0) UIScale.Level = UIScale.DefaultLevel;
+            // Commandes (1) : table en lecture seule, rien à réinitialiser.
         }
     }
 
