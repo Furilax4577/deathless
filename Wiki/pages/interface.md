@@ -30,3 +30,15 @@
 | Bas, à gauche | Portrait avec l’emblème de la classe, vie, endurance, et la jauge de la classe s’il y en a une (barres sans icône) |
 | Bas, au centre | Attaques et compétences avec leur bouton et leur temps de recharge, potions |
 | Centre | Réticule de visée, et l'action possible devant soi (par exemple « Entrer dans le donjon » près du portail) |
+
+## Roue à emotes {décidé}
+
+- **Ouvrir** : maintenir la croix directionnelle bas (manette) ou B (clavier) {à confirmer}. La roue s'affiche au centre de l'écran, par-dessus le HUD.
+- **Choisir** : pointer une emote avec le stick droit ou la souris, depuis le centre. La caméra ne tourne pas tant que la roue est ouverte.
+- **Lancer** : relâcher la touche lance l'emote pointée. Relâcher au centre annule.
+- **Roue** : huit secteurs autour du centre, chacun avec son icône et son nom. Le secteur pointé passe en or, et son nom s'affiche au centre avec l'invite de la touche. La roue suit la taille de l'interface (×1, ×2, ×3).
+- **Les huit emotes**, dans l'ordre de la roue en partant du haut : Salut, Acclamation, Provocation, S'asseoir, Se reposer, Pompes, Boire un coup, Faire le mort.
+- **Quand** : seulement si le héros est vivant, au sol, sans action en cours, et hors d'un portail ou d'un menu. Pas de dégâts, pas de coût.
+- **Fin** : un déplacement, une attaque, une compétence, l'esquive, le saut, un coup reçu ou la mort interrompent l'emote. Assis, couché ou en faisant le mort, se déplacer fait d'abord se relever, sauf sous un coup ou à la mort.
+- **Arme** : elle reste en main pendant l'emote. Pour « Boire un coup », une chope de bière la remplace le temps du geste : pleine au début, puis vide une fois bue.
+- **Multijoueur** : les autres joueurs voient l'emote et la chope.

@@ -79,6 +79,22 @@ MonoBehaviour:
     image: {fileID: 7388822144124034973, guid: 620acf40a9c0d6040a57f674168025f4, type: 3}
   - id: commun_potion_soin
     image: {fileID: 7388822144124034973, guid: 726cd297b1f252242a52b4e26bb1af57, type: 3}
+  - id: emote_acclamation
+    image: {fileID: 7388822144124034973, guid: 2f5313f3f39b4094584de3006fa945a0, type: 3}
+  - id: emote_assis
+    image: {fileID: 7388822144124034973, guid: c1b667114954ab64ea294af8b10f09ec, type: 3}
+  - id: emote_boire
+    image: {fileID: 7388822144124034973, guid: c72631b5c6100f3428ee2b7a173f9d4e, type: 3}
+  - id: emote_mort
+    image: {fileID: 7388822144124034973, guid: ae4da9ce4be9f994b849551092ca9b17, type: 3}
+  - id: emote_pompes
+    image: {fileID: 7388822144124034973, guid: c994b654aa436f44691413cb9dfbc007, type: 3}
+  - id: emote_provocation
+    image: {fileID: 7388822144124034973, guid: 21bca753b81c6ca49be040e94f6bd3d5, type: 3}
+  - id: emote_repos
+    image: {fileID: 7388822144124034973, guid: 8ba75c84dd778124597f5ad1683648e3, type: 3}
+  - id: emote_salut
+    image: {fileID: 7388822144124034973, guid: 046b05c922aecf8459b33f54b4f85e13, type: 3}
   - id: jauge_mana
     image: {fileID: 7388822144124034973, guid: cd845de949da36c48b8d4d0e76f3eb9c, type: 3}
   - id: jauge_rage

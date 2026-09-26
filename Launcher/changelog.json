@@ -1,6 +1,19 @@
 {
   "versions": [
     {
+      "version": "0.5.2",
+      "date": "2026-09-26",
+      "titre": "Portails, emotes et forge",
+      "notes": [
+        "Portails : touche E pour entrer dans le donjon et pour en revenir ; le portail de retour, en gemmes vertes, est bien visible dans le donjon.",
+        "Coffres du donjon : ouverture gratuite, sans cadenas ni serrure.",
+        "Roue à emotes (B, ou croix bas à la manette) : salut, acclamation, provocation, s'asseoir, se reposer, pompes, boire un coup (chope pleine puis vide), faire le mort.",
+        "Compteur des missiles de Nyxessa en haut de l'écran : le crâne se remplit pendant la recharge, avec le nombre disponible (3 / 5).",
+        "Paladin : la charge bélier court derrière le bouclier et finit par un coup de bouclier.",
+        "Forge : enclume à la bonne taille, feu vivant et vrais coups de marteau sur l'enclume."
+      ]
+    },
+    {
       "version": "0.5.1",
       "date": "2026-09-26",
       "titre": "Retouches du HUD",

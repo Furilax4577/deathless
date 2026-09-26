@@ -34,6 +34,8 @@ namespace Deathless.UI.Ecrans
         public VisualTreeAsset achat;
         [Tooltip("Menu du personnage (Tab / Y) : Assets/UI/Screens/Personnage/Personnage.uxml.")]
         public VisualTreeAsset personnage;
+        [Tooltip("Roue à emotes, calque du HUD : Assets/UI/Screens/RoueEmotes/RoueEmotes.uxml.")]
+        public VisualTreeAsset roueEmotes;
 
         public EcranMenuPrincipal MenuPrincipal { get; private set; }
         public EcranOptions Options { get; private set; }
@@ -46,6 +48,8 @@ namespace Deathless.UI.Ecrans
         public EcranLobby Lobby { get; private set; }
         public EcranAchat Achat { get; private set; }
         public EcranPersonnage Personnage { get; private set; }
+        /// Roue à emotes (calque du HUD, hors de la pile : la carte Gameplay reste active pendant qu'on la tient).
+        public CalqueRoueEmotes RoueEmotes { get; private set; }
 
         readonly List<Ecran> m_Pile = new List<Ecran>();
         readonly List<Ecran> m_Tous = new List<Ecran>();
@@ -81,6 +85,7 @@ namespace Deathless.UI.Ecrans
             Saisie = Creer(new EcranSaisie(), saisie, conteneur);
             Achat = Creer(new EcranAchat(), achat, conteneur);
             Personnage = Creer(new EcranPersonnage(), personnage, conteneur);
+            RoueEmotes = new CalqueRoueEmotes(roueEmotes, conteneur);
 
             UINavigation.SetupScreen(m_Racine);
             UIScale.TagRoot(m_Racine);
@@ -144,6 +149,7 @@ namespace Deathless.UI.Ecrans
             var dt = Time.unscaledDeltaTime;
             foreach (var e in m_Tous)
                 if (e.Racine.resolvedStyle.display != DisplayStyle.None) e.MiseAJour(dt);
+            RoueEmotes?.MiseAJour(Sommet == Hud ? DonneesUI.RoueEmotes : null);
         }
 
         // ------------------------------------------------------------------ Pile

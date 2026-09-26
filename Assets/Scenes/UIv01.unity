@@ -171,6 +171,8 @@ MonoBehaviour:
   nuitMort: 2
   delaiReapparition: 10
   figer: 0
+  missilesMax: 5
+  missileRecharge: 8
 --- !u!4 &414157201
 Transform:
   m_ObjectHideFlags: 0
@@ -242,6 +244,7 @@ MonoBehaviour:
   lobby: {fileID: 9197481963319205126, guid: 4cb2743db4b176044b246d1f903716f0, type: 3}
   achat: {fileID: 9197481963319205126, guid: a6561cbfc46156546a77b9a228ee993c, type: 3}
   personnage: {fileID: 9197481963319205126, guid: 08ddcb95706c2f44d89ef6ecc5262bd4, type: 3}
+  roueEmotes: {fileID: 9197481963319205126, guid: fa43e0a08cc19fc46b6cb6abf2f3f80f, type: 3}
 --- !u!114 &431349937
 MonoBehaviour:
   m_ObjectHideFlags: 0

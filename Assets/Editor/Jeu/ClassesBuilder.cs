@@ -532,6 +532,7 @@ namespace Deathless.EditorTools
         {
             var style = Style("Axe2H");
             var c = Socle("Viking_Jeu", style, out var loco, out var haut, out var vide);
+            AjouterEmotes(c);   // roue à emotes (EmotesBuilder.cs)
             var sm = c.layers[0].stateMachine;
             var chop = Clip(Melee, "Melee_2H_Attack_Chop");
             var slice = Clip(Melee, "Melee_2H_Attack_Slice");
@@ -559,6 +560,7 @@ namespace Deathless.EditorTools
         {
             var style = Style("Staff");
             var c = Socle("Mage_Jeu", style, out var loco, out var haut, out var vide);
+            AjouterEmotes(c);   // roue à emotes (EmotesBuilder.cs)
             // Sur la couche du haut du corps : on marche en lançant.
             Declencheur(c, haut, Etat(haut, "Tir", Clip(Ranged, "Ranged_Magic_Shoot"), new Vector3(450, 0), 1.3f), "Attack1", vide, 0.9f, 0.05f);
             Booleen(c, "Cone");
@@ -572,6 +574,7 @@ namespace Deathless.EditorTools
         {
             var style = Style("BowQuiver");
             var c = Socle("Rodeur_Jeu", style, out var loco, out var haut, out var vide);
+            AjouterEmotes(c);   // roue à emotes (EmotesBuilder.cs)
             var sm = c.layers[0].stateMachine;
             var b = GameBalance.Courant;
             Booleen(c, "Aiming");
@@ -601,6 +604,7 @@ namespace Deathless.EditorTools
         {
             var style = Style("DaggerCrossbow");
             var c = Socle("Assassin_Jeu", style, out var loco, out var haut, out var vide);
+            AjouterEmotes(c);   // roue à emotes (EmotesBuilder.cs)
             var sm = c.layers[0].stateMachine;
             // Marche discrète : seconde locomotion (Sneaking) tant que « Sneaking ».
             Booleen(c, "Sneaking");

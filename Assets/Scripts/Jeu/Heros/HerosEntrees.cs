@@ -19,11 +19,15 @@ namespace Deathless.Jeu
         public bool SprintMaintenu { get; private set; }
         /// Attaque principale maintenue (bander l'arc du rôdeur).
         public bool AttaqueMaintenue { get; private set; }
+        /// Touche de la roue à emotes maintenue (Gameplay/Emote : croix bas, B).
+        public bool EmoteMaintenue { get; private set; }
+        /// Carte Gameplay active (fausse dans les menus) : la roue à emotes se ferme sans rien lancer.
+        public bool CarteJeuActive => m_Jeu != null && m_Jeu.enabled;
         /// Action résolue (nom de l'action de la carte Gameplay : Jump, Dodge, AttackPrimary, Skill1…).
         public event Action<string> Action;
 
         InputChordResolver m_Accords;
-        InputAction m_Move, m_Look, m_Garde, m_Sprint, m_Attaque;
+        InputAction m_Move, m_Look, m_Garde, m_Sprint, m_Attaque, m_Emote;
         InputActionMap m_Jeu;
         static bool s_NavigateurPresent;
 
@@ -37,6 +41,7 @@ namespace Deathless.Jeu
             m_Garde = m_Jeu.FindAction("AttackSecondary", true);
             m_Sprint = m_Jeu.FindAction("Sprint", true);
             m_Attaque = m_Jeu.FindAction("AttackPrimary", true);
+            m_Emote = m_Jeu.FindAction("Emote", false);
             m_Accords = InputChordResolver.ForGameplay(actions);
             m_Accords.Triggered += OnAction;
             s_NavigateurPresent = FindAnyObjectByType<Deathless.UI.Ecrans.NavigateurEcrans>() != null;
@@ -72,6 +77,17 @@ namespace Deathless.Jeu
             return v * b.sensibiliteManette * Time.deltaTime;
         }
 
+        /// Regard brut de cette image, pour pointer un secteur de la roue à emotes : delta de la souris en pixels
+        /// (`souris` vrai) ou position du stick droit (-1 à 1).
+        public Vector2 RegardBrut(out bool souris)
+        {
+            souris = false;
+            if (m_Look == null || !m_Jeu.enabled) return Vector2.zero;
+            var dev = m_Look.activeControl != null ? m_Look.activeControl.device : null;
+            souris = dev is Pointer;
+            return m_Look.ReadValue<Vector2>();
+        }
+
         /// Tests (client automatique du réseau) : déplacement et sprint imposés, à la place de la manette.
         public Vector2? DeplacementTest;
         public bool SprintTest;
@@ -98,13 +114,14 @@ namespace Deathless.Jeu
             if (m_Jeu == null || !m_Jeu.enabled)
             {
                 Deplacement = Vector2.zero;
-                GardeMaintenue = SprintMaintenu = AttaqueMaintenue = false;
+                GardeMaintenue = SprintMaintenu = AttaqueMaintenue = EmoteMaintenue = false;
                 return;
             }
             Deplacement = Vector2.ClampMagnitude(m_Move.ReadValue<Vector2>(), 1f);
             GardeMaintenue = m_Accords.IsHeld(m_Garde);
             SprintMaintenu = m_Accords.IsHeld(m_Sprint);
             AttaqueMaintenue = m_Accords.IsHeld(m_Attaque);
+            EmoteMaintenue = m_Emote != null && m_Accords.IsHeld(m_Emote);
         }
     }
 }

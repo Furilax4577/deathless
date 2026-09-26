@@ -343,6 +343,7 @@ namespace Deathless.UI.EditorTools
             nav.lobby = Uxml("Lobby");
             nav.achat = Uxml("Achat");
             nav.personnage = Uxml("Personnage");
+            nav.roueEmotes = Uxml("RoueEmotes");
             uiGo.AddComponent<Deathless.UI.Dev.DemoV01>();
 
             EditorSceneManager.SaveScene(scene, V01ScenePath);

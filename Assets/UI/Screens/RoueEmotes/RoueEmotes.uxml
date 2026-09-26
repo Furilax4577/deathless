@@ -1,0 +1,19 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:dl="Deathless.UI" editor-extension-mode="False">
+    <Style src="RoueEmotes.uss" />
+    <!-- Roue à emotes : calque du HUD (Deathless.UI.Ecrans.CalqueRoueEmotes). Les huit secteurs (icône, nom) sont créés par
+         le code dans « roue-secteurs », le premier en haut puis dans le sens des aiguilles d'une montre. -->
+    <ui:VisualElement name="roue-emotes" class="roue" picking-mode="Ignore">
+        <ui:VisualElement name="roue-disque" class="roue__disque" picking-mode="Ignore">
+            <dl:FondRoueEmotes name="roue-fond" class="roue__fond" picking-mode="Ignore" />
+            <ui:VisualElement name="roue-secteurs" class="roue__secteurs" picking-mode="Ignore" />
+            <ui:VisualElement name="roue-centre" class="roue__centre" picking-mode="Ignore">
+                <ui:Label text="EMOTES" class="dl-section-label roue__titre" picking-mode="Ignore" />
+                <ui:Label name="roue-nom" text="Annuler" class="roue__nom" picking-mode="Ignore" />
+                <ui:VisualElement class="roue__invite" picking-mode="Ignore">
+                    <dl:InputPrompt action="Gameplay/Emote" class="dl-prompt--small" picking-mode="Ignore" />
+                    <ui:Label name="roue-aide" text="Pointer une emote" class="roue__aide" picking-mode="Ignore" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

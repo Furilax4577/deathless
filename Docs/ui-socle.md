@@ -187,6 +187,7 @@ Clavier : l'Input System lie des **positions physiques** (disposition US). La ta
 | Skill3 | ButtonWithOneModifier `leftShoulder` + `rightShoulder`, ordre libre | `f` | F |
 | Sprint | `leftStickPress` (L3) | `leftShift` | Maj |
 | DrinkPotion | `dpad/up` | `1` (rangée des chiffres) | 1 (icône ; la touche porte « & » en AZERTY) |
+| Emote | `dpad/down` (maintenu) | `b` (maintenu) | B |
 | Ready | `<DualShockGamepad>/touchpadButton` (pavé tactile) et `select` (Vue ; Create sur DualSense, voulu) | `f1` | F1 |
 | Pause | `start` (Menu, Options) | `escape` | Échap |
 
@@ -223,6 +224,7 @@ Schémas : **Gamepad** (`<Gamepad>`) et **KeyboardMouse** (`<Keyboard>` + `<Mous
 - **DualSense : le bouton Create déclare aussi « prêt »**, en plus du pavé tactile (liaison `<Gamepad>/select` gardée volontairement ; l'invite affiche le pavé tactile).
 - Taille de l'interface : ×1 = 0,8, ×2 = 1, ×3 = 1,35.
 - **DeathlessControls est l'asset d'actions du projet** (Project Settings > Input System > Project-wide Actions) dans main ; `Assets/InputSystem_Actions.inputactions` du gabarit a été retiré de main (aucune référence). Le bac à sable garde l'ancien réglage.
+- **Roue à emotes** (26/09/2026, touche {à confirmer} par Quentin) : action `Gameplay/Emote`, type Button, relayée par `InputChordResolver` comme les autres ; le jeu lit l'appui (`Triggered`) pour ouvrir la roue et le maintien (`IsHeld`, `HerosEntrees.EmoteMaintenue`) pour la garder ouverte, puis lance l'emote au relâchement. Liaisons libres vérifiées : croix bas (la croix haut est la potion ; LB, RB et leur accord ne sont pas touchés) et B, libre au clavier (G et C, libérés par le retrait de l'ultime et de l'accroupissement, restent disponibles). R3 est écarté : l'enfoncer tout en pointant avec le même stick est malcommode. Classe générée `DeathlessControls.cs` mise à jour à la main à l'identique du générateur (Unity la régénère à l'import de l'asset).
 
 ## À trancher
 

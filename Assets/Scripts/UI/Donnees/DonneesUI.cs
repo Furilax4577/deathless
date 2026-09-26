@@ -36,6 +36,10 @@ namespace Deathless.UI.Donnees
         public static event Action MenuPersonnageDemande;
         public static void OuvrirMenuPersonnage() => MenuPersonnageDemande?.Invoke();
 
+        /// Roue à emotes du joueur local (posée par le jeu quand le héros local existe ; null sinon). Affichée par le
+        /// navigateur d'écrans en calque du HUD tant qu'elle est ouverte.
+        public static IRoueEmotes RoueEmotes { get; set; }
+
         /// Appelé à chaque enregistrement ou retrait (les écrans se réabonnent aux événements de IEtatPartie).
         public static event Action Changees;
 
@@ -65,6 +69,7 @@ namespace Deathless.UI.Donnees
             Commandes = null;
             ApercuClasse = null;
             Lobby = null;
+            RoueEmotes = null;
             Changees = null;
         }
     }

@@ -127,6 +127,18 @@ La rangée du haut est élargie pour que la barre de Nyxessa garde sa longueur :
 
 Vérifié en Play le 26/09/2026. Captures (`Assets/Screenshots/`) : village en solo, palier 3, 2 missiles sur 4, recharge en cours : `hud_missiles_village_x1.png`, `_x2.png`, `_x3.png` ; missile gagné : `hud_missiles_village_pop.png` ; missile tiré : `hud_missiles_village_tir.png` ; banc (3 sur 5) : `hud_missiles_banc_x1.png`, `_x2.png`, `_x3.png`.
 
+### Roue à emotes : `IRoueEmotes`, `IEmoteRoue` (`Donnees/IRoueEmotes.cs`, 26/09/2026)
+
+Posée par le jeu dans `DonneesUI.RoueEmotes` (le composant `Deathless.Jeu.EmotesHeros` du héros local), lue à chaque image. Le jeu tient tout (ouverture, secteur pointé, lancement) ; l'UI ne fait qu'afficher. Règles : Wiki `interface.md`, « Roue à emotes ».
+
+| Membre | Sens |
+|---|---|
+| `Ouverte` | Touche `Gameplay/Emote` maintenue : la roue est affichée. |
+| `Emotes` | Les emotes (`IEmoteRoue` : `Nom`, `Icone`), la première en haut puis dans le sens horaire. Huit pour l'instant. |
+| `Pointee` | Secteur pointé, ou -1 au centre (relâcher n'y lance rien). |
+
+**Calque** `CalqueRoueEmotes` (`Ecrans/CalqueRoueEmotes.cs`, UXML et USS `Assets/UI/Screens/RoueEmotes/`) : ce n'est pas un écran de la pile, car la carte Gameplay doit rester active tant que la touche est tenue. `NavigateurEcrans` le crée dans le conteneur des écrans (champ `roueEmotes`, à renseigner dans les scènes Village et UIv01 et dans les deux générateurs) et l'affiche seulement quand le HUD est au sommet et que la roue est ouverte. Contenu : anneau de huit secteurs (`Deathless.UI.FondRoueEmotes`, Painter2D, couleurs `--roue-*` reprises des jetons), icône (`emote_<id>`, `ArtSources/Icones/generer_emotes.py`, copiées dans `Assets/UI/Icones/Emotes/`) et nom par secteur ; secteur pointé en or ; au centre, le nom de l'emote pointée (ou « Annuler ») et l'invite de `Gameplay/Emote`. Son de survol à chaque changement de secteur. Roue de 720 px à ×2, 640 px à ×3.
+
 ### Classes : `IClassesJouables`, `IClasseJouable`, `IEtatJoueurClasse` (`Donnees/IClasses.cs`, 25/09/2026)
 
 Cinq classes jouables (Wiki `classes.md`, `commandes.md`). Tout est **facultatif et rétrocompatible** : un jeu qui n'implémente rien de nouveau garde son comportement (choix affiché depuis le catalogue, `LancerSolo()` appelé).

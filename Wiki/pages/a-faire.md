@@ -6,7 +6,7 @@ Travaux prévus ou notés, pas encore faits. Une ligne quitte cette page quand l
 
 - **Revoir le menu des options de jeu.** (noté le 25/09/2026)
 - **Barde** : nouvelle passe pour qu'il soit aussi lisse que les personnages KayKit.
-- **Roue à emotes** : 11 animations s'y prêtent (voir la rubrique Animations), assez pour une roue de 8. Pas de danse, rire ni applaudissement dans les packs.
+- **Roue à emotes** (faite le 26/09/2026, voir [Interface](interface.md)) : reste à confirmer la touche (croix bas, B). « Boire un coup » : le clip `Use_Item` lève la chope devant la poitrine sans la porter à la bouche ; un vrai geste de boire serait à créer. Pas de danse, rire ni applaudissement dans les packs : à créer pour de futures emotes.
 - **Idées de personnages** (classes jouables possibles, noté le 25/09/2026) :
   - une **Bavaroise** qui se bat à coups de chopes de bière ;
   - un **barde** et son luth ;

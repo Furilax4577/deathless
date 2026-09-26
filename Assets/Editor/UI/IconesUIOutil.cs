@@ -38,7 +38,8 @@ namespace Deathless.EditorUI
         }
 
         /// Copie dans Assets/UI/Icones/ les SVG nouveaux ou modifiés de ArtSources/Icones/ (Classes : sauf les variantes
-        /// « classe_x_a.svg » ; Competences : sauf les icônes provisoires du druide « druide_* »). Faite au chargement de
+        /// « classe_x_a.svg » ; Competences : sauf les icônes provisoires du druide « druide_* » ; Emotes : icônes de la
+        /// roue à emotes, generer_emotes.py). Faite au chargement de
         /// l'éditeur et par le menu : un emblème qui arrive dans ArtSources (ex. classe_mecanicien) remplace le repli.
         [InitializeOnLoadMethod]
         static void SynchroniserAuChargement() => EditorApplication.delayCall += () => { if (Synchroniser() > 0) AssetDatabase.Refresh(); };
@@ -47,7 +48,7 @@ namespace Deathless.EditorUI
         {
             var racine = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "ArtSources", "Icones"));
             var copies = 0;
-            foreach (var sous in new[] { "Classes", "Competences" })
+            foreach (var sous in new[] { "Classes", "Competences", "Emotes" })
             {
                 var source = Path.Combine(racine, sous);
                 if (!Directory.Exists(source)) continue;
