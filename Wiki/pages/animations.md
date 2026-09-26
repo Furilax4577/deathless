@@ -1,6 +1,6 @@
 # Animations
 
-Toutes les animations KayKit du projet, jouées sur le mannequin du pack Character Animations 1.1 (rig Medium, celui des héros et des squelettes) ou sur Morgrim, le Golem squelette (rig Large). Quand un clip est fait pour un type d'arme, le mannequin porte l'arme KayKit correspondante, posée par le style d'arme validé quand il existe (voir `Docs/styles-d-armes.md`). 161 animations en 15 familles, 27,9 Mo de vidéos.
+Toutes les animations KayKit du projet, jouées sur le mannequin du pack Character Animations 1.1 (rig Medium, celui des héros et des squelettes) ou sur Morgrim, le Golem squelette (rig Large). Quand un clip est fait pour un type d'arme, le mannequin porte l'arme KayKit correspondante, posée par le style d'arme validé quand il existe (voir `Docs/styles-d-armes.md`). 161 animations en 15 familles, plus 5 ouvertures de coffre, 28,8 Mo de vidéos.
 
 > Chaque carte donne le nom en français, le nom technique du clip (celui du code et des contrôleurs), l'arme portée, et si le clip est une boucle ou se joue une fois (la vidéo marque alors une courte pause au début et à la fin). Caméra fixe de 3/4 ; le sol est quadrillé tous les mètres pour juger des déplacements. Les vidéos se chargent quand elles arrivent à l'écran.
 
@@ -147,27 +147,29 @@ Clips utilisables pour une roue à emotes : 11 candidats, de quoi remplir une ro
 
 ## Outils et métiers (28)
 
-Outils du pack RPG Tools Bits dans `handslot.r`. Pas de canne à pêche dans les packs : les clips de pêche sont joués à mains vides, comme ceux de l'établi et du port d'objet.
+Outils du pack RPG Tools Bits dans `handslot.r`, chacun avec sa prise (position et rotation vérifiées sur plusieurs images de chaque clip) : la hache frappe par le fer, tenue au bout du manche ; la pelle se tient à deux mains (la main gauche sur la ligature, le fer entre de 5 cm en terre puis rejette la terre à gauche) ; la scie va et vient lame en avant, dents en bas, la main gauche tenant la pièce. Valeurs dans `PlancheAccessoires.cs` (`PriseHache`, `PrisePelle`, `PriseScie`).
 
-{video media/animations/Chopping.mp4} **Bûcheronner, coups répétés** | `Chopping` | Arme : hache de bûcheron (RPG Tools axe) | boucle · 1,33 s
-{video media/animations/Chop.mp4} **Bûcheronner, séquence complète** | `Chop` | Arme : hache de bûcheron (RPG Tools axe) | une fois · 4,33 s
-{video media/animations/Digging.mp4} **Creuser, pelletées répétées** | `Digging` | Arme : pelle (RPG Tools shovel) | boucle · 1,40 s
-{video media/animations/Dig.mp4} **Creuser, séquence complète** | `Dig` | Arme : pelle (RPG Tools shovel) | une fois · 4,67 s
+Pêche : **canne provisoire**, générée par script (bâton facetté aux couleurs de l'atlas des outils KayKit, moulinet dont la manivelle suit la main gauche, ligne, bouchon rouge et blanc, flaque et poisson provisoires). Aucune canne dans les packs KayKit FREE ni dans les archives de `Relic/ArtSources` (elle est peut-être dans RPG Tools Bits EXTRA, que nous n'avons pas). Les clips de l'établi et du port d'objet restent joués à mains vides.
+
+{video media/animations/Chopping.mp4} **Bûcheronner, coups répétés** | `Chopping` | Arme : hache de bûcheron (RPG Tools axe dans handslot.r, tenue au bout du manche, tranchant vers l'avant) | boucle · 1,33 s
+{video media/animations/Chop.mp4} **Bûcheronner, séquence complète** | `Chop` | Arme : hache de bûcheron (RPG Tools axe dans handslot.r, tenue au bout du manche, tranchant vers l'avant) | une fois · 4,33 s
+{video media/animations/Digging.mp4} **Creuser, pelletées répétées** | `Digging` | Arme : pelle (RPG Tools shovel à deux mains, handslot.r en haut du manche, fer en bas, main gauche sur le manche) | boucle · 1,40 s
+{video media/animations/Dig.mp4} **Creuser, séquence complète** | `Dig` | Arme : pelle (RPG Tools shovel à deux mains, handslot.r en haut du manche, fer en bas, main gauche sur le manche) | une fois · 4,67 s
 {video media/animations/Hammering.mp4} **Marteler, coups répétés** | `Hammering` | Arme : marteau (RPG Tools hammer) | boucle · 2,67 s
 {video media/animations/Hammer.mp4} **Marteler, séquence complète** | `Hammer` | Arme : marteau (RPG Tools hammer) | une fois · 4,33 s
 {video media/animations/Pickaxing.mp4} **Piocher, coups répétés** | `Pickaxing` | Arme : pioche (RPG Tools pickaxe) | boucle · 3,73 s
 {video media/animations/Pickaxe.mp4} **Piocher, séquence complète** | `Pickaxe` | Arme : pioche (RPG Tools pickaxe) | une fois · 6,03 s
-{video media/animations/Sawing.mp4} **Scier, va-et-vient** | `Sawing` | Arme : scie (RPG Tools saw) | boucle · 0,67 s
-{video media/animations/Saw.mp4} **Scier, séquence complète** | `Saw` | Arme : scie (RPG Tools saw) | une fois · 2,40 s
+{video media/animations/Sawing.mp4} **Scier, va-et-vient** | `Sawing` | Arme : scie (RPG Tools saw, poignée dans handslot.r, lame en avant, dents vers le bas) | boucle · 0,67 s
+{video media/animations/Saw.mp4} **Scier, séquence complète** | `Saw` | Arme : scie (RPG Tools saw, poignée dans handslot.r, lame en avant, dents vers le bas) | une fois · 2,40 s
 {video media/animations/Lockpicking.mp4} **Crocheter une serrure, en continu** | `Lockpicking` | Arme : crochet (RPG Tools screwdriver_A_short) | boucle · 2,33 s
 {video media/animations/Lockpick.mp4} **Crocheter une serrure, séquence complète** | `Lockpick` | Arme : crochet (RPG Tools screwdriver_A_short) | une fois · 3,00 s
-{video media/animations/Fishing_Cast.mp4} **Pêche, lancer la ligne** | `Fishing_Cast` | Arme : aucune | une fois · 1,93 s
-{video media/animations/Fishing_Idle.mp4} **Pêche, attente** | `Fishing_Idle` | Arme : aucune | boucle · 2,33 s
-{video media/animations/Fishing_Bite.mp4} **Pêche, ça mord** | `Fishing_Bite` | Arme : aucune | une fois · 2,23 s
-{video media/animations/Fishing_Tug.mp4} **Pêche, ferrer** | `Fishing_Tug` | Arme : aucune | une fois · 1,90 s
-{video media/animations/Fishing_Reeling.mp4} **Pêche, mouliner** | `Fishing_Reeling` | Arme : aucune | boucle · 1,60 s
-{video media/animations/Fishing_Struggling.mp4} **Pêche, lutter avec la prise** | `Fishing_Struggling` | Arme : aucune | boucle · 3,43 s
-{video media/animations/Fishing_Catch.mp4} **Pêche, sortir la prise** | `Fishing_Catch` | Arme : aucune | une fois · 3,23 s
+{video media/animations/Fishing_Cast.mp4} **Pêche, lancer la ligne** | `Fishing_Cast` | Arme : canne à pêche **provisoire** (générée par script : bâton facetté, moulinet, ligne, bouchon) | une fois · 1,93 s
+{video media/animations/Fishing_Idle.mp4} **Pêche, attente** | `Fishing_Idle` | Arme : canne à pêche **provisoire** (générée par script : bâton facetté, moulinet, ligne, bouchon) | boucle · 2,33 s
+{video media/animations/Fishing_Bite.mp4} **Pêche, ça mord** | `Fishing_Bite` | Arme : canne à pêche **provisoire** (générée par script : bâton facetté, moulinet, ligne, bouchon) | une fois · 2,23 s
+{video media/animations/Fishing_Tug.mp4} **Pêche, ferrer** | `Fishing_Tug` | Arme : canne à pêche **provisoire** (générée par script : bâton facetté, moulinet, ligne, bouchon) | une fois · 1,90 s
+{video media/animations/Fishing_Reeling.mp4} **Pêche, mouliner** | `Fishing_Reeling` | Arme : canne à pêche **provisoire** (générée par script : bâton facetté, moulinet, ligne, bouchon) | boucle · 1,60 s
+{video media/animations/Fishing_Struggling.mp4} **Pêche, lutter avec la prise** | `Fishing_Struggling` | Arme : canne à pêche **provisoire** (générée par script : bâton facetté, moulinet, ligne, bouchon) | boucle · 3,43 s
+{video media/animations/Fishing_Catch.mp4} **Pêche, sortir la prise** | `Fishing_Catch` | Arme : canne à pêche **provisoire** (générée par script : bâton facetté, moulinet, ligne, bouchon) | une fois · 3,23 s
 {video media/animations/Holding_A.mp4} **Tenir un objet d'une main** | `Holding_A` | Arme : aucune | boucle · 1,00 s
 {video media/animations/Holding_B.mp4} **Tenir un objet à deux mains** | `Holding_B` | Arme : aucune | boucle · 1,00 s
 {video media/animations/Holding_C.mp4} **Tenir un objet contre soi** | `Holding_C` | Arme : aucune | boucle · 1,00 s
@@ -177,6 +179,18 @@ Outils du pack RPG Tools Bits dans `handslot.r`. Pas de canne à pêche dans les
 {video media/animations/Work_B.mp4} **Travail à l'établi B, séquence complète** | `Work_B` | Arme : aucune | une fois · 3,10 s
 {video media/animations/Working_C.mp4} **Travail à l'établi C, en continu** | `Working_C` | Arme : aucune | boucle · 2,00 s
 {video media/animations/Work_C.mp4} **Travail à l'établi C, séquence complète** | `Work_C` | Arme : aucune | une fois · 3,67 s
+
+## Coffres (5)
+
+Ouverture du coffre du donjon, rejouée comme dans le jeu (`DonjonJeu.Ouvrir`, `CadenasOuverture`) : la clé entre dans la serrure et tourne, l'anse saute, le cadenas tombe (1 s) ; le couvercle bascule de 105° en 0,45 s à partir de 0,9 s ; puis 2 pièces d'or montent en tournant (4 pour le grand coffre). Ouvrir un coffre ne coûte jamais d'or {décidé} (Quentin, 26/09/2026 ; plus tard, peut-être une clé). Le coffre du donjon porte le cadenas d'acier, le grand coffre le cadenas d'or ; le cadenas de cuivre est une déclinaison préparée, sans usage en jeu.
+
+> Écart avec le jeu : `DonjonJeu.CoffreDe` tourne le cadenas de 180°, ce qui met sa serrure contre le coffre (la clé entre par l'intérieur, invisible). Ici le cadenas est posé serrure vers l'extérieur pour montrer la clé ; à corriger dans le jeu si Quentin valide.
+
+{video media/animations/Coffre_Ouverture.mp4} **Coffre, ouverture sans cadenas** | Objet : `chest` (KayKit Dungeon, `DonjonKit.coffre`) | Cadenas : aucun | une fois · 0,45 s (couvercle 0,45 s, puis les pièces)
+{video media/animations/Coffre_Cadenas_Acier.mp4} **Coffre à cadenas d'acier (celui du donjon)** | Objet : `chest` (KayKit Dungeon, `DonjonKit.coffre`) | Cadenas : acier (`Cadenas_Acier`, clé `Cle_Acier`) | une fois · 1,35 s (cadenas 0,9 s puis couvercle 0,45 s, puis les pièces)
+{video media/animations/Coffre_Cadenas_Cuivre.mp4} **Coffre à cadenas de cuivre (déclinaison préparée)** | Objet : `chest` (KayKit Dungeon, `DonjonKit.coffre`) | Cadenas : cuivre (`Cadenas_Cuivre`, clé `Cle_Cuivre`) | une fois · 1,35 s (cadenas 0,9 s puis couvercle 0,45 s, puis les pièces)
+{video media/animations/GrandCoffre_Cadenas_Or.mp4} **Grand coffre plein d'or, cadenas d'or (celui du donjon)** | Objet : `chest_gold` (KayKit Dungeon, plein d'or, `DonjonKit.grandCoffre`) | Cadenas : or (`Cadenas_Or`, clé `Cle_Or`) | une fois · 1,35 s (cadenas 0,9 s puis couvercle 0,45 s, puis les pièces)
+{video media/animations/GrandCoffre_Ouverture.mp4} **Grand coffre plein d'or, ouverture sans cadenas** | Objet : `chest_gold` (KayKit Dungeon, plein d'or, `DonjonKit.grandCoffre`) | Cadenas : aucun | une fois · 0,45 s (couvercle 0,45 s, puis les pièces)
 
 ## Squelettes, apparitions et références (17)
 
@@ -236,4 +250,4 @@ Aucun mannequin Large dans les packs : ces clips sont joués sur `Skeleton_Golem
 
 ## Produire les vidéos
 
-Bac à sable `sandbox-level` : scène `Assets/Scenes/Animations.unity` (décor et mannequins équipés), outil `Assets/Animations_Planche/Editor/PlancheAnimations.cs`. `Planche.Capturer(debut, nombre)` rejoue chaque clip image par image (30 i/s, pas fixe, en édition, sans Play) dans une scène de prévisualisation isolée, encode en MP4 H.264 480 × 480 muet par `UnityEditor.Media.MediaEncoder` et copie dans `Wiki/media/animations/` ; `Assets/Animations_Planche/Outils~/generer_page.py` réécrit cette page à partir du manifeste `animations.json`.
+Bac à sable `sandbox-level` : scène `Assets/Scenes/Animations.unity` (décor et mannequins équipés), outil `Assets/Animations_Planche/Editor/PlancheAnimations.cs`. `Planche.Capturer(debut, nombre)` rejoue chaque clip image par image (30 i/s, pas fixe, en édition, sans Play) dans une scène de prévisualisation isolée, encode en MP4 H.264 480 × 480 muet par `UnityEditor.Media.MediaEncoder` et copie dans `Wiki/media/animations/` ; `Assets/Animations_Planche/Outils~/generer_page.py` réécrit cette page à partir du manifeste `animations.json`. Prises des outils, canne provisoire et coffres : `Assets/Animations_Planche/Editor/PlancheAccessoires.cs` (`Planche.CapturerCoffres()` pour les coffres ; cadenas et clés copiés de main, `Assets/Art/Cadenas/`).
