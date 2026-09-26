@@ -134,6 +134,77 @@ namespace Deathless.EditorTools
             sm.RemoveStateMachine(ancienne);
         }
 
+        // ================================================================= Portail (arrivée)
+
+        const string SousMachinePortail = "Portail";
+
+        [MenuItem("Deathless/Jeu/12. Portail (arrivée) : contrôleurs des héros")]
+        public static string PortailArrivee()
+        {
+            int n = 0;
+            foreach (var nom in s_ControleursHeros)
+            {
+                var c = AssetDatabase.LoadAssetAtPath<AnimatorController>(AnimDir + "/" + nom + ".controller");
+                if (c == null) { Debug.LogWarning("Portail (arrivée) : contrôleur absent " + nom); continue; }
+                AjouterPortailArrivee(c);
+                n++;
+            }
+            AssetDatabase.SaveAssets();
+            string r = "Portail (arrivée) : " + n + " contrôleurs à jour (Spawn_Air au donjon, Spawn_Ground au village et au rappel)";
+            Debug.Log(r);
+            return r;
+        }
+
+        /// Ajoute (ou refait) la sous-machine « Portail » de la couche de base : déclencheur « PortailArrivee » et
+        /// booléen « PortailAir » (PortailAnim), joués en entier depuis n'importe quel état, retour à la locomotion à la
+        /// fin du clip. Même modèle que AjouterEmotes ; joué par DonjonJeu.Transit via Heros.DeclencherPortail.
+        public static void AjouterPortailArrivee(AnimatorController c)
+        {
+            RetirerPortailArrivee(c);
+            if (!AParametre(c, PortailAnim.ParamDeclencheur)) c.AddParameter(PortailAnim.ParamDeclencheur, AnimatorControllerParameterType.Trigger);
+            if (!AParametre(c, PortailAnim.ParamAir)) c.AddParameter(PortailAnim.ParamAir, AnimatorControllerParameterType.Bool);
+            var sm = c.layers[0].stateMachine;
+            var loco = sm.defaultState;
+            var pm = sm.AddStateMachine(SousMachinePortail, new Vector3(1100, 640));
+
+            // Spawn_Air et Spawn_Ground sont génériques (Rig_Medium_General.fbx), pas Rig_Medium_Special (squelettes) :
+            // Skeletons_Spawn_Ground est un clip distinct, propre aux squelettes.
+            var air = Clip(General, "Spawn_Air");
+            var sol = Clip(General, "Spawn_Ground");
+
+            var sAir = Etat(pm, PortailAnim.EtatAir, air, new Vector3(300, 0));
+            sAir.tag = PortailAnim.TagEtat;
+            var tAir = sm.AddAnyStateTransition(sAir);
+            tAir.hasExitTime = false; tAir.duration = 0.05f; tAir.canTransitionToSelf = false;
+            tAir.AddCondition(AnimatorConditionMode.If, 0, PortailAnim.ParamDeclencheur);
+            tAir.AddCondition(AnimatorConditionMode.If, 0, PortailAnim.ParamAir);
+            Sortie(sAir, loco, 0.95f, 0.15f);
+
+            var sSol = Etat(pm, PortailAnim.EtatSol, sol, new Vector3(300, 80));
+            sSol.tag = PortailAnim.TagEtat;
+            var tSol = sm.AddAnyStateTransition(sSol);
+            tSol.hasExitTime = false; tSol.duration = 0.05f; tSol.canTransitionToSelf = false;
+            tSol.AddCondition(AnimatorConditionMode.If, 0, PortailAnim.ParamDeclencheur);
+            tSol.AddCondition(AnimatorConditionMode.IfNot, 0, PortailAnim.ParamAir);
+            Sortie(sSol, loco, 0.95f, 0.15f);
+
+            EditorUtility.SetDirty(c);
+        }
+
+        /// Retire la sous-machine « Portail » et les transitions « N'importe quel état » vers ses états (paramètres gardés).
+        static void RetirerPortailArrivee(AnimatorController c)
+        {
+            var sm = c.layers[0].stateMachine;
+            AnimatorStateMachine ancienne = null;
+            foreach (var enfant in sm.stateMachines) if (enfant.stateMachine.name == SousMachinePortail) ancienne = enfant.stateMachine;
+            if (ancienne == null) return;
+            var etats = new HashSet<AnimatorState>();
+            foreach (var e in ancienne.states) etats.Add(e.state);
+            foreach (var t in sm.anyStateTransitions)
+                if (t.destinationState == null || etats.Contains(t.destinationState)) sm.RemoveAnyStateTransition(t);
+            sm.RemoveStateMachine(ancienne);
+        }
+
         static bool AParametre(AnimatorController c, string nom) => System.Array.FindIndex(c.parameters, p => p.name == nom) >= 0;
 
         static AnimationClip BoucleSi(AnimationClip source, string nom) => source != null ? Boucle(source, nom) : null;

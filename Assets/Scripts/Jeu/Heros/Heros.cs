@@ -78,6 +78,8 @@ namespace Deathless.Jeu
         static readonly int P_Jump = Animator.StringToHash("Jump");
         static readonly int P_Hit = Animator.StringToHash("Hit");
         static readonly int P_Respawn = Animator.StringToHash("Respawn");
+        static readonly int P_PortailArrivee = Animator.StringToHash(PortailAnim.ParamDeclencheur);
+        static readonly int P_PortailAir = Animator.StringToHash(PortailAnim.ParamAir);
 
         GameBalance B => GameBalance.Courant;
 
@@ -147,6 +149,16 @@ namespace Deathless.Jeu
         }
 
         public void Declencher(string nom) => Declencher(Animator.StringToHash(nom));
+
+        /// Portail (DonjonJeu.Transit) : joue le clip d'arrivée en entier, sans contrôle (EnTransit), par le
+        /// NetworkAnimator comme les emotes — les autres postes voient la même séquence sur la marionnette.
+        /// `air` : vrai (Spawn_Air, au donjon), faux (Spawn_Ground, au village ou au rappel de Nyxessa).
+        public void DeclencherPortail(bool air)
+        {
+            if (animator == null) return;
+            animator.SetBool(P_PortailAir, air);
+            Declencher(P_PortailArrivee);
+        }
 
         /// Annule un déclencheur resté armé (pas encore consommé), ici et chez les autres postes.
         public void AnnulerDeclencheur(int hash)

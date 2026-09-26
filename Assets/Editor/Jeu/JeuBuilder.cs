@@ -301,6 +301,7 @@ namespace Deathless.EditorTools
             Debug.Log("Paladin_Jeu : charge bélier, pieds de " + (style.run != null ? style.run.name : "?") + " à " + courseNaturelle.ToString("F2")
                 + " m/s (échelle du jeu), impact du coup de bouclier à " + impactCoup.ToString("F2") + " s");
             AjouterEmotes(c);   // roue à emotes : sous-machine commune (EmotesBuilder.cs)
+            AjouterPortailArrivee(c);   // arrivée par un portail : sous-machine commune (EmotesBuilder.cs)
             return c;
         }
 

@@ -63,6 +63,12 @@ namespace Deathless.Jeu
         Partie P => Partie.Instance;
         GameBalance B => GameBalance.Courant;
 
+        /// Durées du passage (Wiki : portail.md, {décidé} 26/09/2026). Départ : l'effet en gemmes (PortalTransit.Depart)
+        /// se joue en entier, immobile, avant la téléportation. Arrivée : les gemmes se reforment (PortalTransit.Arrive),
+        /// puis le clip d'arrivée prend le relais dès sa première image (PortailAnim.DureeClip, Heros.DeclencherPortail),
+        /// en entier, avant de rendre le contrôle.
+        const float DureeTransitDepart = 1.1f, DureeTransitArriveeGemmes = 0.5f;
+
         readonly List<Squelette> m_Gardiens = new List<Squelette>();
         readonly float[] m_Demande = new float[DonjonPlan.NbButins];
         int m_PrisVus;
@@ -637,21 +643,25 @@ namespace Deathless.Jeu
         }
 
         /// Passage du héros local (EnTransit : ni déplacement ni action) : le corps part en gemmes vers le centre du
-        /// portail de départ (onde d'entrée, réaction de Nyxessa) ou sur place (rappel), le héros saute à `destination`,
-        /// puis les gemmes jaillissent du portail d'arrivée (onde de sortie) ou de devant lui, et le corps se reforme.
-        /// Diffusé aux autres postes (effets 203 et 204, avec le code du portail).
+        /// portail de départ (onde d'entrée, réaction de Nyxessa) ou sur place (rappel), immobile jusqu'à la fin de
+        /// l'effet ; le héros saute alors à `destination`, les gemmes jaillissent du portail d'arrivée (onde de sortie)
+        /// ou de devant lui et se reforment, puis le clip d'arrivée (Spawn_Air au donjon, Spawn_Ground au village et au
+        /// rappel ; Heros.DeclencherPortail) se joue en entier avant de rendre le contrôle. Diffusé aux autres postes
+        /// (effets 203 et 204, avec le code du portail) ; le clip lui-même passe par le NetworkAnimator, comme les emotes.
         IEnumerator Transit(Heros h, Vector3 destination, bool versDonjon, PortalVisual portailDepart, PortalVisual portailArrivee)
         {
             m_Transit = true;
             h.EnTransit = true;
             var gemmes = EffetsJeu.Gemmes;
             Bounds corps = EffetsJeu.Volume(h.gameObject);
-            if (portailDepart != null) PortalTransit.Depart(corps, portailDepart, gemmes, 1.1f);
-            else PortalTransit.Depart(corps, corps.center + Vector3.up * 0.3f, gemmes, 1.1f);
+            if (portailDepart != null) PortalTransit.Depart(corps, portailDepart, gemmes, DureeTransitDepart);
+            else PortalTransit.Depart(corps, corps.center + Vector3.up * 0.3f, gemmes, DureeTransitDepart);
             h.Classe?.DiffuserTransit(ClasseHeros.EffetTransitDepart, h.transform.position, CodeDe(portailDepart));
             AudioBank.Jouer(SonsDuJeu.PortailPassage, h.transform.position + Vector3.up, 0.9f);
             Visible(h, false);
-            yield return new WaitForSeconds(0.55f);
+            // Immobile jusqu'à la fin de l'effet de départ (Quentin, 26/09/2026) : la téléportation n'arrive qu'une fois
+            // les gemmes parties, jamais avant.
+            yield return new WaitForSeconds(DureeTransitDepart);
             Vector3 avant = h.transform.position;
             h.Teleporter(destination + Vector3.up * 0.05f);
             // Regard à l'arrivée : vers l'intérieur du donjon (orientation de l'arrivée), ou vers Nyxessa au village.
@@ -667,11 +677,15 @@ namespace Deathless.Jeu
             var nt = h.GetComponent<Unity.Netcode.Components.NetworkTransform>();
             if (nt != null && nt.IsSpawned && nt.IsOwner) nt.Teleport(h.transform.position, h.transform.rotation, h.transform.localScale);
             Bounds arrivee = corps; arrivee.center += h.transform.position - avant;
-            if (portailArrivee != null) PortalTransit.Arrive(arrivee, portailArrivee, gemmes, 1.0f);
-            else PortalTransit.Arrive(arrivee, arrivee.center + h.transform.forward * 1.2f, gemmes, 1.0f);
+            if (portailArrivee != null) PortalTransit.Arrive(arrivee, portailArrivee, gemmes, DureeTransitArriveeGemmes);
+            else PortalTransit.Arrive(arrivee, arrivee.center + h.transform.forward * 1.2f, gemmes, DureeTransitArriveeGemmes);
             h.Classe?.DiffuserTransit(ClasseHeros.EffetTransitArrivee, h.transform.position, CodeDe(portailArrivee));
-            yield return new WaitForSeconds(0.75f);
+            yield return new WaitForSeconds(DureeTransitArriveeGemmes);
+            // Corps reformé : le clip d'arrivée prend le relais dès sa première image (Spawn_Air commence en l'air),
+            // joué en entier, toujours sans contrôle.
             Visible(h, true);
+            h.DeclencherPortail(versDonjon);
+            yield return new WaitForSeconds(PortailAnim.DureeClip);
             h.EnTransit = false;
             m_Transit = false;
         }
@@ -682,7 +696,10 @@ namespace Deathless.Jeu
         }
 
         /// Autres postes : passage d'un portail par la marionnette d'un joueur (dissolution vers le portail de départ,
-        /// puis arrivée depuis le portail d'arrivée ; `portail` : code de DonjonJeu, 0 = sur place).
+        /// puis arrivée depuis le portail d'arrivée ; `portail` : code de DonjonJeu, 0 = sur place). Le clip d'arrivée
+        /// (Spawn_Air / Spawn_Ground) n'est pas déclenché ici : il arrive du propriétaire par le NetworkAnimator, comme
+        /// les emotes (Heros.DeclencherPortail) ; on ne fait ici que suivre les gemmes et rendre le corps visible au
+        /// même instant que chez le propriétaire.
         public static void TransitDistant(Heros h, Vector3 position, bool arrivee, int portail = AucunPortail)
         {
             if (h == null) return;
@@ -692,15 +709,15 @@ namespace Deathless.Jeu
             if (!arrivee)
             {
                 AudioBank.Jouer(SonsDuJeu.PortailPassage, position + Vector3.up, 0.9f);
-                if (pv != null) PortalTransit.Depart(corps, pv, gemmes, 1.1f);
-                else PortalTransit.Depart(corps, corps.center + Vector3.up * 0.3f, gemmes, 1.1f);
+                if (pv != null) PortalTransit.Depart(corps, pv, gemmes, DureeTransitDepart);
+                else PortalTransit.Depart(corps, corps.center + Vector3.up * 0.3f, gemmes, DureeTransitDepart);
                 Visible(h, false);
             }
             else
             {
-                if (pv != null) PortalTransit.Arrive(corps, pv, gemmes, 1.0f);
-                else PortalTransit.Arrive(corps, corps.center + h.transform.forward * 1.2f, gemmes, 1.0f);
-                if (Instance != null) Instance.StartCoroutine(Instance.Montrer(h, 0.75f));
+                if (pv != null) PortalTransit.Arrive(corps, pv, gemmes, DureeTransitArriveeGemmes);
+                else PortalTransit.Arrive(corps, corps.center + h.transform.forward * 1.2f, gemmes, DureeTransitArriveeGemmes);
+                if (Instance != null) Instance.StartCoroutine(Instance.Montrer(h, DureeTransitArriveeGemmes));
                 else Visible(h, true);
             }
         }
