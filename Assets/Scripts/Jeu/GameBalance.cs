@@ -108,6 +108,9 @@ namespace Deathless.Jeu
         public float morgrimMassueTourbillonDuree = 1.8f;
         public float morgrimMassueTourbillonPreparation = 1f;
         public float morgrimMassueTourbillonRecharge = 10f;
+        [Tooltip("Tourbillon : léger recul (wiki : ennemis.md), impulsion vers l'extérieur (m/s, amortie) donnée toutes les morgrimMassueTourbillonReculIntervalle s à qui reste dans le rayon.")]
+        public float morgrimMassueTourbillonRecul = 3f;
+        public float morgrimMassueTourbillonReculIntervalle = 0.3f;
         [Tooltip("Charge écrasante (Massue) : fonce en ligne droite et renverse (statut Renversé, 26/09/2026) le premier joueur touché, thème Terre.")]
         public float morgrimMassueChargeDistance = 8f;
         public float morgrimMassueChargeVitesse = 9f;

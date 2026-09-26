@@ -194,6 +194,12 @@ namespace Deathless.Reseau
         [Rpc(SendTo.Owner)]
         void RenverserRpc() => Heros.RenverserLocal();
 
+        /// Hôte : poussée amortie (recul du Tourbillon) ; son propriétaire l'applique à son héros (Heros.PousserLocal).
+        public void Pousser(Vector3 vitesse) => PousserRpc(vitesse);
+
+        [Rpc(SendTo.Owner)]
+        void PousserRpc(Vector3 vitesse) => Heros.PousserLocal(vitesse);
+
         // ----------------------------------------------------------------- Mort et réapparition (l'hôte fait foi)
 
         /// Propriétaire (client) : son héros vient de mourir ; l'hôte compte la mort et fixe le délai.
