@@ -50,6 +50,7 @@ namespace Deathless.Jeu
         public bool PeutAgir => m_EtatCourant == Etat.Libre && Vivant && EnJeu && !EnTransit && (Classe == null || !Classe.Occupe);
         /// Passage d'un portail (donjon) : immobile, invisible, sans action.
         public bool EnTransit { get; set; }
+        bool m_ClasseActive;
 
         CameraEpaule m_Camera;
         EtatJoueur m_Etat;
@@ -529,7 +530,12 @@ namespace Deathless.Jeu
             bool impose = false;
 
             if (Classe != null) Classe.Temps(dt);
-            if (m_EtatCourant == Etat.Libre && Classe != null && enJeu) Classe.Maj(dt, dir);
+            // Portail (EnTransit) ou partie finie : plus d'action de classe, et celle en cours (tournante, cône du mage,
+            // arc bandé…) est coupée une fois, sinon elle continuait (effets, son en boucle) sans que Maj la termine.
+            bool classeActive = m_EtatCourant == Etat.Libre && Classe != null && enJeu && !EnTransit;
+            if (classeActive) Classe.Maj(dt, dir);
+            else if (m_ClasseActive && Classe != null && (!enJeu || EnTransit)) Classe.Interrompre();
+            m_ClasseActive = classeActive;
 
             switch (m_EtatCourant)
             {
