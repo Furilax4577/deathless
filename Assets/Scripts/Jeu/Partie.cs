@@ -59,6 +59,7 @@ namespace Deathless.Jeu
         void Awake()
         {
             Instance = this;
+            Ivresse.Reinitialiser();
             if (reglages != null) GameBalance.Courant = reglages;
             ReseauJeu.Assurer();
         }
