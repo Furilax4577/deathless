@@ -47,8 +47,12 @@ namespace Deathless.Reseau
         public readonly NetworkVariable<int> NuitAtteinte = new NetworkVariable<int>();
         public readonly NetworkVariable<int> OrEquipe = new NetworkVariable<int>();
         public readonly NetworkVariable<int> PalierMissiles = new NetworkVariable<int>(1);
-        // Missiles de Nyxessa : stock seul ; la recharge est extrapolée chez chaque client (Partie.SuivreMissiles).
+        // Missiles de Nyxessa : stock à chaque changement, recharge du prochain 5 fois par seconde (comme TempsPhase) ;
+        // chaque client complète entre deux envois (Partie.SuivreMissiles). Nécessaire depuis la canalisation du bouclier
+        // (27/09/2026, BouclierNyxessa) : elle peut faire bondir la recharge sans faire monter le stock, ce qu'une simple
+        // extrapolation en dt ne peut plus suivre.
         public readonly NetworkVariable<int> StockMissiles = new NetworkVariable<int>();
+        public readonly NetworkVariable<float> MissileRegeneration = new NetworkVariable<float>();
         // Donjon : graine du jour (tirée par l'hôte, 0 = aucun) et butins déjà pris (un bit par emplacement).
         public readonly NetworkVariable<int> GraineDonjon = new NetworkVariable<int>();
         public readonly NetworkVariable<int> ButinsPris = new NetworkVariable<int>();
@@ -104,8 +108,13 @@ namespace Deathless.Reseau
             if (p.nyxessa != null) { Ecrire(NyxPv, p.nyxessa.Pv); Ecrire(NyxPvMax, p.nyxessa.pvMax); }
             Ecrire(NyxDetruite, e.nyxessa.detruite);
             // Temps : 5 fois par seconde (les clients avancent seuls entre deux envois), et à chaque changement de phase.
+            // La recharge du prochain missile de Nyxessa voyage avec, pour la même raison (elle peut bondir).
             m_EnvoiTemps -= Time.deltaTime;
-            if (m_EnvoiTemps <= 0f || e.tempsPhase < TempsPhase.Value) { m_EnvoiTemps = 0.2f; TempsPhase.Value = e.tempsPhase; Duree.Value = e.duree; }
+            if (m_EnvoiTemps <= 0f || e.tempsPhase < TempsPhase.Value)
+            {
+                m_EnvoiTemps = 0.2f; TempsPhase.Value = e.tempsPhase; Duree.Value = e.duree;
+                MissileRegeneration.Value = e.nyxessa.regeneration;
+            }
             var so = Sorcier.Instance;
             if (so != null)
             {
@@ -254,6 +263,12 @@ namespace Deathless.Reseau
 
         [Rpc(SendTo.NotServer)]
         void SorcierInvoqueRpc() => Sorcier.Instance?.InvoquerDistant();
+
+        /// Bouclier frappé : le sorcier joue une courte réaction de coup, vue de tous.
+        public void SorcierTouche() { if (IsServer) SorcierToucheRpc(); }
+
+        [Rpc(SendTo.NotServer)]
+        void SorcierToucheRpc() => Sorcier.Instance?.ToucherDistant();
 
         /// Missile en crâne (Nyxessa ou Nécromancien) : les clients voient le même vol, sans dégâts (l'hôte les applique).
         public void Missile(Vector3 depart, Sante cible, float vitesse, float guidage, bool parNyxessa)

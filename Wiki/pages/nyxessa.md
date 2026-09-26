@@ -74,6 +74,7 @@ Un bouclier cylindrique de gemmes en lévitation protège Nyxessa {effet validé
 
 - **Invocation** : c'est un **villageois sorcier** qui invoque le bouclier, **seulement la nuit**. Au crépuscule, il sort de sa maison et vient se placer près de Nyxessa ; à l'aube, il rentre chez lui.
 - **Posture du sorcier** {décidé} : il incante **dos à Nyxessa**, face à l'extérieur, à l'intérieur du bouclier. Il peut se tourner **de quelques degrés** vers les ennemis qui arrivent devant lui, mais garde toujours Nyx dans le dos. À sa mort, il **tombe en arrière**, sans que rien ne le gêne.
+- **Coup encaissé** {décidé} : quand le bouclier est touché (pour Nyxessa ou pour lui), le sorcier joue une courte réaction de coup, sans perdre sa pose d'incantation plus d'un instant ; la fréquence est limitée pour qu'il ne tremble pas en continu sous une pluie de coups.
 - **Plateforme** {décidé} : la plateforme de pierre de Nyxessa a le **diamètre du bouclier** ; le cylindre de gemmes repose sur son bord.
 - **Valeurs de départ** {à équilibrer} : bouclier de 5,3 m de rayon et 6 m de haut, palier 1 au départ (les suivants s'achètent à la relique) ; incantation de 3 s ; sorcier : 60 points de vie, 3,2 m/s, pivot de ±20°, incantation à 3,6 m du centre de Nyxessa. S'il cède sur un coup, le reste de ce coup passe à Nyxessa. Tant qu'il est levé, il protège aussi le sorcier.
 - **Encaissement** : la quantité de dégâts que le bouclier peut absorber est **améliorable**.
@@ -82,6 +83,7 @@ Un bouclier cylindrique de gemmes en lévitation protège Nyxessa {effet validé
   - **Effet** {décidé} : le bouclier devient **plus puissant encore**. Le sorcier puise dans l'**énergie** de Nyxessa, **jamais dans sa vie** : la relique ne perd rien.
   - **Signe visuel** {décidé} : un lien d'énergie se forme entre le **bâton levé** du sorcier et Nyxessa, tant qu'il canalise.
   - Gain de puissance : {à équilibrer}.
+  - **Recharge des missiles** {décidé} : dès ce palier, une part des dégâts que le bouclier encaisse avance aussi la recharge du **prochain missile** de Nyxessa (un gros coup peut en faire gagner plusieurs d'un coup) ; le taux (dégâts encaissés pour 1 s de recharge) est dans `GameBalance.bouclierDegatsParSecondeRecharge` {à équilibrer}. {{dev: (`BouclierNyxessa.Absorber` → `AvancerRechargeMissiles`)}}
 
 ### À décider
 

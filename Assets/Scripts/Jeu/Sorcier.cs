@@ -10,7 +10,10 @@ namespace Deathless.Jeu
     /// nuit. À l'aube, le bouclier redescend et il rentre chez lui. Bouclier brisé : il meurt (dissolution, son énergie
     /// retourne à Nyxessa : MortAllie) et réapparaît chez lui le jour suivant. Les squelettes peuvent le frapper comme
     /// Nyxessa ; le bouclier levé encaisse ces coups à sa place. Autorité : l'hôte (solo : ce poste). Rien ne tourne tant
-    /// que la partie n'est pas lancée (menu).
+    /// que la partie n'est pas lancée (menu). Réaction de coup (Quentin, retour 0.5.2) : chaque coup encaissé par le
+    /// bouclier (BouclierNyxessa.Touche, qu'il protège Nyxessa ou lui) lui fait jouer une courte réaction (Hit_A, socle
+    /// commun à toutes les classes) sans perdre sa pose d'incantation plus d'un instant ; fréquence limitée
+    /// (sorcierReactionCoupIntervalle), vue de tous (PartieReseau.SorcierTouche).
     [RequireComponent(typeof(NavMeshAgent), typeof(Sante))]
     public class Sorcier : MonoBehaviour
     {
@@ -41,6 +44,10 @@ namespace Deathless.Jeu
         int m_CoucheHaut = -1;
         float m_PoidsHaut;
         bool m_Pret;
+        // Réaction de coup (bouclier frappé, wiki : Bouclier) : le déclencheur "Hit" (Socle : Hit_A) est commun à toutes
+        // les classes ; fréquence limitée ici pour ne pas trembler en continu sous une pluie de coups
+        // (GameBalance.sorcierReactionCoupIntervalle).
+        float m_DernierHit = -99f;
 
         static readonly int P_Speed = Animator.StringToHash("Speed");
         static readonly int P_Grounded = Animator.StringToHash("Grounded");
@@ -73,7 +80,8 @@ namespace Deathless.Jeu
             Sante.equipe = Equipe.Relique;
             Sante.Initialiser(B.sorcierPV);
             Sante.Tue += _ => Mourir("tué");
-            Sante.Touche += (i, r) => { if (r > 0f && animator != null) animator.SetTrigger(P_Hit); };
+            // Coup qui passe malgré tout (bouclier baissé ou brisé sur ce coup) : même réaction que le bouclier frappé.
+            Sante.Touche += (i, r) => { if (r > 0f) JouerReactionCoup(); };
             Agent.speed = B.sorcierVitesse;
             Agent.stoppingDistance = 0.1f;
             Calculer();
@@ -82,7 +90,13 @@ namespace Deathless.Jeu
                 P.PhaseChangee += OnPhase;
                 Sante.absorbeur = i => Bouclier != null ? Bouclier.Absorber(i) : i.montant;
             }
-            if (Bouclier != null) Bouclier.Brise += () => Mourir("bouclier brisé");
+            if (Bouclier != null)
+            {
+                Bouclier.Brise += () => Mourir("bouclier brisé");
+                // Le bouclier encaisse un coup (pour Nyxessa ou pour lui) : il « prend » le coup à sa place (Quentin,
+                // retour 0.5.2), une courte réaction sans perdre sa pose d'incantation plus d'un instant.
+                Bouclier.Touche += _ => JouerReactionCoup();
+            }
             Rentrer(true);
         }
 
@@ -397,6 +411,26 @@ namespace Deathless.Jeu
 
         /// Client : il lève son bâton (invocation) comme chez l'hôte.
         public void InvoquerDistant() { if (animator != null) animator.SetTrigger(P_Invoque); }
+
+        /// Hôte (et poste solo) : le bouclier vient d'encaisser un coup, ou un coup est passé jusqu'à lui. Fréquence
+        /// limitée (sorcierReactionCoupIntervalle) pour ne pas trembler en continu sous une pluie de coups ; vu de tous
+        /// (PartieReseau.SorcierTouche). Réutilise le déclencheur "Hit" commun à toutes les classes (Socle : Hit_A), qui
+        /// revient à Vide puis, tant que le bouclier tient (Cone), repart aussitôt vers l'incantation.
+        void JouerReactionCoup()
+        {
+            if (Partie.ClientReseau || m_Etat == Etat.Mort || m_Etat == Etat.Maison) return;
+            if (Time.time - m_DernierHit < B.sorcierReactionCoupIntervalle) return;
+            m_DernierHit = Time.time;
+            if (animator != null) animator.SetTrigger(P_Hit);
+            if (Deathless.Reseau.ReseauJeu.EnPartie && Deathless.Reseau.ReseauJeu.Autorite) Deathless.Reseau.PartieReseau.Instance?.SorcierTouche();
+        }
+
+        /// Client : réaction de coup du sorcier (bouclier touché), comme chez l'hôte.
+        public void ToucherDistant()
+        {
+            if (animator == null || m_Etat == Etat.Mort || m_Etat == Etat.Maison) return;
+            animator.SetTrigger(P_Hit);
+        }
 
         void ArreterBoucle()
         {
