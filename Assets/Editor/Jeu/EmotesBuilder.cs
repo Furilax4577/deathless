@@ -205,6 +205,80 @@ namespace Deathless.EditorTools
             sm.RemoveStateMachine(ancienne);
         }
 
+        // ================================================================= Renversé (knockdown)
+
+        const string SousMachineRenverse = "Renverse";
+
+        [MenuItem("Deathless/Jeu/13. Renversé (knockdown) : contrôleurs des héros")]
+        public static string Renverse()
+        {
+            int n = 0;
+            foreach (var nom in s_ControleursHeros)
+            {
+                var c = AssetDatabase.LoadAssetAtPath<AnimatorController>(AnimDir + "/" + nom + ".controller");
+                if (c == null) { Debug.LogWarning("Renversé : contrôleur absent " + nom); continue; }
+                AjouterRenverse(c);
+                n++;
+            }
+            AssetDatabase.SaveAssets();
+            string r = "Renversé : " + n + " contrôleurs à jour (Death_A puis Lie_StandUp, rig Medium General)";
+            Debug.Log(r);
+            return r;
+        }
+
+        /// Ajoute (ou refait) la sous-machine « Renverse » de la couche de base : déclencheur « RenverseChute » (Death_A,
+        /// joué en entier depuis n'importe quel état, tenu sur sa dernière image le temps que le code déclenche la
+        /// suite), déclencheur « RenverseRelevage » (Lie_StandUp, vitesse pilotée par le flottant « RenverseVitesse »,
+        /// posé par Heros.RenverserLocal), retour à la locomotion en fin de relevé. Durées réellement tenues par le code
+        /// (Heros.cs, Etat.Renverse : martelage de Saut compris) ; l'Animator ne fait que jouer les deux clips au bon
+        /// moment, comme la sous-machine Portail. Joué par Heros.RenverserLocal via le NetworkAnimator (marionnettes
+        /// comprises, comme les emotes et le portail).
+        public static void AjouterRenverse(AnimatorController c)
+        {
+            RetirerRenverse(c);
+            if (!AParametre(c, "RenverseChute")) c.AddParameter("RenverseChute", AnimatorControllerParameterType.Trigger);
+            if (!AParametre(c, "RenverseRelevage")) c.AddParameter("RenverseRelevage", AnimatorControllerParameterType.Trigger);
+            if (!AParametre(c, "RenverseVitesse")) c.AddParameter("RenverseVitesse", AnimatorControllerParameterType.Float);
+            var sm = c.layers[0].stateMachine;
+            var loco = sm.defaultState;
+            var rm = sm.AddStateMachine(SousMachineRenverse, new Vector3(1100, 800));
+
+            var chute = Clip(General, "Death_A");
+            var releve = Clip(Simulation, "Lie_StandUp");   // comme AjouterEmotes (coucheRelever) : Lie_StandUp est dans Rig_Medium_Simulation.fbx
+
+            var sChute = Etat(rm, "RenverseChute", chute, new Vector3(300, 0));
+            sChute.tag = SousMachineRenverse;
+            var tChute = sm.AddAnyStateTransition(sChute);
+            tChute.hasExitTime = false; tChute.duration = 0.05f; tChute.canTransitionToSelf = false;
+            tChute.AddCondition(AnimatorConditionMode.If, 0, "RenverseChute");
+            // Pas de sortie automatique : Death_A tient sa dernière image (la pose au sol) jusqu'au déclencheur suivant.
+
+            var sRelevage = Etat(rm, "RenverseRelevage", releve, new Vector3(600, 0));
+            sRelevage.tag = SousMachineRenverse;
+            sRelevage.speedParameterActive = true;
+            sRelevage.speedParameter = "RenverseVitesse";
+            var tRelevage = sChute.AddTransition(sRelevage);
+            tRelevage.hasExitTime = false; tRelevage.duration = 0.1f; tRelevage.canTransitionToSelf = false;
+            tRelevage.AddCondition(AnimatorConditionMode.If, 0, "RenverseRelevage");
+            Sortie(sRelevage, loco, 0.92f, 0.2f);
+
+            EditorUtility.SetDirty(c);
+        }
+
+        /// Retire la sous-machine « Renverse » et les transitions « N'importe quel état » vers ses états (paramètres gardés).
+        static void RetirerRenverse(AnimatorController c)
+        {
+            var sm = c.layers[0].stateMachine;
+            AnimatorStateMachine ancienne = null;
+            foreach (var enfant in sm.stateMachines) if (enfant.stateMachine.name == SousMachineRenverse) ancienne = enfant.stateMachine;
+            if (ancienne == null) return;
+            var etats = new HashSet<AnimatorState>();
+            foreach (var e in ancienne.states) etats.Add(e.state);
+            foreach (var t in sm.anyStateTransitions)
+                if (t.destinationState == null || etats.Contains(t.destinationState)) sm.RemoveAnyStateTransition(t);
+            sm.RemoveStateMachine(ancienne);
+        }
+
         static bool AParametre(AnimatorController c, string nom) => System.Array.FindIndex(c.parameters, p => p.name == nom) >= 0;
 
         static AnimationClip BoucleSi(AnimationClip source, string nom) => source != null ? Boucle(source, nom) : null;

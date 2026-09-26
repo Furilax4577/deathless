@@ -10,7 +10,8 @@ bienfait) et la jauge de durée. Formes larges et peu nombreuses : lisibles à 2
 - statut_ralenti : escargot, coquille en terre et sable, corps en os (Terre, Os) ;
 - statut_etourdi : trois étoiles d'or sur leur orbite, comme l'indicateur du jeu (Sacré) ;
 - statut_ivresse : chope de bois cerclée de fer qui penche, mousse et bulles de bière (Terre, Fer de Rage, Os, Critique) ;
-- statut_provoque : veine de colère, quatre crochets rouges (Rage).
+- statut_provoque : veine de colère, quatre crochets rouges (Rage) ;
+- statut_renverse : silhouette couchée en os, flèche de bascule qui retombe (Rage) — Renversé, 26/09/2026.
 
 Relançable : `python generer_statuts.py` (écrit Statuts/*.svg ; `--png dossier` ajoute des aperçus PNG à 128, 48 et
 24 px). Les SVG sont copiés dans Assets/UI/Icones/Statuts/ par Deathless > UI > 6. Table des icônes (IconesUIOutil).
@@ -107,7 +108,26 @@ def statut_provoque():
     return ic
 
 
-STATUTS = [statut_brulure, statut_ralenti, statut_etourdi, statut_ivresse, statut_provoque]
+def statut_renverse():
+    ic = g.Icone("statut_renverse", "statuts", "Renversé", "Statut : tombe à la renverse puis se relève, sans contrôle "
+        "(charge écrasante de Morgrim massue, onde de choc non sautée, grosse chute).")
+    # Silhouette couchée (os) : tête ronde à gauche, corps allongé au sol, bras étendu.
+    ic.gemme(g.regulier((30, 100), 13, 10, 0), MOUSSE)
+    ic.bande([(41, 100), (58, 96), (86, 96), (104, 92)], [18, 16, 14, 12], MOUSSE)
+    ic.bande([(60, 97), (66, 78), (64, 58)], [8, 7, 6], MOUSSE)
+    # Flèche de bascule : arc qui part debout (haut) et retombe à la renverse, pointe vers le bas.
+    arc = []
+    cx, cy, r = 70, 52, 40
+    for i in range(16):
+        a = math.radians(205 - i * 8.5)
+        arc.append((cx + r * math.cos(a), cy + r * math.sin(a)))
+    ic.bande(arc, 10, RAGE)
+    bx, by = arc[-1]
+    ic.gemme([(bx - 13, by - 3), (bx + 3, by - 15), (bx + 9, by + 9)], RAGE, centre=(bx, by - 3))
+    return ic
+
+
+STATUTS = [statut_brulure, statut_ralenti, statut_etourdi, statut_ivresse, statut_provoque, statut_renverse]
 
 
 def main():

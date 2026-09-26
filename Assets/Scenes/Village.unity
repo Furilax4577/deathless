@@ -122670,8 +122670,8 @@ MonoBehaviour:
   prefabGuerrier: {fileID: 5935539975271108772, guid: bdf2373f18a1ee14d84cc4f4798cca58, type: 3}
   prefabGolem: {fileID: 588009689203450280, guid: d56353feaf9a5704a9cd7055cda12bd9, type: 3}
   prefabNecromancien: {fileID: 7874091714259045706, guid: 8a56081ffcce75242a01deb68c3745e6, type: 3}
-  prefabMorgrimMassue: {fileID: 0}
-  prefabMorgrimMartache: {fileID: 0}
+  prefabMorgrimMassue: {fileID: 7642534684864006856, guid: fbf7d73ab263b7d47960bdd5bdb07133, type: 3}
+  prefabMorgrimMartache: {fileID: 5993373600862596061, guid: b70ea074115a7c14e8df90c9ba2b5114, type: 3}
   conteneur: {fileID: 640644663}
 --- !u!114 &1378086237
 MonoBehaviour:

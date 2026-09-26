@@ -339,6 +339,34 @@ namespace Deathless.Jeu
                 animator.SetTrigger(P_Attack);
             }
             AudioBank.Jouer(SonsDuJeu.SquelettePreparation, transform.position, 0.6f, 0.1f);
+            AnnoncerCoup(cible);
+        }
+
+        // ----------------------------------------------------------------- Annonce du coup (jauge de parade)
+
+        Heros m_AnnonceCible;
+        float m_AnnonceImpact = -99f, m_AnnonceDuree;
+
+        /// Autorité : le coup en préparation vise `cible` ; son poste l'affiche (jauge de parade du paladin) et peut juger
+        /// une parade parfaite sur l'instant d'impact prévu (TelegraphieCoups, Docs/reseau.md « Parade parfaite »).
+        void AnnoncerCoup(Heros cible)
+        {
+            m_AnnonceCible = cible;
+            m_AnnonceDuree = m_Stats.preparation;
+            m_AnnonceImpact = Time.time + m_AnnonceDuree;
+            if (cible == null) return;
+            if (!cible.Distant) { TelegraphieCoups.Annoncer(this, cible, m_AnnonceDuree); return; }
+            var r = cible.GetComponent<Deathless.Reseau.HerosReseau>();
+            if (r != null && m_Reseau != null && m_Reseau.IsSpawned) r.AnnoncerCoup(m_Reseau.NetworkObjectId, m_AnnonceDuree);
+        }
+
+        /// Autorité : dernier coup annoncé contre `h` (impact prévu en temps de l'hôte, durée de la préparation). Sert à
+        /// valider la parade parfaite demandée par un client (ParadeParfaite.Demande).
+        public bool CoupAnnonceSur(Heros h, out float impact, out float duree)
+        {
+            impact = m_AnnonceImpact;
+            duree = m_AnnonceDuree;
+            return h != null && m_AnnonceCible == h;
         }
 
         protected virtual void MajPreparation()

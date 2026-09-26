@@ -91,11 +91,16 @@ namespace Deathless.Jeu
         [Header("Morgrim (deux versions du mini-boss, nuit 10 ; wiki : ennemis.md, Morgrim ; décidé 26/09/2026, valeurs à équilibrer)")]
         [Tooltip("Rayon dans lequel un joueur compte comme « proche » pour le choix de compétence.")]
         public float morgrimJoueursProchesRayon = 6f;
-        [Tooltip("Fracas (Massue) : onde de choc au sol qui étourdit, reprend le coup de zone actuel du Golem, thème Terre.")]
+        [Tooltip("Fracas (Massue, 26/09/2026) : anneau qui part de l'impact et s'étend lentement (m/s, jusqu'à ce rayon) ; " +
+            "non parable, non esquivable (roulade) ; seul un saut au bon instant l'évite. Bande de détection au passage du " +
+            "front (largeur, m). Un héros touché au sol : dégâts et statut Renversé. « morgrimMassueFracasRayon » ne sert " +
+            "plus qu'au contact fixe de Nyxessa (elle ne saute pas).")]
         public float morgrimMassueFracasRayon = 3.5f;
         public float morgrimMassueFracasDegats = 45f;
         public float morgrimMassueFracasDegatsNyxessa = 60f;
-        public float morgrimMassueFracasEtourdi = 1.2f;
+        public float morgrimMassueFracasOndeVitesse = 6f;
+        public float morgrimMassueFracasOndeRayonMax = 14f;
+        public float morgrimMassueFracasOndeLargeurBande = 1.4f;
         public float morgrimMassueFracasPreparation = 1.6f;
         [Tooltip("Tourbillon (Massue) : dégâts continus à 360° tant qu'un joueur reste dans le rayon, thème Terre.")]
         public float morgrimMassueTourbillonRayon = 3f;
@@ -103,12 +108,11 @@ namespace Deathless.Jeu
         public float morgrimMassueTourbillonDuree = 1.8f;
         public float morgrimMassueTourbillonPreparation = 1f;
         public float morgrimMassueTourbillonRecharge = 10f;
-        [Tooltip("Charge écrasante (Massue) : fonce en ligne droite et renverse (Étourdi) le premier joueur touché, thème Terre.")]
+        [Tooltip("Charge écrasante (Massue) : fonce en ligne droite et renverse (statut Renversé, 26/09/2026) le premier joueur touché, thème Terre.")]
         public float morgrimMassueChargeDistance = 8f;
         public float morgrimMassueChargeVitesse = 9f;
         public float morgrimMassueChargeLargeur = 1.6f;
         public float morgrimMassueChargeDegats = 50f;
-        public float morgrimMassueChargeEtourdi = 1.5f;
         public float morgrimMassueChargePreparation = 1.4f;
         public float morgrimMassueChargeRecharge = 12f;
         [Tooltip("Fauche (Martache) : coup en cône devant lui, thème Rage.")]
@@ -304,6 +308,31 @@ namespace Deathless.Jeu
         public float gardeBriseeEtourdi = 0.8f;
         public float paradeFenetre = 0.25f;
         public float paradeEtourdi = 1f;
+        [Header("Parade parfaite (jauge de parade, 26/09/2026, à équilibrer)")]
+        [Tooltip("Fenêtre de la parade parfaite (s avant l'impact prévu) : la garde levée dans ces derniers instants donne un coup de bouclier.")]
+        public float paradeParfaiteFenetre = 0.1f;
+        [Tooltip("Tolérance après l'impact prévu (s) : un appui juste après compte encore (écart d'affichage, gigue du réseau).")]
+        public float paradeParfaiteGrace = 0.05f;
+        [Tooltip("Durée montrée par la jauge de parade (s) : le curseur part de la gauche quand il reste cette durée avant l'impact.")]
+        public float paradeJaugeDuree = 0.8f;
+        [Tooltip("Coup de bouclier : bond en avant (m) et sa durée (s).")]
+        public float paradeParfaiteBond = 0.7f;
+        public float paradeParfaiteBondDuree = 0.14f;
+        [Tooltip("Instant du coup de bouclier après l'appui (s) : repousse et étourdissement partent à cet instant.")]
+        public float paradeParfaiteInstant = 0.12f;
+        [Tooltip("Durée totale du coup de bouclier (s) : le paladin ne fait rien d'autre pendant ce temps.")]
+        public float paradeParfaiteDuree = 0.45f;
+        [Tooltip("Cône du coup de bouclier : portée (m) et demi-angle (°) devant le paladin.")]
+        public float paradeParfaitePortee = 2.5f;
+        public float paradeParfaiteDemiAngle = 60f;
+        [Tooltip("Repousse des ennemis touchés par le coup de bouclier (m) et leur étourdissement (s).")]
+        public float paradeParfaiteRepousse = 2f;
+        public float paradeParfaiteEtourdi = 0.8f;
+        [Tooltip("Réseau : l'hôte accepte une parade parfaite d'un client jusqu'à l'impact + le temps d'aller-retour + cette marge (s).")]
+        public float paradeParfaiteToleranceReseau = 0.3f;
+        [Tooltip("Tremblement de la caméra au coup de bouclier : amplitude (m) et durée (s) ; 0 : aucun.")]
+        public float paradeParfaiteSecousse = 0.06f;
+        public float paradeParfaiteSecousseDuree = 0.18f;
         [Header("Charge bélier (précision utilisateur du 25/09/2026)")]
         public float chargeDistance = 7f;
         public float chargeDuree = 0.5f;
@@ -454,6 +483,24 @@ namespace Deathless.Jeu
         public float chuteRalentiDuree = 3f;
         [Tooltip("Part de vitesse retirée par ce Ralenti (0,4 = −40 %).")]
         [Range(0f, 0.9f)] public float chuteRalentiForce = 0.4f;
+        [Tooltip("Deuxième seuil (m, 26/09/2026) : au-delà, le héros est Renversé (Heros.Renverser) avant le Ralenti de chute.")]
+        public float chuteRenverseSeuil = 7f;
+
+        [Header("Renversé (knockdown, 26/09/2026 ; wiki : statuts.md ; valeurs à équilibrer)")]
+        [Tooltip("Chute à la renverse (Death_A, rig Medium General) : durée du clip (s).")]
+        public float renverseChuteDuree = 0.8f;
+        [Tooltip("Temps tenu au sol, pose finale de la chute (s), avant de se relever.")]
+        public float renverseAuSolDuree = 0.4f;
+        [Tooltip("Relevé (Lie_StandUp, rig Medium General) : durée du clip à vitesse 1 (s).")]
+        public float renverseReleveDuree = 2.33f;
+        [Tooltip("Accélération du relevé (facteur de vitesse de l'Animator) : 1,5 ramène Lie_StandUp à environ 1,55 s.")]
+        public float renverseReleveVitesse = 1.5f;
+        [Tooltip("Marteler Saut (accessibilité : maintenir) pendant le Renversé : secondes de temps au sol/relevé retirées par appui.")]
+        public float renverseMartelementReduction = 0.08f;
+        [Tooltip("Intervalle minimal entre deux réductions en mode « maintenir » (s) : même rythme maximal que marteler.")]
+        public float renverseMartelementIntervalleMaintenir = 0.15f;
+        [Tooltip("Plafond de réduction, en part de la durée totale du Renversé (0,5 = jamais plus de moitié moins).")]
+        [Range(0f, 0.9f)] public float renverseMartelementPlafond = 0.5f;
 
         [Header("Mort et réapparition (wiki : deroule)")]
         public float reapparitionBase = 8f;

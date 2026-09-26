@@ -517,3 +517,75 @@
 .statut--petit { width: 36px; height: 36px; margin: 0 2px; border-radius: 8px; background-color: rgba(16, 19, 27, 0.78); }
 .statut--petit .statut__icone { left: 3px; top: 2px; right: 3px; bottom: 6px; }
 .statut--petit .statut__jauge { left: 4px; right: 4px; bottom: 2px; height: 3px; border-radius: 2px; }
+
+/* ---------- Jauge de parade du paladin (HudParade.cs, 26/09/2026) ----------
+   Sous le réticule, seulement quand un coup parable vise le joueur. Impact prévu au bord droit, curseur ivoire qui
+   avance vers lui ; fenêtre de parade en ivoire léger, fenêtre parfaite en or (palette Sacre) ; repère fin de l'appui.
+   Issue : liseré or (parfaite, avec « Parfaite »), ivoire (parade), atténué (bloqué), rouge (touché). Ni vert ni icône. */
+.hud-parade { position: absolute; left: 50%; top: 50%; width: 240px; height: 36px; margin-top: 40px; translate: -50% 0; }
+.hud-parade__piste {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 13px;
+    height: 12px;
+    border-radius: 6px;
+    border-width: 2px;
+    border-color: var(--dl-color-border-strong);
+    background-color: rgba(16, 19, 27, 0.82);
+    overflow: hidden;
+}
+.hud-parade__zone { position: absolute; right: 0; top: 0; bottom: 0; background-color: rgba(244, 236, 216, 0.4); }
+.hud-parade__parfaite { position: absolute; right: 0; top: 0; bottom: 0; background-color: var(--dl-color-gold); }
+.hud-parade__appui { position: absolute; top: 0; bottom: 0; width: 3px; translate: -50% 0; background-color: var(--dl-color-text-muted); }
+.hud-parade__curseur {
+    position: absolute;
+    top: 6px;
+    width: 6px;
+    height: 26px;
+    translate: -50% 0;
+    border-radius: 3px;
+    border-width: 1px;
+    border-color: var(--dl-color-ink);
+    background-color: var(--dl-color-text);
+}
+.hud-parade__texte {
+    position: absolute;
+    left: 50%;
+    top: -30px;
+    translate: -50% 0;
+    display: none;
+    margin: 0;
+    padding: 0 12px;
+    height: 27px;
+    border-radius: 14px;
+    border-width: 1px;
+    border-color: var(--dl-color-gold);
+    background-color: rgba(16, 19, 27, 0.85);
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+    font-size: var(--dl-text-caption);
+    color: var(--dl-color-gold);
+    -unity-text-align: middle-center;
+}
+.hud-parade--parfaite .hud-parade__piste { border-color: var(--dl-color-gold); }
+.hud-parade--parfaite .hud-parade__curseur { background-color: var(--dl-color-gold); }
+.hud-parade--parade .hud-parade__piste { border-color: var(--dl-color-text); }
+.hud-parade--bloque .hud-parade__piste { border-color: var(--dl-color-text-disabled); }
+.hud-parade--touche .hud-parade__piste { border-color: var(--dl-color-life); }
+
+/* ---------- Jauge de relevé du Renversé (HudRelevage.cs, 26/09/2026) ----------
+   Sous le héros local le temps qu'il est à terre (statut Renversé) : invite du bouton Saut à marteler, jauge de
+   martelage en dessous qui se remplit à mesure qu'on approche le plafond (50 % de réduction au plus). Liseré rouge
+   d'affliction (pas de vert). */
+.hud-relevage { position: absolute; align-items: center; width: 60px; }
+.hud-relevage__touche { margin-bottom: 3px; }
+.hud-relevage__jauge {
+    width: 54px;
+    height: 7px;
+    border-radius: 4px;
+    border-width: 1px;
+    border-color: var(--dl-color-border-strong);
+    background-color: var(--dl-color-well);
+    overflow: hidden;
+}
+.hud-relevage__remplissage { height: 100%; width: 0%; background-color: var(--dl-color-life); }

@@ -11,7 +11,9 @@ namespace Deathless.Jeu
     public class Heros : MonoBehaviour
     {
         /// État commun : Classe = une action de la classe est en cours (voir ClasseHeros.Occupe).
-        public enum Etat { Libre, Esquive, Etourdi, Mort, Reapparition }
+        /// Renverse (26/09/2026) : chute à la renverse sans contrôle (Death_A), un instant au sol, puis relevé
+        /// (Lie_StandUp) — voir Renverser ci-dessous et statuts.md.
+        public enum Etat { Libre, Esquive, Etourdi, Renverse, Mort, Reapparition }
 
         public Animator animator;
         public HelmetVisor visiere;
@@ -35,6 +37,14 @@ namespace Deathless.Jeu
         public Etat EtatCourant => m_EtatCourant;
         public bool AuSol => m_AuSol;
         public float Endurance => m_Endurance;
+        /// Renversé (26/09/2026, statuts.md) : sans contrôle, en cours de chute/relevé.
+        public bool EnRenverse => m_EtatCourant == Etat.Renverse;
+        /// Progression du Renversé (0 à 1 : chute, au sol, relevé), martelage compris — pour la jauge de relevé (HUD).
+        public float RenverseProgression => EnRenverse && m_RenverseDureeTotale > 0.01f ? Mathf.Clamp01((m_EtatDepuis + m_RenverseMartelement) / m_RenverseDureeTotale) : 0f;
+        /// Part du plafond de martelage déjà atteinte (0 à 1) : jauge de relevé (HUD).
+        public float RenverseMartelementRatio => EnRenverse && m_RenverseDureeTotale > 0.01f ? Mathf.Clamp01(m_RenverseMartelement / (m_RenverseDureeTotale * B.renverseMartelementPlafond)) : 0f;
+        /// Dernier martelage (Time.time) : la jauge de relevé (HUD) en tire un petit tremblement.
+        public float RenverseDernierMartelement => m_RenverseDerniereReduction;
         public bool EnJeu => Partie != null && Partie.EnCours;
         /// Libre de lancer une action (vivant, en jeu, ni esquive ni étourdissement, pas d'action de classe en cours).
         public bool PeutAgir => m_EtatCourant == Etat.Libre && Vivant && EnJeu && !EnTransit && (Classe == null || !Classe.Occupe);
@@ -51,6 +61,12 @@ namespace Deathless.Jeu
         float m_RechargeEsquive;
         Vector3 m_DirEsquive;
         float m_Etourdi;
+        // Renversé (26/09/2026) : durées effectives de la séquence en cours (chute + au sol + relevé, secondes), martelage
+        // cumulé (retiré du temps écoulé, plafonné), relevé déjà déclenché (le trigger de l'Animator ne part qu'une fois).
+        float m_RenverseChute, m_RenverseAuSol, m_RenverseReleve, m_RenverseDureeTotale;
+        float m_RenverseMartelement, m_RenverseDerniereReduction = -99f;
+        bool m_RenverseReleveDeclenche;
+        Deathless.Reseau.HerosReseau m_ReseauHeros;
         float m_InvulnerableJusque;
         bool m_EsquiveArriere;
         float m_Pas;
@@ -75,9 +91,15 @@ namespace Deathless.Jeu
         static readonly int P_Grounded = Animator.StringToHash("Grounded");
         static readonly int P_Dead = Animator.StringToHash("Dead");
         static readonly int P_Dodge = Animator.StringToHash("Dodge");
+        static readonly int P_DodgeBack = Animator.StringToHash("DodgeBack");
+        /// Direction du clip d'esquive par rapport à la face (0 Avant, 1 Droite, 2 Arrière, 3 Gauche ; DodgeDirection).
+        static readonly int P_DodgeDir = Animator.StringToHash("DodgeDir");
         static readonly int P_Jump = Animator.StringToHash("Jump");
         static readonly int P_Hit = Animator.StringToHash("Hit");
         static readonly int P_Respawn = Animator.StringToHash("Respawn");
+        static readonly int P_RenverseChute = Animator.StringToHash("RenverseChute");
+        static readonly int P_RenverseRelevage = Animator.StringToHash("RenverseRelevage");
+        static readonly int P_RenverseVitesse = Animator.StringToHash("RenverseVitesse");
         static readonly int P_PortailArrivee = Animator.StringToHash(PortailAnim.ParamDeclencheur);
         static readonly int P_PortailAir = Animator.StringToHash(PortailAnim.ParamAir);
 
@@ -97,6 +119,7 @@ namespace Deathless.Jeu
             if (visiere == null) visiere = GetComponentInChildren<HelmetVisor>();
             if (animator != null) m_CoucheHaut = animator.GetLayerIndex("HautDuCorps");
             m_AnimReseau = GetComponent<Unity.Netcode.Components.NetworkAnimator>();
+            m_ReseauHeros = GetComponent<Deathless.Reseau.HerosReseau>();
             if (animator != null) foreach (var t in animator.GetComponentsInChildren<Transform>(true)) if (t.name == "chest") { m_Buste = t; break; }
             if (animator != null && animator.transform != transform) { m_Modele = animator.transform; m_RotModele = m_Modele.localRotation; }
         }
@@ -247,6 +270,51 @@ namespace Deathless.Jeu
             if (Statuts != null) Statuts.Ajouter(TypeStatut.Etourdi, duree, 1f, OrigineStatut.Ennemi);
         }
 
+        /// Renverse le héros (statut Renversé, 26/09/2026 : chute à la renverse, un instant au sol, puis relevé, sans
+        /// contrôle) : charge écrasante de Morgrim massue, onde de choc non sautée, grosse chute. Ne s'applique que sur
+        /// le vrai héros du propriétaire (Heros.Update ne tourne que là) : chez l'hôte, pour le héros d'un autre poste,
+        /// la demande part par HerosReseau (RPC hôte → propriétaire) plutôt que de changer l'état localement ici.
+        public void Renverser()
+        {
+            if (m_ReseauHeros != null && m_ReseauHeros.IsSpawned && !m_ReseauHeros.IsOwner) { m_ReseauHeros.Renverser(); return; }
+            RenverserLocal();
+        }
+
+        /// Propriétaire (ou solo) : déroule vraiment la séquence. Appelé directement (Renverser ci-dessus) ou par
+        /// HerosReseau.RenverserRpc quand l'hôte l'a décidé pour ce joueur.
+        public void RenverserLocal()
+        {
+            if (!Vivant) return;
+            if (Classe != null) Classe.Interrompre();
+            var b = B;
+            m_EtatCourant = Etat.Renverse;
+            m_EtatDepuis = 0f;
+            m_RenverseChute = Mathf.Max(0.1f, b.renverseChuteDuree);
+            m_RenverseAuSol = Mathf.Max(0f, b.renverseAuSolDuree);
+            m_RenverseReleve = b.renverseReleveDuree / Mathf.Max(0.1f, b.renverseReleveVitesse);
+            m_RenverseDureeTotale = m_RenverseChute + m_RenverseAuSol + m_RenverseReleve;
+            m_RenverseMartelement = 0f;
+            m_RenverseDerniereReduction = -99f;
+            m_RenverseReleveDeclenche = false;
+            if (animator != null)
+            {
+                animator.SetFloat(P_RenverseVitesse, b.renverseReleveVitesse);
+                Declencher(P_RenverseChute);
+            }
+            if (Statuts != null) Statuts.Ajouter(TypeStatut.Renverse, m_RenverseDureeTotale, 1f, OrigineStatut.Ennemi);
+        }
+
+        /// Martelage de Saut pendant le Renversé (touche unique, accessibilité « maintenir » : OptionsJoueur) : raccourcit
+        /// le temps au sol puis le relevé, jamais plus de moitié moins (GameBalance.renverseMartelementPlafond).
+        void Marteler()
+        {
+            if (m_EtatCourant != Etat.Renverse) return;
+            var b = B;
+            m_RenverseDerniereReduction = Time.time;
+            float plafond = m_RenverseDureeTotale * b.renverseMartelementPlafond;
+            m_RenverseMartelement = Mathf.Min(m_RenverseMartelement + b.renverseMartelementReduction, plafond);
+        }
+
         /// Applique un coup du héros : dégâts, score, retour à la classe (rage, mana). Renvoie les dégâts réels.
         public float Frapper(Sante s, float degats, bool critique, Vector3 point, Vector3 direction, bool parBoule = false, bool continu = false)
         {
@@ -271,14 +339,19 @@ namespace Deathless.Jeu
         }
 
         /// Esquive déclenchée par une classe (roulade arrière du rôdeur) : même mouvement que l'esquive commune.
-        public void EsquiveImposee(Vector3 direction, bool arriere)
+        /// `arriere` : roulade imposée (toujours Dodge_Backward). Sinon, `clipDir` choisit le clip directionnel
+        /// (0 Avant, 1 Droite, 2 Arrière, 3 Gauche ; DirectionClip) de l'esquive commune.
+        public void EsquiveImposee(Vector3 direction, bool arriere, int clipDir = 0)
         {
             m_DirEsquive = direction.normalized;
             m_EsquiveArriere = arriere;
             m_EtatCourant = Etat.Esquive;
             m_EtatDepuis = 0f;
             Invulnerable(B.esquiveInvulnerable);
-            if (animator != null) Declencher(arriere ? "DodgeBack" : "Dodge");
+            if (animator == null) return;
+            if (arriere) { Declencher(P_DodgeBack); return; }
+            animator.SetInteger(P_DodgeDir, clipDir);
+            Declencher(P_Dodge);
         }
 
         /// Pendant une ruée ou un bond, le héros traverse les squelettes (sauf `sauf`) ; seul le décor l'arrête.
@@ -307,6 +380,8 @@ namespace Deathless.Jeu
             if (action == "CharacterMenu") { if (Partie.EnCours) (Deathless.UI.Donnees.DonneesUI.Personnage as MenuPersonnage)?.Ouvrir(); return; }
             if (!Vivant || !Partie.EnCours) return;
             if (Emotes != null && Emotes.SurAction(action)) return;   // roue à emotes ; toute autre action l'interrompt
+            // Renversé (26/09/2026) : sans contrôle, seul Saut compte (martelage, accélère le relevé) ; il ne fait pas sauter.
+            if (m_EtatCourant == Etat.Renverse) { if (action == "Jump") Marteler(); return; }
             switch (action)
             {
                 case "Interact": PointInteraction.InteragirIci(this); break;
@@ -328,17 +403,31 @@ namespace Deathless.Jeu
             if (Classe != null) Classe.DiffuserCommun(ClasseHeros.EffetSaut);
         }
 
+        /// Esquive directionnelle (décision de Quentin, 26/09/2026) : le héros ne pivote plus avant d'esquiver, il garde
+        /// sa face vers la visée, la caméra ou la cible (`FaceVisee`). Le déplacement suit la direction réelle du stick
+        /// (relative à la caméra, comme avant) ; le clip joué (Dodge_Forward/Right/Backward/Left) dépend de cette
+        /// direction par rapport à la face du héros. Sans direction au stick : esquive arrière (réflexe classique).
         void Esquiver()
         {
             if (m_EtatCourant != Etat.Libre || m_RechargeEsquive > 0f || (Classe != null && !Classe.PeutEsquiver) || !Depenser(B.esquiveCout)) return;
             if (Classe != null) Classe.Interrompre();
+            Vector3 face = Classe != null && Classe.FaceVisee ? FaceDeVisee() : transform.forward;
             Vector3 d = DirectionEntree();
-            Vector3 dir = d.sqrMagnitude > 0.01f ? d.normalized : transform.forward;
-            transform.rotation = Quaternion.LookRotation(dir);
+            Vector3 dir = d.sqrMagnitude > 0.01f ? d.normalized : -face;
             m_RechargeEsquive = B.esquiveRecharge;
-            EsquiveImposee(dir, false);
+            EsquiveImposee(dir, false, DirectionClip(dir, face));
             AudioBank.Jouer(SonsDuJeu.Esquive, transform.position + Vector3.up, 0.8f);
             if (Classe != null) Classe.DiffuserCommun(ClasseHeros.EffetEsquive);
+        }
+
+        /// Quadrant du clip d'esquive par rapport à la face (0 Avant, 1 Droite, 2 Arrière, 3 Gauche), au plus proche.
+        static int DirectionClip(Vector3 dir, Vector3 face)
+        {
+            float a = Vector3.SignedAngle(face, dir, Vector3.up);
+            if (a > -45f && a <= 45f) return 0;     // Avant
+            if (a > 45f && a <= 135f) return 1;      // Droite
+            if (a < -45f && a >= -135f) return 3;    // Gauche
+            return 2;                                // Arrière
         }
 
         Interception Intercepter(InfoDegats info)
@@ -480,6 +569,21 @@ namespace Deathless.Jeu
                     m_Etourdi -= dt;
                     if (m_Etourdi <= 0f) m_EtatCourant = Etat.Libre;
                     break;
+                case Etat.Renverse:
+                {
+                    // Accessibilité « maintenir » (OptionsJoueur) : Saut maintenu martèle tout seul, au même rythme maximal.
+                    if (!Distant && OptionsJoueur.RelevageMaintenir && Entrees.SautMaintenu
+                        && Time.time - m_RenverseDerniereReduction >= b.renverseMartelementIntervalleMaintenir)
+                        Marteler();
+                    float ecoule = m_EtatDepuis + m_RenverseMartelement;
+                    if (!m_RenverseReleveDeclenche && ecoule >= m_RenverseChute + m_RenverseAuSol)
+                    {
+                        m_RenverseReleveDeclenche = true;
+                        if (animator != null) Declencher(P_RenverseRelevage);
+                    }
+                    if (ecoule >= m_RenverseDureeTotale) m_EtatCourant = Etat.Libre;
+                    break;
+                }
             }
 
             // Endurance : régénération après un court délai sans dépense.
@@ -538,7 +642,10 @@ namespace Deathless.Jeu
             if (Partie != null) Partie.Journal("Chute de " + hauteur.ToString("F1") + " m : " + degats.ToString("F0") + " dégâts, ralenti " + b.chuteRalentiDuree.ToString("F1") + " s");
             if (degats > 0f)
                 Sante.Encaisser(new InfoDegats { montant = degats, equipeSource = Equipe.Ennemis, point = transform.position + Vector3.up * 0.2f, direction = Vector3.down });
-            if (Vivant && Statuts != null) Statuts.Ajouter(TypeStatut.Ralenti, b.chuteRalentiDuree, b.chuteRalentiForce, OrigineStatut.Chute);
+            if (!Vivant) return;
+            // Grosse chute (26/09/2026) : renversé avant le Ralenti habituel (statuts.md).
+            if (hauteur > b.chuteRenverseSeuil) RenverserLocal();
+            if (Statuts != null) Statuts.Ajouter(TypeStatut.Ralenti, b.chuteRalentiDuree, b.chuteRalentiForce, OrigineStatut.Chute);
         }
 
         /// Direction du corps en visée : vers la visée, corrigée du décalage de lacet de la pose de tir (l'arme regarde le

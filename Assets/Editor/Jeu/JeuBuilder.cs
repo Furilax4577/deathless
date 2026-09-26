@@ -193,7 +193,10 @@ namespace Deathless.EditorTools
             var c = NouveauControleur(AnimDir + "/Paladin_Jeu.controller");
             foreach (var p in new[] { "Speed" }) c.AddParameter(p, AnimatorControllerParameterType.Float);
             foreach (var p in new[] { "Grounded", "Guard", "Dead" }) c.AddParameter(p, AnimatorControllerParameterType.Bool);
-            foreach (var p in new[] { "Attack1", "Attack2", "Dodge", "Jump", "Charge", "Heal", "BlockHit", "Hit", "Respawn" }) c.AddParameter(p, AnimatorControllerParameterType.Trigger);
+            foreach (var p in new[] { "Attack1", "Attack2", "Dodge", "DodgeBack", "Jump", "Charge", "Heal", "BlockHit", "Hit", "Respawn" }) c.AddParameter(p, AnimatorControllerParameterType.Trigger);
+            // DodgeDir (esquive commune, avec Dodge) : 0 Avant, 1 Droite, 2 Arrière, 3 Gauche (Heros.DirectionClip),
+            // comme le Socle des 4 autres classes (ClassesBuilder.cs) — esquive directionnelle, décision du 26/09/2026.
+            c.AddParameter("DodgeDir", AnimatorControllerParameterType.Int);
             var b = GameBalance.Courant;
 
             var sm = c.layers[0].stateMachine;
@@ -215,10 +218,28 @@ namespace Deathless.EditorTools
             DeNimporte(sm, a2, 0.05f).AddCondition(AnimatorConditionMode.If, 0, "Attack2");
             Sortie(a1, loco, 0.8f); Sortie(a2, loco, 0.75f);
 
-            var dodgeClip = Clip(AnimPack + "Rig_Medium_MovementAdvanced.fbx", "Dodge_Forward");
-            var dodge = Etat(sm, "Esquive", dodgeClip, new Vector3(400, 120), dodgeClip != null ? dodgeClip.length / (b.esquiveDuree + 0.15f) : 1f);
-            DeNimporte(sm, dodge, 0.05f).AddCondition(AnimatorConditionMode.If, 0, "Dodge");
-            Sortie(dodge, loco, 0.9f);
+            const string AvancePaladin = AnimPack + "Rig_Medium_MovementAdvanced.fbx";
+            AnimatorState EtatEsquivePaladin(string etat, string clipNom, Vector3 pos)
+            {
+                var clip = Clip(AvancePaladin, clipNom);
+                return Etat(sm, etat, clip, pos, clip != null ? clip.length / (b.esquiveDuree + 0.15f) : 1f);
+            }
+            void DodgeVersPaladin(AnimatorState etat, int dir)
+            {
+                var t = DeNimporte(sm, etat, 0.05f);
+                t.AddCondition(AnimatorConditionMode.If, 0, "Dodge");
+                t.AddCondition(AnimatorConditionMode.Equals, dir, "DodgeDir");
+                Sortie(etat, loco, 0.9f);
+            }
+            var dodge = EtatEsquivePaladin("Esquive", "Dodge_Forward", new Vector3(250, 100));
+            DodgeVersPaladin(dodge, 0);
+            var dodgeDroite = EtatEsquivePaladin("EsquiveDroite", "Dodge_Right", new Vector3(250, 140));
+            DodgeVersPaladin(dodgeDroite, 1);
+            var dodgeArriere = EtatEsquivePaladin("EsquiveArriere", "Dodge_Backward", new Vector3(250, 180));
+            DodgeVersPaladin(dodgeArriere, 2);
+            DeNimporte(sm, dodgeArriere, 0.05f).AddCondition(AnimatorConditionMode.If, 0, "DodgeBack");
+            var dodgeGauche = EtatEsquivePaladin("EsquiveGauche", "Dodge_Left", new Vector3(250, 220));
+            DodgeVersPaladin(dodgeGauche, 3);
 
             var j1 = Etat(sm, "SautDepart", Clip(AnimPack + "Rig_Medium_MovementBasic.fbx", "Jump_Start"), new Vector3(400, 180), 1.4f);
             var j2 = Etat(sm, "SautAir", Clip(AnimPack + "Rig_Medium_MovementBasic.fbx", "Jump_Idle"), new Vector3(600, 180));
@@ -302,6 +323,7 @@ namespace Deathless.EditorTools
                 + " m/s (échelle du jeu), impact du coup de bouclier à " + impactCoup.ToString("F2") + " s");
             AjouterEmotes(c);   // roue à emotes : sous-machine commune (EmotesBuilder.cs)
             AjouterPortailArrivee(c);   // arrivée par un portail : sous-machine commune (EmotesBuilder.cs)
+            AjouterRenverse(c);   // Renversé, knockdown : sous-machine commune (EmotesBuilder.cs)
             return c;
         }
 

@@ -85,41 +85,30 @@ namespace Deathless.Jeu
             }
         }
 
-        /// Frappe la boule à pointes au sol : onde de choc en cercle qui étourdit (reprend le coup de zone actuel du
-        /// Golem, OndeDeChoc/DirtBurst), + gerbe de gemmes Terre.
+        /// Frappe la boule à pointes au sol : au lieu du coup de zone instantané d'avant, une onde de choc qui part de
+        /// l'impact et s'étend lentement (GameBalance.morgrimMassueFracasOnde*, décidé le 26/09/2026 ; wiki : ennemis.md,
+        /// Morgrim massue) — non parable, non esquivable (roulade), seul un saut au bon instant l'évite ; un héros
+        /// touché au sol au passage du front est renversé, en plus des dégâts (jugement et réseau : OndeChocLente).
+        /// Nyxessa ne saute pas : elle garde un contact fixe autour de l'impact, comme avant.
         void FaireFracas()
         {
             var b = B;
             Vector3 impact = transform.position + transform.forward * (b.morgrimMassueFracasRayon * 0.35f);
             if (EffetsJeu.Terre != null) DirtBurst.Spawn(impact, EffetsJeu.Terre, 1f);
-            var fx = EffetsJeu.Instance;
-            if (fx != null && fx.prefabOndeGolem != null)
-            {
-                var onde = Instantiate(fx.prefabOndeGolem, impact + Vector3.up, Quaternion.LookRotation(transform.forward));
-                var o = onde.GetComponent<OndeDeChoc>();
-                if (o != null) o.Jouer();
-                Destroy(onde, 3f);
-            }
-            Impact(impact + Vector3.up * 0.2f, VfxTheme.Terre, b.morgrimMassueFracasRayon);
             AudioBank.Jouer(SonsDuJeu.GolemCoup, impact, 1f);
-            float r = b.morgrimMassueFracasRayon;
-            if (P == null) return;
-            foreach (var h in P.TousLesHeros)
-            {
-                if (h == null || !h.Vivant) continue;
-                Vector3 d = h.transform.position - impact; d.y = 0f;
-                if (d.magnitude > r) continue;
-                float reel = h.Sante.Encaisser(new InfoDegats
-                {
-                    montant = b.morgrimMassueFracasDegats, equipeSource = Equipe.Ennemis, source = gameObject, parable = true,
-                    point = h.transform.position + Vector3.up, direction = (h.transform.position - transform.position).normalized
-                });
-                if (reel > 0f) h.Statuts?.Ajouter(TypeStatut.Etourdi, b.morgrimMassueFracasEtourdi, 1f, OrigineStatut.Ennemi);
-            }
-            if (P.nyxessa == null) return;
+            Impact(impact + Vector3.up * 0.2f, VfxTheme.Terre, 1.3f);   // gerbe locale au point d'impact (signal immédiat)
+
+            float depart = Deathless.Reseau.EnnemiReseau.TempsReseau();
+            var fx = EffetsJeu.Instance;
+            OndeChocLente.Creer(fx != null ? fx.prefabOndeGolem : null, impact, b.morgrimMassueFracasOndeVitesse,
+                b.morgrimMassueFracasOndeRayonMax, b.morgrimMassueFracasOndeLargeurBande, depart, m_Reseau);
+            if (m_Reseau != null && m_Reseau.IsSpawned && m_Reseau.IsServer)
+                m_Reseau.DiffuserOndeMorgrim(impact, b.morgrimMassueFracasOndeVitesse, b.morgrimMassueFracasOndeRayonMax, b.morgrimMassueFracasOndeLargeurBande);
+
+            if (P == null || P.nyxessa == null) return;
             Vector3 dn = P.nyxessa.transform.position - impact; dn.y = 0f;
             var bo = BouclierNyxessa.Instance;
-            if (dn.magnitude > (bo != null && bo.Leve ? RayonContact + 0.8f : r + 1.3f)) return;
+            if (dn.magnitude > (bo != null && bo.Leve ? RayonContact + 0.8f : b.morgrimMassueFracasRayon + 1.3f)) return;
             m_DernierCoupNyxessa = Time.time;
             P.nyxessa.Encaisser(new InfoDegats { montant = b.morgrimMassueFracasDegatsNyxessa, equipeSource = Equipe.Ennemis, source = gameObject, point = impact + Vector3.up * 1.5f, direction = transform.forward });
         }
@@ -158,8 +147,8 @@ namespace Deathless.Jeu
             }
         }
 
-        /// Fonce en ligne droite sur sa cible et renverse (Étourdi) le premier joueur touché ; pas de parade en cours
-        /// de charge (comme la charge bélier du Paladin), contrairement au reste des coups de Morgrim.
+        /// Fonce en ligne droite sur sa cible et renverse (statut Renversé, 26/09/2026) le premier joueur touché ; pas de
+        /// parade en cours de charge (comme la charge bélier du Paladin), contrairement au reste des coups de Morgrim.
         IEnumerator FaireCharge()
         {
             var b = B;
@@ -184,7 +173,7 @@ namespace Deathless.Jeu
                             montant = b.morgrimMassueChargeDegats, equipeSource = Equipe.Ennemis, source = gameObject,
                             point = h.transform.position + Vector3.up, direction = d.normalized
                         });
-                        if (reel > 0f) h.Statuts?.Ajouter(TypeStatut.Etourdi, b.morgrimMassueChargeEtourdi, 1f, OrigineStatut.Ennemi);
+                        if (reel > 0f) h.Renverser();
                         Impact(h.transform.position, VfxTheme.Terre, 1.2f, transform.forward, 90f);
                         touche = true;
                         break;

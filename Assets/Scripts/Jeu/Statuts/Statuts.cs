@@ -5,7 +5,9 @@ using UnityEngine;
 namespace Deathless.Jeu
 {
     /// Types de statut (wiki : statuts.md). La valeur sert aussi d'identifiant réseau (octet) : ne pas renuméroter.
-    public enum TypeStatut : byte { Aucun = 0, Brulure = 1, Ralenti = 2, Etourdi = 3, Ivresse = 4, Provoque = 5 }
+    /// Renverse (26/09/2026) : chute à la renverse, sans contrôle (Heros.Etat.Renverse porte le déroulé — chute, au sol,
+    /// relevé — ; ce statut n'est que l'affichage réseau/HUD, comme Etourdi).
+    public enum TypeStatut : byte { Aucun = 0, Brulure = 1, Ralenti = 2, Etourdi = 3, Ivresse = 4, Provoque = 5, Renverse = 6 }
 
     /// D'où vient un statut (infobulle du menu du personnage : « Source »).
     public enum OrigineStatut : byte { Inconnue = 0, Joueur = 1, Ennemi = 2, Chute = 3, Taverne = 4, Eau = 5 }

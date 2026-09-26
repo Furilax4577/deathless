@@ -103,7 +103,7 @@ namespace Deathless.Reseau
                 switch (type)
                 {
                     case TypeStatut.Ralenti: intensite = Mathf.Clamp(intensite, 0f, 0.9f); break;
-                    case TypeStatut.Etourdi: case TypeStatut.Ivresse: intensite = 1f; break;
+                    case TypeStatut.Etourdi: case TypeStatut.Ivresse: case TypeStatut.Renverse: intensite = 1f; break;
                     default: return s;
                 }
                 return new Statut { type = type, duree = duree, intensite = intensite, origine = origine, sourceId = 0 };

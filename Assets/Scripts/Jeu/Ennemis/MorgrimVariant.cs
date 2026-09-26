@@ -55,6 +55,11 @@ namespace Deathless.Jeu
             else JouerImpact(point, theme, rayon, transform.forward, angleDeg);
         }
 
+        /// Client (marionnette) : reçoit l'onde de choc lente du Fracas (Morgrim massue, 26/09/2026) et rejoue la même
+        /// onde chez lui (visuel partout ; jugement des dégâts en plus sur son propre héros, OndeChocLente.Creer).
+        public void RecevoirOndeDistante(Vector3 centre, float vitesse, float rayonMax, float largeurBande, float depart)
+            => OndeChocLente.Creer(EffetsJeu.Instance != null ? EffetsJeu.Instance.prefabOndeGolem : null, centre, vitesse, rayonMax, largeurBande, depart, m_Reseau);
+
         void JouerTelegraphie(Vector3 point, VfxTheme theme, float rayon, float duree, float angleDeg)
         {
             var mat = EffetsJeu.GemmesMorgrim;

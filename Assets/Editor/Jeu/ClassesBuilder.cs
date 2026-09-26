@@ -453,14 +453,18 @@ namespace Deathless.EditorTools
         const string Basique = AnimPack + "Rig_Medium_MovementBasic.fbx";
         const string Avance = AnimPack + "Rig_Medium_MovementAdvanced.fbx";
 
-        /// Socle commun : locomotion du style, saut, esquive (avant, arrière), mort et réapparition ; couche « haut du
-        /// corps » (masque chest) avec l'état vide et le coup reçu. Renvoie (contrôleur, locomotion, couche haute, vide).
+        /// Socle commun : locomotion du style, saut, esquive directionnelle (avant, droite, arrière, gauche : décision
+        /// de Quentin du 26/09/2026, clip choisi selon la direction du stick par rapport à la face, sans pivot), mort et
+        /// réapparition ; couche « haut du corps » (masque chest) avec l'état vide et le coup reçu. Renvoie (contrôleur,
+        /// locomotion, couche haute, vide).
         static AnimatorController Socle(string nom, WeaponStyle style, out AnimatorState loco, out AnimatorStateMachine haut, out AnimatorState vide)
         {
             var c = NouveauControleur(AnimDir + "/" + nom + ".controller");
             c.AddParameter("Speed", AnimatorControllerParameterType.Float);
             foreach (var p in new[] { "Grounded", "Dead" }) c.AddParameter(p, AnimatorControllerParameterType.Bool);
             foreach (var p in new[] { "Jump", "Dodge", "DodgeBack", "Hit", "Respawn" }) c.AddParameter(p, AnimatorControllerParameterType.Trigger);
+            // DodgeDir (esquive commune, avec Dodge) : 0 Avant, 1 Droite, 2 Arrière, 3 Gauche (Heros.DirectionClip).
+            c.AddParameter("DodgeDir", AnimatorControllerParameterType.Int);
             var sm = c.layers[0].stateMachine;
             loco = c.CreateBlendTreeInController("Locomotion", out BlendTree arbre, 0);
             arbre.blendParameter = "Speed";
@@ -471,16 +475,31 @@ namespace Deathless.EditorTools
             arbre.AddChild(style.run, 1.6f);
             var enfants = arbre.children; enfants[3].timeScale = 1.35f; arbre.children = enfants;
             sm.defaultState = loco;
+            var locoState = loco;   // copie locale : « loco » est un paramètre out, inutilisable dans une fonction locale
 
             var b = GameBalance.Courant;
-            var dodgeClip = Clip(Avance, "Dodge_Forward");
-            var dodge = Etat(sm, "Esquive", dodgeClip, new Vector3(400, 120), dodgeClip != null ? dodgeClip.length / (b.esquiveDuree + 0.15f) : 1f);
-            DeNimporte(sm, dodge, 0.05f).AddCondition(AnimatorConditionMode.If, 0, "Dodge");
-            Sortie(dodge, loco, 0.9f);
-            var backClip = Clip(Avance, "Dodge_Backward");
-            var back = Etat(sm, "EsquiveArriere", backClip, new Vector3(400, 150), backClip != null ? backClip.length / (b.esquiveDuree + 0.15f) : 1f);
-            DeNimporte(sm, back, 0.05f).AddCondition(AnimatorConditionMode.If, 0, "DodgeBack");
-            Sortie(back, loco, 0.9f);
+            AnimatorState EtatEsquive(string etat, string clipNom, Vector3 pos)
+            {
+                var clip = Clip(Avance, clipNom);
+                return Etat(sm, etat, clip, pos, clip != null ? clip.length / (b.esquiveDuree + 0.15f) : 1f);
+            }
+            // Esquive directionnelle (Dodge + DodgeDir : 0 Avant, 1 Droite, 2 Arrière, 3 Gauche, Heros.DirectionClip).
+            void DodgeVers(AnimatorState etat, int dir)
+            {
+                var t = DeNimporte(sm, etat, 0.05f);
+                t.AddCondition(AnimatorConditionMode.If, 0, "Dodge");
+                t.AddCondition(AnimatorConditionMode.Equals, dir, "DodgeDir");
+                Sortie(etat, locoState, 0.9f);
+            }
+            var dodge = EtatEsquive("Esquive", "Dodge_Forward", new Vector3(400, 90));
+            DodgeVers(dodge, 0);
+            var droite = EtatEsquive("EsquiveDroite", "Dodge_Right", new Vector3(400, 130));
+            DodgeVers(droite, 1);
+            var back = EtatEsquive("EsquiveArriere", "Dodge_Backward", new Vector3(400, 170));
+            DodgeVers(back, 2);
+            DeNimporte(sm, back, 0.05f).AddCondition(AnimatorConditionMode.If, 0, "DodgeBack");   // roulade arrière imposée (Rôdeur)
+            var gauche = EtatEsquive("EsquiveGauche", "Dodge_Left", new Vector3(400, 210));
+            DodgeVers(gauche, 3);
 
             var j1 = Etat(sm, "SautDepart", Clip(Basique, "Jump_Start"), new Vector3(400, 180), 1.4f);
             var j2 = Etat(sm, "SautAir", Clip(Basique, "Jump_Idle"), new Vector3(600, 180));
@@ -538,6 +557,7 @@ namespace Deathless.EditorTools
             var c = Socle("Viking_Jeu", style, out var loco, out var haut, out var vide);
             AjouterEmotes(c);   // roue à emotes (EmotesBuilder.cs)
             AjouterPortailArrivee(c);   // arrivée par un portail (EmotesBuilder.cs)
+            AjouterRenverse(c);   // Renversé, knockdown (EmotesBuilder.cs)
             var sm = c.layers[0].stateMachine;
             var chop = Clip(Melee, "Melee_2H_Attack_Chop");
             var slice = Clip(Melee, "Melee_2H_Attack_Slice");
@@ -567,6 +587,7 @@ namespace Deathless.EditorTools
             var c = Socle("Mage_Jeu", style, out var loco, out var haut, out var vide);
             AjouterEmotes(c);   // roue à emotes (EmotesBuilder.cs)
             AjouterPortailArrivee(c);   // arrivée par un portail (EmotesBuilder.cs)
+            AjouterRenverse(c);   // Renversé, knockdown (EmotesBuilder.cs)
             // Sur la couche du haut du corps : on marche en lançant.
             Declencheur(c, haut, Etat(haut, "Tir", Clip(Ranged, "Ranged_Magic_Shoot"), new Vector3(450, 0), 1.3f), "Attack1", vide, 0.9f, 0.05f);
             Booleen(c, "Cone");
@@ -582,6 +603,7 @@ namespace Deathless.EditorTools
             var c = Socle("Rodeur_Jeu", style, out var loco, out var haut, out var vide);
             AjouterEmotes(c);   // roue à emotes (EmotesBuilder.cs)
             AjouterPortailArrivee(c);   // arrivée par un portail (EmotesBuilder.cs)
+            AjouterRenverse(c);   // Renversé, knockdown (EmotesBuilder.cs)
             var sm = c.layers[0].stateMachine;
             var b = GameBalance.Courant;
             Booleen(c, "Aiming");
@@ -613,6 +635,7 @@ namespace Deathless.EditorTools
             var c = Socle("Assassin_Jeu", style, out var loco, out var haut, out var vide);
             AjouterEmotes(c);   // roue à emotes (EmotesBuilder.cs)
             AjouterPortailArrivee(c);   // arrivée par un portail (EmotesBuilder.cs)
+            AjouterRenverse(c);   // Renversé, knockdown (EmotesBuilder.cs)
             var sm = c.layers[0].stateMachine;
             // Marche discrète : seconde locomotion (Sneaking) tant que « Sneaking ».
             Booleen(c, "Sneaking");

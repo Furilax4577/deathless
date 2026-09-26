@@ -48,6 +48,10 @@ Flèches et carreaux ont une **vitesse** et subissent la **pesanteur** : plus un
 
 Toutes les touches : voir [Commandes](commandes.md).
 
+### Esquive directionnelle {décidé}
+
+L'esquive des **cinq classes** est **directionnelle** (26/09/2026) : le héros ne pivote plus avant d'esquiver, il garde sa face tournée vers sa visée, sa caméra ou sa cible. Il joue le clip KayKit correspondant à la direction du stick **par rapport à sa face** — esquive avant, arrière, à droite ou à gauche (rig Medium) —, au plus proche selon le quadrant en diagonale. Sans direction au stick, l'esquive part **en arrière** (réflexe classique pour se dégager). Le déplacement suit toujours la direction réelle du stick : durée, distance et invulnérabilité ne changent pas. La **roulade arrière du Rôdeur** (compétence dédiée) reste une esquive imposée vers l'arrière, inchangée.
+
 ## Menu du personnage et points de compétence
 
 - **Menu du personnage** {décidé} : la touche **Tab** (Y à la manette, Triangle) ouvre un menu avec **le personnage** (vie, endurance, jauge, vitesse, nuits survécues, ennemis tués), **l'inventaire** (vide pour l'instant) et **l'amélioration des compétences**. La partie continue pendant qu'il est ouvert.

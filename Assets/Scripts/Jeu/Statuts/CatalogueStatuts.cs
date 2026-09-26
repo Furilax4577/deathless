@@ -50,6 +50,11 @@ namespace Deathless.Jeu
                 type = TypeStatut.Provoque, id = "provoque", nom = "Provoqué", icone = "statut_provoque", regle = RegleCumul.Remplacer,
                 effet = s => "S’acharne sur le héros qui l’a provoqué, avant Nyxessa.",
             },
+            new DefinitionStatut
+            {
+                type = TypeStatut.Renverse, id = "renverse", nom = "Renversé", icone = "statut_renverse", regle = RegleCumul.Remplacer,
+                effet = s => "Tombe à la renverse puis se relève, sans contrôle. Marteler Saut accélère le relevé (jusqu’à moitié moins).",
+            },
         };
 
         public static DefinitionStatut De(TypeStatut type)

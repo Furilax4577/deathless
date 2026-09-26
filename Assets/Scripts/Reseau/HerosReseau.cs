@@ -139,6 +139,47 @@ namespace Deathless.Reseau
             });
         }
 
+        // ----------------------------------------------------------------- Parade parfaite (Docs/reseau.md)
+
+        /// Hôte : un coup parable de l'ennemi `ennemi` (NetworkObjectId) vise ce héros et porte dans `duree` s ; son
+        /// propriétaire l'annonce localement (jauge de parade, jugement de la parade parfaite).
+        public void AnnoncerCoup(ulong ennemi, float duree) { if (IsSpawned && IsServer && !IsOwner) CoupAnnonceRpc(ennemi, duree); }
+
+        [Rpc(SendTo.Owner)]
+        void CoupAnnonceRpc(ulong ennemi, float duree)
+        {
+            if (Heros == null || !NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(ennemi, out var no)) return;
+            var sq = no.GetComponent<Squelette>();
+            if (sq != null) TelegraphieCoups.Annoncer(sq, Heros, duree);
+        }
+
+        /// Propriétaire (client) : parade parfaite jugée ici contre le coup de `attaquant` ; l'hôte la valide (tolérance)
+        /// et applique le coup de bouclier (repousse, étourdissement). `avance` : appui avant l'impact prévu (s, journal).
+        public void DemanderParadeParfaite(Squelette attaquant, Vector3 direction, float avance)
+        {
+            var no = attaquant != null ? attaquant.GetComponent<NetworkObject>() : null;
+            ParadeParfaiteRpc(no != null && no.IsSpawned ? no.NetworkObjectId : 0UL, direction, avance);
+        }
+
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
+        void ParadeParfaiteRpc(ulong ennemi, Vector3 direction, float avance)
+        {
+            Squelette sq = null;
+            if (ennemi != 0 && NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(ennemi, out var no)) sq = no.GetComponent<Squelette>();
+            float rtt = 0f;
+            try { rtt = NetworkManager.NetworkConfig.NetworkTransport.GetCurrentRtt(OwnerClientId) / 1000f; } catch { }
+            ParadeParfaite.Demande(Heros, sq, direction, rtt, avance);
+        }
+
+        // ----------------------------------------------------------------- Renversé (hôte → propriétaire, 26/09/2026)
+
+        /// Hôte : ce joueur vient d'être renversé (charge écrasante de Morgrim massue, onde de choc non sautée, grosse
+        /// chute côté hôte s'il joue lui-même) ; son propriétaire déroule vraiment la séquence (Heros.RenverserLocal).
+        public void Renverser() => RenverserRpc();
+
+        [Rpc(SendTo.Owner)]
+        void RenverserRpc() => Heros.RenverserLocal();
+
         // ----------------------------------------------------------------- Mort et réapparition (l'hôte fait foi)
 
         /// Propriétaire (client) : son héros vient de mourir ; l'hôte compte la mort et fixe le délai.

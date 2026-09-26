@@ -137,6 +137,8 @@ MonoBehaviour:
     image: {fileID: 7388822144124034973, guid: 2e9ffd1fe3a76ae4a85ae8f0ca165102, type: 3}
   - id: statut_ralenti
     image: {fileID: 7388822144124034973, guid: a84569a2fee92364fbe4a2366f26f769, type: 3}
+  - id: statut_renverse
+    image: {fileID: 7388822144124034973, guid: 18ad74e01c6ccda48b4a5c8388e2fe1e, type: 3}
   - id: viking_attaque_tournante
     image: {fileID: 7388822144124034973, guid: 0966b98e095ddcf4bb96f01681947083, type: 3}
   - id: viking_hache

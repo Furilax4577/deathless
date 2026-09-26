@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using Deathless.Jeu;
 using Unity.Netcode;
 using UnityEngine;
@@ -205,5 +206,66 @@ namespace Deathless.Reseau
         [Rpc(SendTo.NotServer)]
         void EffetMorgrimRpc(bool telegraphie, byte theme, float rayon, float duree, float angleDeg)
             => (Squelette as MorgrimVariant)?.RejouerEffetDistant(telegraphie, (VfxTheme)theme, rayon, duree, angleDeg);
+
+        // ----------------------------------------------------------------- Morgrim : onde de choc lente du Fracas (Massue, 26/09/2026)
+
+        /// Temps réseau (NetworkManager.ServerTime), sinon Time.time hors réseau (solo) : même horloge que StatutsReseau,
+        /// pour que chaque poste calcule le même front d'onde malgré la latence (Docs/reseau.md).
+        public static float TempsReseau()
+        {
+            var nm = NetworkManager.Singleton;
+            return nm != null && nm.IsListening ? (float)nm.ServerTime.TimeAsFloat : Time.time;
+        }
+
+        // Hôte : onde de Fracas en cours (une seule à la fois par Morgrim) — centre, vitesse, portée et largeur de bande
+        // de détection, heure de départ réseau ; joueurs déjà crédités (une touche par onde).
+        Vector3 m_OndeCentre;
+        float m_OndeDepart = -999f, m_OndeVitesse, m_OndeRayonMax, m_OndeLargeurBande;
+        readonly HashSet<int> m_OndeTouches = new HashSet<int>();
+
+        /// Hôte : lance l'onde de Fracas et la diffuse aux autres postes avec l'heure de départ réseau, pour qu'ils
+        /// calculent le même front que l'hôte malgré la latence (Docs/reseau.md). Le jugement (au sol ou en l'air) se
+        /// fait ensuite chez chaque client, sur l'onde qu'il voit (OndeChocLente) : voir SignalerOndeTouchee.
+        public void DiffuserOndeMorgrim(Vector3 centre, float vitesse, float rayonMax, float largeurBande)
+        {
+            if (!IsServer || !IsSpawned) return;
+            m_OndeCentre = centre; m_OndeVitesse = vitesse; m_OndeRayonMax = rayonMax; m_OndeLargeurBande = largeurBande;
+            m_OndeDepart = TempsReseau();
+            m_OndeTouches.Clear();
+            OndeMorgrimRpc(centre, vitesse, rayonMax, largeurBande, m_OndeDepart);
+        }
+
+        [Rpc(SendTo.NotServer)]
+        void OndeMorgrimRpc(Vector3 centre, float vitesse, float rayonMax, float largeurBande, float depart)
+            => (Squelette as MorgrimVariant)?.RecevoirOndeDistante(centre, vitesse, rayonMax, largeurBande, depart);
+
+        /// Client (propriétaire touché) : signale à l'hôte avoir été touché par l'onde en cours, jugé chez lui (au sol
+        /// au passage du front — la latence ferait sinon voir à l'hôte les sauts en retard, Docs/reseau.md). L'hôte
+        /// vérifie la vraisemblance (front au bon endroit au bon instant, une fois par joueur) avant d'appliquer.
+        public void SignalerOndeTouchee() => OndeToucheeRpc();
+
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        void OndeToucheeRpc(RpcParams p = default)
+        {
+            if (m_OndeDepart < 0f || Squelette == null || !Squelette.Vivant) return;
+            int joueurId = Partie.IdJoueur(p.Receive.SenderClientId);
+            if (m_OndeTouches.Contains(joueurId)) return;
+            var h = Partie.Instance != null ? Partie.Instance.HerosDe(joueurId) : null;
+            if (h == null || !h.Vivant) return;
+            float ecoule = TempsReseau() - m_OndeDepart;
+            float duree = m_OndeRayonMax / Mathf.Max(0.1f, m_OndeVitesse);
+            if (ecoule < 0f || ecoule > duree + 0.6f) return;   // fenêtre dépassée : trop tard pour être crédible
+            float rFront = Mathf.Min(m_OndeVitesse * ecoule, m_OndeRayonMax);
+            Vector3 d = h.transform.position - m_OndeCentre; d.y = 0f;
+            if (Mathf.Abs(d.magnitude - rFront) > m_OndeLargeurBande + 1.5f) return;   // vraisemblance : latence tolérée
+            m_OndeTouches.Add(joueurId);
+            var b = GameBalance.Courant;
+            h.Sante.Encaisser(new InfoDegats
+            {
+                montant = b.morgrimMassueFracasDegats, equipeSource = Equipe.Ennemis, source = Squelette.gameObject, parable = false,
+                point = h.transform.position + Vector3.up, direction = d.sqrMagnitude > 0.0001f ? d.normalized : Squelette.transform.forward
+            });
+            h.Renverser();
+        }
     }
 }
