@@ -1,6 +1,6 @@
 # Animations
 
-Toutes les animations KayKit du projet, jouées sur le mannequin du pack Character Animations 1.1 (rig Medium, celui des héros et des squelettes) ou sur Morgrim, le Golem squelette (rig Large). Quand un clip est fait pour un type d'arme, le mannequin porte l'arme KayKit correspondante, posée par le style d'arme validé quand il existe (voir `Docs/styles-d-armes.md`). 161 animations en 15 familles, plus 5 ouvertures de coffre, 28,8 Mo de vidéos.
+Toutes les animations KayKit du projet, jouées sur le mannequin du pack Character Animations 1.1 (rig Medium, celui des héros et des squelettes) ou sur Morgrim, le Golem squelette (rig Large). Quand un clip est fait pour un type d'arme, le mannequin porte l'arme KayKit correspondante, posée par le style d'arme validé quand il existe (voir `Docs/styles-d-armes.md`). 161 animations en 15 familles, plus 5 ouvertures de coffre, 28,7 Mo de vidéos.
 
 > Chaque carte donne le nom en français, le nom technique du clip (celui du code et des contrôleurs), l'arme portée, et si le clip est une boucle ou se joue une fois (la vidéo marque alors une courte pause au début et à la fin). Caméra fixe de 3/4 ; le sol est quadrillé tous les mètres pour juger des déplacements. Les vidéos se chargent quand elles arrivent à l'écran.
 
@@ -182,15 +182,18 @@ Pêche : **canne provisoire**, générée par script (bâton facetté aux couleu
 
 ## Coffres (5)
 
-Ouverture du coffre du donjon, rejouée comme dans le jeu (`DonjonJeu.Ouvrir`, `CadenasOuverture`) : la clé entre dans la serrure et tourne, l'anse saute, le cadenas tombe (1 s) ; le couvercle bascule de 105° en 0,45 s à partir de 0,9 s ; puis 2 pièces d'or montent en tournant (4 pour le grand coffre). Ouvrir un coffre ne coûte jamais d'or {décidé} (Quentin, 26/09/2026 ; plus tard, peut-être une clé). Le coffre du donjon porte le cadenas d'acier, le grand coffre le cadenas d'or ; le cadenas de cuivre est une déclinaison préparée, sans usage en jeu.
+Ouverture du coffre du donjon, rejouée comme dans le jeu (`DonjonJeu.Ouvrir`) : le couvercle bascule de 105° en 0,45 s, puis 2 pièces d'or montent en tournant (4 pour le grand coffre). Ouvrir un coffre ne coûte jamais d'or {décidé} (Quentin, 26/09/2026 ; plus tard, peut-être une clé). Plus de cadenas (retour de Quentin, 26/09/2026) :
 
-> Écart avec le jeu : `DonjonJeu.CoffreDe` tourne le cadenas de 180°, ce qui met sa serrure contre le coffre (la clé entre par l'intérieur, invisible). Ici le cadenas est posé serrure vers l'extérieur pour montrer la clé ; à corriger dans le jeu si Quentin valide.
+- **coffres sans serrure** (`Coffre`, `GrandCoffre`) : ceux du jeu pour l'instant, ouverture gratuite ; la gâche et le moraillon à trou de serrure du modèle KayKit sont retirés (copies des maillages) ;
+- **coffres à clé**, déclinaisons prêtes pour plus tard (`Coffre_Acier`, `_Cuivre`, `_Or`, et `GrandCoffre_*`) : le coffre garde sa serrure et tout son métal (ferrures, coins, clous, serrure) prend la couleur de la clé ; la clé entre dans la serrure, tourne d'un quart de tour et reste en place pendant que le couvercle s'ouvre.
 
-{video media/animations/Coffre_Ouverture.mp4} **Coffre, ouverture sans cadenas** | Objet : `chest` (KayKit Dungeon, `DonjonKit.coffre`) | Cadenas : aucun | une fois · 0,45 s (couvercle 0,45 s, puis les pièces)
-{video media/animations/Coffre_Cadenas_Acier.mp4} **Coffre à cadenas d'acier (celui du donjon)** | Objet : `chest` (KayKit Dungeon, `DonjonKit.coffre`) | Cadenas : acier (`Cadenas_Acier`, clé `Cle_Acier`) | une fois · 1,35 s (cadenas 0,9 s puis couvercle 0,45 s, puis les pièces)
-{video media/animations/Coffre_Cadenas_Cuivre.mp4} **Coffre à cadenas de cuivre (déclinaison préparée)** | Objet : `chest` (KayKit Dungeon, `DonjonKit.coffre`) | Cadenas : cuivre (`Cadenas_Cuivre`, clé `Cle_Cuivre`) | une fois · 1,35 s (cadenas 0,9 s puis couvercle 0,45 s, puis les pièces)
-{video media/animations/GrandCoffre_Cadenas_Or.mp4} **Grand coffre plein d'or, cadenas d'or (celui du donjon)** | Objet : `chest_gold` (KayKit Dungeon, plein d'or, `DonjonKit.grandCoffre`) | Cadenas : or (`Cadenas_Or`, clé `Cle_Or`) | une fois · 1,35 s (cadenas 0,9 s puis couvercle 0,45 s, puis les pièces)
-{video media/animations/GrandCoffre_Ouverture.mp4} **Grand coffre plein d'or, ouverture sans cadenas** | Objet : `chest_gold` (KayKit Dungeon, plein d'or, `DonjonKit.grandCoffre`) | Cadenas : aucun | une fois · 0,45 s (couvercle 0,45 s, puis les pièces)
+Assets dans le bac à sable `sandbox-level`, sous `Assets/Art/Coffres/` (générés par `CoffresBuilder`), prêts à être copiés dans le jeu.
+
+{video media/animations/Coffre_SansSerrure.mp4} **Coffre sans serrure, ouverture gratuite** | Objet : prefab `Coffre` (KayKit `chest` sans serrure) | Clé : aucune (pas de serrure) | une fois · 0,45 s (couvercle 0,45 s, puis les pièces)
+{video media/animations/GrandCoffre_SansSerrure.mp4} **Grand coffre plein d'or sans serrure, ouverture gratuite** | Objet : prefab `GrandCoffre` (KayKit `chest_gold`, plein d'or, sans serrure) | Clé : aucune (pas de serrure) | une fois · 0,45 s (couvercle 0,45 s, puis les pièces)
+{video media/animations/Coffre_Cle_Acier.mp4} **Coffre à clé d'acier (déclinaison pour plus tard)** | Objet : prefab `Coffre_Acier` (KayKit `chest`, métal teinté acier) | Clé : `Cle_Acier` | une fois · 1,10 s (clé 0,65 s puis couvercle 0,45 s, puis les pièces)
+{video media/animations/Coffre_Cle_Cuivre.mp4} **Coffre à clé de cuivre (déclinaison pour plus tard)** | Objet : prefab `Coffre_Cuivre` (KayKit `chest`, métal teinté cuivre) | Clé : `Cle_Cuivre` | une fois · 1,10 s (clé 0,65 s puis couvercle 0,45 s, puis les pièces)
+{video media/animations/Coffre_Cle_Or.mp4} **Coffre à clé d'or (déclinaison pour plus tard)** | Objet : prefab `Coffre_Or` (KayKit `chest`, métal teinté or) | Clé : `Cle_Or` | une fois · 1,10 s (clé 0,65 s puis couvercle 0,45 s, puis les pièces)
 
 ## Squelettes, apparitions et références (17)
 
@@ -250,4 +253,4 @@ Aucun mannequin Large dans les packs : ces clips sont joués sur `Skeleton_Golem
 
 ## Produire les vidéos
 
-Bac à sable `sandbox-level` : scène `Assets/Scenes/Animations.unity` (décor et mannequins équipés), outil `Assets/Animations_Planche/Editor/PlancheAnimations.cs`. `Planche.Capturer(debut, nombre)` rejoue chaque clip image par image (30 i/s, pas fixe, en édition, sans Play) dans une scène de prévisualisation isolée, encode en MP4 H.264 480 × 480 muet par `UnityEditor.Media.MediaEncoder` et copie dans `Wiki/media/animations/` ; `Assets/Animations_Planche/Outils~/generer_page.py` réécrit cette page à partir du manifeste `animations.json`. Prises des outils, canne provisoire et coffres : `Assets/Animations_Planche/Editor/PlancheAccessoires.cs` (`Planche.CapturerCoffres()` pour les coffres ; cadenas et clés copiés de main, `Assets/Art/Cadenas/`).
+Bac à sable `sandbox-level` : scène `Assets/Scenes/Animations.unity` (décor et mannequins équipés), outil `Assets/Animations_Planche/Editor/PlancheAnimations.cs`. `Planche.Capturer(debut, nombre)` rejoue chaque clip image par image (30 i/s, pas fixe, en édition, sans Play) dans une scène de prévisualisation isolée, encode en MP4 H.264 480 × 480 muet par `UnityEditor.Media.MediaEncoder` et copie dans `Wiki/media/animations/` ; `Assets/Animations_Planche/Outils~/generer_page.py` réécrit cette page à partir du manifeste `animations.json`. Prises des outils, canne provisoire et coffres : `Assets/Animations_Planche/Editor/PlancheAccessoires.cs` (`Planche.CapturerCoffres()` pour les coffres, prefabs de `Assets/Art/Coffres/`, clés `Cle_*` de `Assets/Art/Cadenas/`).
