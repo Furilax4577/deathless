@@ -614,6 +614,9 @@ namespace Deathless.Jeu
             {
                 var pv = PortailVillage;
                 if (!PortailVillageOuvert || !pv.ouvert || AuDonjon(h) || Mathf.Abs(ph.y - pv.Center.y) > 3f) return null;
+                // Fin du jour : le héros n'arrive au donjon que DureeTransitDepart après l'appui ; si le crépuscule tombe
+                // entre-temps, RappelerTous ne le voit pas encore au donjon et il y restait la nuit sans être rappelé.
+                if (P.Etat.phase == Phase.Jour && P.Etat.TempsRestant < DureeTransitDepart + 0.4f) return null;
                 distance = Horizontal(ph, pv.Center);
                 return distance <= B.distancePortail ? "Entrer dans le donjon" : null;
             }
