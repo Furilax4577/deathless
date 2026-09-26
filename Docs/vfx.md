@@ -41,7 +41,7 @@ Source unique : `Assets/VFX/_Palettes/` — `VfxPalette.cs` (ScriptableObject : 
 | **Ombre** (ajouté) | ombre : nuit `#140b1f` · base : violet sombre `#2b1840` · vif : violet `#5b3a8a` · cœur : lilas `#a58ad6` · accent : fumée `#6b6478` | assassin : mode furtif (`ModeFurtif`), grenade fumigène (`Fumigene`) |
 | **BouclierPlein / BouclierEntame / BouclierCritique** (ajoutés) | bleu `#0d2e73` `#1a66d9` `#4ca6ff` `#95bfff` + lueur `#59a6ff` · orange `#732e08` `#e67314` `#ffad40` `#ffca8a` + lueur `#ff9933` · rouge `#660a0a` `#d91f1a` `#ff594c` `#ff9f95` + lueur `#ff4033` | bouclier de la relique (`RelicShieldVisual`) : les trois thèmes codent la **vie restante** (> 40 %, 15-40 %, < 15 %), pas un élément ; cœur × 1,2 en HDR par le script (valeurs de Relic inchangées) |
 
-Hors thèmes (inchangés) : fumée grise de `FireEffect` (plus utilisée par la boule de feu), éclair chaud de l'aube de `GemBurst.Rise`, émission de `RelicGlow` (champs du composant), ambiance jour/nuit (`Ambiance`).
+Hors thèmes (inchangés) : fumée grise de `FireEffect` (plus utilisée par la boule de feu), éclair chaud de l'aube de `GemBurst.Rise`, émission de `RelicGlow` (champs du composant), ambiance jour/nuit (`Ambiance`), vitres des intérieurs vues du dedans (`InterieursAmbiance` : `vitreJour` `#8eaacf`, `vitreNuit` `#080a1a`, émission mêlée selon la nuit), brume au sol (`GroundMist` : couleur violet-gris `#73619e`, lueur de nuit `#17122b`).
 
 ## Lumière des effets (VfxLumiere, 25/09/2026)
 
@@ -107,7 +107,7 @@ Nyxessa envoie une charge au portail pour l'ouvrir et la reprend à la fermeture
 ## Dossiers communs
 
 - `Assets/VFX/_RelicCommun/` : `LowPolyGem` (écriture d'une gemme dans un maillage partagé), **`TraineeAir`** (traînée d'air des flèches et carreaux : `TraineeAir.Attacher(projectile, décalageLocal, matériau, longueur, épaisseur, vie)`, `Detacher()`), **`GemmesVolantes`** (25/09/2026 : `GemmesVolantes.Creer(nom, matériau, capacité, détruireQuandVide)` puis `Emettre(position, vitesse, taille, durée, couleur, gravité, freinage, éclosion, tenue, étirement, retard)` ; gravité négative = la gemme monte ; le maillage reste en repère monde même parenté), `GemShape` (ScriptableObject : nuage de points cuit), `GemBurst` (`Explode`, `Implode`, `Shatter`, `Rise`), `GemTrail` (`Follow`), `FireballVisual` (`Attach`, `SpawnEmber`), `FireballEmber`, `LowPolyBlast` (`Fire`, `Spawn`), `DirtBurst` (`Spawn`), `AreaBurst` (`Spawn`), `FireEffect` (`Create`, `SetEmitting`), `WavyTrail` (copié, plus utilisé par la boule actuelle), `Ambiance` (presets jour/crépuscule), shader `VertexColorUnlit`, `PortalVoxel.mat`, `FireBurst.mat`.
-- `Assets/VFX/_Ambiance/DayCycle.cs` : seul fichier d'ambiance repris, parce que `RelicGem` et `RelicGlow` lisent `DayCycle.Night` (statique). Copie « Visual only » (`nuit` 0/1 et `heure` 0-1 à la place de `RunProgress`). Sans `DayCycle` dans la scène, `Night` vaut 0 (jour). L'asset `Ambiance.asset`, le ciel, le sol et la brume `GroundMist` du labo ne sont pas repris.
+- `Assets/VFX/_Ambiance/` : `DayCycle.cs`, repris d'abord parce que `RelicGem` et `RelicGlow` lisent `DayCycle.Night` (statique). Copie « Visual only » (`nuit` 0/1 et `heure` 0-1 à la place de `RunProgress`). Sans `DayCycle` dans la scène, `Night` vaut 0 (jour). Depuis, le dossier porte aussi la brume au sol `GroundMist.cs` (copie « Visual only » de Relic, lit `DayCycle.Night`) et `GroundMist.mat`, les préréglages `Ambiance.asset` et `AmbianceVillage.asset`, `LanternesReglages.asset` et le profil de bloom `Lueur.asset` (voir « Ambiance de nuit » plus bas).
 
 ## Ambiance de nuit (village, 25/09/2026)
 
@@ -262,7 +262,7 @@ Palette : table des `intensiteEmission` par thème dans `Assets/VFX/_Palettes/*.
 - **Scripts** : `AuraSoin` (déclencheur écrit pour Deathless, reprend `AuraSoinDemo` sans la boucle), `AuraGemmes` (paillettes en gemmes).
 - **API** : `AuraSoin.Jouer()` au soin (croix + paillettes, ~1 s).
 - **Paramètres** : 6 à 8 croix `Croix.asset` (grille 3 × 3 de cellules de 0,14 m), disque de 1,1 m parcouru en 0,3 s, montée 1,3-2 m/s ; 20 à 40 gemmes de 0,05-0,09 m, montée 0,9-1,4 m/s, durée 1 s. `Fragment.asset` copié mais inutilisé.
-- **Palette** : thème **Soin** (menthe `#4fcf9a`, menthe sombre `#2e9e72` ; croix en URP Lit, paillettes en couleurs par sommet).
+- **Palette** : thème **Soin** (or `#e8c872`, or sombre `#b8903a`) pour les paillettes en couleurs par sommet et la lumière ; les croix en URP Lit prennent le thème **SoinCroix** (menthe `#4fcf9a`, menthe sombre `#2e9e72`).
 
 ### Rugissement du viking (bac à sable)
 - **Prefab** : `Assets/VFX/Rugissement/Rugissement.prefab`, racine au centre de la capsule du personnage (le crâne `Crane` est à 1,65 m au-dessus), visage vers +Z.

@@ -208,7 +208,7 @@ Cinq classes jouables (Wiki `classes.md`, `commandes.md`). Tout est **facultatif
 
 | Type | Membres | Rôle |
 |---|---|---|
-| `IClasseJouable` | `Id` (« paladin », « mage », « rodeur », « assassin », « viking »), `Nom`, `Role`, `Arme`, `Description`, `Teinte`, `Embleme` (icône hexagonale, ex. « classe_paladin »), `Jauge` (`JaugeClasse.Aucune` / `Mana` / `Rage`), `Actions` | Une classe, pour l'écran de choix et la carte du menu principal. |
+| `IClasseJouable` | `Id` (« paladin », « mage », « rodeur », « assassin », « viking »), `Nom`, `Role`, `Arme`, `Description`, `Teinte`, `Embleme` (icône hexagonale, ex. « classe_paladin »), `Jauge` (`JaugeClasse.Aucune` / `Mana` / `Rage`), `Actions` | Une classe, pour l'écran de choix et le HUD. |
 | `IActionClasse` | `Action` (« Gameplay/AttackPrimary »…), `Nom` (null ou vide : emplacement vide, affiché grisé « Vide pour l'instant »), `Icone` (identifiant de l'icône, ex. « paladin_charge_belier ») | Cinq actions dans l'ordre : attaque principale (RT), attaque secondaire (LT), compétences 1 (LB), 2 (RB), 3 (LB + RB). |
 | `IEtatJoueurPotions` | `Potions`, `PotionsMax` | Facultatif, sur l'objet enregistré comme `IEtatJoueur` : le HUD affiche l'emplacement de potion (icône `commun_potion_soin`, nombre restant, invite de `Gameplay/DrinkPotion`) à droite des jauges ; grisé à 0. Le jeu ne l'implémente pas encore (pas de potions en 0.1) ; `EtatFactice` oui (2 sur 3). |
 | `IApercuClasse` | `Rendu` (RenderTexture), `Montrer(classeId)`, `Cacher()`, `Tourner(degres)` | Facultatif, posé par le jeu dans `DonneesUI.ApercuClasse` : personnage de la classe en 3D dans l'écran de choix (voir « Choix de classe en 3D »). Absent (banc UIv01) : la colonne est masquée. |
@@ -324,7 +324,7 @@ Quentin a choisi la **piste A « bandeau »** parmi trois maquettes de l'écran 
 
 ### Fond du menu principal (scène Village, 25/09/2026)
 
-Le menu principal s'affiche par-dessus le village **de nuit**, sur un plan fixe où Nyxessa et le portail sont lisibles dans la moitié droite (le panneau du menu couvre environ 44 % à gauche à ×2, la carte de classe est en bas à droite). Ce plan n'existe que dans l'état « menu » (`Partie.Etat.phase == Attente`) : pas de squelettes, pas d'horloge, pas de HUD.
+Le menu principal s'affiche par-dessus le village **de nuit**, sur un plan fixe où Nyxessa et le portail sont lisibles dans la moitié droite (le panneau du menu couvre environ 44 % à gauche à ×2). Ce plan n'existe que dans l'état « menu » (`Partie.Etat.phase == Attente`) : pas de squelettes, pas d'horloge, pas de HUD.
 
 - **Caméra** : `Deathless.Jeu.CameraEpaule` sans cible (aucun héros) se place sur le plan du menu. Champs (inspecteur de la caméra de Village, mêmes valeurs par défaut dans le code) : `menuPosition` (-8, 13, -22), `menuRotation` (23,8 ; 13,4 ; 0), `menuChamp` 44° (champ vertical ; le champ de jeu de la caméra est rendu dès qu'elle suit le héros), `menuBalancement` 0,8 m et `menuPeriode` 50 s (très lent va-et-vient latéral ; 0 pour un plan fixe). L'ancienne orbite autour du village est retirée.
 - **Ambiance** : `Deathless.Jeu.VueCycle` pilote le cycle en **milieu de nuit** tant que la partie est en attente (`CycleJourNuit.Piloter(Nuit, dureeNuit / 2)`) : lumière, brume, lanternes et lueurs vertes de Nyxessa sont celles de la nuit en partie.
@@ -371,9 +371,11 @@ Menu → A sur Solo → HUD (carte Gameplay seule, pas de focus) ; Start → pau
 - Icônes des compétences : absentes (abréviations « Ép », « Ga », « Ch », « So »).
 - Le curseur de la souris n'est ni caché ni verrouillé en jeu (à faire côté jeu, avec la caméra).
 
-## Hors 0.1 (non construit)
+## Hors 0.1 (non construit, état au 25/09/2026)
 
 Multijoueur en jeu (réseau Unity Relay et Lobby, vie des autres joueurs à gauche, « Prêts 2 / 3 »), potions, donjon et portail (rappel, butin), options Affichage / Audio / manette, personnalisation des touches.
+
+Depuis le 26/09/2026, sont construits : le multijoueur (voir `reseau.md`), le donjon et le portail (`Assets/Scripts/Jeu/Donjon/`), l'onglet Audio des options. Restent à faire : les potions en jeu, la langue et les réglages manette des options, la personnalisation des touches.
 
 ## Report dans main
 
