@@ -383,10 +383,10 @@ namespace Deathless.UI.Ecrans
         VisualElement m_PageJeu, m_PageCommandes, m_PageAudio;
         float m_DernierApercu;
         Label m_EnteteManette;
+        Button m_Retour;
         int m_Onglet;
 
         Label m_PseudoValeur;
-        Button m_Retour;
 
         public override void AuSommet() { if (m_PseudoValeur != null) m_PseudoValeur.text = DonneesUI.Profil.Pseudo; }
 
