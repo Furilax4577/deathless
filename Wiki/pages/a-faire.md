@@ -5,7 +5,6 @@ Travaux prévus ou notés, pas encore faits. Une ligne quitte cette page quand l
 ## Noté par Quentin
 
 - **Revoir le menu des options de jeu.** (noté le 25/09/2026)
-- **Barde** : nouvelle passe pour qu'il soit aussi lisse que les personnages KayKit.
 - **Roue à emotes** (faite le 26/09/2026, voir [Interface](interface.md)) : reste à confirmer la touche (croix bas, B). « Boire un coup » : le clip `Use_Item` lève la chope devant la poitrine sans la porter à la bouche ; un vrai geste de boire serait à créer. Pas de danse, rire ni applaudissement dans les packs : à créer pour de futures emotes.
 - **Idées de personnages** (classes jouables possibles, noté le 25/09/2026) :
   - une **Bavaroise** qui se bat à coups de chopes de bière ;
@@ -15,7 +14,7 @@ Travaux prévus ou notés, pas encore faits. Une ligne quitte cette page quand l
 ## En cours
 
 - Barde : modèle prêt dans le bac à sable. **Attaque de base** : il tient son luth par le manche et frappe avec, comme une massue (référence d'image de Quentin). Animation de jeu du luth à créer.
-- Bavaroise (chopes KayKit) et clochard : en cours dans les bacs à sable.
+- Barde, Bavaroise, Clochard pétomane : modèles lissés (26/09/2026), candidats au personnage du mois ; kits, design et effets à valider. Barde et Bavaroise un peu au-dessus de 8 000 triangles : alléger celui qui sera retenu.
 
 ## Plus tard
 
