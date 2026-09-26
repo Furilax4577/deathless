@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 namespace Deathless.Jeu
@@ -129,18 +130,42 @@ namespace Deathless.Jeu
             if (P == null) return;
             foreach (var h in P.TousLesHeros)
             {
-                if (h == null || !h.Vivant) continue;
-                Vector3 d = h.transform.position - origine; d.y = 0f;
-                float avance = Vector3.Dot(d, dir);
-                if (avance < 0f || avance > b.morgrimMartacheFendSolLongueur) continue;
-                Vector3 lateral = d - dir * avance;
-                if (lateral.magnitude > b.morgrimMartacheFendSolLargeur * 0.5f) continue;
+                if (h == null || !h.Vivant || !DansFissure(h, origine, dir)) continue;
                 float reel = h.Sante.Encaisser(new InfoDegats
                 {
                     montant = b.morgrimMartacheFendSolDegats, equipeSource = Equipe.Ennemis, source = gameObject, parable = true,
                     point = h.transform.position + Vector3.up, direction = dir
                 });
                 if (reel > 0f) h.Statuts?.Ajouter(TypeStatut.Ralenti, b.morgrimMartacheFendSolRalentiDuree, b.morgrimMartacheFendSolRalentiForce, OrigineStatut.Ennemi);
+            }
+            if (b.morgrimMartacheFendSolFissureDuree > 0f) StartCoroutine(Fissure(origine, dir));
+        }
+
+        /// Le héros est dans la ligne du Fend-sol (longueur × largeur devant `origine`, selon `dir`).
+        bool DansFissure(Heros h, Vector3 origine, Vector3 dir)
+        {
+            var b = B;
+            Vector3 d = h.transform.position - origine; d.y = 0f;
+            float avance = Vector3.Dot(d, dir);
+            if (avance < 0f || avance > b.morgrimMartacheFendSolLongueur) return false;
+            return (d - dir * avance).magnitude <= b.morgrimMartacheFendSolLargeur * 0.5f;
+        }
+
+        /// La fissure reste au sol (wiki : ennemis.md, « ralentit les joueurs qui restent dedans ») : toutes les 0,5 s,
+        /// Ralenti court (1 s, règle Prolonger) sur qui s'y tient. Hôte seulement (l'IA de Morgrim ne tourne que
+        /// là) ; les statuts partent aux autres postes par le chemin habituel (StatutsReseau).
+        IEnumerator Fissure(Vector3 origine, Vector3 dir)
+        {
+            var b = B;
+            float fin = Time.time + b.morgrimMartacheFendSolFissureDuree;
+            var attente = new WaitForSeconds(0.5f);
+            while (Time.time < fin)
+            {
+                yield return attente;
+                if (P == null) continue;
+                foreach (var h in P.TousLesHeros)
+                    if (h != null && h.Vivant && DansFissure(h, origine, dir))
+                        h.Statuts?.Ajouter(TypeStatut.Ralenti, 1f, b.morgrimMartacheFendSolRalentiForce, OrigineStatut.Ennemi);
             }
         }
 

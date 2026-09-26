@@ -132,6 +132,8 @@ namespace Deathless.Jeu
         [Range(0f, 0.9f)] public float morgrimMartacheFendSolRalentiForce = 0.4f;
         public float morgrimMartacheFendSolPreparation = 1.5f;
         public float morgrimMartacheFendSolRecharge = 9f;
+        [Tooltip("Fend-sol : la fissure reste au sol ce temps (s) et ralentit qui s'y tient (Ralenti renouvelé toutes les 0,5 s, force morgrimMartacheFendSolRalentiForce).")]
+        public float morgrimMartacheFendSolFissureDuree = 4f;
         [Tooltip("Coup de brèche (Martache) : vise le bouclier de Nyxessa, dégâts renforcés contre lui, thème Rage.")]
         public float morgrimMartacheBrecheDegats = 70f;
         public float morgrimMartacheBrecheMultiplicateurBouclier = 2f;
