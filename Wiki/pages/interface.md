@@ -32,6 +32,7 @@
 | Au-dessus des ennemis | Statuts de chaque ennemi affecté : petites icônes et jauge de durée discrète |
 | Bas, au centre | Attaques et compétences avec leur bouton et leur temps de recharge, potions |
 | Centre | Réticule de visée, et l'action possible devant soi (par exemple « Entrer dans le donjon » près du portail) |
+| Centre, sous le réticule | Jauge de parade du paladin, seulement quand un coup le vise (voir plus bas) |
 
 ## Statuts {décidé}
 
@@ -40,6 +41,16 @@ Liste des statuts, effets et durées : [Statuts](statuts.md).
 - **HUD du joueur** : en bas à gauche, juste au-dessus de la barre de vie, une case par statut actif (six au plus) : l'icône, une jauge de durée en bas de la case et les secondes restantes dans une pastille. Liseré rouge pour une affliction, or pour un bienfait (l'ivresse). Sans durée (dans l'eau du donjon), ni jauge ni secondes. La pastille des points de compétence reste au-dessus de tout le bloc joueur. La rangée suit la taille de l'interface (×1, ×2, ×3).
 - **Au-dessus des ennemis** : une rangée de petites icônes au-dessus de la tête de l'ennemi affecté (quatre au plus), chacune avec une fine jauge de durée. Elle n'apparaît que tant qu'il est affecté, s'il est à l'écran et à moins de 30 m, et s'estompe en approchant de cette limite.
 - **Menu du personnage** (Tab, Y, Triangle) : section « Afflictions » sous les caractéristiques, un bouton par statut (icône, jauge, secondes), ou « Aucune affliction. ». Le **survol à la souris** ou le **focus à la manette** ouvre une infobulle : nom, effet, durée restante et source. À la manette : gauche et droite passent d'un statut à l'autre ; à droite du dernier, on arrive aux compétences ; à gauche d'une compétence, on revient aux statuts.
+
+## Jauge de parade {décidé}
+
+Paladin seulement (26/09/2026 ; règles : [Paladin](classe-paladin.md#règles)).
+
+- **Quand** : dès qu'un ennemi prépare un coup qui vise le joueur, et jusqu'à l'impact. Plusieurs coups à la fois : la jauge suit celui qui porte le plus tôt. Sinon, rien n'est affiché.
+- **Où** : sous le réticule, au centre de l'écran : c'est là que le regard se pose en pleine mêlée, et elle ne bouge pas avec les ennemis (au-dessus de l'attaquant, elle se perdrait parmi les statuts et les autres ennemis).
+- **Lecture** : une barre fine ; l'impact est au bord droit. Un curseur ivoire avance vers lui. Avant l'impact, la **fenêtre de parade** est marquée en ivoire léger et la **fenêtre parfaite**, plus étroite, en or. Un fin repère reste là où la garde a été levée.
+- **Issue** : parade parfaite, liseré or et « Parfaite » avec un petit rebond ; parade, liseré ivoire ; coup seulement bloqué, liseré atténué ; coup reçu, liseré rouge. Puis la jauge s'efface.
+- Pas de vert, aucune icône. Elle suit la taille de l'interface (×1, ×2, ×3).
 
 ## Roue à emotes {décidé}
 

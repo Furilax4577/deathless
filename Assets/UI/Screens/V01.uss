@@ -100,7 +100,12 @@
 .options__pseudo-action { font-size: var(--dl-text-small); color: var(--dl-color-gold); margin: 0; padding: 0; }
 
 /* ---------- Lobby multijoueur ---------- */
-.lobby { padding: 54px 102px 0 102px; }
+/* padding-bottom en dur = hauteur de la barre d'invites (84 px) + une marge de respiration (18 px), pour que
+   lobby__scroll (ci-dessous) s'arrête toujours avant la barre, à toutes les tailles et tous les formats. */
+.lobby { padding: 54px 102px 102px 102px; }
+/* Corps défilant (règle des écrans denses à ×3, Docs/ui-socle.md) : par défaut tout tient sans défiler à ×1 et ×2 ;
+   à ×3, ou sur un format très bas (16:10 large, fenêtré...), il défile plutôt que de passer sous la barre d'invites. */
+.lobby__scroll { flex-grow: 1; }
 .lobby__entete { margin-bottom: var(--dl-space-4); }
 .lobby__aide { margin: 3px 0 0 0; }
 .lobby__entree { flex-direction: row; margin: 0 -15px; }
@@ -115,13 +120,13 @@
 .lobby__message { margin: var(--dl-space-3) 0 0 0; min-height: 30px; color: var(--dl-color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .lobby__message--erreur { color: #ff8a70; }
 .lobby__message--vide { color: rgba(0, 0, 0, 0); }
-.lobby__salon { flex-grow: 1; }
 .lobby__code-ligne { flex-direction: row; align-items: center; margin-bottom: var(--dl-space-3); }
 .lobby__code-titre { margin: 0 18px 0 0; }
 .lobby__code-valeur { font-size: 45px; -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Bold-SDF.asset"); letter-spacing: 6px; margin: 0 24px 0 0; padding: 0; color: var(--dl-color-text); }
 .lobby__petit-bouton { min-height: 48px; padding: 0 18px; margin: 0 9px 0 0; font-size: var(--dl-text-small); }
 .lobby__copie { color: var(--dl-color-gold); margin: 0 0 0 6px; }
-.lobby__emplacements { flex-direction: row; margin: 0 -10px; }
+/* Conteneur position: relative (valeur par défaut, explicite ici) : lobby-compte s'y positionne en absolute. */
+.lobby__emplacements { position: relative; flex-direction: row; margin: 0 -10px; }
 .lobby-place { flex-grow: 1; flex-basis: 0; min-height: 300px; margin: 0 10px; padding: 24px 18px; border-radius: 21px; border-width: 3px; border-color: var(--dl-color-border); background-color: rgba(35, 42, 58, 0.97); align-items: center; }
 .lobby-place--local { border-color: var(--dl-color-border-strong); background-color: var(--dl-color-panel-active); }
 .lobby-place--pret { border-color: var(--dl-color-gold); }
@@ -135,7 +140,25 @@
 .lobby-place__etat { font-size: var(--dl-text-small); -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); margin: 0; padding: 4px 16px; border-radius: 16px; border-width: 2px; border-color: var(--dl-color-border-strong); color: var(--dl-color-text-muted); }
 .lobby-place--pret .lobby-place__etat { color: var(--dl-color-ink); background-color: var(--dl-color-gold); border-color: var(--dl-color-gold); }
 .lobby-place--libre .lobby-place__etat { display: none; }
-.lobby__compte { margin: var(--dl-space-3) 0 0 0; -unity-text-align: middle-center; font-size: var(--dl-text-heading); -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); color: var(--dl-color-gold); }
+/* Bandeau du compte à rebours : en surimpression par-dessus les 4 cartes (position absolute, jamais dans le flux),
+   centré, près du haut des cartes (au-dessus des emblèmes) pour ne pas gêner la lecture des pseudos en dessous. */
+.lobby__compte {
+    position: absolute;
+    left: 50%;
+    top: 14px;
+    translate: -50% 0;
+    -unity-text-align: middle-center;
+    font-size: var(--dl-text-heading);
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+    color: var(--dl-color-gold);
+    background-color: rgba(13, 16, 23, 0.88);
+    border-width: 2px;
+    border-color: var(--dl-color-gold);
+    border-radius: var(--dl-radius-lg);
+    padding: 10px 28px;
+    white-space: nowrap;
+    margin: 0;
+}
 .lobby__actions { flex-direction: row; margin: var(--dl-space-3) -9px 0 -9px; }
 .lobby__actions > .lobby__bouton { flex-grow: 1; flex-basis: 0; margin: 0 9px; }
 .lobby__bouton--actif { border-color: var(--dl-color-gold); color: var(--dl-color-gold); }
@@ -306,11 +329,24 @@
 .dl-scale-3 .saisie__panneau { top: 24px; width: 1000px; padding: 24px 30px; }
 .dl-scale-3 .clavier__touche { width: 62px; height: 52px; }
 .dl-scale-3 .clavier__touche--large { width: 150px; }
-.dl-scale-3 .lobby { padding: 30px 48px 0 48px; }
-.dl-scale-3 .lobby__carte { padding: 21px 24px; }
-.dl-scale-3 .lobby-place { min-height: 250px; padding: 15px; }
-.dl-scale-3 .lobby-place__embleme { width: 72px; height: 72px; }
+/* Écrans denses (×3) : marges et espacements resserrés pour que le salon (code, 4 cartes, actions) tienne toujours
+   au-dessus de la barre d'invites, à toutes les tailles et sur tous les formats (16:9, 21:9, 16:10) ; 96 px de
+   réserve en bas = hauteur de la barre (84 px) + une petite marge. Si un cas extrême ne tenait quand même pas
+   (petite fenêtre, pseudo très long...), lobby__scroll défile plutôt que de passer sous la barre. */
+.dl-scale-3 .lobby { padding: 24px 42px 96px 42px; }
+.dl-scale-3 .lobby__entete { margin-bottom: var(--dl-space-2); }
+.dl-scale-3 .lobby__message { margin-top: var(--dl-space-2); min-height: 24px; }
+.dl-scale-3 .lobby__carte { padding: 18px 24px; }
+.dl-scale-3 .lobby__bouton { min-height: 60px; margin: 4px 0; }
+.dl-scale-3 .lobby__petit-bouton { min-height: 40px; }
+.dl-scale-3 .lobby__code-ligne { margin-bottom: var(--dl-space-2); }
+.dl-scale-3 .lobby-place { min-height: 220px; padding: 12px; }
+.dl-scale-3 .lobby-place__embleme { width: 64px; height: 64px; margin: 8px 0; }
+.dl-scale-3 .lobby-place__classe { margin: 2px 0 8px 0; }
+.dl-scale-3 .lobby-place__etat { padding: 3px 12px; }
 .dl-scale-3 .lobby__code-valeur { font-size: 36px; }
+.dl-scale-3 .lobby__compte { top: 8px; padding: 6px 18px; font-size: var(--dl-text-large); }
+.dl-scale-3 .lobby__actions { margin-top: var(--dl-space-2); }
 .choix-classe--derniere .choix-classe__derniere { display: flex; }
 .dl-scale-3 .choix-classe--derniere .choix-classe__derniere { display: none; }
 .dl-scale-3 .choix__apercu { width: 300px; margin-left: 18px; }

@@ -6,45 +6,52 @@
             <ui:Label name="lobby-sous-titre" text="Jusqu’à quatre joueurs. Chacun choisit sa classe, puis se déclare prêt." class="dl-text dl-text--muted lobby__aide" />
         </ui:VisualElement>
 
-        <!-- Entrée : créer ou rejoindre -->
-        <ui:VisualElement name="lobby-entree" class="lobby__entree">
-            <ui:VisualElement class="dl-panel lobby__carte">
-                <ui:Label text="HÉBERGER" class="dl-section-label" />
-                <ui:Label text="Créer un salon" class="dl-heading" />
-                <ui:Label text="Tu es l’hôte : partage le code du salon avec tes amis." class="dl-text dl-text--muted lobby__texte" />
-                <ui:Button name="lobby-creer" text="Créer un salon" class="lobby__bouton" />
+        <!-- Corps défilant (règle des écrans denses à ×3, Docs/ui-socle.md) : n'apparaît que si nécessaire, pour que
+             rien ne passe jamais sous la barre d'invites, quelle que soit la taille ou le format d'écran. -->
+        <ui:ScrollView name="lobby-scroll" class="lobby__scroll" mode="Vertical" horizontal-scroller-visibility="Hidden">
+            <!-- Entrée : créer ou rejoindre -->
+            <ui:VisualElement name="lobby-entree" class="lobby__entree">
+                <ui:VisualElement class="dl-panel lobby__carte">
+                    <ui:Label text="HÉBERGER" class="dl-section-label" />
+                    <ui:Label text="Créer un salon" class="dl-heading" />
+                    <ui:Label text="Tu es l’hôte : partage le code du salon avec tes amis." class="dl-text dl-text--muted lobby__texte" />
+                    <ui:Button name="lobby-creer" text="Créer un salon" class="lobby__bouton" />
+                </ui:VisualElement>
+                <ui:VisualElement class="dl-panel lobby__carte">
+                    <ui:Label text="REJOINDRE" class="dl-section-label" />
+                    <ui:Label text="Rejoindre un salon" class="dl-heading" />
+                    <ui:Label text="Saisis le code du salon que l’hôte te donne." class="dl-text dl-text--muted lobby__texte" />
+                    <ui:Button name="lobby-code" class="lobby__champ">
+                        <ui:Label name="lobby-code-texte" text="Saisir le code (6 caractères)" class="lobby__champ-texte lobby__champ-texte--vide" />
+                    </ui:Button>
+                    <ui:Button name="lobby-rejoindre" text="Rejoindre" class="lobby__bouton" />
+                    <ui:Button name="lobby-par-ip" text="Rejoindre par adresse IP" class="lobby__lien" />
+                </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement class="dl-panel lobby__carte">
-                <ui:Label text="REJOINDRE" class="dl-section-label" />
-                <ui:Label text="Rejoindre un salon" class="dl-heading" />
-                <ui:Label text="Saisis le code du salon que l’hôte te donne." class="dl-text dl-text--muted lobby__texte" />
-                <ui:Button name="lobby-code" class="lobby__champ">
-                    <ui:Label name="lobby-code-texte" text="Saisir le code (6 caractères)" class="lobby__champ-texte lobby__champ-texte--vide" />
-                </ui:Button>
-                <ui:Button name="lobby-rejoindre" text="Rejoindre" class="lobby__bouton" />
-                <ui:Button name="lobby-par-ip" text="Rejoindre par adresse IP" class="lobby__lien" />
-            </ui:VisualElement>
-        </ui:VisualElement>
-        <ui:Label name="lobby-message" text="Message" class="dl-text lobby__message lobby__message--vide" />
+            <ui:Label name="lobby-message" text="Message" class="dl-text lobby__message lobby__message--vide" />
 
-        <!-- Salon -->
-        <ui:VisualElement name="lobby-salon" class="lobby__salon">
-            <ui:VisualElement class="lobby__code-ligne">
-                <ui:Label name="lobby-code-titre" text="CODE DU SALON" class="dl-section-label lobby__code-titre" />
-                <ui:Label name="lobby-code-valeur" text="••••••" class="lobby__code-valeur" />
-                <ui:Button name="lobby-afficher" text="Afficher" class="lobby__petit-bouton" />
-                <ui:Button name="lobby-copier" text="Copier" class="lobby__petit-bouton" />
-                <ui:Label name="lobby-copie" text="Copié" class="dl-text dl-text--small lobby__copie" style="visibility: hidden;" />
+            <!-- Salon -->
+            <ui:VisualElement name="lobby-salon" class="lobby__salon">
+                <ui:VisualElement class="lobby__code-ligne">
+                    <ui:Label name="lobby-code-titre" text="CODE DU SALON" class="dl-section-label lobby__code-titre" />
+                    <ui:Label name="lobby-code-valeur" text="••••••" class="lobby__code-valeur" />
+                    <ui:Button name="lobby-afficher" text="Afficher" class="lobby__petit-bouton" />
+                    <ui:Button name="lobby-copier" text="Copier" class="lobby__petit-bouton" />
+                    <ui:Label name="lobby-copie" text="Copié" class="dl-text dl-text--small lobby__copie" style="visibility: hidden;" />
+                </ui:VisualElement>
+                <!-- Les 4 cartes ; le bandeau « Tous prêts » (lobby-compte) est un enfant en surimpression, jamais un
+                     élément de la mise en page (position absolute) : il ne décale jamais les cartes ni les actions. -->
+                <ui:VisualElement name="lobby-emplacements" class="lobby__emplacements">
+                    <ui:Label name="lobby-compte" text="Tous prêts : la partie commence dans 3" class="lobby__compte" style="display: none;" />
+                </ui:VisualElement>
+                <ui:VisualElement class="lobby__actions">
+                    <ui:Button name="lobby-classe" text="Choisir sa classe" class="lobby__bouton" />
+                    <ui:Button name="lobby-pret" text="Je suis prêt" class="lobby__bouton lobby__bouton--pret" />
+                    <ui:Button name="lobby-lancer" text="Lancer" class="lobby__bouton" />
+                    <ui:Button name="lobby-quitter" text="Quitter le salon" class="lobby__bouton" />
+                </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="lobby-emplacements" class="lobby__emplacements" />
-            <ui:Label name="lobby-compte" text="Tous prêts : la partie commence dans 3" class="lobby__compte" style="visibility: hidden;" />
-            <ui:VisualElement class="lobby__actions">
-                <ui:Button name="lobby-classe" text="Choisir sa classe" class="lobby__bouton" />
-                <ui:Button name="lobby-pret" text="Je suis prêt" class="lobby__bouton lobby__bouton--pret" />
-                <ui:Button name="lobby-lancer" text="Lancer" class="lobby__bouton" />
-                <ui:Button name="lobby-quitter" text="Quitter le salon" class="lobby__bouton" />
-            </ui:VisualElement>
-        </ui:VisualElement>
+        </ui:ScrollView>
 
         <ui:VisualElement class="dl-prompt-bar">
             <ui:VisualElement class="dl-prompt-bar__group">

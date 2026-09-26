@@ -50,6 +50,8 @@ public class Nyxessa : MonoBehaviour
     }
 
     public Vector3 CentreCristal { get { return cristal != null ? cristal.position : transform.position; } }
+    /// Transform du cristal (canalisation : FiletEnergie suit ce point image par image).
+    public Transform Cristal { get { return cristal != null ? cristal : transform; } }
 
     // Réaction à un événement ; `point` : départ du missile pour TirMissile (ignoré sinon).
     public void Reagir(ReactionNyxessa type, Vector3 point = default(Vector3))

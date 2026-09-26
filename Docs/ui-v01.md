@@ -4,7 +4,7 @@ Première version jouable (décision de l'utilisateur) : **défense solo, une se
 
 Banc : scène `Assets/Scenes/UIv01.unity` (première scène du build), données factices. Générée par **Deathless > UI > 5. Scène des écrans 0.1**.
 
-Captures (`Assets/Screenshots/`) : `UI01_menu.png`, `UI01_hud_jour.png`, `UI01_hud_alerte.png`, `UI01_hud_nuit.png`, `UI01_mort.png`, `UI01_pause.png`, `UI01_options_commandes.png`, `UI01_score.png`, `UI01_hud_x3.png`.
+Captures (`Assets/Screenshots/`) : `UI01_menu.png`, `UI01_hud_jour.png`, `UI01_hud_alerte.png`, `UI01_hud_nuit.png`, `UI01_mort.png`, `UI01_pause.png`, `UI01_options_commandes.png`, `UI01_score.png`, `UI01_hud_x3.png`. Lobby aux trois tailles, dont un format large (21:9) : `lobby_x1.png`, `lobby_x2.png`, `lobby_x3.png`, `lobby_x3_large.png` (26/09/2026, voir « Lobby multijoueur » ci-dessous).
 
 ## Principe : les écrans ne connaissent pas le jeu
 
@@ -156,6 +156,27 @@ Posée par le jeu dans `DonneesUI.Statuts` (`Deathless.Jeu.StatutsUI`, créée p
   - Chute testée : 8 m donnent 53 dégâts et Ralenti −40 % pendant 3 s ; un saut sur place ne donne rien.
 - Icônes : `ArtSources/Icones/generer_statuts.py` → `Statuts/`, copiées dans `Assets/UI/Icones/Statuts/` par la synchronisation des icônes (menu 6).
 
+### Jauge de parade : `IJaugeParade` (`Donnees/IJaugeParade.cs`, 26/09/2026)
+
+Posée par le jeu dans `DonneesUI.Parade` (`Deathless.Jeu.ParadeParfaite`, créée par `ClassePaladin` pour le héros local ; retirée à sa destruction), lue à chaque image par le HUD. Absente (autres classes) : rien n'est affiché. Règles : Wiki `interface.md`, « Jauge de parade », et `classe-paladin.md`.
+
+| Membre | Sens |
+|---|---|
+| `Visible` | Un coup parable vise le joueur local (du début de sa préparation à l'impact), ou son issue est encore montrée (0,45 s). |
+| `AvantImpact` | Secondes avant l'impact prévu (négatif juste après). |
+| `Duree` | Durée couverte par toute la largeur (`GameBalance.paradeJaugeDuree`, 0,8 s) : le curseur part de la gauche quand il reste `Duree` s. |
+| `FenetreParade`, `FenetreParfaite` | Fenêtres avant l'impact (`paradeFenetre` 0,25 s, `paradeParfaiteFenetre` 0,1 s). |
+| `Appui` | Secondes avant l'impact où la garde a été levée pour ce coup ; négatif : pas d'appui. |
+| `Resultat`, `DepuisResultat` | `ResultatParade` : `Aucun`, `Bloque`, `Parade`, `Parfaite` (dès l'appui), `Touche` ; temps écoulé depuis. |
+
+- **HUD** (`Ecrans/HudParade.cs`, classe à part : `EcranHud` ne fait que la créer et l'appeler ; allure dans `Hud.uss`, règles `.hud-parade`). Élément `parade` inséré juste après le réticule, centré 40 px sous le centre de l'écran, 240 × 36 px (tailles ×1/×2/×3 par l'échelle du panneau).
+  - Piste sombre de 12 px à liseré (`--dl-color-border-strong`), fenêtre de parade en ivoire à 28 %, fenêtre parfaite en or (`--dl-color-gold`) collée au bord droit (l'impact).
+  - Curseur ivoire de 6 × 26 px qui avance vers la droite ; repère fin (`--dl-color-text-muted`) à l'instant de l'appui.
+  - Issue : classes `hud-parade--parfaite` (liseré et curseur or, « Parfaite » en or au-dessus, rebond ×1,12), `--parade` (liseré ivoire), `--bloque` (liseré grisé), `--touche` (liseré rouge `--dl-color-life`) ; la jauge s'efface ensuite (opacité).
+  - Pas de vert, aucune icône. Masquée quand le joueur est mort.
+- **Pourquoi sous le réticule** : en mêlée, le regard est au centre ; au-dessus de l'attaquant, la jauge bougerait avec lui et se mêlerait aux rangées de statuts des ennemis.
+- Pas encore de version factice dans le banc UIv01 (`EtatFactice`) ; vérification dans le Village avec `Deathless.Jeu.Dev.ScenariosParade`.
+
 ### Bloc joueur : maquette B (26/09/2026)
 
 Quentin a choisi la **maquette B** parmi trois essais du bloc joueur (bac à sable `sandbox-ui`, `Assets/UI/Screens/HudMaquettes/`, capture `maquette_hud_B.png`), intégrée dans le vrai HUD :
@@ -258,7 +279,7 @@ public class PartieUI : MonoBehaviour, IEtatPartie, IEtatJoueur, IScoreFin, ICom
 |---|---|---|---|
 | Menu principal | `MenuPrincipal/MenuPrincipal.uxml`, `V01.uss` | `EcranMenuPrincipal` | Solo (ouvre le choix de classe), Multijoueur (ouvre le lobby), Options, Crédits, Quitter ; « Version 0.1 ». Plus de carte de classe (la classe se choisit juste avant de lancer ; la dernière jouée reste mémorisée pour présélectionner le choix). Capture `UI01_menu_sans_carte.png`. |
 | Saisie | `Saisie/Saisie.uxml`, `V01.uss` | `EcranSaisie` | Saisie d'un texte : champ (clavier physique) et clavier virtuel `ClavierVirtuel` (grille de touches pour la manette et la souris : lettres avec accents courants, chiffres, tiret, Maj, Espace, Effacer, Valider ; majuscule automatique au début du pseudo). A : touche, B : effacer (saisie obligatoire) ou retour, Y : valider. Trois usages : pseudo (premier lancement, options), code de salon (6 caractères), adresse IP (secours). |
-| Lobby | `Lobby/Lobby.uxml`, `V01.uss` | `EcranLobby` | Entrée : « Créer un salon » ; « Rejoindre un salon » (champ du code, ouvre la saisie ; bouton Rejoindre ; lien « Rejoindre par adresse IP »). Salon : code (Afficher, Copier), quatre emplacements (emblème de la classe, pseudo, classe, Prêt / Pas prêt, étiquette Hôte ; emplacement libre grisé), « Choisir sa classe » (écran de choix en mode lobby, avec l'aperçu 3D), « Je suis prêt » (Y), « Lancer » (hôte, actif quand tous sont prêts), « Quitter le salon » (B) ; bandeau du compte à rebours. Captures : `UI01_lobby_entree.png`, `UI01_lobby_salon.png`, `UI01_lobby_prets.png`, `UI01_lobby_classe_prise.png`. |
+| Lobby | `Lobby/Lobby.uxml`, `V01.uss` | `EcranLobby` | Entrée : « Créer un salon » ; « Rejoindre un salon » (champ du code, ouvre la saisie ; bouton Rejoindre ; lien « Rejoindre par adresse IP »). Salon : code (Afficher, Copier), quatre emplacements (emblème de la classe, pseudo, classe, Prêt / Pas prêt, étiquette Hôte ; emplacement libre grisé), « Choisir sa classe » (écran de choix en mode lobby, avec l'aperçu 3D), « Je suis prêt » (Y), « Lancer » (hôte, actif quand tous sont prêts), « Quitter le salon » (B). Bandeau « Tous prêts : la partie commence dans … » **en surimpression par-dessus les 4 cartes**, centré, sur fond sombre (26/09/2026, retour de Quentin) : élément `lobby-compte` positionné en `position: absolute` (USS), toujours enfant de `lobby-emplacements` mais dessiné en dernier pour rester au-dessus des cartes ; jamais dans la mise en page, ne décale donc jamais rien, dans tous les cas (corrigé en 0.4.3, comportement gardé). Contenu du salon dans un `ScrollView` vertical (`lobby-scroll`, règle des écrans denses à ×3 de `ui-socle.md`) : ne défile que si nécessaire, pour que la rangée d'actions du bas tienne toujours au-dessus de la barre d'invites, à ×1/×2/×3 et sur tout format (16:9, 21:9, 16:10) ; marges et hauteurs resserrées à ×3. Captures : `UI01_lobby_entree.png`, `UI01_lobby_salon.png`, `UI01_lobby_prets.png`, `UI01_lobby_classe_prise.png`, `lobby_x1.png`, `lobby_x2.png`, `lobby_x3.png`, `lobby_x3_large.png` (2560×1080). |
 | Choix de classe | `ChoixClasse/ChoixClasse.uxml`, `V01.uss` | `EcranChoixClasse` | Trois colonnes : les cinq classes à gauche (emblème, nom, rôle, étiquette « Dernière »), le personnage en 3D au centre, la fiche à droite (emblème, nom, rôle, arme, description, jauge, cinq actions : icône de l'action, invite du bouton de l'appareil actif, nom ; emplacement vide grisé). À ×3 : colonnes resserrées, étiquette « Dernière » et aide masquées. Dernière classe jouée présélectionnée ; la fiche suit le focus (manette, clavier) et le survol (souris). Valider (A, Entrée, clic) : retient la classe et lance la partie ; Retour (B, Échap) : menu principal. Captures : `UI01_choix_classe_3d_<id>.png` (une par classe, Village) ; avant les icônes et la 3D : `UI01_choix_classe*.png`. |
 | Options | `Options/Options.uxml` | `EcranOptions` | Onglets Jeu / Commandes / Audio (LB, RB). Jeu : taille ×1 (80 %), ×2 (100 %), ×3 (135 %). Commandes : table en lecture seule (clavier et manette, la colonne manette suit la dernière manette), lignes focusables et défilantes. Audio : volumes principal, musique, effets spéciaux, interface (voir « Audio »). Réinitialiser (Y) : réglages de l'onglet affiché (taille ×2, ou volumes par défaut). |
 | Crédits | `Credits/Credits.uxml` | `EcranCredits` | Contenu de `Wiki/pages/credits.md`. |

@@ -555,6 +555,21 @@
     "statut": "utilise"
   },
   {
+    "id": "hache_vent",
+    "nom": "Viking — attaque tournante, souffle de la hache",
+    "categorie": "Viking",
+    "usage": "À chaque tour complet de la hache pendant l'attaque tournante maintenue (en plus de la boucle whirlwind_loop) : un whoosh bref, une des 3 variantes tirée au hasard.",
+    "fichier": "Sonniss/hache_vent_1.wav",
+    "variantes": [
+      "Sonniss/hache_vent_1.wav",
+      "Sonniss/hache_vent_2.wav",
+      "Sonniss/hache_vent_3.wav"
+    ],
+    "source": "Sonniss.com GDC 2026 Game Audio Bundle 1/5 et 2/5 (licence libre de droits pour les jeux) : \"344 Audio — Elemental Palette Designed Vol. 1\" (WINDDsgn_Wind, Rush, Whoosh, Long x5 ; METLMisc_Metal, Slow Whoosh, Rattle, Pass By x4) et \"David Dumais Audio — Melee Weapons Sound Effects Pack 2\" (METLFric_SWING SCRAPE Swift Melee Weapon Swing With A Long Blade 14) ; un extrait de 0,3 à 0,45 s par source, ramené en mono 44,1 kHz et normalisé pour le projet.",
+    "licence": "Sonniss GDC Game Audio Bundle : libre de droits pour les jeux",
+    "statut": "utilise"
+  },
+  {
     "id": "arrow_rain",
     "nom": "Rôdeur — nuée de flèches",
     "categorie": "Assassin et rôdeur",

@@ -25,6 +25,7 @@ namespace Deathless.Jeu
         float m_DernierCoup = -99f;
         float m_ProchainTic;
         bool m_VfxTournante;
+        int m_ToursVent;
         float m_RechargeRugir, m_RechargeSaut;
         bool m_Crie, m_VfxCri, m_Impact;
         Vector3 m_DirSaut, m_DepartSaut;
@@ -40,7 +41,7 @@ namespace Deathless.Jeu
 
         // Effets diffusés aux autres postes (ClasseHeros.Diffuser).
         const int E_Elan = 1, E_Hache = 2, E_TournanteDebut = 3, E_TournanteVfx = 4, E_TournanteTic = 5, E_TournanteFin = 6,
-            E_RugirVfx = 7, E_RugirCri = 8, E_Saut = 9;
+            E_RugirVfx = 7, E_RugirCri = 8, E_Saut = 9, E_TournanteVent = 10;
 
         // Instants du geste (clips à vitesse 1, mesurés par VfxBench) et vitesses de lecture du contrôleur.
         const float CriClip = 1.63f, VitesseCri = 1.6f;
@@ -170,6 +171,14 @@ namespace Deathless.Jeu
                 case Action.Tournante:
                     m_Rage -= b.tournanteRage * Facteur(1) * dt;
                     if (!m_VfxTournante && m_Depuis >= 0.35f && m_Tournante != null && teteHache != null) { m_Tournante.Commencer(transform, teteHache); m_VfxTournante = true; Diffuser(E_TournanteVfx); }
+                    // Souffle de la hache : un whoosh à chaque tour complet de la tête (AttaqueTournante.Tours), en plus
+                    // de la boucle whirlwind_loop déjà lancée par Commencer().
+                    if (m_VfxTournante && m_Tournante != null && m_Tournante.Tours > m_ToursVent)
+                    {
+                        m_ToursVent = m_Tournante.Tours;
+                        AudioBank.Jouer(SonsDuJeu.TournanteVent, transform.position + Vector3.up, 0.75f);
+                        Diffuser(E_TournanteVent);
+                    }
                     if (m_Depuis >= 0.35f && Time.time >= m_ProchainTic)
                     {
                         m_ProchainTic = Time.time + b.tournanteIntervalle;
@@ -215,6 +224,7 @@ namespace Deathless.Jeu
             m_Depuis = 0f;
             m_ProchainTic = 0f;
             m_VfxTournante = false;
+            m_ToursVent = 0;
             if (Anim != null) Anim.SetBool(P_Tourne, true);
             m_SonTournante = AudioBank.Boucle(SonsDuJeu.Tournante, transform, 0.8f);
             Diffuser(E_TournanteDebut);
@@ -299,6 +309,7 @@ namespace Deathless.Jeu
                     if (m_Tournante != null && teteHache != null && !m_VfxTournante) { m_Tournante.Commencer(transform, teteHache); m_VfxTournante = true; }
                     break;
                 case E_TournanteTic: AudioBank.Jouer(SonsDuJeu.Hache, transform.position + Vector3.up, 0.6f, 0.25f); break;
+                case E_TournanteVent: AudioBank.Jouer(SonsDuJeu.TournanteVent, transform.position + Vector3.up, 0.75f); break;
                 case E_TournanteFin: FinTournante(); break;
                 case E_RugirVfx: if (m_Rugissement != null) m_Rugissement.Jouer(); break;
                 case E_RugirCri: AudioBank.Jouer(SonsDuJeu.Rugissement, transform.position + Vector3.up * 1.6f, 1f); break;

@@ -93,6 +93,7 @@ namespace Deathless.Jeu
         public static readonly string[] Fumee = { "smoke_bomb" };
         public static readonly string[] Hache = { "hache_coup", "kenney_rpg_chop" };
         public static readonly string[] Tournante = { "whirlwind_loop" };
+        public static readonly string[] TournanteVent = { "hache_vent" };   // whoosh à chaque tour complet (3 variantes)
         public static readonly string[] Rugissement = { "viking_roar" };
         public static readonly string[] SautPercutant = { "viking_leap_land" };
 

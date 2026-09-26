@@ -324,6 +324,11 @@ namespace Deathless.UI.Ecrans
                 conteneur.Add(e.racine);
                 m_Emplacements.Add(e);
             }
+            // Le bandeau du compte à rebours (lobby-compte, déclaré dans l'UXML comme premier enfant de
+            // lobby-emplacements pour rester à côté des cartes dans le document) doit peindre par-dessus les 4
+            // cartes : on le redéplace en dernier enfant. Il reste en position absolute (USS), donc ce déplacement
+            // ne change jamais la mise en page, seulement l'ordre de dessin.
+            conteneur.Add(m_Compte);
             MajCodeSaisi();
         }
 
@@ -419,8 +424,9 @@ namespace Deathless.UI.Ecrans
             m_Lancer.style.display = l.EstHote ? DisplayStyle.Flex : DisplayStyle.None;
             m_Lancer.SetEnabled(tousPrets);
             var compte = etat == EtatLobby.CompteARebours;
-            // Décompte : sa ligne est toujours réservée (masquée hors décompte), les boutons en dessous ne bougent jamais.
-            m_Compte.style.visibility = compte ? Visibility.Visible : Visibility.Hidden;
+            // Décompte : bandeau en surimpression par-dessus les 4 cartes (position absolute en USS), jamais dans la
+            // mise en page ; afficher ou cacher ne décale donc jamais les cartes ni les actions (corrigé en 0.4.3).
+            m_Compte.style.display = compte ? DisplayStyle.Flex : DisplayStyle.None;
             if (compte) m_Compte.text = "Tous prêts : la partie commence dans " + Mathf.CeilToInt(l.CompteARebours);
         }
 

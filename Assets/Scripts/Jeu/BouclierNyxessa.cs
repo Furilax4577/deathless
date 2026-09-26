@@ -24,6 +24,14 @@ namespace Deathless.Jeu
         public Vector3 Centre => transform.position;   // base du cylindre, au centre de Nyxessa
         public float Rayon => effet != null ? effet.Radius : GameBalance.Courant.bouclierRayon;
 
+        /// Canalisation (Wiki nyxessa.md, palier 4+) : bouclier levé et palier suffisant.
+        public bool Canalise => Leve && PalierActuel >= B.bouclierCanalisationPalier;
+
+        RelicShieldVisual m_Visuel;
+        FiletEnergie m_Filet;
+        Transform m_AncrageBaton;
+        bool m_CanaliseVu;
+
         /// Le bouclier vient d'être brisé (le sorcier meurt).
         public event System.Action Brise;
 
@@ -39,9 +47,49 @@ namespace Deathless.Jeu
         {
             Instance = this;
             if (effet == null) effet = GetComponentInChildren<RelicShieldEtat>(true);
+            if (effet != null) m_Visuel = effet.GetComponent<RelicShieldVisual>();
         }
 
         void OnDestroy() { if (Instance == this) Instance = null; }
+
+        /// Signe visuel de l'amélioration (Wiki nyxessa.md : « chaque palier rend le bouclier plus dense ») : le mur et
+        /// la lévitation autour suivent le palier acheté (RelicShieldVisual.palierQuantite, piste B). Et, à partir du
+        /// palier de canalisation, le filet d'énergie entre le bâton du sorcier et le cristal de Nyxessa.
+        void Update()
+        {
+            if (m_Visuel != null) m_Visuel.palierQuantite = Mathf.Clamp(PalierActuel, 1, 5);
+            SuivreCanalisation();
+        }
+
+        void SuivreCanalisation()
+        {
+            bool actif = Canalise;
+            if (actif == m_CanaliseVu) return;
+            m_CanaliseVu = actif;
+            if (!actif) { if (m_Filet != null) m_Filet.Desactiver(); return; }
+            var sorcier = Sorcier.Instance;
+            var nyxessa = Nyxessa.Instance;
+            if (sorcier == null || nyxessa == null) { m_CanaliseVu = false; return; }   // réessaie au prochain changement
+            if (m_AncrageBaton == null)
+            {
+                // Le sorcier (PNJ) porte son bâton sous le nom "baton_sorcier" (handslot.r), pas le socket "staff" que
+                // crée le style d'arme des joueurs (ClasseMage) : bug trouvé le 26/09/2026 (vérification en jeu), le
+                // filet ne se posait jamais faute d'ancrage. Repli sur "staff" si le prefab change un jour de convention.
+                var baton = MannequinEquip.Trouver(sorcier.transform, "baton_sorcier") ?? MannequinEquip.Trouver(sorcier.transform, "staff");
+                if (baton == null) { m_CanaliseVu = false; return; }
+                var go = new GameObject("FiletEnergie_AncrageBaton");
+                go.transform.SetParent(baton, false);
+                go.transform.localPosition = new Vector3(0f, 1.2f, 0f);   // pointe du bâton, comme ClasseMage/VfxBench.PointArme
+                m_AncrageBaton = go.transform;
+            }
+            if (m_Filet == null)
+            {
+                var go = new GameObject("FiletEnergie_Canalisation");
+                m_Filet = go.AddComponent<FiletEnergie>();
+                m_Filet.DefinirMateriau(EffetsJeu.Gemmes);
+            }
+            m_Filet.Activer(m_AncrageBaton, nyxessa.Cristal);
+        }
 
         void Start()
         {
@@ -126,9 +174,13 @@ namespace Deathless.Jeu
             int max = GameBalance.AuPalier(B.missilesStockPaliers, n.palierMissiles);
             if (n.stock >= max) return;
             float duree = GameBalance.AuPalier(B.missileRegenerationPaliers, n.palierMissiles);
+            int avant = n.stock;
             n.regeneration += degats / B.bouclierDegatsParSecondeRecharge;
             while (n.stock < max && n.regeneration >= duree) { n.regeneration -= duree; n.stock++; }
             if (n.stock >= max) n.regeneration = 0f;
+            // Signe visuel (Wiki nyxessa.md : « s'illumine brièvement ») : la recharge d'un missile a effectivement
+            // avancé le stock, le filet d'énergie brille un instant.
+            if (n.stock > avant && m_Filet != null) m_Filet.Pulse();
         }
 
         // ----------------------------------------------------------------- Client d'une partie réseau (l'hôte fait foi)
