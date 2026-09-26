@@ -216,7 +216,7 @@ namespace Deathless.Jeu
             if (elite)
             {
                 stats = new StatsSquelette { pv = stats.pv * 3f, vitesse = stats.vitesse, degatsJoueur = stats.degatsJoueur * 1.5f, degatsNyxessa = stats.degatsNyxessa * 1.5f, intervalle = stats.intervalle, preparation = stats.preparation, portee = stats.portee + 0.3f };
-                go.transform.localScale *= 1.25f;
+                go.transform.localScale *= 1.3f;   // wiki (ennemis.md) : environ 1,3 fois plus grand
             }
             sq.Agent.Warp(point);
             sq.Initialiser(stats, mult);
