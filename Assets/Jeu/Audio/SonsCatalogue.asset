@@ -20,61 +20,71 @@ MonoBehaviour:
     clips:
     - {fileID: 8300000, guid: 67a3c0b13296ac34281e5ff8228f5df2, type: 3}
     - {fileID: 8300000, guid: d50955ecb9596a9498f2c692f1dd4ab2, type: 3}
+    portee: 0
   - id: ui_clic
     nom: "Interface \u2014 clic de validation"
-    statut: utilise
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 603dae63f659ecd40bffb9bb3945f30d, type: 3}
     - {fileID: 8300000, guid: 2e175d02a470e6d4093daa0b94f5faca, type: 3}
+    portee: 0
   - id: ui_survol
     nom: "Interface \u2014 survol d'un bouton"
-    statut: utilise
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: c6a8dc3072244084fb6a260334aadd05, type: 3}
+    portee: 0
   - id: ui_retour
     nom: "Interface \u2014 retour"
-    statut: utilise
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 0c7fc15692d4d2d4a90f097148b66635, type: 3}
+    portee: 0
   - id: ui_refus
     nom: "Interface \u2014 action refus\xE9e"
-    statut: utilise
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: ffbc5b14e0efc064582c6a3d4733bd72, type: 3}
+    portee: 0
   - id: ui_confirmation
     nom: "Interface \u2014 confirmation"
-    statut: utilise
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: adaf1bcdaae7bb444a164f21ddb547be, type: 3}
+    portee: 0
   - id: ui_decompte
     nom: "Interface \u2014 d\xE9compte"
-    statut: utilise
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 09f9842b1c9d3e64389770569d7b5c02, type: 3}
+    portee: 0
   - id: vote_pret
     nom: "Vote \xAB pr\xEAt \xBB \u2014 joueur pr\xEAt"
-    statut: utilise
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 1946493675ddd2b408447fcd4b104c8e, type: 3}
+    portee: 0
   - id: vote_tous_prets
     nom: "Vote \xAB pr\xEAt \xBB \u2014 tout le monde est pr\xEAt"
-    statut: utilise
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 9e300dc4a4051c34ea3b74038b8103fd, type: 3}
+    portee: 0
   - id: vote_annule
     nom: "Vote \xAB pr\xEAt \xBB \u2014 vote annul\xE9"
-    statut: utilise
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 06e6a04c35b711e479fa28d3e82e7813, type: 3}
+    portee: 0
   - id: player_hurt
     nom: "Joueur \u2014 touch\xE9"
     statut: utilise
@@ -83,18 +93,21 @@ MonoBehaviour:
     - {fileID: 8300000, guid: df343fda28d92c547831f0233884c4b6, type: 3}
     - {fileID: 8300000, guid: 1301f37d9bd631f4e99d3ba74d219540, type: 3}
     - {fileID: 8300000, guid: 184485fc9a9604f428158665486b15c2, type: 3}
+    portee: 0
   - id: player_death
     nom: "Joueur \u2014 mort"
     statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 0d30e2bc354cbec4ab903a5ed54305d3, type: 3}
+    portee: 0
   - id: respawn
     nom: "Joueur \u2014 r\xE9apparition"
     statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 8ad5291a69901e74087d3cf6c6649f09, type: 3}
+    portee: 0
   - id: dodge
     nom: "Joueur \u2014 esquive, roulade"
     statut: utilise
@@ -102,6 +115,7 @@ MonoBehaviour:
     clips:
     - {fileID: 8300000, guid: b57f3c304a4b3b7428f8b6aa9dd3467c, type: 3}
     - {fileID: 8300000, guid: 65e9392ec2a15234fb09057f48947a9c, type: 3}
+    portee: 0
   - id: land
     nom: "Joueur \u2014 r\xE9ception d'un saut"
     statut: utilise
@@ -110,6 +124,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 701ac24116a72484e9a0db5328e85b15, type: 3}
     - {fileID: 8300000, guid: b3fa2a7af8ba19644bce1b66f5c2bf3f, type: 3}
     - {fileID: 8300000, guid: 2685ffbfbc3cdd643881f273f7f9dc22, type: 3}
+    portee: 0
   - id: kenney_rpg_footstep
     nom: "Joueur \u2014 pas"
     statut: utilise
@@ -125,6 +140,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: f5feb5e6680d7e746b60e46e109b262e, type: 3}
     - {fileID: 8300000, guid: 610d77ac2e2ee1a4084764b01f2d51cf, type: 3}
     - {fileID: 8300000, guid: 206f3bb3247338c41bef404fb0a823fe, type: 3}
+    portee: 0
   - id: kenney_rpg_handlesmallleather
     nom: "Potion \u2014 sortie de la sacoche"
     statut: utilise
@@ -132,6 +148,7 @@ MonoBehaviour:
     clips:
     - {fileID: 8300000, guid: d0ac846f8038c5b428386819640e9b98, type: 3}
     - {fileID: 8300000, guid: 9f34230b7d9cc7f4a80f5672cdd73538, type: 3}
+    portee: 0
   - id: water_step
     nom: "Joueur \u2014 pas dans l'eau"
     statut: disponible
@@ -140,6 +157,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 2ef5013628372de4c87ca528f4128b95, type: 3}
     - {fileID: 8300000, guid: edc9d4ce2ff9858498dd958c758ec4c5, type: 3}
     - {fileID: 8300000, guid: 73b6791f973dbd84caa81cf09654fb77, type: 3}
+    portee: 0
   - id: bow_shot_v3
     nom: "Arc \u2014 tir"
     statut: disponible
@@ -148,6 +166,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 9610b4cbd27c77945abb159a63ba78ca, type: 3}
     - {fileID: 8300000, guid: 58fe493505007e44a8b0001ad46989b9, type: 3}
     - {fileID: 8300000, guid: 41d9fd5d5b53c3040a17b552ad030d12, type: 3}
+    portee: 0
   - id: bow_shot_v2
     nom: "Arc \u2014 tir (ancienne version)"
     statut: disponible
@@ -156,12 +175,14 @@ MonoBehaviour:
     - {fileID: 8300000, guid: ee5c884e5047a8a4ca85509d9cd3b4fc, type: 3}
     - {fileID: 8300000, guid: 8ba6f46398261514d938effca5f1d020, type: 3}
     - {fileID: 8300000, guid: c996b61ae3d891b4eb9ba936633592d3, type: 3}
+    portee: 0
   - id: bow_shot_v3_charged
     nom: "Arc \u2014 tir charg\xE9"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: ede56ad1846612b498411883c059c238, type: 3}
+    portee: 0
   - id: bow_shot_charged
     nom: "Arc \u2014 tir charg\xE9 (ancienne version)"
     statut: disponible
@@ -169,6 +190,7 @@ MonoBehaviour:
     clips:
     - {fileID: 8300000, guid: 2d58fe006d4f1204aa1306e8511d3d6a, type: 3}
     - {fileID: 8300000, guid: 44c250347361d774d9da1c63eb0545f4, type: 3}
+    portee: 0
   - id: crossbow_shot_v3
     nom: "Arbal\xE8te \u2014 tir"
     statut: disponible
@@ -177,6 +199,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: ef3522d9b58874c439a7b4eab2fd71e7, type: 3}
     - {fileID: 8300000, guid: c1aebf1a140fe2a4c85a06bbc0105c91, type: 3}
     - {fileID: 8300000, guid: f6dbe73627f86f24482ab8cd15fb996a, type: 3}
+    portee: 0
   - id: crossbow_shot
     nom: "Arbal\xE8te \u2014 tir (ancienne version)"
     statut: disponible
@@ -185,6 +208,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 3b792b02718e5c44ea81a4ad7f06308e, type: 3}
     - {fileID: 8300000, guid: b7476aa71da99104ea80cd4922a73441, type: 3}
     - {fileID: 8300000, guid: 6d9b44be9e0a3ad488d3202cefc93350, type: 3}
+    portee: 0
   - id: arrow_impact
     nom: "Fl\xE8che \u2014 impact"
     statut: utilise
@@ -193,12 +217,14 @@ MonoBehaviour:
     - {fileID: 8300000, guid: f9634dee7e19a4848ac4177fe7a810e2, type: 3}
     - {fileID: 8300000, guid: 536c0421c985b314d95fc4ae582d9191, type: 3}
     - {fileID: 8300000, guid: 6b6da4fbf69789647a3bb7c5cd814103, type: 3}
+    portee: 0
   - id: kenney_rpg_chop
     nom: "Hache \u2014 coup"
     statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 66c10ffe8490bb74e8a280c450cd3862, type: 3}
+    portee: 0
   - id: kenney_rpg_knifeslice
     nom: "Lame \u2014 coup"
     statut: utilise
@@ -206,6 +232,7 @@ MonoBehaviour:
     clips:
     - {fileID: 8300000, guid: c7a5941b389201d40b717678637ca9cd, type: 3}
     - {fileID: 8300000, guid: 4ff2c82431449a04dab59062a51a7cca, type: 3}
+    portee: 0
   - id: bow_shot
     nom: "Arc \u2014 tir (premi\xE8re version)"
     statut: disponible
@@ -214,6 +241,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 788e6d951ac52b04088ae5c87efecf3a, type: 3}
     - {fileID: 8300000, guid: a79ac0ac2bf5cd846ab95bed6e9093c2, type: 3}
     - {fileID: 8300000, guid: f1f153d67c786ba48ab324453be2fa32, type: 3}
+    portee: 0
   - id: coup_critique
     nom: Coup critique
     statut: disponible
@@ -222,60 +250,70 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 60cacaf38a04bb84bb15e775905b348b, type: 3}
     - {fileID: 8300000, guid: 4fa68bb956571284d83b6dc08da05191, type: 3}
     - {fileID: 8300000, guid: e680cb04bc593e240af88c330e3e652d, type: 3}
+    portee: 0
   - id: coup_critique_meilleur
     nom: "Coup critique \u2014 meilleur critique"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: f80aa7d4d39a5f74e8a3f9a0e83ab96f, type: 3}
+    portee: 0
   - id: arbalete_recharge
     nom: "Arbal\xE8te \u2014 rechargement"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 208e8927adec70a45954d8638384c402, type: 3}
+    portee: 0
   - id: fireball_cast
     nom: "Boule de feu \u2014 lancer"
     statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 7ebbed65a4171b24e81c1308419c758d, type: 3}
+    portee: 0
   - id: fireball_flight_loop
     nom: "Boule de feu \u2014 vol (boucle)"
     statut: utilise
     boucle: 1
     clips:
     - {fileID: 8300000, guid: 70d941b14e994884c99ce90380ca2e6e, type: 3}
+    portee: 0
   - id: fireball_explosion
     nom: "Boule de feu \u2014 explosion"
     statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 2b327e2b0090e4c42bb98627af4a37af, type: 3}
+    portee: 0
   - id: mage_flame_cone_loop
     nom: "C\xF4ne de flammes (boucle)"
     statut: utilise
     boucle: 1
     clips:
     - {fileID: 8300000, guid: b4f0c7b1840fe4841984a88c620adc58, type: 3}
+    portee: 0
   - id: mage_ignite
     nom: "Mage \u2014 embrasement"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 7040ee6a16018794aac13b060de1d6d9, type: 3}
+    portee: 0
   - id: mage_avatar
     nom: "Mage \u2014 avatar du feu"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 1f2b731b35e8b1d4e945a41e9528af12, type: 3}
+    portee: 0
   - id: brulure
     nom: "Br\xFBlure \u2014 cr\xE9pitement (boucle)"
     statut: disponible
     boucle: 1
     clips:
     - {fileID: 8300000, guid: bf77e2745cabdfb49b212276609a3e5e, type: 3}
+    portee: 0
   - id: shield_block
     nom: "Bouclier \u2014 coup bloqu\xE9"
     statut: utilise
@@ -284,30 +322,35 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 94e4c90961558b842af3130757c2b04f, type: 3}
     - {fileID: 8300000, guid: 45237aabad11cd545b04fdfc98fb2f3c, type: 3}
     - {fileID: 8300000, guid: 5518c7bfa082db34395083c1e472b75b, type: 3}
+    portee: 0
   - id: parry
     nom: "Bouclier \u2014 parade"
     statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 4c13fe87a41af764abe898d936082e73, type: 3}
+    portee: 0
   - id: knight_charge
     nom: "Paladin \u2014 charge b\xE9lier"
     statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 7cccd513e0eb1ec47a5cef5311bad68c, type: 3}
+    portee: 0
   - id: knight_heal
     nom: "Paladin \u2014 soin sur soi"
     statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 6115e1aead9f81d40b752fd980413e99, type: 3}
+    portee: 0
   - id: knight_bash
     nom: "Paladin \u2014 pouss\xE9e au bouclier"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: b354161f1fae1b74e9d8786e64d64f85, type: 3}
+    portee: 0
   - id: viking_roar
     nom: "Viking \u2014 rugissement"
     statut: utilise
@@ -315,121 +358,141 @@ MonoBehaviour:
     clips:
     - {fileID: 8300000, guid: 14b511d6fff671f4db40c90fc8f8d9fc, type: 3}
     - {fileID: 8300000, guid: 1b24c24bbc6c8d644a6366f731139652, type: 3}
+    portee: 0
   - id: viking_leap_land
     nom: "Viking \u2014 saut percutant, impact"
     statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 4dce5789a04a4834eae9e88cb84a0de4, type: 3}
+    portee: 0
   - id: whirlwind_loop
     nom: "Viking \u2014 attaque tournante (boucle)"
     statut: utilise
     boucle: 1
     clips:
     - {fileID: 8300000, guid: 172940dd60d25ef4e9465aebb8b80dc0, type: 3}
+    portee: 0
   - id: arrow_rain
     nom: "R\xF4deur \u2014 nu\xE9e de fl\xE8ches"
     statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 0a9b5e4dcbdcdc54e882d5ff82f4f517, type: 3}
+    portee: 0
   - id: smoke_bomb
     nom: "Grenade fumig\xE8ne \u2014 impact"
     statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: dedf5687b7b3ed74baa117d45b8e0690, type: 3}
+    portee: 0
   - id: ranger_focus
     nom: "R\xF4deur \u2014 concentration"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: c9e96707ef73d694c999c2b1ceed9f7e, type: 3}
+    portee: 0
   - id: arc_bander
     nom: "Arc \u2014 bander"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 467075b2ddeb33f47aa1d85d643d5c78, type: 3}
+    portee: 0
   - id: arc_charge_complete
     nom: "Arc \u2014 charg\xE9 \xE0 fond"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: b0d09bfe01f339a4894e2ce19ff05da7, type: 3}
+    portee: 0
   - id: nuee_marqueur
     nom: "Nu\xE9e de fl\xE8ches \u2014 marqueur au sol"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: ea8dc8c863efe53419aa9fd2d7fa23ac, type: 3}
+    portee: 0
   - id: assassin_furtif
     nom: "Assassin \u2014 passage en mode furtif"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 7230de2c0b3db05458cf38f99450b5c9, type: 3}
+    portee: 0
   - id: assassin_furtif_sortie
     nom: "Assassin \u2014 sortie du mode furtif"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: ef6c5aa4451cd164bb51679f8188255a, type: 3}
+    portee: 0
   - id: assassin_repere
     nom: "Assassin \u2014 rep\xE9r\xE9"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 4009718ac02a94b4ca6c14ece0ce2bd8, type: 3}
+    portee: 0
   - id: grenade_lancer
     nom: "Grenade fumig\xE8ne \u2014 lancer"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 7dcb9eababce0ca47b233b459ee4e310, type: 3}
+    portee: 0
   - id: portal_open
     nom: "Portail \u2014 ouverture"
     statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: e6f0fd128854bd4468423531ffdad0a1, type: 3}
+    portee: 0
   - id: portal_close
     nom: "Portail \u2014 fermeture"
     statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 51a9024733a4bc4408046cd712a127d2, type: 3}
+    portee: 0
   - id: portal_hum_loop
     nom: "Portail \u2014 bourdonnement (boucle)"
     statut: utilise
     boucle: 1
     clips:
     - {fileID: 8300000, guid: 6d3c97d9b54ce7344b93cf4590d1e660, type: 3}
+    portee: 0
   - id: portal_pass
     nom: "Portail \u2014 entr\xE9e d'un joueur"
     statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 786f06cf6527a4e4d9ebb18f9fa1bac3, type: 3}
+    portee: 0
   - id: relic_pulse
     nom: "Nyxessa \u2014 impulsion"
-    statut: utilise
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 594a5620cedada94581f4da7954dfafd, type: 3}
+    portee: 0
   - id: relic_hit
     nom: "Nyxessa \u2014 frapp\xE9e"
-    statut: utilise
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 6821289bfdd37434e84da3f8f992a7db, type: 3}
     - {fileID: 8300000, guid: f21fa86721a577b4393006a42d600f43, type: 3}
+    portee: 0
   - id: shield_raise
     nom: "Bouclier de Nyxessa \u2014 lev\xE9e"
     statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 47277d6e167941345b2a5a67bb59533b, type: 3}
+    portee: 0
   - id: shield_hit
     nom: "Bouclier de Nyxessa \u2014 coup encaiss\xE9"
     statut: utilise
@@ -438,90 +501,105 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 475c7f1ed77bb7a408274f3dc3be1bbb, type: 3}
     - {fileID: 8300000, guid: f82ae8d17d33be44ca0afbf80e58a831, type: 3}
     - {fileID: 8300000, guid: a5e0ef9ec322da44c9aec6be8ae87095, type: 3}
+    portee: 0
   - id: shield_break
     nom: "Bouclier de Nyxessa \u2014 rupture"
     statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 79d55293147f47541972eb1cef3599f2, type: 3}
+    portee: 0
   - id: skull_flight_loop
     nom: "Missile en cr\xE2ne \u2014 vol (boucle)"
     statut: utilise
     boucle: 1
     clips:
     - {fileID: 8300000, guid: 3a76d21081cdf8b4d873942447cca63a, type: 3}
+    portee: 0
   - id: skull_explosion
     nom: "Missile en cr\xE2ne \u2014 \xE9clatement"
     statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 97350eb161c2f264384ec685c527d18d, type: 3}
+    portee: 0
   - id: nyxessa_alerte
     nom: "Nyxessa \u2014 alerte, relique attaqu\xE9e"
-    statut: utilise
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 63aecdff01648d34081fff6cf226cc48, type: 3}
+    portee: 0
   - id: nyxessa_charge_portail
     nom: "Nyxessa \u2014 charge vers le portail"
-    statut: utilise
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: ed1cf2bc48b04704fbd1333e73751933, type: 3}
+    portee: 0
   - id: nyxessa_retour_energie
     nom: "Nyxessa \u2014 retour de l'\xE9nergie"
-    statut: utilise
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: dabb40a27ba775a4eb3fec3739d6b32c, type: 3}
+    portee: 0
   - id: portail_goutte
     nom: "Portail \u2014 goutte d'eau, entr\xE9e"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 1e68cf324b5fde34aac81699dd44e493, type: 3}
+    portee: 0
   - id: portail_goutte_sortie
     nom: "Portail \u2014 goutte d'eau, sortie"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: eb0e6a11d4f5c6d4f898bb887f3bfb67, type: 3}
+    portee: 0
   - id: portail_arrivee
     nom: "Portail \u2014 arriv\xE9e d'un joueur"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 93144651e8417b24aaea77498a877fc0, type: 3}
+    portee: 0
   - id: nyxessa_onde_passage
     nom: "Nyxessa \u2014 onde de la ceinture"
-    statut: utilise
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: b6a65394c2393e04898c56cd005d3366, type: 3}
+    portee: 0
   - id: nyxessa_rappel
     nom: "Nyxessa \u2014 rappel forc\xE9"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 3efc6bbc53b67534eaa8c5bc395e44be, type: 3}
+    portee: 0
   - id: nyxessa_palier
     nom: "Nyxessa \u2014 palier am\xE9lior\xE9"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 7df062e27d2e5d044a4d52b72038e1fb, type: 3}
+    portee: 0
   - id: sorcier_incantation
     nom: "Sorcier \u2014 incantation du bouclier (boucle)"
     statut: utilise
     boucle: 1
     clips:
     - {fileID: 8300000, guid: 615e084e724896b4cb3d52b4420c9407, type: 3}
+    portee: 0
   - id: nyxessa_destruction
     nom: "Nyxessa \u2014 destruction (d\xE9faite)"
-    statut: utilise
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 58d0c85cfc817c7469f844234e5609b6, type: 3}
+    portee: 0
   - id: skeleton_spawn
     nom: "Squelette \u2014 sortie de terre"
     statut: utilise
@@ -529,6 +607,7 @@ MonoBehaviour:
     clips:
     - {fileID: 8300000, guid: a8b5c258973e37a4ea1786180872b2ad, type: 3}
     - {fileID: 8300000, guid: 5b3b2285ea4899d49b8fc1b7ee2939b1, type: 3}
+    portee: 0
   - id: skeleton_hit
     nom: "Squelette \u2014 touch\xE9"
     statut: utilise
@@ -537,6 +616,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: c1b7204f347e5d7498815c22dfb494a1, type: 3}
     - {fileID: 8300000, guid: 3d9b83d6673224d41a7abfcf1f9b1c98, type: 3}
     - {fileID: 8300000, guid: 3da43b2398cd3c8439faadec49c7ac56, type: 3}
+    portee: 0
   - id: skeleton_death
     nom: "Squelette \u2014 mort"
     statut: utilise
@@ -545,6 +625,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 8c3a487f991f07b47a299916ccda2f94, type: 3}
     - {fileID: 8300000, guid: 10dded4658365c945aae311d4d1c49ae, type: 3}
     - {fileID: 8300000, guid: 9bf88a4c85b2e584ebb94ed798d8b0f4, type: 3}
+    portee: 0
   - id: dawn_vaporize
     nom: "Squelette \u2014 d\xE9sint\xE9gration \xE0 l'aube"
     statut: utilise
@@ -552,6 +633,7 @@ MonoBehaviour:
     clips:
     - {fileID: 8300000, guid: d636761c0b4d4f548bc33ead648c13ba, type: 3}
     - {fileID: 8300000, guid: db7e72c8c6951c64ca58fd0fa5fe8fd1, type: 3}
+    portee: 0
   - id: kenney_rpg_drawknife
     nom: "Squelette \u2014 pr\xE9paration d'un coup"
     statut: utilise
@@ -560,6 +642,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 1f9862a759ea67049b3b829ddd9dad63, type: 3}
     - {fileID: 8300000, guid: 621d7c36de767ac48a4cadbb6bdb6b40, type: 3}
     - {fileID: 8300000, guid: 2e6d59f6aa5a8ef47bb33d82afa75fc4, type: 3}
+    portee: 0
   - id: skeleton_bow_shot
     nom: "Squelette archer \u2014 tir"
     statut: disponible
@@ -568,72 +651,84 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 3f43308aa5d3a6d48bf410500150a1d9, type: 3}
     - {fileID: 8300000, guid: 18a5fdec5966ca9408a0fe0b80a7ed52, type: 3}
     - {fileID: 8300000, guid: fbeb2eb44f2a9cc4f9d5ca77b2a296c5, type: 3}
+    portee: 0
   - id: necro_summon
     nom: "N\xE9cromancien \u2014 invocation"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 407f7e87b9d7e6e4dadede54f095818a, type: 3}
+    portee: 0
   - id: necro_heal_loop
     nom: "N\xE9cromancien \u2014 soin en canal (boucle)"
     statut: disponible
     boucle: 1
     clips:
     - {fileID: 8300000, guid: 95f58dee01960d54a88d325c145041a1, type: 3}
+    portee: 0
   - id: nightfall
     nom: "Tomb\xE9e de la nuit"
     statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 71eed61d13267054baafe4355c174304, type: 3}
+    portee: 0
   - id: dawn
     nom: L'aube
     statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 6dc8f4a4a09a5474a998c732f7ebb529, type: 3}
+    portee: 0
   - id: nuit_vague
     nom: "Nuit \u2014 nouvelle vague"
     statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: f3f576bcdfc3eeb4a8bbf0a4e4713766, type: 3}
+    portee: 0
   - id: donjon_alerte_nuit
     nom: "Donjon \u2014 alerte avant la nuit"
     statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 72de0e1ce999b0d4996ccc6ca1d34382, type: 3}
+    portee: 0
   - id: partie_victoire
     nom: "Partie \u2014 victoire"
     statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 04f6606953f1037488f99f8bcfe57948, type: 3}
+    portee: 0
   - id: musique_dehors_jour
     nom: "Musique \u2014 village, le jour"
     statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 0f9352d4068f0db46acd1c515f964792, type: 3}
+    portee: 0
   - id: musique_dehors_nuit
     nom: "Musique \u2014 village, la nuit"
     statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: d40c3bd98a973214e858f566085b15fd, type: 3}
+    portee: 0
   - id: musique_dedans_donjon
     nom: "Musique \u2014 donjon"
     statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 3f08a7894b7937e438ddf137baacb89f, type: 3}
+    portee: 0
   - id: chest_open
     nom: "Coffre \u2014 ouverture"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: cef21927c2bde414a828ad68c4d5ec48, type: 3}
+    portee: 0
   - id: crystal_light
     nom: "Cristal de passage \u2014 allumage"
     statut: disponible
@@ -641,24 +736,28 @@ MonoBehaviour:
     clips:
     - {fileID: 8300000, guid: ed013126b2be4d540be5a2bedfa8397e, type: 3}
     - {fileID: 8300000, guid: f1c3fc47678153947a29b29e839f9056, type: 3}
+    portee: 0
   - id: trap_spikes
     nom: "Pi\xE8ge \xE0 piques"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 55fd88555332c0e49a65a94fb62450a1, type: 3}
+    portee: 0
   - id: trap_flames
     nom: "Grille \xE0 flammes"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 6cc01a7acd055d24abfd1f888e57628f, type: 3}
+    portee: 0
   - id: structure_place
     nom: "Tour ou mur \u2014 pose"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: dd88a1f6ee09c9546a0234ed3fa05c61, type: 3}
+    portee: 0
   - id: structure_hit
     nom: "Tour ou mur \u2014 frapp\xE9"
     statut: disponible
@@ -666,12 +765,14 @@ MonoBehaviour:
     clips:
     - {fileID: 8300000, guid: 7b77512c83ec8b14b8d877da608ad134, type: 3}
     - {fileID: 8300000, guid: 6db4bf2cde768d84486ca1781e9d32cd, type: 3}
+    portee: 0
   - id: structure_destroyed
     nom: "Tour ou mur \u2014 d\xE9truit"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 272e1aa6389395f47bd906d8a031c9c1, type: 3}
+    portee: 0
   - id: tower_shot
     nom: "Tour \u2014 tir"
     statut: disponible
@@ -679,12 +780,14 @@ MonoBehaviour:
     clips:
     - {fileID: 8300000, guid: 2379b109f08d92f4793007e64beec169, type: 3}
     - {fileID: 8300000, guid: cc26e60a77b628b4ca2781a4c1cf80ab, type: 3}
+    portee: 0
   - id: turret_turn_loop
     nom: "Tourelle \u2014 pivot (boucle)"
     statut: disponible
     boucle: 1
     clips:
     - {fileID: 8300000, guid: 51c2475f390028d419ebdda92e3f6a8d, type: 3}
+    portee: 0
   - id: forge_enclume
     nom: "Forge \u2014 marteau sur l'enclume"
     statut: disponible
@@ -693,14 +796,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 50712ed10e2f2b4479477b2017295429, type: 3}
     - {fileID: 8300000, guid: 198056329ad8e1440881a7f7fea6706d, type: 3}
     - {fileID: 8300000, guid: 73a997555e796344c914b62829632129, type: 3}
-  - id: hache_vent
-    nom: "Viking — attaque tournante, souffle de la hache"
-    statut: utilise
-    boucle: 0
-    clips:
-    - {fileID: 8300000, guid: 025dee86154b40ea84661eaabca76b01, type: 3}
-    - {fileID: 8300000, guid: 8df539afaa8441c19f591ecc0d2da228, type: 3}
-    - {fileID: 8300000, guid: 2451b284d00d43ecbba215d7d3957440, type: 3}
+    portee: 0
   - id: kenney_rpg_belthandle
     nom: "Ceinture \u2014 manipulation"
     statut: disponible
@@ -708,18 +804,21 @@ MonoBehaviour:
     clips:
     - {fileID: 8300000, guid: c178e19d8c46e2d47925c3f1c219a114, type: 3}
     - {fileID: 8300000, guid: 1ddde1ad06947d6419e98236c1cc5762, type: 3}
+    portee: 0
   - id: kenney_rpg_bookclose
     nom: "Livre \u2014 fermeture"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 04309d1c0ab2968428b8a48821d965cf, type: 3}
+    portee: 0
   - id: kenney_rpg_bookopen
     nom: "Livre \u2014 ouverture"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: ca5629da8c7b091428d7b68a99baf9c8, type: 3}
+    portee: 0
   - id: kenney_rpg_bookflip
     nom: "Livre \u2014 page tourn\xE9e"
     statut: disponible
@@ -728,6 +827,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 8ce397aee42868740855856d185a3d97, type: 3}
     - {fileID: 8300000, guid: 9c69f0d8e221edb489245aa4b8d43ab7, type: 3}
     - {fileID: 8300000, guid: 3a0736300e4d79944a01b3cac8f22f65, type: 3}
+    portee: 0
   - id: kenney_rpg_bookplace
     nom: "Livre \u2014 pos\xE9"
     statut: disponible
@@ -736,6 +836,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 58e82fcc192676d4f871798dde83e48e, type: 3}
     - {fileID: 8300000, guid: 5fe1a0673939db8488f4a5df864b976f, type: 3}
     - {fileID: 8300000, guid: fd1bb7434c653874d9944f3d52986192, type: 3}
+    portee: 0
   - id: kenney_rpg_cloth
     nom: "Tissu \u2014 froissement"
     statut: disponible
@@ -745,6 +846,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: d1b2b4b7725fbac4d8fa456213e5655b, type: 3}
     - {fileID: 8300000, guid: 8a125e68760c0cc43a0f5728ae89dc7d, type: 3}
     - {fileID: 8300000, guid: eb738fae5fd456a4a8eed0e998347591, type: 3}
+    portee: 0
   - id: kenney_rpg_clothbelt
     nom: Tissu et ceinture
     statut: disponible
@@ -752,6 +854,7 @@ MonoBehaviour:
     clips:
     - {fileID: 8300000, guid: 595cd7ec59deb0f47ab37bd83b11e30b, type: 3}
     - {fileID: 8300000, guid: 0665332cc9107744d8ace86947309c88, type: 3}
+    portee: 0
   - id: kenney_rpg_creak
     nom: "Bois \u2014 grincement"
     statut: disponible
@@ -760,6 +863,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 3dbe44c8de46fbf4e99120054ecef398, type: 3}
     - {fileID: 8300000, guid: 82b8c54085e145444a3bf7e22aac48e4, type: 3}
     - {fileID: 8300000, guid: 5d48f1bca9974e04bb511016b37fb006, type: 3}
+    portee: 0
   - id: kenney_rpg_doorclose
     nom: "Porte \u2014 fermeture"
     statut: disponible
@@ -769,6 +873,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 1784dc62e554bee48913482721cce642, type: 3}
     - {fileID: 8300000, guid: 7b7c3e6bbf573cd46b3226126f9b133b, type: 3}
     - {fileID: 8300000, guid: 2d51ea63ba599a944943d136d1ff92ce, type: 3}
+    portee: 0
   - id: kenney_rpg_dooropen
     nom: "Porte \u2014 ouverture"
     statut: disponible
@@ -776,24 +881,28 @@ MonoBehaviour:
     clips:
     - {fileID: 8300000, guid: cbc026a945b2ce64781bbf0a7f6ec47e, type: 3}
     - {fileID: 8300000, guid: d6f46a97cd08cf747bd2b49663dc0dc7, type: 3}
+    portee: 0
   - id: kenney_rpg_dropleather
     nom: "Cuir \u2014 l\xE2ch\xE9 au sol"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 5453da86d9b2c9646ab6a5d637be02c8, type: 3}
+    portee: 0
   - id: kenney_rpg_metalclick
     nom: "M\xE9tal \u2014 clic"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 89a69e9820ac2ea48aa7ad838714290a, type: 3}
+    portee: 0
   - id: kenney_rpg_metallatch
     nom: "M\xE9tal \u2014 loquet"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: c5e18563a96884c4a8c178c664478963, type: 3}
+    portee: 0
   - id: kenney_rpg_metalpot
     nom: "M\xE9tal \u2014 casserole heurt\xE9e"
     statut: disponible
@@ -802,549 +911,934 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 3d4dd136a84ade349958f394fe467178, type: 3}
     - {fileID: 8300000, guid: 18d30249bf895e141b93e20a4184164a, type: 3}
     - {fileID: 8300000, guid: 1a7308553b2d45b48a0a1b8fbf3e4e54, type: 3}
+    portee: 0
   - id: kenney_ui_back_002
     nom: "Interface \u2014 retour (2)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 62eb22b4fbe5ea843abc77b0531693e0, type: 3}
+    portee: 0
   - id: kenney_ui_back_003
     nom: "Interface \u2014 retour (3)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 9dd5873ad0264444ebbd9c4d5b6fbb99, type: 3}
+    portee: 0
   - id: kenney_ui_back_004
     nom: "Interface \u2014 retour (4)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: f44491e48ebc0e84697afb314ff20f8c, type: 3}
+    portee: 0
   - id: kenney_ui_click_001
     nom: "Interface \u2014 clic (1)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: a1de98918d9208842a2f77fbfc760164, type: 3}
+    portee: 0
   - id: kenney_ui_click_004
     nom: "Interface \u2014 clic (4)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 3513b96c65bf20148b30e671e98edd00, type: 3}
+    portee: 0
   - id: kenney_ui_click_005
     nom: "Interface \u2014 clic (5)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: a1698b74d35133848b72ee2b1645bd33, type: 3}
+    portee: 0
   - id: kenney_ui_close_001
     nom: "Interface \u2014 fermeture (1)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 858746339f1c95840a0dde401e3c6f74, type: 3}
+    portee: 0
   - id: kenney_ui_close_002
     nom: "Interface \u2014 fermeture (2)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 52d2b7b9b73c4ea4a8b7abaec3e61542, type: 3}
+    portee: 0
   - id: kenney_ui_close_003
     nom: "Interface \u2014 fermeture (3)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 3e08ff2db5db4f2498103d73a248a765, type: 3}
+    portee: 0
   - id: kenney_ui_close_004
     nom: "Interface \u2014 fermeture (4)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: c0df7cdaf65edb94c881830d4bf8f351, type: 3}
+    portee: 0
   - id: kenney_ui_confirmation_001
     nom: "Interface \u2014 confirmation (1)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 6606573bb1519c242922b6935a47acb0, type: 3}
+    portee: 0
   - id: kenney_ui_confirmation_003
     nom: "Interface \u2014 confirmation (3)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: e86b330e86cfede4b8021b7e5d478953, type: 3}
+    portee: 0
   - id: kenney_ui_confirmation_004
     nom: "Interface \u2014 confirmation (4)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: b9ae55da4d1cc2c4db78024b7ee8c20e, type: 3}
+    portee: 0
   - id: kenney_ui_drop_001
     nom: "Interface \u2014 objet l\xE2ch\xE9 (1)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 0945c8dd54668894f99801c3c3895e2e, type: 3}
+    portee: 0
   - id: kenney_ui_drop_002
     nom: "Interface \u2014 objet l\xE2ch\xE9 (2)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: b6d16060454af494496d79411abd5edb, type: 3}
+    portee: 0
   - id: kenney_ui_drop_003
     nom: "Interface \u2014 objet l\xE2ch\xE9 (3)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: a6286acd7474fb94d8d05ce52587f7e8, type: 3}
+    portee: 0
   - id: kenney_ui_drop_004
     nom: "Interface \u2014 objet l\xE2ch\xE9 (4)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 5e18f04682ab56d4eaf57c4dc42ff535, type: 3}
+    portee: 0
   - id: kenney_ui_error_001
     nom: "Interface \u2014 erreur (1)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 09129b0bb57b7144e855dcc2a2bcd24a, type: 3}
+    portee: 0
   - id: kenney_ui_error_002
     nom: "Interface \u2014 erreur (2)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 2fee7265c48f5b14b88c48ee86cfa784, type: 3}
+    portee: 0
   - id: kenney_ui_error_003
     nom: "Interface \u2014 erreur (3)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 226950d364c146341a0ce31e9e332cbe, type: 3}
+    portee: 0
   - id: kenney_ui_error_005
     nom: "Interface \u2014 erreur (5)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: ff3eebb4205628d4bb7e9167fa03eda7, type: 3}
+    portee: 0
   - id: kenney_ui_error_006
     nom: "Interface \u2014 erreur (6)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 831f95daf64336742bd3fc8226f039c2, type: 3}
+    portee: 0
   - id: kenney_ui_error_007
     nom: "Interface \u2014 erreur (7)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 60e2c78163eb3514db66bd6637f20586, type: 3}
+    portee: 0
   - id: kenney_ui_glass_001
     nom: "Interface \u2014 verre (1)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: bfddc5326c22fbe4bad39f49a957f750, type: 3}
+    portee: 0
   - id: kenney_ui_glass_002
     nom: "Interface \u2014 verre (2)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: c7fc57f8e23a3184cb290c77ee7df779, type: 3}
+    portee: 0
   - id: kenney_ui_glass_003
     nom: "Interface \u2014 verre (3)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 782c0cc77a1d0774b83230574515a443, type: 3}
+    portee: 0
   - id: kenney_ui_glass_004
     nom: "Interface \u2014 verre (4)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: be53ae8d613729d44aa263663b001e48, type: 3}
+    portee: 0
   - id: kenney_ui_glass_005
     nom: "Interface \u2014 verre (5)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 35cb8b6850e270e46be32959ce40107e, type: 3}
+    portee: 0
   - id: kenney_ui_glass_006
     nom: "Interface \u2014 verre (6)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: d056ef0dc644a4e4f8a4d58c3e088384, type: 3}
+    portee: 0
   - id: kenney_ui_glitch_001
     nom: "Interface \u2014 parasite num\xE9rique (1)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 67ee6031aa7951c4ca1ec2082661597d, type: 3}
+    portee: 0
   - id: kenney_ui_glitch_002
     nom: "Interface \u2014 parasite num\xE9rique (2)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 357bf73720be5404e98576cbde66bbc2, type: 3}
+    portee: 0
   - id: kenney_ui_glitch_003
     nom: "Interface \u2014 parasite num\xE9rique (3)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 42d8a630cbe9db34d9213f8e0c46f0d9, type: 3}
+    portee: 0
   - id: kenney_ui_glitch_004
     nom: "Interface \u2014 parasite num\xE9rique (4)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: c09fff0a1f2ec4143845eca9584dc5f2, type: 3}
+    portee: 0
   - id: kenney_ui_maximize_001
     nom: "Interface \u2014 agrandissement (1)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 1a4a7a28012dd284ca66986bb9e3cf60, type: 3}
+    portee: 0
   - id: kenney_ui_maximize_002
     nom: "Interface \u2014 agrandissement (2)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 7f807564d0733bf4aac44afb42d05ad8, type: 3}
+    portee: 0
   - id: kenney_ui_maximize_003
     nom: "Interface \u2014 agrandissement (3)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 89edd6222ea2174469ff946d29e57437, type: 3}
+    portee: 0
   - id: kenney_ui_maximize_004
     nom: "Interface \u2014 agrandissement (4)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 11db0cfca6f48e540a5c445369e5f9b4, type: 3}
+    portee: 0
   - id: kenney_ui_maximize_005
     nom: "Interface \u2014 agrandissement (5)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 642b9d92993528a49b61576b98efd53a, type: 3}
+    portee: 0
   - id: kenney_ui_maximize_006
     nom: "Interface \u2014 agrandissement (6)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: ad017a79fdca2c2478c12aece71245d4, type: 3}
+    portee: 0
   - id: kenney_ui_maximize_007
     nom: "Interface \u2014 agrandissement (7)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: ba39eb5a885dd5b4fa31606a97b0fc5b, type: 3}
+    portee: 0
   - id: kenney_ui_maximize_008
     nom: "Interface \u2014 agrandissement (8)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 95de8d2e6fd213d4b98465b9778ba87b, type: 3}
+    portee: 0
   - id: kenney_ui_maximize_009
     nom: "Interface \u2014 agrandissement (9)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: eca41709b4cef4f47a1894121a328468, type: 3}
+    portee: 0
   - id: kenney_ui_minimize_001
     nom: "Interface \u2014 r\xE9duction (1)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 1a2bd34de46f98744bda347f6568bc86, type: 3}
+    portee: 0
   - id: kenney_ui_minimize_002
     nom: "Interface \u2014 r\xE9duction (2)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 06f5f30be62ba4d4794046645c28a80d, type: 3}
+    portee: 0
   - id: kenney_ui_minimize_003
     nom: "Interface \u2014 r\xE9duction (3)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 5dd17e5fbef9b0d4b8a2bfcf61adddd9, type: 3}
+    portee: 0
   - id: kenney_ui_minimize_004
     nom: "Interface \u2014 r\xE9duction (4)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 1d9b1c30bde6599469744bc322c1a4dc, type: 3}
+    portee: 0
   - id: kenney_ui_minimize_005
     nom: "Interface \u2014 r\xE9duction (5)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: d96a526f53b8c0f4a8d9bbae67a2593b, type: 3}
+    portee: 0
   - id: kenney_ui_minimize_006
     nom: "Interface \u2014 r\xE9duction (6)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: a3e5f589f8796b647b14e36509fbe55a, type: 3}
+    portee: 0
   - id: kenney_ui_minimize_007
     nom: "Interface \u2014 r\xE9duction (7)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 2e3d87683461fb540ae5cd6299fb2f6e, type: 3}
+    portee: 0
   - id: kenney_ui_minimize_008
     nom: "Interface \u2014 r\xE9duction (8)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: c76340905bd0890488357887de94e2ec, type: 3}
+    portee: 0
   - id: kenney_ui_minimize_009
     nom: "Interface \u2014 r\xE9duction (9)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 5efbf83c953f73e4d9b70025fe6bf047, type: 3}
+    portee: 0
   - id: kenney_ui_open_001
     nom: "Interface \u2014 ouverture (1)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: e6b8314e8e7ce3240b9b8652a8fa075f, type: 3}
+    portee: 0
   - id: kenney_ui_open_002
     nom: "Interface \u2014 ouverture (2)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: baa5f5ad89a0a14419f85475a2aadf56, type: 3}
+    portee: 0
   - id: kenney_ui_open_003
     nom: "Interface \u2014 ouverture (3)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: e3df347fe19128f439eb5ea122ba11b3, type: 3}
+    portee: 0
   - id: kenney_ui_open_004
     nom: "Interface \u2014 ouverture (4)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 80abc21a7d25d124a8acb3e5f7213b5f, type: 3}
+    portee: 0
   - id: kenney_ui_pluck_001
     nom: "Interface \u2014 corde pinc\xE9e (1)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: e11478bae8092a040b673929a94b0fdd, type: 3}
+    portee: 0
   - id: kenney_ui_pluck_002
     nom: "Interface \u2014 corde pinc\xE9e (2)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 9956d5e29092ce64f9aeea85faf8e9ee, type: 3}
+    portee: 0
   - id: kenney_ui_question_001
     nom: "Interface \u2014 question (1)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: f0ba9279ab67c7c4cad03b954e1cefa1, type: 3}
+    portee: 0
   - id: kenney_ui_question_002
     nom: "Interface \u2014 question (2)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 7c0927455c97a3a4e90d508c26a3fc28, type: 3}
+    portee: 0
   - id: kenney_ui_question_003
     nom: "Interface \u2014 question (3)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: b2184c0c0be68614b9bdb07f7e84ba3d, type: 3}
+    portee: 0
   - id: kenney_ui_question_004
     nom: "Interface \u2014 question (4)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 93aba22b99af32349a09e423bcfee368, type: 3}
+    portee: 0
   - id: kenney_ui_scratch_001
     nom: "Interface \u2014 grattement (1)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 84277db12f4f7f6488eaf62ee8007fda, type: 3}
+    portee: 0
   - id: kenney_ui_scratch_002
     nom: "Interface \u2014 grattement (2)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 97ac6531b6ec00144b8b338b1c4300e1, type: 3}
+    portee: 0
   - id: kenney_ui_scratch_003
     nom: "Interface \u2014 grattement (3)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 725b0419b0a62464fafc9887a5525e10, type: 3}
+    portee: 0
   - id: kenney_ui_scratch_004
     nom: "Interface \u2014 grattement (4)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 2045541e1fd1a854f86472cb6a36f1e5, type: 3}
+    portee: 0
   - id: kenney_ui_scratch_005
     nom: "Interface \u2014 grattement (5)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: ce2477ed94bf4de41974ef14b852fd57, type: 3}
+    portee: 0
   - id: kenney_ui_scroll_001
     nom: "Interface \u2014 d\xE9filement (1)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: ccbd9f54ac455c14faac30e3f57b4367, type: 3}
+    portee: 0
   - id: kenney_ui_scroll_002
     nom: "Interface \u2014 d\xE9filement (2)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 2786457b40eea114c99fa0ba73ccae05, type: 3}
+    portee: 0
   - id: kenney_ui_scroll_003
     nom: "Interface \u2014 d\xE9filement (3)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 794a44caf35b0c24486d649b43b1528e, type: 3}
+    portee: 0
   - id: kenney_ui_scroll_004
     nom: "Interface \u2014 d\xE9filement (4)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 76c551d652f943a4488145f9a1ad09fe, type: 3}
+    portee: 0
   - id: kenney_ui_scroll_005
     nom: "Interface \u2014 d\xE9filement (5)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 4cc7b418b5dcc6945bfe4803addd50f5, type: 3}
+    portee: 0
   - id: kenney_ui_select_001
     nom: "Interface \u2014 s\xE9lection (1)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: bf5702bec94f9f84e9acae7a6fcd1fd2, type: 3}
+    portee: 0
   - id: kenney_ui_select_002
     nom: "Interface \u2014 s\xE9lection (2)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: ff7f18a45d9cdb54a813d2979a6469fe, type: 3}
+    portee: 0
   - id: kenney_ui_select_003
     nom: "Interface \u2014 s\xE9lection (3)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 18bd8a365527ff94a85fabc25329b9be, type: 3}
+    portee: 0
   - id: kenney_ui_select_004
     nom: "Interface \u2014 s\xE9lection (4)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 699374fd24948e7458dd9efef52695fa, type: 3}
+    portee: 0
   - id: kenney_ui_select_005
     nom: "Interface \u2014 s\xE9lection (5)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 2a5898a46c727744e91925c40c55e23c, type: 3}
+    portee: 0
   - id: kenney_ui_select_006
     nom: "Interface \u2014 s\xE9lection (6)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: cf32ecfe447df9248adf65e045f9e3d6, type: 3}
+    portee: 0
   - id: kenney_ui_select_007
     nom: "Interface \u2014 s\xE9lection (7)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 523107e7b314d2b41826a5ad145efb74, type: 3}
+    portee: 0
   - id: kenney_ui_select_008
     nom: "Interface \u2014 s\xE9lection (8)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: b4e3910699b33a34f84103ff07a11dab, type: 3}
+    portee: 0
   - id: kenney_ui_switch_001
     nom: "Interface \u2014 commutateur (1)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: cdb8d1ab7b9f45647aa1aa56e662d95f, type: 3}
+    portee: 0
   - id: kenney_ui_switch_002
     nom: "Interface \u2014 commutateur (2)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 5d788b65752960247943b281ae2eb85a, type: 3}
+    portee: 0
   - id: kenney_ui_switch_003
     nom: "Interface \u2014 commutateur (3)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: ebf1cc7d7d9e0ef4cac43c42922b2da0, type: 3}
+    portee: 0
   - id: kenney_ui_switch_004
     nom: "Interface \u2014 commutateur (4)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 4bdf6ddb036579b499bf1279f2f5b04e, type: 3}
+    portee: 0
   - id: kenney_ui_switch_005
     nom: "Interface \u2014 commutateur (5)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 7a02b0ce1da96184e8f2f8c234912cb9, type: 3}
+    portee: 0
   - id: kenney_ui_switch_006
     nom: "Interface \u2014 commutateur (6)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 88fef8550098cd9439c53bbce16460f3, type: 3}
+    portee: 0
   - id: kenney_ui_switch_007
     nom: "Interface \u2014 commutateur (7)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: a1f1b6bb37784804aae493e2ae8174e7, type: 3}
+    portee: 0
   - id: kenney_ui_tick_004
     nom: "Interface \u2014 tic (4)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 59137d15cd1cdfc488023eb12ae0a9bb, type: 3}
+    portee: 0
   - id: kenney_ui_toggle_001
     nom: "Interface \u2014 bascule (1)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 0bb21420cbf4114449ef06ef53f4e6f1, type: 3}
+    portee: 0
   - id: kenney_ui_toggle_002
     nom: "Interface \u2014 bascule (2)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: cbc344ac650e457439ec83d8fa2343d4, type: 3}
+    portee: 0
   - id: kenney_ui_toggle_003
     nom: "Interface \u2014 bascule (3)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 0c73f57ccc164f34a96577a8e23956d2, type: 3}
+    portee: 0
   - id: kenney_ui_toggle_004
     nom: "Interface \u2014 bascule (4)"
     statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: d1eca651d7dc664478163586933080d4, type: 3}
+    portee: 0
+  - id: dl_interface_survol
+    nom: "Interface \u2014 survol d'un bouton (identit\xE9 Deathless)"
+    statut: utilise
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 576e5686f536f8a43bdaccf8360324a4, type: 3}
+    - {fileID: 8300000, guid: e106e39620a413f45984d61c9e2c5e11, type: 3}
+    portee: 0
+  - id: dl_interface_clic
+    nom: "Interface \u2014 clic de validation (identit\xE9 Deathless)"
+    statut: utilise
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 1265d0a3557864c41b2ae1275a6f8e3d, type: 3}
+    - {fileID: 8300000, guid: 772a589818535574d93887b2998d6a0a, type: 3}
+    portee: 0
+  - id: dl_interface_retour
+    nom: "Interface \u2014 retour (identit\xE9 Deathless)"
+    statut: utilise
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: ac92ae763af43a548b45355ca0e794ed, type: 3}
+    portee: 0
+  - id: dl_interface_refus
+    nom: "Interface \u2014 action refus\xE9e (identit\xE9 Deathless)"
+    statut: utilise
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 8b6bd61d2dab06442b9fb785a7ef3ba6, type: 3}
+    portee: 0
+  - id: dl_interface_confirmation
+    nom: "Interface \u2014 confirmation (identit\xE9 Deathless)"
+    statut: utilise
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 0e61667a3b505d5429eb9dee309c2579, type: 3}
+    portee: 0
+  - id: dl_interface_decompte
+    nom: "Interface \u2014 d\xE9compte (identit\xE9 Deathless)"
+    statut: utilise
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 0064ad9dd0e8ad7429280bae7464a72c, type: 3}
+    portee: 0
+  - id: dl_interface_onglet
+    nom: "Interface \u2014 changement d'onglet (identit\xE9 Deathless)"
+    statut: utilise
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 0a62545905ee4c24fa49322be48ed5ca, type: 3}
+    portee: 0
+  - id: dl_interface_pret
+    nom: "Vote \xAB pr\xEAt \xBB \u2014 joueur pr\xEAt (identit\xE9 Deathless)"
+    statut: utilise
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 5f14094b0152bb04fa9220e6d79d9831, type: 3}
+    portee: 0
+  - id: dl_interface_pret_annule
+    nom: "Vote \xAB pr\xEAt \xBB \u2014 vote annul\xE9 (identit\xE9 Deathless)"
+    statut: utilise
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: fd5be8ecd72bc6847aa8df189bf453f5, type: 3}
+    portee: 0
+  - id: dl_interface_tous_prets
+    nom: "Vote \xAB pr\xEAt \xBB \u2014 tout le monde est pr\xEAt (identit\xE9 Deathless)"
+    statut: utilise
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: fb4f59167e6212c42bb71968ce235140, type: 3}
+    portee: 0
+  - id: dl_nyxessa_tir
+    nom: "Nyxessa \u2014 tir d'un missile (identit\xE9 Deathless)"
+    statut: utilise
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 55e48aeb18373fc4eae1ede0ceb0d496, type: 3}
+    - {fileID: 8300000, guid: d5758e6907430dc4187a00eeceede55d, type: 3}
+    - {fileID: 8300000, guid: 266771a22cb95f049ba2e9f2aee5ee37, type: 3}
+    portee: 60
+  - id: dl_nyxessa_frappee
+    nom: "Nyxessa \u2014 frapp\xE9e (identit\xE9 Deathless)"
+    statut: utilise
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: c87c28e6c4a974c4f863438cf815ff27, type: 3}
+    - {fileID: 8300000, guid: 7afccf5d8c616444f8dfb9771ddffb70, type: 3}
+    - {fileID: 8300000, guid: ea48922aa92413848b752a96fa880533, type: 3}
+    portee: 40
+  - id: dl_nyxessa_alerte
+    nom: "Nyxessa \u2014 alerte (identit\xE9 Deathless)"
+    statut: utilise
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: cef37fae17abbf9469a308219eb43375, type: 3}
+    portee: 0
+  - id: dl_nyxessa_palier
+    nom: "Nyxessa \u2014 palier am\xE9lior\xE9 (identit\xE9 Deathless)"
+    statut: utilise
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: c637c7d551f575044ae4b6d8674e6e07, type: 3}
+    portee: 60
+  - id: dl_nyxessa_charge_portail
+    nom: "Nyxessa \u2014 charge vers le portail (identit\xE9 Deathless)"
+    statut: utilise
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 55f333672d668184a800ed55c2dc64a3, type: 3}
+    portee: 60
+  - id: dl_nyxessa_retour_energie
+    nom: "Nyxessa \u2014 retour de l'\xE9nergie (identit\xE9 Deathless)"
+    statut: utilise
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 8cc427925c1ea774692ea663738da453, type: 3}
+    portee: 60
+  - id: dl_nyxessa_onde
+    nom: "Nyxessa \u2014 onde de la ceinture (identit\xE9 Deathless)"
+    statut: utilise
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 32ce6a738e129854c834d5c64040a896, type: 3}
+    portee: 40
+  - id: dl_nyxessa_destruction
+    nom: "Nyxessa \u2014 destruction (identit\xE9 Deathless)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: fccbab8da941a7c41ba773baff9d88f7, type: 3}
+    portee: 60
+  - id: dl_nyxessa_missile_vol
+    nom: "Missile en cr\xE2ne \u2014 vol, boucle (identit\xE9 Deathless)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: dcd8077da6024a049b35b3d639664e63, type: 3}
+    portee: 40
+  - id: dl_nyxessa_missile_eclat
+    nom: "Missile en cr\xE2ne \u2014 \xE9clatement (identit\xE9 Deathless)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: bf47e0eeea4d7fc428655b4eab79db09, type: 3}
+    - {fileID: 8300000, guid: e16ba4e7780975d44a6021b14bb1fe69, type: 3}
+    - {fileID: 8300000, guid: 00ce0b267b92e784f9b8b28bc8bc5e73, type: 3}
+    portee: 40
+  - id: dl_nyxessa_rappel
+    nom: "Nyxessa \u2014 rappel forc\xE9 (identit\xE9 Deathless)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 74d5d2ace03ab80448ba6d985449e2af, type: 3}
+    portee: 0
+  - id: dl_nyxessa_reapparition
+    nom: "Nyxessa \u2014 r\xE9apparition d'un joueur (identit\xE9 Deathless)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: f2138ec8dd4e3fd4ba8b2241a3996c1e, type: 3}
+    portee: 40
+  - id: dl_bouclier_leve
+    nom: "Bouclier de Nyxessa \u2014 lev\xE9e (identit\xE9 Deathless)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: e8fcfec5b250a714cafb9387634744e5, type: 3}
+    portee: 60
+  - id: dl_bouclier_touche
+    nom: "Bouclier de Nyxessa \u2014 coup encaiss\xE9 (identit\xE9 Deathless)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 3d47b131be4e0d64d8af450487161006, type: 3}
+    - {fileID: 8300000, guid: 938d7ae9a3df40d4c82407f0d1d1d2bd, type: 3}
+    - {fileID: 8300000, guid: 1d89306e026e0a645987dc47612bb9d8, type: 3}
+    - {fileID: 8300000, guid: 9685fad4b069ed24c81135ae9568eb25, type: 3}
+    portee: 40
+  - id: dl_bouclier_etat_entame
+    nom: "Bouclier de Nyxessa \u2014 entam\xE9 (identit\xE9 Deathless)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 314e4e8d04040984598add6a620e4ae2, type: 3}
+    portee: 40
+  - id: dl_bouclier_etat_critique
+    nom: "Bouclier de Nyxessa \u2014 pr\xE8s de c\xE9der (identit\xE9 Deathless)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 35b32d2274818b342bbeb98853c83bfe, type: 3}
+    portee: 40
+  - id: dl_bouclier_brise
+    nom: "Bouclier de Nyxessa \u2014 rupture (identit\xE9 Deathless)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 0232b152e1ddb0c4ab417ad87a848b77, type: 3}
+    portee: 60
+  - id: dl_bouclier_breche
+    nom: "Bouclier de Nyxessa \u2014 coup de br\xE8che (identit\xE9 Deathless)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: d4bebb51eb3997a4a8b45f4c9146702b, type: 3}
+    - {fileID: 8300000, guid: 5fa4c7c7fdf2521409e45334e80c50d6, type: 3}
+    portee: 60
+  - id: dl_bouclier_palier
+    nom: "Bouclier de Nyxessa \u2014 palier (identit\xE9 Deathless)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 55ef69e57f41ba64fbd10919640f2a6c, type: 3}
+    portee: 60
+  - id: dl_sorcier_incantation
+    nom: "Sorcier \u2014 incantation du bouclier, boucle (identit\xE9 Deathless)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: dbc6ffd6d1dcb6943a6b374f63cdd7ee, type: 3}
+    portee: 40
+  - id: dl_sorcier_canalisation
+    nom: "Sorcier \u2014 canalisation, boucle (identit\xE9 Deathless)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: eaf0c8223c2f1ae4aadc4c82ae34f3a7, type: 3}
+    portee: 20
+  - id: dl_sorcier_canalisation_eclat
+    nom: "Sorcier \u2014 \xE9clat de la canalisation (identit\xE9 Deathless)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 774ee7cd98a53b54eb0e983f62e8832a, type: 3}
+    - {fileID: 8300000, guid: d7bc294696fd493439e098cff5d2f8f7, type: 3}
+    portee: 20
+  - id: dl_portail_ouverture
+    nom: "Portail \u2014 ouverture (identit\xE9 Deathless)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 88047994546d09f4eb30ce087c6b9247, type: 3}
+    portee: 60
+  - id: dl_portail_fermeture
+    nom: "Portail \u2014 fermeture (identit\xE9 Deathless)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 234f6853923fb6b41b27d6ac562862c3, type: 3}
+    portee: 60
+  - id: dl_portail_bourdon
+    nom: "Portail \u2014 bourdon, boucle (identit\xE9 Deathless)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 3cd56421d4428a1458c579cfd1ebde10, type: 3}
+    portee: 20
+  - id: dl_portail_depart
+    nom: "Portail \u2014 d\xE9part d'un joueur (identit\xE9 Deathless)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: d390a8fe6759d6e40a3a9a8ff554e80d, type: 3}
+    portee: 40
+  - id: dl_portail_arrivee
+    nom: "Portail \u2014 arriv\xE9e d'un joueur (identit\xE9 Deathless)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 22d64a9abdd0f6f4e821cd3c1cdeb84b, type: 3}
+    portee: 40
+  - id: dl_portail_chute_ciel
+    nom: "Portail \u2014 chute du ciel, arriv\xE9e au donjon (identit\xE9 Deathless)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: dda1276465a20d542b55b63b064838ee, type: 3}
+    portee: 40
+  - id: dl_portail_sortie_sol
+    nom: "Portail \u2014 sortie du sol, retour au village (identit\xE9 Deathless)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 3c30fbdf118795c488775116d0e2d586, type: 3}
+    portee: 40
+  - id: dl_portail_ferme_refus
+    nom: "Portail \u2014 ferm\xE9, refus (identit\xE9 Deathless)"
+    statut: utilise
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 670c8be546b63fd40aed974d93a74005, type: 3}
+    portee: 60
