@@ -1,6 +1,16 @@
 {
   "versions": [
     {
+      "version": "0.5.1",
+      "date": "2026-09-26",
+      "titre": "Retouches du HUD",
+      "notes": [
+        "Le portrait en bas à gauche montre l'emblème de ta classe.",
+        "Plus d'icône à côté de la barre de mana.",
+        "« Améliorer Nyxessa » ne s'affiche que sur le dessus de la plateforme de Nyxessa."
+      ]
+    },
+    {
       "version": "0.5.0",
       "date": "2026-09-26",
       "titre": "Le donjon",
