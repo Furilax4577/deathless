@@ -135,17 +135,29 @@ namespace Deathless.Reseau
         // ----------------------------------------------------------------- Salon → partie
 
         /// Hôte : tous sont prêts, le compte à rebours est fini. Tous les postes chargent le village en mode réseau.
+        /// Un seul lancement à la fois : un vote rebasculé pendant le chargement (Rejouer) rappelait LancerPartie, et le
+        /// gestionnaire abonné deux fois faisait apparaître les héros en double.
         public void LancerPartie()
         {
-            if (!Reseau.IsServer) return;
+            if (!Reseau.IsServer || m_Lancement) return;
             Journal("lancement de la partie : " + string.Join(", ", JoueursPartie.Select(j => j.pseudo + " (" + j.classeId + ")")));
             Reseau.SceneManager.OnLoadEventCompleted += ChargementTermine;
-            Reseau.SceneManager.LoadScene(SceneManager.GetActiveScene().name, LoadSceneMode.Single);
+            var statut = Reseau.SceneManager.LoadScene(SceneManager.GetActiveScene().name, LoadSceneMode.Single);
+            if (statut != SceneEventProgressStatus.Started)
+            {
+                Reseau.SceneManager.OnLoadEventCompleted -= ChargementTermine;
+                Journal("lancement refusé : " + statut);
+                return;
+            }
+            m_Lancement = true;
         }
+
+        bool m_Lancement;
 
         void ChargementTermine(string scene, LoadSceneMode mode, List<ulong> ok, List<ulong> expires)
         {
             Reseau.SceneManager.OnLoadEventCompleted -= ChargementTermine;
+            m_Lancement = false;
             Journal("village chargé par " + ok.Count + " poste(s)" + (expires.Count > 0 ? ", " + expires.Count + " en retard" : ""));
             if (Partie.Instance != null) Partie.Instance.ApparaitreHerosReseau();
         }
@@ -153,6 +165,7 @@ namespace Deathless.Reseau
         /// Fin du réseau (quitter le salon ou la partie) : arrêt du NetworkManager, partie réseau oubliée.
         public void Arreter()
         {
+            m_Lancement = false;
             if (Reseau != null && Reseau.IsListening) Reseau.Shutdown();
         }
 
