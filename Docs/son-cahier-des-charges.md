@@ -48,10 +48,10 @@ Sept timbres récurrents font la signature. Chacun est décrit pour qu'un script
 | **Gemme** (cristal de Nyxessa) | Nyxessa, portail, bouclier, téléportation, réapparition, éclats de Nyxar | Barre de cristal libre : partiels aux rapports **1 : 2,756 : 5,404 : 8,933**, amplitudes 1 / 0,42 / 0,2 / 0,09 ; fondamental de 330 Hz (mi4, gemme lourde) à 2,6 kHz (mi7, étincelle), sur la gamme commune ; chaque partiel doublé d'un **jumeau désaccordé de 0,6 à 3 Hz** (le frisson de la gemme) | Attaque 0,4 ms avec un petit choc de verre (bruit filtré autour de 3 × f0, 1,2 ms) ; décroissance exponentielle, T60 du fondamental de 0,3 à 2,6 s, les partiels aigus 2 à 6 fois plus brefs | 0,3 à 2,6 s | `gemme`, `scintillement` |
 | **Bois sec** (interface, maisons) | Menus, votes, décompte, portes, tables, tonneaux | Lame de marimba accordée **1 : 3,93 : 9,24** (amplitudes 1 / 0,3 / 0,1) sur la gamme commune (mi5 à ré7) ; clic de bois : bruit en bande 2,6 à 4,2 kHz, 0,9 ms | Attaque 0,6 ms ; T60 de **25 à 90 ms** pour un « tic » ou un « toc », de **0,3 à 0,7 s** pour une note qui chante | 0,07 à 1 s | `bois`, `tambour_bois` |
 | **Os creux** (squelettes) | Pas, coups reçus, mort, sortie de terre, préparation | Tube court fermé : modes impairs autour de **450 à 900 Hz** (rapports 1 : 3 : 5 légèrement désaccordés), plus un cliquetis de 3 à 8 petits chocs (1,5 à 4 kHz, 1 ms chacun) espacés de 8 à 25 ms | Attaque 0,5 ms ; T60 **40 à 80 ms** (sec, sans résonance) ; le cliquetis retombe en grappe irrégulière | 0,1 à 0,6 s | à créer (lot 3) |
-| **Poussière et terre** | Mort et aube des squelettes, sortie de terre, saut percutant, chute de Morgrim | Bruit brun (bruit blanc intégré) passé en bas à 300-600 Hz pour la masse, grains de gravier (bruit en bande 1 à 3 kHz, impulsions aléatoires de 2 ms à densité décroissante) | Coup sourd de 5 à 15 ms, puis ruissellement qui s'éclaircit et s'éteint en 0,3 à 1,2 s | 0,3 à 1,5 s | `sub`, à compléter (lot 3) |
+| **Poussière et terre** | Mort et aube des squelettes, sortie de terre, saut percutant, chute de Morgrim | Bruit brun (bruit blanc intégré) passé en bas à 300-600 Hz pour la masse, grains de gravier (bruit en bande 1 à 3 kHz, impulsions aléatoires de 2 ms à densité décroissante) | Coup sourd de 5 à 15 ms, puis ruissellement qui s'éclaircit et s'éteint en 0,3 à 1,2 s | 0,3 à 1,5 s | `sub`, `gravier`, `pas_pierre` (lot 2) ; bruit brun à ajouter (lot 3) |
 | **Souffle** (air, énergie, mouvement) | Charge et retour de l'énergie, élans d'armes, esquives, traînée des flèches, onde de choc | Bruit blanc dans un **passe-bande** (Q 1 à 1,6) dont la fréquence centrale **balaie** : montée 300 Hz → 4-7 kHz pour ce qui part, descente pour ce qui revient ; élan d'arme : 600 Hz → 2,5 kHz en 80 à 150 ms | Attaque de 5 ms (élan) à 1,2 s (charge) ; forme de décroissance en puissance 1,2 à 2 | 0,08 à 2 s | `souffle` |
 | **Feu** | Mage, brûlure, forge, torches, pièges | Grondement : bruit brun passé en bas à 250-500 Hz, modulé lentement (2 à 6 Hz) ; crépitements : impulsions de 0,5 à 2 ms en bande 2-6 kHz, densité 8 à 40 par seconde selon l'intensité | Allumage en 30 à 80 ms, maintien en boucle, extinction en 0,2 à 0,5 s | 0,3 s à boucle | à créer (lot 7) |
-| **Éclat d'or** (critiques, or, sacré) | Coups critiques, pièces, charge bélier dorée, soin | Métal fin et clair : 3 à 5 partiels inharmoniques de **2,5 à 7 kHz** (plaque mince, rapports 1 : 1,59 : 2,14 : 2,65), plus un corps de coup (« toc » grave de l'impact) ; pièces : grappe de 4 à 20 tintements de 3 à 9 kHz, T60 de 60 à 200 ms | Attaque 0,3 ms, T60 **0,15 à 0,5 s**, jamais plus : l'or brille un instant | 0,15 à 0,6 s | à créer (lots 5 et 11) |
+| **Éclat d'or** (critiques, or, sacré) | Coups critiques, pièces, charge bélier dorée, soin | Métal fin et clair : 3 à 5 partiels inharmoniques de **2,5 à 7 kHz** (plaque mince, rapports 1 : 1,59 : 2,14 : 2,65), plus un corps de coup (« toc » grave de l'impact) ; pièces : grappe de 4 à 20 tintements de 3 à 9 kHz, T60 de 60 à 200 ms | Attaque 0,3 ms, T60 **0,15 à 0,5 s**, jamais plus : l'or brille un instant | 0,15 à 0,6 s | `plaque` (lot 2, fer de Morgrim sur le bouclier) ; pièces à ajouter (lots 5 et 11) |
 
 **Poussée grave** (complément transversal) : sinus de 35 à 120 Hz qui glisse vers le bas en 0,15 à 1,7 s. Elle donne la masse (Nyxessa qui pulse, impacts lourds, boss) sans remplir le médium. Brique `sub`. On la dose avec prudence, car beaucoup d'enceintes de télévision ne la rendent pas : le son doit rester lisible sans elle.
 
@@ -469,24 +469,25 @@ Tous en **mi mineur** (nuit, combat, donjon) ou en **sol majeur**, son relatif (
 **Attaque et fin.** Jamais plus de **20 ms de silence en tête** (un son part au déclenchement ; mesuré : premier échantillon au-dessus de -40 dBFS). Fin sans clic (fondu en cosinus de 12 à 60 ms). Boucles : raccord sans couture (fondu enchaîné de la fin sur le début dans le script, 50 à 200 ms), longueur exacte d'un nombre entier de mesures pour les musiques.
 
 **Nommage.**
-- Fichiers : `famille_evenement_N.wav` (N = 1, 2… pour les variantes ; pas de numéro s'il n'y en a qu'une), en minuscules, sans accent, en français (`nyxessa_frappee_2.wav`, `interface_clic_1.wav`). Boucles : `famille_evenement_boucle.wav` (l'importeur du catalogue marque déjà les boucles). Musiques : `musique_<morceau>_<couche>.wav` (`musique_nuit_tambours.wav`).
+- Fichiers : `famille_evenement_N.wav` (N = 1, 2… pour les variantes ; pas de numéro s'il n'y en a qu'une), en minuscules, sans accent, en français (`nyxessa_frappee_2.wav`, `interface_clic_1.wav`). Boucles : `famille_evenement_boucle.wav`. L'importeur du catalogue (`JeuBuilder`) ne reconnaît aujourd'hui une boucle qu'à `_loop` dans le nom du fichier : il faudra qu'il reconnaisse aussi `_boucle` (le drapeau n'est pas lu par `AudioBank`, qui boucle déjà tout ce qu'on lui donne par `AudioBank.Boucle`). Musiques : `musique_<morceau>_<couche>.wav` (`musique_nuit_tambours.wav`).
 - Ids du catalogue : le nom sans numéro. Tant que l'ancien son est branché sous un autre id, le nouveau prend le préfixe **`dl_`** (identité Deathless) : `dl_nyxessa_tir`. Le branchement se fait en mettant cet id en tête de la liste de `SonsDuJeu` (la liste est déjà un ordre de préférence, et l'ancien son y reste en repli).
 
 **Dossiers et scripts.**
 - `Assets/Audio/Deathless/<Famille>/` : les WAV et **un script par famille** (`synth_<famille>.py`), qui écrit tous les fichiers de la famille.
 - `Assets/Audio/Deathless/deathless_audio.py` : briques communes (timbres de la palette, filtres, mastering, analyse), importées par chaque script.
-- `Assets/Audio/Deathless/controle.py` : planche de contrôle (mesures de tous les fichiers, un tableau par script).
+- `Assets/Audio/Deathless/controle.py` : planches de contrôle, une par lot (`Docs/son-lotN-controle.md`, un tableau par script). Chaque script déclare ses sons dans une liste `SONS` de (nom, lot, cible en dB, fondu de fin ou `BOUCLE`, fabrique) : `controle.py` y lit le lot et la cible de chaque fichier, et `deathless_audio.produire` écrit les fichiers.
+- **Boucles** : rendues sans raccord par `deathless_audio` (`plier` replie la traîne des événements sur le début, `fondre_boucle` fond le continu à puissance constante, les sinus tenus ont un nombre entier de périodes sur la boucle) ; `controle.py` vérifie qu'il n'y a pas de saut à la jointure.
 - Familles prévues : Interface, Nyxessa, Bouclier, Portail, Joueurs, Critiques, Paladin, Viking, Mage, Rodeur, Assassin, Candidats, Squelettes, Morgrim, Nyxar, Statuts, Village, JourNuit, Ambiances, Musique.
 
 **Graines fixes**, une plage par famille (un script relancé réécrit exactement les mêmes fichiers) : Nyxessa 1100-1199, Interface 1200-1299, Portail 1300, Bouclier 1350, Joueurs 1400, Critiques 1450, Paladin 1500, Viking 1600, Mage 1700, Rodeur 1800, Assassin 1900, Squelettes 2000, Morgrim 2100, Nyxar 2150, Statuts 2200, Village 2300, JourNuit 2500, Ambiances 2600, Candidats 2700, Musique 3000-3999.
 
-**Catalogue.** Une entrée par son dans `Wiki/data/sons.json` : `source: "Deathless (synthèse)"`, `licence: "propre"`, `statut: "a_ecouter"` jusqu'à l'écoute de Quentin, puis `utilise`. L'usage dit quel ancien son il remplacera. Ne pas toucher aux `.meta` : Unity les crée à l'import.
+**Catalogue.** Une entrée par son dans `Wiki/data/sons.json` : `source: "Deathless (synthèse)"`, `licence: "propre"`, `statut: "a_ecouter"` jusqu'à l'écoute de Quentin, puis `utilise`, et pour un son 3D `portee` en mètres (C = 20, M = 40, L = 60, colonne Portée du § 3 ; absent pour un son 2D). L'usage dit quel ancien son il remplacera. Ne pas toucher aux `.meta` : Unity les crée à l'import.
 
 **Commandes.** Toujours `python -B` (pas de `__pycache__` dans `Assets/`) :
 ```
 python -B Assets/Audio/Deathless/Nyxessa/synth_nyxessa.py
 python -B Assets/Audio/Deathless/Interface/synth_interface.py
-python -B Assets/Audio/Deathless/controle.py
+python -B Assets/Audio/Deathless/controle.py        # toutes les planches ; controle.py 2 : le lot 2 seulement
 ```
 Un script accepte un dossier de sortie (pour écouter hors de `Assets/`) et une liste de noms : `python -B synth_nyxessa.py <dossier> nyxessa_tir_1 nyxessa_palier`.
 
@@ -531,7 +532,7 @@ Chaque lot fait 15 à 25 sons (identifiants ou fichiers), tient dans une session
 | Lot | Contenu | Priorité | Sons |
 |---|---|---|---|
 | **1** (fait) | Nyxessa (tir, frappée, alerte, palier, charge, retour, onde, destruction) et interface (survol, clic, retour, refus, confirmation, décompte, onglet, votes) | V | 18 ids, 24 fichiers |
-| 2 | Nyxessa (suite : missile vol et éclat, rappel, réapparition), bouclier et sorcier, portail et téléportation | V | 20 ids |
+| **2** (fait) | Nyxessa (suite : missile vol et éclat, rappel, réapparition), bouclier et sorcier, portail et téléportation | V et C | 22 ids, 29 fichiers |
 | 3 | Squelettes : sortie, préparation, coups, touché, mort, aube, pas, mage squelette ; nouvelle brique os creux et poussière | V | 15 ids, environ 45 fichiers |
 | 4 | Joueurs : pas (4 sols), saut, réception, chutes, esquive, touché, mort, potion | V | 13 ids, environ 45 fichiers |
 | 5 | Paladin et critiques ; nouvelle brique éclat d'or | V | 15 ids |
@@ -559,7 +560,9 @@ Chaque lot fait 15 à 25 sons (identifiants ou fichiers), tient dans une session
 
 ---
 
-## 8. Lot 1 produit
+## 8. Lots produits
+
+### 8.1 Lot 1 produit
 
 24 fichiers, 18 identifiants, générés le 26/09/2026 :
 
@@ -587,3 +590,47 @@ Chaque lot fait 15 à 25 sons (identifiants ou fichiers), tient dans une session
 | `AchatRefuse` | `dl_interface_refus` |
 | `ReglagesAudio` : survol, clic, retour, refus | `interface_survol_1`, `interface_clic_1`, `interface_retour`, `interface_refus` (clips) |
 | Décompte (`ui_decompte`) | `dl_interface_decompte` |
+
+### 8.2 Lot 2 produit
+
+29 fichiers, 22 identifiants, générés le 26/09/2026 (Nyxessa, suite ; bouclier et sorcier ; portail et téléportation) :
+
+- `Assets/Audio/Deathless/Nyxessa/synth_nyxessa.py` (complété) : `nyxessa_missile_vol_boucle`, `nyxessa_missile_eclat_1..3`, `nyxessa_rappel`, `nyxessa_reapparition` (6 fichiers, 4 ids).
+- `Assets/Audio/Deathless/Bouclier/synth_bouclier.py` : `bouclier_leve`, `bouclier_touche_1..4`, `bouclier_etat_entame`, `bouclier_etat_critique`, `bouclier_brise`, `bouclier_breche_1..2`, `bouclier_palier`, `sorcier_incantation_boucle`, `sorcier_canalisation_boucle`, `sorcier_canalisation_eclat_1..2` (15 fichiers, 10 ids).
+- `Assets/Audio/Deathless/Portail/synth_portail.py` : `portail_ouverture`, `portail_fermeture`, `portail_bourdon_boucle`, `portail_depart`, `portail_arrivee`, `portail_chute_ciel`, `portail_sortie_sol`, `portail_ferme_refus` (8 fichiers, 8 ids).
+- Briques ajoutées à `deathless_audio.py` : `plaque` (éclat d'or et fer, § 2), `gravier` et `pas_pierre` (poussière et terre, § 2), boucles sans raccord (`plier`, `fondre_boucle`, `master_boucle`) et `produire` (écriture d'une famille). Les scripts du lot 1 déclarent désormais leurs sons dans la même liste `SONS` ; leurs 24 fichiers sont inchangés, à l'octet près.
+- Catalogue : ids `dl_nyxessa_*` (4), `dl_bouclier_*` (7), `dl_sorcier_*` (3) et `dl_portail_*` (8) dans `Wiki/data/sons.json`, statut `a_ecouter`, avec `portee` pour les sons 3D (ajoutée aussi aux sons 3D du lot 1).
+- Planche de contrôle : [`son-lot2-controle.md`](son-lot2-controle.md) (29 fichiers conformes, dont 4 boucles vérifiées à la jointure).
+
+**Hypothèses prises** (à confirmer en jeu) :
+- **Chute du ciel** et **sortie du sol** : le clip dure 1,3 s ; le contact avec le sol (`Spawn_Air`) et le corps entier (`Spawn_Ground`) sont placés vers **1,0 s**, faute de mesure de l'instant dans le clip. Si l'instant diffère, décaler le déclenchement du son plutôt que le fichier.
+- **Missile en vol** : la boucle est celle du missile de **Nyxessa** (gemme tenue sur si5). Celle du mage squelette, 5 demi-tons plus aiguë (§ 3.2), viendra avec le lot 3 (même fonction, `base="E6"`).
+- **Rappel** : son 2D pour le joueur rappelé seulement ; les autres joueurs entendent l'arrivée (`portail_sortie_sol`) au village.
+- **Réapparition** : un seul fichier, joué au point de réapparition près de Nyxessa.
+- **Boucles** : `nyxessa_missile_vol_boucle` 1,5 s, `sorcier_incantation_boucle` 3 s, `sorcier_canalisation_boucle` 4 s, `portail_bourdon_boucle` 6 s ; cibles -17 à -20 dB, sous la plage des événements de la famille (ce sont des sons de présence, entendus de près).
+
+**Branchement proposé** (après écoute, par l'agent local ; aucun script de jeu n'a été modifié) :
+
+| Constante de `SonsDuJeu` ou réglage | Nouvel id en tête |
+|---|---|
+| `MissileVol` | `dl_nyxessa_missile_vol` (pour Nyxessa ; le mage squelette garde `skull_flight_loop` jusqu'au lot 3) |
+| `MissileEclat` | `dl_nyxessa_missile_eclat` |
+| `NyxessaRappel` | `dl_nyxessa_rappel` |
+| `Reapparition` | `dl_nyxessa_reapparition` |
+| `BouclierLeve` | `dl_bouclier_leve` |
+| `BouclierTouche` | `dl_bouclier_touche` |
+| `BouclierBrise` | `dl_bouclier_brise` |
+| `SorcierIncantation` | `dl_sorcier_incantation` |
+| `PortailOuverture` | `dl_portail_ouverture` |
+| `PortailFermeture` | `dl_portail_fermeture` |
+| `PortailBourdon` | `dl_portail_bourdon` |
+| `PortailPassage` | `dl_portail_depart` |
+| *nouveau* : arrivée par le portail (`PortalTransit.Arrive`) | `dl_portail_arrivee` |
+| *nouveau* : clip `Spawn_Air` (arrivée au donjon) | `dl_portail_chute_ciel` |
+| *nouveau* : clip `Spawn_Ground` (retour au village, rappel) | `dl_portail_sortie_sol` |
+| *nouveau* : Interagir au portail fermé | `dl_portail_ferme_refus` |
+| *nouveau* : bouclier sous 40 % et sous 15 % (changement de thème de `RelicShieldVisual`) | `dl_bouclier_etat_entame`, `dl_bouclier_etat_critique` |
+| *nouveau* : coup de brèche de Morgrim martache sur le bouclier | `dl_bouclier_breche` |
+| *nouveau* : palier du bouclier acheté (en plus de `dl_nyxessa_palier`) | `dl_bouclier_palier` |
+| *nouveau* : canalisation du sorcier (boucle tant qu'elle dure) et son éclat (`AvancerRechargeMissiles`) | `dl_sorcier_canalisation`, `dl_sorcier_canalisation_eclat` |
+| Importeur du catalogue (`JeuBuilder`) | reconnaître `_boucle` comme `_loop` |

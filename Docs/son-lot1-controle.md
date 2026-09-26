@@ -1,8 +1,8 @@
 # Planche de contrôle des sons de Deathless, lot 1
 
-Générée par `python -B Assets/Audio/Deathless/controle.py` : ne pas modifier à la main, relancer le script après chaque régénération. Méthode et cibles : [cahier des charges son](son-cahier-des-charges.md), § 5.
+Générée par `python -B Assets/Audio/Deathless/controle.py 1` : ne pas modifier à la main, relancer le script après chaque régénération. Méthode et cibles : [cahier des charges son](son-cahier-des-charges.md), § 5.
 
-Colonnes : **crête** en dBFS (plafond -1,4) ; **RMS** moyen sur tout le fichier ; **niveau** perçu = RMS maximal sur 50 ms, en dBFS (c'est lui qui est réglé sur la **cible**) ; **tête** = temps avant le premier échantillon au-dessus de -40 dBFS (20 ms au plus) ; **spectre** = part de l'énergie en % dans les bandes < 250 Hz, 250-1k, 1-4k, 4-10k, > 10k.
+Colonnes : **crête** en dBFS (plafond -1,4) ; **RMS** moyen sur tout le fichier ; **niveau** perçu = RMS maximal sur 50 ms, en dBFS (c'est lui qui est réglé sur la **cible**) ; **tête** = temps avant le premier échantillon au-dessus de -40 dBFS (20 ms au plus) ; **spectre** = part de l'énergie en % dans les bandes < 250 Hz, 250-1k, 1-4k, 4-10k, > 10k. Une **boucle** est vérifiée à sa jointure (pas de saut entre la fin et le début) au lieu du fondu de fin.
 
 **24 fichiers, 24 conformes.**
 
@@ -27,7 +27,7 @@ Sons de l'interface (Deathless, lot 1 du cahier des charges son, 26/09/2026).
 
 ## Nyxessa — `Assets/Audio/Deathless/Nyxessa/synth_nyxessa.py`
 
-Sons de Nyxessa, la relique (Deathless, lot 1 du cahier des charges son, 26/09/2026).
+Sons de Nyxessa, la relique (Deathless, lots 1 et 2 du cahier des charges son, 26/09/2026).
 
 | Fichier | Durée | Crête | RMS | Niveau | Cible | Tête | Spectre (%) | Contrôle |
 |---|---|---|---|---|---|---|---|---|

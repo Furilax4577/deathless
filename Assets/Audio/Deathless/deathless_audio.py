@@ -253,6 +253,83 @@ def sub(buf, f0, f1, amp, duree, debut=0.0, attaque=0.004):
     sinus_glisse(buf, f0, f1, amp, duree, debut, attaque, duree * 0.85, 0.5)
 
 
+# Éclat d'or (critiques, pièces, métal fin) : plaque mince de métal, partiels inharmoniques 1 : 1,59 : 2,14 : 2,65
+# (modes d'une plaque circulaire), aigus aussi longs que le fondamental (le métal « sonne », contrairement au bois),
+# T60 court de 0,15 à 0,5 s : l'or brille un instant. Pas de jumeau désaccordé : c'est ce frisson qui distingue la
+# gemme de Nyxessa du métal. Grave (f0 de 700 Hz à 1,2 kHz) : fer, marteau ; aigu (2,5 à 4 kHz) : or, pièces.
+PLAQUE_RAPPORTS = [1.0, 1.59, 2.14, 2.65, 3.16]
+PLAQUE_AMPS = [1.0, 0.8, 0.6, 0.45, 0.3]
+PLAQUE_T60 = [1.0, 0.9, 0.8, 0.7, 0.6]
+
+
+def plaque(rng, buf, f0, amp, t60, debut=0.0, durete=1.0):
+    for r, a, t in zip(PLAQUE_RAPPORTS, PLAQUE_AMPS, PLAQUE_T60):
+        f = f0 * r * rng.uniform(0.99, 1.01)
+        if f >= RATE * 0.45:
+            continue
+        mode(buf, f, amp * a * rng.uniform(0.8, 1.2), t60 * t, debut, 0.0003, rng.uniform(0, 2 * math.pi))
+    if durete > 0:
+        choc(rng, buf, debut, amp * 0.5 * durete, 0.0008, min(7000.0, f0 * 2.0), 0.8)
+
+
+# Poussière et terre : grains de gravier (impulsions de 2 ms en bande 1 à 3 kHz) dont la densité suit `densite(u)` et
+# la bande `bande(u)` (u de 0 à 1 sur la durée) : ruissellement qui retombe, gravier qui monte, sol qui tremble.
+def gravier(rng, buf, debut, duree, nombre, amp, densite=None, bande=None):
+    n = idx(0.004)
+    for _ in range(nombre):
+        u = rng.random()
+        if densite is not None:
+            u = densite(u)
+        fc = bande(u) if bande is not None else rng.uniform(1000.0, 3000.0)
+        grain = passe_bande(bruit(rng, n), fc * rng.uniform(0.8, 1.25), 1.5)
+        grain = [v * math.exp(-(i / RATE) / 0.0008) for i, v in enumerate(grain)]
+        ajouter(buf, grain, debut + u * duree, amp * rng.uniform(0.3, 1.0))
+
+
+def pas_pierre(rng, buf, debut, amp):
+    """Pied ou corps qui se pose sur la pierre : toc sourd (modes 300 et 520 Hz, 40 ms), grain de gravier."""
+    mode(buf, 300.0 * rng.uniform(0.9, 1.1), amp, 0.045, debut, 0.0006)
+    mode(buf, 520.0 * rng.uniform(0.9, 1.1), amp * 0.5, 0.03, debut, 0.0006)
+    choc(rng, buf, debut, amp * 0.5, 0.0015, 1500.0, 0.7)
+    gravier(rng, buf, debut, 0.08, 6, amp * 0.25, densite=lambda u: u ** 2)
+
+
+# --- Boucles sans raccord ------------------------------------------------------------------------------------------
+# Une boucle de L secondes se fabrique en deux parts :
+# - les événements (tintements, coups) sont rendus sur L + traîne, puis la traîne est **repliée** sur le début
+#   (`plier`) : une gemme qui sonne encore à la fin continue exactement au début, sans coupure ;
+# - le continu (souffles, bourdons) est rendu sur L + F, puis ses F dernières secondes sont fondues à puissance
+#   constante sur le début (`fondre_boucle`) : le bruit passe la jointure sans trou ni bosse.
+# Les modulations (respiration, battements, vibrato) font un nombre entier de cycles sur L.
+def plier(x, duree):
+    n = idx(duree)
+    res = list(x[:n]) + [0.0] * max(0, n - len(x))
+    for i in range(n, len(x)):
+        res[i % n] += x[i]
+    return res
+
+
+def fondre_boucle(x, duree, fondu):
+    n, nf = idx(duree), idx(fondu)
+    assert len(x) >= n + nf, "le continu doit durer la boucle plus le fondu"
+    res = list(x[:n])
+    for i in range(nf):
+        a = math.sin(0.5 * math.pi * i / nf)
+        b = math.cos(0.5 * math.pi * i / nf)
+        res[i] = x[i] * a + x[n + i] * b
+    return res
+
+
+def master_boucle(buf, cible_db):
+    """Comme `master`, sans fondu de fin (la boucle reprend au début) ; le niveau perçu d'une boucle est son RMS
+    maximal sur 50 ms, comme un effet."""
+    moyenne = sum(buf) / len(buf)
+    buf = [v - moyenne for v in buf]
+    crete = max(abs(v) for v in buf) or 1.0
+    gain = min(CRETE / crete, 10 ** ((cible_db - niveau_percu(buf)) / 20.0))
+    return [v * gain for v in buf]
+
+
 # --- Mastering et écriture -----------------------------------------------------------------------------------------
 def niveau_percu(x):
     """RMS maximal sur 50 ms (fenêtres glissantes par pas de 10 ms), en dB pleine échelle."""
@@ -369,3 +446,28 @@ def analyser(chemin):
         "fin": abs(x[-1]),
         "bandes": spectre_bandes(x, taux),
     }
+
+
+# --- Écriture d'une famille ----------------------------------------------------------------------------------------
+BOUCLE = "boucle"   # valeur de « fondu » d'une boucle : mastering sans fondu de fin
+
+
+def produire(sons, dossier_defaut, argv):
+    """Écrit les sons d'une famille. `sons` : liste de (nom, lot, cible dB, fondu en s / None / BOUCLE, fabrique) ;
+    argv : [dossier_sortie] [nom ...] (par défaut : le dossier du script, tous les sons)."""
+    import os
+    dossier = argv[1] if len(argv) > 1 else dossier_defaut
+    noms = argv[2:]
+    for nom, _lot, cible, fondu, fabrique in sons:
+        if noms and nom not in noms:
+            continue
+        buf = fabrique()
+        if fondu == BOUCLE:
+            buf = master_boucle(buf, cible)
+        elif fondu is None:
+            buf = master(buf, cible)
+        else:
+            buf = master(buf, cible, fondu)
+        chemin = os.path.join(dossier, nom + ".wav")
+        ecrire(chemin, buf)
+        print("écrit", chemin)

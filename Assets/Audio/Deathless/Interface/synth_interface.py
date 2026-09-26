@@ -35,7 +35,7 @@ def survol(graine, n):
     rng = random.Random(graine)
     buf = da.tampon(0.07)
     da.bois(rng, buf, N(n), 0.5, 0.035, 0.0, clic=0.6, clarte=0.7)
-    return da.master(buf, -24.0, fondu=0.012)
+    return buf
 
 
 def clic(graine, n):
@@ -43,7 +43,7 @@ def clic(graine, n):
     buf = da.tampon(0.16)
     da.bois(rng, buf, N(n), 0.55, 0.09, 0.0, clic=1.0)
     da.mode(buf, 240.0, 0.18, 0.035, 0.0, 0.0006)      # la planche sous la lame : un peu de corps
-    return da.master(buf, -18.0, fondu=0.02)
+    return buf
 
 
 def retour(graine):
@@ -51,7 +51,7 @@ def retour(graine):
     buf = da.tampon(0.22)
     da.bois(rng, buf, N("A5"), 0.42, 0.07, 0.0, clic=0.8)
     da.bois(rng, buf, N("E5"), 0.5, 0.08, 0.065, clic=0.7)
-    return da.master(buf, -19.0, fondu=0.02)
+    return buf
 
 
 def refus(graine):
@@ -62,7 +62,7 @@ def refus(graine):
         da.bois(rng, buf, N("F4"), 0.3, 0.06, t0, clic=0.0, clarte=0.3)   # demi-ton de trop : « non »
         da.ajouter(buf, da.enveloppe(da.passe_bas(da.bruit(rng, da.idx(0.03)), 900.0), 0.0006, 0.003, 0.026, 2.0),
                    t0, 0.3)
-    return da.master(buf, -18.0, fondu=0.03)
+    return buf
 
 
 def confirmation(graine):
@@ -71,7 +71,7 @@ def confirmation(graine):
     da.bois(rng, buf, N("E5"), 0.35, 0.05, 0.0, clic=1.0)
     da.bois(rng, buf, N("E5"), 0.45, 0.42, 0.004, clic=0.0)
     da.bois(rng, buf, N("B5"), 0.45, 0.48, 0.085, clic=0.5)
-    return da.master(buf, -16.0, fondu=0.05)
+    return buf
 
 
 def decompte(graine):
@@ -79,7 +79,7 @@ def decompte(graine):
     buf = da.tampon(0.25)
     da.bois(rng, buf, N("A5"), 0.55, 0.06, 0.0, clic=1.2, clarte=0.6)
     da.mode(buf, N("A5") * 2.31, 0.18, 0.03, 0.0, 0.0006)               # second mode du bloc de bois (non accordé)
-    return da.master(buf, -17.0, fondu=0.03)
+    return buf
 
 
 def onglet(graine):
@@ -87,7 +87,7 @@ def onglet(graine):
     buf = da.tampon(0.13)
     da.ajouter(buf, da.souffle(rng, 0.06, 2500.0, 5000.0, 1.2, 0.004, 0.05, 1.5), 0.0, 0.35)
     da.bois(rng, buf, N("D7"), 0.25, 0.025, 0.035, clic=0.6, clarte=0.6)
-    return da.master(buf, -21.0, fondu=0.02)
+    return buf
 
 
 def pret(graine):
@@ -96,7 +96,7 @@ def pret(graine):
     da.bois(rng, buf, N("E5"), 0.3, 0.05, 0.0, clic=1.0)
     da.bois(rng, buf, N("E5"), 0.4, 0.38, 0.003, clic=0.0)
     da.bois(rng, buf, N("B5"), 0.35, 0.36, 0.003, clic=0.0)
-    return da.master(buf, -16.0, fondu=0.04)
+    return buf
 
 
 def pret_annule(graine):
@@ -104,7 +104,7 @@ def pret_annule(graine):
     buf = da.tampon(0.35)
     da.bois(rng, buf, N("B5"), 0.4, 0.25, 0.0, clic=0.6, clarte=0.6)
     da.bois(rng, buf, N("G5"), 0.45, 0.25, 0.09, clic=0.4, clarte=0.5)
-    return da.master(buf, -18.0, fondu=0.04)
+    return buf
 
 
 def tous_prets(graine):
@@ -115,34 +115,28 @@ def tous_prets(graine):
         da.bois(rng, buf, N(n), 0.4, 0.5, 0.004 + 0.07 * k, clic=0.5)
     da.bois(rng, buf, N("B5"), 0.3, 0.65, 0.29, clic=0.3)
     da.bois(rng, buf, N("E6"), 0.38, 0.7, 0.29, clic=0.3)
-    return da.master(buf, -14.0, fondu=0.06)
+    return buf
 
 
+# (nom du fichier, lot du plan de production, cible de niveau perçu en dB, fondu de fin en s ou None, fabrique)
 SONS = [
-    ("interface_survol_1", lambda: survol(1201, "B6")),
-    ("interface_survol_2", lambda: survol(1202, "D7")),
-    ("interface_clic_1", lambda: clic(1211, "A5")),
-    ("interface_clic_2", lambda: clic(1212, "B5")),
-    ("interface_retour", lambda: retour(1221)),
-    ("interface_refus", lambda: refus(1231)),
-    ("interface_confirmation", lambda: confirmation(1241)),
-    ("interface_decompte", lambda: decompte(1251)),
-    ("interface_onglet", lambda: onglet(1261)),
-    ("interface_pret", lambda: pret(1271)),
-    ("interface_pret_annule", lambda: pret_annule(1281)),
-    ("interface_tous_prets", lambda: tous_prets(1291)),
+    ("interface_survol_1", 1, -24.0, 0.012, lambda: survol(1201, "B6")),
+    ("interface_survol_2", 1, -24.0, 0.012, lambda: survol(1202, "D7")),
+    ("interface_clic_1", 1, -18.0, 0.02, lambda: clic(1211, "A5")),
+    ("interface_clic_2", 1, -18.0, 0.02, lambda: clic(1212, "B5")),
+    ("interface_retour", 1, -19.0, 0.02, lambda: retour(1221)),
+    ("interface_refus", 1, -18.0, 0.03, lambda: refus(1231)),
+    ("interface_confirmation", 1, -16.0, 0.05, lambda: confirmation(1241)),
+    ("interface_decompte", 1, -17.0, 0.03, lambda: decompte(1251)),
+    ("interface_onglet", 1, -21.0, 0.02, lambda: onglet(1261)),
+    ("interface_pret", 1, -16.0, 0.04, lambda: pret(1271)),
+    ("interface_pret_annule", 1, -18.0, 0.04, lambda: pret_annule(1281)),
+    ("interface_tous_prets", 1, -14.0, 0.06, lambda: tous_prets(1291)),
 ]
 
 
 def main():
-    dossier = sys.argv[1] if len(sys.argv) > 1 else os.path.dirname(os.path.abspath(__file__))
-    noms = sys.argv[2:]
-    for nom, fabrique in SONS:
-        if noms and nom not in noms:
-            continue
-        chemin = os.path.join(dossier, nom + ".wav")
-        da.ecrire(chemin, fabrique())
-        print("écrit", chemin)
+    da.produire(SONS, os.path.dirname(os.path.abspath(__file__)), sys.argv)
 
 
 if __name__ == "__main__":
