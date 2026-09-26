@@ -22,7 +22,9 @@
 # Vidéos : une ligne qui commence par {video chemin} (chemin relatif à Wiki/, ex. media/animations/Idle_A.mp4) devient une
 # carte vidéo (lecture automatique en boucle, muette, chargée seulement quand elle arrive à l'écran) ; le texte qui suit la
 # balise est la légende, en parties séparées par " | " (une ligne chacune). Les lignes {video} consécutives forment une
-# grille. Le fichier est copié dans site/videos/ ; la version joueur n'a jamais de vidéo (balise retirée).
+# grille. Le fichier est copié dans <version>/videos/ (site/ et public/). Dans la version joueur, une partie de légende
+# qui porte {dev} est retirée (ex. le nom technique du clip), et toute la carte si {dev} est dans sa première partie ;
+# une carte {à confirmer} y est retirée comme toute ligne {à confirmer}.
 import html, io, json, os, re, datetime, shutil, unicodedata, urllib.parse
 
 ICI = os.path.dirname(os.path.abspath(__file__))
@@ -34,7 +36,7 @@ AUDIO = os.path.normpath(os.path.join(ICI, "..", "Assets", "Audio"))
 SITE_SONS = os.path.join(SITE, "sons")
 ICONES = os.path.normpath(os.path.join(ICI, "..", "ArtSources", "Icones"))
 ICONES_COPIEES = set()  # icônes SVG référencées par {icone nom}, copiées dans <version>/icones/
-VIDEOS_COPIEES = set()  # vidéos référencées par {video chemin} (chemins relatifs à media/), copiées dans site/videos/
+VIDEOS_COPIEES = set()  # vidéos référencées par {video chemin} (chemins relatifs à media/), copiées dans <version>/videos/
 
 # Ordre du menu : (fichier sans extension, libellé court[, options]). Options, séparées par des espaces : "dev" si la page
 # est réservée à la version développeur, "sous" pour une sous-page (affichée en retrait sous la page qui la précède).
@@ -110,14 +112,14 @@ def copier_icones(dossier):
         shutil.copyfile(os.path.join(ICONES, sous, nom + ".svg"), os.path.join(cible, nom + ".svg"))
 
 
-# ------------------------------------------------------------------ vidéos ({video chemin}, version développeur)
+# ------------------------------------------------------------------ vidéos ({video chemin}, les deux versions)
 
 RE_VIDEO = re.compile(r"^\{video ([^}]+)\}\s*(.*)$")
 
 
 def carte_video(m):
     """{video chemin} légende | ligne 2 | ... : carte avec une vidéo muette en boucle, chargée paresseusement (data-src,
-    posée par JS_VIDEOS quand la carte approche de l'écran). Le fichier est copié plus tard dans site/videos/."""
+    posée par JS_VIDEOS quand la carte approche de l'écran). Le fichier est copié plus tard dans <version>/videos/."""
     chemin = m.group(1).strip().replace("\\", "/")
     rel = chemin[len("media/"):] if chemin.startswith("media/") else chemin
     if not os.path.isfile(os.path.join(ICI, chemin)):
@@ -359,8 +361,6 @@ def filtrer(md, public):
         md = re.sub(r"\{\{dev:\s*(.*?)\}\}", r"\1", md)
     out, saut, table_cols = [], None, None
     for l in md.split("\n"):
-        if public and RE_VIDEO.match(l.strip()):
-            continue  # pas de vidéos dans la version joueur
         m = re.match(r"^(#{1,3}) ", l)
         if m:
             n = len(m.group(1))
@@ -372,6 +372,11 @@ def filtrer(md, public):
                 continue
         elif saut is not None:
             continue
+        mv = RE_VIDEO.match(l.strip())
+        if public and mv:  # carte vidéo : parties de légende {dev} retirées ({dev} dans la 1re partie : carte retirée plus bas)
+            parts = mv.group(2).split(" | ")
+            if "{dev}" not in parts[0]:
+                l = ("{video %s} %s" % (mv.group(1), " | ".join(p for p in parts if "{dev}" not in p))).rstrip()
         if l.startswith("|"):
             cells = l.strip().strip("|").split("|")
             if table_cols is None:  # ligne d'en-tête du tableau

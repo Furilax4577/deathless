@@ -24,3 +24,29 @@
 - **Effets** : nuages en gemmes jaune-brun moutarde qui grossissent puis disparaissent par la taille ; **jamais vert** (le vert est réservé à Nyxessa).
 
 {dev} Modèle : créé de zéro dans le style KayKit (`sandbox-ui/Assets/Art/Clochard/`).
+
+## Clips proposés {à confirmer}
+
+Gestes KayKit proposés pour ce kit, repris des bacs à sable : rien n'est encore branché en jeu. L'arme est celle de la vidéo, suivie de l'arme prévue.
+
+{dev} Sources : `sandbox-ui` (contrôleur du clochard, `ClochardBuilder.cs`, état `Frappe`), banc `NcBanc` de `sandbox-vfx` (scène `NouvellesClasses`) et demande de Quentin pour « boire ».
+
+### Coup de bouteille
+
+{video media/animations/Melee_1H_Attack_Chop.mp4} **Coup de bouteille** {à confirmer} | {dev} `Melee_1H_Attack_Chop` | Arme : hache à une main et bouclier (prévu : bouteille) | une fois · 1,07 s
+
+### Pet de défense
+
+Aucun geste proposé pour l'instant.
+
+### Nuage pestilentiel
+
+{video media/animations/Interact.mp4} **Nuage pestilentiel** {à confirmer} | {dev} `Interact` | Arme : aucune (prévu : bouteille) | une fois · 1,30 s
+
+### Pet-propulsion
+
+{video media/animations/Jump_Full_Long.mp4} **Pet-propulsion : bond** {à confirmer} | {dev} `Jump_Full_Long` | Arme : aucune (prévu : bouteille) | une fois · 2,33 s
+
+### Boire (jauge de Gaz)
+
+{video media/animations/Use_Item.mp4} **Boire un coup** {à confirmer} | {dev} `Use_Item` | Arme : potion (prévu : bouteille) | boucle · 1,60 s

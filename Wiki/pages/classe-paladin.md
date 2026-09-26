@@ -22,6 +22,32 @@ Répartition de la charge et du soin sur LB et RB : celle de la version 0.1 {à 
 
 Actions communes à toutes les classes : voir [Classes](classes.md#actions-communes).
 
+## Clips des compétences
+
+Les gestes joués en jeu pour chaque action, dans l'ordre où ils s'enchaînent. Vidéos sur le mannequin KayKit, caméra fixe de 3/4, sol quadrillé tous les mètres ; l'arme est celle de la vidéo, suivie de celle du jeu quand elle diffère.
+
+{dev} Source : contrôleur `Assets/Jeu/Animation/Paladin_Jeu.controller` (généré par `JeuBuilder.ControleurPaladin`), déclenché par `ClassePaladin`. Toutes les animations : [Animations](animations.md).
+
+### Épée
+
+Les deux tailles alternent à chaque coup.
+
+{video media/animations/Melee_1H_Attack_Slice_Horizontal.mp4} **Épée : taille horizontale (1er coup)** | {dev} `Melee_1H_Attack_Slice_Horizontal` | Arme : épée et bouclier | une fois · 1,37 s | {dev} vitesse `epeeVitesseClip` ×1,25
+{video media/animations/Melee_1H_Attack_Slice_Diagonal.mp4} **Épée : taille en diagonale (2e coup)** | {dev} `Melee_1H_Attack_Slice_Diagonal` | Arme : épée et bouclier | une fois · 1,00 s | {dev} vitesse `epeeVitesseClip`
+
+### Garde et parade
+
+{video media/animations/Melee_Blocking.mp4} **Garde : bouclier levé** | {dev} `Melee_Blocking` | Arme : épée et bouclier | boucle · 1,07 s | {dev} haut du corps, copie bouclante `Melee_Blocking_Loop`
+{video media/animations/Melee_Block_Hit.mp4} **Garde : coup bloqué ou paré** | {dev} `Melee_Block_Hit` | Arme : épée et bouclier | une fois · 1,07 s | {dev} haut du corps, vitesse ×1,6
+
+### Charge bélier
+
+{video media/animations/Melee_Block_Attack.mp4} **Charge bélier : coup de bouclier** | {dev} `Melee_Block_Attack` | Arme : épée et bouclier | une fois · 1,07 s | {dev} vitesse ×1,2, joué pendant toute la ruée : pas de clip de course
+
+### Soin sur soi
+
+{video media/animations/Ranged_Magic_Raise.mp4} **Soin sur soi : épée levée** | {dev} `Ranged_Magic_Raise` | Arme : bâton (en jeu : épée et bouclier) | une fois · 2,10 s | {dev} soin donné à `soinIncantation`
+
 ## Règles
 
 - Épée et bouclier. La visière du casque s'abaisse et se relève.

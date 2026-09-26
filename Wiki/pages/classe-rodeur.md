@@ -21,6 +21,31 @@ L'archer. Plus il vise juste et bande fort, plus il fait mal : une flèche charg
 
 Actions communes à toutes les classes : voir [Classes](classes.md#actions-communes).
 
+## Clips des compétences
+
+Les gestes joués en jeu pour chaque action, dans l'ordre où ils s'enchaînent. Vidéos sur le mannequin KayKit, caméra fixe de 3/4, sol quadrillé tous les mètres ; l'arme est celle de la vidéo, suivie de celle du jeu quand elle diffère.
+
+{dev} Source : contrôleur `Assets/Jeu/Animation/Rodeur_Jeu.controller` (généré par `ClassesBuilder.ControleurRodeur`), déclenché par `ClasseRodeur`. Toutes les animations : [Animations](animations.md).
+
+### Viser, bander et tirer
+
+{video media/animations/Ranged_Bow_Draw.mp4} **Tir : bander l'arc** | {dev} `Ranged_Bow_Draw` | Arme : arc et carquois | une fois · 1,33 s | {dev} haut du corps, durée calée sur `arcCharge`
+{video media/animations/Ranged_Bow_Aiming_Idle.mp4} **Tir : arc bandé, tenu** | {dev} `Ranged_Bow_Aiming_Idle` | Arme : arc et carquois | boucle · 1,83 s | {dev} copie bouclante `Ranged_Bow_Aiming_Idle_Loop`
+{video media/animations/Ranged_Bow_Release.mp4} **Tir : décocher** | {dev} `Ranged_Bow_Release` | Arme : arc et carquois | une fois · 1,33 s | {dev} vitesse ×1,3
+
+{dev} Viser seul (LT) ne joue pas de clip : les gestes partent quand le rôdeur bande l'arc.
+
+### Nuée de flèches
+
+{video media/animations/Ranged_Bow_Draw_Up.mp4} **Nuée : bander vers le ciel** | {dev} `Ranged_Bow_Draw_Up` | Arme : arc et carquois | une fois · 1,33 s | {dev} corps entier, vitesse ×2,2
+{video media/animations/Ranged_Bow_Release_Up.mp4} **Nuée : décocher vers le ciel** | {dev} `Ranged_Bow_Release_Up` | Arme : arc et carquois | une fois · 1,37 s | {dev} vitesse ×1,2
+
+### Roulade arrière et salve
+
+{video media/animations/Dodge_Backward.mp4} **Roulade arrière** | {dev} `Dodge_Backward` | Arme : aucune (en jeu : arc et carquois) | une fois · 0,40 s | {dev} esquive arrière commune (`DodgeBack`)
+
+{dev} La salve n'a pas de geste propre : les flèches partent pendant la roulade, 0,08 s après son début.
+
 ## Règles
 
 - Arc et carquois {décidé} : au repos, l'arc est tenu le long du corps ; il se lève et se bande pour viser.

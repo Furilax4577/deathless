@@ -22,6 +22,31 @@ Il frappe fort quand on ne le voit pas. Furtif en marchant, il porte ses meilleu
 
 Actions communes à toutes les classes : voir [Classes](classes.md#actions-communes).
 
+## Clips des compétences
+
+Les gestes joués en jeu pour chaque action, dans l'ordre où ils s'enchaînent. Vidéos sur le mannequin KayKit, caméra fixe de 3/4, sol quadrillé tous les mètres ; l'arme est celle de la vidéo, suivie de celle du jeu quand elle diffère.
+
+{dev} Source : contrôleur `Assets/Jeu/Animation/Assassin_Jeu.controller` (généré par `ClassesBuilder.ControleurAssassin`), déclenché par `ClasseAssassin`. Toutes les animations : [Animations](animations.md).
+
+### Dague
+
+{video media/animations/Melee_1H_Attack_Stab.mp4} **Dague : estoc** | {dev} `Melee_1H_Attack_Stab` | Arme : épée et bouclier (en jeu : dague) | une fois · 1,60 s | {dev} vitesse calée sur `dagueInstant` (coup à 0,5 s du clip)
+
+### Arbalète en main
+
+{video media/animations/Ranged_1H_Aiming.mp4} **Arbalète : en main, visée** | {dev} `Ranged_1H_Aiming` | Arme : arbalète à une main | une fois · 1,07 s (tenue en boucle en jeu) | {dev} haut du corps, copie bouclante `Ranged_1H_Aiming_Loop`
+{video media/animations/Ranged_1H_Shoot.mp4} **Arbalète : tir** | {dev} `Ranged_1H_Shoot` | Arme : arbalète à une main | une fois · 1,07 s | {dev} vitesse ×1,2
+
+### Lancer de la grenade
+
+{video media/animations/Throw.mp4} **Grenade fumigène : lancer** | {dev} `Throw` | Arme : fiole (en jeu : grenade fumigène) | une fois · 1,37 s
+
+### Marche discrète (passif)
+
+{video media/animations/Sneaking.mp4} **Marche discrète** | {dev} `Sneaking` | Arme : aucune (en jeu : dague) | boucle · 2,13 s | {dev} seconde locomotion, copie bouclante `Sneaking_Loop`
+
+{dev} RB : vide.
+
 ## Règles
 
 - Dague en main, arbalète rangée dans le dos {décidé}. Changer d'arme fait passer l'arbalète en main et range la dague dans le dos.
