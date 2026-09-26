@@ -2416,6 +2416,7 @@
       "Deathless/Nyxessa/nyxessa_tir_2.wav",
       "Deathless/Nyxessa/nyxessa_tir_3.wav"
     ],
+    "portee": 60,
     "source": "Deathless (synthèse)",
     "licence": "propre",
     "statut": "a_ecouter"
@@ -2431,6 +2432,7 @@
       "Deathless/Nyxessa/nyxessa_frappee_2.wav",
       "Deathless/Nyxessa/nyxessa_frappee_3.wav"
     ],
+    "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
     "statut": "a_ecouter"
@@ -2451,6 +2453,7 @@
     "categorie": "Nyxessa et portail",
     "usage": "Un palier de Nyxessa ou du bouclier est acheté : arpège montant, accord ouvert, gerbe d'étincelles (3D, événement majeur). Remplacera `nyxessa_palier`.",
     "fichier": "Deathless/Nyxessa/nyxessa_palier.wav",
+    "portee": 60,
     "source": "Deathless (synthèse)",
     "licence": "propre",
     "statut": "a_ecouter"
@@ -2461,6 +2464,7 @@
     "categorie": "Nyxessa et portail",
     "usage": "À l'aube, la charge part vers le portail : souffle et gemmes qui montent (3D). Remplacera `nyxessa_charge_portail`.",
     "fichier": "Deathless/Nyxessa/nyxessa_charge_portail.wav",
+    "portee": 60,
     "source": "Deathless (synthèse)",
     "licence": "propre",
     "statut": "a_ecouter"
@@ -2471,6 +2475,7 @@
     "categorie": "Nyxessa et portail",
     "usage": "Au crépuscule, l'énergie revient du portail : souffle qui retombe, gemmes qui descendent, la relique absorbe (3D). Remplacera `nyxessa_retour_energie`.",
     "fichier": "Deathless/Nyxessa/nyxessa_retour_energie.wav",
+    "portee": 60,
     "source": "Deathless (synthèse)",
     "licence": "propre",
     "statut": "a_ecouter"
@@ -2481,6 +2486,7 @@
     "categorie": "Nyxessa et portail",
     "usage": "Une onde fait le tour de la ceinture (passage d'un joueur au portail, énergie d'un allié mort qui revient) : course de gemmes (3D). Remplacera `nyxessa_onde_passage`.",
     "fichier": "Deathless/Nyxessa/nyxessa_onde.wav",
+    "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
     "statut": "a_ecouter"
@@ -2491,6 +2497,266 @@
     "categorie": "Nyxessa et portail",
     "usage": "Nyxessa est détruite, la partie est perdue : fêlure, bris en cascade, dernier soupir grave (3D, événement majeur). Remplacera `nyxessa_destruction`.",
     "fichier": "Deathless/Nyxessa/nyxessa_destruction.wav",
+    "portee": 60,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_nyxessa_missile_vol",
+    "nom": "Missile en crâne — vol, boucle (identité Deathless)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Vol du missile en crâne de gemmes de Nyxessa (boucle 3D de 1,5 s sur le missile) : souffle qui palpite, gemme tenue. Remplacera `skull_flight_loop`.",
+    "fichier": "Deathless/Nyxessa/nyxessa_missile_vol_boucle.wav",
+    "portee": 40,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_nyxessa_missile_eclat",
+    "nom": "Missile en crâne — éclatement (identité Deathless)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Le missile éclate à l'impact : choc de verre, gerbe de gemmes qui monte. Remplacera `skull_explosion`.",
+    "fichier": "Deathless/Nyxessa/nyxessa_missile_eclat_1.wav",
+    "variantes": [
+      "Deathless/Nyxessa/nyxessa_missile_eclat_1.wav",
+      "Deathless/Nyxessa/nyxessa_missile_eclat_2.wav",
+      "Deathless/Nyxessa/nyxessa_missile_eclat_3.wav"
+    ],
+    "portee": 40,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_nyxessa_rappel",
+    "nom": "Nyxessa — rappel forcé (identité Deathless)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Un joueur resté au donjon au crépuscule est ramené de force (2D, pour lui seul) : accord tendu, aspiration, arrivée au village. Remplacera `nyxessa_rappel`.",
+    "fichier": "Deathless/Nyxessa/nyxessa_rappel.wav",
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_nyxessa_reapparition",
+    "nom": "Nyxessa — réapparition d'un joueur (identité Deathless)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Un joueur mort renaît près de Nyxessa : gemmes qui convergent, accord posé, un pas sur la pierre. Remplacera `respawn`.",
+    "fichier": "Deathless/Nyxessa/nyxessa_reapparition.wav",
+    "portee": 40,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_bouclier_leve",
+    "nom": "Bouclier de Nyxessa — levée (identité Deathless)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Le bouclier de gemmes se lève après l'incantation du sorcier : spirale de gemmes graves qui se serre, accord tenu. Remplacera `shield_raise`.",
+    "fichier": "Deathless/Bouclier/bouclier_leve.wav",
+    "portee": 60,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_bouclier_touche",
+    "nom": "Bouclier de Nyxessa — coup encaissé (identité Deathless)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Un coup frappe le bouclier : choc sourd absorbé, mur qui frémit, petit retour de la riposte. Remplacera `shield_hit`.",
+    "fichier": "Deathless/Bouclier/bouclier_touche_1.wav",
+    "variantes": [
+      "Deathless/Bouclier/bouclier_touche_1.wav",
+      "Deathless/Bouclier/bouclier_touche_2.wav",
+      "Deathless/Bouclier/bouclier_touche_3.wav",
+      "Deathless/Bouclier/bouclier_touche_4.wav"
+    ],
+    "portee": 40,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_bouclier_etat_entame",
+    "nom": "Bouclier de Nyxessa — entamé (identité Deathless)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Le bouclier passe à l'orange (moins de 40 %) : l'accord glisse d'un demi-ton, le frisson s'accélère. Nouveau.",
+    "fichier": "Deathless/Bouclier/bouclier_etat_entame.wav",
+    "portee": 40,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_bouclier_etat_critique",
+    "nom": "Bouclier de Nyxessa — près de céder (identité Deathless)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Le bouclier passe au rouge (moins de 15 %) : même geste plus bas, craquements de verre. Nouveau.",
+    "fichier": "Deathless/Bouclier/bouclier_etat_critique.wav",
+    "portee": 40,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_bouclier_brise",
+    "nom": "Bouclier de Nyxessa — rupture (identité Deathless)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Le bouclier cède : craquement, bris des gemmes graves en cascade, souffle qui s'effondre. Remplacera `shield_break`.",
+    "fichier": "Deathless/Bouclier/bouclier_brise.wav",
+    "portee": 60,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_bouclier_breche",
+    "nom": "Bouclier de Nyxessa — coup de brèche (identité Deathless)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Coup de brèche de Morgrim martache sur la paroi : fer sur verre, gemmes qui crient faux. Nouveau.",
+    "fichier": "Deathless/Bouclier/bouclier_breche_1.wav",
+    "variantes": [
+      "Deathless/Bouclier/bouclier_breche_1.wav",
+      "Deathless/Bouclier/bouclier_breche_2.wav"
+    ],
+    "portee": 60,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_bouclier_palier",
+    "nom": "Bouclier de Nyxessa — palier (identité Deathless)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Le bouclier gagne un palier (plus dense) : grappe de gemmes graves en crescendo, accord tenu. Nouveau.",
+    "fichier": "Deathless/Bouclier/bouclier_palier.wav",
+    "portee": 60,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_sorcier_incantation",
+    "nom": "Sorcier — incantation du bouclier, boucle (identité Deathless)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Le sorcier invoque le bouclier (boucle 3D de 3 s tant qu'il incante) : souffle qui respire, motif lent de trois gemmes, sans voix. Remplacera `sorcier_incantation`.",
+    "fichier": "Deathless/Bouclier/sorcier_incantation_boucle.wav",
+    "portee": 40,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_sorcier_canalisation",
+    "nom": "Sorcier — canalisation, boucle (identité Deathless)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Lien d'énergie entre le bâton du sorcier et la relique (palier 4 du bouclier ; boucle 3D de 4 s) : bourdon de gemmes ondulant, petites gemmes qui voyagent. Nouveau.",
+    "fichier": "Deathless/Bouclier/sorcier_canalisation_boucle.wav",
+    "portee": 20,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_sorcier_canalisation_eclat",
+    "nom": "Sorcier — éclat de la canalisation (identité Deathless)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Un coup encaissé fait avancer la recharge d'un missile : gemme brève, souffle qui monte. Nouveau.",
+    "fichier": "Deathless/Bouclier/sorcier_canalisation_eclat_1.wav",
+    "variantes": [
+      "Deathless/Bouclier/sorcier_canalisation_eclat_1.wav",
+      "Deathless/Bouclier/sorcier_canalisation_eclat_2.wav"
+    ],
+    "portee": 20,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_portail_ouverture",
+    "nom": "Portail — ouverture (identité Deathless)",
+    "categorie": "Nyxessa et portail",
+    "usage": "À l'aube, le portail s'ouvre à l'arrivée de la charge : anneau de gemmes qui s'ouvre, souffle qui s'étale, le bourdon s'installe. Remplacera `portal_open`.",
+    "fichier": "Deathless/Portail/portail_ouverture.wav",
+    "portee": 60,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_portail_fermeture",
+    "nom": "Portail — fermeture (identité Deathless)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Au crépuscule, le portail se referme : anneau qui se resserre, souffle aspiré, gemme grave qui s'éteint. Remplacera `portal_close`.",
+    "fichier": "Deathless/Portail/portail_fermeture.wav",
+    "portee": 60,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_portail_bourdon",
+    "nom": "Portail — bourdon, boucle (identité Deathless)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Portail ouvert, au village et au retour du donjon (boucle 3D de 6 s, audible de près) : bourdon de verre, eau qui tourne, rares gemmes. Remplacera `portal_hum_loop`.",
+    "fichier": "Deathless/Portail/portail_bourdon_boucle.wav",
+    "portee": 20,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_portail_depart",
+    "nom": "Portail — départ d'un joueur (identité Deathless)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Un joueur entre dans le portail, son corps part en gemmes : goutte grave, trois anneaux qui s'élargissent, gemmes aspirées. Remplacera `portal_pass`.",
+    "fichier": "Deathless/Portail/portail_depart.wav",
+    "portee": 40,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_portail_arrivee",
+    "nom": "Portail — arrivée d'un joueur (identité Deathless)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Les gemmes jaillissent du portail d'arrivée et reforment le corps : anneaux qui convergent, accord posé. Remplacera `portail_arrivee`.",
+    "fichier": "Deathless/Portail/portail_arrivee.wav",
+    "portee": 40,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_portail_chute_ciel",
+    "nom": "Portail — chute du ciel, arrivée au donjon (identité Deathless)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Arrivée au donjon (clip `Spawn_Air`, 1,3 s) : souffle qui descend, réception sur la pierre vers 1 s. Nouveau.",
+    "fichier": "Deathless/Portail/portail_chute_ciel.wav",
+    "portee": 40,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_portail_sortie_sol",
+    "nom": "Portail — sortie du sol, retour au village (identité Deathless)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Retour au village et rappel (clip `Spawn_Ground`, 1,3 s) : la terre s'ouvre, gravier qui monte, deux gemmes quand le corps est entier (vers 1 s). Nouveau.",
+    "fichier": "Deathless/Portail/portail_sortie_sol.wav",
+    "portee": 40,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_portail_ferme_refus",
+    "nom": "Portail — fermé, refus (identité Deathless)",
+    "categorie": "Nyxessa et portail",
+    "usage": "Interagir près du portail fermé la nuit (2D) : gemme étouffée, toc de pierre. Nouveau.",
+    "fichier": "Deathless/Portail/portail_ferme_refus.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
     "statut": "a_ecouter"
