@@ -414,8 +414,7 @@ namespace Deathless.Jeu
             // Parade parfaite lancée contre cet attaquant : son coup est paré, garde levée ou non (coup de bouclier).
             if (m_Parade != null && info.source != null && m_Parade.Couvre(info.source))
             {
-                var sp = info.source.GetComponent<Squelette>();
-                if (sp != null) sp.Etourdir(B.paradeEtourdi, H.Id);
+                EtourdirAttaquant(info.source);
                 return Interception.Pare;
             }
             // Pendant le coup de bouclier, un autre coup venu de devant est paré lui aussi (le bouclier est en avant).
@@ -424,18 +423,16 @@ namespace Deathless.Jeu
                 Vector3 devant = info.source.transform.position - transform.position; devant.y = 0f;
                 if (Vector3.Angle(transform.forward, devant) <= B.gardeDemiAngle)
                 {
-                    var sr = info.source.GetComponent<Squelette>();
-                    if (sr != null) sr.Etourdir(B.paradeEtourdi, H.Id);
+                    EtourdirAttaquant(info.source);
                     return Interception.Pare;
                 }
             }
             if (!m_Garde || info.source == null) return Interception.Passe;
             Vector3 vers = info.source.transform.position - transform.position; vers.y = 0f;
             if (Vector3.Angle(transform.forward, vers) > B.gardeDemiAngle) return Interception.Passe;
-            var sq = info.source.GetComponent<Squelette>();
             if (m_Parade != null ? m_Parade.DansFenetre(info.source, m_GardeDepuis) : Time.time - m_GardeDepuis <= B.paradeFenetre)
             {
-                if (sq != null) sq.Etourdir(B.paradeEtourdi, H.Id);
+                EtourdirAttaquant(info.source);
                 return Interception.Pare;
             }
             float cout = info.montant * B.gardeCoutParDegat * Facteur(1);
@@ -444,6 +441,20 @@ namespace Deathless.Jeu
             H.ViderEndurance();
             H.Etourdir(B.gardeBriseeEtourdi);
             return Interception.Passe;
+        }
+
+        /// Distance au-delà de laquelle une parade n'étourdit pas l'attaquant : un projectile paré (crâne du Nécromancien)
+        /// a son tireur pour source, tenu à 12-18 m (necroDistance). Couvre les coups au corps à corps les plus longs
+        /// (Fend-sol de Morgrim martache, 5 m).
+        const float DistanceEtourdissementParade = 6f;
+
+        /// Parade réussie : étourdit l'attaquant s'il est au contact (pas le tireur d'un projectile paré de loin).
+        void EtourdirAttaquant(GameObject source)
+        {
+            var sq = source != null ? source.GetComponent<Squelette>() : null;
+            if (sq == null) return;
+            Vector3 d = sq.transform.position - transform.position; d.y = 0f;
+            if (d.magnitude <= DistanceEtourdissementParade) sq.Etourdir(B.paradeEtourdi, H.Id);
         }
 
         public override void SurIntercepte(InfoDegats info, Interception r)
