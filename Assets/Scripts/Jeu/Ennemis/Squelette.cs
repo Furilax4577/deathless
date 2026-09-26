@@ -297,7 +297,7 @@ namespace Deathless.Jeu
         {
             if (Provoque) { m_Cible = m_Provocateur; m_SansFrapper = 0f; }
             else if (m_Cible != null && !Voit(m_Cible)) { m_Cible = null; m_Etat = Etat.Marche; return; }
-            if (!Provoque && DistanceNyxessa() <= RayonContact && (m_Cible == null || !m_Cible.Vivant || Distance(m_Cible.transform.position) > m_Stats.portee))
+            if (!Provoque && DistanceNyxessa() <= RayonContact && (m_Cible == null || !m_Cible.Vivant || Distance(m_Cible.transform.position) > PorteeEngagement(m_Cible)))
             {
                 m_Cible = null;
                 m_Etat = Etat.Marche;
@@ -307,7 +307,7 @@ namespace Deathless.Jeu
             float d = Distance(m_Cible.transform.position);
             m_SansFrapper += dt;
             if (d > B.abandonPoursuite || m_SansFrapper > B.abandonApres) { m_Cible = null; m_Etat = Etat.Marche; return; }
-            if (d <= m_Stats.portee)
+            if (d <= PorteeEngagement(m_Cible))
             {
                 Agent.isStopped = true;
                 Tourner(m_Cible.transform.position);
@@ -319,6 +319,11 @@ namespace Deathless.Jeu
                 Agent.SetDestination(m_Cible.transform.position);
             }
         }
+
+        /// Distance à laquelle le squelette s'arrête pour frapper cette cible. Par défaut la portée de son coup ; un
+        /// ennemi à plusieurs compétences (Morgrim) renvoie la portée de celle qu'il choisirait maintenant, pour ne
+        /// pas s'arrêter hors de portée du coup qui partira.
+        protected virtual float PorteeEngagement(Heros cible) => m_Stats.portee;
 
         protected float Distance(Vector3 p) { Vector3 d = p - transform.position; d.y = 0f; return d.magnitude; }
 
