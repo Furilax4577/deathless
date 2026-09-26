@@ -121,6 +121,16 @@ namespace Deathless.UI.Ecrans
             InputDeviceWatcher.Changed -= OnAppareil;
             foreach (var (action, rappel) in m_Abonnements) action.performed -= rappel;
             m_Abonnements.Clear();
+            // Les écrans sont recréés au prochain OnEnable : ceux-ci se désabonnent et quittent le panneau.
+            foreach (var e in m_Tous)
+            {
+                e.Detruire();
+                e.Racine.RemoveFromHierarchy();
+            }
+            m_Tous.Clear();
+            m_Pile.Clear();
+            RoueEmotes?.Racine.RemoveFromHierarchy();
+            RoueEmotes = null;
         }
 
         T Creer<T>(T ecran, VisualTreeAsset uxml, VisualElement conteneur) where T : Ecran
