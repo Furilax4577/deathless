@@ -109,7 +109,8 @@ namespace Deathless.Jeu
                 if (s == null || !s.Vivant || !Portee(s)) continue;
                 float d = (s.transform.position - transform.position).sqrMagnitude;
                 if (s.SurNyxessa && d < dSur) { dSur = d; sur = s; }
-                if ((s.elite || s.type == TypeEnnemi.Necromancien) && d < dLourd) { dLourd = d; lourd = s; }
+                // Priorité 2 (wiki : nyxessa.md) : un mage lanceur de crâne, un élite ou un boss (Golem : Morgrim).
+                if ((s.elite || s.type == TypeEnnemi.Golem || s.type == TypeEnnemi.Necromancien) && d < dLourd) { dLourd = d; lourd = s; }
                 if (d < dProche) { dProche = d; proche = s; }
             }
             priorite = sur != null ? 1 : lourd != null ? 2 : 3;
