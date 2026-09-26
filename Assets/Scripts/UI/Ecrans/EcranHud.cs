@@ -33,8 +33,10 @@ namespace Deathless.UI.Ecrans
         FlecheHud m_FlecheAttaque;
         VisualElement m_Portrait;
         Label m_Initiale;
+        VisualElement m_Embleme;
+        string m_ClasseEmbleme;
         Gauge m_Vie, m_Endurance, m_JaugeClasse;
-        VisualElement m_Furtif, m_JaugeIcone, m_Potion;
+        VisualElement m_Furtif, m_Potion;
         Label m_PotionNombre;
         string m_ClasseBarre;
         JaugeClasse m_JaugeAffichee = (JaugeClasse)(-1);
@@ -98,11 +100,10 @@ namespace Deathless.UI.Ecrans
             m_FlecheAttaque = Racine.Q<FlecheHud>("attaque-fleche");
             m_Portrait = Racine.Q("portrait");
             m_Initiale = Racine.Q<Label>("portrait-initiale");
+            m_Embleme = Racine.Q("portrait-embleme");
             m_Vie = Racine.Q<Gauge>("joueur-vie");
             m_Endurance = Racine.Q<Gauge>("joueur-endurance");
             m_JaugeClasse = Racine.Q<Gauge>("joueur-jauge");
-            m_JaugeIcone = IconesUI.Creer(IconesUI.Mana, "hud-joueur__jauge-icone");
-            m_JaugeClasse.Q(className: Gauge.HeaderUssClass)?.Insert(0, m_JaugeIcone);
             m_Furtif = Racine.Q("furtif");
             IconesUI.Poser(Racine.Q("furtif-icone"), IconesUI.Furtif);
             m_Potion = Racine.Q("potion");
@@ -360,7 +361,16 @@ namespace Deathless.UI.Ecrans
         void MajJoueur(IEtatJoueur joueur, IEtatPartie partie)
         {
             m_Portrait.style.backgroundColor = joueur.TeinteClasse;
-            m_Initiale.text = string.IsNullOrEmpty(joueur.Classe) ? "?" : joueur.Classe.Substring(0, 1);
+            if (m_ClasseEmbleme != joueur.Classe)
+            {
+                // Emblème hexagonal de la classe (table IconesUI) ; l'initiale reste en repli s'il manque.
+                m_ClasseEmbleme = joueur.Classe;
+                var embleme = ClassesJouables.TrouverParNom(joueur.Classe)?.Embleme;
+                bool avecEmbleme = m_Embleme != null && !string.IsNullOrEmpty(embleme) && IconesUI.Poser(m_Embleme, embleme);
+                if (m_Embleme != null && !avecEmbleme) m_Embleme.style.display = DisplayStyle.None;
+                m_Initiale.text = string.IsNullOrEmpty(joueur.Classe) ? "?" : joueur.Classe.Substring(0, 1);
+                m_Initiale.style.display = avecEmbleme ? DisplayStyle.None : DisplayStyle.Flex;
+            }
             m_Vie.SetValue(joueur.Vie, joueur.VieMax);
             m_Endurance.SetValue(joueur.Endurance, joueur.EnduranceMax);
             MajClasse(joueur as IEtatJoueurClasse);
@@ -423,7 +433,6 @@ namespace Deathless.UI.Ecrans
                 m_JaugeClasse.label = jauge == JaugeClasse.Rage ? "Rage" : "Mana";
                 m_JaugeClasse.EnableInClassList("dl-gauge--mana", jauge == JaugeClasse.Mana);
                 m_JaugeClasse.EnableInClassList("dl-gauge--rage", jauge == JaugeClasse.Rage);
-                IconesUI.Poser(m_JaugeIcone, jauge == JaugeClasse.Rage ? IconesUI.Rage : IconesUI.Mana);
             }
             if (jauge != JaugeClasse.Aucune) m_JaugeClasse.SetValue(classe.ValeurJauge, Mathf.Max(1f, classe.JaugeMax));
             m_Furtif.style.display = classe != null && classe.Furtif ? DisplayStyle.Flex : DisplayStyle.None;

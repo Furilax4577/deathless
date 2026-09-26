@@ -51,7 +51,7 @@ Cinq paliers, soit environ un palier toutes les deux nuits sur une partie de 45 
 
 ### Achats à la relique {décidé}
 
-De **jour**, près de Nyxessa (sur son plateau ou à ses pieds), la touche **Interagir** (E, X, Carré) ouvre le **menu d'achat des paliers** : missiles de Nyxessa et bouclier du sorcier. Chaque ligne montre le palier atteint, ce qu'apporte le suivant et son prix ; l'or est pris dans la **caisse commune**. En multijoueur, **l'hôte décide** : un achat demandé par un autre joueur lui est transmis, et tous entendent le palier monter. Le menu se ferme à la tombée de la nuit. {{dev: (`AchatRelique`, `Partie.Acheter`, écran `EcranAchat`)}}
+De **jour**, sur le dessus du plateau de Nyxessa, la touche **Interagir** (E, X, Carré) ouvre le **menu d'achat des paliers** : missiles de Nyxessa et bouclier du sorcier. Chaque ligne montre le palier atteint, ce qu'apporte le suivant et son prix ; l'or est pris dans la **caisse commune**. En multijoueur, **l'hôte décide** : un achat demandé par un autre joueur lui est transmis, et tous entendent le palier monter. Le menu se ferme à la tombée de la nuit. {{dev: (`AchatRelique`, `Partie.Acheter`, écran `EcranAchat`)}}
 
 ### Règles de tir {décidé}
 

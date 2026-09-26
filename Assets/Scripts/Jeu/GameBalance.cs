@@ -159,8 +159,9 @@ namespace Deathless.Jeu
         [Header("Achats à la relique (wiki : nyxessa, Paliers ; 26/09/2026)")]
         [Tooltip("Prix des paliers 2 à 5 (or de la caisse commune), pour les missiles comme pour le bouclier.")]
         public int[] prixPaliers = { 100, 200, 350, 550 };
-        [Tooltip("Distance horizontale au centre de Nyxessa pour ouvrir le menu d'achat (m) : le plateau et ses abords.")]
-        public float achatDistance = 9f;
+        [Tooltip("Distance horizontale au centre de Nyxessa pour ouvrir le menu d'achat (m) : le dessus du plateau seulement "
+            + "(VillageBuilder.PlateauTopRadius ; Quentin, 26/09/2026).")]
+        public float achatDistance = 5.2f;
 
         public const int PalierMax = 5;
 

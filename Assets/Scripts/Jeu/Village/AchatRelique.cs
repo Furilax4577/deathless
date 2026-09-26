@@ -75,7 +75,7 @@ namespace Deathless.Jeu
         public string LegendeOr => "caisse commune";
         public string Message => m_Message;
         public bool MessageRefus => m_Refus;
-        public bool Ouvert => Disponible(m_Heros) && Distance(m_Heros) <= B.achatDistance + 2f;
+        public bool Ouvert => Disponible(m_Heros) && Distance(m_Heros) <= B.achatDistance + 1f;
 
         public IReadOnlyList<IArticleAchat> Articles
         {

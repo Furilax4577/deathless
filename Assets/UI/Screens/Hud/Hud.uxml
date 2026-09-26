@@ -91,6 +91,7 @@
         <!-- Bas, à gauche : portrait, vie, endurance -->
         <ui:VisualElement class="hud-joueur">
             <ui:VisualElement name="portrait" class="hud-joueur__portrait">
+                <ui:VisualElement name="portrait-embleme" class="dl-icone hud-joueur__embleme" />
                 <ui:Label name="portrait-initiale" text="P" class="hud-joueur__initiale" />
                 <ui:VisualElement name="furtif" class="hud-joueur__furtif" tooltip="Furtif">
                     <ui:VisualElement name="furtif-icone" class="dl-icone hud-joueur__furtif-icone" />
