@@ -9,7 +9,7 @@ On voit les statuts **au-dessus des ennemis affectés**, **dans le HUD** près d
 | | Statut | Effet | Durée | Posé par | Nouveau coup |
 |---|---|---|---|---|---|
 | {icone statut_brulure} | **Brûlure** | 5 dégâts par seconde | 3 s | Boule de feu et cône de flammes du [Mage](classe-mage.md) | La durée repart de zéro, pas de cumul |
-| {icone statut_ralenti} | **Ralenti** | Déplacements ralentis de 40 % | 3 s après une chute ; tant qu'on est dans l'eau du donjon | Une chute de haut (voir plus bas), l'eau du donjon | La fin la plus lointaine l'emporte ; le ralentissement le plus fort compte |
+| {icone statut_ralenti} | **Ralenti** | Déplacements ralentis de 40 % | 3 s après une chute ; tant qu'on est dans l'eau du donjon | Une chute de haut (voir plus bas), l'eau du donjon, le Fend-sol de Morgrim martache (voir [Ennemis](ennemis.md)) | La fin la plus lointaine l'emporte ; le ralentissement le plus fort compte |
 | {icone statut_etourdi} | **Étourdi** | Ni déplacement ni attaque | Charge bélier : 2,5 s pour la cible, 0,6 s pour les ennemis repoussés ; parade : 1 s ; parade parfaite : 0,8 s pour les ennemis repoussés par le coup de bouclier ; saut percutant : 1 s ; garde brisée (héros) : 0,8 s ; moitié moins pour le mini-boss | [Paladin](classe-paladin.md), [Viking](classe-viking.md), la garde brisée d'un héros | La fin la plus lointaine l'emporte |
 | {icone statut_ivresse} | **Ivresse** | La vue tangue et la démarche hésite ; attaques et visée inchangées | Bière : 8 s ; tournée : 15 s | La [taverne](village.md#taverne) | La fin la plus lointaine l'emporte |
 | {icone statut_provoque} | **Provoqué** | L'ennemi s'acharne sur le héros qui l'a provoqué, avant Nyxessa | 5 s | Rugissement du [Viking](classe-viking.md) | Le dernier provocateur prend la place |

@@ -37,6 +37,7 @@ Un élite est un squelette ordinaire **plus fort**, sans éclat de Nyx (décisio
 
 - environ **1,3 fois plus grand** ;
 - **trois fois plus de points de vie** et des dégâts plus forts ;
+- une portée d'attaque un peu plus longue (+0,3 m) {à équilibrer} ; {{dev: (codé en dur dans `DirecteurVagues.Poser`, pas dans `GameBalance`)}}
 - **yeux rouges** et légère **aura rouge**, pour les distinguer.
 
 Valeurs exactes : {à équilibrer}.
@@ -50,11 +51,11 @@ Valeurs exactes : {à équilibrer}.
 
 ### Morgrim, le Roi des os {décidé}
 
-Colosse très résistant et lent, il marche droit sur Nyxessa. Chaque attaque se prépare longtemps, pour laisser le temps de parer ou d'esquiver :
+Colosse très résistant et lent, il marche droit sur Nyxessa. Chaque attaque se prépare longtemps, pour laisser le temps de parer ou d'esquiver. {{dev: Pas encore dans le jeu : ce kit commun (balayage, coup écrasé, cri) n'est pas codé ; en jeu, Morgrim a le kit de sa version, massue ou martache, décrit plus bas.}}
 
 - **Balayage** de hache en arc devant lui ;
 - **Coup écrasé** au sol, qui fait une onde de choc autour de lui ;
-- **Cri** qui renforce les squelettes proches.
+- **Cri** qui renforce les squelettes proches. {{dev: Pas encore dans le jeu.}}
 
 **Déclinaisons** {décidé, 26/09/2026} : le mini-boss existe en **deux versions**, l'une armée d'une **massue** (boule à pointes), l'autre d'une **martache** (hache-marteau), avec des **comportements et des compétences différents**. Les yeux **bleu glacé** de la martache la distinguent de la massue (yeux jaune-orangé habituels) au premier coup d'œil. **Une des deux versions apparaît au hasard à la nuit 10** ; la graine du tirage vient de l'hôte (voir Multijoueur ci-dessous et `Docs/reseau.md`).
 
@@ -77,7 +78,7 @@ Frappes larges et lentes, pense en zone plutôt qu'en cible : elle punit les gro
 Coups plus rapides et plus précis que la massue, avec une compétence dédiée à percer la défense de Nyxessa plutôt qu'à contrôler la zone.
 
 - **Fauche** : coup en cône devant lui avec le tranchant de la hache, touche tous les joueurs dans l'arc. Thème **Rage** (accents fer, comme le rugissement du viking).
-- **Fend-sol** : saut court suivi d'une retombée qui plante l'arme droit devant lui et fend le sol en ligne ; la fissure **ralentit** (statut [Ralenti](statuts.md)) les joueurs qui restent dedans. Thème **Terre** pour la fissure (c'est le sol qui casse, pas l'arme), portée réduite par rapport au Fracas de la massue (une ligne, pas un cercle).
+- **Fend-sol** : saut court suivi d'une retombée qui plante l'arme droit devant lui et fend le sol en ligne ; la fissure **ralentit** (statut [Ralenti](statuts.md)) les joueurs qui restent dedans. Il est **parable** (garde levée au bon moment), comme la Fauche. Thème **Terre** pour la fissure (c'est le sol qui casse, pas l'arme), portée réduite par rapport au Fracas de la massue (une ligne, pas un cercle).
 - **Coup de brèche** : frappe du côté marteau de l'arme, tournée vers le bouclier de [Nyxessa](vfx.md) plutôt que vers les joueurs : inflige des dégâts renforcés à la paroi du bouclier quand il est levé (voir `Docs/vfx.md`, Bouclier de la relique). Thème **Rage**.
 
 {video media/ennemis/morgrim/Fauche_martache.mp4} **Fauche** {à confirmer} | {dev} `Melee_Dualwield_SlashCombo` | Arme : martache (`Skeleton_Golem_Axe_Large`) | une fois · 1,60 s | {dev} approximation
@@ -86,7 +87,7 @@ Coups plus rapides et plus précis que la massue, avec une compétence dédiée 
 
 {dev} Clips filmés sur Morgrim (`Skeleton_Golem`, rig Large, les deux variantes) et son arme, caméra fixe, cadrage commun aux 6 clips : `Assets/Editor/ClipsWiki/ClipsWiki.cs` (`ClipsWiki.Morgrim()`, `sandbox-rig`, 26/09/2026), même méthode que la page [Animations](animations.md) (maillages skinnés cuits, MP4 480 × 480 30 i/s par `MediaEncoder`). Les clips génériques du rig Large qui ne sont pas propres à Morgrim (locomotion, garde, coups non listés ci-dessus) restent sur cette page, filmés sur le mannequin Rig_Large. Prototypé dans le bac à sable `sandbox-rig` (scène `Assets/Scenes/Morgrim.unity`, outils `Assets/Editor/Morgrim/MorgrimBuilder.cs` et `MorgrimCaptures.cs`) : les deux mannequins posés et équipés, poses d'attente et pose clé de chaque compétence échantillonnées sur les clips du rig Large (`Melee_2H_Slam`, `Melee_1H_Slash`, `Melee_2H_Attack` pour la massue ; `Melee_Dualwield_SlashCombo`, `Melee_1H_Stab`, `Melee_Block_Attack` pour la martache — approximations, aucun clip n'est écrit spécifiquement pour ces coups). Effets principaux prototypés dans le langage gemmes (`Assets/VFX/Morgrim/MorgrimEffets.cs`, gemmes `LowPolyGem` / shader `Relic/VertexColorUnlit`, palettes Terre et Rage). Captures du bac à sable : `Assets/Screenshots/morgrim_massue_*.png`, `morgrim_martache_*.png`, planche `morgrim_planche.png`.
 
-{dev} **Reporté dans `main` le 26/09/2026** (mêmes chemins et GUID) : `Assets/VFX/Morgrim/` (`MorgrimEffets.cs`, `MorgrimGemmes.mat`), `Assets/Jeu/Materiaux/Yeux_Glace.mat` ; les armes `Skeleton_Mace_Large.fbx` et `Skeleton_Golem_Axe_Large.fbx` étaient déjà présentes dans `main` (pack KayKit Skeletons EXTRA), rien à copier. Comportement en jeu : `Assets/Scripts/Jeu/Ennemis/MorgrimVariant.cs` (base commune : joueurs proches, télégraphie et impact en gemmes), `MorgrimMassue.cs` (Fracas, Tourbillon, Charge écrasante) et `MorgrimMartache.cs` (Fauche, Fend-sol, Coup de brèche), dérivées de `Golem.cs` ; valeurs dans `GameBalance` (préfixes `morgrimMassue*` / `morgrimMartache*`, {à équilibrer}). Deux prefabs `Assets/Jeu/Prefabs/Morgrim_Massue.prefab` et `Morgrim_Martache.prefab`, construits à partir de `Squelette_Golem.prefab` par l'outil relançable `Assets/Editor/Morgrim/MorgrimPrefabBuilder.cs` (menu **Deathless > Jeu > Morgrim**). `DirecteurVagues` tire l'une des deux versions au hasard à la nuit 10 (`prefabMorgrimMassue` / `prefabMorgrimMartache`), tirage fait par l'hôte seul (Docs/reseau.md). « Renversé » (charge écrasante, et l'onde du Fracas non sautée) est le statut [Renversé](statuts.md) (26/09/2026, knockdown complet : chute, au sol, relevé, sans contrôle), plus l'ancien étourdissement court. Le Coup de brèche inflige des dégâts renforcés au [bouclier de Nyxessa](vfx.md) quand il est levé. **Onde du Fracas** (26/09/2026) : `OndeChocLente.cs`, front lent (`GameBalance.morgrimMassueFracasOnde*`), jugement « au sol ou en l'air » fait côté client propriétaire (`Docs/reseau.md`). Pas encore vérifié en Play (prefabs à générer et scène à câbler au temps 2 du chantier).
+{dev} **Reporté dans `main` le 26/09/2026** (mêmes chemins et GUID) : `Assets/VFX/Morgrim/` (`MorgrimEffets.cs`, `MorgrimGemmes.mat`), `Assets/Jeu/Materiaux/Yeux_Glace.mat` ; les armes `Skeleton_Mace_Large.fbx` et `Skeleton_Golem_Axe_Large.fbx` étaient déjà présentes dans `main` (pack KayKit Skeletons EXTRA), rien à copier. Comportement en jeu : `Assets/Scripts/Jeu/Ennemis/MorgrimVariant.cs` (base commune : joueurs proches, télégraphie et impact en gemmes), `MorgrimMassue.cs` (Fracas, Tourbillon, Charge écrasante) et `MorgrimMartache.cs` (Fauche, Fend-sol, Coup de brèche), dérivées de `Golem.cs` ; valeurs dans `GameBalance` (préfixes `morgrimMassue*` / `morgrimMartache*`, {à équilibrer}). Deux prefabs `Assets/Jeu/Prefabs/Morgrim_Massue.prefab` et `Morgrim_Martache.prefab`, construits à partir de `Squelette_Golem.prefab` par l'outil relançable `Assets/Editor/Morgrim/MorgrimPrefabBuilder.cs` (menu **Deathless > Jeu > Morgrim**). `DirecteurVagues` tire l'une des deux versions au hasard à la nuit 10 (`prefabMorgrimMassue` / `prefabMorgrimMartache`), tirage fait par l'hôte seul (Docs/reseau.md). « Renversé » (charge écrasante, et l'onde du Fracas non sautée) est le statut [Renversé](statuts.md) (26/09/2026, knockdown complet : chute, au sol, relevé, sans contrôle), plus l'ancien étourdissement court. Le Coup de brèche inflige des dégâts renforcés au [bouclier de Nyxessa](vfx.md) quand il est levé. **Onde du Fracas** (26/09/2026) : `OndeChocLente.cs`, front lent (`GameBalance.morgrimMassueFracasOnde*`), jugement « au sol ou en l'air » fait côté client propriétaire (`Docs/reseau.md`). Prefabs `Morgrim_Massue` et `Morgrim_Martache` générés et câblés dans `Assets/Scenes/Village.unity` (champs `prefabMorgrimMassue` / `prefabMorgrimMartache` de `DirecteurVagues`) ; vérification en Play : à confirmer par Quentin.
 
 Points de vie et dégâts : {à équilibrer}.
 
@@ -94,16 +95,16 @@ Points de vie et dégâts : {à équilibrer}.
 
 Invocateur qui combat à distance :
 
-- il **garde ses distances** et **se téléporte** quand on l'approche ;
-- il tire des **salves de crânes** ;
+- il **garde ses distances** et **se téléporte** quand on l'approche ; {{dev: Téléportation : pas encore dans la version 0.1 (il recule seulement).}}
+- il tire des **salves de crânes** ; {{dev: Pas encore dans la version 0.1 : un seul crâne toutes les 3 s.}}
 - il **relève des squelettes** du sol autour de lui ;
-- il **fauche à la faux** ceux qui le serrent de près ;
-- ses **deux éclats de Nyx brillent**, dans le crâne de sa couronne et dans celui de son grimoire à la ceinture : ce sont ses **points faibles** {décidé}.
-  - Chaque éclat se **brise** sous les coups. Chaque éclat brisé lui retire **un tiers de sa puissance** {décidé}.
-  - Il ne peut être **tué qu'une fois ses deux éclats brisés** {décidé}.
+- il **fauche à la faux** ceux qui le serrent de près ; {{dev: Pas encore dans la version 0.1.}}
+- ses **deux éclats de Nyx brillent**, dans le crâne de sa couronne et dans celui de son grimoire à la ceinture : ce sont ses **points faibles** {décidé}. {{dev: Éclats brisables : pas encore dans la version 0.1.}}
+  - Chaque éclat se **brise** sous les coups. Chaque éclat brisé lui retire **un tiers de sa puissance** {décidé}. {{dev: Pas encore dans la version 0.1.}}
+  - Il ne peut être **tué qu'une fois ses deux éclats brisés** {décidé}. {{dev: Pas encore dans la version 0.1 : il est tuable dès le début.}}
   - Vie des éclats et effet précis de la perte de puissance : {à équilibrer}. {{dev: Pas encore dans la version 0.1.}}
 
-**Trois phases**, selon les éclats brisés {décidé} :
+**Trois phases**, selon les éclats brisés {décidé} : {{dev: Pas encore dans la version 0.1 (une seule phase : distance, crâne, sbires relevés).}}
 
 | Phase | Éclats | Combat |
 |---|---|---|
@@ -130,7 +131,7 @@ Points de vie, dégâts et cadence : {à équilibrer}.
 |---|---|---|---|---|
 | Sbire | 100 | 3,4 m/s | 8 | prépare son coup 0,7 s |
 | Guerrier | 160 | 3,0 m/s | 14 | prépare son coup 0,8 s |
-| Élite | ×3 | | ×1,5 | 1 par nuit aux nuits 5 et 6, 2 dès la nuit 7 |
+| Élite | ×3 | | ×1,5 | portée +0,3 m ; 1 par nuit aux nuits 5 et 6, 2 dès la nuit 7 |
 | Morgrim | 1 500 | 2 m/s | 45 en zone, 60 sur Nyxessa | rayon 3 m, prépare son coup 1,6 s |
 | Nyxar | 1 200 | | 18 par crâne, toutes les 3 s | reste entre 12 et 18 m ; relève 3 sbires toutes les 15 s, 12 au plus |
 
@@ -139,7 +140,7 @@ Points de vie, dégâts et cadence : {à équilibrer}.
 
 | Ennemi | Or |
 |---|---|
-| Sbire | 5 |
+| Sbire (y compris ceux relevés par Nyxar) | 5 |
 | Guerrier, voleur | 8 |
 | Mage | 10 |
 | Élite | 25 |
