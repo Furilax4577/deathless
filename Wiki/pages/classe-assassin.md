@@ -68,7 +68,7 @@ Les gestes joués en jeu pour chaque action, dans l'ordre où ils s'enchaînent.
 | Furtif et dans le dos | Meilleur critique | ×5 |
 
 - Multiplicateurs {décidé} : ×2 en furtif, ×3 dans le dos, ×5 pour les deux ensemble. Valeurs {à équilibrer}.
-- **Déclenchement** {décidé} : automatique. Hors combat, dès que l'assassin marche sans courir ni sprinter, il passe en marche discrète et devient furtif. Courir, attaquer ou être repéré le fait sortir du mode furtif.
+- **Déclenchement** {décidé} : automatique. Hors combat, dès que l'assassin marche sans sprinter, il passe en marche discrète et devient furtif. Il n'y a pas de course distincte : en furtif, il marche à 3,2 m/s. Il faut bouger pour entrer en furtif ; s'arrêter ne le fait pas sortir. Sprinter, attaquer ou être repéré le fait sortir du mode furtif.
 - **Détection** {décidé} : un squelette repère l'assassin furtif dans un **cône de vue** devant lui, jusqu'à environ 6 m ; dans son dos, seulement à moins de 1,5 m. Il faut contourner pour frapper. Distances {à équilibrer}.
 ## Valeurs de départ {à équilibrer}
 
@@ -77,7 +77,7 @@ Version 0.2 {{dev: (réglées dans `Assets/Jeu/Resources/GameBalance.asset`)}} :
 | Sujet | Valeur |
 |---|---|
 | Vie | 100 |
-| Dague | 20 dégâts (×2 furtif, ×3 dans le dos, ×5 les deux) |
+| Dague | 20 dégâts (×2 furtif, ×3 dans le dos, ×5 les deux) ; une seule cible, portée 1,8 m, 45° de part et d'autre de l'avant |
 | Marche discrète | 3,2 m/s |
 | Retour hors combat | 4 s sans combat |
 | Carreau | 45 dégâts, ×2 à la tête, recharge 6 s |
