@@ -174,6 +174,14 @@ namespace Deathless.Controls
 
         void Fire(Side side)
         {
+            // Carte désactivée pendant le délai (menu ouvert, pause) : l'appui en attente est abandonné, sinon la
+            // compétence partait derrière le menu.
+            if (!side.action.enabled)
+            {
+                side.phase = Phase.Idle;
+                side.pressed = false;
+                return;
+            }
             side.phase = side.pressed ? Phase.Fired : Phase.Idle;
             Emit(side.action);
         }
