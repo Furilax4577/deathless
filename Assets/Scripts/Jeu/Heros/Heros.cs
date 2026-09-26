@@ -266,8 +266,9 @@ namespace Deathless.Jeu
         public void Etourdir(float duree)
         {
             if (Classe != null) Classe.Interrompre();
+            // Déjà étourdi : la fin la plus lointaine l'emporte (wiki : statuts.md), sans raccourcir l'étourdissement en cours.
+            m_Etourdi = m_EtatCourant == Etat.Etourdi ? Mathf.Max(m_Etourdi, duree) : duree;
             m_EtatCourant = Etat.Etourdi;
-            m_Etourdi = duree;
             if (Statuts != null) Statuts.Ajouter(TypeStatut.Etourdi, duree, 1f, OrigineStatut.Ennemi);
         }
 
