@@ -7,7 +7,7 @@ namespace Deathless.Jeu
     /// Code de la version 0.1, déplacé de Heros sans changement de comportement.
     public class ClassePaladin : ClasseHeros
     {
-        enum Action { Aucune, Attaque, ChargeAnticipation, Charge, Soin }
+        enum Action { Aucune, Attaque, ChargeAnticipation, Charge, Soin, Riposte }
 
         [Tooltip("Instance de l'aura de soin (enfant, racine à y = 0 sous les pieds).")]
         public AuraSoin aura;
@@ -53,13 +53,30 @@ namespace Deathless.Jeu
         public bool EnGarde => m_Garde;
 
         // Effets diffusés aux autres postes (ClasseHeros.Diffuser).
-        const int E_Elan = 1, E_Impact = 2, E_Charge = 3, E_ChargeImpact = 4, E_Soin = 5, E_Aura = 6, E_Garde = 7;
+        const int E_Elan = 1, E_Impact = 2, E_Charge = 3, E_ChargeImpact = 4, E_Soin = 5, E_Aura = 6, E_Garde = 7, E_Riposte = 8;
+
+        // Jauge de parade et parade parfaite (ParadeParfaite.cs) : héros local seulement.
+        ParadeParfaite m_Parade;
+        Squelette m_RiposteSource;
+        float m_RiposteAvance;
+        bool m_RiposteFrappee;
+        Vector3 m_RiposteDir;
+        float m_BondReste;
+        /// Coup de bouclier dans la couche haut du corps (contrôleur Paladin_Jeu : état « CoupBouclier »).
+        static readonly int S_CoupBouclierHaut = Animator.StringToHash("HautDuCorps.CoupBouclier");
+        /// Jauge de parade du paladin local (null sur une marionnette).
+        public ParadeParfaite Parade => m_Parade;
 
         public override void Initialiser(Heros heros)
         {
             base.Initialiser(heros);
             if (aura == null) aura = GetComponentInChildren<AuraSoin>(true);
             LireMesuresCharge();
+            if (!heros.Distant)
+            {
+                m_Parade = new ParadeParfaite(heros);
+                Deathless.UI.Donnees.DonneesUI.Parade = m_Parade;
+            }
             var fx = EffetsJeu.Instance;
             if (fx != null && fx.prefabChargeBelier != null)
             {
@@ -69,14 +86,18 @@ namespace Deathless.Jeu
             }
         }
 
-        void OnDestroy() { if (m_ChargeVisuel != null) Destroy(m_ChargeVisuel.gameObject); }
+        void OnDestroy()
+        {
+            if (m_ChargeVisuel != null) Destroy(m_ChargeVisuel.gameObject);
+            if (m_Parade != null && Deathless.UI.Donnees.DonneesUI.Parade == m_Parade) Deathless.UI.Donnees.DonneesUI.Parade = null;
+        }
 
         public override bool Occupe => m_Action != Action.Aucune;
         public override bool PeutEsquiver => m_Action == Action.Aucune || m_Action == Action.Attaque;
-        public override float FacteurVitesse => m_Action == Action.Attaque ? B.epeeVitesse : m_Action == Action.Soin ? 0f : m_Garde ? B.gardeVitesse : 1f;
+        public override float FacteurVitesse => m_Action == Action.Attaque ? B.epeeVitesse : m_Action == Action.Soin || m_Action == Action.Riposte ? 0f : m_Garde ? B.gardeVitesse : 1f;
         public override bool BloqueSprint => m_Garde;
         public override bool FaceVisee => m_Garde;
-        public override bool HautDuCorps => m_Garde || m_Action == Action.ChargeAnticipation || m_Action == Action.Charge;
+        public override bool HautDuCorps => m_Garde || m_Action == Action.ChargeAnticipation || m_Action == Action.Charge || m_Action == Action.Riposte;
 
         /// Penché de la ruée : déduit de l'état de l'Animator (étiquette « Ruee »), donc identique sur les marionnettes.
         public override float Penche
@@ -109,7 +130,15 @@ namespace Deathless.Jeu
             switch (action)
             {
                 case "AttackPrimary": Attaquer(); break;
-                case "AttackSecondary": m_GardeDepuis = Time.time; break;   // la parade se juge depuis l'appui
+                case "AttackSecondary":
+                    m_GardeDepuis = Time.time;   // la parade se juge depuis l'appui
+                    if (m_Parade != null)
+                    {
+                        m_Parade.NoterAppui();
+                        if (m_Action == Action.Aucune && H.Endurance > 0f && m_Parade.TenterParfaite(H.AvantCamera, out var source, out float avance))
+                            Riposter(source, avance);
+                    }
+                    break;
                 case "Skill1": Charger(); break;
                 case "Skill2": Soigner(); break;
             }
@@ -212,6 +241,7 @@ namespace Deathless.Jeu
         {
             m_RechargeCharge = Mathf.Max(0f, m_RechargeCharge - dt);
             m_RechargeSoin = Mathf.Max(0f, m_RechargeSoin - dt);
+            if (m_Parade != null) m_Parade.Maj();
         }
 
         public override void Maj(float dt, Vector3 dir)
@@ -247,6 +277,10 @@ namespace Deathless.Jeu
                     }
                     if (m_Depuis >= b.soinIncantation + 0.5f) m_Action = Action.Aucune;
                     break;
+                case Action.Riposte:
+                    if (!m_RiposteFrappee && m_Depuis >= b.paradeParfaiteInstant) FrapperRiposte();
+                    if (m_Depuis >= b.paradeParfaiteDuree) m_Action = Action.Aucune;
+                    break;
             }
         }
 
@@ -280,6 +314,14 @@ namespace Deathless.Jeu
                 float d = Mathf.Min(m_PasReste, B.epeePas / Mathf.Max(0.05f, B.epeePasDuree) * dt);
                 m_PasReste -= d;
                 vitesse = transform.forward * d / Mathf.Max(dt, 0.001f);
+                return true;
+            }
+            if (m_Action == Action.Riposte)
+            {
+                // Bond du coup de bouclier : paradeParfaiteBond mètres en paradeParfaiteBondDuree secondes, puis sur place.
+                float d = Mathf.Min(m_BondReste, B.paradeParfaiteBond / Mathf.Max(0.05f, B.paradeParfaiteBondDuree) * dt);
+                m_BondReste -= d;
+                vitesse = m_RiposteDir * d / Mathf.Max(dt, 0.001f);
                 return true;
             }
             if (m_Action == Action.ChargeAnticipation) return true;
@@ -369,11 +411,29 @@ namespace Deathless.Jeu
 
         public override Interception Intercepter(InfoDegats info)
         {
+            // Parade parfaite lancée contre cet attaquant : son coup est paré, garde levée ou non (coup de bouclier).
+            if (m_Parade != null && info.source != null && m_Parade.Couvre(info.source))
+            {
+                var sp = info.source.GetComponent<Squelette>();
+                if (sp != null) sp.Etourdir(B.paradeEtourdi, H.Id);
+                return Interception.Pare;
+            }
+            // Pendant le coup de bouclier, un autre coup venu de devant est paré lui aussi (le bouclier est en avant).
+            if (m_Action == Action.Riposte && info.source != null)
+            {
+                Vector3 devant = info.source.transform.position - transform.position; devant.y = 0f;
+                if (Vector3.Angle(transform.forward, devant) <= B.gardeDemiAngle)
+                {
+                    var sr = info.source.GetComponent<Squelette>();
+                    if (sr != null) sr.Etourdir(B.paradeEtourdi, H.Id);
+                    return Interception.Pare;
+                }
+            }
             if (!m_Garde || info.source == null) return Interception.Passe;
             Vector3 vers = info.source.transform.position - transform.position; vers.y = 0f;
             if (Vector3.Angle(transform.forward, vers) > B.gardeDemiAngle) return Interception.Passe;
             var sq = info.source.GetComponent<Squelette>();
-            if (Time.time - m_GardeDepuis <= B.paradeFenetre)
+            if (m_Parade != null ? m_Parade.DansFenetre(info.source, m_GardeDepuis) : Time.time - m_GardeDepuis <= B.paradeFenetre)
             {
                 if (sq != null) sq.Etourdir(B.paradeEtourdi, H.Id);
                 return Interception.Pare;
@@ -389,11 +449,90 @@ namespace Deathless.Jeu
         public override void SurIntercepte(InfoDegats info, Interception r)
         {
             if (H.EstInvulnerable && !m_Garde) return;   // coup esquivé
-            if (Anim != null) H.Declencher(P_BlockHit);
+            if (m_Parade != null) m_Parade.Noter(info.source, r == Interception.Pare ? Deathless.UI.Donnees.ResultatParade.Parade : Deathless.UI.Donnees.ResultatParade.Bloque);
+            if (Anim != null && m_Action != Action.Riposte) H.Declencher(P_BlockHit);   // pas par-dessus le coup de bouclier
             H.HautDuCorpsPendant(0.5f);
             AudioBank.Jouer(r == Interception.Pare ? SonsDuJeu.Parade : SonsDuJeu.Blocage, transform.position + Vector3.up * 1.2f, 1f);
-            Diffuser(E_Garde, default, default, r == Interception.Pare ? 1f : 0f);
-            if (r == Interception.Pare && H.Partie != null) H.Partie.Journal("Parade !");
+            if (r == Interception.Pare)
+            {
+                Vector3 point = info.point != default ? info.point : transform.position + transform.forward * 0.5f + Vector3.up * 1.2f;
+                Vector3 normale = info.direction != default ? -info.direction : transform.forward;
+                EffetParade(point, normale);
+                Diffuser(E_Garde, point, normale, 1f);
+                if (H.Partie != null) H.Partie.Journal("Parade !");
+            }
+            else Diffuser(E_Garde, default, default, 0f);
+        }
+
+        /// Éclat de la parade réussie (ParadeEclat), au point de contact sur le bouclier ; distinct de l'étourdissement
+        /// de l'ennemi. Repli sur EffetsJeu.Gemmes s'il n'y a pas d'instance ParadeEclat dans la scène (comme Combat.Critique).
+        static void EffetParade(Vector3 point, Vector3 normale)
+        {
+            if (ParadeEclat.Instance != null) ParadeEclat.Instance.Jouer(point, normale);
+            else
+            {
+                var g = EffetsJeu.Gemmes;
+                if (g != null) ParadeEclat.Eclat(point, normale, g);
+            }
+        }
+
+        public override void SurTouche(InfoDegats info, float reel)
+        {
+            if (m_Parade != null) m_Parade.Noter(info.source, Deathless.UI.Donnees.ResultatParade.Touche);
+        }
+
+        // ----------------------------------------------------------------- Parade parfaite : coup de bouclier
+
+        /// Appui dans la fenêtre parfaite (jugé ici, sur l'impact prévu) : court bond avant et coup de bouclier ; le coup
+        /// de `source` sera paré à son arrivée. Repousse et étourdissement à l'instant du coup (FrapperRiposte).
+        void Riposter(Squelette source, float avance)
+        {
+            m_Action = Action.Riposte;
+            m_Depuis = 0f;
+            m_RiposteSource = source;
+            m_RiposteAvance = avance;
+            m_RiposteFrappee = false;
+            Vector3 dir = source != null ? source.transform.position - transform.position : H.AvantCamera;
+            dir.y = 0f;
+            m_RiposteDir = dir.sqrMagnitude > 0.01f ? dir.normalized : H.AvantCamera;
+            // Pas de bond s'il y a déjà un ennemi au contact devant lui (comme le pas de l'épée).
+            m_BondReste = Combat.Ennemis(transform.position, m_RiposteDir, 0.9f, 45f).Count == 0 ? B.paradeParfaiteBond : 0f;
+            m_Garde = false;
+            if (Anim != null) Anim.SetBool(P_Guard, false);
+            H.Tourner(m_RiposteDir);
+            JouerCoupBouclier();
+            m_Parade.Commencer(source);
+        }
+
+        /// Geste du coup de bouclier (haut du corps, Melee_Block_Attack), pris pour que son impact tombe à
+        /// paradeParfaiteInstant. Joué aussi sur la marionnette (E_Riposte).
+        void JouerCoupBouclier()
+        {
+            H.HautDuCorpsPendant(B.paradeParfaiteDuree + 0.2f);
+            if (Anim == null || !m_AnimCharge || !Anim.HasState(1, S_CoupBouclierHaut)) return;
+            float debut = Mathf.Max(0f, m_ImpactCoup - B.paradeParfaiteInstant);
+            Anim.CrossFadeInFixedTime(S_CoupBouclierHaut, 0.04f, 1, debut);
+        }
+
+        void FrapperRiposte()
+        {
+            m_RiposteFrappee = true;
+            var b = B;
+            Vector3 point = transform.position + m_RiposteDir * 0.6f + Vector3.up * 1.1f;
+            EffetRiposte(point, m_RiposteDir);
+            SecousseCamera.Jouer(H.CameraJeu, b.paradeParfaiteSecousse, b.paradeParfaiteSecousseDuree);
+            Diffuser(E_Riposte, point, m_RiposteDir);
+            // Effets : l'autorité les applique (solo, hôte) ; un client les demande à l'hôte, qui valide.
+            var reseau = Deathless.Reseau.HerosReseau.Local(H);
+            if (reseau != null && !reseau.IsServer) reseau.DemanderParadeParfaite(m_RiposteSource, m_RiposteDir, m_RiposteAvance);
+            else ParadeParfaite.Appliquer(H, m_RiposteDir, m_RiposteSource, "appui " + m_RiposteAvance.ToString("0.00") + " s avant l'impact");
+        }
+
+        static void EffetRiposte(Vector3 point, Vector3 dir)
+        {
+            ParadeParfaite.Eclat(point, dir);
+            AudioBank.Jouer(SonsDuJeu.Parade, point, 1f);
+            AudioBank.Jouer(SonsDuJeu.ChargeImpact, point, 0.75f);
         }
 
         // ----------------------------------------------------------------- Multijoueur (marionnette)
@@ -408,7 +547,14 @@ namespace Deathless.Jeu
                 case E_ChargeImpact: EffetChargeImpact(v); break;
                 case E_Soin: AudioBank.Jouer(SonsDuJeu.Soin, transform.position + Vector3.up, 0.9f); break;
                 case E_Aura: if (aura != null) aura.Jouer(); break;
-                case E_Garde: AudioBank.Jouer(v > 0.5f ? SonsDuJeu.Parade : SonsDuJeu.Blocage, transform.position + Vector3.up * 1.2f, 1f); break;
+                case E_Garde:
+                    AudioBank.Jouer(v > 0.5f ? SonsDuJeu.Parade : SonsDuJeu.Blocage, transform.position + Vector3.up * 1.2f, 1f);
+                    if (v > 0.5f) EffetParade(a, b);
+                    break;
+                case E_Riposte:
+                    EffetRiposte(a, b);
+                    JouerCoupBouclier();
+                    break;
                 default: base.EffetDistant(effet, a, b, v); break;
             }
         }
@@ -421,7 +567,7 @@ namespace Deathless.Jeu
             switch (i)
             {
                 case 0: return m_Action == Action.Attaque ? EtatEmplacement.Actif : EtatEmplacement.Pret;
-                case 1: return m_Garde ? EtatEmplacement.Actif : H.Endurance <= 0f ? EtatEmplacement.Indisponible : EtatEmplacement.Pret;
+                case 1: return m_Garde || m_Action == Action.Riposte ? EtatEmplacement.Actif : H.Endurance <= 0f ? EtatEmplacement.Indisponible : EtatEmplacement.Pret;
                 case 2: return Recharge(m_RechargeCharge, B.chargeRecharge * Facteur(2), out restant, out total, m_Action == Action.Charge || m_Action == Action.ChargeAnticipation);
                 case 3: return Recharge(m_RechargeSoin, B.soinRecharge, out restant, out total, m_Action == Action.Soin);
                 default: return EtatEmplacement.Vide;

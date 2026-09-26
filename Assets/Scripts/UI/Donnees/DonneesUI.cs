@@ -43,6 +43,9 @@ namespace Deathless.UI.Donnees
         /// Statuts du joueur local et des ennemis affectés (posé par le jeu ; null : rien n'est affiché).
         public static IEtatStatuts Statuts { get; set; }
 
+        /// Jauge de parade du paladin local (posée par le jeu ; null : pas de jauge).
+        public static IJaugeParade Parade { get; set; }
+
         /// Appelé à chaque enregistrement ou retrait (les écrans se réabonnent aux événements de IEtatPartie).
         public static event Action Changees;
 
@@ -73,6 +76,7 @@ namespace Deathless.UI.Donnees
             ApercuClasse = null;
             Lobby = null;
             RoueEmotes = null;
+            Parade = null;
             Changees = null;
         }
     }

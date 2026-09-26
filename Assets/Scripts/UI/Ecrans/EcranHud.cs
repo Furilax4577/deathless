@@ -62,6 +62,10 @@ namespace Deathless.UI.Ecrans
         readonly List<Emplacement> m_Emplacements = new List<Emplacement>();
         /// Statuts du joueur et des ennemis (classe à part : HudStatuts.cs).
         HudStatuts m_Statuts;
+        /// Jauge de relevé du Renversé (classe à part : HudRelevage.cs).
+        HudRelevage m_Relevage;
+        /// Jauge de parade du paladin, sous le réticule (classe à part : HudParade.cs).
+        HudParade m_Parade;
 
         /// Autres joueurs affichés (colonne de gauche) : trois au plus (salon de quatre).
         public const int AlliesMax = 3;
@@ -150,6 +154,8 @@ namespace Deathless.UI.Ecrans
             if (plein != null) IconesUI.Poser(plein, IconesUI.MissileNyxessa);
             ConstruireAllies();
             m_Statuts = new HudStatuts(Racine);
+            m_Relevage = new HudRelevage(Racine);
+            m_Parade = new HudParade(Racine);
         }
 
         void ConstruireAllies()
@@ -226,6 +232,8 @@ namespace Deathless.UI.Ecrans
             if (joueur != null) MajJoueur(joueur, partie);
             MajEquipe(partie as IEtatEquipe);
             m_Statuts?.Maj(joueur == null || joueur.EstMort);
+            m_Relevage?.Maj();
+            m_Parade?.Maj(joueur == null || joueur.EstMort);
         }
 
         /// Colonne de gauche : un allié par ligne (emblème de classe, pseudo, barre de vie fine ; mort : ligne grisée et

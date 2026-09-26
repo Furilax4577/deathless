@@ -165,7 +165,7 @@ Posée par le jeu dans `DonneesUI.Parade` (`Deathless.Jeu.ParadeParfaite`, cré�
 | `Visible` | Un coup parable vise le joueur local (du début de sa préparation à l'impact), ou son issue est encore montrée (0,45 s). |
 | `AvantImpact` | Secondes avant l'impact prévu (négatif juste après). |
 | `Duree` | Durée couverte par toute la largeur (`GameBalance.paradeJaugeDuree`, 0,8 s) : le curseur part de la gauche quand il reste `Duree` s. |
-| `FenetreParade`, `FenetreParfaite` | Fenêtres avant l'impact (`paradeFenetre` 0,25 s, `paradeParfaiteFenetre` 0,1 s). |
+| `FenetreParade`, `FenetreParfaite` | Fenêtres avant l'impact (`paradeFenetre` 0,35 s, `paradeParfaiteFenetre` 0,1 s). |
 | `Appui` | Secondes avant l'impact où la garde a été levée pour ce coup ; négatif : pas d'appui. |
 | `Resultat`, `DepuisResultat` | `ResultatParade` : `Aucun`, `Bloque`, `Parade`, `Parfaite` (dès l'appui), `Touche` ; temps écoulé depuis. |
 

@@ -60,6 +60,13 @@ Le paladin court derrière son bouclier, penché en avant : les jambes courent, 
 - Épée et bouclier. La visière du casque s'abaisse et se relève.
 - **Épée plus mobile** {décidé} (26/09/2026) : un peu plus de portée, et un **angle d'attaque vers l'avant** qui touche plusieurs ennemis en face, **moins large que la hache du Viking**. Chaque attaque **avance d'un pas** (sauf s'il y a déjà un ennemi au contact), et le paladin **se déplace plus vite en garde**.
 - **Garde et parade** : l'attaque secondaire lève le bouclier. Déclenchée au bon moment face à un coup, la garde devient une parade {décidé}.
+- **Jauge de parade et parade parfaite** {décidé} (26/09/2026, principe ; valeurs {à équilibrer}) :
+  - **Jauge** : quand un ennemi prépare un coup qui vise le paladin, une petite jauge apparaît sous le réticule, du début de la préparation jusqu'à l'impact. Un curseur avance vers l'instant de l'impact, au bord droit. Plusieurs coups à la fois : la jauge suit celui qui porte le plus tôt. Voir [Interface](interface.md#jauge-de-parade).
+  - **Deux fenêtres** sont marquées avant l'impact : la **fenêtre de parade**, large (les 0,35 s avant l’impact), et la **fenêtre parfaite**, beaucoup plus serrée (les 0,1 s juste avant), en or.
+  - **Parade** : lever la garde (LT) dans la fenêtre de parade pare le coup, comme avant : aucun dégât, aucune endurance dépensée, l'attaquant est étourdi 1 s.
+  - **Parade parfaite** : lever la garde dans la fenêtre parfaite pare le coup et lance aussitôt un **coup de bouclier en avance** : un court bond avant (0,7 m) et le coup de bouclier de la charge bélier. Il **repousse** les ennemis dans un cône devant lui (2,5 m, 60° de part et d'autre de l'avant ; l'attaquant aussi, s'il est tout près) de 2 m et les **étourdit** 0,8 s (statut [Étourdi](statuts.md)). Pendant le coup de bouclier, les autres coups venus de devant sont parés aussi. Éclat de parade renforcé en gemmes or et blanc, son plus marqué, léger tremblement de la caméra.
+  - Trop tôt (avant la fenêtre de parade) : le coup est seulement bloqué par la garde et coûte de l'endurance.
+  - {dev} Code : `ParadeParfaite.cs`, `TelegraphieCoups.cs`, `ClassePaladin` ; valeurs `paradeFenetre`, `paradeParfaite*`, `paradeJaugeDuree` dans `GameBalance`. Multijoueur : le joueur juge sa parade sur l'impact qu'il voit, l'hôte la valide et applique la repousse (`Docs/reseau.md`, « Parade parfaite »).
 - **Charge bélier** : le paladin s'élance d'environ 7 m, enveloppé d'une tête de bélier en gemmes dorées qui le précède, et percute à l'arrivée {effet validé}.
   - **Il court derrière son bouclier** {décidé} (26/09/2026) : jambes en course, bouclier levé, corps penché en avant, coup de bouclier à l'arrivée (comme le banc des effets). Les autres joueurs voient le même geste.
   - **Au bout de la trajectoire** : la cible percutée est **étourdie longuement** {décidé}.
@@ -77,7 +84,8 @@ Le paladin court derrière son bouclier, penché en avant : les jambes courent, 
 | Esquive | 4 m, 25 d'endurance, invulnérable 0,3 s |
 | Épée | 30 dégâts toutes les 0,75 s, portée 2,6 m, 40° de part et d'autre de l'avant (hache du Viking : 70°), 3 ennemis au plus par coup, pas en avant de 0,6 m |
 | Garde | un coup bloqué coûte de l'endurance |
-| Parade | fenêtre de 0,25 s, l'attaquant est étourdi 1 s |
+| Parade | fenêtre de 0,35 s, l'attaquant est étourdi 1 s |
+| Parade parfaite | fenêtre de 0,1 s avant l'impact ; coup de bouclier : bond de 0,7 m, cône de 2,5 m et 60°, repousse de 2 m, étourdit 0,8 s |
 | Charge bélier | recharge 14 s |
 | Soin | +25 % de la vie, recharge 30 s |
 - La poussée au bouclier et les valeurs chiffrées sont {à confirmer}.
