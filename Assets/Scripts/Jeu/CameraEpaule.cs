@@ -6,6 +6,10 @@ namespace Deathless.Jeu
     /// tangage pilotés par la souris ou le stick droit (HerosEntrees.Regard), collision par SphereCast (les personnages
     /// sont ignorés). Sans cible (menu principal) : plan fixe du village de nuit, Nyxessa et le portail dans la moitié
     /// droite de l'image (le panneau du menu couvre la gauche), avec un très lent balancement latéral.
+    ///
+    /// En forêt (26/09/2026) : les troncs d'arbres/buissons (FeuillageMasquage.ColliderForet) sont ignorés par le
+    /// recul ci-dessous, comme les personnages et les étages masqués du donjon -- le feuillage qui gêne s'estompe à
+    /// la place (FeuillageMasquage, shader Deathless/ForetDither) ; la caméra elle-même ne bouge pas pour eux.
     [DefaultExecutionOrder(100)]
     public class CameraEpaule : MonoBehaviour
     {
@@ -113,6 +117,7 @@ namespace Deathless.Jeu
                 var h = hits[i];
                 if (h.collider.GetComponentInParent<Sante>() != null) continue;   // personnages ignorés (Nyxessa comprise)
                 if (Deathless.Donjon.DonjonMasquage.ColliderMasque(h.collider)) continue;   // étage du donjon masqué : la caméra le traverse
+                if (FeuillageMasquage.ColliderForet(h.collider)) continue;   // tronc d'arbre/buisson : le feuillage s'estompe (FeuillageMasquage), la caméra ne recule pas pour lui
                 if (h.distance > 0f && h.distance < d) d = h.distance;
             }
             return d;
