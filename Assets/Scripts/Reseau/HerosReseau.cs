@@ -249,8 +249,17 @@ namespace Deathless.Reseau
         [Rpc(SendTo.Owner)]
         void RappelRpc(int garde, int perdu) => DonjonJeu.Instance?.RappelLocal(garde, perdu);
 
-        /// Hôte : un squelette a repéré cet assassin (marionnette) ; son propriétaire sort du mode furtif.
-        public void SignalerRepere() => RepereRpc();
+        /// Hôte : un squelette a repéré cet assassin (marionnette) ; son propriétaire sort du mode furtif. Chaque squelette
+        /// qui le voit appelle ceci à chaque image jusqu'au retour de m_Furtif (un aller-retour) : un envoi au plus toutes
+        /// les 0,5 s, au lieu d'un RPC fiable par image et par squelette.
+        public void SignalerRepere()
+        {
+            if (Time.unscaledTime - m_DernierRepere < 0.5f) return;
+            m_DernierRepere = Time.unscaledTime;
+            RepereRpc();
+        }
+
+        float m_DernierRepere = -99f;
 
         [Rpc(SendTo.Owner)]
         void RepereRpc() { if (Heros.Classe is ClasseAssassin a) a.Reperer(); }
