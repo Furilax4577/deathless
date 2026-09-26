@@ -3,9 +3,9 @@
 Tous les sons présents dans le projet, à écouter ici. Ils viennent de Relic, le projet précédent (des sons générés en Python pour le projet, les packs Kenney RPG Audio et Interface Sounds), ou ont été créés pour Deathless de la même façon, en Python pur. Les fichiers sont dans `Assets/Audio/`.
 
 - **à écouter** : le son vient d'être créé pour Deathless et attend d'être validé à l'écoute. L'encart ci-dessous mène à chacun.
-- **utilisé** : le son a un usage clair dans Deathless, le même que dans Relic ou son équivalent direct.
-- **disponible** : le son est dans le projet, sans usage décidé. Une piste est parfois proposée. Les anciennes versions remplacées y restent pour comparer.
-- **à créer** : Deathless a besoin de ce son et il n'existe pas encore. Voir la section [À créer](sons.md#a-creer) en bas de page.
+- **utilisé** : le jeu joue ce son.
+- **disponible** : le son est dans le projet mais le jeu ne le joue pas : sans usage décidé (une piste est parfois proposée), usage prévu pas encore branché (« Prévu : … »), ou ancienne version remplacée, gardée pour comparer.
+- **à créer** : Deathless a besoin de ce son et il n'existe pas encore ; en attendant, le jeu joue un son proche, cité dans l'usage. Voir la section [À créer](sons.md#a-creer) en bas de page.
 
 {sons à écouter}
 
