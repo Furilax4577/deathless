@@ -64,6 +64,7 @@ MENU = [
     ("classe-barde", "Barde (bientôt)", "sous"),
     ("classe-bavaroise", "Bavaroise (bientôt)", "sous"),
     ("classe-clochard", "Clochard pétomane (bientôt)", "sous"),
+    ("classe-dj-bob", "DJ Bob (bientôt)", "sous"),
     ("ennemis", "Ennemis"),
     ("statuts", "Statuts"),
     ("commandes", "Commandes"),

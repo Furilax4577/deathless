@@ -14,10 +14,11 @@ Cinq classes jouables, et bientôt le **druide** et le **mécanicien**. Chaque c
 | {icone classe_barde} | [Barde](classe-barde.md) | **Candidat du mois** | Soutien, luth |
 | {icone classe_bavaroise} | [Bavaroise](classe-bavaroise.md) | **Candidat du mois** | Mêlée, chopes de bière |
 | {icone classe_clochard} | [Clochard pétomane](classe-clochard.md) | **Candidat du mois** | Contrôle, bouteille et gaz |
+| {icone classe_dj_bob} | [DJ Bob Douville](classe-dj-bob.md) | **Candidat du mois** | Distance moyenne et contrôle, platines et vinyles |
 
 ## Personnage du mois {décidé}
 
-Un **personnage du mois** viendra s'ajouter aux classes : chaque mois, une classe nouvelle est mise à l'honneur et devient jouable. Le **Barde**, la **Bavaroise** et le **Clochard pétomane** sont des **candidats** : leurs pages montrent un kit et un design proposés, pas encore définitifs. Le rythme exact, et ce que devient le personnage du mois une fois le mois passé, sont {à confirmer}.
+Un **personnage du mois** viendra s'ajouter aux classes : chaque mois, une classe nouvelle est mise à l'honneur et devient jouable. Le **Barde**, la **Bavaroise**, le **Clochard pétomane** et **DJ Bob Douville** sont des **candidats** : leurs pages montrent un kit et un design proposés, pas encore définitifs. Le rythme exact, et ce que devient le personnage du mois une fois le mois passé, sont {à confirmer}.
 
 Chaque classe a sa page : présentation, actions et touches, règles détaillées.
 
@@ -33,6 +34,7 @@ Les personnages en 3D ; chaque page de classe les montre aussi en rotation.
 {image media/classes/barde/portrait.png} [Barde](classe-barde.md) {à confirmer} | Proposition en attente de validation
 {image media/classes/bavaroise/portrait.png} [Bavaroise](classe-bavaroise.md) {à confirmer} | Proposition en attente de validation
 {image media/classes/clochard/portrait.png} [Clochard pétomane](classe-clochard.md) {à confirmer} | Proposition en attente de validation
+{image media/classes/dj-bob/portrait.png} [DJ Bob Douville](classe-dj-bob.md) {à confirmer} | Proposition en attente de validation
 
 ## Projectiles {décidé}
 

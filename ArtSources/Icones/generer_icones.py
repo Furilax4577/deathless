@@ -162,9 +162,17 @@ CLOCHARD = {"kraft sombre": "#6e5230", "kraft": "#a07c4e", "kraft clair": "#c9a5
             "gaz nuit": "#2e220a", "gaz profond": "#4a3510", "gaz sombre": "#6a4a12", "gaz": "#a8782a",
             "gaz clair": "#d4a440", "gaz pâle": "#ecca78",
             "rouge usé sombre": "#6e2a22", "rouge usé": "#9a4232", "rouge usé clair": "#c06a52"}
+# DJ Bob (candidat proposé le 26/09/2026) : palette Disco de sandbox-rig (Assets/VFX/_Palettes/Disco.asset, pas encore
+# dans main) : violet, rose, blanc, or ; vinyle noir, argent de la boule à facettes. Aucune teinte verte (le camouflage
+# du pantalon n'apparaît pas dans les icônes).
+DJBOB = {"nuit": "#1a0b2e", "violet sombre": "#3d1a78", "violet": "#7a3ce0", "violet clair": "#a878f0",
+         "rose sombre": "#b8237a", "rose": "#ff4fae", "rose clair": "#ff9fd2", "blanc": "#fff5fb",
+         "or sombre": "#b8862a", "or": "#f5c542", "or clair": "#ffe79a", "vinyle": "#1c1822", "vinyle clair": "#3a3444",
+         "argent sombre": "#8e8aa2", "argent": "#d8d4e6", "peau sombre": "#c8865e", "peau": "#f1c29c"}
 BA = lambda *n: [BARDE[x] for x in n]          # noqa: E731
 BV = lambda *n: [BAVAROISE[x] for x in n]      # noqa: E731
 CL = lambda *n: [CLOCHARD[x] for x in n]       # noqa: E731
+DJ = lambda *n: [DJBOB[x] for x in n]          # noqa: E731
 LUTH = [c("Terre", "Terre claire"), c("Terre", "Sable"), c("Chasse", "Ocre clair")]
 MANCHE_LUTH = [c("Terre", "Terre sombre"), c("Terre", "Terre claire")]
 MOUTARDE = BA("moutarde sombre", "moutarde", "moutarde claire")
@@ -199,6 +207,7 @@ CADRES = {
     "bavaroise": (BV("étain sombre", "étain", "étain", "étain clair"), BAVAROISE["bleu"], BAVAROISE["bleu nuit"]),
     "clochard": ([c("Rage", "Fer"), c("Rage", "Fer clair"), c("Os", "Os gris"), c("Os", "Os")],
                  CLOCHARD["gaz profond"], CLOCHARD["gaz nuit"]),
+    "dj_bob": (DJ("or sombre", "or", "or", "or clair"), DJBOB["violet sombre"], DJBOB["nuit"]),
     "druide": ([c("Os", "Os gris"), c("Os", "Os"), c("Os", "Os"), c("Os", "Os pâle")],
                c("Terre", "Terre profonde"), c("Feu", "Charbon")),
 }
@@ -1172,6 +1181,131 @@ def clochard_jauge_gaz():
     return ic
 
 
+# ---- DJ Bob
+
+VINYLE = DJ("vinyle", "vinyle clair")
+ROSE_DJ = DJ("rose sombre", "rose", "rose clair")
+VIOLET_DJ = DJ("violet sombre", "violet", "violet clair")
+OR_DJ = DJ("or sombre", "or", "or clair")
+ARGENT_DJ = DJ("argent sombre", "argent", "blanc")
+
+
+def disque(ic, cx, cy, rx, ry=None, ang=0.0):
+    """Vinyle (vu de face ou de biais) : galette noire, reflet de sillon, étiquette rose, trou central."""
+    ry = rx if ry is None else ry
+    f = tr(cx, cy, 1.0, ang)
+
+    def ellipse(k, pas):
+        return [f(rx * k * math.cos(math.radians(a)), ry * k * math.sin(math.radians(a))) for a in range(0, 360, pas)]
+
+    ic.gemme(ellipse(1.0, 20), VINYLE, table=0.78, teinte_table=DJBOB["vinyle"], decalage=0.04)
+    ic.bande([f(rx * 0.66 * math.cos(math.radians(a)), ry * 0.66 * math.sin(math.radians(a))) for a in range(200, 291, 18)],
+             2.2, DJ("vinyle clair", "argent sombre"), dessous=False)
+    ic.gemme(ellipse(0.36, 30), ROSE_DJ, table=0.5, teinte_table=DJBOB["rose"])
+    ic.gemme(ellipse(0.08, 60), VINYLE)
+
+
+def classe_dj_bob_a():
+    ic = Icone("classe_dj_bob_a", "dj_bob_variantes", "DJ Bob, variante A : vinyle et casque",
+               "Un 45 tours noir à étiquette rose sous l'arceau d'un casque violet et or. Cadre or, fond violet / nuit.")
+    cadre_hex(ic, "dj_bob")
+    disque(ic, 64, 72, 30)
+    ic.bande([(30, 64), (32, 40), (46, 26), (64, 21), (82, 26), (96, 40), (98, 64)], [7, 8, 9, 9, 9, 8, 7], VIOLET_DJ)
+    for x in (30, 98):
+        ic.gemme(regulier((x, 70), 12, 8, 22.5), OR_DJ, table=0.55, teinte_table=DJBOB["or"])
+        ic.gemme(regulier((x, 70), 5, 6), ROSE_DJ)
+    return ic
+
+
+def classe_dj_bob_b():
+    ic = Icone("classe_dj_bob_b", "dj_bob_variantes", "DJ Bob, variante B : le crâne et les lunettes",
+               "Crâne chauve luisant, lunettes de soleil dégradées violet-rose, grosse moustache.")
+    cadre_hex(ic, "dj_bob")
+    ic.gemme(regulier((64, 62), 34, 12, -90), DJ("peau sombre", "peau", "peau"), table=0.7, teinte_table=DJBOB["peau"])
+    ic.gemme([(42, 38), (52, 32), (56, 36), (46, 42)], DJ("blanc", "blanc"))
+    for sx in (-1, 1):
+        x = 64 + sx * 15
+        ic.gemme([(x - 13, 56), (x + 13, 56), (x + 12, 70), (x - 12, 70)], VINYLE)
+        ic.gemme([(x - 10, 58), (x + 10, 58), (x + 9, 68), (x - 9, 68)], DJ("violet", "rose"))
+    ic.bande([(49, 57), (79, 57)], 4, VINYLE)
+    ic.gemme([(46, 82), (56, 77), (64, 79), (72, 77), (82, 82), (74, 86), (64, 84), (54, 86)], DJ("vinyle", "vinyle clair"))
+    return ic
+
+
+def dj_bob_lancer_vinyle():
+    ic = Icone("dj_bob_lancer_vinyle", "dj_bob", "Lancer de vinyle",
+               "RT : le disque part en ligne, fend les squelettes au passage et revient comme un boomerang.")
+    ic.bande([(24, 94), (40, 108), (70, 110), (100, 94), (112, 70)], [2, 6, 8, 6, 2], ROSE_DJ)
+    ic.gemme([(116, 60), (102, 72), (108, 52)], ROSE_DJ)
+    disque(ic, 60, 50, 36, 18, -12)
+    for i, (x, y) in enumerate(((10, 34), (6, 50), (12, 66))):
+        ic.bande([(x, y), (x + 12, y + 1)], [0, 5], VIOLET_DJ if i % 2 else ROSE_DJ)
+    return ic
+
+
+def dj_bob_scratch():
+    ic = Icone("dj_bob_scratch", "dj_bob", "Scratch",
+               "LT : un coup de platine, une onde sonore en cône qui grince et repousse.")
+    o = (24, 64)
+    disque(ic, 24, 64, 18)
+    for i, (r, rampe) in enumerate(((42, ROSE_DJ), (66, VIOLET_DJ), (90, ROSE_DJ))):
+        pts = [polaire(o, r + (4 if j % 2 else -4), a) for j, a in enumerate(range(-36, 37, 6))]
+        ic.bande(pts, 11 - 2 * i, rampe)
+    return ic
+
+
+def dj_bob_drop():
+    ic = Icone("dj_bob_drop", "dj_bob", "Drop",
+               "LB : la mallette posée au sol, piste de danse : les squelettes dansent, les alliés frappent plus vite.")
+    couleurs = [VIOLET_DJ, ROSE_DJ, OR_DJ, ARGENT_DJ]
+    for i in range(-3, 4):
+        for j in range(0, 3):
+            if (i + j) % 2:
+                continue
+            cx, cy = 64 + i * 14, 92 + j * 10
+            ic.gemme([(cx, cy - 5), (cx + 8, cy), (cx, cy + 5), (cx - 8, cy)], couleurs[(i + j + 8) % 4])
+    ic.gemme([(34, 58), (94, 58), (98, 80), (30, 80)], VINYLE, table=0.8, teinte_table=DJBOB["vinyle clair"], decalage=0.03)
+    for x in (48, 80):
+        ic.gemme([(x - 12, 60), (x + 12, 60), (x + 10, 67), (x - 10, 67)], ARGENT_DJ)
+        ic.gemme([(x - 5, 61.5), (x + 5, 61.5), (x + 4, 65.5), (x - 4, 65.5)], ROSE_DJ)
+    for x in (30, 98):
+        ic.gemme([(x - 3, 56), (x + 3, 56), (x + 3, 82), (x - 3, 82)], OR_DJ)
+    impact(ic, 64, 50, 5, 12, 30, 7, OR_DJ, a0=-150, ouverture=120)
+    return ic
+
+
+def dj_bob_boule_a_facettes():
+    ic = Icone("dj_bob_boule_a_facettes", "dj_bob", "Boule à facettes",
+               "RB : une boule qui flotte et éblouit : les squelettes dans son rayon ralentissent.")
+    for a, rampe in ((60, ROSE_DJ), (90, OR_DJ), (120, VIOLET_DJ)):
+        ic.bande([polaire((64, 50), 26, a), polaire((64, 50), 72, a)], [3, 11], rampe)
+    ic.bande([(64, 8), (64, 22)], 3, OR_DJ)
+    ic.gemme(regulier((64, 50), 28, 16, -90), ARGENT_DJ)
+    for i in range(-3, 4):
+        for j in range(-3, 4):
+            x, y = 64 + i * 7.5, 50 + j * 7.5
+            if (x - 64) ** 2 + (y - 50) ** 2 > 23 ** 2:
+                continue
+            col = DJBOB["blanc"] if (i + j) < -1 else DJBOB["argent"] if (i + j) < 3 else DJBOB["argent sombre"]
+            if (i * 3 + j * 5) % 11 == 0:
+                col = DJBOB["rose"]
+            ic.poly([(x - 3.2, y - 3.2), (x + 3.2, y - 3.2), (x + 3.2, y + 3.2), (x - 3.2, y + 3.2)], col)
+    for x, y in ((18, 30), (108, 26), (24, 72)):
+        ic.gemme([(x, y - 7), (x + 2, y - 2), (x + 7, y), (x + 2, y + 2), (x, y + 7), (x - 2, y + 2), (x - 7, y), (x - 2, y - 2)],
+                 DJ("argent", "blanc"))
+    return ic
+
+
+def dj_bob_jauge_tempo():
+    ic = Icone("dj_bob_jauge_tempo", "dj_bob", "Tempo",
+               "Jauge : un égaliseur ; monte quand il enchaîne ses coups en rythme, retombe à l'arrêt.")
+    for i, h in enumerate((30, 50, 72, 92)):
+        x = 25 + i * 26
+        rampe = (VIOLET_DJ, VIOLET_DJ, ROSE_DJ, OR_DJ)[i]
+        ic.gemme([(x - 9, 112 - h), (x + 9, 112 - h), (x + 9, 112), (x - 9, 112)], rampe, table=0.6, teinte_table=rampe[1])
+    return ic
+
+
 # Variante retenue par classe (A par défaut) pour classe_<nom>.svg.
 NOUVELLES_CLASSES = {
     "barde": ({"a": classe_barde_a, "b": classe_barde_b}, "a", "Barde",
@@ -1183,6 +1317,8 @@ NOUVELLES_CLASSES = {
     "clochard": ({"a": classe_clochard_a, "b": classe_clochard_b}, "a", "Clochard",
                  [clochard_coup_de_bouteille, clochard_pet_de_defense, clochard_nuage_pestilentiel,
                   clochard_pet_propulsion, clochard_debrouille, clochard_jauge_gaz]),
+    "dj_bob": ({"a": classe_dj_bob_a, "b": classe_dj_bob_b}, "a", "DJ Bob",
+               [dj_bob_lancer_vinyle, dj_bob_scratch, dj_bob_drop, dj_bob_boule_a_facettes, dj_bob_jauge_tempo]),
 }
 
 
@@ -1593,7 +1729,8 @@ COMPETENCES = [
 
 NOMS_CLASSES = {"paladin": "Paladin", "mage_feu": "Mage de feu", "rodeur": "Rôdeur", "assassin": "Assassin",
                 "viking": "Viking", "communes": "Communes", "nyxessa": "Nyxessa (HUD)",
-                "druide": "Druide", "barde": "Barde", "bavaroise": "Bavaroise", "clochard": "Clochard"}
+                "druide": "Druide", "barde": "Barde", "bavaroise": "Bavaroise", "clochard": "Clochard",
+                "dj_bob": "DJ Bob"}
 
 # Barre de compétences du HUD (RT, LT, LB, RB) : (icône ou None, invite, état) ; état = "", "active", "recharge:N:f".
 BARRES = {
@@ -1615,11 +1752,14 @@ BARRES.update({
                   ("bavaroise_tournee_generale", "LB", ""), ("bavaroise_charge_du_tonneau", "RB", "")],
     "clochard": [("clochard_coup_de_bouteille", "RT", ""), ("clochard_pet_de_defense", "LT", ""),
                  ("clochard_nuage_pestilentiel", "LB", "recharge:7:0.55"), ("clochard_pet_propulsion", "RB", "")],
+    "dj_bob": [("dj_bob_lancer_vinyle", "RT", ""), ("dj_bob_scratch", "LT", ""),
+               ("dj_bob_drop", "LB", "recharge:6:0.5"), ("dj_bob_boule_a_facettes", "RB", "")],
 })
 JAUGES = {"mage_feu": ("jauge_mana", "Mana", "#4a8fe0", 0.8), "viking": ("jauge_rage", "Rage", "#f07b2a", 0.55),
           "barde": ("barde_jauge_inspiration", "Inspiration", "#d4a82a", 0.6),
           "bavaroise": ("bavaroise_jauge_ivresse", "Ivresse", "#e0962a", 0.45),
-          "clochard": ("clochard_jauge_gaz", "Gaz", "#a8782a", 0.7)}
+          "clochard": ("clochard_jauge_gaz", "Gaz", "#a8782a", 0.7),
+          "dj_bob": ("dj_bob_jauge_tempo", "Tempo", "#ff4fae", 0.65)}
 # Indicateur de passif sur le portrait.
 PASSIFS = {"assassin": "assassin_furtif", "clochard": "clochard_debrouille"}
 
@@ -1870,7 +2010,7 @@ def bloc_nouvelle_classe(cle, par_nom):
             'Puis une icône par action, la jauge et le passif, et la barre du HUD.</p>'
             '<div class="grille">%s</div><div class="grille" style="margin-top:12px">%s</div>'
             '<div style="margin-top:12px">%s</div>'
-            % (titre, cle, cle, choix.upper(), cartes_v, cartes_c, hud(cle, par_nom)))
+            % (titre, cle.replace("_", "-"), cle, choix.upper(), cartes_v, cartes_c, hud(cle, par_nom)))
 
 
 def bloc_mecanicien(par_nom):
