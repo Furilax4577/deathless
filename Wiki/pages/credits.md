@@ -17,6 +17,7 @@ Les licences CC0 n'exigent pas de crédit : ils figurent ici par reconnaissance.
 |---|---|---|
 | Effets sonores des combats, des compétences, des ennemis, de Nyxessa et du portail, musiques du village et du donjon | Créés pour le projet (synthèse sonore en Python) | Propriété du projet |
 | Sons d'objets et de pas (RPG Audio), sons d'interface (Interface Sounds) | Kenney, [kenney.nl](https://kenney.nl) | CC0 |
+| Souffle de la hache du viking (attaque tournante, à chaque tour) | Sonniss.com GDC Game Audio Bundle : « 344 Audio — Elemental Palette Designed Vol. 1 » (Wind Rush Whoosh ; Metal Slow Whoosh Rattle Pass By) et « David Dumais Audio — Melee Weapons Sound Effects Pack 2 » (Swing Scrape Swift Melee Weapon Swing With A Long Blade) | Libre de droits pour les jeux (licence du bundle Sonniss GDC) |
 
 
 ## Polices

@@ -18,6 +18,9 @@ namespace Deathless.Jeu
         [Tooltip("Zones d'apparition (même ordre que les clairières).")]
         public ZoneApparition[] zones;
         public GameObject prefabSbire, prefabGuerrier, prefabGolem, prefabNecromancien;
+        [Tooltip("Morgrim, mini-boss nuit 10 (wiki : ennemis.md) : deux versions, tirées au sort par l'hôte à chaque nuit 10. " +
+            "Remplace prefabGolem si les deux sont renseignés ; prefabGolem reste un repli.")]
+        public GameObject prefabMorgrimMassue, prefabMorgrimMartache;
         public Transform conteneur;
 
         readonly List<Squelette> m_Vivants = new List<Squelette>();
@@ -30,6 +33,8 @@ namespace Deathless.Jeu
         GameBalance B => GameBalance.Courant;
         int m_VagueLancee;
         float[] m_Departs;
+        /// Version de Morgrim tirée au sort pour la nuit en cours (Preparer) : l'hôte décide seul (Docs/reseau.md).
+        GameObject m_PrefabMorgrimChoisi;
 
         void Awake() { Instance = this; }
         void OnDestroy() { if (Instance == this) Instance = null; }
@@ -131,7 +136,18 @@ namespace Deathless.Jeu
             {
                 float dernier = m_Departs[m_Departs.Length - 1] / vit + 1f;
                 int cl = v.clairieresActives[Random.Range(0, v.clairieresActives.Count)];
-                if (nuit == b.nuitGolem && prefabGolem != null) m_AFaire.Add(new Sortie { instant = dernier, type = TypeEnnemi.Golem, clairiere = cl });
+                if (nuit == b.nuitGolem)
+                {
+                    // Morgrim (wiki : ennemis.md) : une des deux versions au hasard, tirage de l'hôte (Docs/reseau.md).
+                    m_PrefabMorgrimChoisi = prefabMorgrimMassue != null && prefabMorgrimMartache != null
+                        ? (Random.value < 0.5f ? prefabMorgrimMassue : prefabMorgrimMartache)
+                        : (prefabMorgrimMassue != null ? prefabMorgrimMassue : (prefabMorgrimMartache != null ? prefabMorgrimMartache : prefabGolem));
+                    if (m_PrefabMorgrimChoisi != null)
+                    {
+                        m_AFaire.Add(new Sortie { instant = dernier, type = TypeEnnemi.Golem, clairiere = cl });
+                        P.Journal("Morgrim (nuit " + nuit + ") : version " + m_PrefabMorgrimChoisi.name);
+                    }
+                }
                 if (nuit == b.nuitNecromancien && prefabNecromancien != null) m_AFaire.Add(new Sortie { instant = dernier, type = TypeEnnemi.Necromancien, clairiere = cl });
             }
             m_AFaire.Sort((a, c) => a.instant.CompareTo(c.instant));
@@ -186,7 +202,9 @@ namespace Deathless.Jeu
                 if (m_Vivants.Count > 0) foreach (var s in m_Vivants) s.Sante.Renforcer(bonus / m_Vivants.Count);
                 return null;
             }
-            GameObject prefab = type == TypeEnnemi.Guerrier ? prefabGuerrier : type == TypeEnnemi.Golem ? prefabGolem : type == TypeEnnemi.Necromancien ? prefabNecromancien : prefabSbire;
+            GameObject prefab = type == TypeEnnemi.Guerrier ? prefabGuerrier
+                : type == TypeEnnemi.Golem ? (m_PrefabMorgrimChoisi != null ? m_PrefabMorgrimChoisi : prefabGolem)
+                : type == TypeEnnemi.Necromancien ? prefabNecromancien : prefabSbire;
             if (prefab == null) return null;
             Vector3 vers = (P != null && P.nyxessa != null ? P.nyxessa.transform.position : Vector3.zero) - point; vers.y = 0f;
             bool reseau = Deathless.Reseau.ReseauJeu.EnPartie;

@@ -81,13 +81,13 @@ Un bouclier cylindrique de gemmes en lévitation protège Nyxessa {effet validé
 - **Riposte** : quand il est frappé, le bouclier **renvoie des dégâts** à l'attaquant.
 - **Canalisation** : au départ, le sorcier tient le bouclier par sa seule incantation. Une **amélioration** du sorcier lui apprend à **canaliser l'énergie de Nyxessa** : un lien d'énergie apparaît entre la relique et son bâton, et il puise dans sa force {décidé}. Elle s'obtient au **palier 4** du bouclier {décidé}.
   - **Effet** {décidé} : le bouclier devient **plus puissant encore**. Le sorcier puise dans l'**énergie** de Nyxessa, **jamais dans sa vie** : la relique ne perd rien.
-  - **Signe visuel** {décidé} : un lien d'énergie se forme entre le **bâton levé** du sorcier et Nyxessa, tant qu'il canalise.
+  - **Signe visuel** {décidé} : un lien d'énergie se forme entre le **bâton levé** du sorcier et Nyxessa, tant qu'il canalise. Filet de gemmes vertes (thème Nyxessa) qui ondule légèrement, avec des gemmes qui voyagent le long du lien ; il s'illumine brièvement quand un coup fait avancer la recharge d'un missile. {{dev: (`Assets/VFX/FiletEnergie/FiletEnergie.cs`, branché par `BouclierNyxessa.SuivreCanalisation` / `Update` ; fiche `Docs/vfx.md`)}}
   - Gain de puissance : {à équilibrer}.
   - **Recharge des missiles** {décidé} : dès ce palier, une part des dégâts que le bouclier encaisse avance aussi la recharge du **prochain missile** de Nyxessa (un gros coup peut en faire gagner plusieurs d'un coup) ; le taux (dégâts encaissés pour 1 s de recharge) est dans `GameBalance.bouclierDegatsParSecondeRecharge` {à équilibrer}. {{dev: (`BouclierNyxessa.Absorber` → `AvancerRechargeMissiles`)}}
 
 ### À décider
 
-- **Signe visuel de l'amélioration** {décidé} : chaque palier rend le bouclier **plus dense** : davantage de gemmes dans le mur et davantage de gemmes en lévitation autour. Un bouclier qui encaisse plus paraît plus épais.
+- **Signe visuel de l'amélioration** {décidé} : chaque palier rend le bouclier **plus dense** : davantage de gemmes dans le mur et davantage de gemmes en lévitation autour. Un bouclier qui encaisse plus paraît plus épais. {{dev: (`RelicShieldVisual.palierQuantite`, piste B, poussé en continu par `BouclierNyxessa.Update` depuis `EtatNyxessa.palierBouclier` ; fiche `Docs/vfx.md`)}}
 - **Paliers** {décidé} : 5 paliers, achetés **à la relique**, comme ses missiles, aux mêmes coûts (100, 200, 350 et 550 or pour les paliers 2 à 5) {à équilibrer}.
 - **Durée** {décidé} : le sorcier invoque le bouclier au début de la nuit ; il tient **jusqu'à être brisé**.
 - **Bouclier brisé** {décidé} : le sorcier **meurt**. Comme un héros, il se dissout et son énergie retourne à Nyxessa {{dev: (même effet que la mort d'un allié, `MortAllie`)}}. Plus de bouclier jusqu'à la nuit suivante ; le sorcier **réapparaît le jour suivant**.

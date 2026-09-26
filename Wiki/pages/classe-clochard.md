@@ -91,7 +91,6 @@ Chaque geste est joué par le Clochard pétomane lui-même, bouteille en main, a
 ### Coup de bouteille
 
 {video media/classes/clochard/coup_de_bouteille.mp4} **Coup de bouteille** {à confirmer} | {dev} `Melee_1H_Attack_Chop` | Arme : bouteille | une fois · 1,07 s · pas encore d'éclats au 3e coup
-{video media/animations/Melee_1H_Attack_Chop.mp4} **Référence : mannequin** {à confirmer} | {dev} `Melee_1H_Attack_Chop` | Arme : hache à une main et bouclier | une fois · 1,07 s
 
 ### Pet de défense
 
@@ -102,16 +101,13 @@ Pas encore de geste ni d'effet dédiés. Proposition : une esquive en avant, pen
 ### Nuage pestilentiel
 
 {video media/classes/clochard/nuage_pestilentiel.mp4} **Nuage pestilentiel** {à confirmer} | {dev} `Interact` puis `Idle_A` · `NuagePestilentiel.Jouer(centre, 3,5, 2,5)` | Arme : bouteille | une fois · 1,30 s · Effet : grand nuage de 3,5 m de rayon devant lui, tenu 2,5 s dans la vidéo (5 s prévues)
-{video media/animations/Interact.mp4} **Référence : mannequin** {à confirmer} | {dev} `Interact` | Arme : aucune | une fois · 1,30 s
 
 ### Pet-propulsion
 
 {video media/classes/clochard/pet_propulsion.mp4} **Pet-propulsion** {à confirmer} | {dev} `Jump_Full_Long` · `PetPropulsion.Jouer(porteur, avant, vol × 0,75)` | Arme : bouteille | une fois · 2,33 s · Effet : bouffée au départ, traînée de gaz, petit nuage qui reste
-{video media/animations/Jump_Full_Long.mp4} **Référence : mannequin** {à confirmer} | {dev} `Jump_Full_Long` | Arme : aucune | une fois · 2,33 s
 
 {dev} Le clip saute sur place : le bond de 5,5 m en cloche, avec une bascule de 18° vers l'avant, est ajouté pendant la phase aérienne, comme dans `NcBanc`.
 
 ### Boire (jauge de Gaz)
 
 {video media/classes/clochard/boire.mp4} **Boire un coup** {à confirmer} | {dev} `Use_Item` | Arme : bouteille | boucle · 1,60 s · le clip lève la bouteille devant la poitrine, pas jusqu'à la bouche : geste à retoucher
-{video media/animations/Use_Item.mp4} **Référence : mannequin** {à confirmer} | {dev} `Use_Item` | Arme : potion | boucle · 1,60 s

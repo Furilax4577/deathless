@@ -27,7 +27,7 @@ Actions communes à toutes les classes : voir [Classes](classes.md#actions-commu
 
 ## Clips des compétences
 
-Les gestes joués en jeu pour chaque action, dans l'ordre où ils s'enchaînent. Vidéos sur le mannequin KayKit, caméra fixe de 3/4, sol quadrillé tous les mètres ; l'arme est celle de la vidéo, suivie de celle du jeu quand elle diffère.
+Les gestes joués en jeu pour chaque action, dans l'ordre où ils s'enchaînent. Vidéos sur le vrai modèle du Paladin (`Knight`, style `SwordShield`), équipé comme en jeu, caméra fixe de 3/4, sol quadrillé tous les mètres (même cadrage que la page [Animations](animations.md)).
 
 {dev} Source : contrôleur `Assets/Jeu/Animation/Paladin_Jeu.controller` (généré par `JeuBuilder.ControleurPaladin`), déclenché par `ClassePaladin`. Toutes les animations : [Animations](animations.md).
 
@@ -35,25 +35,25 @@ Les gestes joués en jeu pour chaque action, dans l'ordre où ils s'enchaînent.
 
 Les deux tailles alternent à chaque coup.
 
-{video media/animations/Melee_1H_Attack_Slice_Horizontal.mp4} **Épée : taille horizontale (1er coup)** | {dev} `Melee_1H_Attack_Slice_Horizontal` | Arme : épée et bouclier | une fois · 1,37 s | {dev} vitesse `epeeVitesseClip` ×1,25
-{video media/animations/Melee_1H_Attack_Slice_Diagonal.mp4} **Épée : taille en diagonale (2e coup)** | {dev} `Melee_1H_Attack_Slice_Diagonal` | Arme : épée et bouclier | une fois · 1,00 s | {dev} vitesse `epeeVitesseClip`
+{video media/classes/paladin/clips/Melee_1H_Attack_Slice_Horizontal.mp4} **Épée : taille horizontale (1er coup)** | {dev} `Melee_1H_Attack_Slice_Horizontal` | Arme : épée et bouclier | une fois · 1,37 s | {dev} vitesse `epeeVitesseClip` ×1,25
+{video media/classes/paladin/clips/Melee_1H_Attack_Slice_Diagonal.mp4} **Épée : taille en diagonale (2e coup)** | {dev} `Melee_1H_Attack_Slice_Diagonal` | Arme : épée et bouclier | une fois · 1,00 s | {dev} vitesse `epeeVitesseClip`
 
 ### Garde et parade
 
-{video media/animations/Melee_Blocking.mp4} **Garde : bouclier levé** | {dev} `Melee_Blocking` | Arme : épée et bouclier | boucle · 1,07 s | {dev} haut du corps, copie bouclante `Melee_Blocking_Loop`
-{video media/animations/Melee_Block_Hit.mp4} **Garde : coup bloqué ou paré** | {dev} `Melee_Block_Hit` | Arme : épée et bouclier | une fois · 1,07 s | {dev} haut du corps, vitesse ×1,6
+{video media/classes/paladin/clips/Melee_Blocking.mp4} **Garde : bouclier levé** | {dev} `Melee_Blocking` | Arme : épée et bouclier | boucle · 1,07 s | {dev} haut du corps, copie bouclante `Melee_Blocking_Loop`
+{video media/classes/paladin/clips/Melee_Block_Hit.mp4} **Garde : coup bloqué ou paré** | {dev} `Melee_Block_Hit` | Arme : épée et bouclier | une fois · 1,07 s | {dev} haut du corps, vitesse ×1,6
 
 ### Charge bélier
 
 Le paladin court derrière son bouclier, penché en avant : les jambes courent, le haut du corps tient la garde, puis le coup de bouclier porte à l'arrivée.
 
-{video media/animations/Running_A.mp4} **Charge bélier : course (jambes)** | {dev} `Running_A` | Arme : aucune (en jeu : épée et bouclier) | boucle · 0,80 s | {dev} couche de base, figée sur sa première image pendant l'anticipation ; cadence = vitesse de la ruée ÷ vitesse des pieds du clip (mesurée par le builder), bornée de ×0,8 à ×3 (`chargeCadenceMin` / `chargeCadenceMax`)
-{video media/animations/Melee_Blocking.mp4} **Charge bélier : garde (haut du corps)** | {dev} `Melee_Blocking` | Arme : épée et bouclier | boucle · 1,07 s | {dev} haut du corps, copie bouclante `Melee_Blocking_Loop`, pendant l'anticipation et la ruée
-{video media/animations/Melee_Block_Attack.mp4} **Charge bélier : coup de bouclier** | {dev} `Melee_Block_Attack` | Arme : épée et bouclier | une fois · 1,07 s | {dev} haut du corps, lancé pour que l'impact (main gauche la plus en avant) tombe à l'arrivée ; à l'arrivée, le corps entier finit le geste depuis l'impact
+{video media/classes/paladin/clips/Running_A.mp4} **Charge bélier : course (jambes)** | {dev} `Running_A` | Arme : épée et bouclier | boucle · 0,80 s | {dev} couche de base, figée sur sa première image pendant l'anticipation ; cadence = vitesse de la ruée ÷ vitesse des pieds du clip (mesurée par le builder), bornée de ×0,8 à ×3 (`chargeCadenceMin` / `chargeCadenceMax`)
+{video media/classes/paladin/clips/Melee_Blocking.mp4} **Charge bélier : garde (haut du corps)** | {dev} `Melee_Blocking` | Arme : épée et bouclier | boucle · 1,07 s | {dev} haut du corps, copie bouclante `Melee_Blocking_Loop`, pendant l'anticipation et la ruée
+{video media/classes/paladin/clips/Melee_Block_Attack.mp4} **Charge bélier : coup de bouclier** | {dev} `Melee_Block_Attack` | Arme : épée et bouclier | une fois · 1,07 s | {dev} haut du corps, lancé pour que l'impact (main gauche la plus en avant) tombe à l'arrivée ; à l'arrivée, le corps entier finit le geste depuis l'impact
 
 ### Soin sur soi
 
-{video media/animations/Ranged_Magic_Raise.mp4} **Soin sur soi : épée levée** | {dev} `Ranged_Magic_Raise` | Arme : bâton (en jeu : épée et bouclier) | une fois · 2,10 s | {dev} soin donné à `soinIncantation`
+{video media/classes/paladin/clips/Ranged_Magic_Raise.mp4} **Soin sur soi : épée levée** | {dev} `Ranged_Magic_Raise` | Arme : épée et bouclier | une fois · 2,10 s | {dev} soin donné à `soinIncantation`
 
 ## Règles
 

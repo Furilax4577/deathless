@@ -23,3 +23,4 @@ Les boucles (vol d'un projectile, cône de flammes, bourdonnement du portail…)
 |---|---|---|
 | Sons générés pour Relic et pour Deathless (Python pur, aucun échantillon tiers) | Aucune : créés pour le projet | Aucun |
 | Kenney, RPG Audio et Interface Sounds | CC0 | Facultatif, donné dans les [Crédits](credits.md) |
+| Sonniss.com, GDC Game Audio Bundle (344 Audio ; David Dumais Audio) | Libre de droits pour les jeux (licence du bundle) | Donné dans les [Crédits](credits.md) |

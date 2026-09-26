@@ -27,26 +27,26 @@ Actions communes à toutes les classes : voir [Classes](classes.md#actions-commu
 
 ## Clips des compétences
 
-Les gestes joués en jeu pour chaque action, dans l'ordre où ils s'enchaînent. Vidéos sur le mannequin KayKit, caméra fixe de 3/4, sol quadrillé tous les mètres ; l'arme est celle de la vidéo, suivie de celle du jeu quand elle diffère.
+Les gestes joués en jeu pour chaque action, dans l'ordre où ils s'enchaînent. Vidéos sur le vrai modèle de l'Assassin (`Rogue_Hooded`, style `DaggerCrossbow`), équipé comme en jeu, caméra fixe de 3/4, sol quadrillé tous les mètres (même cadrage que la page [Animations](animations.md)).
 
 {dev} Source : contrôleur `Assets/Jeu/Animation/Assassin_Jeu.controller` (généré par `ClassesBuilder.ControleurAssassin`), déclenché par `ClasseAssassin`. Toutes les animations : [Animations](animations.md).
 
 ### Dague
 
-{video media/animations/Melee_1H_Attack_Stab.mp4} **Dague : estoc** | {dev} `Melee_1H_Attack_Stab` | Arme : épée et bouclier (en jeu : dague) | une fois · 1,60 s | {dev} vitesse calée sur `dagueInstant` (coup à 0,5 s du clip)
+{video media/classes/assassin/clips/Melee_1H_Attack_Stab.mp4} **Dague : estoc** | {dev} `Melee_1H_Attack_Stab` | Arme : dague (arbalète au dos) | une fois · 1,60 s | {dev} vitesse calée sur `dagueInstant` (coup à 0,5 s du clip)
 
 ### Arbalète en main
 
-{video media/animations/Ranged_1H_Aiming.mp4} **Arbalète : en main, visée** | {dev} `Ranged_1H_Aiming` | Arme : arbalète à une main | une fois · 1,07 s (tenue en boucle en jeu) | {dev} haut du corps, copie bouclante `Ranged_1H_Aiming_Loop`
-{video media/animations/Ranged_1H_Shoot.mp4} **Arbalète : tir** | {dev} `Ranged_1H_Shoot` | Arme : arbalète à une main | une fois · 1,07 s | {dev} vitesse ×1,2
+{video media/classes/assassin/clips/Ranged_1H_Aiming.mp4} **Arbalète : en main, visée** | {dev} `Ranged_1H_Aiming` | Arme : arbalète à une main | une fois · 1,07 s (tenue en boucle en jeu) | {dev} haut du corps, copie bouclante `Ranged_1H_Aiming_Loop`
+{video media/classes/assassin/clips/Ranged_1H_Shoot.mp4} **Arbalète : tir** | {dev} `Ranged_1H_Shoot` | Arme : arbalète à une main | une fois · 1,07 s | {dev} vitesse ×1,2
 
 ### Lancer de la grenade
 
-{video media/animations/Throw.mp4} **Grenade fumigène : lancer** | {dev} `Throw` | Arme : fiole (en jeu : grenade fumigène) | une fois · 1,37 s
+{video media/classes/assassin/clips/Throw.mp4} **Grenade fumigène : lancer** | {dev} `Throw` | Arme : dague et arbalète (en jeu : grenade fumigène) | une fois · 1,37 s
 
 ### Marche discrète (passif)
 
-{video media/animations/Sneaking.mp4} **Marche discrète** | {dev} `Sneaking` | Arme : aucune (en jeu : dague) | boucle · 2,13 s | {dev} seconde locomotion, copie bouclante `Sneaking_Loop`
+{video media/classes/assassin/clips/Sneaking.mp4} **Marche discrète** | {dev} `Sneaking` | Arme : dague (arbalète au dos) | boucle · 2,13 s | {dev} seconde locomotion, copie bouclante `Sneaking_Loop`
 
 {dev} RB : vide.
 

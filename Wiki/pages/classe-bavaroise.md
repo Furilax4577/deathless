@@ -31,23 +31,23 @@
 
 ## Clips proposés {à confirmer}
 
-Gestes KayKit proposés pour ce kit, repris des bacs à sable : rien n'est encore branché en jeu. L'arme est celle de la vidéo, suivie de l'arme prévue.
+Gestes KayKit proposés pour ce kit, repris des bacs à sable : rien n'est encore branché en jeu. Vidéos sur le prefab `Bavaroise.prefab` (lissé), une chope dans chaque main, caméra fixe de 3/4, sol quadrillé tous les mètres (même cadrage que la page [Animations](animations.md)).
 
 {dev} Sources : `sandbox-rig` (contrôleur `Bavaroise.controller`, chope portée à la bouche par `ChopeBoire.cs`) et banc `NcBanc` de `sandbox-vfx` (scène `NouvellesClasses`).
 
 ### Coups de chopes
 
-{video media/animations/Melee_Dualwield_Attack_Slice.mp4} **Coups de chopes : enchaînement gauche-droite** {à confirmer} | {dev} `Melee_Dualwield_Attack_Slice` | Arme : deux dagues (prévu : deux chopes) | une fois · 1,17 s
-{video media/animations/Melee_Dualwield_Attack_Chop.mp4} **Coups de chopes : double coup (4e coup)** {à confirmer} | {dev} `Melee_Dualwield_Attack_Chop` | Arme : deux dagues (prévu : deux chopes) | une fois · 1,27 s
+{video media/classes/bavaroise/clips/Melee_Dualwield_Attack_Slice.mp4} **Coups de chopes : enchaînement gauche-droite** {à confirmer} | {dev} `Melee_Dualwield_Attack_Slice` | Arme : deux chopes | une fois · 1,17 s
+{video media/classes/bavaroise/clips/Melee_Dualwield_Attack_Chop.mp4} **Coups de chopes : double coup (4e coup)** {à confirmer} | {dev} `Melee_Dualwield_Attack_Chop` | Arme : deux chopes | une fois · 1,27 s
 
 ### Trinquer
 
-{video media/animations/Use_Item.mp4} **Trinquer : boire une gorgée** {à confirmer} | {dev} `Use_Item` | Arme : potion (prévu : chope) | boucle · 1,60 s
+{video media/classes/bavaroise/clips/Use_Item.mp4} **Trinquer : boire une gorgée** {à confirmer} | {dev} `Use_Item` | Arme : chope (portée à la bouche, `ChopeBoire.cs`) | boucle · 1,60 s
 
 ### Tournée générale
 
-{video media/animations/Throw.mp4} **Tournée générale : lancer de chope** {à confirmer} | {dev} `Throw` | Arme : fiole (prévu : chope) | une fois · 1,37 s
+{video media/classes/bavaroise/clips/Throw.mp4} **Tournée générale : lancer de chope** {à confirmer} | {dev} `Throw` | Arme : deux chopes (geste de lancer emprunté) | une fois · 1,37 s
 
 ### Charge du tonneau
 
-{video media/animations/Running_A.mp4} **Charge du tonneau : course** {à confirmer} | {dev} `Running_A` | Arme : aucune (prévu : deux chopes) | boucle · 0,80 s
+{video media/classes/bavaroise/clips/Running_A.mp4} **Charge du tonneau : course** {à confirmer} | {dev} `Running_A` | Arme : deux chopes | boucle · 0,80 s

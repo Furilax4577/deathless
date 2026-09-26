@@ -31,26 +31,26 @@
 
 ## Clips proposés {à confirmer}
 
-Gestes KayKit proposés pour ce kit, repris des bacs à sable : rien n'est encore branché en jeu. L'arme est celle de la vidéo, suivie de l'arme prévue.
+Gestes KayKit proposés pour ce kit, repris des bacs à sable : rien n'est encore branché en jeu. Vidéos sur le prefab `Barde.prefab` (lissé), luth tenu par le manche (`BardeLuth`, prise « massue » ou « jouer » selon le geste), caméra fixe de 3/4, sol quadrillé tous les mètres (même cadrage que la page [Animations](animations.md)).
 
 {dev} Sources : `sandbox-rig` (contrôleur `Barde.controller`, enchaînement `BardeCombo.cs`) et banc `NcBanc` de `sandbox-vfx` (scène `NouvellesClasses`).
 
 ### Coup de luth
 
-{video media/animations/Melee_1H_Attack_Chop.mp4} **Coup de luth : 1er coup** {à confirmer} | {dev} `Melee_1H_Attack_Chop` | Arme : hache à une main et bouclier (prévu : luth tenu par le manche) | une fois · 1,07 s
-{video media/animations/Melee_1H_Attack_Slice_Diagonal.mp4} **Coup de luth : 2e coup** {à confirmer} | {dev} `Melee_1H_Attack_Slice_Diagonal` | Arme : épée et bouclier (prévu : luth) | une fois · 1,00 s
-{video media/animations/Melee_1H_Attack_Jump_Chop.mp4} **Coup de luth : 3e coup, « bwoiing »** {à confirmer} | {dev} `Melee_1H_Attack_Jump_Chop` | Arme : hache à une main et bouclier (prévu : luth abattu au sol) | une fois · 1,33 s
+{video media/classes/barde/clips/Melee_1H_Attack_Chop.mp4} **Coup de luth : 1er coup** {à confirmer} | {dev} `Melee_1H_Attack_Chop` | Arme : luth (tenu par le manche, prise « massue ») | une fois · 1,07 s
+{video media/classes/barde/clips/Melee_1H_Attack_Slice_Diagonal.mp4} **Coup de luth : 2e coup** {à confirmer} | {dev} `Melee_1H_Attack_Slice_Diagonal` | Arme : luth (tenu par le manche, prise « massue ») | une fois · 1,00 s
+{video media/classes/barde/clips/Melee_1H_Attack_Jump_Chop.mp4} **Coup de luth : 3e coup, « bwoiing »** {à confirmer} | {dev} `Melee_1H_Attack_Jump_Chop` | Arme : luth (tenu par le manche, prise « massue ») | une fois · 1,33 s
 
 ### Jouer
 
-{video media/animations/Ranged_Magic_Spellcasting_Long.mp4} **Jouer : en attendant l'animation de luth** {à confirmer} | {dev} `Ranged_Magic_Spellcasting_Long` | Arme : bâton (prévu : luth) | une fois · 2,53 s
+{video media/classes/barde/clips/Ranged_Magic_Spellcasting_Long.mp4} **Jouer : en attendant l'animation de luth** {à confirmer} | {dev} `Ranged_Magic_Spellcasting_Long` | Arme : luth (en main, prise « jouer ») | une fois · 2,53 s
 
-L'animation « jouer du luth » reste à créer.
+Luth en main (prise « jouer », `BardeLuth`) sur le clip générique emprunté ; une animation « jouer du luth » propre reste à créer.
 
 ### Ballade entraînante
 
-{video media/animations/Ranged_Magic_Raise.mp4} **Ballade entraînante : luth levé** {à confirmer} | {dev} `Ranged_Magic_Raise` | Arme : bâton (prévu : luth) | une fois · 2,10 s
+{video media/classes/barde/clips/Ranged_Magic_Raise.mp4} **Ballade entraînante : luth levé** {à confirmer} | {dev} `Ranged_Magic_Raise` | Arme : luth (en main, prise « jouer ») | une fois · 2,10 s
 
 ### Accord dissonant
 
-{video media/animations/Ranged_Magic_Shoot.mp4} **Accord dissonant : onde lancée devant** {à confirmer} | {dev} `Ranged_Magic_Shoot` | Arme : bâton (prévu : luth) | une fois · 0,93 s
+{video media/classes/barde/clips/Ranged_Magic_Shoot.mp4} **Accord dissonant : onde lancée devant** {à confirmer} | {dev} `Ranged_Magic_Shoot` | Arme : luth (en main, prise « jouer ») | une fois · 0,93 s

@@ -28,7 +28,7 @@ Actions communes à toutes les classes : voir [Classes](classes.md#actions-commu
 
 ## Clips des compétences
 
-Les gestes joués en jeu pour chaque action, dans l'ordre où ils s'enchaînent. Vidéos sur le mannequin KayKit, caméra fixe de 3/4, sol quadrillé tous les mètres ; l'arme est celle de la vidéo, suivie de celle du jeu quand elle diffère.
+Les gestes joués en jeu pour chaque action, dans l'ordre où ils s'enchaînent. Vidéos sur le vrai modèle du Viking (`Barbarian`, style `Axe2H`), équipé comme en jeu, caméra fixe de 3/4, sol quadrillé tous les mètres (même cadrage que la page [Animations](animations.md)).
 
 {dev} Source : contrôleur `Assets/Jeu/Animation/Viking_Jeu.controller` (généré par `ClassesBuilder.ControleurViking`), déclenché par `ClasseViking`. Toutes les animations : [Animations](animations.md).
 
@@ -36,22 +36,22 @@ Les gestes joués en jeu pour chaque action, dans l'ordre où ils s'enchaînent.
 
 Les deux coups alternent.
 
-{video media/animations/Melee_2H_Attack_Slice.mp4} **Hache : taille (1er coup)** | {dev} `Melee_2H_Attack_Slice` | Arme : hache à deux mains | une fois · 1,10 s | {dev} vitesse calée sur `hacheIntervalle`
-{video media/animations/Melee_2H_Attack_Chop.mp4} **Hache : coup de haut en bas (2e coup)** | {dev} `Melee_2H_Attack_Chop` | Arme : hache à deux mains | une fois · 1,63 s | {dev} vitesse calée sur `hacheIntervalle`
+{video media/classes/viking/clips/Melee_2H_Attack_Slice.mp4} **Hache : taille (1er coup)** | {dev} `Melee_2H_Attack_Slice` | Arme : hache à deux mains | une fois · 1,10 s | {dev} vitesse calée sur `hacheIntervalle`
+{video media/classes/viking/clips/Melee_2H_Attack_Chop.mp4} **Hache : coup de haut en bas (2e coup)** | {dev} `Melee_2H_Attack_Chop` | Arme : hache à deux mains | une fois · 1,63 s | {dev} vitesse calée sur `hacheIntervalle`
 
 ### Attaque tournante
 
-{video media/animations/Melee_2H_Attack_Spin.mp4} **Attaque tournante : élan** | {dev} `Melee_2H_Attack_Spin` | Arme : hache à deux mains | une fois · 2,40 s | {dev} début du clip, jusqu'à 1,2 s
-{video media/animations/Melee_2H_Attack_Spinning.mp4} **Attaque tournante : tourbillon, tant que la touche est tenue** | {dev} `Melee_2H_Attack_Spinning` | Arme : hache à deux mains | boucle · 0,67 s | {dev} copie bouclante `Melee_2H_Attack_Spinning_Loop`
-{video media/animations/Melee_2H_Attack_Spin.mp4} **Attaque tournante : fin** | {dev} `Melee_2H_Attack_Spin` | Arme : hache à deux mains | une fois · 2,40 s | {dev} fin du même clip, à partir de 1,25 s
+{video media/classes/viking/clips/Melee_2H_Attack_Spin.mp4} **Attaque tournante : élan** | {dev} `Melee_2H_Attack_Spin` | Arme : hache à deux mains | une fois · 2,40 s | {dev} début du clip, jusqu'à 1,2 s
+{video media/classes/viking/clips/Melee_2H_Attack_Spinning.mp4} **Attaque tournante : tourbillon, tant que la touche est tenue** | {dev} `Melee_2H_Attack_Spinning` | Arme : hache à deux mains | boucle · 0,67 s | {dev} copie bouclante `Melee_2H_Attack_Spinning_Loop`
+{video media/classes/viking/clips/Melee_2H_Attack_Spin.mp4} **Attaque tournante : fin** | {dev} `Melee_2H_Attack_Spin` | Arme : hache à deux mains | une fois · 2,40 s | {dev} fin du même clip, à partir de 1,25 s
 
 ### Rugissement
 
-{video media/animations/Skeletons_Taunt_Longer.mp4} **Rugissement** | {dev} `Skeletons_Taunt_Longer` | Arme : aucune (en jeu : hache à deux mains) | une fois · 3,00 s | {dev} emprunté au pack Skeletons, vitesse ×1,6 ; geste gardé (V2 écartée par Quentin, 26/09/2026)
+{video media/classes/viking/clips/Skeletons_Taunt_Longer.mp4} **Rugissement** | {dev} `Skeletons_Taunt_Longer` | Arme : hache à deux mains | une fois · 3,00 s | {dev} emprunté au pack Skeletons, vitesse ×1,6 ; geste gardé (V2 écartée par Quentin, 26/09/2026)
 
 ### Saut percutant
 
-{video media/animations/Melee_1H_Attack_Jump_Chop.mp4} **Saut percutant** | {dev} `Melee_1H_Attack_Jump_Chop` | Arme : hache à une main et bouclier (en jeu : hache à deux mains, tenue de la main droite) | une fois · 1,33 s | {dev} vitesse ×1,2 ; bond de 5 m translaté par script
+{video media/classes/viking/clips/Melee_1H_Attack_Jump_Chop.mp4} **Saut percutant** | {dev} `Melee_1H_Attack_Jump_Chop` | Arme : hache à deux mains (clip emprunté à une prise à une main) | une fois · 1,33 s | {dev} vitesse ×1,2 ; bond de 5 m translaté par script
 
 ## Règles
 

@@ -30,17 +30,17 @@ Actions communes à toutes les classes : voir [Classes](classes.md#actions-commu
 
 ## Clips des compétences
 
-Les gestes joués en jeu pour chaque action, dans l'ordre où ils s'enchaînent. Vidéos sur le mannequin KayKit, caméra fixe de 3/4, sol quadrillé tous les mètres ; l'arme est celle de la vidéo, suivie de celle du jeu quand elle diffère.
+Les gestes joués en jeu pour chaque action, dans l'ordre où ils s'enchaînent. Vidéos sur le vrai modèle du Mage (`Mage`, style `Staff`), équipé comme en jeu, caméra fixe de 3/4, sol quadrillé tous les mètres (même cadrage que la page [Animations](animations.md)).
 
 {dev} Source : contrôleur `Assets/Jeu/Animation/Mage_Jeu.controller` (généré par `ClassesBuilder.ControleurMage`), déclenché par `ClasseMage`. Toutes les animations : [Animations](animations.md).
 
 ### Boule de feu
 
-{video media/animations/Ranged_Magic_Shoot.mp4} **Boule de feu : lancer** | {dev} `Ranged_Magic_Shoot` | Arme : bâton | une fois · 0,93 s | {dev} haut du corps, vitesse ×1,3 : on marche en lançant
+{video media/classes/mage/clips/Ranged_Magic_Shoot.mp4} **Boule de feu : lancer** | {dev} `Ranged_Magic_Shoot` | Arme : bâton | une fois · 0,93 s | {dev} haut du corps, vitesse ×1,3 : on marche en lançant
 
 ### Cône de flammes
 
-{video media/animations/Ranged_Magic_Spellcasting.mp4} **Cône de flammes : incantation maintenue** | {dev} `Ranged_Magic_Spellcasting` | Arme : bâton | boucle · 0,67 s | {dev} haut du corps, copie bouclante `Ranged_Magic_Spellcasting_Loop`
+{video media/classes/mage/clips/Ranged_Magic_Spellcasting.mp4} **Cône de flammes : incantation maintenue** | {dev} `Ranged_Magic_Spellcasting` | Arme : bâton | boucle · 0,67 s | {dev} haut du corps, copie bouclante `Ranged_Magic_Spellcasting_Loop`
 
 {dev} Brûlure : pas de geste (effet posé sur les ennemis touchés). LB et RB : vides.
 

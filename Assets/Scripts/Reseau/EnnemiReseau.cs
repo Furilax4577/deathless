@@ -191,5 +191,19 @@ namespace Deathless.Reseau
             var s = StatutsReseau.Valider((TypeStatut)type, duree, intensite, (OrigineStatut)origine, Partie.IdJoueur(p.Receive.SenderClientId), false);
             if (s.type != TypeStatut.Aucun) Statuts.De(Squelette).AjouterDemande(s);
         }
+
+        // ----------------------------------------------------------------- Morgrim : effets au sol (léger, 26/09/2026)
+
+        /// Hôte : diffuse une télégraphie ou un impact au sol de Morgrim aux autres postes (Docs/vfx.md, Docs/reseau.md).
+        /// Léger : un octet de thème, une forme (rayon/angle/durée), pas un message par gemme.
+        public void DiffuserEffetMorgrim(bool telegraphie, byte theme, float rayon, float duree, float angleDeg)
+        {
+            if (!IsServer || !IsSpawned) return;
+            EffetMorgrimRpc(telegraphie, theme, rayon, duree, angleDeg);
+        }
+
+        [Rpc(SendTo.NotServer)]
+        void EffetMorgrimRpc(bool telegraphie, byte theme, float rayon, float duree, float angleDeg)
+            => (Squelette as MorgrimVariant)?.RejouerEffetDistant(telegraphie, (VfxTheme)theme, rayon, duree, angleDeg);
     }
 }

@@ -1,6 +1,6 @@
 # Animations
 
-Toutes les animations KayKit du projet, jouées sur le mannequin du pack Character Animations 1.1 (rig Medium, celui des héros et des squelettes) ou sur Morgrim, le Golem squelette (rig Large). Quand un clip est fait pour un type d'arme, le mannequin porte l'arme KayKit correspondante, posée par le style d'arme validé quand il existe (voir `Docs/styles-d-armes.md`). 161 animations en 15 familles, plus 5 ouvertures de coffre, 28,7 Mo de vidéos.
+Toutes les animations KayKit du projet, jouées sur le mannequin du pack Character Animations 1.1 : rig Medium (celui des héros et des squelettes) ou rig Large (`Mannequin_Large`, importé depuis l'archive du pack ; les personnages comme Morgrim ont leur propre fiche, avec leurs propres clips). Quand un clip est fait pour un type d'arme, le mannequin porte l'arme KayKit correspondante, posée par le style d'arme validé quand il existe (voir `Docs/styles-d-armes.md`). 161 animations en 15 familles, plus 5 ouvertures de coffre, 28,4 Mo de vidéos.
 
 > Chaque carte donne le nom en français, le nom technique du clip (celui du code et des contrôleurs), l'arme portée, et si le clip est une boucle ou se joue une fois (la vidéo marque alors une courte pause au début et à la fin). Caméra fixe de 3/4 ; le sol est quadrillé tous les mètres pour juger des déplacements. Les vidéos se chargent quand elles arrivent à l'écran.
 
@@ -187,15 +187,15 @@ Pêche : **canne provisoire**, générée par script (bâton facetté aux couleu
 Ouverture du coffre du donjon, rejouée comme dans le jeu (`DonjonJeu.Ouvrir`) : le couvercle bascule de 105° en 0,45 s, puis 2 pièces d'or montent en tournant (4 pour le grand coffre). Ouvrir un coffre ne coûte jamais d'or {décidé} (Quentin, 26/09/2026 ; plus tard, peut-être une clé). Plus de cadenas (retour de Quentin, 26/09/2026) :
 
 - **coffres sans serrure** (`Coffre`, `GrandCoffre`) : ceux du jeu pour l'instant, ouverture gratuite ; la gâche et le moraillon à trou de serrure du modèle KayKit sont retirés (copies des maillages) ;
-- **coffres à clé**, déclinaisons prêtes pour plus tard (`Coffre_Acier`, `_Cuivre`, `_Or`, et `GrandCoffre_*`) : le coffre garde sa serrure et tout son métal (ferrures, coins, clous, serrure) prend la couleur de la clé ; la clé entre dans la serrure, tourne d'un quart de tour et reste en place pendant que le couvercle s'ouvre.
+- **coffres à clé**, déclinaisons prêtes pour plus tard (`Coffre_Acier`, `_Cuivre`, `_Or`, et `GrandCoffre_*`) : le coffre garde sa serrure et tout son métal (ferrures, coins, clous, serrure) prend la couleur de la clé ; la clé s'enfonce dans la serrure jusqu'à la tête, tourne d'un quart de tour, puis disparaît (rétrécit à zéro avec un petit éclat, sans fondu) ; le couvercle ne s'ouvre qu'une fois la clé effacée (retour de Quentin, 26/09/2026 : elle restait plantée à moitié, visible dans le couvercle ouvert).
 
 Assets dans le bac à sable `sandbox-level`, sous `Assets/Art/Coffres/` (générés par `CoffresBuilder`), prêts à être copiés dans le jeu.
 
 {video media/animations/Coffre_SansSerrure.mp4} **Coffre sans serrure, ouverture gratuite** | Objet : prefab `Coffre` (KayKit `chest` sans serrure) | Clé : aucune (pas de serrure) | une fois · 0,45 s (couvercle 0,45 s, puis les pièces)
 {video media/animations/GrandCoffre_SansSerrure.mp4} **Grand coffre plein d'or sans serrure, ouverture gratuite** | Objet : prefab `GrandCoffre` (KayKit `chest_gold`, plein d'or, sans serrure) | Clé : aucune (pas de serrure) | une fois · 0,45 s (couvercle 0,45 s, puis les pièces)
-{video media/animations/Coffre_Cle_Acier.mp4} **Coffre à clé d'acier (déclinaison pour plus tard)** | Objet : prefab `Coffre_Acier` (KayKit `chest`, métal teinté acier) | Clé : `Cle_Acier` | une fois · 1,10 s (clé 0,65 s puis couvercle 0,45 s, puis les pièces)
-{video media/animations/Coffre_Cle_Cuivre.mp4} **Coffre à clé de cuivre (déclinaison pour plus tard)** | Objet : prefab `Coffre_Cuivre` (KayKit `chest`, métal teinté cuivre) | Clé : `Cle_Cuivre` | une fois · 1,10 s (clé 0,65 s puis couvercle 0,45 s, puis les pièces)
-{video media/animations/Coffre_Cle_Or.mp4} **Coffre à clé d'or (déclinaison pour plus tard)** | Objet : prefab `Coffre_Or` (KayKit `chest`, métal teinté or) | Clé : `Cle_Or` | une fois · 1,10 s (clé 0,65 s puis couvercle 0,45 s, puis les pièces)
+{video media/animations/Coffre_Cle_Acier.mp4} **Coffre à clé d'acier (déclinaison pour plus tard)** | Objet : prefab `Coffre_Acier` (KayKit `chest`, métal teinté acier) | Clé : `Cle_Acier` | une fois · 1,30 s (clé 0,85 s puis couvercle 0,45 s, puis les pièces)
+{video media/animations/Coffre_Cle_Cuivre.mp4} **Coffre à clé de cuivre (déclinaison pour plus tard)** | Objet : prefab `Coffre_Cuivre` (KayKit `chest`, métal teinté cuivre) | Clé : `Cle_Cuivre` | une fois · 1,30 s (clé 0,85 s puis couvercle 0,45 s, puis les pièces)
+{video media/animations/Coffre_Cle_Or.mp4} **Coffre à clé d'or (déclinaison pour plus tard)** | Objet : prefab `Coffre_Or` (KayKit `chest`, métal teinté or) | Clé : `Cle_Or` | une fois · 1,30 s (clé 0,85 s puis couvercle 0,45 s, puis les pièces)
 
 ## Squelettes, apparitions et références (17)
 
@@ -219,40 +219,40 @@ Clips du fichier `Rig_Medium_Special` (pensés pour les squelettes, joués ici s
 {video media/animations/EXPERIMENTAL_Medium_Transform.mp4} **Transformation (expérimental)** | `EXPERIMENTAL_Medium_Transform` | Arme : aucune | une fois · 1,00 s
 {video media/animations/T-Pose.mp4} **Pose en T (référence du squelette)** | `T-Pose` | Arme : aucune | une fois · 0,03 s
 
-## Rig_Large : Morgrim, le Golem squelette (29)
+## Rig_Large : le mannequin Rig_Large (29)
 
-Aucun mannequin Large dans les packs : ces clips sont joués sur `Skeleton_Golem` (Morgrim, mini-boss de la nuit 10), avec les armes Large des packs (`Skeleton_Golem_Axe_Large`, `axe_1handed_Large`, `shield_round_barbarian_Large`).
+Joués sur `Mannequin_Large` (KayKit Character Animations 1.1, importé le 26/09/2026 depuis l'archive du pack : absent de tous les projets jusqu'ici, ces clips étaient filmés sur Morgrim faute de mannequin), avec les armes Large des packs (`Skeleton_Golem_Axe_Large`, `axe_1handed_Large`, `shield_round_barbarian_Large`). Les compétences propres à Morgrim (massue et martache) sont sur sa fiche, [Ennemis](ennemis.md#morgrim-le-roi-des-os).
 
-{video media/animations/Large_Idle_A.mp4} **Attente** | `Idle_A` · rig Large | Arme : aucune | boucle · 1,97 s
-{video media/animations/Large_Idle_B.mp4} **Attente, variante longue** | `Idle_B` · rig Large | Arme : aucune | boucle · 6,00 s
-{video media/animations/Large_Walking_A.mp4} **Marche** | `Walking_A` · rig Large | Arme : aucune | boucle · 1,07 s
-{video media/animations/Large_Running_A.mp4} **Course** | `Running_A` · rig Large | Arme : aucune | boucle · 1,07 s
-{video media/animations/Large_Dodge_Forward.mp4} **Esquive en avant** | `Dodge_Forward` · rig Large | Arme : aucune | une fois · 0,33 s
-{video media/animations/Large_Dodge_Backwards.mp4} **Esquive en arrière** | `Dodge_Backwards` · rig Large | Arme : aucune | une fois · 0,33 s
-{video media/animations/Large_Dodge_Left.mp4} **Esquive à gauche** | `Dodge_Left` · rig Large | Arme : aucune | une fois · 0,33 s
-{video media/animations/Large_Dodge_Right.mp4} **Esquive à droite** | `Dodge_Right` · rig Large | Arme : aucune | une fois · 0,33 s
-{video media/animations/Large_Melee_1H_Slash.mp4} **Taille, arme à une main** | `Melee_1H_Slash` · rig Large | Arme : hache à une main Large (axe_1handed_Large) | une fois · 1,57 s
-{video media/animations/Large_Melee_1H_Stab.mp4} **Estoc, arme à une main** | `Melee_1H_Stab` · rig Large | Arme : hache à une main Large (axe_1handed_Large) | une fois · 1,40 s
-{video media/animations/Large_Melee_2H_Idle.mp4} **Garde, arme à deux mains** | `Melee_2H_Idle` · rig Large | Arme : hache du Golem (Skeleton_Golem_Axe_Large) | boucle · 1,57 s
-{video media/animations/Large_Melee_2H_Attack.mp4} **Coup, arme à deux mains** | `Melee_2H_Attack` · rig Large | Arme : hache du Golem (Skeleton_Golem_Axe_Large) | une fois · 1,33 s
-{video media/animations/Large_Melee_2H_Slam.mp4} **Frappe au sol, arme à deux mains** | `Melee_2H_Slam` · rig Large | Arme : hache du Golem (Skeleton_Golem_Axe_Large) | une fois · 2,83 s
-{video media/animations/Large_Melee_Dualwield_Slash.mp4} **Taille, deux armes** | `Melee_Dualwield_Slash` · rig Large | Arme : deux haches Large (axe_1handed_Large x 2) | une fois · 1,03 s
-{video media/animations/Large_Melee_Dualwield_SlashCombo.mp4} **Enchaînement de tailles, deux armes** | `Melee_Dualwield_SlashCombo` · rig Large | Arme : deux haches Large (axe_1handed_Large x 2) | une fois · 1,60 s
-{video media/animations/Large_Melee_Block.mp4} **Lever le bouclier** | `Melee_Block` · rig Large | Arme : hache et bouclier Large (axe_1handed_Large, shield_round_barbarian_Large) | une fois · 1,07 s
-{video media/animations/Large_Melee_Blocking.mp4} **Garde au bouclier, maintenue** | `Melee_Blocking` · rig Large | Arme : hache et bouclier Large (axe_1handed_Large, shield_round_barbarian_Large) | boucle · 1,07 s
-{video media/animations/Large_Melee_Block_Hit.mp4} **Coup encaissé au bouclier** | `Melee_Block_Hit` · rig Large | Arme : hache et bouclier Large (axe_1handed_Large, shield_round_barbarian_Large) | une fois · 0,67 s
-{video media/animations/Large_Melee_Block_Attack.mp4} **Coup de bouclier** | `Melee_Block_Attack` · rig Large | Arme : hache et bouclier Large (axe_1handed_Large, shield_round_barbarian_Large) | une fois · 1,03 s
-{video media/animations/Large_Melee_Unarmed_Idle.mp4} **Garde, mains nues** | `Melee_Unarmed_Idle` · rig Large | Arme : aucune | boucle · 1,07 s
-{video media/animations/Large_Melee_Unarmed_Punch.mp4} **Coup de poing, mains nues** | `Melee_Unarmed_Punch` · rig Large | Arme : aucune | une fois · 1,23 s
-{video media/animations/Large_Melee_Unarmed_Kick.mp4} **Coup de pied, mains nues** | `Melee_Unarmed_Kick` · rig Large | Arme : aucune | une fois · 1,70 s
-{video media/animations/Large_Melee_Unarmed_Smash.mp4} **Plongeon écrasant, mains nues** | `Melee_Unarmed_Smash` · rig Large | Arme : aucune | une fois · 3,47 s
-{video media/animations/Large_Hit_A.mp4} **Touché** | `Hit_A` · rig Large | Arme : aucune | une fois · 0,70 s
-{video media/animations/Large_Death_A.mp4} **Mort, effondrement** | `Death_A` · rig Large | Arme : aucune | une fois · 1,67 s
-{video media/animations/Large_Death_A_Pose.mp4} **Mort, pose finale au sol** | `Death_A_Pose` · rig Large | Arme : aucune | une fois · 0,03 s
-{video media/animations/Large_Flexing.mp4} **Montrer ses muscles** | `Flexing` · rig Large | Arme : aucune | une fois · 4,30 s {emote possible}
-{video media/animations/Large_EXPERIMENTAL_Large_Transform.mp4} **Transformation (expérimental)** | `EXPERIMENTAL_Large_Transform` · rig Large | Arme : aucune | une fois · 1,67 s
-{video media/animations/Large_T-Pose.mp4} **Pose en T (référence du squelette)** | `T-Pose` · rig Large | Arme : aucune | une fois · 0,03 s
+{video media/animations/Large_Idle_A.mp4} **Attente** | `Idle_A` · rig Large | Arme : aucune, sur le mannequin Rig_Large | boucle · 1,97 s
+{video media/animations/Large_Idle_B.mp4} **Attente, variante longue** | `Idle_B` · rig Large | Arme : aucune, sur le mannequin Rig_Large | boucle · 6,00 s
+{video media/animations/Large_Walking_A.mp4} **Marche** | `Walking_A` · rig Large | Arme : aucune, sur le mannequin Rig_Large | boucle · 1,07 s
+{video media/animations/Large_Running_A.mp4} **Course** | `Running_A` · rig Large | Arme : aucune, sur le mannequin Rig_Large | boucle · 1,07 s
+{video media/animations/Large_Dodge_Forward.mp4} **Esquive en avant** | `Dodge_Forward` · rig Large | Arme : aucune, sur le mannequin Rig_Large | une fois · 0,33 s
+{video media/animations/Large_Dodge_Backwards.mp4} **Esquive en arrière** | `Dodge_Backwards` · rig Large | Arme : aucune, sur le mannequin Rig_Large | une fois · 0,33 s
+{video media/animations/Large_Dodge_Left.mp4} **Esquive à gauche** | `Dodge_Left` · rig Large | Arme : aucune, sur le mannequin Rig_Large | une fois · 0,33 s
+{video media/animations/Large_Dodge_Right.mp4} **Esquive à droite** | `Dodge_Right` · rig Large | Arme : aucune, sur le mannequin Rig_Large | une fois · 0,33 s
+{video media/animations/Large_Melee_1H_Slash.mp4} **Taille, arme à une main** | `Melee_1H_Slash` · rig Large | Arme : hache à une main Large (axe_1handed_Large), sur le mannequin Rig_Large | une fois · 1,57 s
+{video media/animations/Large_Melee_1H_Stab.mp4} **Estoc, arme à une main** | `Melee_1H_Stab` · rig Large | Arme : hache à une main Large (axe_1handed_Large), sur le mannequin Rig_Large | une fois · 1,40 s
+{video media/animations/Large_Melee_2H_Idle.mp4} **Garde, arme à deux mains** | `Melee_2H_Idle` · rig Large | Arme : hache à deux mains Large (Skeleton_Golem_Axe_Large), sur le mannequin Rig_Large | boucle · 1,57 s
+{video media/animations/Large_Melee_2H_Attack.mp4} **Coup, arme à deux mains** | `Melee_2H_Attack` · rig Large | Arme : hache à deux mains Large (Skeleton_Golem_Axe_Large), sur le mannequin Rig_Large | une fois · 1,33 s
+{video media/animations/Large_Melee_2H_Slam.mp4} **Frappe au sol, arme à deux mains** | `Melee_2H_Slam` · rig Large | Arme : hache à deux mains Large (Skeleton_Golem_Axe_Large), sur le mannequin Rig_Large | une fois · 2,83 s
+{video media/animations/Large_Melee_Dualwield_Slash.mp4} **Taille, deux armes** | `Melee_Dualwield_Slash` · rig Large | Arme : deux haches Large (axe_1handed_Large x 2), sur le mannequin Rig_Large | une fois · 1,03 s
+{video media/animations/Large_Melee_Dualwield_SlashCombo.mp4} **Enchaînement de tailles, deux armes** | `Melee_Dualwield_SlashCombo` · rig Large | Arme : deux haches Large (axe_1handed_Large x 2), sur le mannequin Rig_Large | une fois · 1,60 s
+{video media/animations/Large_Melee_Block.mp4} **Lever le bouclier** | `Melee_Block` · rig Large | Arme : hache et bouclier Large (axe_1handed_Large, shield_round_barbarian_Large), sur le mannequin Rig_Large | une fois · 1,07 s
+{video media/animations/Large_Melee_Blocking.mp4} **Garde au bouclier, maintenue** | `Melee_Blocking` · rig Large | Arme : hache et bouclier Large (axe_1handed_Large, shield_round_barbarian_Large), sur le mannequin Rig_Large | boucle · 1,07 s
+{video media/animations/Large_Melee_Block_Hit.mp4} **Coup encaissé au bouclier** | `Melee_Block_Hit` · rig Large | Arme : hache et bouclier Large (axe_1handed_Large, shield_round_barbarian_Large), sur le mannequin Rig_Large | une fois · 0,67 s
+{video media/animations/Large_Melee_Block_Attack.mp4} **Coup de bouclier** | `Melee_Block_Attack` · rig Large | Arme : hache et bouclier Large (axe_1handed_Large, shield_round_barbarian_Large), sur le mannequin Rig_Large | une fois · 1,03 s
+{video media/animations/Large_Melee_Unarmed_Idle.mp4} **Garde, mains nues** | `Melee_Unarmed_Idle` · rig Large | Arme : aucune, sur le mannequin Rig_Large | boucle · 1,07 s
+{video media/animations/Large_Melee_Unarmed_Punch.mp4} **Coup de poing, mains nues** | `Melee_Unarmed_Punch` · rig Large | Arme : aucune, sur le mannequin Rig_Large | une fois · 1,23 s
+{video media/animations/Large_Melee_Unarmed_Kick.mp4} **Coup de pied, mains nues** | `Melee_Unarmed_Kick` · rig Large | Arme : aucune, sur le mannequin Rig_Large | une fois · 1,70 s
+{video media/animations/Large_Melee_Unarmed_Smash.mp4} **Plongeon écrasant, mains nues** | `Melee_Unarmed_Smash` · rig Large | Arme : aucune, sur le mannequin Rig_Large | une fois · 3,47 s
+{video media/animations/Large_Hit_A.mp4} **Touché** | `Hit_A` · rig Large | Arme : aucune, sur le mannequin Rig_Large | une fois · 0,70 s
+{video media/animations/Large_Death_A.mp4} **Mort, effondrement** | `Death_A` · rig Large | Arme : aucune, sur le mannequin Rig_Large | une fois · 1,67 s
+{video media/animations/Large_Death_A_Pose.mp4} **Mort, pose finale au sol** | `Death_A_Pose` · rig Large | Arme : aucune, sur le mannequin Rig_Large | une fois · 0,03 s
+{video media/animations/Large_Flexing.mp4} **Montrer ses muscles** | `Flexing` · rig Large | Arme : aucune, sur le mannequin Rig_Large | une fois · 4,30 s {emote possible}
+{video media/animations/Large_EXPERIMENTAL_Large_Transform.mp4} **Transformation (expérimental)** | `EXPERIMENTAL_Large_Transform` · rig Large | Arme : aucune, sur le mannequin Rig_Large | une fois · 1,67 s
+{video media/animations/Large_T-Pose.mp4} **Pose en T (référence du squelette)** | `T-Pose` · rig Large | Arme : aucune, sur le mannequin Rig_Large | une fois · 0,03 s
 
 ## Produire les vidéos
 
-Bac à sable `sandbox-level` : scène `Assets/Scenes/Animations.unity` (décor et mannequins équipés), outil `Assets/Animations_Planche/Editor/PlancheAnimations.cs`. `Planche.Capturer(debut, nombre)` rejoue chaque clip image par image (30 i/s, pas fixe, en édition, sans Play) dans une scène de prévisualisation isolée, encode en MP4 H.264 480 × 480 muet par `UnityEditor.Media.MediaEncoder` et copie dans `Wiki/media/animations/` ; `Assets/Animations_Planche/Outils~/generer_page.py` réécrit cette page à partir du manifeste `animations.json`. Prises des outils, canne provisoire et coffres : `Assets/Animations_Planche/Editor/PlancheAccessoires.cs` (`Planche.CapturerCoffres()` pour les coffres, prefabs de `Assets/Art/Coffres/`, clés `Cle_*` de `Assets/Art/Cadenas/`).
+Bac à sable `sandbox-level` : scène `Assets/Scenes/Animations.unity` (décor et mannequins équipés), outil `Assets/Animations_Planche/Editor/PlancheAnimations.cs`. `Planche.Capturer(debut, nombre)` rejoue chaque clip image par image (30 i/s, pas fixe, en édition, sans Play) dans une scène de prévisualisation isolée, encode en MP4 H.264 480 × 480 muet par `UnityEditor.Media.MediaEncoder` et copie dans `Wiki/media/animations/` ; `Assets/Animations_Planche/Outils~/generer_page.py` réécrit cette page à partir du manifeste `animations.json`. Prises des outils, canne provisoire et coffres : `Assets/Animations_Planche/Editor/PlancheAccessoires.cs` (`Planche.CapturerCoffres()` pour les coffres, prefabs de `Assets/Art/Coffres/`, clés `Cle_*` de `Assets/Art/Cadenas/`). Clips Rig_Large (26/09/2026) : filmés dans le bac à sable `sandbox-rig` sur `Mannequin_Large`, même méthode et mêmes noms de fichier (`Assets/Editor/ClipsWiki/ClipsWiki.cs`, `ClipsWiki.MannequinLarge(filtre)`), puis copiés ici dans `Wiki/media/animations/` ; ce manifeste garde leurs `armeLabel` à jour mais leurs vidéos ne passent plus par `Planche.Capturer`.

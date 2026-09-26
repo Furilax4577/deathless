@@ -17,6 +17,8 @@ namespace Deathless.Jeu
         public GameObject prefabChargeBelier;
         public GameObject prefabAuraSoin;
         public GameObject prefabOndeGolem;
+        [Tooltip("MorgrimGemmes.mat : gemmes des compétences de Morgrim (télégraphies et impacts, thèmes Terre et Rage). Repli sur « gemmes » si absent.")]
+        public Material gemmesMorgrim;
         [Header("Classes")]
         [Tooltip("Modèle KayKit arrow_bow (flèches et carreaux, non magiques).")]
         public GameObject modeleFleche;
@@ -36,6 +38,7 @@ namespace Deathless.Jeu
 
         public static Material Gemmes => Instance != null ? Instance.gemmes : null;
         public static Material Terre => Instance != null ? Instance.terre : null;
+        public static Material GemmesMorgrim => Instance != null ? (Instance.gemmesMorgrim != null ? Instance.gemmesMorgrim : Instance.gemmes) : null;
 
         /// Volume visible d'un personnage (rendus actifs).
         public static Bounds Volume(GameObject go)
