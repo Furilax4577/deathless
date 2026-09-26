@@ -92,13 +92,14 @@ namespace Deathless.UI
 
         /// Chaîne haut / bas une liste d'éléments focusables (lignes d'une table dans un ScrollView) : la navigation
         /// spatiale d'UI Toolkit ne passe pas toujours d'une ligne à la suivante dans un ScrollView. Au-dessus de la
-        /// première ligne, la navigation normale reprend (vers les onglets, par exemple).
-        public static void ChainerVerticalement(IList<VisualElement> elements)
+        /// première ligne, la navigation normale reprend (vers les onglets, par exemple). Sous la dernière, le focus va à
+        /// <paramref name="apresDernier"/> s'il est donné (bouton Retour sous la table), sinon il reste sur place.
+        public static void ChainerVerticalement(IList<VisualElement> elements, VisualElement apresDernier = null)
         {
             for (var i = 0; i < elements.Count; i++)
             {
                 var precedent = i > 0 ? elements[i - 1] : null;
-                var suivant = i < elements.Count - 1 ? elements[i + 1] : null;
+                var suivant = i < elements.Count - 1 ? elements[i + 1] : apresDernier;
                 elements[i].RegisterCallback<NavigationMoveEvent>(evt =>
                 {
                     var cible = evt.direction == NavigationMoveEvent.Direction.Down ? suivant

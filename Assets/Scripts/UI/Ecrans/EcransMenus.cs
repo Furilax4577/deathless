@@ -386,6 +386,7 @@ namespace Deathless.UI.Ecrans
         int m_Onglet;
 
         Label m_PseudoValeur;
+        Button m_Retour;
 
         public override void AuSommet() { if (m_PseudoValeur != null) m_PseudoValeur.text = DonneesUI.Profil.Pseudo; }
 
@@ -418,7 +419,8 @@ namespace Deathless.UI.Ecrans
             }
             UIScale.Changed += _ => MajTailles();
             MajTailles();
-            Racine.Q<Button>("options-retour").clicked += () => Navigateur.Fermer();
+            m_Retour = Racine.Q<Button>("options-retour");
+            m_Retour.clicked += () => Navigateur.Fermer();
 
             var table = Racine.Q("options-table");
             var lignes = new List<VisualElement>();
@@ -440,7 +442,7 @@ namespace Deathless.UI.Ecrans
                 table.Add(ligne);
                 lignes.Add(ligne);
             }
-            UINavigation.ChainerVerticalement(lignes);
+            UINavigation.ChainerVerticalement(lignes, m_Retour);
             InputDeviceWatcher.Changed += _ => MajManette();
             MajManette();
             ConstruireVolumes();
@@ -476,7 +478,7 @@ namespace Deathless.UI.Ecrans
                 m_Pourcentages.Add(pc);
                 lignes.Add(curseur);
             }
-            UINavigation.ChainerVerticalement(lignes);
+            UINavigation.ChainerVerticalement(lignes, m_Retour);
             VolumesAudio.Changed += (_, __) => MajVolumes();
             MajVolumes();
         }
