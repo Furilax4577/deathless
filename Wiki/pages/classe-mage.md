@@ -50,6 +50,8 @@ Les gestes joués en jeu pour chaque action, dans l'ordre où ils s'enchaînent.
 - **Cône de flammes** maintenu devant le mage {effet validé}.
 - **Brûlure** : les ennemis touchés brûlent pendant un moment {effet validé}. C'est un [statut](statuts.md) : son icône s'affiche au-dessus de l'ennemi, et chaque nouveau coup de feu relance sa durée.
 - **Mana** {décidé} : jauge de 100. Elle remonte d'environ 1 par seconde, plus un bonus à chaque ennemi touché par la boule de feu. Les compétences coûtent du mana ; le cône de flammes en consomme tant qu'il est maintenu. Valeurs {à équilibrer}.
+  - **Pas de régénération pendant le cône** : le mana ne remonte pas tant que le cône est maintenu.
+  - **Démarrage du cône** : il faut au moins 25 % de son coût par seconde, soit 3,5 de mana, pour le lancer.
 - **Pas d'ultime** {décidé} : le mage garde la boule de feu, le cône de flammes et la brûlure.
 - **Compétences LB et RB** : vides pour l'instant {décidé}. Le mage joue avec la boule de feu (attaque principale) et le cône de flammes (attaque secondaire maintenue). Ses compétences : {à confirmer}.
 - **Valeurs de départ** de la version 0.2 {à équilibrer} {{dev: (réglées dans `Assets/Jeu/Resources/GameBalance.asset`)}} :
@@ -57,7 +59,7 @@ Les gestes joués en jeu pour chaque action, dans l'ordre où ils s'enchaînent.
 | Sujet | Valeur |
 |---|---|
 | Vie | 100 |
-| Boule de feu | 25 dégâts à l'impact, plus 15 en zone sur 2 m ; une toutes les 0,9 s |
+| Boule de feu | 25 dégâts à la cible touchée, 15 aux autres ennemis dans un rayon de 2 m (la cible touchée ne prend pas les 15 en plus) ; une toutes les 0,9 s |
 | Mana | +4 par ennemi touché par la boule de feu |
 | Cône de flammes | 22 dégâts par seconde, 14 mana par seconde |
 | Brûlure | 5 dégâts par seconde pendant 3 s |

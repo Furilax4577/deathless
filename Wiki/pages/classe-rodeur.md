@@ -63,12 +63,15 @@ Les gestes joués en jeu pour chaque action, dans l'ordre où ils s'enchaînent.
 - **Flèches non magiques** {décidé} : les flèches, du rôdeur comme toutes les autres, ne brillent pas. Elles laissent une traînée d'air, jamais lumineuse. Seule exception, le bref éclat de la charge complète.
 - **Vitesse et portée** {décidé} : les flèches volent en **cloche**, tirées par la pesanteur. Plus une flèche part vite, plus elle va loin et droit. La vitesse dépend de **la force avec laquelle le rôdeur bande son arc** : un tir rapide retombe vite, un tir chargé à fond file loin. Valeurs de départ {à équilibrer} : de **18 m/s** (tir rapide) à **55 m/s** (charge complète) ; salve de la roulade 35 m/s ; pesanteur réelle. Chargée à fond, une flèche reste quasi tendue jusqu'à 30 m (0,6 m au-dessus de la ligne de visée) ; un tir rapide retombe vers 16 à 17 m. Une légère aide relève le tir de 3° au plus ; au-delà, on vise au-dessus.
 - **Face à la visée** {décidé} : quand il bande son arc, le rôdeur se tourne vers le point visé, le corps de profil comme un archer, et la flèche part vers le réticule.
-- Valeurs de départ : charge complète en **1,2 s** ; **10 dégâts** sans charge, **40** chargé à fond ; tir à la tête **×2** {à équilibrer}.
+- **Tir continu** : RT maintenu après un tir rebande l'arc tout seul.
+- **Esquive pendant qu'il bande** : la flèche est reposée, sans tir.
+- **Pas d'esquive pendant la nuée de flèches.**
+- Valeurs de départ : charge complète en **1,2 s** ; **10 dégâts** sans charge, **40** chargé à fond ; tir à la tête **×2**, aussi pour les flèches de la salve {à équilibrer}.
 - **Valeurs de départ** des compétences, version 0.2 {à équilibrer} {{dev: (réglées dans `Assets/Jeu/Resources/GameBalance.asset`)}} :
 
 | Sujet | Valeur |
 |---|---|
 | Vie | 110 |
 | Nuée de flèches | 5 salves de 10 dégâts, recharge 12 s |
-| Roulade arrière | recul d'environ 3,7 m, salve de 5 flèches de 15 dégâts, recharge 8 s |
+| Roulade arrière | recul de 4 m, 20 d'endurance, salve de 5 flèches de 15 dégâts, recharge 8 s |
 

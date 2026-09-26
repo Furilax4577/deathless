@@ -61,13 +61,14 @@ Les deux coups alternent.
 - **Rugissement** : un crâne de barbare casqué en gemmes rouges surgit au-dessus du viking, rugit, et une onde part de lui puis revient comme pour dire « venez » {effet validé}.
 - **Saut percutant** : le viking bondit d'environ 5 m vers l'avant et frappe le sol, une onde de terre part du point d'impact {effet validé}.
 - **Rage** {décidé} : jauge de 100. Elle monte quand le viking frappe et redescend lentement hors combat. Les compétences du viking coûtent de la rage. Valeurs {à équilibrer}.
+  - **Baisse** : 6 par seconde, après 4 s sans toucher d'ennemi. Recevoir des coups n'empêche pas la baisse. Pas de baisse pendant l'attaque tournante. {{dev: (`rageBaisse`, `rageDelaiBaisse`)}}
 - **Valeurs de départ** de la version 0.2 {à équilibrer} {{dev: (réglées dans `Assets/Jeu/Resources/GameBalance.asset`)}} :
 
 | Sujet | Valeur |
 |---|---|
 | Vie | 140 |
 | Hache | 38 dégâts, touche tous les ennemis de l'arc ; +8 rage par ennemi touché |
-| Attaque tournante | 20 rage par seconde ; chaque tic rend +2 rage par ennemi touché {à équilibrer} : elle ne se paie qu’à partir de 3 ennemis (décidé le 26/09/2026) |
+| Attaque tournante | 15 rage au moins pour la lancer ; 12 dégâts toutes les 0,3 s, rayon 2,3 m ; vitesse ×0,6 ; 20 rage par seconde ; chaque tic rend +2 rage par ennemi touché {à équilibrer} : elle ne se paie qu’à partir de 3 ennemis (décidé le 26/09/2026) |
 | Rugissement | 25 rage, recharge 12 s |
 | Saut percutant | 35 rage, 45 dégâts, recharge 8 s |
 

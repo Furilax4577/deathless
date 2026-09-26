@@ -47,7 +47,7 @@ Les deux tailles alternent à chaque coup.
 
 Le paladin court derrière son bouclier, penché en avant : les jambes courent, le haut du corps tient la garde, puis le coup de bouclier porte à l'arrivée.
 
-{video media/classes/paladin/clips/Running_A.mp4} **Charge bélier : course (jambes)** | {dev} `Running_A` | Arme : épée et bouclier | boucle · 0,80 s | {dev} couche de base, figée sur sa première image pendant l'anticipation ; cadence = vitesse de la ruée ÷ vitesse des pieds du clip (mesurée par le builder), bornée de ×0,8 à ×3 (`chargeCadenceMin` / `chargeCadenceMax`)
+{video media/classes/paladin/clips/Running_A.mp4} **Charge bélier : course (jambes)** | {dev} `Running_A` | Arme : épée et bouclier | boucle · 0,80 s | {dev} couche de base, figée sur sa première image pendant l'anticipation ; cadence = vitesse de la ruée ÷ vitesse des pieds du clip (mesurée par le builder), bornée de ×0,8 à ×8 (`chargeCadenceMin` / `chargeCadenceMax` ; plafond relevé à ×8 par Quentin le 26/09/2026)
 {video media/classes/paladin/clips/Melee_Blocking.mp4} **Charge bélier : garde (haut du corps)** | {dev} `Melee_Blocking` | Arme : épée et bouclier | boucle · 1,07 s | {dev} haut du corps, copie bouclante `Melee_Blocking_Loop`, pendant l'anticipation et la ruée
 {video media/classes/paladin/clips/Melee_Block_Attack.mp4} **Charge bélier : coup de bouclier** | {dev} `Melee_Block_Attack` | Arme : épée et bouclier | une fois · 1,07 s | {dev} haut du corps, lancé pour que l'impact (main gauche la plus en avant) tombe à l'arrivée ; à l'arrivée, le corps entier finit le geste depuis l'impact
 
@@ -83,7 +83,7 @@ Le paladin court derrière son bouclier, penché en avant : les jambes courent, 
 | Vitesse | 5 m/s, sprint ×1,6 ; ×0,7 en garde ; ×0,4 pendant l'attaque |
 | Esquive | 4 m, 25 d'endurance, invulnérable 0,3 s |
 | Épée | 30 dégâts toutes les 0,75 s, portée 2,6 m, 40° de part et d'autre de l'avant (hache du Viking : 70°), 3 ennemis au plus par coup, pas en avant de 0,6 m |
-| Garde | un coup bloqué coûte de l'endurance |
+| Garde | 1 d'endurance par point de dégât bloqué ; protège seulement devant, 70° de part et d'autre de l'avant ; pas de garde à 0 d'endurance ; si l'endurance manque, la garde est brisée : endurance vidée, le coup passe, paladin étourdi 0,8 s {{dev: (`gardeCoutParDegat`, `gardeDemiAngle`, `gardeBriseeEtourdi`)}} |
 | Parade | fenêtre de 0,35 s, l'attaquant est étourdi 1 s |
 | Parade parfaite | fenêtre de 0,1 s avant l'impact ; coup de bouclier : bond de 0,7 m, cône de 2,5 m et 60°, repousse de 2 m, étourdit 0,8 s |
 | Charge bélier | recharge 14 s |

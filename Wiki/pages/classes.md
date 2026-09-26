@@ -54,6 +54,10 @@ Toutes les touches : voir [Commandes](commandes.md).
 
 L'esquive des **cinq classes** est **directionnelle** (26/09/2026) : le héros ne pivote plus avant d'esquiver, il garde sa face tournée vers sa visée, sa caméra ou sa cible. Il joue le clip KayKit correspondant à la direction du stick **par rapport à sa face** — esquive avant, arrière, à droite ou à gauche (rig Medium) —, au plus proche selon le quadrant en diagonale. Sans direction au stick, l'esquive part **en arrière** (réflexe classique pour se dégager). Le déplacement suit toujours la direction réelle du stick : durée, distance et invulnérabilité ne changent pas. La **roulade arrière du Rôdeur** (compétence dédiée) reste une esquive imposée vers l'arrière, inchangée.
 
+- **Recharge** : 1,2 s entre deux esquives {à équilibrer} {{dev: (`esquiveRecharge`)}}.
+- **Esquive impossible** pendant la charge bélier, le soin et le coup de bouclier du Paladin, le rugissement et le saut percutant du Viking, la nuée de flèches du Rôdeur.
+- **L'esquive interrompt l'action en cours** (coup, garde, cône de flammes, arc bandé…).
+
 ## Menu du personnage et points de compétence
 
 - **Menu du personnage** {décidé} : la touche **Tab** (Y à la manette, Triangle) ouvre un menu avec **le personnage** (vie, endurance, jauge, vitesse, nuits survécues, ennemis tués), **l'inventaire** (vide pour l'instant) et **l'amélioration des compétences**. La partie continue pendant qu'il est ouvert.
@@ -66,14 +70,14 @@ L'esquive des **cinq classes** est **directionnelle** (26/09/2026) : le héros n
 | | Garde solide | −15 % d'endurance par coup bloqué |
 | | Bélier infatigable | −12 % de recharge de la charge bélier |
 | | Soin fervent | +20 % de vie rendue par le soin |
-| Viking | Hache lourde | +10 % de dégâts à la hache |
+| Viking | Hache lourde | +10 % de dégâts au coup de hache (pas à l'attaque tournante) |
 | | Tourbillon | −15 % de rage consommée par l'attaque tournante |
 | | Cri de guerre | −12 % de recharge du rugissement |
 | | Chute brutale | +15 % de dégâts du saut percutant |
 | Mage | Brasier | +10 % de dégâts de la boule de feu |
 | | Souffle économe | −12 % de mana consommé par le cône de flammes |
 | | Source de mana | +20 % de régénération du mana |
-| Rôdeur | Pointes d'acier | +10 % de dégâts des flèches |
+| Rôdeur | Pointes d'acier | +10 % de dégâts du tir bandé (pas la salve ni la nuée) |
 | | Main sûre | −10 % de temps pour bander l'arc à fond |
 | | Nuée drue | −12 % de recharge de la nuée de flèches |
 | | Salve fournie | +1 flèche dans la salve de la roulade |
