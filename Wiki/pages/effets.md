@@ -7,11 +7,12 @@ Chaque effet prend ses couleurs dans la palette de son thème. Changer une coule
 | Thème | Couleurs, du plus sombre au plus clair | Effets |
 |---|---|---|
 | Feu | {couleur #4a1206} {couleur #cc1f08} {couleur #ff610a} {couleur #ffe666} | Boule de feu, cône de flammes, brûlure |
-| Nyxessa | {couleur #145032} {couleur #1e5a32} {couleur #3fae5a} {couleur #9fe870} | Relique, ceinture, portail, téléportation, missile magique. **Vert à approfondir** (émeraude plus saturée, décision du 25/09/2026) : nouvelles teintes {à confirmer} |
+| Nyxessa | {couleur #062a17} {couleur #0b5226} {couleur #178a36} {couleur #3fb552}, éclat {couleur #a4ec90} | Relique, ceinture, portail, téléportation, missile magique. **Vert émeraude profond** {décidé, 26/09/2026} |
 | Terre | {couleur #3a281a} {couleur #5b3f2a} {couleur #8a6a48} {couleur #b8966c} | Saut percutant, charge bélier à l'impact, sortie de terre des squelettes |
 | Rage | {couleur #3a0a08} {couleur #6e1410} {couleur #b3261e} {couleur #ff7359} | Rugissement et sorts du viking |
 | Sacré | {couleur #1e2a3a} {couleur #b8903a} {couleur #e8c872} {couleur #f4e2a8} | Charge bélier du paladin |
-| Soin | {couleur #1b6a4c} {couleur #2e9e72} {couleur #4fcf9a} {couleur #b8f5d8} | Aura de soin. **Passe en blanc chaud et or**, sauf les **croix, qui restent vertes** (décision du 25/09/2026, exception à la règle du vert) |
+| Soin | {couleur #b8903a} {couleur #e8c872} {couleur #f4e2a8} {couleur #fff3d1} | Aura de soin : **blanc chaud et or**, comme l'icône du soin du paladin {décidé} |
+| Soin, croix | {couleur #1b6a4c} {couleur #2e9e72} {couleur #4fcf9a} {couleur #b8f5d8} | Croix qui montent de l'aura de soin : elles **restent vertes** (menthe), exception à la règle du vert {décidé} {{dev: Palette `SoinCroix`.}} |
 | Os | {couleur #999485} {couleur #c7bfa8} {couleur #ebe6cc} | Désintégration des ennemis |
 
 Deux règles tranchées : **le feu est couleur feu**, et **le vert est réservé à Nyxessa** et à son énergie.

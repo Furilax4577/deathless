@@ -29,7 +29,7 @@ Au clavier, les touches sont données sur une disposition AZERTY. Le déplacemen
 
 La combinaison LB + RB utilise un **court délai** : quand on appuie sur LB, le jeu attend environ 0,1 s {à équilibrer}. Si RB arrive dans ce délai, c'est la compétence 3 ; sinon, la compétence 1 part. Aucune compétence ne part par erreur, et le délai reste imperceptible.
 
-{dev} Plus d'ultime ni d'accroupissement {décidé} : les actions `Ultimate` et `Crouch` et l'accord L3 + R3 sont à retirer de `DeathlessControls` et de `InputChordResolver`. R3 reste libre.
+{dev} Plus d'ultime ni d'accroupissement {décidé} : les actions `Ultimate` et `Crouch` et l'accord L3 + R3 ont été retirés de `DeathlessControls` et de `InputChordResolver`. R3 reste libre.
 
 ## Dans les menus {décidé}
 
