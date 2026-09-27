@@ -36,6 +36,8 @@ namespace Deathless.Reseau
         Statuts m_StatutsJeu;
         /// Hauteur de l'étiquette du pseudo au-dessus des pieds.
         public float hauteurPseudo = 2.35f;
+        /// Écart de vie (PV) en deçà duquel le propriétaire ne renvoie pas m_Vie (hors mort, retour à la vie et maximum).
+        public const float PasVie = 0.5f;
         bool m_MortVue;
 
         void Awake() { Heros = GetComponent<Heros>(); m_Statuts = new NetworkList<StatutReseau>(); }
@@ -102,7 +104,11 @@ namespace Deathless.Reseau
             if (!IsSpawned || Heros == null || Heros.Sante == null) return;
             if (IsOwner)
             {
-                if (!Mathf.Approximately(m_Vie.Value, Heros.Sante.Pv)) m_Vie.Value = Heros.Sante.Pv;
+                // Vie envoyée par pas d'au moins PasVie (régénération, brûlure : plus un envoi par image), mais toujours
+                // exacte à 0 (mort de la marionnette : Sante.Mort), en quittant 0 et au maximum.
+                float pv = Heros.Sante.Pv, vu = m_Vie.Value;
+                if (!Mathf.Approximately(vu, pv) && (Mathf.Abs(vu - pv) >= PasVie || pv <= 0f || vu <= 0f || pv >= Heros.Sante.pvMax))
+                    m_Vie.Value = pv;
                 if (!Mathf.Approximately(m_VieMax.Value, Heros.Sante.pvMax)) m_VieMax.Value = Heros.Sante.pvMax;
                 bool furtif = Heros.Classe != null && Heros.Classe.Furtif;
                 if (m_Furtif.Value != furtif) m_Furtif.Value = furtif;
