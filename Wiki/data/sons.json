@@ -3020,58 +3020,83 @@
   },
   {
     "id": "dl_squelette_sortie",
-    "nom": "Squelette — sortie de terre (direction sombre, échantillon)",
+    "nom": "Squelette — sortie de terre",
     "categorie": "Ennemis",
-    "usage": "Un squelette sort de terre : la terre s'ouvre, les mottes retombent, les os s'assemblent. Remplacera `skeleton_spawn`. Échantillon de la direction sombre (26/09/2026).",
+    "usage": "Un squelette sort de terre : la terre s'ouvre, les mottes retombent, les os s'assemblent. Remplacera `skeleton_spawn`. Lot 3, direction sombre (27/09/2026).",
     "fichier": "Deathless/Squelettes/squelette_sortie_1.wav",
     "portee": 60,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "variantes": [
+      "Deathless/Squelettes/squelette_sortie_1.wav",
+      "Deathless/Squelettes/squelette_sortie_2.wav",
+      "Deathless/Squelettes/squelette_sortie_3.wav"
+    ]
   },
   {
     "id": "dl_squelette_preparation",
-    "nom": "Squelette — préparation d'un coup (direction sombre, échantillon)",
+    "nom": "Squelette — préparation d'un coup",
     "categorie": "Ennemis",
-    "usage": "Il prépare son coup : crécelle d'os qui s'accélère jusqu'à l'impact (0,7 s). Remplacera `kenney_rpg_drawknife`. Échantillon de la direction sombre (26/09/2026).",
+    "usage": "Il prépare son coup : crécelle d'os qui s'accélère jusqu'à l'impact (0,7 s). Remplacera `kenney_rpg_drawknife`. Lot 3, direction sombre (27/09/2026).",
     "fichier": "Deathless/Squelettes/squelette_preparation_1.wav",
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "variantes": [
+      "Deathless/Squelettes/squelette_preparation_1.wav",
+      "Deathless/Squelettes/squelette_preparation_2.wav",
+      "Deathless/Squelettes/squelette_preparation_3.wav"
+    ]
   },
   {
     "id": "dl_squelette_touche",
-    "nom": "Squelette — touché (direction sombre, échantillon)",
+    "nom": "Squelette — touché",
     "categorie": "Ennemis",
-    "usage": "Un squelette est touché : os creux frappé, éclats d'os. Remplacera `skeleton_hit`. Échantillon de la direction sombre (26/09/2026).",
+    "usage": "Un squelette est touché : os creux frappé, éclats d'os. Remplacera `skeleton_hit`. Lot 3, direction sombre (27/09/2026).",
     "fichier": "Deathless/Squelettes/squelette_touche_1.wav",
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "variantes": [
+      "Deathless/Squelettes/squelette_touche_1.wav",
+      "Deathless/Squelettes/squelette_touche_2.wav",
+      "Deathless/Squelettes/squelette_touche_3.wav",
+      "Deathless/Squelettes/squelette_touche_4.wav"
+    ]
   },
   {
     "id": "dl_squelette_mort",
-    "nom": "Squelette — mort (direction sombre, échantillon)",
+    "nom": "Squelette — mort",
     "categorie": "Ennemis",
-    "usage": "Il se désintègre : os qui s'effondrent en grappe, poussière, soupir de sable, gemme lointaine. Remplacera `skeleton_death`. Échantillon de la direction sombre (26/09/2026).",
+    "usage": "Il se désintègre : os qui s'effondrent en grappe, poussière, soupir de sable, gemme lointaine. Remplacera `skeleton_death`. Lot 3, direction sombre (27/09/2026).",
     "fichier": "Deathless/Squelettes/squelette_mort_1.wav",
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "variantes": [
+      "Deathless/Squelettes/squelette_mort_1.wav",
+      "Deathless/Squelettes/squelette_mort_2.wav",
+      "Deathless/Squelettes/squelette_mort_3.wav"
+    ]
   },
   {
     "id": "dl_squelette_aube",
-    "nom": "Squelette — désintégration à l'aube (direction sombre, échantillon)",
+    "nom": "Squelette — désintégration à l'aube",
     "categorie": "Ennemis",
-    "usage": "À l'aube : la poussière monte et se disperse, pluie d'os légers. Remplacera `dawn_vaporize`. Échantillon de la direction sombre (26/09/2026).",
+    "usage": "À l'aube : la poussière monte et se disperse, pluie d'os légers. Remplacera `dawn_vaporize`. Lot 3, direction sombre (27/09/2026).",
     "fichier": "Deathless/Squelettes/squelette_aube_1.wav",
     "portee": 60,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "variantes": [
+      "Deathless/Squelettes/squelette_aube_1.wav",
+      "Deathless/Squelettes/squelette_aube_2.wav"
+    ]
   },
   {
     "id": "dl_morgrim_cri",
@@ -3413,5 +3438,178 @@
     "usage": "Le nécromancien invoque ses sbires. En attendant : `necro_summon` (Relic).",
     "fichier": null,
     "statut": "a_creer"
+  },
+  {
+    "id": "dl_squelette_pas",
+    "nom": "Squelette — pas",
+    "categorie": "Ennemis",
+    "usage": "Pas d'un squelette (un sur trois, anti-répétition) : os léger sur la terre, niveau très bas. Nouveau. Lot 3, direction sombre (27/09/2026).",
+    "fichier": "Deathless/Squelettes/squelette_pas_1.wav",
+    "variantes": [
+      "Deathless/Squelettes/squelette_pas_1.wav",
+      "Deathless/Squelettes/squelette_pas_2.wav",
+      "Deathless/Squelettes/squelette_pas_3.wav",
+      "Deathless/Squelettes/squelette_pas_4.wav"
+    ],
+    "portee": 20,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_squelette_coup",
+    "nom": "Squelette — coup (sbire, voleur)",
+    "categorie": "Ennemis",
+    "usage": "Un sbire ou un voleur frappe : souffle de lame rouillée, os du bras, sans chant de métal. Nouveau. Lot 3, direction sombre (27/09/2026).",
+    "fichier": "Deathless/Squelettes/squelette_coup_1.wav",
+    "variantes": [
+      "Deathless/Squelettes/squelette_coup_1.wav",
+      "Deathless/Squelettes/squelette_coup_2.wav",
+      "Deathless/Squelettes/squelette_coup_3.wav"
+    ],
+    "portee": 40,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_guerrier_coup",
+    "nom": "Squelette guerrier — coup",
+    "categorie": "Ennemis",
+    "usage": "Un guerrier frappe : souffle grave, masse, os qui craquent à l'effort. Nouveau. Lot 3, direction sombre (27/09/2026).",
+    "fichier": "Deathless/Squelettes/guerrier_coup_1.wav",
+    "variantes": [
+      "Deathless/Squelettes/guerrier_coup_1.wav",
+      "Deathless/Squelettes/guerrier_coup_2.wav",
+      "Deathless/Squelettes/guerrier_coup_3.wav"
+    ],
+    "portee": 40,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_squelette_etourdi",
+    "nom": "Squelette — étourdi",
+    "categorie": "Ennemis",
+    "usage": "Un squelette est étourdi : la mâchoire claque deux fois, les os vacillent. Nouveau. Lot 3, direction sombre (27/09/2026).",
+    "fichier": "Deathless/Squelettes/squelette_etourdi_1.wav",
+    "variantes": [
+      "Deathless/Squelettes/squelette_etourdi_1.wav",
+      "Deathless/Squelettes/squelette_etourdi_2.wav"
+    ],
+    "portee": 40,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_squelette_repousse",
+    "nom": "Squelette — repoussé",
+    "categorie": "Ennemis",
+    "usage": "Un squelette est repoussé (charge, parade parfaite) : glissement sur la terre, cliquetis. Nouveau. Lot 3, direction sombre (27/09/2026).",
+    "fichier": "Deathless/Squelettes/squelette_repousse_1.wav",
+    "variantes": [
+      "Deathless/Squelettes/squelette_repousse_1.wav",
+      "Deathless/Squelettes/squelette_repousse_2.wav",
+      "Deathless/Squelettes/squelette_repousse_3.wav"
+    ],
+    "portee": 40,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_mage_squelette_incantation",
+    "nom": "Mage squelette — incantation",
+    "categorie": "Ennemis",
+    "usage": "Le mage squelette prépare son crâne : roulement d'os lent qui s'accélère, souffle qui se charge. Nouveau. Lot 3, direction sombre (27/09/2026).",
+    "fichier": "Deathless/Squelettes/mage_squelette_incantation_1.wav",
+    "variantes": [
+      "Deathless/Squelettes/mage_squelette_incantation_1.wav",
+      "Deathless/Squelettes/mage_squelette_incantation_2.wav"
+    ],
+    "portee": 40,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_mage_squelette_tir",
+    "nom": "Mage squelette — tir",
+    "categorie": "Ennemis",
+    "usage": "Le mage squelette tire son crâne : souffle qui part, mâchoire qui claque. Nouveau. Lot 3, direction sombre (27/09/2026).",
+    "fichier": "Deathless/Squelettes/mage_squelette_tir_1.wav",
+    "variantes": [
+      "Deathless/Squelettes/mage_squelette_tir_1.wav",
+      "Deathless/Squelettes/mage_squelette_tir_2.wav"
+    ],
+    "portee": 40,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_mage_squelette_missile_vol",
+    "nom": "Mage squelette — crâne en vol (boucle)",
+    "categorie": "Ennemis",
+    "usage": "Vol du crâne du mage squelette (boucle de 2 s sur le missile) : plaintes des limbes de Nyxessa, 5 demi-tons plus aiguës (crâne plus petit). Remplacera `skull_flight_loop` pour le mage. Lot 3, direction sombre (27/09/2026).",
+    "fichier": "Deathless/Squelettes/mage_squelette_missile_vol_boucle.wav",
+    "portee": 40,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_mage_squelette_missile_eclat",
+    "nom": "Mage squelette — crâne qui éclate",
+    "categorie": "Ennemis",
+    "usage": "Le crâne du mage éclate : cri bref plus aigu que celui de Nyxessa, gemmes sombres, souffle. Remplacera `skull_explosion` pour le mage. Lot 3, direction sombre (27/09/2026).",
+    "fichier": "Deathless/Squelettes/mage_squelette_missile_eclat_1.wav",
+    "variantes": [
+      "Deathless/Squelettes/mage_squelette_missile_eclat_1.wav",
+      "Deathless/Squelettes/mage_squelette_missile_eclat_2.wav"
+    ],
+    "portee": 40,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_voleur_elan",
+    "nom": "Squelette voleur — élan",
+    "categorie": "Ennemis",
+    "usage": "Le voleur se rue sur un joueur isolé : pas d'os rapides, deux lames courtes. Nouveau. Lot 3, direction sombre (27/09/2026).",
+    "fichier": "Deathless/Squelettes/voleur_elan_1.wav",
+    "variantes": [
+      "Deathless/Squelettes/voleur_elan_1.wav",
+      "Deathless/Squelettes/voleur_elan_2.wav"
+    ],
+    "portee": 40,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_elite_aura",
+    "nom": "Élite — aura (boucle)",
+    "categorie": "Ennemis",
+    "usage": "Aura rouge d'un élite (boucle de 3 s, de près) : grondement grave pulsé, gros os qui s'entrechoquent. Nouveau. Lot 3, direction sombre (27/09/2026).",
+    "fichier": "Deathless/Squelettes/elite_aura_boucle.wav",
+    "portee": 20,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_squelette_danse",
+    "nom": "Squelettes — danse (boucle)",
+    "categorie": "Ennemis",
+    "usage": "Squelettes qui dansent sous le Drop de DJ Bob (boucle de 2 s à 120 BPM) : cliquetis d'os en rythme. Nouveau. Lot 3, direction sombre (27/09/2026).",
+    "fichier": "Deathless/Squelettes/squelette_danse_boucle.wav",
+    "portee": 40,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
   }
 ]

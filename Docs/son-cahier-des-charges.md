@@ -569,7 +569,7 @@ Chaque lot fait 15 à 25 sons (identifiants ou fichiers), tient dans une session
 | **1** (fait) | Nyxessa (tir, frappée, alerte, palier, charge, retour, onde, destruction) et interface (survol, clic, retour, refus, confirmation, décompte, onglet, votes) | V | 18 ids, 24 fichiers |
 | **2** (fait) | Nyxessa (suite : missile vol et éclat, rappel, réapparition), bouclier et sorcier, portail et téléportation | V et C | 22 ids, 29 fichiers |
 | *échantillons* (faits) | Un à cinq sons de chaque autre thème et les trois musiques, sous la direction sombre, pour juger le bain (§ 8.3). Les lots suivants partent de ces scripts : ils complètent la famille au lieu de la créer | — | 53 ids, 54 fichiers |
-| 3 | Squelettes : sortie, préparation, coups, touché, mort, aube, pas, mage squelette ; nouvelle brique os creux et poussière | V | 15 ids, environ 45 fichiers |
+| **3** (fait) | Squelettes : sortie, préparation, coups, touché, mort, aube, pas, étourdi, repoussé, mage squelette (et son crâne), voleur, aura d'élite, danse | V, C et B | 17 ids, 41 fichiers |
 | 4 | Joueurs : pas (4 sols), saut, réception, chutes, esquive, touché, mort, potion | V | 13 ids, environ 45 fichiers |
 | 5 | Paladin et critiques ; nouvelle brique éclat d'or | V | 15 ids |
 | 6 | Viking et mage ; nouvelle brique feu | V | 15 ids |
@@ -638,8 +638,10 @@ Chaque lot fait 15 à 25 sons (identifiants ou fichiers), tient dans une session
 - `Assets/Audio/Deathless/Nyxessa/synth_nyxessa.py` (complété) : `nyxessa_missile_vol_boucle`, `nyxessa_missile_eclat_1..3`, `nyxessa_rappel`, `nyxessa_reapparition` (6 fichiers, 4 ids).
 - `Assets/Audio/Deathless/Bouclier/synth_bouclier.py` : `bouclier_leve`, `bouclier_touche_1..4`, `bouclier_etat_entame`, `bouclier_etat_critique`, `bouclier_brise`, `bouclier_breche_1..2`, `bouclier_palier`, `sorcier_incantation_boucle`, `sorcier_canalisation_boucle`, `sorcier_canalisation_eclat_1..2` (15 fichiers, 10 ids).
 - `Assets/Audio/Deathless/Portail/synth_portail.py` : `portail_ouverture`, `portail_fermeture`, `portail_bourdon_boucle`, `portail_depart`, `portail_arrivee`, `portail_chute_ciel`, `portail_sortie_sol`, `portail_ferme_refus` (8 fichiers, 8 ids).
-- Briques ajoutées à `deathless_audio.py` : `plaque` (éclat d'or et fer, § 2), `gravier` et `pas_pierre` (poussière et terre, § 2), boucles sans raccord (`plier`, `fondre_boucle`, `master_boucle`) et `produire` (écriture d'une famille). Les scripts du lot 1 déclarent désormais leurs sons dans la même liste `SONS` ; leurs 24 fichiers sont inchangés, à l'octet près.- Catalogue : ids `dl_nyxessa_*` (4), `dl_bouclier_*` (7), `dl_sorcier_*` (3) et `dl_portail_*` (8) dans `Wiki/data/sons.json`, statut `a_ecouter`, avec `portee` pour les sons 3D (ajoutée aussi aux sons 3D du lot 1).
+- Briques ajoutées à `deathless_audio.py` : `plaque` (éclat d'or et fer, § 2), `gravier` et `pas_pierre` (poussière et terre, § 2), boucles sans raccord (`plier`, `fondre_boucle`, `master_boucle`) et `produire` (écriture d'une famille). Les scripts du lot 1 déclarent désormais leurs sons dans la même liste `SONS` ; leurs 24 fichiers sont inchangés, à l'octet près.
+- Catalogue : ids `dl_nyxessa_*` (4), `dl_bouclier_*` (7), `dl_sorcier_*` (3) et `dl_portail_*` (8) dans `Wiki/data/sons.json`, statut `a_ecouter`, avec `portee` pour les sons 3D (ajoutée aussi aux sons 3D du lot 1).
 - Planche de contrôle : [`son-lots1-2-dark-controle.md`](son-lots1-2-dark-controle.md) (la planche du premier essai, `son-lot2-controle.md`, a été retirée avec ses sons).
+
 **Hypothèses prises** (à confirmer en jeu) :
 - **Chute du ciel** et **sortie du sol** : le clip dure 1,3 s ; le contact avec le sol (`Spawn_Air`) et le corps entier (`Spawn_Ground`) sont placés vers **1,0 s**, faute de mesure de l'instant dans le clip. Si l'instant diffère, décaler le déclenchement du son plutôt que le fichier.
 - **Missile en vol** : la boucle est celle du missile de **Nyxessa** (gemme tenue sur si5). Celle du mage squelette, 5 demi-tons plus aiguë (§ 3.2), viendra avec le lot 3 (même fonction, `base="E6"`).
@@ -662,7 +664,8 @@ Chaque lot fait 15 à 25 sons (identifiants ou fichiers), tient dans une session
 | `PortailOuverture` | `dl_portail_ouverture` |
 | `PortailFermeture` | `dl_portail_fermeture` |
 | `PortailBourdon` | `dl_portail_bourdon` |
-| `PortailPassage` | `dl_portail_depart` || *nouveau* : arrivée par le portail (`PortalTransit.Arrive`, `DonjonJeu.Transit`/`TransitDistant`) | `dl_portail_arrivee` |
+| `PortailPassage` | `dl_portail_depart` |
+| *nouveau* : arrivée par le portail (`PortalTransit.Arrive`, `DonjonJeu.Transit`/`TransitDistant`) | `dl_portail_arrivee` |
 | *nouveau* : réception du clip d'arrivée (`Heros.DeclencherPortail`, vers 1 s dans le clip de 1,3 s, hypothèse § 8.2 ci-dessus) — chute du ciel au donjon (`Spawn_Air`) ou sortie du sol au village et au rappel (`Spawn_Ground`) ; joué seulement côté propriétaire, pas encore chez les autres postes (`TransitDistant` ne connaît pas air/sol) | `dl_portail_chute_ciel`, `dl_portail_sortie_sol` |
 | *nouveau, pas encore branché à un appel de jeu* : Interagir au portail fermé — `PassagePortail.Invite()` renvoie `null` pour un portail fermé, donc jamais sélectionné par `PointInteraction.Courant` ; la constante `SonsDuJeu.PortailFermeRefus` existe, brancher l'appel demande de faire remonter un état « fermé » distinct de « absent » dans `PassagePortail`/`PointInteraction` (hors de cette session) | `dl_portail_ferme_refus` |
 | *nouveau* : bouclier sous 40 % et sous 15 % (`RelicShieldEtat.warnRatio`/`criticalRatio`, `BouclierNyxessa.SuivreEtatVie`) | `dl_bouclier_etat_entame`, `dl_bouclier_etat_critique` |
@@ -686,7 +689,7 @@ Produits le 26/09/2026 au soir, à la demande de Quentin (« touche à tous les 
 | Mage (`Mage/synth_mage.py`) | `boule_lancer_1`, `boule_explosion_1`, `cone_boucle` |
 | Rôdeur (`Rodeur/synth_rodeur.py`) | `arc_tir_1`, `arc_tir_charge_1`, `fleche_impact_os_1` |
 | Assassin (`Assassin/synth_assassin.py`) | `dague_elan_1`, `furtif_entree`, `fumee` |
-| Squelettes (`Squelettes/synth_squelettes.py`) | `squelette_sortie_1`, `squelette_preparation_1`, `squelette_touche_1`, `squelette_mort_1`, `squelette_aube_1` |
+| Squelettes (`Squelettes/synth_squelettes.py`) | `squelette_sortie_1`, `squelette_preparation_1`, `squelette_touche_1`, `squelette_mort_1`, `squelette_aube_1` : complétés et passés au lot 3 (§ 8.4) |
 | Morgrim (`Morgrim/synth_morgrim.py`) | `morgrim_cri`, `massue_fracas_1`, `massue_onde` |
 | Nyxar (`Nyxar/synth_nyxar.py`) | `nyxar_arrivee`, `nyxar_eclat_brise_1` |
 | Statuts (`Statuts/synth_statuts.py`) | `etourdi_boucle`, `brulure_boucle`, `renverse_chute`, `ivresse_debut_1` |
@@ -717,3 +720,42 @@ Briques ajoutées à `deathless_audio.py` pour la direction sombre : `voix`, `ch
 | `TombeeNuit`, `Aube`, `Vague`, `Victoire` | `dl_crepuscule`, `dl_aube`, `dl_vague`, `dl_victoire` |
 | `MusiqueJour`, `MusiqueNuit` | `dl_musique_jour`, `dl_musique_nuit` |
 | *nouveaux* : défaite, musique du donjon, ambiances, cri et onde de Morgrim, Nyxar, étourdi, renversé, ivresse, parade parfaite, potion, candidats | `dl_defaite`, `dl_musique_donjon`, `dl_ambiance_*`, `dl_morgrim_cri`, `dl_massue_onde`, `dl_nyxar_*`, `dl_etourdi`, `dl_renverse_chute`, `dl_ivresse_debut`, `dl_parade_parfaite`, `dl_potion_boire`, `dl_clochard_*`, `dl_djbob_*`, `dl_barde_*` |
+
+### 8.4 Lot 3 produit (squelettes)
+
+41 fichiers, 17 identifiants, générés le 27/09/2026 sous la direction sombre, dans `Assets/Audio/Deathless/Squelettes/synth_squelettes.py` (graines 2001 à 2099). Les cinq échantillons du 26/09 (`squelette_sortie_1`, `_preparation_1`, `_touche_1`, `_mort_1`, `_aube_1`) sont gardés **à l'octet près** et reçoivent leurs variantes ; ils passent du lot `echantillons` au lot 3. Planche : [`son-lot3-controle.md`](son-lot3-controle.md) (41 fichiers conformes, dont 3 boucles vérifiées à la jointure).
+
+| Identifiant | Fichiers | Timbre |
+|---|---|---|
+| `dl_squelette_sortie` | `squelette_sortie_1..3` | terre qui s'ouvre (peau, bruit brun), mottes, os qui s'assemblent |
+| `dl_squelette_pas` | `squelette_pas_1..4` | os léger, peau courte, grain de terre ; -28 dB |
+| `dl_squelette_preparation` | `squelette_preparation_1..3` | crécelle d'os qui s'accélère (80 → 18 ms entre deux coups), souffle qui monte |
+| `dl_squelette_coup` | `squelette_coup_1..3` | souffle de lame rouillée, os du bras |
+| `dl_guerrier_coup` | `guerrier_coup_1..3` | souffle grave, masse, os qui craquent |
+| `dl_squelette_touche` | `squelette_touche_1..4` | os creux frappé, éclats |
+| `dl_squelette_mort` | `squelette_mort_1..3` | os qui s'effondrent, poussière, sable, gemme lointaine |
+| `dl_squelette_aube` | `squelette_aube_1..2` | poussière qui monte, pluie d'os |
+| `dl_squelette_etourdi` | `squelette_etourdi_1..2` | mâchoire qui claque deux fois, os qui vacillent |
+| `dl_squelette_repousse` | `squelette_repousse_1..3` | glissement sur la terre, cliquetis |
+| `dl_mage_squelette_incantation` | `mage_squelette_incantation_1..2` | roulement d'os qui s'accélère, souffle qui se charge |
+| `dl_mage_squelette_tir` | `mage_squelette_tir_1..2` | souffle qui part, mâchoire |
+| `dl_mage_squelette_missile_vol` | `mage_squelette_missile_vol_boucle` | plaintes des limbes du missile de Nyxessa, 5 demi-tons plus aiguës (boucle 2 s) |
+| `dl_mage_squelette_missile_eclat` | `mage_squelette_missile_eclat_1..2` | cri du missile de Nyxessa, pic plus aigu (330 et 370 Hz) |
+| `dl_voleur_elan` | `voleur_elan_1..2` | pas d'os rapides, deux lames courtes |
+| `dl_elite_aura` | `elite_aura_boucle` | grondement de 70 Hz pulsé à 4/3 Hz, gros os (boucle 3 s) |
+| `dl_squelette_danse` | `squelette_danse_boucle` | cliquetis d'os en croches à 120 BPM (boucle 2 s) |
+
+Pas de nouvelle brique : `os_creux`, `cliquetis`, `peau`, `bruit_brun`, `gravier`, `souffle` suffisent ; le crâne du mage réutilise `missile_vol` et `missile_eclat` du script de Nyxessa (chargé par `importlib`, sans dupliquer le code).
+
+**Hypothèses** :
+- **Préparation** : 0,7 s (celle du sbire) ; pour le guerrier (0,8 s), le son finit 0,1 s avant l'impact. Si l'on veut qu'il colle aux deux, jouer le fichier avec un décalage ou étirer la hauteur (`pitch` 0,875) côté jeu.
+- **Missile du mage** : même caractère que celui de Nyxessa (âmes captives, les squelettes étant issus de sa force) ; son sort suit celui du missile de Nyxessa, pas encore validé (§ 8.2).
+- **Pas** : un pas sur trois seulement, avec l'anti-répétition d'`AudioBank`, pour ne pas saturer à 60 squelettes.
+
+**Branchement proposé** (après écoute, par l'agent local ; aucun script de jeu n'a été modifié) :
+
+| Constante de `SonsDuJeu` ou appel | Nouvel id en tête |
+|---|---|
+| `SqueletteSortie`, `SquelettePreparation`, `SqueletteTouche`, `SqueletteMort`, `SqueletteAube` | `dl_squelette_sortie`, `dl_squelette_preparation`, `dl_squelette_touche`, `dl_squelette_mort`, `dl_squelette_aube` |
+| `MissileVol`, `MissileEclat` quand le tireur est un mage squelette (`MissileCrane`, `parNyxessa` faux) | `dl_mage_squelette_missile_vol`, `dl_mage_squelette_missile_eclat` (nouvelles constantes, ou un choix selon `parNyxessa`) |
+| *nouveaux* : pas, coup (sbire, voleur, guerrier), étourdi, repoussé, incantation et tir du mage, élan du voleur, aura d'élite, danse | `dl_squelette_pas`, `dl_squelette_coup`, `dl_guerrier_coup`, `dl_squelette_etourdi`, `dl_squelette_repousse`, `dl_mage_squelette_incantation`, `dl_mage_squelette_tir`, `dl_voleur_elan`, `dl_elite_aura`, `dl_squelette_danse` |
