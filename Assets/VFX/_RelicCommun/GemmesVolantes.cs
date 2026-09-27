@@ -78,6 +78,15 @@ public class GemmesVolantes : MonoBehaviour
         // Sommets en repère monde : l'objet reste à l'origine même s'il est rangé sous un autre objet.
         if (transform.parent != null) transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
         float t = Time.time, dt = Time.deltaTime;
+        // Les gemmes éteintes sont écrites (taille nulle) à la position d'une gemme vivante et non à l'origine du monde :
+        // sinon RecalculateBounds englobe (0, 0, 0) et les bornes couvrent tout le trajet jusqu'à l'effet (donjon à
+        // x ≈ 1000), ce qui rend le culling inopérant. À défaut de gemme vivante (toutes en attente) : la dernière émise.
+        Vector3 repli = pos[(prochain + capacite - 1) % capacite];
+        for (int i = 0; i < capacite; i++)
+        {
+            float age0 = t - ne[i];
+            if (age0 >= 0f && age0 < vie[i]) { repli = pos[i]; break; }
+        }
         bool encore = false;
         for (int i = 0; i < capacite; i++)
         {
@@ -85,7 +94,7 @@ public class GemmesVolantes : MonoBehaviour
             if (age < 0f || age >= vie[i])
             {
                 if (age < 0f && age > -10f) encore = true;
-                LowPolyGem.Write(vertices, colors, i, Vector3.zero, 0f, Vector3.one, Quaternion.identity, Color.black, LowPolyGem.DefaultLight);
+                LowPolyGem.Write(vertices, colors, i, repli, 0f, Vector3.one, Quaternion.identity, Color.black, LowPolyGem.DefaultLight);
                 continue;
             }
             encore = true;

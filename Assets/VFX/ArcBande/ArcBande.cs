@@ -48,6 +48,7 @@ public class ArcBande : MonoBehaviour
     private GameObject porteur;
     private Vector3[] v;
     private Color[] c;
+    private bool anneauVide;           // anneau déjà écrit à taille nulle : rien à renvoyer tant qu'il reste éteint
 
     public float Charge
     {
@@ -133,11 +134,14 @@ public class ArcBande : MonoBehaviour
         int n = gemmesAnneau + 4;
         if (apparition <= 0f)
         {
+            if (anneauVide) return;
+            anneauVide = true;
             for (int i = 0; i < n; i++) LowPolyGem.Write(v, c, i, Vector3.zero, 0f, Vector3.one, Quaternion.identity, Color.black, LowPolyGem.DefaultLight);
             mesh.vertices = v;
             mesh.colors = c;
             return;
         }
+        anneauVide = false;
         Vector3 axe;
         Vector3 centre = Pointe(out axe) + axe * 0.03f;
         Quaternion repere = Quaternion.LookRotation(axe, Mathf.Abs(Vector3.Dot(axe, Vector3.up)) > 0.95f ? Vector3.right : Vector3.up);
