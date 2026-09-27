@@ -4,7 +4,7 @@ Générée par `python -B Assets/Audio/Deathless/controle.py` : ne pas modifier 
 
 Colonnes : **crête** en dBFS (plafond -1,4) ; **RMS** moyen sur tout le fichier ; **niveau** perçu = RMS maximal sur 50 ms, en dBFS (c'est lui qui est réglé sur la **cible**, sauf pour les ambiances et les musiques, réglées sur le RMS moyen) ; **tête** = temps avant le premier échantillon au-dessus de -40 dBFS (20 ms au plus) ; **spectre** = part de l'énergie en % dans les bandes < 250 Hz, 250-1k, 1-4k, 4-10k, > 10k. Une **boucle** est vérifiée à sa jointure (pas de saut entre la fin et le début) au lieu du fondu de fin.
 
-**54 fichiers, 54 conformes.**
+**49 fichiers, 49 conformes.**
 
 ## Ambiances — `Assets/Audio/Deathless/Ambiances/synth_ambiances.py`
 
@@ -128,18 +128,6 @@ Rôdeur, arc (Deathless, échantillons de la direction sombre, 26/09/2026 au soi
 | `arc_tir_1.wav` | 0.60 s | -2.5 | -24.3 | -14.0 | -14.0 | 0.0 ms | 3 · 15 · 56 · 25 · 2 | ok |
 | `arc_tir_charge_1.wav` | 0.60 s | -1.4 | -23.2 | -13.0 | -13.0 | 0.0 ms | 3 · 12 · 47 · 34 · 4 | ok |
 | `fleche_impact_os_1.wav` | 0.30 s | -1.4 | -25.5 | -17.7 | -14.0 | 0.0 ms | 88 · 12 · 0 · 0 · 0 | ok |
-
-## Squelettes — `Assets/Audio/Deathless/Squelettes/synth_squelettes.py`
-
-Squelettes (Deathless, échantillons de la direction sombre, 26/09/2026 au soir).
-
-| Fichier | Durée | Crête | RMS | Niveau | Cible | Tête | Spectre (%) | Contrôle |
-|---|---|---|---|---|---|---|---|---|
-| `squelette_aube_1.wav` | 1.50 s | -1.4 | -20.5 | -15.8 | -15.0 | 11.0 ms | 1 · 31 · 54 · 10 · 4 | ok |
-| `squelette_mort_1.wav` | 1.00 s | -2.5 | -21.8 | -15.0 | -15.0 | 11.0 ms | 40 · 36 · 22 · 2 · 0 | ok |
-| `squelette_preparation_1.wav` | 0.70 s | -1.4 | -21.7 | -17.2 | -16.0 | 0.0 ms | 0 · 14 · 78 · 7 · 1 | ok |
-| `squelette_sortie_1.wav` | 1.20 s | -5.9 | -25.3 | -14.0 | -14.0 | 0.0 ms | 87 · 6 · 6 · 1 · 0 | ok |
-| `squelette_touche_1.wav` | 0.25 s | -1.4 | -23.2 | -16.2 | -16.0 | 0.0 ms | 0 · 10 · 78 · 11 · 1 | ok |
 
 ## Statuts — `Assets/Audio/Deathless/Statuts/synth_statuts.py`
 
