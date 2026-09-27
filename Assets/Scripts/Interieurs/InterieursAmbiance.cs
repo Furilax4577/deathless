@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 // Ambiance des intérieurs du village (visuel seulement, rien sur le réseau). Posé par Deathless > Niveau > Intérieurs
@@ -25,6 +26,11 @@ public class InterieursAmbiance : MonoBehaviour
     public float eclatBraises = 2.2f;
 
     MaterialPropertyBlock m_Bloc;
+    // Copies des matériaux créées par Activer (une par rendu), avec le rendu et son matériau d'origine : détruites par
+    // OnDestroy (sinon elles restent en mémoire après la scène).
+    readonly List<Renderer> m_Rendus = new List<Renderer>();
+    readonly List<Material> m_Copies = new List<Material>();
+    readonly List<Material> m_Origines = new List<Material>();
     Color m_Braises;
     int m_Version = -1;
     static readonly int EmissionId = Shader.PropertyToID("_EmissionColor");
@@ -38,10 +44,32 @@ public class InterieursAmbiance : MonoBehaviour
         Activer(vitres); Activer(braises);
     }
 
-    static void Activer(Renderer[] rs)
+    void Activer(Renderer[] rs)
     {
         if (rs == null) return;
-        foreach (Renderer r in rs) if (r != null) r.material.EnableKeyword("_EMISSION");
+        foreach (Renderer r in rs)
+        {
+            if (r == null) continue;
+            Material origine = r.sharedMaterial;
+            if (m_Copies.Contains(origine)) continue;   // rendu déjà traité (listé deux fois)
+            Material copie = r.material;
+            copie.EnableKeyword("_EMISSION");
+            m_Rendus.Add(r); m_Copies.Add(copie); m_Origines.Add(origine);
+        }
+    }
+
+    void OnDestroy()
+    {
+        for (int i = 0; i < m_Copies.Count; i++)
+        {
+            Material copie = m_Copies[i];
+            if (copie == null) continue;
+            // Le rendu survit au composant (composant retiré seul) : il reprend son matériau d'origine.
+            Renderer r = m_Rendus[i];
+            if (r != null && r.sharedMaterial == copie) r.sharedMaterial = m_Origines[i];
+            Destroy(copie);
+        }
+        m_Rendus.Clear(); m_Copies.Clear(); m_Origines.Clear();
     }
 
     void LateUpdate()
