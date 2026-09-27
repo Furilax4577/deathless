@@ -16,6 +16,13 @@ namespace Deathless.Jeu
 
         Partie P => Partie.Instance;
 
+        /// Vue du cycle de la scène (null si absente) : enregistrée ici plutôt que cherchée à chaque image (DonjonJeu).
+        public static VueCycle Instance { get; private set; }
+
+        void Awake() => Instance = this;
+
+        void OnDestroy() { if (Instance == this) Instance = null; }
+
         void Start()
         {
             if (P != null) P.PhaseChangee += OnPhase;

@@ -89,6 +89,9 @@ namespace Deathless.Jeu
         VueCycle m_VueCycle;
         PassagePortail m_PassageVillage, m_PassageRetour;
         PortalVisual m_BourdonSur;
+        float m_ProchaineEvalPrets;   // prochaine réévaluation périodique du vote « prêt » (Update)
+        CameraEpaule m_CameraJeuDe;     // caméra de jeu dont m_CameraJeu est la Camera (LateUpdate)
+        Camera m_CameraJeu;
 
         sealed class Coffre
         {
@@ -147,7 +150,7 @@ namespace Deathless.Jeu
         {
             get
             {
-                if (m_VueCycle == null) m_VueCycle = FindAnyObjectByType<VueCycle>();
+                if (m_VueCycle == null) m_VueCycle = VueCycle.Instance;   // enregistrée par VueCycle.Awake (pas de recherche par image)
                 return m_VueCycle != null ? m_VueCycle.portail : null;
             }
         }
@@ -509,7 +512,7 @@ namespace Deathless.Jeu
         public void RamasserSac(int id, int joueurId)
         {
             if (P == null) return;
-            int idx = m_Sacs.FindIndex(s => s.id == id);
+            int idx = IndexSac(id);
             if (idx < 0) return;
             var sac = m_Sacs[idx];
             var h = P.HerosDe(joueurId);
@@ -527,12 +530,19 @@ namespace Deathless.Jeu
             if (m_DemandeSac.TryGetValue(id, out float t) && Time.time < t) return;
             m_DemandeSac[id] = Time.time + 1f;
             var h = P != null ? P.HerosLocal : null;
-            int idx = m_Sacs.FindIndex(s => s.id == id);
+            int idx = IndexSac(id);
             if (h == null || idx < 0) return;
             var sac = m_Sacs[idx];
             Dire("Tu ramasses le sac de " + sac.nom + " : " + sac.montant + " or", 5f);
             if (Partie.ClientReseau) PartieReseau.Instance?.DemanderSac(id);
             else RamasserSac(id, h.Id);
+        }
+
+        /// Index du sac `id` dans m_Sacs, ou -1 (boucle : pas de lambda allouée, appelé à chaque image).
+        int IndexSac(int id)
+        {
+            for (int i = 0; i < m_Sacs.Count; i++) if (m_Sacs[i].id == id) return i;
+            return -1;
         }
 
         /// Autorité, au crépuscule : les sacs encore au sol sont perdus (un seul événement réseau pour tous).
@@ -550,16 +560,19 @@ namespace Deathless.Jeu
         /// Client : la liste des sacs suit celle de l'hôte (comme Pris suit ButinsPris).
         void SuivreSacsReseau(Unity.Netcode.NetworkList<SacReseau> distants)
         {
+            // Parcours par index : le foreach de NetworkList passe par IEnumerator<T> et alloue (appelé à chaque image).
+            int n = distants.Count;
             for (int i = m_Sacs.Count - 1; i >= 0; i--)
             {
                 int id = m_Sacs[i].id;
                 bool present = false;
-                foreach (var s in distants) if (s.id == id) { present = true; break; }
+                for (int k = 0; k < n; k++) if (distants[k].id == id) { present = true; break; }
                 if (!present) m_Sacs.RemoveAt(i);
             }
-            foreach (var s in distants)
+            for (int k = 0; k < n; k++)
             {
-                if (m_Sacs.Exists(x => x.id == s.id)) continue;
+                var s = distants[k];
+                if (IndexSac(s.id) >= 0) continue;
                 m_Sacs.Add(new Sac { id = s.id, position = s.position, montant = s.montant, nom = s.nom.ToString() });
             }
         }
@@ -572,7 +585,7 @@ namespace Deathless.Jeu
             if (m_VisuelsSacs.Count == 0) return;
             List<int> disparus = null;
             foreach (var kv in m_VisuelsSacs)
-                if (!m_Sacs.Exists(x => x.id == kv.Key)) (disparus ??= new List<int>()).Add(kv.Key);
+                if (IndexSac(kv.Key) < 0) (disparus ??= new List<int>()).Add(kv.Key);
             if (disparus == null) return;
             foreach (int id in disparus)
             {
@@ -812,16 +825,23 @@ namespace Deathless.Jeu
             if (Pret) { SuivreButins(); SuivreSacsVisuels(); }
 
             // Autorité : mort au donjon avec de l'or porté → un sac tombe (perdu ailleurs, comme avant) ; vote « prêt »
-            // réévalué au retour de l'équipe.
+            // réévalué au retour de l'équipe : tout de suite après une mort traitée ici, sinon toutes les 0,2 s (le vote
+            // lui-même réévalue déjà dans Partie.BasculerPret ; plus de parcours des héros à chaque image).
             if (ReseauJeu.Autorite && p.EnCours)
             {
+                bool mort = false;
                 foreach (var j in p.Etat.joueurs)
                 {
                     if (!j.mort || j.orPorte <= 0) continue;
                     var hj = p.HerosDe(j.id);
                     if (AuDonjon(hj)) CreerSac(j, hj.transform.position); else Perdre(j, out _, out _, "mort au donjon");
+                    mort = true;
                 }
-                if (p.Etat.phase == Phase.Jour) p.EvaluerPrets();
+                if (p.Etat.phase == Phase.Jour && (mort || Time.time >= m_ProchaineEvalPrets))
+                {
+                    m_ProchaineEvalPrets = Time.time + 0.2f;
+                    p.EvaluerPrets();
+                }
             }
 
             // Portails : touche Interagir (PassagePortail), plus de passage en marchant dedans (Quentin, 26/09/2026).
@@ -872,11 +892,23 @@ namespace Deathless.Jeu
             c.reference = reference;
         }
 
+        /// Camera de la caméra de jeu, cherchée une fois par CameraEpaule (sinon Camera.main).
+        Camera CameraJeu
+        {
+            get
+            {
+                var ce = P != null ? P.cameraJeu : null;
+                if (ce == null) return Camera.main;
+                if (m_CameraJeuDe != ce || m_CameraJeu == null) { m_CameraJeuDe = ce; m_CameraJeu = ce.GetComponent<Camera>(); }
+                return m_CameraJeu;
+            }
+        }
+
         /// Ambiance au donjon pour le joueur local : sombre, aux torches, sans ciel (après le cycle jour / nuit).
         void LateUpdate()
         {
             var h = P != null ? P.HerosLocal : null;
-            var cam = P != null && P.cameraJeu != null ? P.cameraJeu.GetComponent<Camera>() : Camera.main;
+            var cam = CameraJeu;
             bool dedans = h != null && (AuDonjon(h) || (cam != null && Contient(cam.transform.position)));
             if (dedans)
             {
