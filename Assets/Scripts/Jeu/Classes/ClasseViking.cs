@@ -162,7 +162,7 @@ namespace Deathless.Jeu
                     {
                         m_CoupPorte = true;
                         bool touche = false;
-                        foreach (var s in Combat.Ennemis(transform.position, transform.forward, b.hachePortee, b.hacheDemiAngle))
+                        foreach (var s in Cibles(transform.position, transform.forward, b.hachePortee, b.hacheDemiAngle))
                         {
                             H.Frapper(s, b.hacheDegats * Facteur(0));
                             touche = true;
@@ -186,7 +186,7 @@ namespace Deathless.Jeu
                     {
                         m_ProchainTic = Time.time + b.tournanteIntervalle;
                         bool touche = false;
-                        foreach (var s in Combat.Ennemis(transform.position, transform.forward, b.tournanteRayon, 180f))
+                        foreach (var s in Cibles(transform.position, transform.forward, b.tournanteRayon, 180f))
                         {
                             H.Frapper(s, b.tournanteDegats, false, s.transform.position + Vector3.up, (s.transform.position - transform.position).normalized, false, true);
                             touche = true;
@@ -273,7 +273,7 @@ namespace Deathless.Jeu
             EffetSautPercutant(point, m_DirSaut);
             Diffuser(E_Saut, point, m_DirSaut);
             int n = 0;
-            foreach (var s in Combat.Ennemis(point, m_DirSaut, b.sautRayon, 180f))
+            foreach (var s in Cibles(point, m_DirSaut, b.sautRayon, 180f))
             {
                 H.Frapper(s, b.sautDegats * Facteur(3));
                 var sq = s.GetComponent<Squelette>();

@@ -8,18 +8,29 @@ namespace Deathless.Jeu
     public static class Combat
     {
         static readonly Collider[] s_Tampon = new Collider[128];
+        // Tampons internes d'Ennemis (vidés à chaque appel, jamais rendus à l'appelant).
+        static readonly List<float> s_Distances = new List<float>();
+        static readonly HashSet<Sante> s_Vus = new HashSet<Sante>();
 
         /// Ennemis vivants devant `origine` (portée horizontale, demi-angle autour de `avant`), du plus proche au plus loin.
+        /// Alloue une liste neuve : hors des chemins chauds, préférer la surcharge à tampon fourni.
         public static List<Sante> Ennemis(Vector3 origine, Vector3 avant, float portee, float demiAngle)
+            => Ennemis(origine, avant, portee, demiAngle, new List<Sante>());
+
+        /// Même chose dans `res` (vidée puis remplie, et renvoyée) : sans allocation. Chaque appelant garde son propre
+        /// tampon (ClasseHeros.Cibles) et le parcourt entièrement avant de le redemander.
+        public static List<Sante> Ennemis(Vector3 origine, Vector3 avant, float portee, float demiAngle, List<Sante> res)
         {
-            var res = new List<Sante>();
-            var dist = new List<float>();
+            res.Clear();
+            var dist = s_Distances;
+            dist.Clear();
+            s_Vus.Clear();
             avant.y = 0f;
             int n = Physics.OverlapSphereNonAlloc(origine + Vector3.up, portee + 1.2f, s_Tampon, ~0, QueryTriggerInteraction.Ignore);
             for (int i = 0; i < n; i++)
             {
                 var s = s_Tampon[i].GetComponentInParent<Sante>();
-                if (s == null || s.equipe != Equipe.Ennemis || s.Mort || res.Contains(s)) continue;
+                if (s == null || s.equipe != Equipe.Ennemis || s.Mort || !s_Vus.Add(s)) continue;
                 Vector3 d = s.transform.position - origine; d.y = 0f;
                 float r = RayonDe(s);
                 float dd = Mathf.Max(0f, d.magnitude - r);
@@ -30,6 +41,7 @@ namespace Deathless.Jeu
                 res.Insert(k, s);
                 dist.Insert(k, dd);
             }
+            s_Vus.Clear();
             return res;
         }
 

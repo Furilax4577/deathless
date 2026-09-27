@@ -167,7 +167,7 @@ namespace Deathless.Jeu
             if (!degats) yield break;   // marionnette : visuel et sons seulement
             for (int i = 0; i < b.nueeSalves; i++)
             {
-                foreach (var s in Combat.Ennemis(centre, Vector3.forward, b.nueeRayon, 180f))
+                foreach (var s in Cibles(centre, Vector3.forward, b.nueeRayon, 180f))
                     H.Frapper(s, b.nueeDegatsSalve, false, s.transform.position + Vector3.up, Vector3.down);
                 yield return new WaitForSeconds(1.2f / b.nueeSalves);
             }

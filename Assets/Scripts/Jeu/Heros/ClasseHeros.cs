@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Deathless.UI.Donnees;
 using UnityEngine;
 
@@ -32,6 +33,13 @@ namespace Deathless.Jeu
 
         /// Facteur de l'amélioration `index` à son rang actuel (1 sans amélioration ; nombre ajouté pour un ajout).
         protected float Facteur(int index) => ArbreCompetences.Facteur(Id, index, Rang(index));
+
+        readonly List<Sante> m_Cibles = new List<Sante>();
+
+        /// Combat.Ennemis dans un tampon propre à cette classe, réutilisé d'un coup à l'autre (pas d'allocation par coup ni
+        /// par tic) : le résultat n'est valable que jusqu'au prochain appel ; le parcourir entièrement avant de redemander.
+        protected List<Sante> Cibles(Vector3 origine, Vector3 avant, float portee, float demiAngle)
+            => Combat.Ennemis(origine, avant, portee, demiAngle, m_Cibles);
 
         // ----------------------------------------------------------------- Déplacement demandé à Heros
 
