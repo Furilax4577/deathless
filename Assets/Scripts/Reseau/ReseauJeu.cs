@@ -21,6 +21,10 @@ namespace Deathless.Reseau
         /// Port de l'adresse IP directe (secours sans Relay). Voir Docs/reseau.md.
         public const ushort PortDirect = 7777;
         public const int JoueursMax = 4;
+        /// Délai de détection d'une coupure (ms) : un poste sans nouvelles de l'autre (battements du transport toutes les
+        /// 0,5 s) pendant ce temps est déconnecté. 10 s au lieu des 30 s par défaut d'UnityTransport (décision du
+        /// 27/09/2026) ; vaut aussi par Relay (même transport).
+        public const int DelaiCoupureMs = 10000;
 
         public NetworkManager Reseau { get; private set; }
         public UnityTransport Transport { get; private set; }
@@ -52,6 +56,7 @@ namespace Deathless.Reseau
             go.SetActive(false);
             var r = go.AddComponent<ReseauJeu>();
             r.Transport = go.AddComponent<UnityTransport>();
+            r.Transport.DisconnectTimeoutMS = DelaiCoupureMs;
             r.Reseau = go.AddComponent<NetworkManager>();
             r.Reseau.NetworkConfig = new NetworkConfig
             {

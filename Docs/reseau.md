@@ -49,7 +49,7 @@ Assets/Jeu/Resources/Reseau/SalonReseau.prefab   (NetworkObject + SalonReseau)
 
 Préfabs : menu **Deathless > Jeu > 8. Réseau** (ajoute `NetworkObject`, `NetworkTransform`, `NetworkAnimator`, `HerosReseau` aux héros sans les reconstruire, crée le préfab du salon, calcule les identifiants réseau) ; `7. Classes` les ajoute aussi quand il reconstruit les héros.
 
-Réglages : `NetworkConfig` créé par code (`ReseauJeu.Assurer`) : approbation des connexions, gestion des scènes, 30 ticks/s, délai de connexion 15 s.
+Réglages : `NetworkConfig` créé par code (`ReseauJeu.Assurer`) : approbation des connexions, gestion des scènes, 30 ticks/s, délai de connexion 15 s. Transport : délai de détection d'une coupure 10 s (`UnityTransport.DisconnectTimeoutMS` = `ReseauJeu.DelaiCoupureMs`, 30 s par défaut ; décision du 27/09/2026), en adresse IP comme par Relay.
 
 ## Étape 2 : le monde tenu par l'hôte
 
@@ -170,7 +170,7 @@ Résultats du 25/09/2026 (hôte Paladin « Quentin », client Mage « Morgane »
 | Rejoindre par code Relay | code BKDTLF créé par l'hôte, rejoint par le client (profil `client2`), même déroulé jusqu'à la partie |
 | Départ d'un client dans le salon | retiré de la liste, classe libérée (l'hôte peut la prendre aussitôt) |
 | Départ propre d'un client en partie | « client parti », héros retiré chez l'hôte, colonne des alliés vidée |
-| Coupure brutale d'un client (processus tué) | détectée par l'hôte en ~30 s (délai du transport), même traitement |
+| Coupure brutale d'un client (processus tué) | détectée par l'hôte en ~30 s (délai du transport, ramené à 10 s le 27/09/2026), même traitement |
 | L'hôte ferme le salon / quitte la partie | le client reçoit « L’hôte a fermé le salon. », revient au menu (scène rechargée) |
 
 Résultats de l'étape 2 (25/09/2026, hôte Paladin, client Mage, adresse IP) : vote des deux joueurs → jour écourté, nuit chez les deux ; squelettes vus par le client, qui en tue (dégâts, tués et or crédités par l'hôte : 4 tués, 320 dégâts, 20 or) ; squelettes qui frappent le héros du client ; coup mortel porté chez l'hôte → mort chez le client, comptée par l'hôte (délai 8 s), réapparition au bout du délai ; sorcier et bouclier suivis ; victoire forcée → écran de score à deux lignes chez les deux ; « Rejouer » → nouvelle partie pour les deux ; Nyxessa détruite chez l'hôte → défaite chez le client. Aucune erreur dans les consoles.
@@ -198,7 +198,7 @@ Résultats de l'étape 2 (25/09/2026, hôte Paladin, client Mage, adresse IP) : 
 - Le penché du buste en visée (arc, arbalète) n'est pas recopié chez les autres ; l'orientation du corps l'est.
 - Chaque coup d'un client sur un squelette est un message ; le cône de flammes en envoie beaucoup (sans gêne constatée à deux). La brûlure n'en envoie plus : l'hôte fait ses dégâts (« Statuts »).
 - Pas d'arrivée en cours de partie ; pas de reconnexion.
-- Coupure brutale : l'hôte ne s'en aperçoit qu'au bout du délai du transport (~30 s).
+- Coupure brutale : l'hôte ne s'en aperçoit qu'au bout du délai du transport (10 s depuis le 27/09/2026, au lieu de ~30 s). Un poste figé plus de 10 s (chargement bloquant, point d'arrêt du débogueur) est aussi déconnecté.
 - Après une déconnexion, le message d'erreur est dans le lobby ; le menu principal s'affiche d'abord.
 - Le secours IP direct suppose le port 7777 ouvert chez l'hôte (réseau local, ou redirection de port sur la box).
 - Le premier usage du multijoueur écrit le jeton du joueur anonyme dans les PlayerPrefs (par profil).
