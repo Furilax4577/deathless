@@ -825,6 +825,9 @@ namespace Deathless.Jeu
             OrGagne?.Invoke(montant, point);
         }
 
+        /// Journal de partie (GameBalance.journal). Éditeur seulement : dans un build, l'appel disparaît à la compilation,
+        /// avec la construction de sa chaîne chez l'appelant (Conditional), sans rien à régler dans l'asset.
+        [System.Diagnostics.Conditional("UNITY_EDITOR")]
         public void Journal(string texte)
         {
             if (B.journal) Debug.Log("[Partie " + Etat.duree.ToString("F1") + " s] " + texte);
