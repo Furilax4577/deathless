@@ -59,6 +59,15 @@ namespace Deathless.UI.Ecrans
         int m_MissilesVus = -1;
         float m_TempsPopMissile = -1f, m_TempsTirMissile = -1f;
 
+        /// Dernières valeurs écrites dans les textes du HUD (lu à chaque image) : le texte n'est reconstruit
+        /// (chaînes allouées) qu'au changement de la valeur affichée.
+        PhasePartie m_PhaseTexte = (PhasePartie)(-1);
+        int m_SecondesTexte = -1, m_NuitTexte = -1;
+        int m_BouclierAffiche = -1, m_PretsAffiches = -1, m_TotalAffiche = -1, m_AlerteNuitAffichee = int.MinValue;
+        int m_OrAffiche = int.MinValue, m_MissilesNombreAffiche = -1, m_MissilesMaxAffiche = -1;
+        int m_VieAffichee = int.MinValue, m_MortAffichee = int.MinValue, m_OrPorteAffiche = int.MinValue;
+        int m_AvantRappelAffiche = int.MinValue, m_PointsAffiches = -1, m_PotionsAffichees = int.MinValue;
+
         readonly List<Emplacement> m_Emplacements = new List<Emplacement>();
         /// Statuts du joueur et des ennemis (classe à part : HudStatuts.cs).
         HudStatuts m_Statuts;
@@ -81,6 +90,7 @@ namespace Deathless.UI.Ecrans
             public VisualElement racine, embleme, piste, vie;
             public Label pseudo, etat;
             public string classe;
+            public int reapparitionAffichee = int.MinValue;
         }
 
         readonly List<LigneAllie> m_Allies = new List<LigneAllie>();
@@ -99,6 +109,8 @@ namespace Deathless.UI.Ecrans
             public InputPrompt invite;
             public VectorImage vecteur;
             public object imageAffichee;
+            /// Clé du compte à rebours affiché (100 + secondes au-dessus d'une seconde, sinon dixièmes) : -1 = aucun.
+            public int rechargeAffichee = -1;
         }
 
         protected override void Construire()
@@ -273,7 +285,15 @@ namespace Deathless.UI.Ecrans
                 }
                 l.pseudo.text = a.Pseudo;
                 l.racine.EnableInClassList("hud-allie--mort", a.EstMort);
-                if (a.EstMort) l.etat.text = "Réapparition dans " + Mathf.CeilToInt(Mathf.Max(0f, a.TempsAvantReapparition)) + " s";
+                if (a.EstMort)
+                {
+                    var reapparition = Mathf.CeilToInt(Mathf.Max(0f, a.TempsAvantReapparition));
+                    if (reapparition != l.reapparitionAffichee)
+                    {
+                        l.reapparitionAffichee = reapparition;
+                        l.etat.text = "Réapparition dans " + reapparition + " s";
+                    }
+                }
                 else l.vie.style.width = Length.Percent((a.VieMax > 0f ? Mathf.Clamp01(a.Vie / a.VieMax) : 0f) * 100f);
                 PlacerPseudo(t, a, cam);
             }
@@ -312,25 +332,46 @@ namespace Deathless.UI.Ecrans
             }
             var bouclierFaible = aBouclier && ratio < 0.5f;
             m_AlerteBouclier.style.display = bouclierFaible ? DisplayStyle.Flex : DisplayStyle.None;
-            if (bouclierFaible) m_AlerteBouclier.text = "Bouclier de Nyxessa à " + Mathf.RoundToInt(ratio * 100f) + " %";
-
-            // Temps.
-            var reste = Horloge(partie.TempsRestantPhase);
-            var nuit = partie.Phase == PhasePartie.Nuit || partie.Phase == PhasePartie.Crepuscule;
-            m_Icone.nuit = nuit;
-            switch (partie.Phase)
+            if (bouclierFaible)
             {
-                case PhasePartie.Jour: m_Temps.text = "Jour · " + reste + " avant la nuit"; break;
-                case PhasePartie.Crepuscule: m_Temps.text = "Crépuscule · la nuit " + partie.NumeroNuit + " tombe"; break;
-                case PhasePartie.Nuit: m_Temps.text = "Nuit " + partie.NumeroNuit + " · " + reste + " avant l’aube"; break;
-                case PhasePartie.Aube: m_Temps.text = "Aube · le jour se lève"; break;
-                default: m_Temps.text = ""; break;
+                var pourcent = Mathf.RoundToInt(ratio * 100f);
+                if (pourcent != m_BouclierAffiche)
+                {
+                    m_BouclierAffiche = pourcent;
+                    m_AlerteBouclier.text = "Bouclier de Nyxessa à " + pourcent + " %";
+                }
+            }
+
+            // Temps (texte reconstruit seulement quand la phase, la seconde affichée ou le numéro de nuit change).
+            var phase = partie.Phase;
+            var nuit = phase == PhasePartie.Nuit || phase == PhasePartie.Crepuscule;
+            m_Icone.nuit = nuit;
+            var secondes = phase == PhasePartie.Jour || phase == PhasePartie.Nuit ? Mathf.Max(0, Mathf.CeilToInt(partie.TempsRestantPhase)) : 0;
+            var numeroNuit = partie.NumeroNuit;
+            if (phase != m_PhaseTexte || secondes != m_SecondesTexte || numeroNuit != m_NuitTexte)
+            {
+                m_PhaseTexte = phase;
+                m_SecondesTexte = secondes;
+                m_NuitTexte = numeroNuit;
+                switch (phase)
+                {
+                    case PhasePartie.Jour: m_Temps.text = "Jour · " + Horloge(secondes) + " avant la nuit"; break;
+                    case PhasePartie.Crepuscule: m_Temps.text = "Crépuscule · la nuit " + numeroNuit + " tombe"; break;
+                    case PhasePartie.Nuit: m_Temps.text = "Nuit " + numeroNuit + " · " + Horloge(secondes) + " avant l’aube"; break;
+                    case PhasePartie.Aube: m_Temps.text = "Aube · le jour se lève"; break;
+                    default: m_Temps.text = ""; break;
+                }
             }
 
             // Vote prêt.
             var vote = partie.Phase == PhasePartie.Jour && partie.VoteActif;
             m_BlocPrets.style.display = vote ? DisplayStyle.Flex : DisplayStyle.None;
-            if (vote) m_Prets.text = "Prêts " + partie.JoueursPrets + " / " + partie.JoueursTotal;
+            if (vote && (partie.JoueursPrets != m_PretsAffiches || partie.JoueursTotal != m_TotalAffiche))
+            {
+                m_PretsAffiches = partie.JoueursPrets;
+                m_TotalAffiche = partie.JoueursTotal;
+                m_Prets.text = "Prêts " + m_PretsAffiches + " / " + m_TotalAffiche;
+            }
 
             // Alerte avant la nuit (clignote).
             // Au donjon, l'alerte du rappel par Nyxessa (même place, plus précise) remplace celle de la nuit.
@@ -339,12 +380,21 @@ namespace Deathless.UI.Ecrans
             m_BlocAlerteNuit.style.display = alerte ? DisplayStyle.Flex : DisplayStyle.None;
             if (alerte)
             {
-                m_AlerteNuit.text = "La nuit tombe dans " + Mathf.CeilToInt(partie.TempsRestantPhase) + " s";
+                var avantNuit = Mathf.CeilToInt(partie.TempsRestantPhase);
+                if (avantNuit != m_AlerteNuitAffichee)
+                {
+                    m_AlerteNuitAffichee = avantNuit;
+                    m_AlerteNuit.text = "La nuit tombe dans " + avantNuit + " s";
+                }
                 m_BlocAlerteNuit.EnableInClassList("hud-alerte-nuit--pulse", Mathf.Repeat(m_Horloge, 1f) < 0.5f);
             }
 
             // Or.
-            m_Or.text = Milliers(partie.OrEquipe);
+            if (partie.OrEquipe != m_OrAffiche)
+            {
+                m_OrAffiche = partie.OrEquipe;
+                m_Or.text = Milliers(m_OrAffiche);
+            }
 
             // Missiles de Nyxessa (facultatif : IEtatMissiles sur la source de la partie).
             MajMissiles(partie as IEtatMissiles, dt);
@@ -389,8 +439,16 @@ namespace Deathless.UI.Ecrans
             else if (m_MissilesVus >= 0 && dispo < m_MissilesVus) m_TempsTirMissile = 0f;
             m_MissilesVus = dispo;
 
-            m_MissilesNombre.text = dispo.ToString();
-            m_MissilesMax.text = "/ " + max;
+            if (dispo != m_MissilesNombreAffiche)
+            {
+                m_MissilesNombreAffiche = dispo;
+                m_MissilesNombre.text = dispo.ToString();
+            }
+            if (max != m_MissilesMaxAffiche)
+            {
+                m_MissilesMaxAffiche = max;
+                m_MissilesMax.text = "/ " + max;
+            }
             m_Missiles.EnableInClassList("hud-missiles--plein", plein);
             m_Missiles.EnableInClassList("hud-missiles--vide", dispo == 0);
             // Missile gagné : l'icône grossit puis revient (demi-sinus).
@@ -481,7 +539,12 @@ namespace Deathless.UI.Ecrans
             // Vie (maquette B) : large barre à embouts de gemme, seule à afficher son chiffre (pas de « / max »).
             var vieRatio = joueur.VieMax > 0f ? Mathf.Clamp01(joueur.Vie / joueur.VieMax) : 0f;
             m_VieRemplissage.style.width = Length.Percent(vieRatio * 100f);
-            m_VieValeur.text = Mathf.RoundToInt(joueur.Vie).ToString();
+            var vie = Mathf.RoundToInt(joueur.Vie);
+            if (vie != m_VieAffichee)
+            {
+                m_VieAffichee = vie;
+                m_VieValeur.text = vie.ToString();
+            }
 
             // Endurance : filet presque invisible, qui ne s'éclaire vraiment que sous 70 % environ.
             var enduranceRatio = joueur.EnduranceMax > 0f ? Mathf.Clamp01(joueur.Endurance / joueur.EnduranceMax) : 0f;
@@ -498,7 +561,15 @@ namespace Deathless.UI.Ecrans
 
             var mort = joueur.EstMort;
             m_Mort.style.display = mort ? DisplayStyle.Flex : DisplayStyle.None;
-            if (mort) m_MortTexte.text = "Réapparition dans " + Mathf.CeilToInt(joueur.TempsAvantReapparition) + " s";
+            if (mort)
+            {
+                var reapparition = Mathf.CeilToInt(joueur.TempsAvantReapparition);
+                if (reapparition != m_MortAffichee)
+                {
+                    m_MortAffichee = reapparition;
+                    m_MortTexte.text = "Réapparition dans " + reapparition + " s";
+                }
+            }
 
             // Donjon : or porté (sous la caisse), alerte avant le rappel par Nyxessa, message (rappel, dépôt).
             var donjon = DonneesUI.Donjon;
@@ -507,13 +578,22 @@ namespace Deathless.UI.Ecrans
                 int porte = donjon != null ? donjon.OrPorte : 0;
                 bool dedans = donjon != null && donjon.AuDonjon;
                 m_OrPorte.style.display = porte > 0 || dedans ? DisplayStyle.Flex : DisplayStyle.None;
-                m_OrPorteValeur.text = porte.ToString();
+                if (porte != m_OrPorteAffiche)
+                {
+                    m_OrPorteAffiche = porte;
+                    m_OrPorteValeur.text = porte.ToString();
+                }
                 m_OrPorteLegende.text = dedans ? "or porté · au donjon" : "or porté";
                 float avant = donjon != null && dedans ? donjon.AvantRappel : -1f;
                 m_DonjonAlerte.style.display = avant >= 0f ? DisplayStyle.Flex : DisplayStyle.None;
                 if (avant >= 0f)
                 {
-                    m_DonjonAlerteTexte.text = "Le portail se ferme dans " + Mathf.CeilToInt(avant) + " s : rentrez au village !";
+                    var avantRappel = Mathf.CeilToInt(avant);
+                    if (avantRappel != m_AvantRappelAffiche)
+                    {
+                        m_AvantRappelAffiche = avantRappel;
+                        m_DonjonAlerteTexte.text = "Le portail se ferme dans " + avantRappel + " s : rentrez au village !";
+                    }
                     m_DonjonAlerte.style.opacity = 0.75f + 0.25f * Mathf.Abs(Mathf.Sin(Time.unscaledTime * 4f));
                 }
                 string msg = donjon != null ? donjon.Message : null;
@@ -526,7 +606,11 @@ namespace Deathless.UI.Ecrans
             if (m_PointsCompetence != null)
             {
                 m_PointsCompetence.style.display = points > 0 ? DisplayStyle.Flex : DisplayStyle.None;
-                if (points > 0) m_PointsTexte.text = points == 1 ? "1 point de compétence" : points + " points de compétence";
+                if (points > 0 && points != m_PointsAffiches)
+                {
+                    m_PointsAffiches = points;
+                    m_PointsTexte.text = points == 1 ? "1 point de compétence" : points + " points de compétence";
+                }
             }
 
             var invite = mort ? null : joueur.InviteInteraction;
@@ -556,7 +640,11 @@ namespace Deathless.UI.Ecrans
         {
             m_Potion.style.display = potions != null && potions.PotionsMax > 0 ? DisplayStyle.Flex : DisplayStyle.None;
             if (potions == null) return;
-            m_PotionNombre.text = potions.Potions.ToString();
+            if (potions.Potions != m_PotionsAffichees)
+            {
+                m_PotionsAffichees = potions.Potions;
+                m_PotionNombre.text = m_PotionsAffichees.ToString();
+            }
             m_Potion.EnableInClassList("hud-potion--vide", potions.Potions <= 0);
         }
 
@@ -625,16 +713,23 @@ namespace Deathless.UI.Ecrans
             e.recharge.style.display = recharge ? DisplayStyle.Flex : DisplayStyle.None;
             if (recharge)
             {
-                e.recharge.text = c.RechargeRestante >= 1f ? Mathf.CeilToInt(c.RechargeRestante).ToString() : c.RechargeRestante.ToString("0.0");
+                // Texte reconstruit seulement quand la valeur affichée change (secondes entières, puis dixièmes).
+                var restante = c.RechargeRestante;
+                var cle = restante >= 1f ? 100 + Mathf.CeilToInt(restante) : Mathf.RoundToInt(restante * 10f);
+                if (cle != e.rechargeAffichee)
+                {
+                    e.rechargeAffichee = cle;
+                    e.recharge.text = restante >= 1f ? Mathf.CeilToInt(restante).ToString() : (cle * 0.1f).ToString("0.0");
+                }
                 // Le voile descend à mesure que la recharge avance.
                 var part = c.RechargeTotale > 0f ? Mathf.Clamp01(c.RechargeRestante / c.RechargeTotale) : 1f;
                 e.voile.style.height = Length.Percent(part * 100f);
             }
         }
 
-        static string Horloge(float secondes)
+        /// Secondes entières (positives) → « m:ss ».
+        static string Horloge(int s)
         {
-            var s = Mathf.Max(0, Mathf.CeilToInt(secondes));
             return (s / 60) + ":" + (s % 60).ToString("00");
         }
 
