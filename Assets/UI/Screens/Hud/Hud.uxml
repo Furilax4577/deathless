@@ -1,10 +1,15 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:dl="Deathless.UI" editor-extension-mode="False">
     <Style src="Hud.uss" />
+    <Style src="HudVie.uss" />
     <ui:VisualElement name="hud" class="hud" picking-mode="Ignore">
         <!-- Pseudos des autres joueurs au-dessus de leur tête (multijoueur ; construits par EcranHud) -->
         <ui:VisualElement name="pseudos" class="hud-pseudos" picking-mode="Ignore" />
         <!-- Statuts au-dessus des ennemis affectés (placés chaque image par HudStatuts) -->
         <ui:VisualElement name="statuts-ennemis" class="hud-statuts-ennemis" picking-mode="Ignore" />
+        <!-- Barres de vie fines au-dessus des ennemis blessés et élites (placées chaque image par HudVieEnnemis) -->
+        <ui:VisualElement name="vie-ennemis" class="hud-statuts-ennemis" picking-mode="Ignore" />
+        <!-- Chiffres de dégâts flottants (pool réutilisé par HudDegats) -->
+        <ui:VisualElement name="degats" class="hud-degats" picking-mode="Ignore" />
 
         <!-- Mort : voile et compte à rebours (sous le reste du HUD) -->
         <ui:VisualElement name="mort" class="hud-mort" picking-mode="Ignore">
@@ -45,6 +50,49 @@
                     <ui:Label name="missiles-max" text="/ 5" class="hud-missiles__max" />
                 </ui:VisualElement>
             </ui:VisualElement>
+
+            <!-- Méga barre du/des boss (Morgrim, Nyxar ; variante B « ornée » choisie par Quentin le 27/09/2026),
+                 sous la barre de Nyxessa, sans la déplacer ni toucher au compteur de missiles. Deux emplacements
+                 empilés au plus, remplis par HudVieEnnemis (déploiement/repli, segments, statuts). -->
+            <ui:VisualElement name="boss-zone" class="boss-zone" picking-mode="Ignore">
+                <ui:VisualElement name="boss1" class="boss-emplacement" picking-mode="Ignore">
+                    <ui:VisualElement name="boss1-deploiement" class="boss-deploiement" style="width: 0;">
+                        <ui:VisualElement name="boss1-cartouche" class="bossB-cartouche">
+                            <ui:Label name="boss1-nom" text="MORGRIM" class="bossB-nom" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="bossB-ligne">
+                            <ui:VisualElement class="bossB-gemme" />
+                            <ui:VisualElement name="boss1-piste" class="bossB-piste">
+                                <ui:VisualElement name="boss1-seg0" class="bossB-segment"><ui:VisualElement name="boss1-seg0-remplissage" class="bossB-segment__remplissage" /></ui:VisualElement>
+                                <ui:VisualElement name="boss1-seg1" class="bossB-segment"><ui:VisualElement name="boss1-seg1-remplissage" class="bossB-segment__remplissage" /></ui:VisualElement>
+                                <ui:VisualElement name="boss1-seg2" class="bossB-segment"><ui:VisualElement name="boss1-seg2-remplissage" class="bossB-segment__remplissage" /></ui:VisualElement>
+                                <ui:VisualElement name="boss1-seg3" class="bossB-segment bossB-segment--fin"><ui:VisualElement name="boss1-seg3-remplissage" class="bossB-segment__remplissage" /></ui:VisualElement>
+                            </ui:VisualElement>
+                            <ui:VisualElement class="bossB-gemme" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="boss1-statuts" class="boss-statuts" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:VisualElement name="boss2" class="boss-emplacement" picking-mode="Ignore">
+                    <ui:VisualElement name="boss2-deploiement" class="boss-deploiement" style="width: 0;">
+                        <ui:VisualElement name="boss2-cartouche" class="bossB-cartouche">
+                            <ui:Label name="boss2-nom" text="NYXAR" class="bossB-nom" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="bossB-ligne">
+                            <ui:VisualElement class="bossB-gemme" />
+                            <ui:VisualElement name="boss2-piste" class="bossB-piste">
+                                <ui:VisualElement name="boss2-seg0" class="bossB-segment"><ui:VisualElement name="boss2-seg0-remplissage" class="bossB-segment__remplissage" /></ui:VisualElement>
+                                <ui:VisualElement name="boss2-seg1" class="bossB-segment"><ui:VisualElement name="boss2-seg1-remplissage" class="bossB-segment__remplissage" /></ui:VisualElement>
+                                <ui:VisualElement name="boss2-seg2" class="bossB-segment"><ui:VisualElement name="boss2-seg2-remplissage" class="bossB-segment__remplissage" /></ui:VisualElement>
+                                <ui:VisualElement name="boss2-seg3" class="bossB-segment bossB-segment--fin"><ui:VisualElement name="boss2-seg3-remplissage" class="bossB-segment__remplissage" /></ui:VisualElement>
+                            </ui:VisualElement>
+                            <ui:VisualElement class="bossB-gemme" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="boss2-statuts" class="boss-statuts" picking-mode="Ignore" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
             <ui:VisualElement class="hud-pastille hud-temps">
                 <dl:IconeJourNuit name="temps-icone" class="hud-temps__icone" />
                 <ui:Label name="temps-texte" text="Jour · 1:42 avant la nuit" class="hud-temps__texte" />

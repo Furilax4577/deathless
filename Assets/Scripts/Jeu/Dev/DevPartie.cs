@@ -31,13 +31,13 @@ namespace Deathless.Jeu.Dev
         }
 
         /// Pose un squelette à `distance` m devant le héros, face à lui (sortie de terre comprise).
-        public static Squelette PoserDevant(TypeEnnemi type, float distance, float lateral = 0f)
+        public static Squelette PoserDevant(TypeEnnemi type, float distance, float lateral = 0f, bool elite = false)
         {
             var h = P != null ? P.HerosLocal : null;
             if (h == null || DirecteurVagues.Instance == null) return null;
             Vector3 p = h.transform.position + h.transform.forward * distance + h.transform.right * lateral;
             if (UnityEngine.AI.NavMesh.SamplePosition(p, out var hit, 3f, UnityEngine.AI.NavMesh.AllAreas)) p = hit.position;
-            return DirecteurVagues.Instance.Poser(type, p, false, false);
+            return DirecteurVagues.Instance.Poser(type, p, elite, false);
         }
 
         /// Place le héros (et la caméra derrière lui) en regardant un point.

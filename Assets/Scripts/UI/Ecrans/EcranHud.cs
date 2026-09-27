@@ -66,6 +66,10 @@ namespace Deathless.UI.Ecrans
         HudRelevage m_Relevage;
         /// Jauge de parade du paladin, sous le réticule (classe à part : HudParade.cs).
         HudParade m_Parade;
+        /// Barres de vie des ennemis et méga barre du/des boss (classe à part : HudVieEnnemis.cs).
+        HudVieEnnemis m_VieEnnemis;
+        /// Chiffres de dégâts flottants (classe à part : HudDegats.cs).
+        HudDegats m_Degats;
 
         /// Autres joueurs affichés (colonne de gauche) : trois au plus (salon de quatre).
         public const int AlliesMax = 3;
@@ -156,6 +160,8 @@ namespace Deathless.UI.Ecrans
             m_Statuts = new HudStatuts(Racine);
             m_Relevage = new HudRelevage(Racine);
             m_Parade = new HudParade(Racine);
+            m_VieEnnemis = new HudVieEnnemis(Racine);
+            m_Degats = new HudDegats(Racine);
         }
 
         void ConstruireAllies()
@@ -234,6 +240,9 @@ namespace Deathless.UI.Ecrans
             m_Statuts?.Maj(joueur == null || joueur.EstMort);
             m_Relevage?.Maj();
             m_Parade?.Maj(joueur == null || joueur.EstMort);
+            m_VieEnnemis?.Maj(dt);
+            m_Degats?.Suivre();
+            m_Degats?.Maj(dt);
         }
 
         /// Colonne de gauche : un allié par ligne (emblème de classe, pseudo, barre de vie fine ; mort : ligne grisée et

@@ -56,6 +56,11 @@
                                     <ui:Button name="releve-maintenir" text="Maintenir" class="options-pill options-pill--dernier" />
                                 </ui:VisualElement>
                             </ui:VisualElement>
+
+                            <ui:VisualElement class="options-combat">
+                                <ui:Label text="COMBAT" class="dl-section-label options-combat__label" />
+                                <ui:Toggle name="options-afficher-degats" label="Afficher les dégâts" value="true" class="dl-field" />
+                            </ui:VisualElement>
                         </ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>

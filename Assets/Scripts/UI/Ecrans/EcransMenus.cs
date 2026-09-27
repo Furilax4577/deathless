@@ -394,6 +394,7 @@ namespace Deathless.UI.Ecrans
 
         Label m_PseudoValeur;
         Button m_ReleveMarteler, m_ReleveMaintenir;
+        Toggle m_AfficherDegats;
         IProfilJoueur m_Profil;
 
         public override void AuSommet() { if (m_PseudoValeur != null) m_PseudoValeur.text = DonneesUI.Profil.Pseudo; }
@@ -449,6 +450,11 @@ namespace Deathless.UI.Ecrans
             m_ReleveMarteler.clicked += () => DefinirRelevage(false);
             m_ReleveMaintenir.clicked += () => DefinirRelevage(true);
             MajRelevage();
+
+            // Combat : chiffres de dégâts flottants (activés par défaut, wiki : interface.md).
+            m_AfficherDegats = Racine.Q<Toggle>("options-afficher-degats");
+            m_AfficherDegats.SetValueWithoutNotify(OptionsJoueur.AfficherDegats);
+            m_AfficherDegats.RegisterValueChangedCallback(e => OptionsJoueur.AfficherDegats = e.newValue);
 
             var table = Racine.Q("options-table");
             var lignes = new List<VisualElement>();
@@ -620,14 +626,16 @@ namespace Deathless.UI.Ecrans
             UINavigation.Focus(PremierFocus);
         }
 
-        /// Réinitialiser (Y) : l'onglet affiché seulement (Jeu : taille ×2 et relevage par martelage ; Audio :
-        /// volumes par défaut).
+        /// Réinitialiser (Y) : l'onglet affiché seulement (Jeu : taille ×2, relevage par martelage et dégâts
+        /// affichés ; Audio : volumes par défaut).
         public override void Reinitialiser()
         {
             if (m_Onglet == 2) { VolumesAudio.Reinitialiser(); return; }
             if (m_Onglet != 0) return;   // Commandes : table en lecture seule, rien à réinitialiser (PR #15)
             UIScale.Level = UIScale.DefaultLevel;
             DefinirRelevage(false);
+            OptionsJoueur.AfficherDegats = true;
+            m_AfficherDegats.SetValueWithoutNotify(true);
         }
     }
 

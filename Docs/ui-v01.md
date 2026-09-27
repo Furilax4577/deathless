@@ -188,6 +188,66 @@ Posée par le jeu dans `DonneesUI.Relevage` (`Deathless.Jeu.RelevageUI`, créée
 | `Martelement` | Part du relevé gagnée en martelant Saut (0 à 1). |
 | `DernierMartelement` | Instant du dernier martelage (petite secousse). |
 
+### Vie des ennemis et méga barre du boss : `IEtatVieEnnemis` (`Donnees/IVieEnnemis.cs`, 26-27/09/2026)
+
+Posée par le jeu dans `DonneesUI.VieEnnemis` (`Deathless.Jeu.VieEnnemisUI`, créée par `HudPresenter`), lue à chaque
+image par `Ecrans/HudVieEnnemis.cs`. Absente : rien n'est affiché. Règles : Wiki `interface.md`, « Barres de vie des
+ennemis ». **Aucun message réseau** : les PV des squelettes sont déjà répliqués chez les clients (`EnnemiReseau`,
+`reseau.md`) ; `VieEnnemisUI` lit `DirecteurVagues.Instance.Vivants` et `Squelette.Sante` comme `StatutsUI` lit les
+ennemis affectés.
+
+| Membre | Sens |
+|---|---|
+| `IEtatVieEnnemis.Ennemis` | Ennemis communs et élites (jamais un boss : `Squelette.type` `Golem`/`Necromancien`). |
+| `IEtatVieEnnemis.Boss` | Deux au plus (Quentin, 26/09/2026), empilés. |
+| `IEnnemiVie.PositionTete` | Même ancre que la rangée de statuts au-dessus de l'ennemi (`StatutsUI.MargeTete`) : la barre se pose juste **sous** cette rangée (statuts en `translate(-50%, -100%)`, barre en `translate(-50%, 0%)` au même point), pour que le petit bloc bouge d'un seul tenant. |
+| `IEnnemiVie.Visible` | Faux à pleine vie depuis plus de 2 s et hors élite (calculé côté jeu avec `Sante.DernierCoup`, déjà tenu par `Sante.Encaisser`) ; le HUD applique en plus sa propre limite de champ et de distance (30 m, estompée sur les 6 derniers mètres, comme `HudStatuts`). |
+| `IEnnemiVie.Vie`, `Elite` | Ratio 0-1 ; élite : barre toujours visible, plus large, liseré rouge (classe `mvi-barre--elite`). |
+| `IBossVie.Cle` | Identifiant stable (`Squelette.Id`) pour garder le même emplacement (boss1/boss2) et animer déploiement et repli d'une image à l'autre. |
+| `IBossVie.Nom`, `Vie`, `Segments` | « MORGRIM » (Golem), « NYXAR » (Necromancien) ; vie 0-1 ; 4 segments provisoires (constante, les vrais paliers de comportement viendront plus tard). |
+| `IBossVie.Vivant` | Vrai de l'apparition à la mort (pilote le déploiement) ; faux après la mort — le boss reste ~0,8 s dans la liste le temps du repli (il quitte `DirecteurVagues.Vivants` à sa désintégration), puis disparaît de `Boss`. |
+| `IBossVie.Statuts` | `IStatutAffiche` (même contrat que les statuts joueur/ennemis), accrochés à la barre. |
+
+- **HUD** (`Ecrans/HudVieEnnemis.cs`, classe à part : `EcranHud` ne fait que la créer et l'appeler) :
+  - **Ennemis** : calque `vie-ennemis` (comme `statuts-ennemis`), une barre `.mvi-barre` par ennemi visible (pool réutilisé, positionné chaque image en espace écran). Classes reprises telles quelles de la maquette (`sandbox-ui`, `Assets/UI/Screens/HudMaquettesVie/HudMaquettesVie.uss`), copiées dans `Assets/UI/Screens/Hud/HudVie.uss`.
+  - **Boss** : variante **B « ornée »** choisie par Quentin le 27/09/2026 (cartouche + nom, embouts de gemme en losange, piste à segments), posée dans `Hud.uxml` juste après `.hud-nyx` dans `.hud-haut` (`boss-zone`, deux emplacements `boss1`/`boss2`) : la barre de Nyxessa et le compteur de missiles à sa droite ne bougent pas. Déploiement (0,8 s) à l'entrée en scène, repli (0,8 s) à la mort, piloté par `HudVieEnnemis` (pas par un événement : une largeur de `%` qui suit `Vivant` image par image). Statuts accrochés au coin supérieur droit de la barre, **écartés d'un cran** de son bout (`.boss-statuts`, `right: -34px` : la maquette les collait, piège relevé dans `sandbox-ui/CLAUDE.md`) ; réutilisent `RangeeStatuts`/`CaseStatut` de `HudStatuts.cs` (vraies icônes et jauges de durée, pas les pastilles factices de la maquette).
+- Vérifié en Play le 27/09/2026 (Village, `Deathless.Jeu.Dev.ScenariosVie`) : squelette commun blessé puis soigné (barre apparaît/s'efface), élite toujours visible, Morgrim posé près du héros (déploiement, coups, statut étourdi ou ralenti sur la barre). Captures : `Assets/Screenshots/vie_ennemis_blesse_elite.png`, `boss_entree.png`, `boss_combat_statut.png`.
+- **Banc UIv01** (`EtatFactice`) : pas encore de version factice (note du 27/09/2026, à ajouter avec les autres sources factices si besoin d'un banc hors Village).
+
+### Chiffres de dégâts flottants : `IDegatsSource` (`Donnees/IDegats.cs`, 26-27/09/2026)
+
+Posée par le jeu dans `DonneesUI.Degats` (`Deathless.Jeu.DegatsUI`, créée et actualisée chaque image par
+`HudPresenter`), à laquelle s'abonne `Ecrans/HudDegats.cs` (**un événement par coup**, jamais une lecture image par
+image). Option `OptionsJoueur.AfficherDegats` (onglet Jeu, activée par défaut) : coupée, plus aucun événement n'est
+levé (les barres de vie restent). Règles : Wiki `interface.md`, « Chiffres de dégâts ».
+
+| Membre | Sens |
+|---|---|
+| `EvenementDegat.Point` | Point du monde où faire naître le chiffre. |
+| `Montant`, `Mot` | Un chiffre, ou l'un des quatre mots (« Paré », « Bloqué », « Esquivé », « Immunisé »), jamais les deux. |
+| `Type` (`TypeChiffreDegat`) | `Normal` (blanc), `Critique` (or, plus gros, à-coup), `Brulure` (orange, petit, cumulé), `Recu` (rouge), `Nyxessa` (vert, seule exception à « ses propres coups » : partagé entre tous les postes), `Soin` (doré, « +N »), `Mot`. |
+| `Continu`, `CleCible` | Tic continu (brûlure, tournante) à cumuler sur le chiffre en cours pour cette cible (le HUD grossit le nombre au lieu d'en faire naître un nouveau). |
+
+- **Jeu (`DegatsUI.cs`)** : s'abonne une seule fois à des **événements globaux de `Sante`** (`AnyTouche`,
+  `AnyIntercepte`, `AnyImmunise`, `AnySoigne` ; `Assets/Scripts/Jeu/Sante.cs`), qui couvrent héros et squelettes quel
+  que soit leur nombre — pas besoin de s'abonner ennemi par ennemi. Filtre (« chacun ne voit que ses coups et ce
+  qu'il reçoit, plus les dégâts subis par Nyxessa ») :
+  - **Coup porté** : `AnyTouche` avec `info.sourceId` = le joueur local et `info.equipeSource == Heros` (normal, critique ou tic de brûlure selon `info.critique`/`continu`).
+  - **Coup reçu** : `AnyTouche` sur le `Sante` du héros local (rouge).
+  - **Dégâts à Nyxessa** : **pas** un événement de `Sante` côté client (ses PV sont répliqués par `PartieReseau`, jamais un vrai `Sante.Encaisser` chez un client) — `DegatsUI.Actualiser()`, appelée chaque image par `HudPresenter`, compare `Partie.Etat.nyxessa.pv` d'une image à l'autre et émet la différence, vue par tous les postes.
+  - **Paré / Bloqué / Esquivé** : `AnyIntercepte` sur le héros local ; `Interception.Pare` → « Paré », `Interception.Bloque` → « Esquivé » si `Heros.EstInvulnerable` (fenêtre d'esquive en cours), sinon « Bloqué » (garde du Paladin).
+  - **Immunisé** : `AnyImmunise`, nouvel événement de `Sante.Encaisser` (coup annulé par `invulnerable` — réapparition, fin d'esquive, mode test — qui ne levait auparavant aucun événement).
+  - **Soin** : `AnySoigne` sur le héros local (doré, « +N »).
+  - **Coup d'un client sur un squelette (marionnette)** : `Sante.Encaisser` du client ne va jamais jusqu'au vrai calcul de PV (il part vers l'hôte, `relais`) ; `AnyTouche` y est quand même levé avec les **dégâts estimés localement** (variable `estime`, déjà calculée pour les jauges de classe), pour un chiffre affiché tout de suite chez le client sans attendre la confirmation de l'hôte (`reseau.md`, « Relais des coups »). Rien de plus côté réseau : ni nouveau message, ni RPC.
+- **HUD (`HudDegats.cs`)** : pool de **trente** `Label` réutilisés au plus (les plus anciens s'effacent d'abord),
+  positionnés une fois en espace écran à la réception de l'événement (jamais reprojetés ensuite, comme la maquette),
+  montent de 60 px et s'effacent en **0,8 s** ; le critique reçoit un petit à-coup d'échelle au début. Classes reprises
+  telles quelles de la maquette (`sandbox-ui`, `HudMaquettesVie.uss`, copiées dans `Assets/UI/Screens/Hud/HudVie.uss`).
+- Vérifié en Play le 27/09/2026 (Village, `ScenariosVie`) : ordinaire, critique, brûlure cumulée (le chiffre grossit
+  au lieu de s'empiler), reçu, un mot (« Bloqué »/« Paré »). Capture : `Assets/Screenshots/degats_variantes.png`.
+  Option à « non » : plus aucun chiffre, les barres de vie inchangées ; capture `Assets/Screenshots/options_afficher_degats.png` (onglet Jeu).
+- **Banc UIv01** (`EtatFactice`) : pas encore de version factice (même note que `IEtatVieEnnemis` ci-dessus).
+
 ### Bloc joueur : maquette B (26/09/2026)
 
 Quentin a choisi la **maquette B** parmi trois essais du bloc joueur (bac à sable `sandbox-ui`, `Assets/UI/Screens/HudMaquettes/`, capture `maquette_hud_B.png`), intégrée dans le vrai HUD :

@@ -1,0 +1,159 @@
+/* Barres de vie des ennemis, méga barre du boss, chiffres de dégâts flottants (interface.md § « Barres de vie des
+   ennemis », 26-27/09/2026). Classes reprises telles quelles du bac à sable sandbox-ui (Assets/UI/Screens/
+   HudMaquettesVie/HudMaquettesVie.uss, maquettes validées par Quentin le 27/09/2026 : variante B « ornée » du boss).
+   Piège UXML connu (sandbox-ui, CLAUDE.md) : jamais de style inline avec un jeton --dl-*, seulement des classes. */
+
+/* ---------------------------------------------------------------- Barre fine des ennemis communs et élites */
+
+/* Positionnée chaque image par HudVieEnnemis (style.left/top), ancrée par le haut (translate -50% 0%) juste sous la
+   rangée de statuts (même ancre : StatutsUI.MargeTete). Transition d'opacité : apparition/effacement en fondu. */
+.hud-vie-barre {
+    position: absolute;
+    translate: -50% 0%;
+}
+
+.mvi-barre {
+    width: 132px;
+    height: 9px;
+    border-radius: 5px;
+    border-width: 1px;
+    border-color: var(--dl-color-border);
+    background-color: var(--dl-color-well);
+    overflow: hidden;
+    transition-property: opacity;
+    transition-duration: 0.35s;
+}
+
+.mvi-barre__remplissage { height: 100%; width: 100%; background-color: var(--dl-color-life); }
+
+.mvi-barre--elite {
+    width: 174px;
+    height: 12px;
+    border-width: 2px;
+    border-color: var(--dl-color-life);
+    border-radius: 6px;
+}
+
+/* ---------------------------------------------------------------- Méga barre du boss (variante B « ornée ») */
+
+/* Conteneur : posé juste sous .hud-nyx (Hud.uss), dans le même bloc .hud-haut, sans toucher à la barre de Nyxessa ni
+   au compteur de missiles. Deux emplacements empilés au plus. */
+.boss-zone { width: 100%; align-items: center; margin-top: 12px; }
+.boss-emplacement { position: relative; width: 660px; margin-bottom: 10px; }
+
+/* Largeur pilotée par HudVieEnnemis (0 à 100 %, relative à .boss-emplacement) : déploiement à l'entrée, repli à la
+   mort. */
+.boss-deploiement { overflow: hidden; }
+
+/* Statuts accrochés à la barre, écartés d'un cran de son coin supérieur droit (jamais collés : correction du 26/09,
+   la maquette les collait). Hors du conteneur de déploiement (overflow: hidden) pour ne pas être rognés. */
+.boss-statuts { position: absolute; right: -34px; top: 8px; flex-direction: row; }
+
+.bossB-cartouche {
+    position: relative;
+    align-self: center;
+    margin-bottom: -14px;
+    padding: 4px 24px;
+    border-radius: var(--dl-radius-md);
+    border-width: 2px;
+    border-color: var(--dl-color-gold);
+    background-color: var(--dl-color-panel-95);
+}
+
+.bossB-nom {
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+    font-size: 22px;
+    letter-spacing: 3px;
+    color: var(--dl-color-text);
+    margin: 0;
+    padding: 0;
+    -unity-text-align: middle-center;
+}
+
+.bossB-ligne { width: 100%; flex-direction: row; align-items: center; padding-top: 18px; }
+.bossB-gemme {
+    width: 20px;
+    height: 20px;
+    margin: 0 10px;
+    rotate: 45deg;
+    background-color: var(--dl-color-gold);
+    border-width: 2px;
+    border-color: var(--dl-color-border-strong);
+}
+
+.bossB-piste {
+    flex-grow: 1;
+    height: 32px;
+    flex-direction: row;
+    border-radius: 16px;
+    border-width: 2px;
+    border-color: var(--dl-color-border-strong);
+    background-color: var(--dl-color-well);
+    overflow: hidden;
+}
+
+.bossB-segment { height: 100%; flex-grow: 1; border-right-width: 2px; border-right-color: rgba(0, 0, 0, 0.55); }
+.bossB-segment--fin { border-right-width: 0; }
+.bossB-segment__remplissage { height: 100%; width: 100%; background-color: var(--dl-color-life); }
+
+/* ---------------------------------------------------------------- Chiffres de dégâts flottants */
+
+.hud-degats { position: absolute; left: 0; top: 0; right: 0; bottom: 0; }
+
+.chiffre {
+    position: absolute;
+    translate: -50% -50%;
+    margin: 0;
+    padding: 0;
+    -unity-text-align: middle-center;
+    white-space: nowrap;
+    display: none;
+}
+
+.chiffre--normal {
+    color: #ffffff;
+    font-size: 32px;
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+}
+
+.chiffre--critique {
+    color: var(--dl-color-gold);
+    font-size: 56px;
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Bold-SDF.asset");
+}
+
+.chiffre--brulure {
+    color: var(--dl-color-rage);
+    font-size: 24px;
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Medium-SDF.asset");
+}
+
+.chiffre--recu {
+    color: var(--dl-color-life);
+    font-size: 34px;
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+}
+
+.chiffre--nyxessa {
+    color: var(--dl-color-nyxessa);
+    font-size: 32px;
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+}
+
+.chiffre--soin {
+    color: var(--dl-color-gold);
+    font-size: 30px;
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+}
+
+.chiffre--mot {
+    color: var(--dl-color-text);
+    font-size: 26px;
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Medium-SDF.asset");
+}
+
+/* ---------------------------------------------------------------- Tailles ×3 */
+
+.dl-scale-3 .boss-emplacement { width: 460px; }
+.dl-scale-3 .bossB-nom { font-size: 19px; }
+.dl-scale-3 .bossB-piste { height: 26px; }

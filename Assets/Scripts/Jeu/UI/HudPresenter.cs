@@ -17,6 +17,9 @@ namespace Deathless.Jeu
         Camera m_Camera;
         List<ICompetenceHud> m_Competences;
         List<ILigneScore> m_Lignes;
+        /// Chiffres de dégâts flottants (classe à part, DegatsUI.cs) : actualisée chaque image (vie de Nyxessa, non
+        /// répliquée par un vrai Sante.Encaisser côté client), et détachée de ses abonnements à la destruction.
+        DegatsUI m_Degats;
 
         Partie P => m_Partie != null ? m_Partie : (m_Partie = Partie.Instance);
         EtatJoueur J => P != null ? P.JoueurLocal : null;
@@ -28,6 +31,8 @@ namespace Deathless.Jeu
             DonneesUI.Personnage = new MenuPersonnage();   // menu du personnage (Tab / Y)
             DonneesUI.Statuts = new StatutsUI();           // statuts du joueur et des ennemis (HUD, menu du personnage)
             DonneesUI.Relevage = new RelevageUI();         // jauge de relevé du Renversé (héros local)
+            DonneesUI.VieEnnemis = new VieEnnemisUI();     // barres de vie des ennemis et méga barre des boss
+            DonneesUI.Degats = m_Degats = new DegatsUI();  // chiffres de dégâts flottants (option AfficherDegats)
         }
 
         void Start()
@@ -70,6 +75,7 @@ namespace Deathless.Jeu
         void OnDisable()
         {
             if (ReferenceEquals(DonneesUI.Commandes, this)) DonneesUI.Enregistrer(null, null, null, null);
+            m_Degats?.Detacher();
         }
 
         void LateUpdate()
@@ -80,6 +86,10 @@ namespace Deathless.Jeu
             var voulu = jeu ? CursorLockMode.Locked : CursorLockMode.None;
             if (Cursor.lockState != voulu) Cursor.lockState = voulu;
             if (Cursor.visible == jeu) Cursor.visible = !jeu;
+
+            // Chiffres de dégâts : la vie de Nyxessa n'est pas un vrai Sante.Encaisser côté client (Docs/reseau.md),
+            // donc DegatsUI la surveille elle-même image par image plutôt que par un événement de Sante.
+            m_Degats?.Actualiser();
         }
 
         // ----------------------------------------------------------------- IEtatPartie

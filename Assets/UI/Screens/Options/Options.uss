@@ -156,6 +156,10 @@
 }
 .options-pill--dernier { margin-right: 0; }
 
+/* Afficher les dégâts (chiffres flottants) : simple case à cocher sous la relève, même colonne latérale. */
+.options-combat { margin-top: 20px; }
+.options-combat__label { margin-bottom: 8px; }
+
 /* ---------- Onglet Commandes : table dense en trois colonnes, défilement interne ---------- */
 .options-table-entete {
     flex-direction: row;
@@ -218,7 +222,7 @@
    masque le suivant (défaut trouvé en vérification, 26/09/2026 ; hauteurs mesurées en jeu). */
 .dl-scale-3 .options-page__corps { flex-direction: column; }
 .dl-scale-3 .options-col-principale { flex-grow: 0; flex-shrink: 0; flex-basis: 168px; height: 168px; margin-right: 0; margin-bottom: 10px; }
-.dl-scale-3 .options-col-aside { flex-grow: 0; flex-shrink: 0; flex-basis: 172px; height: 172px; }
+.dl-scale-3 .options-col-aside { flex-grow: 0; flex-shrink: 0; flex-basis: 216px; height: 216px; }
 .dl-scale-3 .options-tailles { margin-bottom: 4px; height: 68px; }
 .dl-scale-3 .options-taille { min-height: 68px; }
 .dl-scale-3 .options-table-entete { padding: 0 8px; }
@@ -228,6 +232,8 @@
 .dl-scale-3 .options-releve { padding: 10px 16px; flex-grow: 0; flex-shrink: 0; flex-basis: 140px; height: 140px; }
 .dl-scale-3 .options-releve__aide { margin-top: 2px; }
 .dl-scale-3 .options-pilltoggle { flex-grow: 0; flex-shrink: 0; flex-basis: 44px; height: 44px; margin-top: 8px; }
+.dl-scale-3 .options-combat { margin-top: 10px; }
+.dl-scale-3 .options-combat__label { margin-bottom: 4px; }
 .dl-scale-3 .options-volume { min-height: 56px; }
 .dl-scale-3 .options-volume > .unity-base-field__label { flex-grow: 0.8; }
 

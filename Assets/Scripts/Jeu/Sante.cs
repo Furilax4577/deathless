@@ -52,6 +52,18 @@ namespace Deathless.Jeu
         public event Action<InfoDegats> Tue;
         public event Action<float> Soigne;                        // PV réellement rendus
 
+        /// Chiffres de dégâts flottants (interface.md) : ces événements globaux couvrent tous les Sante du jeu (héros,
+        /// squelettes, Nyxessa, sorcier) pour que Deathless.Jeu.DegatsUI s'y abonne une seule fois plutôt que par
+        /// personnage. AnyTouche est aussi levé sur un coup relayé (marionnette réseau, ci-dessous) avec les dégâts
+        /// estimés localement, pour un affichage immédiat côté client sans attendre la confirmation de l'hôte
+        /// (Docs/reseau.md, « Relais des coups »).
+        public static event Action<Sante, InfoDegats, float> AnyTouche;
+        public static event Action<Sante, InfoDegats, Interception> AnyIntercepte;
+        /// Coup entièrement annulé par l'invulnérabilité (réapparition, fin d'esquive, mode test) : aucun autre
+        /// événement n'est levé pour ce coup.
+        public static event Action<Sante, InfoDegats> AnyImmunise;
+        public static event Action<Sante, float> AnySoigne;
+
         /// Dernier coup reçu (pour l'attribution et la priorité des missiles).
         public float DernierCoup { get; private set; } = -99f;
 
@@ -67,17 +79,30 @@ namespace Deathless.Jeu
         public float Encaisser(InfoDegats info)
         {
             if (Mort || !isActiveAndEnabled) return 0f;
-            if (relais != null) return info.montant > 0f ? relais(info) : 0f;
+            if (relais != null)
+            {
+                if (info.montant <= 0f) return 0f;
+                float estime = relais(info);
+                // Estimation locale (client, marionnette) : chiffre de dégâts affiché tout de suite, sans attendre le
+                // PV répliqué par l'hôte (Docs/reseau.md).
+                if (estime > 0f) AnyTouche?.Invoke(this, info, estime);
+                return estime;
+            }
             if (info.parable && intercepteur != null)
             {
                 var r = intercepteur(info);
                 if (r != Interception.Passe)
                 {
                     Intercepte?.Invoke(info, r);
+                    AnyIntercepte?.Invoke(this, info, r);
                     return 0f;
                 }
             }
-            if (invulnerable) return 0f;
+            if (invulnerable)
+            {
+                AnyImmunise?.Invoke(this, info);
+                return 0f;
+            }
             if (absorbeur != null && info.equipeSource == Equipe.Ennemis)
             {
                 info.montant = absorbeur(info);
@@ -88,6 +113,7 @@ namespace Deathless.Jeu
             float reel = avant - pv;
             DernierCoup = Time.time;
             Touche?.Invoke(info, reel);
+            AnyTouche?.Invoke(this, info, reel);
             if (pv <= 0f) Tue?.Invoke(info);
             return reel;
         }
@@ -98,7 +124,7 @@ namespace Deathless.Jeu
             float avant = pv;
             pv = Mathf.Min(pvMax, pv + Mathf.Max(0f, montant));
             float reel = pv - avant;
-            if (reel > 0f) Soigne?.Invoke(reel);
+            if (reel > 0f) { Soigne?.Invoke(reel); AnySoigne?.Invoke(this, reel); }
             return reel;
         }
 
