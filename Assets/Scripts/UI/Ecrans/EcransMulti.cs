@@ -234,6 +234,10 @@ namespace Deathless.UI.Ecrans
         {
             public VisualElement racine, embleme;
             public Label pseudo, classe, etat, hote;
+            /// Dernier emblème posé et pseudo affiché (null : emplacement libre) : MiseAJour (chaque image) ne
+            /// repose l'icône et ne reconstruit le texte qu'au changement.
+            public string emblemePose, pseudoAffiche;
+            public bool localAffiche;
         }
 
         readonly List<Emplacement> m_Emplacements = new List<Emplacement>();
@@ -245,6 +249,9 @@ namespace Deathless.UI.Ecrans
         bool m_CodeVisible;
         float m_CopieJusqua;
         EtatLobby m_EtatAffiche = (EtatLobby)(-1);
+        /// Code du salon affiché et son masquage : le texte (points ou code) n'est reconstruit qu'au changement.
+        string m_CodeAffiche;
+        bool m_CodeMasque;
 
         static ILobby L => DonneesUI.Lobby;
         bool DansSalon => L != null && (L.Etat == EtatLobby.Salon || L.Etat == EtatLobby.CompteARebours || L.Etat == EtatLobby.Connexion);
@@ -310,7 +317,7 @@ namespace Deathless.UI.Ecrans
             var conteneur = Racine.Q("lobby-emplacements");
             for (var i = 0; i < 4; i++)
             {
-                var e = new Emplacement { racine = new VisualElement() };
+                var e = new Emplacement { racine = new VisualElement(), emblemePose = IconesUI.RepliClasse };
                 e.racine.AddToClassList("lobby-place");
                 e.embleme = IconesUI.Creer(IconesUI.RepliClasse, "lobby-place__embleme");
                 e.pseudo = new Label { pickingMode = PickingMode.Ignore };
@@ -392,7 +399,14 @@ namespace Deathless.UI.Ecrans
 
             // Code du salon : l'hôte peut l'afficher (masqué par défaut) et le copier.
             m_CodeTitre.text = l.EstHote ? "CODE DU SALON" : "SALON";
-            m_CodeValeur.text = l.EstHote && !m_CodeVisible ? new string('•', Mathf.Max(6, l.CodeSalon.Length)) : l.CodeSalon;
+            var masque = l.EstHote && !m_CodeVisible;
+            var code = l.CodeSalon;
+            if (code != m_CodeAffiche || masque != m_CodeMasque)
+            {
+                m_CodeAffiche = code;
+                m_CodeMasque = masque;
+                m_CodeValeur.text = masque ? new string('•', Mathf.Max(6, code.Length)) : code;
+            }
             m_Afficher.style.display = l.EstHote ? DisplayStyle.Flex : DisplayStyle.None;
             m_Afficher.text = m_CodeVisible ? "Masquer" : "Afficher";
             m_Copier.style.display = l.EstHote ? DisplayStyle.Flex : DisplayStyle.None;
@@ -409,7 +423,8 @@ namespace Deathless.UI.Ecrans
                 e.hote.style.display = j != null && j.EstHote ? DisplayStyle.Flex : DisplayStyle.None;
                 if (j == null)
                 {
-                    IconesUI.Poser(e.embleme, IconesUI.RepliClasse);
+                    PoserEmbleme(e, IconesUI.RepliClasse);
+                    e.pseudoAffiche = null;
                     e.pseudo.text = "Emplacement libre";
                     e.classe.text = i < l.JoueursMax ? "En attente d’un joueur" : "";
                     e.etat.text = "";
@@ -417,8 +432,14 @@ namespace Deathless.UI.Ecrans
                 }
                 if (!j.Pret) tousPrets = false;
                 var c = ClassesJouables.Trouver(j.ClasseId);
-                IconesUI.Poser(e.embleme, c != null ? c.Embleme : IconesUI.RepliClasse);
-                e.pseudo.text = j.Pseudo + (j.EstLocal ? " (toi)" : "");
+                PoserEmbleme(e, c != null ? c.Embleme : IconesUI.RepliClasse);
+                var pseudo = j.Pseudo ?? "";
+                if (pseudo != e.pseudoAffiche || j.EstLocal != e.localAffiche)
+                {
+                    e.pseudoAffiche = pseudo;
+                    e.localAffiche = j.EstLocal;
+                    e.pseudo.text = pseudo + (j.EstLocal ? " (toi)" : "");
+                }
                 e.classe.text = c != null ? c.Nom : "Classe à choisir";
                 e.etat.text = j.Pret ? "Prêt" : "Pas prêt";
             }
@@ -433,6 +454,14 @@ namespace Deathless.UI.Ecrans
             // mise en page ; afficher ou cacher ne décale donc jamais les cartes ni les actions (corrigé en 0.4.3).
             m_Compte.style.display = compte ? DisplayStyle.Flex : DisplayStyle.None;
             if (compte) m_Compte.text = "Tous prêts : la partie commence dans " + Mathf.CeilToInt(l.CompteARebours);
+        }
+
+        /// Pose l'emblème de l'emplacement seulement s'il change (IconesUI.Poser réécrit le style de l'élément).
+        static void PoserEmbleme(Emplacement e, string id)
+        {
+            if (id == e.emblemePose) return;
+            e.emblemePose = id;
+            IconesUI.Poser(e.embleme, id);
         }
 
         /// B : quitter le salon (reste sur le lobby), sinon fermer le lobby.
