@@ -111,14 +111,18 @@ public class GroundMist : MonoBehaviour
         return center + new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * distance;
     }
 
+    // Tampon des impacts de OnGround (partagé, thread principal) : RaycastAll allouait un tableau à chaque recalage
+    // (450 nappes toutes les ~3 s). 32 impacts sur une verticale suffisent largement (sol, toits, arbres, props).
+    private static readonly RaycastHit[] hitsTampon = new RaycastHit[32];
+
     // Posée sur le sol (la moitié de la nappe sous terre : on ne voit que le dôme bas). Le point le plus bas touché par
     // le rayon : le sol, pas un toit ni la cime d'un arbre.
     private static Vector3 OnGround(Vector3 point)
     {
-        RaycastHit[] hits = Physics.RaycastAll(new Vector3(point.x, 60f, point.z), Vector3.down, 120f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+        int n = Physics.RaycastNonAlloc(new Vector3(point.x, 60f, point.z), Vector3.down, hitsTampon, 120f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
         float lowest = float.PositiveInfinity;
-        foreach (RaycastHit hit in hits)
-            lowest = Mathf.Min(lowest, hit.point.y);
+        for (int i = 0; i < n; i++)
+            lowest = Mathf.Min(lowest, hitsTampon[i].point.y);
         if (!float.IsPositiveInfinity(lowest))
             point.y = lowest;
         return point;
