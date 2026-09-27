@@ -75,3 +75,15 @@ Les gestes joués en jeu pour chaque action, dans l'ordre où ils s'enchaînent.
 | Nuée de flèches | 5 salves de 10 dégâts, recharge 12 s |
 | Roulade arrière | recul de 4 m, 20 d'endurance, salve de 5 flèches de 15 dégâts, recharge 8 s |
 
+## Lissage du 27/09/2026 {décidé}
+
+Suite à l'audit d'équilibrage (`Docs/equilibrage-classes.md`) : le rôdeur avait le mono le plus faible du jeu (24 dégâts par seconde sur le corps) et une zone quatre fois plus faible que le viking. Décidé par Quentin :
+
+- **Flèche à pleine charge** : 40 → **50** dégâts, et elle **étourdit 1 s** l'ennemi touché (toute flèche à pleine charge, tête comprise ; statut [Étourdi](statuts.md)).
+- **Tir rapide** : intervalle 0,3 → **0,15 s**.
+- **Nuée de flèches** : 10 → **14** dégâts par salve, et la zone **ralentit** les ennemis qui y restent (statut Ralenti, même règle que la fissure de Morgrim).
+- **Salve** : 15 → **18**.
+- **Vie** : 110 → **120**.
+
+{dev} `GameBalance` (arc, nuée, salve, PV), `ClasseRodeur` (étourdissement à pleine charge, ralenti de la nuée par le chemin des statuts, hôte fait foi) ; rien de nouveau en réseau.
+

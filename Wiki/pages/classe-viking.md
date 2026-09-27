@@ -72,3 +72,13 @@ Les deux coups alternent.
 | Rugissement | 25 rage, recharge 12 s |
 | Saut percutant | 35 rage, 45 dégâts, recharge 8 s |
 
+## Lissage du 27/09/2026 {décidé}
+
+Suite à l'audit d'équilibrage (`Docs/equilibrage-classes.md`) : le viking partait à zéro rage à chaque vague (rage vide en 20 s, vagues à 40 s d'écart), donc sans saut ni rugissement au début de chaque assaut, et son rugissement l'immobilisait 1,5 s sans protection. Décidé par Quentin :
+
+- **Plancher de rage : 30**. La rage ne descend jamais sous 30 hors combat ; il a toujours de quoi ouvrir une vague.
+- **Coûts** : saut percutant 35 → **25**, rugissement 25 → **15**, attaque tournante 12 → **10** de rage.
+- **Rugissement** : il pose **Peau de fer** sur le viking (statut : **−35 % de dégâts subis pendant 6 s**, bienfait, liseré or dans le HUD) et se joue sur le **haut du corps** : il continue de marcher pendant le cri.
+
+{dev} `GameBalance` (rageMin, coûts), `ClasseViking` (plancher, Peau de fer par le chemin des statuts, couche haute de l'Animator comme la charge du paladin), nouveau statut `PeauDeFer` dans le catalogue (icône à générer), réseau par `HerosReseau.StatutRpc` existant.
+
