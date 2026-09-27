@@ -124,6 +124,8 @@ Règle : **lissage jusqu'à 45°**, arête vive au-delà. Les biseaux sont liss�
 - Couleurs : feuillage **#88C33F -> #056B37** (vert-jaune saturé vers vert-bleu), tronc **#F17C36 -> #813223** (orange vif vers brun rouge). Le tronc n'utilise que le bas de sa case (v 0,13-0,40) ; le feuillage toute la case, du bas du volume au sommet.
 - Buissons : un volume lissé de 44-72 triangles (cube arrondi, boule). Rochers : volumes facettés (48 triangles), arêtes vives.
 
+**Cible retenue par Quentin pour nos propres arbres (27/09/2026)** : la référence `Docs/references/arbres-lowpoly-reference.webp` (planche low poly : conifères en 3 à 5 étages facettés, feuillus en grappes de 4 à 7 boules, arbres morts nus, souches, groupes de rochers, 3 ou 4 verts par famille). Même grammaire que KayKit (facettes plates, couleur unie par facette), avec ces adaptations : **troncs dégagés** jusqu'à ~1,5 fois la hauteur des personnages (couronnes relevées, deux ou trois moignons de branches), **verts plus profonds** que la planche avec le dégradé de l'atlas (sombre vers le bas de la couronne), **couronne et tronc en deux maillages** (le feuillage seul s'estompe devant la caméra, `FeuillageMasquage`), moins d'arbres et plus gros qu'aujourd'hui. Budget : conifère 150-300 triangles, feuillu 300-500.
+
 ### 2.8 Sols (Dungeon Pack)
 
 ![Sols du Dungeon Pack, filaire](../../sandbox-level/Assets/Screenshots/etude_sols_donjon_filaire.png)

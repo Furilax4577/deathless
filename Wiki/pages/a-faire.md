@@ -24,7 +24,8 @@ Travaux prévus ou notés, pas encore faits. Une ligne quitte cette page quand l
 - **Clochard pétomane** : pet de défense provisoire (roulade avant et grosse bouffée), nuage à 2,5 s dans la vidéo au lieu de 5 s, geste pour boire à retoucher.
 - **Effets des nouvelles classes** (bac à sable des effets) : nuage pestilentiel un peu opaque, flaque de la tournée en mosaïque, Trinquer discret.
 - **Maison générée selon le guide de style** (`sandbox-level`, scène `StyleKayKit`) : 11 280 triangles contre 1 000 à 1 400 pour KayKit ; leviers d'allègement notés dans le guide. Si validée : arbre et sol avec le même guide, puis intégration au village (code des intérieurs agrandis et de la porte qui claque mis de côté dans git, tag `parc-maisons-generees`).
-- **Arbre et sol** (preuves de concept dans `sandbox-ui`) : jugés pas assez KayKit, à refaire avec le guide.
+- **Arbres** {décidé} (27/09/2026) : à refaire sur la référence low poly choisie par Quentin (`Docs/references/arbres-lowpoly-reference.webp`, cible décrite dans `Docs/style-kaykit.md` § 2.7) : générateur à fiche par essence, 3 conifères, 3 feuillus, 2 arbres morts, souches, rochers ; troncs dégagés, verts profonds, couronne et tronc séparés. Part dans `sandbox-level` après le socle de la maison ; captures à valider.
+- **Sol** (preuve de concept dans `sandbox-ui`) : jugé pas assez KayKit, à refaire avec le guide, après les arbres.
 - **Maisons la nuit** : entrer seulement le jour ? Reconduire dehors au crépuscule ? (voir [À décider](a-decider.md)).
 - **Renversé** : pas d'invulnérabilité pendant la chute (choix par défaut, à confirmer).
 
