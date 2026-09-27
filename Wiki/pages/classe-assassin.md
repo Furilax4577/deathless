@@ -20,7 +20,7 @@ Il frappe fort quand on ne le voit pas. Furtif en marchant, il porte ses meilleu
 | {icone assassin_dague} | RT | Dague |
 | {icone assassin_arbalete} | LT | Arbalète en main et visée ; RT tire |
 | {icone assassin_fumigene} | LB | Grenade fumigène |
-|  | RB | Vide |
+|  | RB | Pas de l'ombre (bond derrière l'ennemi visé) {décidé, 27/09/2026} |
 | {icone assassin_furtif} |  | Indicateur du mode furtif |
 
 Actions communes à toutes les classes : voir [Classes](classes.md#actions-communes).
@@ -81,10 +81,20 @@ Version 0.2 {{dev: (réglées dans `Assets/Jeu/Resources/GameBalance.asset`)}} :
 | Marche discrète | 3,2 m/s |
 | Retour hors combat | 4 s sans combat |
 | Carreau | 45 dégâts, ×2 à la tête, recharge 6 s |
+| Pas de l'ombre | 7 m en 0,15 s, arrêt 1 m derrière la cible visée, invulnérable pendant, recharge 6 s (remise à zéro par une exécution) |
+| Exécution | ennemi commun sous 30 % de vie achevé ; élite ou boss : ×3 |
 
 ## Style de jeu {décidé}
 
-L'assassin joue **principalement à la dague**. L'arbalète et la grenade sont des outils ponctuels. **Pas d'autre compétence active** : dague, passifs, arbalète et grenade fumigène forment son kit complet.
+L'assassin joue **principalement à la dague**. L'arbalète et la grenade sont des outils ponctuels. Depuis le 27/09/2026, une compétence active de plus, le **Pas de l'ombre**, et un passif, l'**Exécution** (ci-dessous) : retour de Quentin, « il est trop lent pour attraper un ennemi dans le dos ». La furtivité reste son ouverture d'angle : rester furtif sans bouger continue de préparer le premier coup.
+
+## Pas de l'ombre et Exécution {décidé}
+
+Décidés le 27/09/2026 (audit d'équilibrage, `Docs/equilibrage-classes.md`) : le coup dans le dos ×3 reste la récompense, on donne à l'assassin le moyen d'y arriver.
+
+- **Pas de l'ombre** (RB) : un bond de **7 m** en 0,15 s dans la direction visée, **invulnérable pendant le bond**, qui traverse les ennemis mais pas les murs. Si le réticule est sur un ennemi, le bond s'arrête **1 m derrière lui, face à son dos** : le coup suivant est un coup dans le dos. Recharge **6 s** {à équilibrer}. Le bond ne fait pas sortir du mode furtif ; attaquer, oui.
+- **Exécution** (passif de la dague) : un coup de dague sur un ennemi commun (sbire, guerrier, voleur, mage) sous **30 % de vie** l'**achève net** ; sur un élite ou un boss, le coup fait **×3** sans achever. Chaque exécution **recharge le Pas de l'ombre** aussitôt : bond → dos → exécution → bond, tant qu'il y a des blessés. Seuil {à équilibrer}.
+- {dev} Le bond passe par le propriétaire comme l'esquive (chemin `Diffuser` pour le visuel chez les autres postes, effet du thème Ombre) ; l'exécution passe par le chemin des coups (l'hôte fait foi sur la vie). Animation du bond : la roulade accélérée ou `Dodge_Forward`, avec une traînée de gemmes Ombre.
 
 ## Arbalète {décidé}
 
