@@ -99,6 +99,7 @@ namespace Deathless.Donjon
         public readonly sbyte[] escalierDe = new sbyte[NbNoeuds];     // escalier posé sur la cellule, -1 sinon
         public readonly byte[] ouvert = new byte[NbNoeuds];           // bits 1 << direction : passage ouvert
         public readonly bool[] eau = new bool[NbCellules];            // cellule du bassin (rez, 2 m plus bas)
+        public readonly bool[] grille = new bool[NbCellules];         // grille d'égout voulue sur cette dalle du rez
         public readonly Bord[] bordH = new Bord[NbNiveaux * Largeur * (Profondeur + 1)];   // bords le long de x
         public readonly Bord[] bordV = new Bord[NbNiveaux * (Largeur + 1) * Profondeur];   // bords le long de z
         public readonly Escalier[] escaliers = new Escalier[NbEscaliers];
@@ -168,6 +169,7 @@ namespace Deathless.Donjon
             Array.Clear(materiau, 0, NbNoeuds);
             Array.Clear(ouvert, 0, NbNoeuds);
             Array.Clear(eau, 0, NbCellules);
+            Array.Clear(grille, 0, NbCellules);
             Array.Clear(m_Occupe, 0, NbNoeuds);
             Array.Clear(m_Utilise, 0, NbNoeuds);
             for (int i = 0; i < NbNoeuds; i++) escalierDe[i] = -1;
@@ -969,7 +971,8 @@ namespace Deathless.Donjon
             for (int b = 0; b < NbBlocs; b++)
                 for (int k = 0; k < NbNiveaux; k++)
                 {
-                    int nt = typeBloc[b] == TypeBloc.Entree ? 2 : 1;
+                    // Deux torches dans l'entrée et, au rez, sous une mezzanine ou la tour (salle couverte : lumière d'appoint, G2).
+                    int nt = typeBloc[b] == TypeBloc.Entree || (k == 0 && (typeBloc[b] == TypeBloc.Mezzanine || typeBloc[b] == TypeBloc.Tour)) ? 2 : 1;
                     for (int t = 0; t < nt && nbTorches < MaxTorches; t++)
                     {
                         int bc = -1, bd = 0, bs = int.MinValue, libre = -1;
@@ -994,6 +997,8 @@ namespace Deathless.Donjon
                                     if (sc > bs) { bs = sc; bc = c; bd = d; }
                                 }
                             }
+                        // Sous une mezzanine, la seconde torche est une torchère dans la cellule libre la plus loin de la première.
+                        if (t == 1 && k == 0 && typeBloc[b] != TypeBloc.Entree) { TorchereLoin(b); continue; }
                         if (bc >= 0)
                         {
                             Pose p = PoseCellule(k, bc, Dx[bd] * 1.5f, Dy[bd] * 1.5f, Angle(-Dx[bd], -Dy[bd]));
@@ -1007,8 +1012,57 @@ namespace Deathless.Donjon
                             p.type = Torchere;
                             torches[nbTorches++] = p;
                         }
+                        else if (typeBloc[b] == TypeBloc.Bassin && t == 0 && k == 0) TorchereBassin();
                     }
                 }
+        }
+
+        /// Torchère au rez d'un bloc couvert, dans la cellule libre la plus éloignée des torches déjà posées au rez.
+        void TorchereLoin(int b)
+        {
+            int best = -1; float dbest = -1f;
+            for (int j = 0; j < BlocTaille; j++)
+                for (int i = 0; i < BlocTaille; i++)
+                {
+                    int c = CelluleBloc(b, i, j);
+                    if (!Praticable(c) || eau[c] || m_Utilise[c] || m_Occupe[c] != 0) continue;
+                    float cx = (c % Largeur + 0.5f) * Cellule, cz = (c / Largeur + 0.5f) * Cellule, dmin = 1e9f;
+                    for (int q = 0; q < nbTorches; q++)
+                    {
+                        if (torches[q].niveau != 0) continue;
+                        float ex = torches[q].x - cx, ez = torches[q].z - cz, dd = ex * ex + ez * ez;
+                        if (dd < dmin) dmin = dd;
+                    }
+                    if (dmin > dbest) { dbest = dmin; best = c; }
+                }
+            if (best < 0 || nbTorches >= MaxTorches) return;
+            m_Occupe[best] |= 1;
+            Pose p = PoseCellule(0, best, 1.2f, 1.2f, Entier(4) * 90f);
+            p.type = Torchere;
+            torches[nbTorches++] = p;
+        }
+
+        /// Le bloc du bassin n'a ni mur ni cellule sèche : une torchère au bord de l'eau, sur la cellule du rez voisine de
+        /// l'arrivée de l'escalier du bassin (le coin tourné vers le bassin), pour sortir le bassin de la pénombre (C6).
+        void TorchereBassin()
+        {
+            int ie = -1;
+            for (int i = 0; i < nbEscaliers; i++) if (escaliers[i].bassin) ie = i;
+            if (ie < 0 || nbTorches >= MaxTorches) return;
+            Escalier e = escaliers[ie];
+            int dg = (e.dir + 1) & 3, dd = (e.dir + 3) & 3;
+            for (int t = 0; t < 2; t++)
+            {
+                int d = t == 0 ? dg : dd;
+                int c = Voisine(e.arrivee, d);
+                if (c < 0 || !Praticable(c) || eau[c] || m_Utilise[c] || m_Occupe[c] != 0) continue;
+                m_Occupe[c] |= 1;
+                // Coin de la cellule côté bassin (direction opposée à la montée) et côté escalier (direction opposée à d).
+                Pose p = PoseCellule(0, c, (-Dx[e.dir] - Dx[d]) * 1.2f, (-Dy[e.dir] - Dy[d]) * 1.2f, Entier(4) * 90f);
+                p.type = Torchere;
+                torches[nbTorches++] = p;
+                return;
+            }
         }
 
         /// Mobilier des planches KayKit : tonneaux, caisses, tables, dans les coins entre deux murs ; longues tables le
@@ -1027,7 +1081,9 @@ namespace Deathless.Donjon
                         int dv = (coin == 0 || coin == 3) ? 0 : 2, dh = (coin == 0 || coin == 1) ? 1 : 3;
                         if (!EstMur(BordCellule(k, c, dv)) || !EstMur(BordCellule(k, c, dh))) continue;
                         byte q = (byte)(1 << coin);
-                        if ((m_Occupe[no] & q) != 0 || m_Occupe[no] == 31) continue;
+                        // Jamais dans une cellule d'apparition (centre pris) : un gardien sortait de terre dans les tonneaux
+                        // et son agent restait coincé (audit du 27/09/2026, G6).
+                        if ((m_Occupe[no] & q) != 0 || m_Occupe[no] == 31 || (m_Occupe[no] & 16) != 0) continue;
                         if (Entier(100) >= 55) continue;
                         m_Occupe[no] |= q;
                         AjouterDecor(DecorCoin, k, c, Dx[dh] * 1.1f, Dy[dv] * 1.1f, Entier(4) * 90f + (Entier(21) - 10));
@@ -1065,6 +1121,8 @@ namespace Deathless.Donjon
                 int v = m_Cand[Entier(n)], cc = v / 4, dd = v % 4;
                 AjouterDecor(DecorBanniere, 0, cc, Dx[dd] * 1.5f, Dy[dd] * 1.5f, Angle(-Dx[dd], -Dy[dd]));
             }
+            // Dalle d'arrivée (G4 : elle n'était jamais posée), au centre de la cellule d'arrivée.
+            AjouterDecor(DecorDalleArrivee, 0, arrivee.cellule, 0f, 0f, 0f);
             // Tonneaux flottants dans le bassin.
             for (int f = 0, essai = 0; f < 2 && essai < 20; essai++)
             {
@@ -1074,16 +1132,50 @@ namespace Deathless.Donjon
                 AjouterDecor(DecorFlottant, 0, c, (Entier(9) - 4) * 0.2f, (Entier(9) - 4) * 0.2f, Entier(360));
                 f++;
             }
-            // Ossements sur chaque point d'apparition (les squelettes sortent de terre là).
+            // Grilles d'égout : une par bloc de hall au plus (une chance sur deux), sur une cellule libre du rez, jamais sous
+            // un point d'apparition, un butin, un décor ni à l'arrivée (audit du 27/09/2026, G5 : plus de grille tirée au hasard).
+            for (int b = 0; b < NbBlocs; b++)
+            {
+                if (typeBloc[b] != TypeBloc.Hall || Entier(100) >= 50) continue;
+                int n = 0;
+                for (int j = 0; j < BlocTaille; j++)
+                    for (int i = 0; i < BlocTaille; i++)
+                    {
+                        int c = CelluleBloc(b, i, j);
+                        if (!Praticable(c) || eau[c] || m_Utilise[c] || m_Occupe[c] != 0 || EscalierAuDessus(c)) continue;
+                        if (n < m_Cand.Length) m_Cand[n++] = c;
+                    }
+                if (n == 0) continue;
+                int g = m_Cand[Entier(n)];
+                grille[g] = true;
+                m_Occupe[g] |= 16;
+            }
+            // Ossements près de chaque point d'apparition, à OsDistance (1,6 m) du point, du côté opposé au décalage du point
+            // dans sa cellule : le squelette ne sort plus de terre à travers un crâne (audit du 27/09/2026, point 3). Si aucun
+            // côté ne tient dans la cellule, pas d'os sur cette cellule.
             for (int i = 0; i < NbApparitions && nbDecors < MaxDecors; i++)
             {
-                Pose p = apparitions[i];
-                p.type = DecorOs;
-                p.rotY = Entier(360);
-                p.variante = (byte)Entier(256);
-                decors[nbDecors++] = p;
+                Pose a = apparitions[i];
+                float cx = (a.cellule % Largeur + 0.5f) * Cellule, cz = (a.cellule / Largeur + 0.5f) * Cellule;
+                float jx = a.x - cx, jz = a.z - cz;
+                int d0 = Math.Abs(jx) > Math.Abs(jz) ? (jx > 0f ? 3 : 1) : (jz > 0f ? 2 : 0);   // direction opposée au décalage
+                bool pose = false;
+                for (int t = 0; t < 4 && !pose; t++)
+                {
+                    int d = (d0 + t) & 3;
+                    float ox = jx + Dx[d] * OsDistance, oz = jz + Dy[d] * OsDistance;
+                    if (Math.Abs(ox) > Cellule * 0.5f - 0.45f || Math.Abs(oz) > Cellule * 0.5f - 0.45f) continue;
+                    Pose p = PoseCellule(a.niveau, a.cellule, ox, oz, Entier(360));
+                    p.type = DecorOs;
+                    p.variante = (byte)Entier(256);
+                    decors[nbDecors++] = p;
+                    pose = true;
+                }
             }
         }
+
+        /// Distance (m) entre un point d'apparition et l'ossement qui le décore (≥ 1,5 m : le squelette sort de terre à côté).
+        public const float OsDistance = 1.6f;
 
         bool EscalierAuDessus(int c)
         {
@@ -1092,7 +1184,8 @@ namespace Deathless.Donjon
             return false;
         }
 
-        bool TorcheSur(int k, int c, int d)
+        /// Une torche murale est-elle posée sur le bord d de la cellule c au niveau k ? (Le générateur n'y met pas de fenêtre.)
+        public bool TorcheSur(int k, int c, int d)
         {
             for (int i = 0; i < nbTorches; i++)
                 if (torches[i].niveau == k && torches[i].cellule == c && torches[i].type == TorcheMurale && torches[i].variante == d) return true;

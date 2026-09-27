@@ -1,6 +1,20 @@
 {
   "versions": [
     {
+      "version": "0.5.10",
+      "date": "2026-09-27",
+      "titre": "Le donjon remis d'aplomb",
+      "notes": [
+        "Caméra : elle ne traverse plus les murs, n'entre plus dans les piliers ni dans les coffres et ne sort plus de l'enceinte du donjon, même au bord de la plate-forme du 2e étage.",
+        "Murs : plus de portes fermées ni d'arches bouchées ; les murs sont pleins, les fenêtres rares et fermées (rien de noir derrière), les murs cassés rares et doublés d'un mur derrière. Les demi-murs écrasés deviennent de vrais murets de pierre d'un mètre.",
+        "Squelettes : les ossements sont posés à côté des points d'apparition, plus dessous ; un gardien ne sort plus de terre à travers un crâne, et plus aucun point d'apparition n'est dans un tonneau.",
+        "Coffres : une fois l'or pris, le tas de pièces s'envole en gemmes d'or et le coffre reste vide ; plus rien qui ressemble à de l'or à ramasser.",
+        "Étages : un plafond sous chaque plancher et un toit sur l'enceinte (plus d'aplat noir sous les mezzanines), une torchère de plus sous chaque salle couverte et au bord du bassin, une dalle de bois qui marque l'arrivée, des grilles d'égout posées avec mesure.",
+        "Interface : le message du donjon (rappel par Nyxessa, or versé) s'affiche sous la pastille de phase au lieu de se superposer, et l'invite « Prêts » n'apparaît plus au donjon.",
+        "Performance : les pièces immobiles du donjon sont combinées après la génération (environ quatre fois moins de lots de rendu dans le hall d'arrivée)."
+      ]
+    },
+    {
       "version": "0.5.9",
       "date": "2026-09-27",
       "titre": "Cinq classes, cinq rôles",

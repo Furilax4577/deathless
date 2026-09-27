@@ -12,13 +12,20 @@ namespace Deathless.Donjon
         public GameObject[] solsRez;
         public GameObject[] solsPierre;
         public GameObject[] solsBois;
-        [Tooltip("Dalle posée sous les planchers des étages, vue d'en bas (facultatif).")]
+        [Tooltip("Dalle posée sous les planchers des étages, vue d'en bas (ceiling_tile : pivot au plan du plancher, pend de 0,25 m).")]
         public GameObject plafond;
+        [Tooltip("Grille d'égout posée en décor voulu (une par bloc de hall au plus, jamais sous un point d'apparition ni à l'arrivée) ; plus jamais tirée au hasard.")]
+        public GameObject solGrille;
 
         [Header("Murs, garde-corps, piliers")]
+        [Tooltip("Murs pleins (wall, wall_pillar, wall_scaffold) : le mur par défaut, tiré au hasard dans cette liste. Jamais de porte ni d'arche ici (27/09/2026) : une porte ou une arche n'a de sens que sur un passage, et les passages du donjon sont les arcades.")]
         public GameObject[] murs;
-        [Tooltip("Murs extérieurs des étages (fenêtres fermées, grilles...).")]
+        [Tooltip("Fenêtres FERMÉES (volets clos, rien ne se voit derrière) des murs d'enceinte des étages : au plus une par pan de 3 cellules, jamais sous une torche.")]
         public GameObject[] mursHauts;
+        [Tooltip("Mur cassé : rare (un pan sur 15), jamais deux côte à côte, doublé d'un mur plein derrière sur l'enceinte pour ne pas montrer le vide.")]
+        public GameObject murCasse;
+        [Tooltip("Muret plein entre deux halls du rez : bloc de fondation (2 x 2 m) mis à 4 m de large, 1 m de haut et 1 m d'épaisseur. Vide : bloc de pierre facetté généré.")]
+        public GameObject muret;
         public GameObject gardeCorps;
         public GameObject pilier;
         public GameObject poteau;

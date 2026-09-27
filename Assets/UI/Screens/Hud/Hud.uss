@@ -425,11 +425,13 @@
 .hud-or-porte { position: absolute; right: 48px; top: 105px; height: 54px; display: none; border-width: 2px; border-color: var(--dl-color-gold); }
 .hud-donjon-alerte { position: absolute; top: 150px; left: 50%; translate: -50% 0; height: 60px; display: none; background-color: rgba(120, 30, 20, 0.9); border-width: 2px; border-color: #ff9a3c; }
 .hud-donjon-alerte__texte { font-size: var(--dl-text-large); color: #ffffff; margin: 0; padding: 0; -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); }
-.hud-donjon-message { position: absolute; top: 222px; left: 50%; translate: -50% 0; height: 54px; display: none; }
+/* Message du donjon sous la pastille de phase (212-263 px) ET sous la bannière NUIT N (225-373 px) : il ne se superpose plus
+   à « Crépuscule · la nuit tombe » (audit du 27/09/2026, G1). À ×3 : pastille 190-241, bannière 157-298. */
+.hud-donjon-message { position: absolute; top: 386px; left: 50%; translate: -50% 0; height: 54px; display: none; }
 .hud-donjon-message__texte { font-size: var(--dl-text-body); color: var(--dl-color-gold); margin: 0; padding: 0; }
 .dl-scale-3 .hud-or-porte { right: 24px; top: 88px; }
 .dl-scale-3 .hud-donjon-alerte { top: 120px; }
-.dl-scale-3 .hud-donjon-message { top: 188px; }
+.dl-scale-3 .hud-donjon-message { top: 312px; }
 /* Au-dessus du bloc joueur (portrait 132 px + marge, maquette B) ; la rangée de statuts est maintenant dans le
    bloc, au-dessus de la barre de vie, donc la hauteur du bloc ne varie plus avec elle (HudStatuts.cs). */
 .hud-points { position: absolute; left: 48px; bottom: 189px; height: 54px; display: none; border-width: 2px; border-color: var(--dl-color-gold); }

@@ -33,6 +33,13 @@ namespace Deathless.Donjon
         public float DernierTempsPlanMs { get; private set; }
         public float DernierTempsConstructionMs { get; private set; }
         public float DernierTempsNavMeshMs { get; private set; }
+        public float DernierTempsCombinaisonMs { get; private set; }
+        /// Maillages combinés (un par groupe et par matériau) à la dernière génération.
+        public int NbCombines { get; private set; }
+        [Tooltip("Après la génération, combine les mailles immobiles de chaque groupe (bloc, niveau) par matériau (G7 de l'audit : " +
+                 "~2 400 lots de rendu → ~150). Les pièces qui bougent ou disparaissent (coffres, tas d'or, portail, eau) restent à part ; " +
+                 "pendant une transition de masquage, les pièces se montrent une à une puis le combiné reprend.")]
+        public bool combiner = true;
         public long DerniereAllocationOctets { get; private set; }
         public int NbObjets { get; private set; }
         public int NbLumieres { get; private set; }
@@ -79,6 +86,9 @@ namespace Deathless.Donjon
             if (genererAuDemarrage && Application.isPlaying) Generer(graine);
         }
 
+        /// Les maillages combinés sont créés à la volée : détruits avec le générateur (pas de fuite au rechargement de scène).
+        void OnDestroy() { Decombiner(); }
+
         // ================================================================== Génération
         /// Génère et construit le donjon de la graine. Renvoie false si le plan n'a pas pu respecter la consigne.
         /// `essaiImpose` ≥ 0 (clients) : construit directement le plan à partir de cet essai, celui que l'hôte a
@@ -119,6 +129,9 @@ namespace Deathless.Donjon
             }
             EssaiRetenu = Mathf.Max(0, m_Plan.essais - 1);
             Relances = impose || premier == 0 ? 0 : 1;
+            chrono.Restart();
+            if (combiner) Combiner();
+            DernierTempsCombinaisonMs = (float)chrono.Elapsed.TotalMilliseconds;
             DernierTempsPlanMs = plan; DernierTempsConstructionMs = pieces; DernierTempsNavMeshMs = nav;
             DerniereAllocationOctets = GC.GetTotalMemory(false) - alloc0;
             if (Genere != null) Genere(this);
@@ -173,6 +186,7 @@ namespace Deathless.Donjon
         {
             if (kit == null) { Debug.LogError("Donjon : aucun kit de pièces (DonjonKit) assigné."); return; }
             Preparer();
+            Decombiner();
             m_Masquage.Preparer(m_Plan);
             foreach (var r in m_ListeReserves) r.utilises = 0;
             m_BoitesUtilisees = 0; m_LampesUtilisees = 0;
@@ -212,7 +226,8 @@ namespace Deathless.Donjon
             if (m_Racine != null) return;
             Transform ancien = transform.Find("Genere");
             if (ancien != null) Detruire(ancien.gameObject);
-            m_Reserves.Clear(); m_ListeReserves.Clear(); m_Boites.Clear(); m_Lampes.Clear(); m_Anneau = null; m_Portail = null; m_PortailVisuel = null;
+            m_Reserves.Clear(); m_ListeReserves.Clear(); m_Boites.Clear(); m_Lampes.Clear(); m_Anneau = null; m_Portail = null; m_PortailVisuel = null; m_ModeleMuret = null; m_Eau = null;
+            for (int g = 0; g < NbGroupes; g++) if (m_Combines[g] != null) m_Combines[g].Clear();
             m_Racine = Enfant(transform, "Genere");
             m_Visuels = Enfant(m_Racine, "Visuels");
             m_Collisions = Enfant(m_Racine, "Collisions");
@@ -413,10 +428,17 @@ namespace Deathless.Donjon
                 int k = noeud / DonjonPlan.NbCellules, c = noeud % DonjonPlan.NbCellules;
                 int g = Groupe(DonjonPlan.BlocDe(c), k);
                 uint h = Hache(noeud + m_Plan.graine * 7919);
-                GameObject m = k == 0 ? Choisir(kit.solsRez, h >> 3) : m_Plan.materiau[noeud] == 1 ? Choisir(kit.solsBois, h >> 3) : Choisir(kit.solsPierre, h >> 3);
+                // Rez : dalle pleine, sauf la grille d'égout voulue par le plan (une par bloc de hall au plus, G5).
+                GameObject m = k == 0 ? (m_Plan.grille[c] && kit.solGrille != null ? kit.solGrille : Choisir(kit.solsRez, h >> 3))
+                    : m_Plan.materiau[noeud] == 1 ? Choisir(kit.solsBois, h >> 3) : Choisir(kit.solsPierre, h >> 3);
                 Vector3 p = new Vector3((c % DonjonPlan.Largeur + 0.5f) * C, m_Plan.HauteurSol(noeud), (c / DonjonPlan.Largeur + 0.5f) * C);
                 Prendre(m, g, p, (h & 3) * 90f);
-                if (k > 0 && kit.plafond != null) Prendre(kit.plafond, g, p + Vector3.down * 0.18f, 0f, new Vector3(1f, -1f, 1f));
+                // Plafond sous les planchers des étages (ceiling_tile : pivot au plan du plancher, pend de 0,25 m, faces vers le
+                // bas) : plus de dessous de dalle noir vu d'en bas (G2).
+                if (k > 0 && kit.plafond != null) Prendre(kit.plafond, g, p, (h >> 2 & 3) * 90f);
+                // Toit au sommet de l'enceinte (12 m), sur toute l'emprise, dans le groupe du dernier niveau : un plancher masqué
+                // ne découvre plus le fond noir (G2), le donjon reste sans ciel.
+                if (k == 0 && kit.plafond != null) Prendre(kit.plafond, Groupe(DonjonPlan.BlocDe(c), DonjonPlan.NbNiveaux - 1), new Vector3(p.x, DonjonPlan.NbNiveaux * H, p.z), (h >> 4 & 3) * 90f);
                 Boite(g, p, Quaternion.identity, new Vector3(0f, -0.1f, 0f), new Vector3(C, 0.3f, C));
             }
         }
@@ -433,7 +455,10 @@ namespace Deathless.Donjon
                         Bord b = m_Plan.BordH(k, x, vy);
                         if (b == Bord.Rien) continue;
                         int ca = vy > 0 ? x + (vy - 1) * L : -1, cb = vy < P ? x + vy * L : -1;
-                        PoserBord(k, b, ChoisirCellule(k, ca, cb), new Vector3((x + 0.5f) * C, k * H, vy * C), 0f, x * 131 + vy * 17 + k * 7, cb >= 0 && m_Plan.eau[cb] ? 0f : 180f);
+                        int cellule = ChoisirCellule(k, ca, cb);
+                        // Bord nord (d = 0) de la cellule du dessous, ou sud (d = 2) de celle du dessus ; pan de 3 : x % 3 == 1.
+                        PoserBord(k, b, cellule, cellule == ca ? 0 : 2, x % DonjonPlan.BlocTaille == 1, new Vector3((x + 0.5f) * C, k * H, vy * C), 0f,
+                            x * 131 + vy * 17 + k * 7, x > 0 ? (x - 1) * 131 + vy * 17 + k * 7 : int.MinValue, cb >= 0 && m_Plan.eau[cb] ? 0f : 180f);
                     }
                 for (int y = 0; y < P; y++)
                     for (int vx = 0; vx <= L; vx++)
@@ -441,9 +466,19 @@ namespace Deathless.Donjon
                         Bord b = m_Plan.BordV(k, vx, y);
                         if (b == Bord.Rien) continue;
                         int ca = vx > 0 ? vx - 1 + y * L : -1, cb = vx < L ? vx + y * L : -1;
-                        PoserBord(k, b, ChoisirCellule(k, ca, cb), new Vector3(vx * C, k * H, (y + 0.5f) * C), 90f, vx * 71 + y * 29 + k * 13 + 5, cb >= 0 && m_Plan.eau[cb] ? 90f : 270f);
+                        int cellule = ChoisirCellule(k, ca, cb);
+                        PoserBord(k, b, cellule, cellule == ca ? 1 : 3, y % DonjonPlan.BlocTaille == 1, new Vector3(vx * C, k * H, (y + 0.5f) * C), 90f,
+                            vx * 71 + y * 29 + k * 13 + 5, y > 0 ? vx * 71 + (y - 1) * 29 + k * 13 + 5 : int.MinValue, cb >= 0 && m_Plan.eau[cb] ? 90f : 270f);
                     }
             }
+        }
+
+        /// Un pan de mur est-il « cassé » ? Un sur quinze (hachage du bord), jamais deux côte à côte (le précédent du même
+        /// alignement ne l'est pas). G3 : sur l'enceinte, le trou est doublé d'un mur plein derrière.
+        bool MurCasse(int graineLocale, int graineVoisin)
+        {
+            if (kit.murCasse == null || Hache(graineLocale + m_Plan.graine * 104729) % 15 != 0) return false;
+            return graineVoisin == int.MinValue || Hache(graineVoisin + m_Plan.graine * 104729) % 15 != 0;
         }
 
         /// Cellule qui porte un bord : celle qui est praticable au niveau k, sinon celle qui existe.
@@ -454,8 +489,14 @@ namespace Deathless.Donjon
             return a >= 0 ? a : b;
         }
 
-        /// versBassin : direction (degrés) vers le côté bassin d'un muret de bassin.
-        void PoserBord(int k, Bord b, int cellule, Vector3 p, float rot, int graineLocale, float versBassin)
+        /// Règle des murs (Quentin, 27/09/2026, audit point 4) : un mur PLEIN par défaut ; une porte ou une arche seulement sur
+        /// un passage (ici, les passages sont les arcades : plus aucune porte ni arche de mur) ; une fenêtre FERMÉE seulement
+        /// sur un mur d'enceinte d'étage (rien derrière), au milieu d'un pan de 3 cellules, une chance sur deux, jamais sous
+        /// une torche ; un mur cassé rare (1 sur 15), jamais deux côte à côte, doublé d'un mur plein derrière sur l'enceinte.
+        /// d : direction du bord vue de `cellule` (0 N, 1 E, 2 S, 3 O) ; milieuPan : cellule du milieu de son pan de 3 ;
+        /// graineVoisin : clé du bord précédent du même alignement (int.MinValue : aucun) ; versBassin : direction (degrés)
+        /// vers le côté bassin d'un muret de bassin.
+        void PoserBord(int k, Bord b, int cellule, int d, bool milieuPan, Vector3 p, float rot, int graineLocale, int graineVoisin, float versBassin)
         {
             int g = Groupe(DonjonPlan.BlocDe(cellule), k);
             uint h = Hache(graineLocale + m_Plan.graine * 104729);
@@ -468,13 +509,17 @@ namespace Deathless.Donjon
                     return;
                 case Bord.Arcade:
                     // Poteaux et linteau de bois sous le bord du balcon : on passe dessous, seuls les poteaux arrêtent.
+                    // Boîtes des poteaux à 0,6 m et sur toute la hauteur (la caméra entrait dans le chapiteau, B1).
                     Prendre(kit.arcade, g, p, rot);
-                    Boite(g, p, r, new Vector3(1.8f, 1.8f, 0f), new Vector3(0.4f, 3.6f, 0.4f));
-                    Boite(g, p, r, new Vector3(-1.8f, 1.8f, 0f), new Vector3(0.4f, 3.6f, 0.4f));
+                    Boite(g, p, r, new Vector3(1.8f, H * 0.5f, 0f), new Vector3(0.6f, H, 0.6f));
+                    Boite(g, p, r, new Vector3(-1.8f, H * 0.5f, 0f), new Vector3(0.6f, H, 0.6f));
                     return;
                 case Bord.MurBas:
-                    Prendre(Choisir(kit.murs, h >> 4), g, p, rot + ((h >> 2 & 1) == 0 ? 0f : 180f), new Vector3(1f, 0.5f, 1f));
-                    Boite(g, p, r, new Vector3(0f, H * 0.25f, 0f), new Vector3(C, H * 0.5f, 1f));
+                    // Muret plein d'un mètre entre deux halls (point 5) : bloc de fondation (2 x 2 x 2,1 m) mis à 4 m de large,
+                    // 1 m de haut et 1 m d'épaisseur ; sans modèle, bloc de pierre facetté généré.
+                    if (kit.muret != null) Prendre(kit.muret, g, p, rot + ((h >> 2 & 1) == 0 ? 0f : 180f), new Vector3(2f, 0.5f, 0.48f));
+                    else PrendreMuret(g, p, rot);
+                    Boite(g, p, r, new Vector3(0f, 0.5f, 0f), new Vector3(C, 1f, 1f));
                     return;
                 case Bord.Bassin:
                 {
@@ -486,9 +531,165 @@ namespace Deathless.Donjon
                     return;
                 }
             }
-            GameObject m = b == Bord.MurExterieur && k > 0 && (h & 3) == 0 ? Choisir(kit.mursHauts, h >> 4) : Choisir(kit.murs, h >> 4);
+            bool enceinte = b == Bord.MurExterieur;
+            GameObject m;
+            bool casse = false;
+            if (enceinte && k > 0 && milieuPan && (h & 1) == 0 && kit.mursHauts != null && kit.mursHauts.Length > 0 && !m_Plan.TorcheSur(k, cellule, d))
+                m = Choisir(kit.mursHauts, h >> 4);
+            else if (MurCasse(graineLocale, graineVoisin)) { m = kit.murCasse; casse = true; }
+            else m = Choisir(kit.murs, h >> 4);
             Prendre(m, g, p, rot + ((h >> 2 & 1) == 0 ? 0f : 180f));
+            if (casse && enceinte)
+            {
+                // Mur plein derrière le trou, côté extérieur : on voit de la pierre, plus le noir du fond.
+                Vector3 dehors = new Vector3(DonjonPlan.DirX(d), 0f, DonjonPlan.DirY(d));
+                Prendre(Choisir(kit.murs, 0), g, p + dehors * 0.95f, rot);
+            }
             Boite(g, p, r, new Vector3(0f, H * 0.5f, 0f), new Vector3(C, H, 1f));
+        }
+
+        // ------------------------------------------------------------------ Combinaison des mailles (G7)
+        readonly List<GameObject>[] m_Combines = new List<GameObject>[NbGroupes];
+        readonly Dictionary<Material, List<CombineInstance>> m_ParMateriau = new Dictionary<Material, List<CombineInstance>>();
+        readonly List<Material> m_OrdreMateriaux = new List<Material>(8);
+        readonly List<Renderer> m_Individuels = new List<Renderer>(256);
+        readonly HashSet<GameObject> m_Dynamiques = new HashSet<GameObject>();
+        static readonly List<Material> s_Mats = new List<Material>(4);
+
+        /// Rend leurs rendus aux pièces et éteint les maillages combinés (avant de reposer les pièces).
+        void Decombiner()
+        {
+            for (int g = 0; g < NbGroupes; g++)
+            {
+                if (m_Combines[g] == null) continue;
+                foreach (var go in m_Combines[g])
+                {
+                    if (go == null) continue;   // scène en cours de déchargement (OnDestroy)
+                    var mf = go.GetComponent<MeshFilter>();
+                    if (mf.sharedMesh != null) { if (Application.isPlaying) Destroy(mf.sharedMesh); else DestroyImmediate(mf.sharedMesh); mf.sharedMesh = null; }
+                    if (go.activeSelf) go.SetActive(false);
+                }
+            }
+            foreach (var r in m_ListeReserves)
+                foreach (var go in r.objets)
+                {
+                    if (go == null) continue;
+                    foreach (var rd in go.GetComponentsInChildren<Renderer>(true)) if (!rd.enabled) rd.enabled = true;
+                }
+            if (m_Masquage != null) m_Masquage.Decombiner();
+            NbCombines = 0;
+        }
+
+        /// Un maillage par groupe et par matériau, dans le repère du groupe ; les pièces combinées gardent leur objet (collisions
+        /// à part, masquage par pièce pendant les transitions) mais leur rendu s'éteint au profit du combiné.
+        void Combiner()
+        {
+            m_Dynamiques.Clear();
+            for (int i = 0; i < Butins.Length; i++) if (Butins[i] != null && Butins[i].visuel != null) m_Dynamiques.Add(Butins[i].visuel);
+            if (m_Portail != null) m_Dynamiques.Add(m_Portail);
+            if (m_Anneau != null) m_Dynamiques.Add(m_Anneau);
+            if (m_Eau != null) m_Dynamiques.Add(m_Eau);
+            NbCombines = 0;
+            for (int g = 0; g < NbGroupes; g++)
+            {
+                Transform grp = m_GroupesVisuels[g];
+                m_ParMateriau.Clear(); m_OrdreMateriaux.Clear(); m_Individuels.Clear();
+                Matrix4x4 versGroupe = grp.worldToLocalMatrix;
+                for (int c = 0; c < grp.childCount; c++)
+                {
+                    Transform t = grp.GetChild(c);
+                    if (!t.gameObject.activeSelf || m_Dynamiques.Contains(t.gameObject) || t.name.StartsWith("Combine_")) continue;
+                    foreach (var mf in t.GetComponentsInChildren<MeshFilter>())
+                    {
+                        var mr = mf.GetComponent<MeshRenderer>();
+                        if (mr == null || mf.sharedMesh == null) continue;
+                        mr.GetSharedMaterials(s_Mats);
+                        int n = Mathf.Min(mf.sharedMesh.subMeshCount, s_Mats.Count);
+                        for (int s = 0; s < n; s++)
+                        {
+                            Material mat = s_Mats[s];
+                            if (mat == null) continue;
+                            List<CombineInstance> liste;
+                            if (!m_ParMateriau.TryGetValue(mat, out liste)) { liste = new List<CombineInstance>(64); m_ParMateriau.Add(mat, liste); m_OrdreMateriaux.Add(mat); }
+                            liste.Add(new CombineInstance { mesh = mf.sharedMesh, subMeshIndex = s, transform = versGroupe * mf.transform.localToWorldMatrix });
+                        }
+                        m_Individuels.Add(mr);
+                    }
+                }
+                if (m_Combines[g] == null) m_Combines[g] = new List<GameObject>(4);
+                for (int i = 0; i < m_OrdreMateriaux.Count; i++)
+                {
+                    Material mat = m_OrdreMateriaux[i];
+                    GameObject go;
+                    if (i < m_Combines[g].Count) go = m_Combines[g][i];
+                    else
+                    {
+                        go = new GameObject("Combine_" + i);
+                        go.transform.SetParent(grp, false);
+                        go.AddComponent<MeshFilter>();
+                        go.AddComponent<MeshRenderer>();
+                        m_Combines[g].Add(go);
+                    }
+                    var mesh = new Mesh { name = "Combine_" + grp.name + "_" + i, indexFormat = UnityEngine.Rendering.IndexFormat.UInt32 };
+                    mesh.CombineMeshes(m_ParMateriau[mat].ToArray(), true, true, false);
+                    go.GetComponent<MeshFilter>().sharedMesh = mesh;
+                    var rd = go.GetComponent<MeshRenderer>();
+                    rd.sharedMaterial = mat;
+                    if (!go.activeSelf) go.SetActive(true);
+                    m_Masquage.Combine(g, rd);
+                    NbCombines++;
+                }
+                foreach (var mr in m_Individuels) m_Masquage.Individuel(g, mr);
+            }
+        }
+
+        static Mesh s_MeshMuret;
+
+        /// Bloc de pierre facetté (4 x 1 x 1 m, pans coupés) quand le kit n'a pas de muret : modèle créé une fois dans la
+        /// réserve (inactif), puis pris comme une pièce du kit.
+        void PrendreMuret(int g, Vector3 p, float rot)
+        {
+            if (m_ModeleMuret == null)
+            {
+                m_ModeleMuret = new GameObject("Muret");
+                m_ModeleMuret.transform.SetParent(m_Reserve, false);
+                m_ModeleMuret.AddComponent<MeshFilter>().sharedMesh = MeshMuret();
+                m_ModeleMuret.AddComponent<MeshRenderer>().sharedMaterial = kit.anneau;
+                m_ModeleMuret.SetActive(false);
+            }
+            Prendre(m_ModeleMuret, g, p, rot);
+        }
+        [NonSerialized] GameObject m_ModeleMuret;
+
+        static Mesh MeshMuret()
+        {
+            if (s_MeshMuret != null) return s_MeshMuret;
+            // Boîte 4 x 1 x 1 aux arêtes supérieures chanfreinées (0,15 m), faces plates.
+            float L = 2f, Hm = 1f, E = 0.5f, c = 0.15f;
+            Vector3[] q =
+            {
+                new Vector3(-L, 0, -E), new Vector3(L, 0, -E), new Vector3(L, 0, E), new Vector3(-L, 0, E),
+                new Vector3(-L, Hm - c, -E), new Vector3(L, Hm - c, -E), new Vector3(L, Hm - c, E), new Vector3(-L, Hm - c, E),
+                new Vector3(-L + c, Hm, -E + c), new Vector3(L - c, Hm, -E + c), new Vector3(L - c, Hm, E - c), new Vector3(-L + c, Hm, E - c)
+            };
+            int[][] faces =
+            {
+                new[] { 0, 3, 2, 1 }, new[] { 0, 1, 5, 4 }, new[] { 1, 2, 6, 5 }, new[] { 2, 3, 7, 6 }, new[] { 3, 0, 4, 7 },
+                new[] { 4, 5, 9, 8 }, new[] { 5, 6, 10, 9 }, new[] { 6, 7, 11, 10 }, new[] { 7, 4, 8, 11 }, new[] { 8, 9, 10, 11 }
+            };
+            var v = new List<Vector3>(); var n = new List<Vector3>(); var tri = new List<int>();
+            foreach (var f in faces)
+            {
+                Vector3 a = q[f[0]], bb = q[f[1]], cc = q[f[2]], dd = q[f[3]];
+                Vector3 nf = Vector3.Cross(bb - a, dd - a).normalized;
+                int i0 = v.Count;
+                v.Add(a); v.Add(bb); v.Add(cc); v.Add(dd);
+                n.Add(nf); n.Add(nf); n.Add(nf); n.Add(nf);
+                tri.Add(i0); tri.Add(i0 + 2); tri.Add(i0 + 1); tri.Add(i0); tri.Add(i0 + 3); tri.Add(i0 + 2);
+            }
+            s_MeshMuret = new Mesh { name = "MuretDonjon", vertices = v.ToArray(), normals = n.ToArray(), triangles = tri.ToArray() };
+            s_MeshMuret.RecalculateBounds();
+            return s_MeshMuret;
         }
 
         void PoserSommets()
@@ -518,7 +719,7 @@ namespace Deathless.Donjon
                         else
                         {
                             Prendre(kit.poteau, g, p, 0f);
-                            Boite(g, p, Quaternion.identity, new Vector3(0f, 0.7f, 0f), new Vector3(0.7f, 1.4f, 0.7f));
+                            BoiteModele(kit.poteau, g, p, 0f);
                         }
                     }
         }
@@ -721,6 +922,7 @@ namespace Deathless.Donjon
                         break;
                     }
                     case DonjonPlan.DecorDalleArrivee:
+                        // Dalle de bois sombre posée sur la dalle de pierre de l'arrivée (G4 : le point d'arrivée se voit).
                         Prendre(kit.dalleArrivee, g, p + Vector3.up * 0.015f, 0f);
                         break;
                 }

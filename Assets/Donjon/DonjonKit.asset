@@ -17,32 +17,28 @@ MonoBehaviour:
   - {fileID: 919132149155446097, guid: 92a55501f29bfa545beec9a38ee0cc24, type: 3}
   - {fileID: 919132149155446097, guid: 92a55501f29bfa545beec9a38ee0cc24, type: 3}
   - {fileID: 919132149155446097, guid: 92a55501f29bfa545beec9a38ee0cc24, type: 3}
-  - {fileID: 919132149155446097, guid: 92a55501f29bfa545beec9a38ee0cc24, type: 3}
-  - {fileID: 919132149155446097, guid: 92a55501f29bfa545beec9a38ee0cc24, type: 3}
-  - {fileID: 919132149155446097, guid: 92a55501f29bfa545beec9a38ee0cc24, type: 3}
-  - {fileID: 919132149155446097, guid: dfc87f75b17c027488235c8f91bfeb82, type: 3}
   solsPierre:
   - {fileID: 919132149155446097, guid: 92a55501f29bfa545beec9a38ee0cc24, type: 3}
   solsBois:
   - {fileID: 919132149155446097, guid: 1803df3d99c46a841aea8d6bd18ae385, type: 3}
   - {fileID: 919132149155446097, guid: 1803df3d99c46a841aea8d6bd18ae385, type: 3}
   - {fileID: 919132149155446097, guid: b8c10b57237e6e4429d3d48eb4f2c22b, type: 3}
-  plafond: {fileID: 0}
+  plafond: {fileID: 919132149155446097, guid: cc6db2ac46384d94da58b89626217e62, type: 3}
+  solGrille: {fileID: 919132149155446097, guid: dfc87f75b17c027488235c8f91bfeb82, type: 3}
   murs:
   - {fileID: 919132149155446097, guid: 7151f0d581458bb448ca3345a55843af, type: 3}
   - {fileID: 919132149155446097, guid: 7151f0d581458bb448ca3345a55843af, type: 3}
   - {fileID: 919132149155446097, guid: 7151f0d581458bb448ca3345a55843af, type: 3}
-  - {fileID: 919132149155446097, guid: 2c7b4e1cc530f22408d769c2d4ee93b2, type: 3}
-  - {fileID: 919132149155446097, guid: 1f8a9347842e1cb4cb3e416328b7aad8, type: 3}
-  - {fileID: 919132149155446097, guid: 18f943e300a5371489f75e780bb9e612, type: 3}
-  - {fileID: 919132149155446097, guid: 18f943e300a5371489f75e780bb9e612, type: 3}
-  - {fileID: 919132149155446097, guid: 4cf6ebff0d323b941bdaf04fef9da473, type: 3}
-  - {fileID: 919132149155446097, guid: 38f441d36449fd043998fd1a04ab4ecc, type: 3}
+  - {fileID: 919132149155446097, guid: 7151f0d581458bb448ca3345a55843af, type: 3}
+  - {fileID: 919132149155446097, guid: 7151f0d581458bb448ca3345a55843af, type: 3}
   - {fileID: 919132149155446097, guid: da250fb0f13350c48ad7eaf93cf118ae, type: 3}
+  - {fileID: 919132149155446097, guid: da250fb0f13350c48ad7eaf93cf118ae, type: 3}
+  - {fileID: 919132149155446097, guid: 18f943e300a5371489f75e780bb9e612, type: 3}
+  - {fileID: 919132149155446097, guid: 18f943e300a5371489f75e780bb9e612, type: 3}
   mursHauts:
   - {fileID: 919132149155446097, guid: 61d97b72e82ee3542a2ee8402f8a6361, type: 3}
-  - {fileID: 919132149155446097, guid: 449a8edcfe5075c49afa43237b3af94e, type: 3}
-  - {fileID: 919132149155446097, guid: 61d97b72e82ee3542a2ee8402f8a6361, type: 3}
+  murCasse: {fileID: 919132149155446097, guid: 2c7b4e1cc530f22408d769c2d4ee93b2, type: 3}
+  muret: {fileID: 919132149155446097, guid: 4ca5729b5477697468a5ad90fff42ba2, type: 3}
   gardeCorps: {fileID: 919132149155446097, guid: 224376dc28276b540b1eb7589148386a, type: 3}
   pilier: {fileID: 919132149155446097, guid: 280ad2f7ea6df3042a8a6f8b6710f358, type: 3}
   poteau: {fileID: 919132149155446097, guid: 173559ac3999b9043a784a7ee78b4055, type: 3}
@@ -83,7 +79,7 @@ MonoBehaviour:
   - {fileID: 919132149155446097, guid: 7e047c73d1ed69b45804e69f607ed468, type: 3}
   - {fileID: 919132149155446097, guid: 46961154c4a24a64bb181368b69049ec, type: 3}
   - {fileID: 919132149155446097, guid: d9a45adf15c5fba4f8bfaaedf3e15b0b, type: 3}
-  dalleArrivee: {fileID: 0}
+  dalleArrivee: {fileID: 919132149155446097, guid: b8c10b57237e6e4429d3d48eb4f2c22b, type: 3}
   torcheMurale: {fileID: 919132149155446097, guid: b423af8fcc8641e4dbce487565a5085f, type: 3}
   torcheSurPied: {fileID: 919132149155446097, guid: 1d85d0174a2b9074ab890f9e01edf78d, type: 3}
   colonneTorchere: {fileID: 919132149155446097, guid: 173559ac3999b9043a784a7ee78b4055, type: 3}

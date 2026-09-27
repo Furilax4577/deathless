@@ -58,6 +58,8 @@ namespace Deathless.Donjon
             {
                 if (m_Items[g] == null) { m_Items[g] = new List<Transform>(128); m_Echelles[g] = new List<Vector3>(128); m_Retards[g] = new List<float>(128); }
                 m_Items[g].Clear(); m_Echelles[g].Clear(); m_Retards[g].Clear();
+                if (m_Combines[g] != null) m_Combines[g].Clear();
+                if (m_Individuels[g] != null) m_Individuels[g].Clear();
                 m_Cible[g] = m_Etat[g] = m_EnCours[g] = false;
             }
             enabled = false;
@@ -68,6 +70,43 @@ namespace Deathless.Donjon
             m_Items[groupe].Add(t);
             m_Echelles[groupe].Add(t.localScale);
             m_Retards[groupe].Add(0f);
+        }
+
+        // ------------------------------------------------------------------ Maillages combinés (DonjonGenerateur.Combiner)
+        // Hors transition, le groupe se rend par ses combinés et les rendus des pièces combinées sont éteints ; pendant une
+        // transition (rétrécissement en vague), les pièces se rendent elles-mêmes et le combiné s'éteint.
+        readonly List<Renderer>[] m_Combines = new List<Renderer>[NbGroupes];
+        readonly List<Renderer>[] m_Individuels = new List<Renderer>[NbGroupes];
+
+        public void Decombiner()
+        {
+            for (int g = 0; g < NbGroupes; g++)
+            {
+                if (m_Combines[g] != null) m_Combines[g].Clear();
+                if (m_Individuels[g] != null) m_Individuels[g].Clear();
+            }
+        }
+
+        public void Combine(int g, Renderer r)
+        {
+            if (m_Combines[g] == null) m_Combines[g] = new List<Renderer>(4);
+            m_Combines[g].Add(r);
+            r.enabled = !m_EnCours[g] && !m_Cible[g];
+        }
+
+        public void Individuel(int g, Renderer r)
+        {
+            if (m_Individuels[g] == null) m_Individuels[g] = new List<Renderer>(128);
+            m_Individuels[g].Add(r);
+            r.enabled = m_EnCours[g];
+        }
+
+        void Rendus(int g, bool transition, bool masque)
+        {
+            var c = m_Combines[g];
+            if (c != null) for (int i = 0; i < c.Count; i++) { bool v = !transition && !masque; if (c[i] != null && c[i].enabled != v) c[i].enabled = v; }
+            var ind = m_Individuels[g];
+            if (ind != null) for (int i = 0; i < ind.Count; i++) if (ind[i] != null && ind[i].enabled != transition) ind[i].enabled = transition;
         }
 
         /// Fin de construction : réapplique l'état courant du héros (le donjon a pu être régénéré sous ses pieds).
@@ -142,6 +181,7 @@ namespace Deathless.Donjon
                         if (t.gameObject.activeSelf == m_Cible[g]) t.gameObject.SetActive(!m_Cible[g]);
                     }
                     m_Etat[g] = m_Cible[g]; m_EnCours[g] = false;
+                    Rendus(g, false, m_Cible[g]);
                     continue;
                 }
                 // Transition animée : retards en vague depuis le héros.
@@ -159,6 +199,7 @@ namespace Deathless.Donjon
                 }
                 m_Debut[g] = t0; m_Fin[g] = t0 + maxRetard + duree;
                 m_Etat[g] = m_Cible[g]; m_EnCours[g] = true;
+                Rendus(g, true, false);
                 anime = true;
             }
             if (anime) enabled = true;
@@ -195,7 +236,7 @@ namespace Deathless.Donjon
                         if (masquer && t.gameObject.activeSelf) t.gameObject.SetActive(false);
                     }
                 }
-                if (fini) m_EnCours[g] = false; else reste = true;
+                if (fini) { m_EnCours[g] = false; Rendus(g, false, masquer); } else reste = true;
             }
             if (!reste) enabled = false;
         }

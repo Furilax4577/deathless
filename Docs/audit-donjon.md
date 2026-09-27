@@ -4,11 +4,24 @@ Audit **sans correction** du donjon du projet `main`, en Play dans `Assets/Scene
 
 **Non testé** : le réseau à deux postes (voir « Non testé »), les sons (non audibles par l'agent ; les appels et les clips sont listés), les coffres à clé (aucun code de clé dans le projet à cette date : `DonjonJeu.CadenasActifs = false`, aucune classe de clé, tous les coffres s'ouvrent sans clé conformément au wiki).
 
+> **Corrections du 27/09/2026** (version 0.5.10 « Le donjon remis d'aplomb », décision de Quentin : tout sauf les balcons). Chaque défaut porte ci-dessous son état : **Corrigé le 27/09/2026** avec sa capture `Assets/Screenshots/donjon_fix_NN_*.png` (même numéro que la capture d'audit correspondante), ou **Reporté**. Contrôles de fin : génération et NavMesh valides sur les 5 graines (escaliers 3/3, butins tous accessibles, aucun butin ni point d'apparition dans un mur ou un décor, 0 bord de plancher ouvert sur le vide hors paliers), console sans erreur ni avertissement, scène non modifiée, hors Play à la fin. Règles reportées au wiki : `Wiki/pages/donjon.md`. Outils : `ScenariosDonjon.Ouvertures / OsApparitions / BordsOuverts / CasCamera / CoffreVide / TasOr / VoirPiece / Hud`.
+>
+> | Graine | Portes | Arches | Fenêtres | Murs cassés | Murs pleins | Murs écrasés | Murets | Plafonds | Grilles | Os → apparition (min) |
+> |---|---|---|---|---|---|---|---|---|---|---|
+> | 111 | 22 → **0** | 12 → **0** | 29 → 22 (fermées) | 15 → 15 (doublés) | 55 → 140 | 3 → **0** | 0 → 3 | 0 → 259 | 31 → 9 | 0,04 m → 1,60 m |
+> | 2222 | 26 → **0** | 16 → **0** | 22 → 16 | 13 → 10 | 55 → 146 | 3 → **0** | 0 → 3 | 0 → 259 | 35 → 5 | 0,04 → 1,60 |
+> | 33333 | 25 → **0** | 20 → **0** | 24 → 14 | 13 → 13 | 54 → 148 | 3 → **0** | 0 → 3 | 0 → 257 | 21 → 2 | 0,04 → 1,60 |
+> | 4444 | 20 → **0** | 17 → **0** | 28 → 15 | 14 → 8 | 61 → 147 | 3 → **0** | 0 → 3 | 0 → 257 | 19 → 6 | 0,04 → 1,60 |
+> | 55555 | 33 → **0** | 12 → **0** | 28 → 16 | 10 → 14 | 59 → 146 | 3 → **0** | 0 → 3 | 0 → 258 | 20 → 10 | 0,04 → 1,60 |
+>
+> Les plans ont changé pour une même graine (tirages supplémentaires : grilles, torchères, ossements) ; la comparaison porte sur les familles de pièces. Les « fenêtres » d'après sont des volets clos (`wall_window_closed`, une par pan de 3 cellules au plus, sur ~116 pans d'enceinte aux étages) ; plus aucune fenêtre grillagée sur le noir. Les murs cassés sont doublés d'un mur plein derrière. « Murs pleins » d'avant comptait `wall` + `wall_pillar` seulement (les `wall_scaffold` à part) ; après, les trois.
+
 ## Les cinq points de Quentin
 
 Ils passent en tête ; ils sont repris dans la liste par gravité plus bas.
 
 ### 1. « Pièce à ramasser » — gênant, correctif petit
+- **Corrigé le 27/09/2026** : à l'ouverture, le corps du coffre passe sur un maillage sans pièces (`DonjonJeu.SansPieces`, triangles à l'UV dorée de l'atlas KayKit) et le tas s'envole en gemmes d'or (`EnvolOr`, `GemmesVolantes`, 24 ou 44 gemmes, thème Sacré) ; plus de `PieceOr` pour les coffres ; le maillage plein revient à `PreparerButins`. Mesure : grand coffre 1 472 → 630 triangles (corps 1 084 → 242), or 0 → 120, 0 `PieceOr` en vol. Tas d'or au sol : crédité (120 → 140) et retiré (`visuel actif False`). Captures `donjon_fix_05_grandcoffre_0.png` (gemmes en vol, coffre vide) et `_1.png` (2 s après), `donjon_fix_06_tasor.png`.
 
 - **Ce qui se passe** : après l'ouverture d'un coffre (or crédité, couvercle basculé), le coffre reste ouvert **plein de pièces d'or** : le modèle `Assets/Art/Coffres` (grand coffre et coffre sans serrure) contient un tas de pièces à l'intérieur, qui reste visible une fois l'or pris. Le joueur voit de l'or « encore à ramasser » et revient dessus ; l'invite a disparu et rien ne se passe. C'est la lecture la plus probable du retour. Deux autres candidats, moins probables : les pièces `PieceOr` qui montent 0,9 s au-dessus du coffre puis disparaissent (rien à ramasser, mais elles ressemblent à un objet) ; les tas d'or (`coin_stack_*`) qui se ramassent en marchant dessus et non par E (sans invite : on peut tourner autour sans comprendre).
 - **Vérifié** : l'or des coffres est bien crédité (50 / 50 / 120) et celui des gardiens n'existe pas (`Squelette.OrRapporte = 0` pour un gardien, `Partie.GagnerOr` sort à `montant <= 0` : aucune pièce ne s'affiche à leur mort ; mesuré : 0 `PieceOr` en vol après avoir tué les 6 gardiens). Aucune pièce ne tombe au sol, aucune ne reste.
@@ -18,6 +31,7 @@ Ils passent en tête ; ils sont repris dans la liste par gravité plus bas.
 - **Correctif** : petit — modèle de coffre vide (ou enfant « pièces » désactivé à l'ouverture dans `Ouvrir`, réactivé dans `PreparerButins`).
 
 ### 2. « Des balcons plus que des niveaux » — gênant, correctif gros (conception)
+- **Reporté** : décision de conception à prendre avec Quentin (étages pleins ou balcons) ; rien de touché dans `DonjonPlan.Planchers`.
 
 - **Ce qui se passe** : le niveau 1 est presque entièrement un **balcon d'une cellule de large** (4 m) qui court le long du mur d'enceinte, plus deux mezzanines de 9 cellules ; le niveau 2 est une **plate-forme de 12 cellules** (la « tour ») entourée de balustrades, ouverte sur le hall. Rien ne se lit comme un étage : on est toujours sur une passerelle au-dessus du vide, avec le rez visible en contrebas.
 - **Mesures** (5 graines) : rez 180 cellules pleines, niveau 1 62 à 67 cellules (dont ~50 de balcon périphérique), niveau 2 12 cellules ; 56 à 67 garde-corps (`barrier`) par donjon.
@@ -26,6 +40,7 @@ Ils passent en tête ; ils sont repris dans la liste par gravité plus bas.
 - **Correctif** : gros — revoir le plan (étages pleins sur plusieurs blocs, balcons réservés aux halls à double hauteur), puis le masquage des étages et le chemin critique qui en dépendent.
 
 ### 3. « Des squelettes qui spawnent dans des crânes » — cosmétique, correctif petit
+- **Corrigé le 27/09/2026** : `DonjonPlan.PlacerDecor` pose l'ossement à `OsDistance` = 1,6 m du point, du côté opposé au jeu du point dans sa cellule (aucun os si aucun côté ne tient dans la cellule) ; distance minimale apparition → os mesurée à 1,60 m sur les 5 graines (23-24 os pour 24 apparitions, 0 apparition à moins de 1,5 m d'un os). Capture `donjon_fix_30_g111_gardien_os.png` (guerrier debout à côté de ses ossements, plus dedans).
 
 - **Ce qui se passe** : le plan pose un ossement (`bone_A`, `bone_B`, `bone_C` ou `skull`, au hasard) **exactement sur chaque point d'apparition** ; les gardiens sont posés sur ces points ; un gardien sur quatre sort donc de terre à travers un crâne, puis reste planté dedans à son poste.
 - **Mesures** : gardien ↔ ossement à **0,04 m** sur toutes les graines (guerrier sur `bone_C` graine 111, sur `ribcage` 2222, sbire sur `skull` 33333 et 55555, sur `bone_A` 4444) ; 3 à 7 crânes par donjon sur 24 apparitions.
@@ -34,6 +49,7 @@ Ils passent en tête ; ils sont repris dans la liste par gravité plus bas.
 - **Correctif** : petit — décaler l'ossement de 0,8 à 1,2 m du point (ou retirer `skull` de `kit.os`, ou poser le gardien à côté).
 
 ### 4. « Des portes et des fenêtres partout » — gênant, correctif moyen
+- **Corrigé le 27/09/2026** : règle dans `DonjonGenerateur.PoserBord` (mur plein par défaut ; porte ou arche seulement sur un passage, or les passages sont les arcades : plus aucune ; fenêtre fermée `wall_window_closed` seulement sur l'enceinte des étages, cellule du milieu du pan de 3, une chance sur deux, jamais sous une torche (`DonjonPlan.TorcheSur`) ; mur cassé 1 sur 15, jamais deux côte à côte, doublé d'un mur plein derrière sur l'enceinte). `DonjonKit.murs` = pleins seulement, `mursHauts` = volets clos, `murCasse`. Comptes avant/après en tête du document. Captures `donjon_fix_32_g111_mur_rez.png` (enceinte du rez sans porte), `donjon_fix_33_g111_fenetre.png` (fenêtre fermée du balcon, rien de noir), `donjon_fix_35_g111_mur_casse.png` (trou doublé de pierre). Décision notée : pas d'arche de pierre à l'entrée des salles couvertes (le modèle `wall_arched` du kit n'est pas un passage franc) ; les arcades de bois restent les seuls passages.
 
 - **Ce qui se passe** : chaque bord de mur (intérieur ou d'enceinte, tous niveaux) tire son modèle **au hasard** dans `kit.murs` = `wall ×3, wall_broken, wall_arched, wall_scaffold ×2, wall_doorway, wall_doorway_scaffold, wall_pillar` : 3 modèles sur 10 sont une porte ou une arche, 1 sur 10 un mur cassé (trou). Les murs d'enceinte des étages tirent en plus 1 fois sur 4 dans `kit.mursHauts` = `wall_window_closed ×2, wall_archedwindow_gated` (fenêtres sur le vide noir). Toutes ces ouvertures sont doublées d'une boîte de collision pleine (`Boite` 4 × 4 × 1) : porte fermée qui ne s'ouvre pas, porte sur le mur d'enceinte, arche bouchée, fenêtre sur le noir, trou sur le noir.
 - **Comptage** (pièces posées par donjon, 5 graines) :
@@ -52,6 +68,7 @@ Ils passent en tête ; ils sont repris dans la liste par gravité plus bas.
 - **Correctif** : moyen — `Bord.Mur` / `MurExterieur` : murs pleins seulement (`wall`, `wall_pillar`, `wall_scaffold`) ; `wall_doorway` / `wall_arched` réservés aux passages réellement ouverts du plan (bord `Rien` entre deux cellules pleines, sans boîte) ; fenêtres et murs cassés retirés de l'enceinte tant qu'il n'y a rien derrière (ou décor de fond).
 
 ### 5. « Des demi-murs qui ne servent à rien » — cosmétique, correctif petit
+- **Corrigé le 27/09/2026** : `Bord.MurBas` pose un vrai muret plein (`DonjonKit.muret` = bloc de fondation `floor_foundation_front` mis à 4 × 1 × 1 m, boîte de 1 m ; sans modèle : bloc facetté généré `MeshMuret`) ; 0 mur écrasé sur les 5 graines, 3 murets par donjon, entre deux halls du rez (ils séparent deux zones). Capture `donjon_fix_34_g111_mur_bas.png`.
 
 - **Ce qui se passe** : 2 à 3 « murs bas » par donjon, entre deux halls voisins du rez, sur une seule cellule : un modèle de mur tiré au hasard dans `kit.murs` (donc parfois `wall_broken`, `wall_arched`, `wall_scaffold`, `wall_doorway`) **écrasé à mi-hauteur** (échelle Y 0,5), avec une boîte de 2 m. Ils ne ferment rien, ne couvrent rien, ne servent pas de couvert de combat, et une arche ou une porte écrasée à 2 m se lit comme un bug.
 - **Mesures** : 2 murs bas (graines 141337, 457966), 3 (111, 2222, 33333, 4444, 55555) ; modèles écrasés vus : `wall`, `wall_scaffold`, `wall_arched`, `wall_broken`.
@@ -70,6 +87,7 @@ Ils passent en tête ; ils sont repris dans la liste par gravité plus bas.
 - **Reproduire** : `ScenariosDonjon.Construire(111); Aller("butin0"); Regarder(-71, 30)` ; parcours : `Parcourir("butin1", 45, "cap")` depuis l'arrivée (graine 464927).
 - **Cause probable** : `CameraEpaule.Premier` ignore les touches à distance 0 (`h.distance > 0f`) et les balayages PhysX qui démarrent en chevauchement (boîte d'un décor à 1,5 m, capsule du héros) ne remontent pas de façon fiable les colliders suivants ; les trois tests (épaule → arrière, pivot → droite, pivot → caméra à rayon 0,12) partent tous du pivot (1,6 m au-dessus du héros, à l'intérieur de sa capsule). À confirmer au débogueur ; le fait est reproductible.
 - **Correctif** : moyen — compléter les SphereCast par un `Linecast` sans rayon (pivot → caméra, tête → caméra) qui ne souffre pas du chevauchement initial, ignorer explicitement la capsule du héros par masque de couche plutôt que par `GetComponentInParent<Sante>`, et rapprocher la caméra dès qu'un `CheckSphere` la trouve dans un collider ; épaissir les boîtes des piliers (`column` : boîte 0,7 m pour un chapiteau plus large).
+- **Corrigé le 27/09/2026** : `CameraEpaule.Recul` ajoute deux lancers sans rayon (pivot → caméra, épaule → caméra : un rayon parti dans un collider l'ignore et touche ceux qui suivent), `CameraEpaule.Enceinte` (boîte intérieure des murs sous leur sommet, posée par `DonjonJeu.LateUpdate` quand le héros local est au donjon : la caméra ne passe plus par-dessus l'enceinte) et un dernier filet `DansUnCollider` (sphère 0,18 m : recul par pas de 0,2 m). Boîtes des poteaux d'arcade 0,6 × 4 m (la caméra entrait dans le chapiteau), boîte du poteau de balustrade sur son modèle. Vérifié sur les 4 cas de l'audit : bord de la plate-forme du 2e étage graine 111 (lacet −71, tangage 30) : 0 image dans un collider, 0 hors enceinte, recul 2,17 m (`donjon_fix_01_camera_enceinte.png`) ; parcours arrivée → coffre 1 graine 464927 : 668 images, 0 dans un collider (3-4 avant), 0 héros caché (1-4 avant), recul minimal 3,06 m (0,55-0,78 avant) (`donjon_fix_02_cam_butin1_fin.png`) ; parcours → bassin : 228 images, 0 / 0, recul minimal 1,35 m (`donjon_fix_03_cam_eau_fin.png`) ; sous la mezzanine (coffre 1 graine 111) : 0 / 0 (`donjon_fix_19_masquage_butin1.png`).
 
 ### Gênant
 
@@ -78,54 +96,67 @@ Ils passent en tête ; ils sont repris dans la liste par gravité plus bas.
 - **Captures** : `audit_donjon_15_rappel.png`, `audit_donjon_16_rappel_fin.png`, `audit_donjon_12_depot.png`.
 - **Cause** : `Assets/UI/Screens/Hud/Hud.uss` ligne 428 : `.hud-donjon-message { position: absolute; top: 222px; left: 50% … }` — même hauteur que la pastille de phase ; `EcranHud` ne décale pas l'un quand l'autre est visible.
 - **Correctif** : petit — placer le message sous la pastille de phase (ou sous l'alerte donjon), ou masquer la phase pendant le message.
+- **Corrigé le 27/09/2026** : `Hud.uss` `.hud-donjon-message` top 386 px (sous la pastille de phase 212-263 px et sous la bannière NUIT N 225-373 px), 312 px à ×3 (pastille 190-241, bannière 157-298), mesuré en Play par `ScenariosDonjon.Hud()`. Capture `donjon_fix_15_rappel.png` (« Crépuscule · la nuit 2 tombe » et « Rappelé par Nyxessa : 0 or gardés, 200 perdus » lisibles tous les deux).
 
 **G2. Plafond noir dans le champ sous les mezzanines** — correctif moyen.
 - Sous un plancher (coffre du rez « sous un plancher », allées couvertes), le tiers supérieur de l'image est un aplat noir : dessous des dalles du niveau 1, non éclairé, jamais masqué quand la caméra et le héros ne sont pas dans le même bloc couvert (masquage par bloc de 3 × 3 cellules : le bloc voisin garde son plancher).
 - **Captures** : `audit_donjon_19_masquage_butin1.png`, `audit_donjon_10_sac_visuel.png`, `audit_donjon_30_g111_gardien_os.png`.
 - **Cause** : `DonjonKit.plafond` vide (`{fileID: 0}`) : `DonjonGenerateur.PoserSols` ne pose aucune sous-face ; lumières sans ombre au-dessus des dalles, rien en dessous ; `DonjonMasquage.Recalculer` ne masque que le bloc du héros, celui de la caméra et les deux blocs diagonaux, et seulement si le bloc du héros est « couvert » (5 cellules sur 9).
 - **Correctif** : moyen — dalle de plafond claire (`kit.plafond`), lumière d'appoint sous les mezzanines, et masquage étendu au bloc devant la caméra (direction de vue) même hors bloc couvert.
+- **Corrigé le 27/09/2026** : `DonjonKit.plafond` = `ceiling_tile` posé sous chaque plancher d'étage (77-79 par donjon) et en toit à 12 m sur toute l'emprise (180 dalles, groupe du dernier niveau : un plancher masqué ne découvre plus le fond noir) ; deuxième torche (torchère dans la cellule libre la plus loin de la première) au rez des blocs Mezzanine et Tour (`DonjonPlan.TorchereLoin`, 37 → 40 lumières). Le masquage n'est pas étendu (le plafond posé suffit : plus d'aplat noir, un plafond sombre de dalles et de poutres). Capture `donjon_fix_19_masquage_butin1.png`.
 
 **G3. Trous et fenêtres sur le noir** — correctif petit (compris dans le point 4).
 - Les `wall_broken` (10 à 21 par donjon, dont sur l'enceinte) et les fenêtres des étages montrent le fond de brouillard noir : le donjon paraît percé. Captures `audit_donjon_35_g111_mur_casse.png`, `audit_donjon_47_g33333_mur_casse.png`, `audit_donjon_53_g4444_mur_casse.png`, `audit_donjon_33_g111_fenetre.png`, `audit_donjon_03_coffre1_0.png`. Cause et correctif : point 4.
+- **Corrigé le 27/09/2026** : point 4 (fenêtres fermées, murs cassés doublés). Captures `donjon_fix_33_g111_fenetre.png`, `donjon_fix_35_g111_mur_casse.png`.
 
 **G4. Pas de dalle d'arrivée : on tombe du ciel sur une grille d'égout** — correctif petit.
 - `DonjonKit.dalleArrivee` est vide (`{fileID: 0}`) : `PoserDecor` (`DecorDalleArrivee`) ne pose rien, et la cellule d'arrivée reçoit le sol tiré au hasard, souvent `floor_tile_big_grate`. Le héros atterrit sur une grille noire ; rien ne signale le point d'arrivée.
 - **Captures** : `audit_donjon_02_passage_2.png`, `audit_donjon_02_passage_3.png`, `audit_donjon_14_alerte.png`.
 - **Correctif** : petit — renseigner `dalleArrivee` (et exclure la grille des sols de l'entrée).
+- **Corrigé le 27/09/2026** : `dalleArrivee` = `floor_wood_large_dark` et, surtout, le plan pose enfin un `DecorDalleArrivee` (il ne le faisait jamais) ; l'arrivée n'est plus une grille (grilles voulues seulement, G5). Capture `donjon_fix_02_passage_arrivee.png`.
 
 **G5. Grilles au sol partout** — correctif petit.
 - `kit.solsRez` = 7 dalles pleines + 1 `floor_tile_big_grate` tirée par cellule : 19 à 35 grilles noires par donjon, au hasard, y compris sous les tables, sous les points d'apparition et à l'arrivée. Elles se lisent comme des trous ou des trappes et aplatissent la lecture du sol.
 - **Captures** : `audit_donjon_02_passage_1.png`, `audit_donjon_20_cam_butin0_1.png`, `audit_donjon_36_g111_zone_sombre.png`.
 - **Cause** : `DonjonGenerateur.PoserSols` (`Choisir(kit.solsRez, h >> 3)`), `Assets/Donjon/DonjonKit.asset`.
 - **Correctif** : petit — retirer la grille des sols aléatoires ; la poser en décor voulu (une par bloc au plus).
+- **Corrigé le 27/09/2026** : `solsRez` = dalles pleines ; `DonjonPlan.grille[]` : une cellule libre par bloc de hall, une chance sur deux, jamais sous un point d'apparition, un butin, un décor ni à l'arrivée ; `DonjonKit.solGrille`. 19-35 → 2-10 grilles par donjon. Captures `donjon_fix_34_g111_mur_bas.png`, `donjon_fix_02_passage_arrivee.png`.
 
 **G6. Un point d'apparition dans un décor de coin** — correctif petit.
 - Sur 3 graines sur 7, un point d'apparition (`Apparition_Voleur_*`, niveau 1, cellule de coin) est **dans la boîte d'un décor de coin** (tonneaux, caisses : boîte 1,6 × 1,5 × 1,6 ou 2,1 × 1,0 × 2,1). Un gardien posé là sort de terre dans les tonneaux et son agent NavMesh se retrouve coincé (constaté en analyse, pas de gardien tiré dessus pendant l'audit : les gardiens vont aux 6 points les plus proches des butins).
 - **Mesure** : `ScenariosDonjon.Analyser()` : « apparition 10 (Apparition_Voleur_11) dans Boite (1.6, 1.5, 1.6) à (1001.3, 4.0, 46.7) » (graine 457966), idem 2222 (apparition 13), 111 (apparition 19).
 - **Cause** : `DonjonPlan.Peupler` : les décors de coin (`DecorCoin`) marquent la cellule (`m_Occupe` quarts) mais `ApparitionDansRegion` teste `(m_Occupe[no] & 16)` (centre) et `m_Utilise` : un point d'apparition posé avant le décor, ou le décor collé dans le coin de la cellule d'apparition, se chevauchent.
 - **Correctif** : petit — exclure des décors de coin les cellules d'apparition (ou tester la distance).
+- **Corrigé le 27/09/2026** : `DonjonPlan.PlacerDecor` exclut des décors de coin toute cellule dont le centre est pris (`m_Occupe & 16` : apparition, butin) ; `Analyser()` : « aucun apparition dans un mur » sur les 5 graines (1 sur 111 et 2222 avant).
 
 **G7. Performances au donjon (éditeur)** — correctif moyen, à surveiller en build.
 - Hall d'arrivée : **30,1 ms par image** (min 21,7), 847 000 triangles, 1,37 M sommets, **2 431 batches**, 44 SetPass ; plate-forme du 2e étage, vue sur le hall : 26,1 ms, 639 000 triangles, 2 174 batches, 40 SetPass. Mesures dans l'éditeur (Game 1920 × 1080), sans comparaison village dans cet audit. 1 330 à 1 370 objets actifs, 36 lumières ponctuelles sans ombre (Forward+ : pas de limite par objet).
 - **Cause** : une pièce KayKit par cellule et par bord, aucun batching statique (objets réutilisés d'un donjon à l'autre), pas de LOD, murs à détails saillants.
 - **Correctif** : moyen — `StaticBatchingUtility.Combine` par groupe après génération (les groupes ne bougent pas jusqu'au donjon suivant), ou instancing ; réduire les pièces d'habillage (`wall_scaffold`, `wall_open_scaffold` : 47 à 57 par donjon).
+- **Corrigé le 27/09/2026** : `DonjonGenerateur.Combiner` combine après la génération les mailles immobiles de chaque groupe (bloc, niveau) par matériau (`Mesh.CombineMeshes`, 71-77 maillages, 9-27 ms ; modèles du kit passés en lecture) ; coffres, tas d'or, portail et eau restent à part ; pendant une transition de masquage les pièces se rendent elles-mêmes (`DonjonMasquage.Rendus`). Mesures au même endroit (graine 111, éditeur 1920 × 1080, 120 images) : hall d'arrivée **2 148 → 498 lots**, 43 → 41 SetPass, 30,4 → 23,8 ms (min 21,4 → 21,2) ; plate-forme du 2e étage **2 322 → 582 lots**, 47 → 42 SetPass, 28,3 → 28,2 ms. Le temps d'image dans l'éditeur reste dominé par autre chose que le rendu du donjon ; les triangles soumis montent (654 k → 929 k : le tri par pièce disparaît), à surveiller en build.
 
 **G8. Gardien de la tour posé au bord du vide** — à confirmer, correctif petit.
 - Sur la plate-forme du 2e étage (graine 457966), le guerrier gardien est posé à (1025.55, 8.08, 37.70) tourné vers l'arrivée : la cellule devant lui n'a pas de plancher (cellule (5, 9) vide aux niveaux 1 et 2, pas de NavMesh). Un héros qui le contourne par là tombe de 8 m (renversé + ralenti : PV 150 → 96, mesuré en s'y téléportant). Pas de garde-corps constaté à cet endroit sur la capture ; à revérifier graine par graine (`Bord` `GardeCorps` attendu au bord d'un plancher).
+- **Non reproduit le 27/09/2026** : `ScenariosDonjon.BordsOuverts()` compte les bords de plancher des étages sans garde-corps ni mur (hors paliers d'escalier) : 0 sur les 5 graines. Le plan pose bien un `GardeCorps` à chaque bord de plancher ; la chute constatée devait passer par la trémie d'un palier.
 
 ### Cosmétique
 
-**C1.** Coffre ouvert plein de pièces (point 1). **C2.** Murs bas écrasés (point 5). **C3.** Ossements sous les gardiens (point 3). **C4.** Balcons (point 2 : gênant, mais la lecture d'ensemble est cosmétique ; le cœur est la conception du plan).
+**C1.** Coffre ouvert plein de pièces (point 1) — **Corrigé le 27/09/2026**. **C2.** Murs bas écrasés (point 5) — **Corrigé le 27/09/2026**. **C3.** Ossements sous les gardiens (point 3) — **Corrigé le 27/09/2026**. **C4.** Balcons (point 2 : gênant, mais la lecture d'ensemble est cosmétique ; le cœur est la conception du plan) — **Reporté**.
 
 **C5. « Prêts 0 / 1 · F1 » affiché au donjon** — le vote est bien inactif (`BasculerPret` ignoré, `pret` reste faux : `audit_donjon_60_vote_donjon.png`), mais l'invite F1 reste affichée sans retour. Correctif petit (`EcranHud` : cacher « Prêts » quand `DonneesUI.Donjon.AuDonjon`).
+- **Corrigé le 27/09/2026** : `EcranHud` cache le bloc « Prêts » quand `DonneesUI.Donjon.AuDonjon` (absent de toutes les captures `donjon_fix_*` au donjon).
 
 **C6. Pénombre du bassin** — la cellule la plus éloignée de toute lampe est dans le bassin (13,3 m, graine 111 ; 47 à 58 cellules à plus de 8 m d'une lampe par donjon). Lisible grâce à l'ambiance (0,30), mais terne : `audit_donjon_36_g111_zone_sombre.png`. Correctif petit (torchère au bord du bassin : `DonjonPlan.PlacerTorches` n'en pose pas dans le bloc bassin).
+- **Corrigé le 27/09/2026** : torchère au bord du bassin, sur la cellule du rez voisine de l'arrivée de son escalier (`DonjonPlan.TorchereBassin`). Capture `donjon_fix_36_g111_bassin.png`.
 
 **C7. Portail de retour posé devant une porte** — le portail de gemmes (contre le mur sud de l'entrée) se retrouve devant une `wall_doorway` de l'enceinte (`audit_donjon_38_g2222_porte_rez.png` a été retirée, capture polluée par un héros mort ; reproduire avec la graine 2222). Correctif : point 4.
+- **Corrigé le 27/09/2026** : plus aucune porte dans les murs (point 4).
 
 **C8. Torches murales dans les fenêtres / au-dessus des portes** — `PlacerTorches` pose une torche par région sur un « mur plein » du plan, mais le modèle tiré peut être une porte ou une fenêtre : torche au-dessus d'une porte fermée (`audit_donjon_32_g111_porte_rez.png`). Correctif : point 4.
+- **Corrigé le 27/09/2026** : plus de porte ; une fenêtre n'est jamais posée sur un bord qui porte une torche (`DonjonPlan.TorcheSur`, point 4).
 
 **C9. Squelette invisible pendant la première seconde de la sortie de terre** — au lever du jour, les 6 gardiens sont « SortieDeTerre » mais leur modèle est sous la dalle ~1 s (montée sur 1,2 s) : sans effet de terre visible à distance, un joueur qui arrive tôt voit des ossements, puis un squelette planté. Cosmétique, lié au point 3.
+- **Reporté** (cosmétique, effet de sortie de terre à distance : hors du périmètre de cette passe ; l'ossement n'est plus sous le squelette).
 
 **Non constaté** : z-fighting (aucun scintillement sur 63 captures statiques ; les murs se recouvrent aux angles mais un pilier (`pillar`, 16 par donjon) couvre chaque angle), torche sans lumière (35 torches, 36 lampes : une par torche + le portail), coffre ou gardien dans un mur (0 sur 7 graines), salle ou butin inaccessible (0 sur 7 graines), trou dans le sol (aucun ; le seul « trou » est le vide au bord de la tour, G8).
 
@@ -180,6 +211,8 @@ Ils passent en tête ; ils sont repris dans la liste par gravité plus bas.
 
 ## Fichiers
 
-- Scénario de dev laissé en place : `Assets/Scripts/Jeu/Dev/ScenariosDonjon.cs` (aucun effet hors Play).
+- Scénario de dev laissé en place : `Assets/Scripts/Jeu/Dev/ScenariosDonjon.cs` (aucun effet hors Play), complété le 27/09/2026 (`Ouvertures`, `OsApparitions`, `BordsOuverts`, `CasCamera`, `CoffreVide`, `TasOr`, `VoirPiece`, `Hud`).
+- Captures des corrections : `Assets/Screenshots/donjon_fix_01_camera_enceinte.png`, `02_cam_butin1_fin`, `02_passage_arrivee`, `03_cam_eau_fin`, `05_grandcoffre_0/1`, `06_tasor`, `15_rappel`, `19_masquage_butin1`, `30_g111_gardien_os`, `32_g111_mur_rez`, `33_g111_fenetre`, `34_g111_mur_bas`, `35_g111_mur_casse`, `36_g111_bassin`.
+- Fichiers modifiés le 27/09/2026 : `Assets/Scripts/Donjon/DonjonGenerateur.cs`, `DonjonPlan.cs`, `DonjonKit.cs`, `DonjonMasquage.cs`, `Assets/Scripts/Jeu/CameraEpaule.cs`, `Assets/Scripts/Jeu/Donjon/DonjonJeu.cs`, `Assets/Scripts/UI/Ecrans/EcranHud.cs`, `Assets/UI/Screens/Hud/Hud.uss`, `Assets/Donjon/DonjonKit.asset`, importeurs des 43 modèles KayKit du kit (lecture activée) et maillages `Assets/Art/Coffres/Maillages/*` (lecture), `Wiki/pages/donjon.md` (nouvelle page), `Launcher/changelog.json` (0.5.10).
 - Captures : `Assets/Screenshots/audit_donjon_01_invite_village.png` à `audit_donjon_63_camera_enceinte.png` (68 fichiers).
 - Aucun fichier de jeu modifié ; `Village.unity` non touchée.

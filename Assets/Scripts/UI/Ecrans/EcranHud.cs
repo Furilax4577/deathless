@@ -364,7 +364,8 @@ namespace Deathless.UI.Ecrans
             }
 
             // Vote prêt.
-            var vote = partie.Phase == PhasePartie.Jour && partie.VoteActif;
+            // Au donjon, le vote est inactif : l'invite « Prêts N / M · F1 » n'a rien à y faire (audit du 27/09/2026, C5).
+            var vote = partie.Phase == PhasePartie.Jour && partie.VoteActif && !(DonneesUI.Donjon != null && DonneesUI.Donjon.AuDonjon);
             m_BlocPrets.style.display = vote ? DisplayStyle.Flex : DisplayStyle.None;
             if (vote && (partie.JoueursPrets != m_PretsAffiches || partie.JoueursTotal != m_TotalAffiche))
             {

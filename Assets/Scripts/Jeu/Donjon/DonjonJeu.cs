@@ -35,6 +35,16 @@ namespace Deathless.Jeu
         /// Coin du donjon (60 x 48 m) : loin du village (le village tient dans ± 240 m, caméra à 400 m).
         public static readonly Vector3 Origine = new Vector3(1000f, 0f, 0f);
         static readonly Bounds Emprise = new Bounds(Origine + new Vector3(30f, 5f, 24f), new Vector3(66f, 34f, 54f));
+        /// Intérieur des murs d'enceinte (faces intérieures à 0,5 m des bords, du fond du bassin au sommet des murs du
+        /// dernier étage) : la caméra du joueur local n'en sort pas (CameraEpaule.Enceinte, B1 de l'audit).
+        static readonly Bounds EnceinteCamera = EnceinteInterieure();
+
+        static Bounds EnceinteInterieure()
+        {
+            float yMin = -DonjonPlan.ProfondeurBassin - 0.5f, yMax = DonjonPlan.NbNiveaux * DonjonPlan.HauteurNiveau - 0.3f;
+            float lx = DonjonPlan.Largeur * DonjonPlan.Cellule, lz = DonjonPlan.Profondeur * DonjonPlan.Cellule;
+            return new Bounds(Origine + new Vector3(lx * 0.5f, (yMin + yMax) * 0.5f, lz * 0.5f), new Vector3(lx - 1.1f, yMax - yMin, lz - 1.1f));
+        }
 
         public static DonjonJeu Instance { get; private set; }
 
@@ -98,6 +108,42 @@ namespace Deathless.Jeu
             public Transform couvercle;
             public Quaternion ferme;
             public CadenasOuverture cadenas;
+            /// Corps du coffre et son maillage complet (avec les pièces d'or) : à l'ouverture, le corps prend le maillage
+            /// sans pièces (SansPieces) ; PreparerButins le lui rend.
+            public MeshFilter corps;
+            public Mesh maillagePlein;
+        }
+
+        /// Maillages des corps de coffre sans leurs pièces d'or (audit du 27/09/2026, point 1 : le coffre ouvert restait plein
+        /// de pièces « à ramasser »). Les pièces sont les triangles dont l'UV tombe dans la zone dorée de l'atlas KayKit
+        /// (u ≥ 0,84, v ≤ 0,5) ; un maillage sans triangle doré est rendu tel quel.
+        static readonly Dictionary<Mesh, Mesh> s_SansPieces = new Dictionary<Mesh, Mesh>();
+
+        static Mesh SansPieces(Mesh plein)
+        {
+            if (plein == null) return null;
+            if (s_SansPieces.TryGetValue(plein, out var vide)) return vide;
+            if (!plein.isReadable) { s_SansPieces[plein] = plein; return plein; }   // build : maillage non lisible, laissé tel quel
+            var uv = plein.uv; var tri = plein.triangles;
+            var garde = new List<int>(tri.Length);
+            int retires = 0;
+            for (int t = 0; t + 2 < tri.Length; t += 3)
+            {
+                bool or = uv.Length > 0;
+                for (int k = 0; k < 3 && or; k++) { Vector2 u = uv[tri[t + k]]; or = u.x >= 0.84f && u.y <= 0.5f; }
+                if (or) { retires++; continue; }
+                garde.Add(tri[t]); garde.Add(tri[t + 1]); garde.Add(tri[t + 2]);
+            }
+            if (retires == 0) vide = plein;
+            else
+            {
+                vide = Instantiate(plein);
+                vide.name = plein.name + "_Vide";
+                vide.triangles = garde.ToArray();
+                vide.RecalculateBounds();
+            }
+            s_SansPieces[plein] = vide;
+            return vide;
         }
         readonly Dictionary<GameObject, Coffre> m_Coffres = new Dictionary<GameObject, Coffre>();
 
@@ -118,6 +164,7 @@ namespace Deathless.Jeu
 
         void OnDestroy()
         {
+            CameraEpaule.Enceinte = null;
             if (Instance == this) Instance = null;
             if (ReferenceEquals(DonneesUI.Donjon, this)) DonneesUI.Donjon = null;
         }
@@ -249,6 +296,7 @@ namespace Deathless.Jeu
                 {
                     if (coffre.couvercle != null) coffre.couvercle.localRotation = coffre.ferme;
                     if (coffre.cadenas != null) { coffre.cadenas.gameObject.SetActive(true); coffre.cadenas.Reinitialiser(); }
+                    if (coffre.corps != null && coffre.maillagePlein != null) coffre.corps.sharedMesh = coffre.maillagePlein;
                 }
                 var c = r.GetComponent<CoffreDonjon>();
                 if (r.butin != TypeButin.TasOr) { if (c == null) c = r.gameObject.AddComponent<CoffreDonjon>(); c.enabled = true; }
@@ -270,6 +318,13 @@ namespace Deathless.Jeu
             foreach (var t in visuel.GetComponentsInChildren<Transform>(true))
                 if (t != visuel.transform && (t.name.EndsWith(suffixe, System.StringComparison.OrdinalIgnoreCase) || t.name.EndsWith("_lid")))
                 { c.couvercle = t; c.ferme = t.localRotation; break; }
+            // Corps : le premier maillage qui n'est pas sous le couvercle et qui contient des pièces d'or.
+            foreach (var mf in visuel.GetComponentsInChildren<MeshFilter>(true))
+            {
+                if (mf.sharedMesh == null || (c.couvercle != null && mf.transform.IsChildOf(c.couvercle))) continue;
+                if (SansPieces(mf.sharedMesh) == mf.sharedMesh) continue;
+                c.corps = mf; c.maillagePlein = mf.sharedMesh; break;
+            }
             // Cadenas : désactivé (CadenasActifs), code gardé pour les coffres à clé.
             var prefab = !CadenasActifs ? null : grand ? cadenasGrandCoffre : cadenasCoffre;
             if (prefab != null)
@@ -435,8 +490,31 @@ namespace Deathless.Jeu
                 }
                 c.couvercle.localRotation = ouvert;
             }
-            for (int k = 0; k < (r.butin == TypeButin.GrandCoffre ? 4 : 2); k++) { PieceOr.Jouer(p + Random.insideUnitSphere * 0.3f); yield return new WaitForSeconds(0.08f); }
+            // L'or s'envole : le tas de pièces du modèle disparaît (maillage sans pièces) et part en gemmes d'or (thème Sacré,
+            // le seul thème doré des palettes), rien ne reste « à ramasser » (point 1 de l'audit du 27/09/2026).
+            if (c != null && c.corps != null && c.maillagePlein != null) c.corps.sharedMesh = SansPieces(c.maillagePlein);
+            EnvolOr(r.transform, r.butin == TypeButin.GrandCoffre ? 44 : 24);
             AudioBank.Jouer(SonsDuJeu.Or, p, 0.7f);
+        }
+
+        /// Petit tas de gemmes d'or qui s'envole du coffre (GemmesVolantes, langage visuel des effets du projet).
+        static void EnvolOr(Transform coffre, int nombre)
+        {
+            var mat = EffetsJeu.Gemmes;
+            if (mat == null) return;
+            var gemmes = GemmesVolantes.Creer("Coffre_Or", mat, nombre + 8, true);
+            Color sombre = VfxPalette.Couleur(VfxTheme.Sacre, VfxRole.Base, new Color(0.722f, 0.565f, 0.227f));
+            Color vif = VfxPalette.Couleur(VfxTheme.Sacre, VfxRole.Vif, new Color(0.910f, 0.784f, 0.447f));
+            Color coeur = VfxPalette.Couleur(VfxTheme.Sacre, VfxRole.Coeur, new Color(0.957f, 0.886f, 0.659f));
+            Vector3 centre = coffre.position + Vector3.up * 0.55f;
+            for (int i = 0; i < nombre; i++)
+            {
+                Vector3 depart = centre + coffre.right * Random.Range(-0.5f, 0.5f) + coffre.forward * Random.Range(-0.3f, 0.3f) + Vector3.up * Random.Range(0f, 0.35f);
+                Vector3 v = Vector3.up * Random.Range(1.6f, 3.4f) + coffre.right * Random.Range(-0.7f, 0.7f) + coffre.forward * Random.Range(-0.5f, 0.5f);
+                float r = Random.value;
+                Color col = r < 0.45f ? sombre : r < 0.9f ? vif : coeur;   // surtout de l'or franc, peu de reflets clairs
+                gemmes.Emettre(depart, v, Random.Range(0.045f, 0.085f), Random.Range(0.55f, 0.95f), col, 4.5f, 0.6f, 0.04f, 0.45f, default(Vector3), Random.Range(0f, 0.25f));
+            }
         }
 
         // ================================================================== Retour, dépôt, rappel
@@ -911,6 +989,7 @@ namespace Deathless.Jeu
             var h = P != null ? P.HerosLocal : null;
             var cam = CameraJeu;
             bool dedans = h != null && (AuDonjon(h) || (cam != null && Contient(cam.transform.position)));
+            CameraEpaule.Enceinte = h != null && AuDonjon(h) ? EnceinteCamera : (Bounds?)null;
             if (dedans)
             {
                 if (!m_AmbianceActive && cam != null) { m_CamAmbiance = cam; m_FondCamera = cam.clearFlags; m_FondCouleur = cam.backgroundColor; }

@@ -50,6 +50,7 @@ MENU = [
     ("univers", "L'univers"),
     ("principes", "Principes"),
     ("deroule", "Déroulé d'une partie"),
+    ("donjon", "Le donjon", "sous"),
     ("village", "Le village"),
     ("nyxessa", "Nyxessa, la relique"),
     ("portail", "Le portail"),

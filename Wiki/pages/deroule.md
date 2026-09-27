@@ -59,7 +59,7 @@ Un cycle complet dure **4 min 10 s**. Les 5 s de crépuscule et d'aube laissent 
 
 ## Le donjon {décidé}
 
-Le donjon est **régénéré chaque nuit** : chaque jour, le portail mène à un donjon nouveau.
+Le donjon est **régénéré chaque nuit** : chaque jour, le portail mène à un donjon nouveau. Les règles de construction du lieu (murs, fenêtres, plafonds, ossements, coffres, caméra) sont sur la page [Le donjon](donjon.md).
 
 **Taille unique** {décidé} : tous les donjons ont la même taille. Elle respecte une consigne : un aller-retour complet, de l'arrivée par le portail au retour au village, est **faisable en 90 secondes** (le jour dure 120 s). **Forme** {décidé} : plutôt **ouvert**, sur **2 à 3 étages** reliés par des escaliers. Quand on entre dans une pièce sous un étage, **l'étage du dessus disparaît** pour qu'on voie bien dedans (chaque joueur pour lui-même). Peu de couloirs : de **grandes salles ouvertes et lisibles**, pas un labyrinthe. Des balcons et mezzanines longent les murs ; **3 escaliers au plus**, en pierre ou en bois. Un **vrai 2e étage** plein, relié par l'un de ces escaliers. **Consigne des 90 s** : le chemin le plus long (arrivée, butin le plus lointain, portail de retour, escaliers et eau compris) fait au plus 250 m.
 

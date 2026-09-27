@@ -5,6 +5,7 @@ using System.Text;
 using Deathless.Donjon;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UIElements;
 
 namespace Deathless.Jeu.Dev
 {
@@ -234,8 +235,9 @@ namespace Deathless.Jeu.Dev
             {
                 int i = int.Parse(ou.Substring(5));
                 var r = g.Butins[i];
-                Vector3 p = r.transform.position - r.transform.forward * 1.5f;
-                if (NavMesh.SamplePosition(p + Vector3.up * 0.3f, out var hb, 2f, NavMesh.AllAreas)) return hb.position;
+                // Devant le coffre (il tourne le dos au mur) ; jusqu'au 27/09/2026, « - forward » plaçait le héros dans le mur.
+                Vector3 p = r.transform.position + r.transform.forward * 1.5f;
+                if (NavMesh.SamplePosition(p + Vector3.up * 0.3f, out var hb, 1.2f, NavMesh.AllAreas)) return hb.position;
                 return r.transform.position;
             }
             if (ou.StartsWith("apparition"))
@@ -245,7 +247,7 @@ namespace Deathless.Jeu.Dev
             }
             if (ou == "portailvillage") { var vc = VueCycle.Instance; return vc != null && vc.portail != null ? vc.portail.Center : Vector3.zero; }
             var parts = ou.Split(',');
-            if (parts.Length == 3) return new Vector3(float.Parse(parts[0]), float.Parse(parts[1]), float.Parse(parts[2]));
+            if (parts.Length == 3) return new Vector3(float.Parse(parts[0], System.Globalization.CultureInfo.InvariantCulture), float.Parse(parts[1], System.Globalization.CultureInfo.InvariantCulture), float.Parse(parts[2], System.Globalization.CultureInfo.InvariantCulture));
             return Vector3.zero;
         }
 
@@ -397,6 +399,7 @@ namespace Deathless.Jeu.Dev
                 if ((mur || cache) && capture != null && captures < 3) { captures++; DevPartie.Capturer(capture + "_" + captures); }
             }
             h.Entrees.DeplacementTest = null; h.Entrees.SprintTest = false;
+            if (capture != null && captures == 0) DevPartie.Capturer(capture + "_fin");   // aucune image fautive : vue d'arrivée
             Log("parcours " + images + " images : caméra dans un mur " + imagesMur + " (" + premMur + "), héros caché " + imagesCache + " (" + premCache + "), recul min " + reculMin.ToString("F2") + " m, héros " + h.transform.position.ToString("F1"));
         }
 
@@ -420,6 +423,231 @@ namespace Deathless.Jeu.Dev
 #endif
             Log("perf sur " + images + " images : moyenne " + (somme / images).ToString("F1") + " ms, min " + min.ToString("F1") + ", max " + max.ToString("F1")
                 + stats + " | héros " + (H != null ? H.transform.position.ToString("F0") : "?"));
+        }
+
+        // ================================================================== Contrôles des correctifs du 27/09/2026
+
+        /// Compte des pièces de mur posées, par famille (audit point 4 : avant / après), plus murets, plafonds, grilles, combinés.
+        public static string Ouvertures()
+        {
+            var g = G;
+            if (g == null) return "pas de générateur";
+            int portes = 0, arches = 0, fenetres = 0, casses = 0, pleins = 0, murets = 0, plafonds = 0, grilles = 0, combines = 0, ecrases = 0;
+            Transform visuels = g.transform.Find("Genere/Visuels");
+            if (visuels != null)
+                foreach (Transform grp in visuels)
+                    foreach (Transform t in grp)
+                    {
+                        if (!t.gameObject.activeSelf) continue;
+                        string n = t.name;
+                        if (n.StartsWith("Combine_")) combines++;
+                        else if (n.StartsWith("wall_doorway")) portes++;
+                        else if (n.StartsWith("wall_arched")) arches++;
+                        else if (n.Contains("window")) fenetres++;
+                        else if (n == "wall_broken") casses++;
+                        else if (n == "wall" || n == "wall_pillar" || n == "wall_scaffold") pleins++;
+                        else if (n == "ceiling_tile") plafonds++;
+                        else if (n == "floor_tile_big_grate") grilles++;
+                        if (n.StartsWith("wall") && Mathf.Abs(t.localScale.y - 0.5f) < 0.01f) ecrases++;
+                        if ((n == "floor_foundation_front" && Mathf.Abs(t.localScale.y - 0.5f) < 0.01f) || n == "Muret") murets++;
+                    }
+            string r = "graine " + g.Plan.graine + " : portes " + portes + ", arches " + arches + ", fenêtres " + fenetres + ", cassés " + casses + ", pleins " + pleins
+                + ", murs écrasés " + ecrases + ", murets " + murets + ", plafonds " + plafonds + ", grilles " + grilles + ", combinés " + combines + " (" + g.DernierTempsCombinaisonMs.ToString("F0") + " ms)";
+            Log(r);
+            return r;
+        }
+
+        /// Distance de chaque point d'apparition à l'ossement le plus proche (point 3 : ≥ 1,5 m attendu), et point d'apparition dans un décor (G6).
+        public static string OsApparitions()
+        {
+            var g = G;
+            if (g == null) return "pas de générateur";
+            var os = new List<Transform>();
+            Transform visuels = g.transform.Find("Genere/Visuels");
+            if (visuels != null)
+                foreach (Transform grp in visuels)
+                    foreach (Transform t in grp)
+                        if (t.gameObject.activeSelf && (t.name.StartsWith("bone_") || t.name == "skull" || t.name == "ribcage")) os.Add(t);
+            float min = 99f; int sous = 0;
+            foreach (var a in g.Apparitions)
+            {
+                float best = 99f;
+                foreach (var o in os) { float d = Vector3.Distance(o.position, a.transform.position); if (d < best) best = d; }
+                if (best < min) min = best;
+                if (best < 1.5f) sous++;
+            }
+            string r = "ossements " + os.Count + ", distance minimale apparition → os " + min.ToString("F2") + " m, apparitions à moins de 1,5 m d'un os : " + sous + "\n" + DansMurs("apparition", g.Apparitions);
+            Log(r);
+            return r;
+        }
+
+        /// Bords de plancher des étages sans garde-corps ni mur (G8) : cellule pleine au niveau k ≥ 1 dont la voisine est vide
+        /// et dont le bord est « Rien », hors palier d'escalier.
+        public static string BordsOuverts()
+        {
+            var g = G;
+            if (g == null) return "pas de générateur";
+            var plan = g.Plan;
+            int n = 0; var sb = new StringBuilder();
+            for (int k = 1; k < DonjonPlan.NbNiveaux; k++)
+                for (int c = 0; c < DonjonPlan.NbCellules; c++)
+                {
+                    if (!plan.plein[k * DonjonPlan.NbCellules + c]) continue;
+                    for (int d = 0; d < 4; d++)
+                    {
+                        int v = DonjonPlan.Voisine(c, d);
+                        if (v < 0 || plan.plein[k * DonjonPlan.NbCellules + v]) continue;
+                        if (plan.BordCellule(k, c, d) != Bord.Rien) continue;
+                        bool palier = false;
+                        for (int i = 0; i < plan.nbEscaliers; i++)
+                        {
+                            var e = plan.escaliers[i];
+                            if (!e.bassin && e.niveau == k - 1 && e.arrivee == c && e.haut == v) palier = true;
+                        }
+                        if (palier) continue;
+                        n++;
+                        if (sb.Length < 300) sb.Append("niveau ").Append(k).Append(" cellule ").Append(c).Append(" dir ").Append(d).Append(" ; ");
+                    }
+                }
+            string r = "bords de plancher ouverts sur le vide (hors paliers) : " + n + " " + sb;
+            Log(r);
+            return r;
+        }
+
+        /// Cas de caméra de l'audit : téléporte à `ou`, oriente la caméra, attend quelques images puis vérifie que la caméra n'est
+        /// dans aucun collider (sphère 0,15 m) et qu'elle est dans l'enceinte ; capture `capture` (facultative).
+        public static void CasCamera(string ou, float lacet, float tangage, string capture = null) { var i = I; i.StartCoroutine(i.CoCasCamera(ou, lacet, tangage, capture)); }
+
+        IEnumerator CoCasCamera(string ou, float lacet, float tangage, string capture)
+        {
+            var h = H; var cam = P != null ? P.cameraJeu : null;
+            if (h == null || cam == null) { Log("pas de héros/caméra"); yield break; }
+            Aller(ou);
+            yield return null;
+            Regarder(lacet, tangage);
+            var hits = new Collider[16];
+            int dansMur = 0, hors = 0, images = 0; float reculMin = 99f; string premier = "";
+            for (int k = 0; k < 20; k++)
+            {
+                yield return null;
+                images++;
+                int n = Physics.OverlapSphereNonAlloc(cam.transform.position, 0.15f, hits, ~(1 << 2), QueryTriggerInteraction.Ignore);
+                bool mur = false;
+                for (int i = 0; i < n; i++) if (!CameraEpaule.Ignore(hits[i])) { mur = true; if (premier.Length == 0) premier = hits[i].name + " " + hits[i].bounds.size.ToString("F1"); }
+                if (mur) dansMur++;
+                if (!DonjonJeu.Contient(cam.transform.position) || (CameraEpaule.Enceinte.HasValue && !CameraEpaule.Enceinte.Value.Contains(cam.transform.position))) hors++;
+                float recul = Vector3.Distance(cam.transform.position, h.transform.position + Vector3.up * GameBalance.Courant.cameraHauteur);
+                if (recul < reculMin) reculMin = recul;
+            }
+            if (capture != null) DevPartie.Capturer(capture);
+            Log("cas caméra " + ou + " lacet " + lacet + " tangage " + tangage + " : " + images + " images, dans un collider " + dansMur + (premier.Length > 0 ? " (" + premier + ")" : "")
+                + ", hors enceinte " + hors + ", recul " + reculMin.ToString("F2") + " m, héros " + h.transform.position.ToString("F2") + ", caméra " + cam.transform.position.ToString("F2"));
+        }
+
+        /// Ouvre le coffre `index` puis compte les triangles du corps (le tas de pièces doit avoir disparu) ; capture après 1 s.
+        public static void CoffreVide(int index, string capture = null) { var i = I; i.StartCoroutine(i.CoCoffreVide(index, capture)); }
+
+        IEnumerator CoCoffreVide(int index, string capture)
+        {
+            var g = G; var dj = DJ;
+            if (g == null || dj == null) yield break;
+            var r = g.Butins[index];
+            int avant = Triangles(r.visuel), apres;
+            Aller("butin" + index);
+            yield return null;
+            // Caméra de trois quarts : le héros ne cache plus le coffre.
+            var cam = P.cameraJeu; cam.lacet += 55f; cam.tangage = 32f;
+            yield return null;
+            int orAvant = dj.OrPorte;
+            PointInteraction.InteragirIci(H);
+            yield return new WaitForSeconds(0.55f);
+            if (capture != null) DevPartie.Capturer(capture + "_0");
+            yield return new WaitForSeconds(1.3f);
+            apres = Triangles(r.visuel);
+            int pieces = 0; foreach (var p in FindObjectsByType<PieceOr>(FindObjectsSortMode.None)) pieces++;
+            if (capture != null) DevPartie.Capturer(capture + "_1");
+            Log("coffre " + index + " : triangles du modèle " + avant + " → " + apres + ", or porté " + orAvant + " → " + dj.OrPorte + ", PieceOr en vol " + pieces + ", visuel actif " + r.visuel.activeSelf);
+        }
+
+        static int Triangles(GameObject go)
+        {
+            int n = 0;
+            foreach (var mf in go.GetComponentsInChildren<MeshFilter>()) if (mf.sharedMesh != null && mf.sharedMesh.isReadable) n += mf.sharedMesh.triangles.Length / 3;
+            return n;
+        }
+
+        /// Place le héros à 3,5 m devant la `index`-ième pièce active nommée `nom` (côté intérieur du donjon), la regarde, capture.
+        public static void VoirPiece(string nom, int index, string capture, float tangage = 14f) { var i = I; i.StartCoroutine(i.CoVoirPiece(nom, index, capture, tangage)); }
+
+        IEnumerator CoVoirPiece(string nom, int index, string capture, float tangage)
+        {
+            var g = G; var h = H;
+            if (g == null || h == null) yield break;
+            // nom : « wall », « wall@1 » (niveau 1), « muret » (fondation écrasée à 0,5 ou bloc généré).
+            int niveau = -1; int at = nom.IndexOf('@');
+            if (at >= 0) { niveau = int.Parse(nom.Substring(at + 1)); nom = nom.Substring(0, at); }
+            Transform piece = null; int n = 0;
+            Transform visuels = g.transform.Find("Genere/Visuels");
+            foreach (Transform grp in visuels) foreach (Transform t in grp)
+            {
+                if (!t.gameObject.activeSelf) continue;
+                bool ok = nom == "muret" ? (t.name == "Muret" || (t.name == "floor_foundation_front" && Mathf.Abs(t.localScale.y - 0.5f) < 0.01f)) : t.name == nom;
+                if (!ok || (niveau >= 0 && Mathf.RoundToInt(t.localPosition.y / DonjonPlan.HauteurNiveau) != niveau)) continue;
+                if (n++ == index) { piece = t; break; }
+            }
+            if (piece == null) { Log("pièce " + nom + " " + index + " introuvable (" + n + " actives)"); yield break; }
+            Vector3 centre = g.transform.TransformPoint(new Vector3(DonjonPlan.Largeur * DonjonPlan.Cellule * 0.5f, 0f, DonjonPlan.Profondeur * DonjonPlan.Cellule * 0.5f));
+            Vector3 vers = centre - piece.position; vers.y = 0f;
+            // Pièce de bord (mur, muret) : on se place perpendiculairement à elle, côté centre.
+            Vector3 normale = piece.right; normale.y = 0f;
+            if (Mathf.Abs(Vector3.Dot(normale, piece.forward)) < 0.5f) normale = piece.forward;
+            normale.y = 0f; normale.Normalize();
+            if (Vector3.Dot(normale, vers) < 0f) normale = -normale;
+            Vector3 p = piece.position + normale * 3.5f;
+            if (NavMesh.SamplePosition(p + Vector3.up * 0.5f, out var hit, 2.5f, NavMesh.AllAreas)) p = hit.position;
+            Teleporter(p.x, p.y, p.z);
+            Vector3 d = piece.position - p; d.y = 0f;
+            float lacet = Mathf.Atan2(d.x, d.z) * Mathf.Rad2Deg;
+            Regarder(lacet, tangage);
+            for (int k = 0; k < 15; k++) yield return null;
+            if (capture != null) DevPartie.Capturer(capture);
+            Log("pièce " + nom + " " + index + " à " + piece.position.ToString("F1") + ", héros à " + p.ToString("F1") + ", lacet " + lacet.ToString("F0"));
+        }
+
+        /// Marche sur le tas d'or `index` : crédité et retiré ? Capture 0,4 s après.
+        public static void TasOr(int index, string capture = null) { var i = I; i.StartCoroutine(i.CoTasOr(index, capture)); }
+
+        IEnumerator CoTasOr(int index, string capture)
+        {
+            var g = G; var dj = DJ;
+            if (g == null || dj == null) yield break;
+            var r = g.Butins[index];
+            int orAvant = dj.OrPorte;
+            Vector3 p = r.transform.position;
+            Teleporter(p.x, p.y, p.z);
+            yield return new WaitForSeconds(0.4f);
+            if (capture != null) DevPartie.Capturer(capture);
+            Log("tas d'or " + index + " : pris " + dj.ButinPris(index) + ", or porté " + orAvant + " → " + dj.OrPorte + ", visuel actif " + r.visuel.activeSelf);
+        }
+
+        /// Position des pastilles du HUD (temps et message du donjon) dans le panneau, pour régler Hud.uss (G1).
+        public static string Hud()
+        {
+            var doc = FindAnyObjectByType<UnityEngine.UIElements.UIDocument>();
+            if (doc == null) return "pas d'UIDocument";
+            var sb = new StringBuilder();
+            foreach (var d in FindObjectsByType<UnityEngine.UIElements.UIDocument>(FindObjectsSortMode.None))
+            {
+                var root = d.rootVisualElement;
+                if (root == null) continue;
+                var temps = root.Q("temps-texte"); var msg = root.Q("donjon-message"); var al = root.Q("donjon-alerte"); var ban = root.Q("banniere");
+                if (temps == null) continue;
+                var pastille = temps.parent;
+                sb.Append(d.name).Append(" : temps ").Append(pastille.worldBound.ToString()).Append(" message ").Append(msg != null ? msg.worldBound.ToString() : "?")
+                  .Append(" alerte ").Append(al != null ? al.worldBound.ToString() : "?").Append(" bannière ").Append(ban != null ? ban.worldBound.ToString() : "?")
+                  .Append(" classes ").Append(string.Join(",", root.GetClasses())).Append(" panneau ").Append(root.panel != null ? root.panel.visualTree.worldBound.ToString() : "?").Append("\n");
+            }
+            return sb.ToString();
         }
 
         // ================================================================== Scénarios enchaînés
