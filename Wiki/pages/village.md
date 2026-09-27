@@ -23,9 +23,9 @@ Ces éléments ont été essayés puis retirés du village le 25/09/2026 : l'enc
 
 Un **sentier de pierre** part du village vers **chacune des trois zones** d'où sortent les squelettes. Entretenu à la sortie du village, il se **dégrade** à mesure qu'on s'enfonce dans la forêt : dalles espacées, cassées, envahies d'herbe, puis quelques pierres éparses. Une ou deux **lanternes**, au sol ou sur poteau, jalonnent chaque sentier.
 
-## Refonte de la carte {à confirmer}
+## Refonte de la carte {décidé}
 
-Chantier ouvert par Quentin le 27/09/2026, au stade de la maquette (raisonnement, puis volumes gris dans le bac à sable avant tout habillage) :
+Chantier ouvert par Quentin le 27/09/2026. **Plan validé sur la maquette grise le 27/09/2026** (`sandbox-level`, scène `VillageV5`, générateur `VillageV5Builder`, captures `v5_*.png`) : maisons sur une couronne à **r = 30 m** (l'axe nord ±20° est réservé à la vue plateau → cascade, les trois couloirs de vagues ±25° restent libres), cascade **plein nord**, falaise en trois gradins (18, 28, 38 m) à r = 34 m, pierrier r 26-34 m, rivière de 4,5 m, ponts de 3 m, gué de 4,5 m. Prochaine étape : l'habillage dans le bac à sable (sol, eau, falaise et pierrier, ponts, nos arbres, nos maisons).
 
 - **Moins de forêt** : elle reste au sud et à l'ouest, en deux masses qui gardent les couloirs des vagues ; l'est devient une lande (prairie, rochers, souches, arbres isolés).
 - **Une montagne au nord** {décidé} : formation rocheuse dont le premier pic forme une **crête infranchissable** (la géométrie et le NavMesh suffisent, pas de mur invisible), avec un **pierrier** entre la falaise et les maisons. Fond de tableau du menu principal et des plans vers Nyxessa ; les vagues n'arrivent plus que par l'est, le sud et l'ouest.
