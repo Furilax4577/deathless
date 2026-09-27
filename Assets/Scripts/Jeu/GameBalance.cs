@@ -545,7 +545,7 @@ namespace Deathless.Jeu
         public bool lancerDirectement;
         [Tooltip("Classe lancée par « lancerDirectement » (paladin, mage, rodeur, assassin, viking).")]
         public string classeDeTest = "paladin";
-        [Tooltip("Journal détaillé (vagues, tirs de Nyxessa).")]
+        [Tooltip("Journal détaillé (vagues, tirs de Nyxessa). Éditeur seulement : retiré des builds (Partie.Journal est Conditional).")]
         public bool journal = true;
 
         // ----------------------------------------------------------------- Aides
