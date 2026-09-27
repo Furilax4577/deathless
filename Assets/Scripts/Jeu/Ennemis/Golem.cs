@@ -44,8 +44,10 @@ namespace Deathless.Jeu
             float r = m_Stats.portee;
             if (P != null)
             {
-                foreach (var h in P.TousLesHeros)
+                var tous = P.TousLesHeros;
+                for (int i = 0; i < tous.Count; i++)
                 {
+                    var h = tous[i];
                     if (h == null || !h.Vivant) continue;
                     Vector3 d = h.transform.position - impact; d.y = 0f;
                     if (d.magnitude > r) continue;

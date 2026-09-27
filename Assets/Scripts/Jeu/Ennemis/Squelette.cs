@@ -247,8 +247,10 @@ namespace Deathless.Jeu
             if (P == null) return null;
             Heros meilleur = null;
             float d = rayon * rayon;
-            foreach (var h in P.TousLesHeros)
+            var tous = P.TousLesHeros;
+            for (int i = 0; i < tous.Count; i++)
             {
+                var h = tous[i];
                 if (h == null || !h.Vivant) continue;
                 float dd = (h.transform.position - transform.position).sqrMagnitude;
                 if (dd < d && Voit(h)) { d = dd; meilleur = h; }

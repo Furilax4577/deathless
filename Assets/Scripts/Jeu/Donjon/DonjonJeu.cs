@@ -138,7 +138,8 @@ namespace Deathless.Jeu
             {
                 var p = Partie.Instance;
                 if (p == null) return false;
-                foreach (var h in p.TousLesHeros) if (AuDonjon(h)) return true;
+                var tous = p.TousLesHeros;
+                for (int i = 0; i < tous.Count; i++) if (AuDonjon(tous[i])) return true;
                 return false;
             }
         }
