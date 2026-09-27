@@ -20,6 +20,9 @@ namespace Deathless.Jeu
         /// Chiffres de dégâts flottants (classe à part, DegatsUI.cs) : actualisée chaque image (vie de Nyxessa, non
         /// répliquée par un vrai Sante.Encaisser côté client), et détachée de ses abonnements à la destruction.
         DegatsUI m_Degats;
+        /// Carte « Gameplay » des actions du projet, cherchée une fois (et de nouveau si l'asset d'actions change).
+        UnityEngine.InputSystem.InputActionAsset m_Actions;
+        UnityEngine.InputSystem.InputActionMap m_CarteGameplay;
 
         Partie P => m_Partie != null ? m_Partie : (m_Partie = Partie.Instance);
         EtatJoueur J => P != null ? P.JoueurLocal : null;
@@ -82,7 +85,12 @@ namespace Deathless.Jeu
         {
             // Curseur caché et verrouillé en jeu (carte Gameplay active, partie en cours) ; libre dans les menus.
             var actions = UnityEngine.InputSystem.InputSystem.actions;
-            bool jeu = P != null && P.EnCours && actions != null && actions.FindActionMap("Gameplay").enabled;
+            if (!ReferenceEquals(actions, m_Actions))
+            {
+                m_Actions = actions;
+                m_CarteGameplay = actions != null ? actions.FindActionMap("Gameplay") : null;
+            }
+            bool jeu = P != null && P.EnCours && m_CarteGameplay != null && m_CarteGameplay.enabled;
             var voulu = jeu ? CursorLockMode.Locked : CursorLockMode.None;
             if (Cursor.lockState != voulu) Cursor.lockState = voulu;
             if (Cursor.visible == jeu) Cursor.visible = !jeu;
