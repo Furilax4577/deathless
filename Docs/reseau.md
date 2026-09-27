@@ -33,7 +33,8 @@ Scripts/Reseau/
   LobbyReseau.cs      ILobby réel (Deathless.UI.Donnees) : services, créer / rejoindre (code, IP), quitter,
                       déconnexion ; enregistré dans DonneesUI.Lobby (remplace LobbyFactice, écran inchangé)
   SalonReseau.cs      état du salon, possédé par l'hôte (NetworkList<JoueurSalon> : clientId, pseudo, classe, prêt ;
-                      compte à rebours ; Lance) ; les clients ne font que des demandes (RPC) que l'hôte valide
+                      fin du compte à rebours en temps serveur, écrite une fois, restant calculé par chaque poste ;
+                      Lance) ; les clients ne font que des demandes (RPC) que l'hôte valide
   HerosReseau.cs      côté réseau d'un héros : pseudo et classe (posés par l'hôte) ; vie, vie max, furtivité et soins reçus
                       (écrits par le propriétaire) ; mort et délai de réapparition (écrits par l'hôte) ; implémente IAllie (HUD)
   ClientAutomatique.cs  poste piloté par la ligne de commande (tests sans fenêtre)

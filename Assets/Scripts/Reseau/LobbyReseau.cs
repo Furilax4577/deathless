@@ -48,7 +48,7 @@ namespace Deathless.Reseau
         public int JoueursMax => ReseauJeu.JoueursMax;
         public float CompteARebours
         {
-            get { var s = SalonReseau.Instance; return s != null && s.CompteARebours.Value >= 0f ? s.CompteARebours.Value : 0f; }
+            get { var s = SalonReseau.Instance; return s != null && s.IsSpawned ? s.Restant : 0f; }
         }
         public string Message => m_Message;
         NetworkManager NM => ReseauJeu.Instance != null ? ReseauJeu.Instance.Reseau : null;
@@ -266,7 +266,7 @@ namespace Deathless.Reseau
                     EstLocal = j.clientId == ReseauJeu.IdLocal, EstHote = j.clientId == NetworkManager.ServerClientId,
                 });
             if (s.Lance.Value) m_Etat = EtatLobby.Lancement;
-            else if (s.CompteARebours.Value >= 0f) m_Etat = EtatLobby.CompteARebours;
+            else if (s.EnCompte) m_Etat = EtatLobby.CompteARebours;
             else m_Etat = EtatLobby.Salon;
         }
 
