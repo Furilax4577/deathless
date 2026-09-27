@@ -51,7 +51,7 @@ namespace Deathless.UI
         public bool nuit
         {
             get => m_Nuit;
-            set { m_Nuit = value; MarkDirtyRepaint(); }
+            set { if (m_Nuit == value) return; m_Nuit = value; MarkDirtyRepaint(); }
         }
 
         protected override void Dessiner(Painter2D p, Rect r)
@@ -149,6 +149,8 @@ namespace Deathless.UI
     public partial class AnneauJauge : FormeHud
     {
         float m_Value = 1f;
+        /// Écart minimal de `value` qui redessine l'anneau (0,36° d'arc, invisible) : le HUD l'écrit à chaque image.
+        const float EcartValeur = 0.001f;
         string m_Couleur = "#4a8fe0";
         float m_Epaisseur = 6f;
 
@@ -156,7 +158,7 @@ namespace Deathless.UI
         public float value
         {
             get => m_Value;
-            set { m_Value = value; MarkDirtyRepaint(); }
+            set { if (Mathf.Abs(m_Value - value) < EcartValeur) return; m_Value = value; MarkDirtyRepaint(); }
         }
 
         [UxmlAttribute("couleur")]
@@ -210,7 +212,7 @@ namespace Deathless.UI
         public float angle
         {
             get => m_Angle;
-            set { m_Angle = value; MarkDirtyRepaint(); }
+            set { if (Mathf.Approximately(m_Angle, value)) return; m_Angle = value; MarkDirtyRepaint(); }
         }
 
         protected override void Dessiner(Painter2D p, Rect r)
