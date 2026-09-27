@@ -62,6 +62,9 @@ namespace Deathless.Reseau
                 NomJoueur.Value = new FixedString64Bytes(m_PseudoPrepare);
                 Classe.Value = new FixedString32Bytes(m_ClassePreparee);
             }
+            m_Pseudo = m_ClasseId = null;
+            NomJoueur.OnValueChanged += NomChange;
+            Classe.OnValueChanged += ClasseChange;
             Tous.Add(this);
             BrancherStatuts();
             if (IsOwner && !IsServer) Heros.Sante.Soigne += OnSoigne;
@@ -87,6 +90,9 @@ namespace Deathless.Reseau
         {
             if (Heros != null && Heros.Sante != null) Heros.Sante.Soigne -= OnSoigne;
             m_Soins.OnValueChanged -= OnSoinsChange;
+            NomJoueur.OnValueChanged -= NomChange;
+            Classe.OnValueChanged -= ClasseChange;
+            m_Pseudo = m_ClasseId = null;
             DebrancherStatuts();
             Tous.Remove(this);
             if (Partie.Instance != null) Partie.Instance.DetacherHeros(OwnerClientId);
@@ -320,8 +326,15 @@ namespace Deathless.Reseau
 
         // ----------------------------------------------------------------- IAllie
 
-        public string Pseudo => NomJoueur.Value.ToString();
-        public string ClasseId => Classe.Value.ToString();
+        /// Pseudo et classe en chaînes, gardés entre deux changements (le HUD les lit à chaque image) : plus de
+        /// ToString() de FixedString par lecture.
+        string m_Pseudo, m_ClasseId;
+
+        void NomChange(FixedString64Bytes avant, FixedString64Bytes apres) => m_Pseudo = null;
+        void ClasseChange(FixedString32Bytes avant, FixedString32Bytes apres) => m_ClasseId = null;
+
+        public string Pseudo => m_Pseudo ??= NomJoueur.Value.ToString();
+        public string ClasseId => m_ClasseId ??= Classe.Value.ToString();
         public float Vie => m_Vie.Value;
         public float VieMax => m_VieMax.Value;
         public bool EstMort => m_Mort.Value;
