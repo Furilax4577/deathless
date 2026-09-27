@@ -11,10 +11,30 @@ namespace Deathless.Jeu
     {
         sealed class Affiche : IStatutAffiche
         {
+            Statut m_Statut;
+            string m_Effet, m_Source;
+            bool m_EffetPret, m_SourcePret;
+
             public string Nom { get; set; }
             public string Icone { get; set; }
-            public string Effet { get; set; }
-            public string Source { get; set; }
+            /// Effet et source en clair : chaînes construites à la première lecture seulement (menu du personnage),
+            /// pas à chaque image pour chaque statut de chaque ennemi.
+            public string Effet
+            {
+                get
+                {
+                    if (!m_EffetPret) { m_Effet = CatalogueStatuts.Effet(m_Statut); m_EffetPret = true; }
+                    return m_Effet;
+                }
+            }
+            public string Source
+            {
+                get
+                {
+                    if (!m_SourcePret) { m_Source = CatalogueStatuts.Source(m_Statut); m_SourcePret = true; }
+                    return m_Source;
+                }
+            }
             public float Restant { get; set; }
             public float Duree { get; set; }
             public bool Nefaste { get; set; }
@@ -23,8 +43,8 @@ namespace Deathless.Jeu
             {
                 Nom = CatalogueStatuts.Nom(s.type);
                 Icone = CatalogueStatuts.Icone(s.type);
-                Effet = CatalogueStatuts.Effet(s);
-                Source = CatalogueStatuts.Source(s);
+                m_Statut = s;
+                m_EffetPret = m_SourcePret = false;
                 Restant = s.Restant;
                 Duree = s.duree;
                 Nefaste = CatalogueStatuts.Nefaste(s.type);
@@ -45,6 +65,10 @@ namespace Deathless.Jeu
         readonly List<Ennemi> m_PoolEnnemis = new List<Ennemi>();
         readonly List<IEnnemiAffecte> m_Ennemis = new List<IEnnemiAffecte>();
         int m_ImageJoueur = -1, m_ImageEnnemis = -1;
+        /// Squelette de chaque porteur de statuts (évite un GetComponent par ennemi et par image) ; vidé s'il grossit trop
+        /// (porteurs détruits).
+        readonly Dictionary<Statuts, Squelette> m_Squelettes = new Dictionary<Statuts, Squelette>();
+        const int SquelettesMax = 256;
 
         /// Au-dessus de la tête : marge au-dessus du crâne (m).
         public static float MargeTete = 0.35f;
@@ -86,7 +110,12 @@ namespace Deathless.Jeu
                 {
                     var st = actifs[i];
                     if (st == null || st.Nombre == 0) continue;
-                    var sq = st.GetComponent<Squelette>();
+                    if (!m_Squelettes.TryGetValue(st, out var sq))
+                    {
+                        if (m_Squelettes.Count >= SquelettesMax) m_Squelettes.Clear();
+                        sq = st.GetComponent<Squelette>();
+                        m_Squelettes[st] = sq;
+                    }
                     if (sq == null || sq.Sante == null || sq.Sante.Mort) continue;
                     if (k >= m_PoolEnnemis.Count) m_PoolEnnemis.Add(new Ennemi());
                     var e = m_PoolEnnemis[k++];
