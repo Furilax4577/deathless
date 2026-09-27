@@ -178,7 +178,10 @@ namespace Deathless.Jeu
         {
             var def = CatalogueStatuts.De(s.type);
             var regle = def != null ? def.regle : RegleCumul.Prolonger;
-            int i = m_Liste.FindIndex(x => x.type == s.type && !x.Permanent);
+            // Boucle plutôt que FindIndex(lambda) : la lambda capture `s` et allouait une fermeture à chaque appel.
+            int i = -1;
+            for (int j = 0; j < m_Liste.Count; j++)
+                if (m_Liste[j].type == s.type && !m_Liste[j].Permanent) { i = j; break; }
             if (i < 0)
             {
                 m_Liste.Add(s);
