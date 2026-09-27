@@ -18,6 +18,9 @@ namespace Deathless.Jeu
             public string Niveau { get; set; }
             public int Prix { get; set; }
             public bool Achetable { get; set; }
+            // Palier et réglages des textes Niveau et Description : ils ne sont refaits que si l'un d'eux change.
+            public int palierTexte = -1;
+            public GameBalance reglagesTexte;
         }
 
         readonly List<IArticleAchat> m_Articles = new List<IArticleAchat>
@@ -85,10 +88,14 @@ namespace Deathless.Jeu
                 foreach (Article art in m_Articles)
                 {
                     int palier = p != null ? p.PalierDe(art.a) : 1;
-                    int suivant = Mathf.Min(GameBalance.PalierMax, palier + 1);
-                    art.Niveau = "Palier " + palier + " / " + GameBalance.PalierMax;
                     art.Prix = b.PrixPalierSuivant(palier);
                     art.Achetable = p != null && p.RefusAchat(art.a, out _) == null;
+                    // Lu à chaque image par le menu ouvert (EcranAchat) : textes refaits seulement au changement de palier.
+                    if (art.palierTexte == palier && art.reglagesTexte == b) continue;
+                    art.palierTexte = palier;
+                    art.reglagesTexte = b;
+                    int suivant = Mathf.Min(GameBalance.PalierMax, palier + 1);
+                    art.Niveau = "Palier " + palier + " / " + GameBalance.PalierMax;
                     if (art.Prix < 0) art.Description = "Palier maximal atteint.";
                     else if (art.a == Partie.Amelioration.Missiles)
                         art.Description = "Palier " + suivant + " : " + GameBalance.AuPalier(b.missilesStockPaliers, suivant) + " missiles en stock, un de plus toutes les "
