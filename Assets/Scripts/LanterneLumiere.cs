@@ -48,6 +48,8 @@ public class LanterneLumiere : MonoBehaviour
     public Renderer[] rendus;
 
     private MaterialPropertyBlock bloc;
+    private Color derniereEmission;   // dernière émission posée sur les vitres
+    private bool emissionEcrite;      // faux : la prochaine émission est écrite quoi qu'il arrive
     private float phase1, phase2, freq1 = 1f, freq2 = 1f;
     private static readonly int EmissionId = Shader.PropertyToID("_EmissionColor");
 
@@ -60,6 +62,7 @@ public class LanterneLumiere : MonoBehaviour
         float h1 = Hash(p.x * 12.9898f + p.z * 78.233f), h2 = Hash(p.x * 39.346f + p.z * 11.135f + p.y * 3.7f);
         phase1 = h1 * 6.2832f; phase2 = h2 * 6.2832f;
         freq1 = 0.85f + 0.3f * h2; freq2 = 0.85f + 0.3f * h1;
+        emissionEcrite = false;
         Rafraichir();
     }
 
@@ -84,16 +87,22 @@ public class LanterneLumiere : MonoBehaviour
     {
         float k = Mathf.Clamp01(allumage) * Scintillement(t);
         Color c = CouleurEffective;
-        if (lumiere != null)
+        // En jeu, une lanterne éteinte (le jour) dont la lumière est déjà coupée n'a rien à réécrire.
+        bool allumee = allumage > 0.01f;
+        if (lumiere != null && (allumee || lumiere.enabled || !Application.isPlaying))
         {
             lumiere.color = c;
-            lumiere.enabled = allumage > 0.01f;
+            lumiere.enabled = allumee;
             lumiere.intensity = intensite * k;
         }
         if (rendus == null) return;
         if (bloc == null) bloc = new MaterialPropertyBlock();
         float eclat = reglages != null ? reglages.eclatVitres : 1.1f;
         Color e = c * (eclat * k);
+        // Blocs de propriétés réécrits seulement si l'émission change (en jeu) : de jour elle reste noire, rien à écrire.
+        if (Application.isPlaying && emissionEcrite && e.Equals(derniereEmission)) return;
+        emissionEcrite = true;
+        derniereEmission = e;
         foreach (Renderer r in rendus)
         {
             if (r == null) continue;
@@ -188,6 +197,7 @@ public class LanterneLumiere : MonoBehaviour
         ll.intensite = intensite;
         ll.allumage = allumee ? 1f : 0f;
         ll.rendus = liste.ToArray();
+        ll.emissionEcrite = false;   // nouveaux rendus : l'émission leur est posée
         ll.Rafraichir();
         return ll;
     }
