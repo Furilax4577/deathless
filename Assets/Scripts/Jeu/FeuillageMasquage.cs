@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -78,6 +79,7 @@ namespace Deathless.Jeu
             }
             m_Items = liste.ToArray();
             m_DansListe = new bool[m_Items.Length];
+            s_Forets.Clear();
             m_EnCours.Clear();
             m_Prochain = 0f;
         }
@@ -87,7 +89,7 @@ namespace Deathless.Jeu
             while (t != null)
             {
                 string n = t.name;
-                if (n.StartsWith("Tree_") || n.StartsWith("Bush_")) return true;
+                if (n.StartsWith("Tree_", StringComparison.Ordinal) || n.StartsWith("Bush_", StringComparison.Ordinal)) return true;
                 t = t.parent;
             }
             return false;
@@ -96,7 +98,18 @@ namespace Deathless.Jeu
         /// Un collider appartient-il à un arbre ou un buisson de la forêt ? Appelé par CameraEpaule.Premier pour que
         /// ses SphereCast de recul ignorent les troncs (le feuillage s'estompe à la place ; la caméra ne recule pas
         /// pour eux), comme elle ignore déjà les personnages (Sante) et les étages masqués du donjon (DonjonMasquage).
-        public static bool ColliderForet(Collider c) { return NomForet(c.transform); }
+        /// Réponse gardée par collider : trois SphereCast par image, et chaque Transform.name lu en remontant les parents
+        /// alloue une chaîne. Les colliders de la forêt et du décor ne changent pas de nom ; le cache est vidé à chaque
+        /// Collecter (village reconstruit) et s'il devient trop grand (colliders détruits entre-temps).
+        public static bool ColliderForet(Collider c)
+        {
+            if (s_Forets.TryGetValue(c, out bool foret)) return foret;
+            if (s_Forets.Count >= 4096) s_Forets.Clear();
+            foret = NomForet(c.transform);
+            s_Forets[c] = foret;
+            return foret;
+        }
+        static readonly Dictionary<Collider, bool> s_Forets = new Dictionary<Collider, bool>();
 
         // En LateUpdate, après que CameraEpaule (ordre 100) a placé la caméra pour cette image : transform.position
         // est déjà la position finale (recul contre les murs compris), pas celle de l'image précédente.
