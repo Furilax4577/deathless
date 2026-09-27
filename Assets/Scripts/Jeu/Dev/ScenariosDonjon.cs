@@ -413,9 +413,13 @@ namespace Deathless.Jeu.Dev
                 float ms = Time.unscaledDeltaTime * 1000f;
                 somme += ms; if (ms > max) max = ms; if (ms < min) min = ms;
             }
+            string stats = "";
+#if UNITY_EDITOR
+            // UnityStats n'existe que dans l'éditeur : hors de ce bloc, le build du joueur ne compile pas.
+            stats = " | triangles " + UnityEditor.UnityStats.triangles + " sommets " + UnityEditor.UnityStats.vertices + " batches " + UnityEditor.UnityStats.batches + " setPass " + UnityEditor.UnityStats.setPassCalls;
+#endif
             Log("perf sur " + images + " images : moyenne " + (somme / images).ToString("F1") + " ms, min " + min.ToString("F1") + ", max " + max.ToString("F1")
-                + " | triangles " + UnityEditor.UnityStats.triangles + " sommets " + UnityEditor.UnityStats.vertices + " batches " + UnityEditor.UnityStats.batches + " setPass " + UnityEditor.UnityStats.setPassCalls
-                + " | héros " + (H != null ? H.transform.position.ToString("F0") : "?"));
+                + stats + " | héros " + (H != null ? H.transform.position.ToString("F0") : "?"));
         }
 
         // ================================================================== Scénarios enchaînés
