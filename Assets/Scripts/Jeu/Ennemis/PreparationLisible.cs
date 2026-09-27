@@ -31,6 +31,8 @@ namespace Deathless.Jeu
         MaterialPropertyBlock m_Bloc;
         Color m_BaseEmission;
         bool m_A;
+        bool m_BlocPose;     // un bloc de propriétés est posé sur les yeux (préparation en cours)
+        float m_Facteur;     // facteur d'émission du bloc posé
         static readonly int EmissionId = Shader.PropertyToID("_EmissionColor");
 
         // En Start (pas Awake) : posé automatiquement par Squelette.Awake (AddComponent), donc son propre Awake tournerait
@@ -58,16 +60,25 @@ namespace Deathless.Jeu
             if (!m_A || m_Squelette == null || m_Yeux.Length == 0) return;
             if (m_Bloc == null) m_Bloc = new MaterialPropertyBlock();   // garde-fou : rechargement de domaine en cours de Play
             float k = m_Squelette.PreparationProgress;
-            float facteur = 1f;
-            if (k > 0f)
+            if (k <= 0f)
             {
-                facteur = Mathf.Lerp(1f, intensiteMax, k);
-                if (k > seuilPulsation)
+                // Au repos : yeux du matériau, sans bloc de propriétés (les rendus retournent au SRP Batcher), retiré une seule fois.
+                if (m_BlocPose)
                 {
-                    float t = (k - seuilPulsation) / Mathf.Max(0.01f, 1f - seuilPulsation);
-                    facteur += pulsationAmplitude * intensiteMax * t * Mathf.Max(0f, Mathf.Sin(Time.time * pulsationHz * Mathf.PI * 2f));
+                    foreach (var r in m_Yeux) if (r != null) r.SetPropertyBlock(null);
+                    m_BlocPose = false;
                 }
+                return;
             }
+            float facteur = Mathf.Lerp(1f, intensiteMax, k);
+            if (k > seuilPulsation)
+            {
+                float t = (k - seuilPulsation) / Mathf.Max(0.01f, 1f - seuilPulsation);
+                facteur += pulsationAmplitude * intensiteMax * t * Mathf.Max(0f, Mathf.Sin(Time.time * pulsationHz * Mathf.PI * 2f));
+            }
+            if (m_BlocPose && facteur == m_Facteur) return;   // rien à réécrire
+            m_Facteur = facteur;
+            m_BlocPose = true;
             Color c = m_BaseEmission * facteur;
             foreach (var r in m_Yeux)
             {
