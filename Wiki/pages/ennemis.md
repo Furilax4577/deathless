@@ -126,6 +126,8 @@ Points de vie, dégâts et cadence : {à équilibrer}.
 
 ## Comportement et détection
 
+- **Riposte au contact de Nyxessa** {décidé, 27/09/2026} : un squelette qui frappe Nyxessa ne l'ignore plus tout à fait : s'il est **frappé deux fois de suite par le même héros à moins de 3 m**, il se retourne vers lui (quelques coups), puis revient à Nyxessa. Fini les coups dans le dos gratuits ; la garde du paladin sert aussi autour de la relique. {{dev: `Squelette.OnTouche` (compteur par héros, `DistanceNyxessa() <= RayonContact` ne bloque plus la riposte), IA de l'hôte seulement.}}
+
 - **Cible prioritaire** {décidé} : les squelettes marchent vers Nyxessa. Un joueur qui les frappe, ou qui passe à moins de 4 m, devient leur cible pendant quelques secondes, puis ils reprennent leur route. Le voleur fait exception : il chasse les joueurs isolés. Distance et durée {à équilibrer}.
 - **Détection de l'assassin furtif** {décidé} : cône de vue d'environ 6 m devant le squelette, 1,5 m dans son dos. Voir [Classes](classes.md).
 - **Valeurs de départ** de la version 0.1 {à équilibrer} {{dev: (réglées dans `Assets/Jeu/Resources/GameBalance.asset`)}} :
