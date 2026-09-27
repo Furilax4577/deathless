@@ -334,8 +334,11 @@ namespace Deathless.Jeu
             float voulu = 0f, dmin = 18f;
             var dv = DirecteurVagues.Instance;
             if (dv != null)
-                foreach (var s in dv.Vivants)
+            {
+                var vivants = dv.Vivants;
+                for (int iv = 0; iv < vivants.Count; iv++)
                 {
+                    var s = vivants[iv];
                     if (s == null || !s.Vivant) continue;
                     Vector3 d = s.transform.position - transform.position; d.y = 0f;
                     float dist = d.magnitude;
@@ -345,6 +348,7 @@ namespace Deathless.Jeu
                     dmin = dist;
                     voulu = Mathf.Clamp(a, -B.sorcierPivotMax, B.sorcierPivotMax);
                 }
+            }
             m_Pivot = Mathf.MoveTowards(m_Pivot, voulu, 30f * dt);
             Quaternion cible = Quaternion.LookRotation(Quaternion.Euler(0f, m_Pivot, 0f) * dehors);
             // En arrivant, il se retourne (demi-tour en un peu plus d'une seconde), puis ne bouge plus que doucement.

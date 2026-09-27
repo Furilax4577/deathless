@@ -335,8 +335,11 @@ namespace Deathless.Jeu
             CadenceCourse(vitesse.magnitude);
             var dv = DirecteurVagues.Instance;
             if (dv != null)
-                foreach (var s in dv.Vivants)
+            {
+                var vivants = dv.Vivants;
+                for (int iv = 0; iv < vivants.Count; iv++)
                 {
+                    var s = vivants[iv];
                     if (s == null || !s.Vivant || s == m_CibleCharge || m_Repousses.Contains(s)) continue;
                     Vector3 d = s.transform.position - transform.position; d.y = 0f;
                     float le = Vector3.Dot(d, m_Dir);
@@ -348,6 +351,7 @@ namespace Deathless.Jeu
                     if (cote.sqrMagnitude < 0.01f) cote = lat.sqrMagnitude > 0.01f ? lat.normalized : Vector3.Cross(Vector3.up, m_Dir);
                     s.Repousser(cote.normalized * b.chargeRepoussement, b.chargeEtourdiRepousses, H.Id);
                 }
+            }
             if (k >= 1f) FinCharge();
             return true;
         }

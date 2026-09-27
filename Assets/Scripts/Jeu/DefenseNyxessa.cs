@@ -104,8 +104,10 @@ namespace Deathless.Jeu
         {
             Squelette sur = null, lourd = null, proche = null;
             float dSur = float.MaxValue, dLourd = float.MaxValue, dProche = float.MaxValue;
-            foreach (var s in dv.Vivants)
+            var vivants = dv.Vivants;
+            for (int iv = 0; iv < vivants.Count; iv++)
             {
+                var s = vivants[iv];
                 if (s == null || !s.Vivant || !Portee(s)) continue;
                 float d = (s.transform.position - transform.position).sqrMagnitude;
                 if (s.SurNyxessa && d < dSur) { dSur = d; sur = s; }
@@ -121,7 +123,12 @@ namespace Deathless.Jeu
         {
             int n = 0;
             float r2 = B.groupeRayon * B.groupeRayon;
-            foreach (var s in dv.Vivants) if (s != null && s.Vivant && (s.transform.position - c.transform.position).sqrMagnitude <= r2) n++;
+            var vivants = dv.Vivants;
+            for (int iv = 0; iv < vivants.Count; iv++)
+            {
+                var s = vivants[iv];
+                if (s != null && s.Vivant && (s.transform.position - c.transform.position).sqrMagnitude <= r2) n++;
+            }
             return n;
         }
 
@@ -129,8 +136,10 @@ namespace Deathless.Jeu
         {
             float r2 = B.groupeRayon * B.groupeRayon;
             int i = 0;
-            foreach (var s in dv.Vivants)
+            var vivants = dv.Vivants;
+            for (int iv = 0; iv < vivants.Count; iv++)
             {
+                var s = vivants[iv];
                 if (s == null || !s.Vivant || (s.transform.position - c.transform.position).sqrMagnitude > r2) continue;
                 if (i++ == rang % Mathf.Max(1, Groupe(dv, c))) return s;
             }
