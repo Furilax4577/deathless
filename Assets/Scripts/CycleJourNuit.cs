@@ -62,6 +62,19 @@ public class CycleJourNuit : MonoBehaviour
 
     private MaterialPropertyBlock bloc;
     private static readonly int EmissionId = Shader.PropertyToID("_EmissionColor");
+    private static readonly int SolCielId = Shader.PropertyToID("_GroundColor");
+    private static readonly int TeinteCielId = Shader.PropertyToID("_SkyTint");
+    // Valeurs déjà posées (on ne réécrit que ce qui change) : fenêtres des maisons, sol du ciel (par matériau), lucioles.
+    private bool fenetresEcrites;
+    private Color dernieresFenetres;
+    private Material cielEcrit;
+    private Color dernierSolCiel;
+    private float derniersLucioles = -1f;
+    // Lumière du soleil (celle de DayCycle), lue une fois ; couleur de Nyxessa, relue quand la palette change.
+    private DayCycle soleilDe;
+    private Light soleil;
+    private int versionPalette = -1;
+    private Color couleurNyxessa;
     // Lanternes réglées par LanterneLumiere (couleur, scintillement, vitres) : le cycle ne leur donne que l'allumage.
     private LanterneLumiere[] pilotes;
 
@@ -145,19 +158,26 @@ public class CycleJourNuit : MonoBehaviour
             dayCycle.AppliquerImmediat();
             // teinte chaude au milieu du crépuscule et de l'aube
             Material cielN = RenderSettings.skybox;
-            if (cielN != null && cielN.HasProperty("_GroundColor"))
+            if (cielN != null && cielN.HasProperty(SolCielId))
             {
-                if (!solCielLu) { solCielJour = cielN.GetColor("_GroundColor"); solCielLu = true; }
-                cielN.SetColor("_GroundColor", Color.Lerp(solCielJour, solCielNuit, n));
+                if (!solCielLu) { solCielJour = cielN.GetColor(SolCielId); solCielLu = true; }
+                // Seul ce script écrit _GroundColor : inutile de le reposer tant que le fondu et le ciel ne changent pas.
+                Color solCiel = Color.Lerp(solCielJour, solCielNuit, n);
+                if (cielN != cielEcrit || !solCiel.Equals(dernierSolCiel))
+                {
+                    cielN.SetColor(SolCielId, solCiel);
+                    cielEcrit = cielN;
+                    dernierSolCiel = solCiel;
+                }
             }
             float w = PhaseCourante == Phase.Crepuscule || PhaseCourante == Phase.Aube ? Mathf.Sin(Mathf.PI * k) : 0f;
             if (w > 0f)
             {
-                Light soleil = dayCycle.GetComponent<Light>();
+                if (soleilDe != dayCycle || soleil == null) { soleilDe = dayCycle; soleil = dayCycle.GetComponent<Light>(); }
                 soleil.color = Color.Lerp(soleil.color, soleilChaud, 0.75f * w);
                 RenderSettings.fogColor = Color.Lerp(RenderSettings.fogColor, brouillardChaud, 0.6f * w);
                 Material ciel = RenderSettings.skybox;
-                if (ciel != null && ciel.HasProperty("_SkyTint")) ciel.SetColor("_SkyTint", Color.Lerp(ciel.GetColor("_SkyTint"), cielChaud, 0.7f * w));
+                if (ciel != null && ciel.HasProperty(TeinteCielId)) ciel.SetColor(TeinteCielId, Color.Lerp(ciel.GetColor(TeinteCielId), cielChaud, 0.7f * w));
             }
         }
         // Portail présent le jour ; il se referme au crépuscule (charge rendue à Nyxessa) et se rouvre à l'aube (charge).
@@ -169,7 +189,12 @@ public class CycleJourNuit : MonoBehaviour
         {
             lumiereNyxessa.enabled = n > 0.01f;
             lumiereNyxessa.intensity = intensiteNyxessa * Mathf.SmoothStep(0f, 1f, n);
-            lumiereNyxessa.color = VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Coeur, new Color(0.62f, 0.91f, 0.44f));
+            if (versionPalette != VfxPalette.Version)
+            {
+                versionPalette = VfxPalette.Version;
+                couleurNyxessa = VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Coeur, new Color(0.62f, 0.91f, 0.44f));
+            }
+            lumiereNyxessa.color = couleurNyxessa;
         }
         if (lanternes != null)
             for (int i = 0; i < lanternes.Length; i++)
@@ -182,18 +207,30 @@ public class CycleJourNuit : MonoBehaviour
                 l.intensity = intensiteLanterne * allume * (0.92f + 0.08f * Mathf.PerlinNoise(Time.time * 3f, l.GetInstanceID() * 0.01f));
             }
         if (flammes != null) foreach (GameObject f in flammes) if (f != null && f.activeSelf != allume > 0.3f) f.SetActive(allume > 0.3f);
-        if (maisons != null && bloc != null)
+        // Fenêtres : blocs de propriétés reposés seulement quand l'émission change (fondu du crépuscule et de l'aube) ;
+        // de jour comme de nuit elle est constante, rien à réécrire.
+        Color emissionFenetres = fenetres * allume;
+        if (maisons != null && bloc != null && (!fenetresEcrites || !emissionFenetres.Equals(dernieresFenetres)))
+        {
+            fenetresEcrites = true;
+            dernieresFenetres = emissionFenetres;
             foreach (Renderer r in maisons)
             {
                 if (r == null) continue;
                 r.GetPropertyBlock(bloc);
-                bloc.SetColor(EmissionId, fenetres * allume);
+                bloc.SetColor(EmissionId, emissionFenetres);
                 r.SetPropertyBlock(bloc);
             }
+        }
         if (lucioles != null)
         {
-            var em = lucioles.emission;
-            em.rateOverTime = luciolesParSeconde * Mathf.Clamp01((n - 0.5f) * 2f);
+            float taux = luciolesParSeconde * Mathf.Clamp01((n - 0.5f) * 2f);
+            if (taux != derniersLucioles)
+            {
+                derniersLucioles = taux;
+                var em = lucioles.emission;
+                em.rateOverTime = taux;
+            }
         }
     }
 }
