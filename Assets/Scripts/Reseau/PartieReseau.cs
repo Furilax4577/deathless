@@ -91,7 +91,11 @@ namespace Deathless.Reseau
         public readonly NetworkVariable<float> SorcierVitesse = new NetworkVariable<float>();
         public NetworkList<ScoreReseau> Scores;
 
-        float m_EnvoiTemps;
+        float m_EnvoiTemps, m_EnvoiSorcier;
+
+        /// Intervalle (s) entre deux envois de la position du sorcier qui marche (10 fois par seconde) ; chaque client
+        /// glisse d'un envoi à l'autre (Sorcier.SuivreHote).
+        public const float IntervalleSorcier = 0.1f;
 
         void Awake() { Scores = new NetworkList<ScoreReseau>(); Sacs = new NetworkList<SacReseau>(); }
 
@@ -140,8 +144,18 @@ namespace Deathless.Reseau
             var so = Sorcier.Instance;
             if (so != null)
             {
+                bool etatChange = SorcierEtat.Value != (byte)so.EtatCourant;
                 Ecrire(SorcierEtat, (byte)so.EtatCourant);
-                if ((SorcierPosition.Value - so.transform.position).sqrMagnitude > 0.0004f) SorcierPosition.Value = so.transform.position;
+                // Position : 10 fois par seconde au plus (au-delà de 2 cm), mais aussitôt avec un changement d'état ou un
+                // saut de plus d'un mètre (téléportation) : le client la reçoit dans le même tick que l'état.
+                m_EnvoiSorcier -= Time.deltaTime;
+                Vector3 pos = so.transform.position;
+                float ecart = (SorcierPosition.Value - pos).sqrMagnitude;
+                if (ecart > 0.0004f && (m_EnvoiSorcier <= 0f || etatChange || ecart > 1f))
+                {
+                    SorcierPosition.Value = pos;
+                    m_EnvoiSorcier = IntervalleSorcier;
+                }
                 if (Mathf.Abs(Mathf.DeltaAngle(SorcierLacet.Value, so.transform.eulerAngles.y)) > 0.5f) SorcierLacet.Value = so.transform.eulerAngles.y;
                 float v = so.Vitesse;
                 if (Mathf.Abs(SorcierVitesse.Value - v) > 0.1f) SorcierVitesse.Value = v;
