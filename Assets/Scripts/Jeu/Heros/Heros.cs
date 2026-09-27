@@ -226,7 +226,18 @@ namespace Deathless.Jeu
 
         // ----------------------------------------------------------------- Services pour les classes
 
-        public Camera CameraJeu => m_Camera != null ? m_Camera.GetComponent<Camera>() : Camera.main;
+        public Camera CameraJeu
+        {
+            get
+            {
+                if (m_Camera == null) return Camera.main;
+                // Caméra de la CameraEpaule suivie, cherchée une fois (lue à chaque image par l'alignement de la visée).
+                if (m_CameraDe != m_Camera || m_CameraCache == null) { m_CameraDe = m_Camera; m_CameraCache = m_Camera.GetComponent<Camera>(); }
+                return m_CameraCache;
+            }
+        }
+        CameraEpaule m_CameraDe;
+        Camera m_CameraCache;
         public CameraEpaule CameraEpaule => m_Camera;
         public Vector3 AvantCamera => m_Camera != null ? m_Camera.AvantPlat : transform.forward;
 

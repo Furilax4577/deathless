@@ -8,6 +8,7 @@ namespace Deathless.Jeu
     public class MissileCrane : MonoBehaviour
     {
         Sante m_Cible;
+        Squelette m_CibleSquelette;   // squelette de la cible (hauteur visée), cherché une fois au tir
         Vector3 m_DernierPoint;
         float m_Vitesse, m_Guidage, m_Degats, m_Vie;
         Equipe m_Equipe;
@@ -39,10 +40,12 @@ namespace Deathless.Jeu
         {
             var go = new GameObject(parNyxessa ? "MissileNyxessa" : "MissileNecromancien");
             go.transform.position = depart;
-            Vector3 vise = Viser(cible, depart + Vector3.forward);
+            var cibleSq = cible != null ? cible.GetComponent<Squelette>() : null;
+            Vector3 vise = Viser(cible, cibleSq, depart + Vector3.forward);
             go.transform.rotation = Quaternion.LookRotation((vise - depart).normalized + Vector3.up * 0.35f);
             var m = go.AddComponent<MissileCrane>();
             m.m_Cible = cible;
+            m.m_CibleSquelette = cibleSq;
             m.m_DernierPoint = vise;
             m.m_Degats = degats;
             m.m_Vitesse = vitesse;
@@ -66,10 +69,9 @@ namespace Deathless.Jeu
             return m;
         }
 
-        static Vector3 Viser(Sante s, Vector3 defaut)
+        static Vector3 Viser(Sante s, Squelette sq, Vector3 defaut)
         {
             if (s == null) return defaut;
-            var sq = s.GetComponent<Squelette>();
             float h = sq != null && sq.type == TypeEnnemi.Golem ? 2.2f : 1.1f;
             return s.transform.position + Vector3.up * h;
         }
@@ -79,7 +81,7 @@ namespace Deathless.Jeu
             if (m_Fini) return;
             float dt = Time.deltaTime;
             m_Vie += dt;
-            if (m_Cible != null && !m_Cible.Mort && m_Cible.isActiveAndEnabled) m_DernierPoint = Viser(m_Cible, m_DernierPoint);
+            if (m_Cible != null && !m_Cible.Mort && m_Cible.isActiveAndEnabled) m_DernierPoint = Viser(m_Cible, m_CibleSquelette, m_DernierPoint);
             Vector3 vers = m_DernierPoint - transform.position;
             float dist = vers.magnitude;
             if (dist < 0.5f || m_Vie > 5f) { Arriver(); return; }

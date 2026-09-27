@@ -78,6 +78,7 @@ namespace Deathless.Jeu
         public override float FacteurAnimation => m_Furtif ? 1f : 1f;
 
         Transform m_Arbal;
+        Transform m_Main;   // socket handslot.r (grenade tenue puis lancée), cherché une fois
 
         /// Arbalète en main : la ligne de tir est l'axe avant du modèle crossbow_1handed.
         public override bool AxeDeTir(out Vector3 origine, out Vector3 direction)
@@ -266,7 +267,8 @@ namespace Deathless.Jeu
                     if (m_Depuis >= 0.4f) m_Action = Action.Aucune;
                     break;
                 case Action.Grenade:
-                    var main = MannequinEquip.Trouver(transform, "handslot.r");
+                    if (m_Main == null) m_Main = MannequinEquip.Trouver(transform, "handslot.r");
+                    var main = m_Main;
                     if (!m_GrenadeTenue && m_Depuis >= 0.1f) { m_GrenadeTenue = true; if (main != null) m_Fumigene.Tenir(main); }
                     if (!m_GrenadeLancee && m_Depuis >= 0.75f)
                     {
