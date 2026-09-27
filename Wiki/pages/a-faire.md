@@ -16,6 +16,7 @@ Travaux prévus ou notés, pas encore faits. Une ligne quitte cette page quand l
   - **Druide** : lierre et fleurs sur les colombages, jardinières sous les fenêtres ; séchoir à herbes sous un auvent ; enseigne fiole, toit un peu plus pentu couvert de mousse.
   - **Sorcier** : pignon rehaussé (ou petite tourelle d'angle) avec fenêtre ronde qui luit la nuit ; toit en ardoise bleu sombre ; croissant de lune en girouette et symboles peints sur la porte.
   - **Maison de décor** : potager clôturé, linge qui sèche, puits ou tas de bois.
+- **Refonte de la carte, maquette grise** {décidé} (27/09/2026, règles dans [Village](village.md#refonte-de-la-carte)) : générateur du village en v5 dans `sandbox-level`, volumes gris seulement (falaise et pierrier au nord, cascade, rivière qui longe le plateau, deux ponts et un gué, forêt réduite au sud et à l'ouest, lande à l'est, trois clairières est / sud / ouest), circulation revérifiée (vagues jusqu'aux ponts et au gué), captures depuis le menu, Nyxessa et chaque pont. Part après les arbres.
 - **Bande-annonce Steam** : v1 tournée le 26/09/2026 (`Docs/trailer-storyboard.md`, outil `Assets/Scripts/Dev/Tournage/`), 39 s, à **écouter et valider** par Quentin ; à retourner quand le décor aura quitté KayKit.
 
 ## En attente de validation (Quentin)
