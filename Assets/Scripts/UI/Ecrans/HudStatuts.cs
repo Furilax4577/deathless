@@ -13,6 +13,9 @@ namespace Deathless.UI.Ecrans
         readonly VisualElement m_Icone, m_Jauge, m_Remplissage;
         readonly Label m_Temps;
         string m_IconePosee;
+        /// Clé des secondes affichées (100 + secondes au-dessus d'une seconde, sinon dixièmes) : le texte n'est
+        /// reconstruit qu'à son changement (-1 = aucun).
+        int m_TempsAffiche = -1;
 
         public CaseStatut(bool petit)
         {
@@ -51,7 +54,16 @@ namespace Deathless.UI.Ecrans
             if (m_Temps != null)
             {
                 m_Temps.style.display = duree ? DisplayStyle.Flex : DisplayStyle.None;
-                if (duree) m_Temps.text = Secondes(s.Restant);
+                if (duree)
+                {
+                    var restant = s.Restant;
+                    var cle = restant >= 1f ? 100 + Mathf.CeilToInt(restant) : Mathf.RoundToInt(restant * 10f);
+                    if (cle != m_TempsAffiche)
+                    {
+                        m_TempsAffiche = cle;
+                        m_Temps.text = restant >= 1f ? Mathf.CeilToInt(restant).ToString() : (cle * 0.1f).ToString("0.0");
+                    }
+                }
             }
         }
 
