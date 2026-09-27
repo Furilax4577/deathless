@@ -21,6 +21,7 @@ namespace Deathless.Jeu
             public string Niveau => "";
             public int Prix { get; set; }
             public bool Achetable { get; set; }
+            public float valeurTexte = float.NaN;   // valeur de réglage affichée dans Description (texte refait si elle change)
         }
 
         readonly List<IArticleAchat> m_Lignes = new List<IArticleAchat>
@@ -82,6 +83,10 @@ namespace Deathless.Jeu
                 {
                     l.Prix = Prix(l.a);
                     l.Achetable = P != null && P.RefusTaverne(l.a, m_Heros) == null;
+                    // Lu à chaque image par le menu ouvert (EcranAchat) : texte refait seulement si son réglage change.
+                    float v = l.a == Article.Repas ? b.taverneSoinRepas : l.a == Article.Biere ? b.ivresseBiere : b.ivresseTournee;
+                    if (v == l.valeurTexte) continue;
+                    l.valeurTexte = v;
                     l.Description = l.a == Article.Repas ? "Un bol de ragoût chaud : +" + b.taverneSoinRepas.ToString("0") + " points de vie."
                         : l.a == Article.Biere ? "Une chope bien fraîche. La tête tourne un peu, pendant " + b.ivresseBiere.ToString("0") + " s."
                         : "Une chope pour tout le monde : tous les joueurs sont ivres pendant " + b.ivresseTournee.ToString("0") + " s.";
