@@ -9,6 +9,13 @@ Travaux prévus ou notés, pas encore faits. Une ligne quitte cette page quand l
 {jauge-kaykit}
 
 - **Barres de vie des ennemis** {décidé} (26/09/2026, règles dans [Interface](interface.md#barres-de-vie-des-ennemis)) : barre fine sous les statuts des ennemis blessés (toujours visible sur un élite), méga barre du boss sous celle de Nyxessa ; **chiffres de dégâts** flottants et option « Afficher les dégâts » (onglet Jeu, `OptionsJoueur`), même page du wiki. Maquette dans `sandbox-ui` d'abord, capture à valider par Quentin, puis intégration au HUD et au jeu.
+- **Maisons générées : modèle standard refait et personnalisation** (retours de Quentin du 27/09/2026, règles dans [Village](village.md#taille-des-maisons)) : socle à une assise, murs 7,6 × 6 m, façade à porte décalée et deux fenêtres, fiche de paramètres (teintes, fenêtres, options). Éléments distinctifs proposés, deux ou trois par maison {à confirmer} :
+  - **Taverne** : enseigne suspendue (chope) sur potence en fer forgé ; auvent au-dessus d'une porte à deux vantaux, deux tonneaux et un banc dessous ; cheminée plus massive qui fume, fenêtres plus larges et plus chaudes la nuit.
+  - **Forgeron** : appentis ouvert sur le côté avec le foyer extérieur et sa cheminée de pierre massive (lueur et fumée jour et nuit) ; tas de bûches et outils accrochés sous l'appentis ; fenêtres à barreaux sans volets, dalles noircies devant.
+  - **Mécano** : vitrine à petits carreaux avec armes exposées ; enseigne engrenage et clé ; tuyau de poêle en métal coudé à la place de la cheminée, roue dentée ou girouette mécanique sur le faîte, caisses devant.
+  - **Druide** : lierre et fleurs sur les colombages, jardinières sous les fenêtres ; séchoir à herbes sous un auvent ; enseigne fiole, toit un peu plus pentu couvert de mousse.
+  - **Sorcier** : pignon rehaussé (ou petite tourelle d'angle) avec fenêtre ronde qui luit la nuit ; toit en ardoise bleu sombre ; croissant de lune en girouette et symboles peints sur la porte.
+  - **Maison de décor** : potager clôturé, linge qui sèche, puits ou tas de bois.
 - **Bande-annonce Steam** : v1 tournée le 26/09/2026 (`Docs/trailer-storyboard.md`, outil `Assets/Scripts/Dev/Tournage/`), 39 s, à **écouter et valider** par Quentin ; à retourner quand le décor aura quitté KayKit.
 
 ## En attente de validation (Quentin)

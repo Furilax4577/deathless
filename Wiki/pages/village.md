@@ -27,6 +27,13 @@ Un **sentier de pierre** part du village vers **chacune des trois zones** d'où 
 
 Les portes des maisons sont à l'échelle du joueur : 2,1 m pour un personnage de 2 m. Les maisons font donc 6 à 6,5 m de large.
 
+Maisons générées (cap « sortir de KayKit », retours de Quentin du 27/09/2026 sur la maison du guide de style) {décidé} :
+
+- **Porte** de 1,8 × 2,6 m au clair (un personnage passe sans toucher les bords).
+- **Fondations basses** : une seule assise de pierres, pas deux.
+- **Plus grandes et plus larges de façade** : on doit pouvoir y entrer à plusieurs sans être à l'étroit, la taverne surtout. Façade à porte et deux fenêtres, plus une fenêtre de pignon.
+- **Des règles communes, une personnalisation par habitant** : même grammaire (proportions, socle, toit, porte, atlas) pour toutes ; chaque maison prend deux ou trois éléments distinctifs selon celui qui l'habite et son activité (taverne, forgeron, mécano, druide, sorcier, maison de décor), et ses propres teintes d'enduit, de volets et de toit. Propositions par maison : dans [À faire](a-faire.md).
+
 ## Villageois
 
 - **Sorcier** {décidé} : un villageois sorcier invoque le bouclier de Nyxessa. **Le jour**, il reste dans **sa maison** ; **la nuit**, il se tient près de Nyx et la protège. Pour le moment, on ne lui parle pas. Voir [Nyxessa](nyxessa.md). Il porte un **bâton à cornes dorées**, dont le **cristal est vert**, couleur de Nyxessa {décidé}.
