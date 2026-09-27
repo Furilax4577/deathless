@@ -23,6 +23,16 @@ Ces éléments ont été essayés puis retirés du village le 25/09/2026 : l'enc
 
 Un **sentier de pierre** part du village vers **chacune des trois zones** d'où sortent les squelettes. Entretenu à la sortie du village, il se **dégrade** à mesure qu'on s'enfonce dans la forêt : dalles espacées, cassées, envahies d'herbe, puis quelques pierres éparses. Une ou deux **lanternes**, au sol ou sur poteau, jalonnent chaque sentier.
 
+## Refonte de la carte {à confirmer}
+
+Chantier ouvert par Quentin le 27/09/2026, au stade de la maquette (raisonnement, puis volumes gris dans le bac à sable avant tout habillage) :
+
+- **Moins de forêt** : elle reste au sud et à l'ouest, en deux masses qui gardent les couloirs des vagues ; l'est devient une lande (prairie, rochers, souches, arbres isolés).
+- **Une montagne au nord** {décidé} : formation rocheuse dont le premier pic forme une **crête infranchissable** (la géométrie et le NavMesh suffisent, pas de mur invisible), avec un **pierrier** entre la falaise et les maisons. Fond de tableau du menu principal et des plans vers Nyxessa ; les vagues n'arrivent plus que par l'est, le sud et l'ouest.
+- **Une petite cascade** sort de la crête : source visuelle et sonore du village.
+- **La rivière traverse le village** : elle longe le plateau de Nyxessa (à ~10 m) et sort au sud-ouest ; **deux ponts** (nord près du portail, sud) qui font goulets pour les vagues, et **un gué** (eau peu profonde, ralenti comme l'eau du donjon) pour que l'IA ne soit jamais bloquée ; trois maisons par rive ; la nuit, l'eau reflète la lueur de Nyxessa. À confirmer : position exacte de la rivière, nombre de ponts, gué.
+- Maquette : `Docs/references/` et le fil de discussion ; générateur du village en v5 dans `sandbox-level`, circulation revérifiée (72 azimuts, remontée aux ponts).
+
 ## Taille des maisons {décidé} {dev}
 
 Les portes des maisons sont à l'échelle du joueur : 2,1 m pour un personnage de 2 m. Les maisons font donc 6 à 6,5 m de large.
