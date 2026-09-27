@@ -294,6 +294,362 @@ def pas_pierre(rng, buf, debut, amp):
     gravier(rng, buf, debut, 0.08, 6, amp * 0.25, densite=lambda u: u ** 2)
 
 
+# --- Direction sombre (26/09/2026 au soir) ---------------------------------------------------------------------------
+# Retour de Quentin après écoute des lots 1 et 2 : « trop cristallin, enfantin ». Les briques qui suivent donnent le
+# caractère sombre et organique : voix fantômes et chœurs sourds (l'âme captive de Nyxessa), bourdons graves, métal
+# frotté, os creux, peaux tendues, souffles modulés, cordes pincées, feu. La gemme reste la signature de Nyxessa, plus
+# grave, et toujours mêlée à une voix ou à un bourdon.
+
+# Voix fantôme : synthèse par formants, le modèle source-filtre de la voix humaine.
+# - Source : impulsions glottiques de Rosenberg (ouverture 60 % de la période : montée en demi-cosinus sur 2/3, retombée
+#   en quart de cosinus sur 1/3, glotte fermée ensuite), dérivées (la bouche rayonne la dérivée du débit), avec gigue de
+#   hauteur (dérive aléatoire lissée), vibrato lent, raucité (modulation d'amplitude rapide à 47 Hz) et sous-harmonique
+#   (une période sur deux affaiblie : la voix se casse, le cri). Le souffle (bruit blanc) passe surtout quand la glotte
+#   est ouverte, comme dans une vraie voix soufflée.
+# - Filtre : quatre résonateurs de Klatt en cascade (formants F1 à F4 de la voyelle, avec leurs largeurs de bande), mis à
+#   jour tous les 32 échantillons quand la voyelle glisse (« ou » → « o » → « a »).
+# - Paramètres : fréquence (Hz, ou fonction de u de 0 à 1 : glissandos), voyelle (nom ou fonction de u → (A, B,
+#   mélange)), souffle (0 : voix pleine, 1 : chuchotement), rauque, gigue, vibrato (fréquence, profondeur), sous_harm.
+# Les voyelles sombres (« ou », « o ») donnent la plainte ; « a » ouvert donne l'appel et le cri.
+VOYELLES = {
+    "ou": ((300, 60), (750, 80), (2300, 140), (3200, 200)),
+    "o": ((450, 70), (820, 90), (2450, 150), (3350, 200)),
+    "a": ((750, 90), (1150, 110), (2600, 160), (3500, 220)),
+    "e": ((550, 70), (1650, 100), (2550, 150), (3450, 200)),
+    "eu": ((480, 70), (1350, 100), (2350, 150), (3300, 200)),
+}
+
+
+def _formants(a, b, m):
+    return [(fa + (fb - fa) * m, ba + (bb - ba) * m) for (fa, ba), (fb, bb) in zip(VOYELLES[a], VOYELLES[b])]
+
+
+def voix(rng, duree, frequence, voyelle="ou", souffle=0.3, rauque=0.0, gigue=0.01, vibrato=(5.0, 0.015),
+         sous_harm=0.0):
+    """Voix fantôme (voir le modèle ci-dessus). Renvoie une liste normalisée à une crête de 1."""
+    n = idx(duree)
+    f_de = frequence if callable(frequence) else (lambda u, f=frequence: f)
+    v_de = voyelle if callable(voyelle) else (lambda u, v=voyelle: (v, v, 0.0))
+    vib_f, vib_p = vibrato
+    ph_vib = rng.uniform(0, 2 * math.pi)
+    src = [0.0] * n
+    phase = derive = 0.0
+    periode = 0
+    for i in range(n):
+        u = i / max(1, n - 1)
+        t = i / RATE
+        if i % 300 == 0:
+            derive = derive * 0.8 + rng.uniform(-gigue, gigue)
+        f = f_de(u) * (1 + vib_p * math.sin(2 * math.pi * vib_f * t + ph_vib) + derive)
+        phase += f / RATE
+        if phase >= 1.0:
+            phase -= 1.0
+            periode += 1
+        if phase < 0.396:
+            g = 0.5 * (1 - math.cos(math.pi * phase / 0.396))
+        elif phase < 0.6:
+            g = math.cos(0.5 * math.pi * (phase - 0.396) / 0.204)
+        else:
+            g = 0.0
+        if sous_harm and periode % 2:
+            g *= 1 - sous_harm
+        if rauque:
+            g *= 1 - rauque * (0.5 + 0.5 * math.sin(2 * math.pi * 47 * t + math.sin(t * 13)))
+        src[i] = g
+    d = [src[i] - src[i - 1] if i else 0.0 for i in range(n)]
+    crete = max(1e-9, max(abs(v) for v in d))
+    sig = [v / crete + souffle * rng.uniform(-1, 1) * (0.3 + 0.7 * src[i]) for i, v in enumerate(d)]
+    for rang in range(4):
+        y1 = y2 = 0.0
+        sortie = [0.0] * n
+        A = B = C = 0.0
+        for i in range(n):
+            if i % 32 == 0:
+                a, b, m = v_de(i / max(1, n - 1))
+                F, BW = _formants(a, b, m)[rang]
+                C = -math.exp(-2 * math.pi * BW / RATE)
+                B = 2 * math.exp(-math.pi * BW / RATE) * math.cos(2 * math.pi * F / RATE)
+                A = 1 - B - C
+            y = A * sig[i] + B * y1 + C * y2
+            y2, y1 = y1, y
+            sortie[i] = y
+        sig = sortie
+    crete = max(1e-9, max(abs(v) for v in sig))
+    return [v / crete for v in sig]
+
+
+def choeur(rng, duree, frequence, voyelle="ou", nombre=4, desaccord=0.012, souffle=0.45, octaves=(1.0,),
+           vibrato=(4.5, 0.012), gigue=0.008):
+    """Chœur sourd : `nombre` voix fantômes par octave, désaccordées de ± `desaccord` (fraction de la fréquence), vibratos
+    et gigues indépendants : ça bat, ça respire, on n'entend aucune voix seule. Normalisé à une crête de 1."""
+    n = idx(duree)
+    res = [0.0] * n
+    f_de = frequence if callable(frequence) else (lambda u, f=frequence: f)
+    for o in octaves:
+        for k in range(nombre):
+            ecart = 1 + desaccord * (2 * k / max(1, nombre - 1) - 1) if nombre > 1 else 1.0
+            v = voix(rng, duree, lambda u, e=ecart, o=o: f_de(u) * e * o, voyelle, souffle=souffle, gigue=gigue,
+                     vibrato=(vibrato[0] * rng.uniform(0.8, 1.2), vibrato[1] * rng.uniform(0.7, 1.3)))
+            poids = 1.0 / (1 + 0.6 * abs(math.log2(o)))
+            for i in range(n):
+                res[i] += v[i] * poids
+    crete = max(1e-9, max(abs(v) for v in res))
+    return [v / crete for v in res]
+
+
+def passe_bas_variable(x, fc):
+    """Passe-bas du premier ordre dont la coupure suit `fc(u)` (u de 0 à 1) : une voix qui s'éloigne perd ses aigus."""
+    n = len(x)
+    y, s = [0.0] * n, 0.0
+    a = 0.0
+    for i, v in enumerate(x):
+        if i % 32 == 0:
+            a = 1.0 - math.exp(-2 * math.pi * fc(i / max(1, n - 1)) / RATE)
+        s += a * (v - s)
+        y[i] = s
+    return y
+
+
+def saturer(x, k=2.5):
+    """Saturation douce (tangente hyperbolique) : le cri se déchire sans écrêter."""
+    t = math.tanh(k)
+    return [math.tanh(k * v) / t for v in x]
+
+
+# Bourdon grave : oscillateurs en dents de scie adoucies (10 harmoniques, amplitudes 1/k × 0,85^k), lus dans une table,
+# doublés d'un jumeau écarté de `battement` Hz (battements lents), filtrés en passe-bas (`coupure`). Des fréquences
+# arrondies à un nombre entier de périodes sur la durée donnent une boucle exacte.
+_TAILLE_TABLE = 4096
+TABLE_SCIE = [sum(math.sin(2 * math.pi * k * i / _TAILLE_TABLE) * (0.85 ** k) / k for k in range(1, 11))
+              for i in range(_TAILLE_TABLE)]
+TABLE_SINUS = [math.sin(2 * math.pi * i / _TAILLE_TABLE) for i in range(_TAILLE_TABLE)]
+
+
+def oscillateur(n, f, table=TABLE_SCIE, phase=0.0, vibrato=None):
+    """Lecture de table à fréquence fixe (ou `vibrato(t)` : facteur de fréquence, évalué tous les 64 échantillons)."""
+    res = [0.0] * n
+    pas = f * _TAILLE_TABLE / RATE
+    p = phase * _TAILLE_TABLE
+    facteur = 1.0
+    for i in range(n):
+        if vibrato is not None and i % 64 == 0:
+            facteur = vibrato(i / RATE)
+        res[i] = table[int(p) % _TAILLE_TABLE]
+        p += pas * facteur
+    return res
+
+
+def bourdon(rng, duree, frequences, battement=0.25, coupure=700.0, boucle=False):
+    n = idx(duree)
+    res = [0.0] * n
+    for f in frequences:
+        for ecart in (0.0, battement):
+            fb = f + ecart
+            if boucle:
+                fb = round(fb * duree) / duree
+            o = oscillateur(n, fb, TABLE_SCIE, rng.random())
+            for i in range(n):
+                res[i] += o[i]
+    if boucle:
+        res = circulaire(lambda x: passe_bas(passe_bas(x, coupure), coupure), res)
+    else:
+        res = passe_bas(passe_bas(res, coupure), coupure)
+    crete = max(1e-9, max(abs(v) for v in res))
+    return [v / crete for v in res]
+
+
+def circulaire(filtre, x):
+    """Applique un filtre à une boucle comme si elle tournait déjà : on filtre deux tours et on garde le second (l'état
+    du filtre à la fin du premier tour est celui du début du second : pas de saut à la jointure)."""
+    n = len(x)
+    return filtre(x + x)[n:]
+
+
+# Métal frotté : un archet sur une plaque ou une scie. Partiels inharmoniques de plaque (1, 1,59, 2,14, 2,30, 2,65,
+# 2,92, 3,16, 3,50), chacun excité **lentement** (montée de `attaque` s) avec une amplitude qui tremble (bruit lissé à
+# 5 Hz : le frottement accroche et glisse), plus un filet de bruit d'archet autour du partiel 2,14. Le son enfle, grince
+# un peu, et s'éteint quand l'archet quitte la plaque (relâche des 30 derniers pour cent).
+METAL_RAPPORTS = [1.0, 1.59, 2.14, 2.30, 2.65, 2.92, 3.16, 3.50]
+METAL_AMPS = [1.0, 0.7, 0.8, 0.4, 0.5, 0.3, 0.35, 0.2]
+
+
+def _bruit_lisse(rng, n, frequence):
+    """Bruit lissé (points aléatoires tous les 1/frequence s, interpolés en cosinus), entre -1 et 1."""
+    pas = max(1, int(RATE / frequence))
+    points = [rng.uniform(-1, 1) for _ in range(n // pas + 2)]
+    res = [0.0] * n
+    for i in range(n):
+        k, r = divmod(i, pas)
+        m = 0.5 - 0.5 * math.cos(math.pi * r / pas)
+        res[i] = points[k] * (1 - m) + points[k + 1] * m
+    return res
+
+
+def metal_frotte(rng, duree, f0, attaque=0.4, tremble=0.35):
+    n = idx(duree)
+    res = [0.0] * n
+    nr = int(n * 0.3)
+    for r, a in zip(METAL_RAPPORTS, METAL_AMPS):
+        f = f0 * r * rng.uniform(0.995, 1.005)
+        if f >= RATE * 0.45:
+            continue
+        lisse = _bruit_lisse(rng, n, 5.0)
+        w = 2 * math.pi * f / RATE
+        ph = rng.uniform(0, 2 * math.pi)
+        att = attaque * rng.uniform(0.7, 1.3)
+        for i in range(n):
+            t = i / RATE
+            env = (1 - math.exp(-t / att)) * (1 + tremble * lisse[i])
+            if i > n - nr:
+                env *= (n - i) / nr
+            res[i] += a * env * math.sin(w * i + ph)
+    archet = passe_bande(bruit(rng, n), f0 * 2.14, 6.0)
+    archet = enveloppe(archet, attaque, max(0.0, duree * 0.7 - attaque), duree * 0.3, 1.0)
+    crete_a = max(1e-9, max(abs(v) for v in archet))
+    crete = max(1e-9, max(abs(v) for v in res))
+    return [v / crete + 0.12 * b / crete_a for v, b in zip(res, archet)]
+
+
+# Os creux : un petit tube d'os fermé frappé. Modes impairs (1 : 3,03 : 5,1, légèrement désaccordés), T60 court (40 à
+# 80 ms) : sec, sans résonance, creux. Le cliquetis est une grappe de petits os (f0 de 1,2 à 2,6 kHz, T60 15 à 30 ms).
+def os_creux(rng, buf, f0, amp, debut=0.0, t60=0.06):
+    for r, a, t in ((1.0, 1.0, 1.0), (3.03, 0.5, 0.6), (5.1, 0.25, 0.4)):
+        mode(buf, f0 * r * rng.uniform(0.98, 1.02), amp * a, t60 * t, debut, 0.0004, rng.uniform(0, 6.3))
+    choc(rng, buf, debut, amp * 0.4, 0.0008, 2500.0, 0.9)
+
+
+def cliquetis(rng, buf, debut, duree, nombre, amp, densite=None):
+    for _ in range(nombre):
+        u = rng.random()
+        if densite is not None:
+            u = densite(u)
+        os_creux(rng, buf, rng.uniform(1200.0, 2600.0), amp * rng.uniform(0.4, 1.0), debut + u * duree,
+                 rng.uniform(0.015, 0.03))
+
+
+# Peau tendue : membrane circulaire frappée. Fondamental dont la hauteur retombe (tension qui se relâche : f0 × `chute`
+# → f0 en 30 ms), modes de membrane 1,594 / 2,136 / 2,296 / 2,653 plus brefs, bruit de baguette ou de main passé en bas.
+# Grave (50 à 90 Hz) : grosse caisse, tambour de guerre ; médium (120 à 250 Hz) : tom, tambour sur cadre.
+def peau(rng, buf, f0, amp, debut=0.0, t60=0.35, chute=1.4, durete=1.0):
+    i0 = idx(debut)
+    n = min(len(buf) - i0, idx(t60 * 1.2))
+    ph = 0.0
+    k = math.exp(-6.9078 / (t60 * RATE))
+    env = amp
+    for i in range(n):
+        t = i / RATE
+        f = f0 * (1 + (chute - 1) * math.exp(-t / 0.03))
+        ph += 2 * math.pi * f / RATE
+        buf[i0 + i] += env * min(1.0, i / 20.0) * math.sin(ph)
+        env *= k
+    for r, a, t in ((1.594, 0.35, 0.45), (2.136, 0.22, 0.3), (2.296, 0.15, 0.25), (2.653, 0.1, 0.2)):
+        mode(buf, f0 * r, amp * a, t60 * t, debut, 0.0005, rng.uniform(0, 6.3))
+    if durete > 0:
+        x = passe_bas(bruit(rng, idx(0.02)), 2500.0)
+        x = [v * math.exp(-(i / RATE) / 0.004) for i, v in enumerate(x)]
+        ajouter(buf, x, debut, amp * 0.6 * durete)
+
+
+def souffle_module(rng, duree, fc, q=1.0, frequence_mod=0.3, profondeur=0.5, derive=0.25):
+    """Souffle qui respire : bruit en passe-bande dont la fréquence centrale dérive (± `derive`) et dont l'amplitude
+    ondule (`profondeur`) à `frequence_mod` Hz. Pour une boucle, choisir un nombre entier de cycles sur la durée."""
+    n = idx(duree)
+    ph = rng.uniform(0, 2 * math.pi)
+    x = passe_bande(bruit(rng, n), lambda u: fc * (1 + derive * math.sin(2 * math.pi * frequence_mod * u * duree + ph)), q)
+    return [v * (1 - profondeur * (0.5 + 0.5 * math.sin(2 * math.pi * frequence_mod * i / RATE + ph + 1.3)))
+            for i, v in enumerate(x)]
+
+
+def bruit_brun(rng, n):
+    """Bruit brun (bruit blanc intégré avec fuite) : grondement, terre, masse. Crête normalisée à 1."""
+    y, res = 0.0, [0.0] * n
+    for i in range(n):
+        y = 0.985 * y + 0.15 * rng.uniform(-1, 1)
+        res[i] = y
+    crete = max(1e-9, max(abs(v) for v in res))
+    return [v / crete for v in res]
+
+
+# Corde pincée (Karplus-Strong) : ligne à retard d'une période, remplie d'un bruit passé en bas (`brillance` : 0 sourd,
+# 1 clair), rebouclée à travers une moyenne de deux échantillons et un gain réglé sur le T60 ; lecture fractionnaire
+# (interpolation linéaire) pour que la note soit juste. Luth, cordes grattées, basse pincée, corde d'arc.
+def corde(rng, duree, f, t60=1.2, brillance=0.5):
+    n = idx(duree)
+    periode = RATE / f
+    taille = int(periode) + 3
+    init = passe_bas(bruit(rng, taille), 800.0 + 7000.0 * brillance)
+    ligne = init + [0.0] * n
+    g = 10 ** (-3.0 / (t60 * f))
+    ent, frac = int(periode), periode - int(periode)
+    for i in range(taille, taille + n):
+        a = ligne[i - ent] * (1 - frac) + ligne[i - ent - 1] * frac
+        b = ligne[i - ent - 1] * (1 - frac) + ligne[i - ent - 2] * frac
+        ligne[i] = g * 0.5 * (a + b)
+    crete = max(1e-9, max(abs(v) for v in init))
+    return [v / crete for v in ligne[:n]]
+
+
+# Feu : grondement (bruit brun passé en bas à 450 Hz, ondulant lentement) et crépitements (impulsions de 0,5 à 2 ms en
+# bande 2 à 6 kHz, `crepitements` par seconde). Le feu crépite et gronde, il ne tinte jamais.
+def feu(rng, duree, crepitements=18, grondement=1.0):
+    n = idx(duree)
+    base = passe_bas(bruit_brun(rng, n), 450.0)
+    lisse = _bruit_lisse(rng, n, 3.0)
+    res = [grondement * b * (0.7 + 0.3 * l) for b, l in zip(base, lisse)]
+    crete = max(1e-9, max(abs(v) for v in res))
+    res = [v / crete * 0.6 for v in res]
+    for _ in range(int(crepitements * duree)):
+        t = rng.uniform(0, duree)
+        grain = passe_bande(bruit(rng, idx(0.006)), rng.uniform(2000.0, 6000.0), 1.2)
+        tau = rng.uniform(0.0005, 0.002)
+        grain = [v * math.exp(-(i / RATE) / tau) for i, v in enumerate(grain)]
+        ajouter(res, grain, t, rng.uniform(0.2, 0.9))
+    return res
+
+
+# --- Stéréo (ambiances, musiques) ------------------------------------------------------------------------------------
+def panoramique(x, pan):
+    """Place un signal mono dans le champ stéréo à puissance constante (pan de -1 gauche à 1 droite)."""
+    a = (pan + 1) * math.pi / 4
+    return [v * math.cos(a) for v in x], [v * math.sin(a) for v in x]
+
+
+def ajouter_stereo(g, d, x, debut=0.0, gain=1.0, pan=0.0):
+    xg, xd = panoramique(x, pan)
+    ajouter(g, xg, debut, gain)
+    ajouter(d, xd, debut, gain)
+
+
+def reverberation(x, taille=1.0, humide=0.25, amorti=0.3, circulaire=False):
+    """Réverbération de Schroeder (quatre peignes filtrés en parallèle, deux passe-tout en série), **réservée aux
+    musiques** (les effets restent secs : l'espace vient du jeu). `circulaire` : le signal est une boucle, la queue de la
+    fin revient au début (on traite deux tours et on garde le second)."""
+    n = len(x)
+    entree = x + x if circulaire else x
+    m = len(entree)
+    mouille = [0.0] * m
+    for ms, fb in ((29.7, 0.805), (37.1, 0.827), (41.1, 0.783), (43.7, 0.764)):
+        dl = int(ms * taille * RATE / 1000)
+        ligne = [0.0] * m
+        filtre = 0.0
+        for i in range(m):
+            sortie = ligne[i - dl] if i >= dl else 0.0
+            filtre = sortie * (1 - amorti) + filtre * amorti
+            ligne[i] = entree[i] + fb * filtre
+            mouille[i] += sortie
+    for ms, gain in ((5.0, 0.7), (1.7, 0.7)):
+        dl = int(ms * RATE / 1000)
+        tamp = [0.0] * m
+        sortie = [0.0] * m
+        for i in range(m):
+            retard = tamp[i - dl] if i >= dl else 0.0
+            tamp[i] = mouille[i] + gain * retard
+            sortie[i] = retard - gain * tamp[i]
+        mouille = sortie
+    mouille = mouille[n:] if circulaire else mouille
+    return [a * (1 - humide) + 0.25 * humide * b for a, b in zip(x, mouille)]
+
+
 # --- Boucles sans raccord ------------------------------------------------------------------------------------------
 # Une boucle de L secondes se fabrique en deux parts :
 # - les événements (tintements, coups) sont rendus sur L + traîne, puis la traîne est **repliée** sur le début
@@ -345,12 +701,12 @@ def niveau_percu(x):
 
 def master(buf, cible_db, fondu=0.03):
     """Fondu de fin, puis gain vers la cible de niveau perçu, crête plafonnée à 0,85 (-1,4 dBFS)."""
+    # retire une éventuelle composante continue (moyenne) avant le fondu : la fin retombe exactement à zéro
+    moyenne = sum(buf) / len(buf)
+    buf = [v - moyenne for v in buf]
     nf = min(len(buf), idx(fondu))
     for i in range(nf):
         buf[len(buf) - nf + i] *= 0.5 * (1 + math.cos(math.pi * i / nf))
-    # retire une éventuelle composante continue (moyenne), sans toucher au transitoire
-    moyenne = sum(buf) / len(buf)
-    buf = [v - moyenne for v in buf]
     crete = max(abs(v) for v in buf) or 1.0
     niveau = niveau_percu(buf)
     gain = min(CRETE / crete, 10 ** ((cible_db - niveau) / 20.0))
@@ -431,7 +787,9 @@ def spectre_bandes(x, taux=RATE, taille=4096):
 
 def analyser(chemin):
     x, taux, canaux = lire(chemin)
-    crete = max(abs(v) for v in x) or 1e-9
+    with wave.open(chemin, "rb") as w:                  # crête : le canal le plus fort, pas la moyenne des canaux
+        brut = w.readframes(w.getnframes())
+    crete = max(abs(v) for v in struct.unpack("<%dh" % (len(brut) // 2), brut)) / 32768.0 or 1e-9
     rms = math.sqrt(sum(v * v for v in x) / len(x)) or 1e-9
     seuil = 0.01  # -40 dBFS
     tete = next((i for i, v in enumerate(x) if abs(v) >= seuil), len(x))
@@ -452,9 +810,40 @@ def analyser(chemin):
 BOUCLE = "boucle"   # valeur de « fondu » d'une boucle : mastering sans fondu de fin
 
 
-def produire(sons, dossier_defaut, argv):
+def niveau_rms(x):
+    rms = math.sqrt(sum(v * v for v in x) / len(x)) if x else 0.0
+    return 20 * math.log10(rms) if rms > 0 else -120.0
+
+
+def master_stereo(g, d, cible_db, mesure="niveau", fondu=None):
+    """Mastering d'un son stéréo : gain commun aux deux canaux ; `mesure` = « niveau » (RMS maximal sur 50 ms, comme un
+    effet) ou « rms » (RMS moyen sur tout le fichier : ambiances et musiques). Crête plafonnée à -1,4 dBFS."""
+    if fondu:
+        nf = idx(fondu)
+        for c in (g, d):
+            for i in range(nf):
+                c[len(c) - nf + i] *= 0.5 * (1 + math.cos(math.pi * i / nf))
+    moy = [(a + b) * 0.5 for a, b in zip(g, d)]
+    niveau = niveau_rms(moy) if mesure == "rms" else niveau_percu(moy)
+    crete = max(max(abs(v) for v in g), max(abs(v) for v in d)) or 1.0
+    gain = min(CRETE / crete, 10 ** ((cible_db - niveau) / 20.0))
+    return [v * gain for v in g], [v * gain for v in d]
+
+
+def ecrire_stereo(chemin, g, d):
+    with wave.open(chemin, "wb") as w:
+        w.setnchannels(2)
+        w.setsampwidth(2)
+        w.setframerate(RATE)
+        w.writeframes(b"".join(struct.pack("<hh", max(-32767, min(32767, int(round(a * 32767)))),
+                                           max(-32767, min(32767, int(round(b * 32767)))))
+                               for a, b in zip(g, d)))
+
+
+def produire(sons, dossier_defaut, argv, mesure="niveau"):
     """Écrit les sons d'une famille. `sons` : liste de (nom, lot, cible dB, fondu en s / None / BOUCLE, fabrique) ;
-    argv : [dossier_sortie] [nom ...] (par défaut : le dossier du script, tous les sons)."""
+    une fabrique rend une liste (mono) ou un couple (gauche, droite) (stéréo). `mesure` : « niveau » (RMS maximal sur
+    50 ms) ou « rms » (RMS moyen, ambiances et musiques). argv : [dossier_sortie] [nom ...]."""
     import os
     dossier = argv[1] if len(argv) > 1 else dossier_defaut
     noms = argv[2:]
@@ -462,12 +851,17 @@ def produire(sons, dossier_defaut, argv):
         if noms and nom not in noms:
             continue
         buf = fabrique()
-        if fondu == BOUCLE:
-            buf = master_boucle(buf, cible)
-        elif fondu is None:
-            buf = master(buf, cible)
-        else:
-            buf = master(buf, cible, fondu)
         chemin = os.path.join(dossier, nom + ".wav")
-        ecrire(chemin, buf)
+        if isinstance(buf, tuple):
+            g, d = master_stereo(list(buf[0]), list(buf[1]), cible, mesure,
+                                 None if fondu in (None, BOUCLE) else fondu)
+            ecrire_stereo(chemin, g, d)
+        else:
+            if fondu == BOUCLE:
+                buf = master_boucle(buf, cible)
+            elif fondu is None:
+                buf = master(buf, cible)
+            else:
+                buf = master(buf, cible, fondu)
+            ecrire(chemin, buf)
         print("écrit", chemin)
