@@ -16,15 +16,24 @@ public class Etourdissement : MonoBehaviour
     private Vector3[] v;
     private Color[] c;
 
+    // Indicateur en cours par cible (tenu par Jouer et OnDestroy).
+    private static readonly System.Collections.Generic.Dictionary<Transform, Etourdissement> parCible =
+        new System.Collections.Generic.Dictionary<Transform, Etourdissement>();
+
+    // Rechargement de domaine désactivé : le registre repart vide à chaque lancement du jeu.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void Reinitialiser() { parCible.Clear(); }
+
     public static Etourdissement Jouer(Transform cible, float duree, bool court, Material materiau, VfxTheme theme = VfxTheme.Sacre)
     {
         if (cible == null || materiau == null) return null;
-        // Un seul indicateur par cible : le nouveau remplace l'ancien.
-        foreach (Etourdissement e in FindObjectsByType<Etourdissement>(FindObjectsSortMode.None))
-            if (e.cible == cible) Destroy(e.gameObject);
+        // Un seul indicateur par cible : le nouveau remplace l'ancien (registre, plus de recherche dans toute la scène).
+        Etourdissement ancien;
+        if (parCible.TryGetValue(cible, out ancien) && ancien != null) Destroy(ancien.gameObject);
         GameObject go = new GameObject("Etourdissement");
         Etourdissement t = go.AddComponent<Etourdissement>();
         t.cible = cible;
+        parCible[cible] = t;
         t.duree = Mathf.Max(0.3f, duree);
         t.debut = Time.time;
         t.etoiles = court ? 3 : 5;
@@ -66,6 +75,10 @@ public class Etourdissement : MonoBehaviour
     private void OnDestroy()
     {
         if (mesh != null) Destroy(mesh);
+        // Retiré du registre seulement s'il y est encore (un remplaçant a pu prendre sa place, Destroy étant différé).
+        Etourdissement inscrit;
+        if (!ReferenceEquals(cible, null) && parCible.TryGetValue(cible, out inscrit) && ReferenceEquals(inscrit, this))
+            parCible.Remove(cible);
     }
 
     private void LateUpdate()
