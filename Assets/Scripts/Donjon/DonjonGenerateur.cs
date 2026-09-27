@@ -66,6 +66,8 @@ namespace Deathless.Donjon
         readonly List<Light> m_Lampes = new List<Light>(64);
         [NonSerialized] int m_LampesUtilisees;
         [NonSerialized] GameObject m_Anneau, m_Portail;
+        /// PortalVisual de m_Portail, retenu à sa création (VisuelPortailRetour est lu plusieurs fois par image).
+        [NonSerialized] PortalVisual m_PortailVisuel;
         [NonSerialized] Transform m_DernierVisuel;
         static Mesh s_MeshAnneau;
 
@@ -210,7 +212,7 @@ namespace Deathless.Donjon
             if (m_Racine != null) return;
             Transform ancien = transform.Find("Genere");
             if (ancien != null) Detruire(ancien.gameObject);
-            m_Reserves.Clear(); m_ListeReserves.Clear(); m_Boites.Clear(); m_Lampes.Clear(); m_Anneau = null; m_Portail = null;
+            m_Reserves.Clear(); m_ListeReserves.Clear(); m_Boites.Clear(); m_Lampes.Clear(); m_Anneau = null; m_Portail = null; m_PortailVisuel = null;
             m_Racine = Enfant(transform, "Genere");
             m_Visuels = Enfant(m_Racine, "Visuels");
             m_Collisions = Enfant(m_Racine, "Collisions");
@@ -800,6 +802,7 @@ namespace Deathless.Donjon
             var go = Instantiate(kit.portail, support.transform, false);
             go.name = kit.portail.name;
             var pv = go.GetComponentInChildren<PortalVisual>(true);
+            m_PortailVisuel = pv;
             if (pv != null)
             {
                 pv.AlimenteParNyxessa = false;
@@ -811,7 +814,9 @@ namespace Deathless.Donjon
         }
 
         /// Visuel du portail de retour (PortalVisual) quand c'est le portail de gemmes (en jeu), sinon null.
-        public PortalVisual VisuelPortailRetour => m_Portail != null && PortailRetour != null && PortailRetour.visuel == m_Portail ? m_Portail.GetComponentInChildren<PortalVisual>() : null;
+        /// Comme l'ancien GetComponentInChildren (objets actifs seulement) : null tant que le visuel est masqué.
+        public PortalVisual VisuelPortailRetour => m_Portail != null && PortailRetour != null && PortailRetour.visuel == m_Portail
+            && m_PortailVisuel != null && m_PortailVisuel.gameObject.activeInHierarchy ? m_PortailVisuel : null;
 
         [NonSerialized] GameObject m_Eau;
         static Mesh s_MeshEau;
