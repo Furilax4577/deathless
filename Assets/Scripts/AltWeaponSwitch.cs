@@ -34,6 +34,13 @@ public class AltWeaponSwitch : MonoBehaviour
     private Vector3 mainFromPos, altFromPos;
     private Quaternion mainFromRot, altFromRot;
 
+    // Os retrouvés une fois (main, dos, ceinture) avec le nom cherché : plus de GetComponentsInChildren à chaque
+    // changement d'arme ; recherchés de nouveau si le nom change ou si l'os disparaît.
+    private Transform osMain, osDos, osCeinture;
+    private string nomMain, nomDos, nomCeinture;
+    private int crossbowHash;
+    private string crossbowHashNom;
+
     private Transform FindBone(string n)
     {
         foreach (Transform x in GetComponentsInChildren<Transform>(true))
@@ -41,19 +48,35 @@ public class AltWeaponSwitch : MonoBehaviour
         return null;
     }
 
+    private Transform Os(ref Transform os, ref string nomOs, string nom)
+    {
+        if (os == null || nomOs != nom) { os = FindBone(nom); nomOs = nom; }
+        return os;
+    }
+
+    // Hachage du paramètre (Animator.StringToHash), recalculé seulement si son nom change.
+    private int CrossbowHash()
+    {
+        if (crossbowHashNom != crossbowParam) { crossbowHash = Animator.StringToHash(crossbowParam); crossbowHashNom = crossbowParam; }
+        return crossbowHash;
+    }
+
     private void Awake()
     {
         if (animator == null) animator = GetComponent<Animator>();
         if (mainWeapon == null) mainWeapon = FindBone("dagger");
         if (altWeapon == null) altWeapon = FindBone("crossbow_1handed");
-        crossbowOut = animator != null && animator.GetBool(crossbowParam);
+        Os(ref osMain, ref nomMain, handBone);
+        Os(ref osDos, ref nomDos, backBone);
+        Os(ref osCeinture, ref nomCeinture, sheathBone);
+        crossbowOut = animator != null && animator.GetBool(CrossbowHash());
         Place(crossbowOut, true);
     }
 
     private void Update()
     {
         if (animator == null) return;
-        bool want = animator.GetBool(crossbowParam);
+        bool want = animator.GetBool(CrossbowHash());
         if (want != crossbowOut) { crossbowOut = want; Place(want, false); }
         if (t < 1f)
         {
@@ -65,8 +88,9 @@ public class AltWeaponSwitch : MonoBehaviour
     // Pose immédiate dans l'état voulu (utilisable aussi hors Play mode, depuis l'éditeur).
     public void Place(bool crossbow, bool instant)
     {
-        Reparent(mainWeapon, FindBone(crossbow ? sheathBone : handBone), out mainFromPos, out mainFromRot);
-        Reparent(altWeapon, FindBone(crossbow ? handBone : backBone), out altFromPos, out altFromRot);
+        Transform main = Os(ref osMain, ref nomMain, handBone);
+        Reparent(mainWeapon, crossbow ? Os(ref osCeinture, ref nomCeinture, sheathBone) : main, out mainFromPos, out mainFromRot);
+        Reparent(altWeapon, crossbow ? main : Os(ref osDos, ref nomDos, backBone), out altFromPos, out altFromRot);
         crossbowOut = crossbow;
         t = instant ? 1f : 0f;
         if (instant) Blend(crossbow, 1f);

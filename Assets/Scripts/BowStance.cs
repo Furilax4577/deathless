@@ -20,9 +20,27 @@ public class BowStance : MonoBehaviour
     public string aimIdleState = "Aiming_Idle";
 
     private float amount; // 0 = repos, 1 = visée
+    // Hachages des noms ci-dessus (Animator.StringToHash), calculés une fois au lieu de hacher les chaînes à chaque image.
+    private int aimingHash, drawHash, aimIdleHash;
+
+    private void Hacher()
+    {
+        aimingHash = Animator.StringToHash(aimingParam);
+        drawHash = Animator.StringToHash(drawState);
+        aimIdleHash = Animator.StringToHash(aimIdleState);
+    }
+
+    private void OnValidate() { Hacher(); }
+
+    // Même règle que AnimatorStateInfo.IsName : nom court ou chemin complet (« Base Layer.Draw »).
+    private static bool EstEtat(AnimatorStateInfo state, int hash)
+    {
+        return state.shortNameHash == hash || state.fullPathHash == hash;
+    }
 
     private void Awake()
     {
+        Hacher();
         if (animator == null) animator = GetComponent<Animator>();
         foreach (Transform t in GetComponentsInChildren<Transform>(true))
         {
@@ -30,20 +48,20 @@ public class BowStance : MonoBehaviour
             if (arrow == null && t.name == "arrow_bow") arrow = t.gameObject;
         }
         if (bowRenderer == null && bow != null) bowRenderer = bow.GetComponent<SkinnedMeshRenderer>();
-        amount = animator != null && animator.GetBool(aimingParam) ? 1f : 0f;
+        amount = animator != null && animator.GetBool(aimingHash) ? 1f : 0f;
         Apply();
     }
 
     private void Update()
     {
         if (animator == null || bow == null) return;
-        bool aiming = animator.GetBool(aimingParam);
+        bool aiming = animator.GetBool(aimingHash);
         amount = Mathf.MoveTowards(amount, aiming ? 1f : 0f, blendSeconds > 0f ? Time.deltaTime / blendSeconds : 1f);
         Apply();
         AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
         float draw = 0f;
-        if (state.IsName(drawState)) draw = Mathf.Clamp01(state.normalizedTime) * 100f;
-        else if (state.IsName(aimIdleState)) draw = 100f;
+        if (EstEtat(state, drawHash)) draw = Mathf.Clamp01(state.normalizedTime) * 100f;
+        else if (EstEtat(state, aimIdleHash)) draw = 100f;
         if (bowRenderer != null) bowRenderer.SetBlendShapeWeight(0, draw);
     }
 
