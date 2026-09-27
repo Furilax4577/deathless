@@ -46,6 +46,14 @@ namespace Deathless.UI.Ecrans
 
         readonly List<Button> m_Boutons = new List<Button>();
         readonly List<IClasseJouable> m_Classes = new List<IClasseJouable>();
+        /// Étiquette « Prise · pseudo » de chaque bouton (mise en cache à la création) et pseudo qu'elle affiche :
+        /// MajPrises (chaque image) ne touche au texte qu'au changement de PrisePar.
+        readonly List<Label> m_LabelsPrise = new List<Label>();
+        readonly List<string> m_PrisesAffichees = new List<string>();
+        /// Valeur « jamais affichée » (null veut dire : classe libre).
+        const string PriseInconnue = "\u0001";
+        IClasseJouable m_FicheClasse;
+        string m_FichePrise;
         readonly List<(VisualElement ligne, VisualElement icone, Label nom)> m_LignesActions = new List<(VisualElement, VisualElement, Label)>();
         VisualElement m_Liste, m_Embleme, m_Actions, m_Apercu, m_ApercuImage;
         Label m_Nom, m_Role, m_Arme, m_Description, m_Jauge;
@@ -155,6 +163,8 @@ namespace Deathless.UI.Ecrans
             m_Liste.Clear();
             m_Boutons.Clear();
             m_Classes.Clear();
+            m_LabelsPrise.Clear();
+            m_PrisesAffichees.Clear();
             foreach (var c in source)
             {
                 var classe = c;
@@ -190,6 +200,8 @@ namespace Deathless.UI.Ecrans
                 m_Liste.Add(b);
                 m_Boutons.Add(b);
                 m_Classes.Add(c);
+                m_LabelsPrise.Add(prise);
+                m_PrisesAffichees.Add(PriseInconnue);
             }
             UINavigation.ChainerVerticalement(new List<VisualElement>(m_Boutons));
             MajDerniere();
@@ -240,14 +252,19 @@ namespace Deathless.UI.Ecrans
             for (var i = 0; i < m_Boutons.Count; i++)
             {
                 var p = PrisePar(m_Classes[i]);
+                if (p == m_PrisesAffichees[i]) continue;
+                m_PrisesAffichees[i] = p;
                 m_Boutons[i].EnableInClassList("choix-classe--prise", p != null);
-                var l = m_Boutons[i].Q<Label>("prise");
+                var l = m_LabelsPrise[i];
                 l.text = p != null ? "Prise · " + p : "";
                 l.style.display = p != null ? DisplayStyle.Flex : DisplayStyle.None;
             }
             if (m_Affichee != null)
             {
                 var p = PrisePar(m_Affichee);
+                if (m_Affichee == m_FicheClasse && p == m_FichePrise) return;
+                m_FicheClasse = m_Affichee;
+                m_FichePrise = p;
                 m_Prise.text = p != null ? "Déjà prise par " + p + " dans ce salon" : "";
                 m_Prise.style.display = p != null ? DisplayStyle.Flex : DisplayStyle.None;
                 m_InviteValider?.EnableInClassList("dl-prompt--inactive", m_Affichee.Verrouillee || p != null);
@@ -271,6 +288,7 @@ namespace Deathless.UI.Ecrans
         {
             if (c == null) return;
             m_Affichee = c;
+            m_FicheClasse = null;   // la fiche (et l'invite Valider) est repeinte : MajPrises la reprend.
             IconesUI.Poser(m_Embleme, c.Embleme);
             m_ApercuActif?.Montrer(c.Id);
             m_Nom.text = c.Nom;
