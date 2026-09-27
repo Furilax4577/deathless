@@ -653,6 +653,8 @@ namespace Deathless.UI.Ecrans
         VisualElement m_Lignes;
         Button m_Rejouer;
         IScoreFin m_Affiche;
+        /// Compte « Prêts a / b » affiché : le texte n'est reconstruit qu'à son changement.
+        int m_PretsAffiches = -1, m_TotalAffiche = -1;
 
         protected override void Construire()
         {
@@ -683,7 +685,12 @@ namespace Deathless.UI.Ecrans
             var score = DonneesUI.Score;
             if (score == null) return;
             if (!ReferenceEquals(score, m_Affiche)) Remplir(score);
-            m_Prets.text = "Prêts " + score.JoueursPrets + " / " + score.JoueursTotal;
+            if (score.JoueursPrets != m_PretsAffiches || score.JoueursTotal != m_TotalAffiche)
+            {
+                m_PretsAffiches = score.JoueursPrets;
+                m_TotalAffiche = score.JoueursTotal;
+                m_Prets.text = "Prêts " + m_PretsAffiches + " / " + m_TotalAffiche;
+            }
             m_Rejouer.EnableInClassList("score-bouton--pret", score.EstPretLocal);
         }
 
