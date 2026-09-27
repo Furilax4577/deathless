@@ -29,8 +29,9 @@ namespace Deathless.Reseau
 
     /// Synchronisation des statuts (Docs/reseau.md, « Statuts ») : l'hôte fait foi. Il écrit la liste d'un personnage
     /// dans sa NetworkList seulement quand elle change (ajout, retrait, fin, ou fin décalée de plus de `Tolerance` : un
-    /// rafraîchissement de brûlure à chaque tic du cône n'envoie donc presque rien) ; NGO n'envoie que les éléments
-    /// modifiés. Les clients relisent la liste à chaque changement reçu, et font défiler les durées eux-mêmes.
+    /// rafraîchissement de brûlure à chaque tic du cône n'envoie donc presque rien) ; les éléments sont appariés par
+    /// type et NGO n'envoie que ceux qui ont changé. Les clients relisent la liste à chaque changement reçu, et font
+    /// défiler les durées eux-mêmes.
     public static class StatutsReseau
     {
         /// Décalage de fin (s) en deçà duquel un rafraîchissement n'est pas envoyé.
@@ -43,12 +44,18 @@ namespace Deathless.Reseau
         static float Maintenant(NetworkManager nm) => nm != null && nm.IsListening ? nm.ServerTime.TimeAsFloat : Time.time;
 
         /// Hôte : recopie les statuts (sauf ceux de zone, sans durée, que chaque poste calcule) dans la NetworkList.
+        /// Appariement par type (un seul statut à durée par type : Statuts.Appliquer) et non par position : retirer un
+        /// statut n'envoie que son retrait (les suivants ne sont pas réécrits), un nouveau statut s'ajoute en fin de
+        /// liste, un statut modifié n'envoie que lui. L'ordre reste celui de l'hôte (retraits sur place, ajouts en fin).
         public static void Ecrire(NetworkList<StatutReseau> liste, Statuts st, NetworkManager nm)
         {
             if (liste == null || st == null) return;
             float maintenant = Maintenant(nm), t = Time.time;
-            int n = 0;
             var l = st.Liste;
+            // Retraits : types qui ne sont plus sur le personnage (en partant de la fin, les indices restent valables).
+            for (int k = liste.Count - 1; k >= 0; k--)
+                if (IndexType(l, liste[k].type) < 0) liste.RemoveAt(k);
+            // Modifications et ajouts.
             for (int i = 0; i < l.Count; i++)
             {
                 var s = l[i];
@@ -58,17 +65,30 @@ namespace Deathless.Reseau
                     type = (byte)s.type, origine = (byte)s.origine, source = (byte)Mathf.Clamp(s.sourceId, 0, 255),
                     intensite = s.intensite, duree = s.duree, fin = maintenant + (s.fin - t),
                 };
-                if (n < liste.Count)
+                int k = IndexType(liste, r.type);
+                if (k >= 0)
                 {
-                    var a = liste[n];
-                    if (a.type != r.type || a.origine != r.origine || a.source != r.source || Mathf.Abs(a.intensite - r.intensite) > 0.001f
+                    var a = liste[k];
+                    if (a.origine != r.origine || a.source != r.source || Mathf.Abs(a.intensite - r.intensite) > 0.001f
                         || Mathf.Abs(a.fin - r.fin) > Tolerance || Mathf.Abs(a.duree - r.duree) > Tolerance)
-                        liste[n] = r;
+                        liste[k] = r;
                 }
                 else liste.Add(r);
-                n++;
             }
-            while (liste.Count > n) liste.RemoveAt(liste.Count - 1);
+        }
+
+        /// Index du statut à durée de ce type dans la liste du personnage (-1 s'il n'y est pas).
+        static int IndexType(IReadOnlyList<Statut> l, byte type)
+        {
+            for (int i = 0; i < l.Count; i++) if (!l[i].Permanent && (byte)l[i].type == type) return i;
+            return -1;
+        }
+
+        /// Index du statut de ce type dans la NetworkList (-1 s'il n'y est pas).
+        static int IndexType(NetworkList<StatutReseau> liste, byte type)
+        {
+            for (int i = 0; i < liste.Count; i++) if (liste[i].type == type) return i;
+            return -1;
         }
 
         /// Client : la liste de l'hôte devient celle du personnage (fins converties en Time.time de ce poste).
