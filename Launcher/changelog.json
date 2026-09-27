@@ -1,6 +1,19 @@
 {
   "versions": [
     {
+      "version": "0.5.8",
+      "date": "2026-09-27",
+      "titre": "Lire le combat",
+      "notes": [
+        "Barres de vie : une barre fine au-dessus des ennemis blessés (elle s'efface 2 s après le dernier coup), toujours visible sur un élite ; les boss ont une grande barre sous celle de Nyxessa, avec leur nom, des segments et leurs statuts.",
+        "Chiffres de dégâts : chaque coup s'affiche au point d'impact (blanc, or pour un critique, orange pour la brûlure, rouge pour ce que tu reçois, « +N » pour un soin, « Paré », « Bloqué », « Esquivé »). Option « Afficher les dégâts » dans l'onglet Jeu.",
+        "Sons : lots 1 et 2 regénérés dans une direction plus sombre (Nyxessa a une voix, bourdons, métal frotté, os), lot 3 des squelettes et échantillons de tous les thèmes à écouter sur le wiki.",
+        "Paladin : un projectile (crâne du Nécromancien) se bloque à la garde, il ne se pare jamais. Morgrim : le Tourbillon repousse qui reste dedans, la fissure du Fend-sol ralentit qui s'y tient. Morgrim est une cible prioritaire de Nyxessa ; élites ×1,3.",
+        "Réseau : coupure détectée en 10 s, positions envoyées avec des seuils raisonnables, vie et sorcier envoyés moins souvent, statuts appariés par type.",
+        "Performance : une quarantaine d'allocations par image supprimées (HUD, statuts, poursuite des squelettes, effets), fuites de matériaux corrigées, journal de partie retiré des builds."
+      ]
+    },
+    {
       "version": "0.5.7",
       "date": "2026-09-26",
       "titre": "La nuit de Nyxessa",
