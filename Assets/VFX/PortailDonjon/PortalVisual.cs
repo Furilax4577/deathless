@@ -125,11 +125,16 @@ public class PortalVisual : MonoBehaviour
         Entrer();
     }
 
-    private static Color Dark => VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Base, new Color(0.07f, 0.38f, 0.05f));
-    private static Color Mid => VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Vif, new Color(0.25f, 0.7f, 0.08f));
-    private static Color Light => VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Coeur, new Color(0.55f, 0.95f, 0.2f));
-    // HDR (26/09/2026, luminance de nuit) : le cœur du portail rayonne, intensité du thème Nyxessa.
-    private static Color Pale => VfxPalette.Accent(VfxTheme.Nyxessa, "Éclat", new Color(0.76f, 1f, 0.44f)) * VfxPalette.Intensite(VfxTheme.Nyxessa, 2.5f);
+    // Teintes de la soupe (sombre, moyenne, claire, pâle), lues une fois par version de palette (VfxPalette.Cache) et
+    // non plus à chaque gemme et à chaque image. Pâle en HDR (26/09/2026, luminance de nuit) : le cœur du portail
+    // rayonne, intensité du thème Nyxessa.
+    private static Color[] Teintes => VfxPalette.Cache("PortalVisual.Nyxessa", () => new[]
+    {
+        VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Base, new Color(0.07f, 0.38f, 0.05f)),
+        VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Vif, new Color(0.25f, 0.7f, 0.08f)),
+        VfxPalette.Couleur(VfxTheme.Nyxessa, VfxRole.Coeur, new Color(0.55f, 0.95f, 0.2f)),
+        VfxPalette.Accent(VfxTheme.Nyxessa, "Éclat", new Color(0.76f, 1f, 0.44f)) * VfxPalette.Intensite(VfxTheme.Nyxessa, 2.5f),
+    });
 
 
     private void Start()
@@ -372,6 +377,8 @@ public class PortalVisual : MonoBehaviour
         float t = flowTime;
         // Rotation moyenne des cubes (celle d'un cube à mi-rayon) : le champ de couleurs la suit.
         meanRotation += dt * (0.35f + 1.6f * 0.25f);
+        Color[] teintes = Teintes;
+        Color sombre = teintes[0], moyen = teintes[1], clair = teintes[2], pale = teintes[3];
         for (int i = 0; i < pRadius.Length; i++)
         {
             // Tourbillon (plus rapide près de l'œil) et lente aspiration ; arrivé au centre, le cube renaît au bord.
@@ -396,7 +403,7 @@ public class PortalVisual : MonoBehaviour
                 + Mathf.PerlinNoise(q.x * 3.2f + 40f - drift, q.y * 3.2f + 60f + drift) * 0.15f
                 + 0.25f * (0.5f + 0.5f * Mathf.Sin(3f * fa + 7f * r - t * 0.8f));
             value += (0.55f - r) * 0.35f;
-            Color color = value < 0.42f ? Dark : value < 0.53f ? Mid : value < 0.63f ? Light : Pale;
+            Color color = value < 0.42f ? sombre : value < 0.53f ? moyen : value < 0.63f ? clair : pale;
 
             // Présence : ouverture et fermeture (le rayon `reveal` avance ou recule), bord qui bouillonne, et le cube qui
             // renaît au bord grandit au lieu d'apparaître d'un coup.
@@ -423,8 +430,8 @@ public class PortalVisual : MonoBehaviour
             {
                 float amort = 1f - goutte / GoutteSecondes;
                 // Pendant la goutte, le cœur clair de la soupe est atténué pour que les crêtes se détachent.
-                if (color == Pale && amort > 0.25f)
-                    color = Light;
+                if (color == pale && amort > 0.25f)
+                    color = clair;
                 float vitesse = goutteLongueurOnde / Mathf.Max(0.05f, goutteDecalage) / radius;   // rayon relatif par seconde
                 float decalageCreux = 0.45f * goutteLongueurOnde / radius;
                 for (int k = 0; k < Mathf.Max(1, goutteAnneaux); k++)
@@ -441,9 +448,9 @@ public class PortalVisual : MonoBehaviour
                     z += amp * (crete - 0.55f * creux);
                     // Crête claire, creux sombre : les anneaux se lisent aussi de face.
                     if (crete * amp > 0.1f)
-                        color = Pale;
+                        color = pale;
                     else if (creux * amp > 0.12f)
-                        color = Dark;
+                        color = sombre;
                 }
                 float centre = Mathf.Exp(-r * r / 0.02f);
                 if (!goutteSortie)
@@ -458,5 +465,12 @@ public class PortalVisual : MonoBehaviour
         }
         mesh.vertices = vertices;
         mesh.colors = colors;
+    }
+
+    // Le maillage de la soupe est créé par script : il n'appartient à aucun asset et doit être détruit avec le portail.
+    private void OnDestroy()
+    {
+        if (mesh != null)
+            Destroy(mesh);
     }
 }
