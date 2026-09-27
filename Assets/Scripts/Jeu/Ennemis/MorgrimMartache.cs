@@ -98,8 +98,10 @@ namespace Deathless.Jeu
             float r = b.morgrimMartacheFaucheRayon;
             float demiAngle = b.morgrimMartacheFaucheAngle * 0.5f;
             if (P == null) return;
-            foreach (var h in P.TousLesHeros)
+            var tous = P.TousLesHeros;
+            for (int i = 0; i < tous.Count; i++)
             {
+                var h = tous[i];
                 if (h == null || !h.Vivant) continue;
                 Vector3 d = h.transform.position - impact; d.y = 0f;
                 if (d.magnitude > r || Vector3.Angle(transform.forward, d) > demiAngle) continue;
@@ -128,8 +130,10 @@ namespace Deathless.Jeu
             Impact(origine + dir * (b.morgrimMartacheFendSolLongueur * 0.5f) + Vector3.up * 0.05f, VfxTheme.Terre, b.morgrimMartacheFendSolLongueur * 0.5f, dir, 20f);
             AudioBank.Jouer(SonsDuJeu.GolemCoup, origine, 1f);
             if (P == null) return;
-            foreach (var h in P.TousLesHeros)
+            var tous = P.TousLesHeros;
+            for (int i = 0; i < tous.Count; i++)
             {
+                var h = tous[i];
                 if (h == null || !h.Vivant || !DansFissure(h, origine, dir)) continue;
                 float reel = h.Sante.Encaisser(new InfoDegats
                 {
@@ -163,9 +167,13 @@ namespace Deathless.Jeu
             {
                 yield return attente;
                 if (P == null) continue;
-                foreach (var h in P.TousLesHeros)
+                var tous = P.TousLesHeros;
+                for (int i = 0; i < tous.Count; i++)
+                {
+                    var h = tous[i];
                     if (h != null && h.Vivant && DansFissure(h, origine, dir))
                         h.Statuts?.Ajouter(TypeStatut.Ralenti, 1f, b.morgrimMartacheFendSolRalentiForce, OrigineStatut.Ennemi);
+                }
             }
         }
 

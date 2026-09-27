@@ -33,6 +33,8 @@ namespace Deathless.Jeu
         public bool EnCours => Etat.phase != Phase.Attente && Etat.phase != Phase.Terminee && !m_Chute;
 
         readonly Dictionary<int, Heros> m_Heros = new Dictionary<int, Heros>();
+        /// Mêmes héros que m_Heros, en liste tenue à jour (PoserHeros, RetirerHeros) : parcours par index sans allocation.
+        readonly List<Heros> m_ListeHeros = new List<Heros>();
         readonly Dictionary<int, EtatJoueur> m_Distants = new Dictionary<int, EtatJoueur>();
         public Heros HerosLocal { get; private set; }
         EtatJoueur m_Local;
@@ -154,7 +156,7 @@ namespace Deathless.Jeu
             {
                 h.Initialiser(this, j);
                 h.EcrireEtat(j);
-                m_Heros[j.id] = h;
+                PoserHeros(j.id, h);
                 HerosLocal = h;
                 if (cameraJeu != null) cameraJeu.Suivre(h.transform);
             }
@@ -222,7 +224,7 @@ namespace Deathless.Jeu
             var j = NouveauJoueur(IdJoueur(clientId), pseudo, classeId, def);
             h.DevenirDistant();
             h.Initialiser(this, j);
-            m_Heros[j.id] = h;
+            PoserHeros(j.id, h);
             m_Distants[j.id] = j;
             // L'hôte tient l'état de tous les joueurs (vote, morts, score, nombre d'ennemis).
             if (ReseauJeu.Autorite && Joueur(j.id) == null) Etat.joueurs.Add(j);
@@ -232,7 +234,7 @@ namespace Deathless.Jeu
         public void DetacherHeros(ulong clientId)
         {
             int id = IdJoueur(clientId);
-            if (m_Distants.Remove(id)) m_Heros.Remove(id);
+            if (m_Distants.Remove(id)) RetirerHeros(id);
             var j = Joueur(id);
             if (j != null && j != m_Local) Etat.joueurs.Remove(j);
         }
@@ -686,7 +688,32 @@ namespace Deathless.Jeu
         }
 
         public Heros HerosDe(int id) => m_Heros.TryGetValue(id, out var h) ? h : null;
-        public IEnumerable<Heros> TousLesHeros => m_Heros.Values;
+        /// Tous les héros (local et distants). Parcourir par index (for) aux endroits appelés à chaque image : un foreach
+        /// sur l'interface alloue son énumérateur.
+        public IReadOnlyList<Heros> TousLesHeros => m_ListeHeros;
+
+        /// Pose le héros d'un joueur (remplace l'ancien à la même place, comme le dictionnaire).
+        void PoserHeros(int id, Heros h)
+        {
+            int i = m_Heros.TryGetValue(id, out var ancien) ? IndexHeros(ancien) : -1;
+            m_Heros[id] = h;
+            if (i >= 0) m_ListeHeros[i] = h; else m_ListeHeros.Add(h);
+        }
+
+        void RetirerHeros(int id)
+        {
+            if (!m_Heros.TryGetValue(id, out var h)) return;
+            m_Heros.Remove(id);
+            int i = IndexHeros(h);
+            if (i >= 0) m_ListeHeros.RemoveAt(i);
+        }
+
+        /// Comparaison par référence : un héros détruit reste retrouvable (l'égalité Unity le confondrait avec null).
+        int IndexHeros(Heros h)
+        {
+            for (int i = 0; i < m_ListeHeros.Count; i++) if (ReferenceEquals(m_ListeHeros[i], h)) return i;
+            return -1;
+        }
 
         void MettreAJourJoueurs(float dt)
         {

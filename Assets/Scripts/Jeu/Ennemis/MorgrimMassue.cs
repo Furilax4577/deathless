@@ -140,8 +140,10 @@ namespace Deathless.Jeu
                 }
                 if (P != null)
                 {
-                    foreach (var h in P.TousLesHeros)
+                    var tous = P.TousLesHeros;
+                    for (int i = 0; i < tous.Count; i++)
                     {
+                        var h = tous[i];
                         if (h == null || !h.Vivant) continue;
                         Vector3 d = h.transform.position - transform.position; d.y = 0f;
                         if (d.magnitude > b.morgrimMassueTourbillonRayon) continue;
@@ -175,8 +177,10 @@ namespace Deathless.Jeu
                 if (Agent != null && Agent.enabled) Agent.Move(transform.forward * (b.morgrimMassueChargeVitesse * dt));
                 if (P != null)
                 {
-                    foreach (var h in P.TousLesHeros)
+                    var tous = P.TousLesHeros;
+                    for (int i = 0; i < tous.Count; i++)
                     {
+                        var h = tous[i];
                         if (h == null || !h.Vivant) continue;
                         Vector3 d = h.transform.position - transform.position; d.y = 0f;
                         if (d.magnitude > b.morgrimMassueChargeLargeur || Vector3.Angle(transform.forward, d) > 70f) continue;

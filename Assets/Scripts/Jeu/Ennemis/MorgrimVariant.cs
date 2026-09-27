@@ -16,8 +16,10 @@ namespace Deathless.Jeu
         {
             if (P == null) return 0;
             int n = 0;
-            foreach (var h in P.TousLesHeros)
+            var tous = P.TousLesHeros;
+            for (int i = 0; i < tous.Count; i++)
             {
+                var h = tous[i];
                 if (h == null || !h.Vivant) continue;
                 Vector3 d = h.transform.position - transform.position; d.y = 0f;
                 if (d.magnitude <= rayon) n++;
