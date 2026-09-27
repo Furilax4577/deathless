@@ -90,3 +90,14 @@ Le paladin court derrière son bouclier, penché en avant : les jambes courent, 
 | Charge bélier | recharge 14 s |
 | Soin | +25 % de la vie, recharge 30 s |
 - La poussée au bouclier et les valeurs chiffrées sont {à confirmer}.
+
+## Lissage du 27/09/2026 {décidé}
+
+Suite à l'audit d'équilibrage (`Docs/equilibrage-classes.md`) : le paladin est la classe la plus complète (meilleur mono de mêlée, seule mitigation, contrôle, soin, mobilité). Décidé par Quentin : il garde son rôle, on le lisse et son soin devient un soutien du groupe.
+
+- **Épée** : 30 → **27** dégâts.
+- **Soin** : recharge 30 → **20 s**, et il devient un **soin d'aura** : il soigne le paladin **et les alliés à moins de 4 m** du même montant (37,5 PV, croix et paillettes du thème Soin sur chacun).
+- **Garde** : 1 → **0,8** endurance par point de dégât bloqué.
+
+{dev} `GameBalance` (épée, soin, garde), `ClassePaladin.Soigner` (alliés dans le rayon : chez l'hôte, soin appliqué par le chemin des soins existant, `HerosReseau` : les soins reçus par un client passent déjà par le propriétaire (`Soigne`) ; il faut un RPC hôte → propriétaire pour l'aura sur les marionnettes), effet `AuraSoin` rejoué chez chaque allié soigné (`Diffuser`).
+
