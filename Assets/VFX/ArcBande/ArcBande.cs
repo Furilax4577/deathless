@@ -179,35 +179,67 @@ public class ArcBande : MonoBehaviour
         mesh.RecalculateBounds();
     }
 
+    // Flash en cours : rendus de la flèche, leurs matériaux d'origine et les copies émissives posées à leur place. Gardés
+    // ici (et non dans la coroutine seule) pour être rendus même si le flash est interrompu : composant désactivé ou
+    // détruit (la coroutine s'arrête sans finir), ou nouveau flash avant la fin du précédent.
+    private Renderer[] flashRendus;
+    private Material[][] flashOrigines;
+    private Material[][] flashCopies;
+    private static readonly int EmissionId = Shader.PropertyToID("_EmissionColor");
+
+    private void OnDisable() { FinirFlash(); }
+
+    // Rend à la flèche ses matériaux d'origine et détruit les copies émissives (sans effet si aucun flash en cours).
+    private void FinirFlash()
+    {
+        if (flashRendus == null) return;
+        for (int i = 0; i < flashRendus.Length; i++)
+        {
+            if (flashRendus[i] != null) flashRendus[i].sharedMaterials = flashOrigines[i];
+            foreach (Material m in flashCopies[i]) if (m != null) Destroy(m);
+        }
+        flashRendus = null;
+        flashOrigines = null;
+        flashCopies = null;
+    }
+
     // Brille brièvement : copie du matériau avec émission, rendue au bout de `dureeFlash`.
     private IEnumerator Flash(GameObject fleche)
     {
+        FinirFlash();   // flash précédent pas fini : la flèche reprend d'abord ses vrais matériaux
         Renderer[] rendus = fleche.GetComponentsInChildren<Renderer>();
         Material[][] origines = new Material[rendus.Length][];
         Material[][] copies = new Material[rendus.Length][];
         Color lueur = VfxPalette.Couleur(VfxTheme.Chasse, VfxRole.Coeur, new Color(0.85f, 0.7f, 0.35f));
+        flashRendus = rendus;
+        flashOrigines = origines;
+        flashCopies = copies;
         for (int i = 0; i < rendus.Length; i++)
         {
             origines[i] = rendus[i].sharedMaterials;
             copies[i] = new Material[origines[i].Length];
             for (int j = 0; j < origines[i].Length; j++)
             {
+                if (origines[i][j] == null) continue;
                 copies[i][j] = new Material(origines[i][j]);
                 copies[i][j].EnableKeyword("_EMISSION");
             }
             rendus[i].sharedMaterials = copies[i];
         }
-        for (float t = 0f; t < dureeFlash; t += Time.deltaTime)
+        try
         {
-            float k = Mathf.Sin(Mathf.PI * t / dureeFlash);
-            for (int i = 0; i < copies.Length; i++)
-                foreach (Material m in copies[i]) m.SetColor("_EmissionColor", lueur * intensiteFlash * k);
-            yield return null;
+            // S'arrête aussi si un autre flash a pris la place de celui-ci (ses copies sont alors déjà détruites).
+            for (float t = 0f; t < dureeFlash && flashCopies == copies; t += Time.deltaTime)
+            {
+                float k = Mathf.Sin(Mathf.PI * t / dureeFlash);
+                for (int i = 0; i < copies.Length; i++)
+                    foreach (Material m in copies[i]) if (m != null) m.SetColor(EmissionId, lueur * intensiteFlash * k);
+                yield return null;
+            }
         }
-        for (int i = 0; i < rendus.Length; i++)
+        finally
         {
-            if (rendus[i] != null) rendus[i].sharedMaterials = origines[i];
-            foreach (Material m in copies[i]) Destroy(m);
+            if (flashCopies == copies) FinirFlash();
         }
     }
 
