@@ -56,6 +56,7 @@ public class ForgeFeu : MonoBehaviour
     Vector3[] m_Base, m_Vit;
     Quaternion[] m_Rot;
     MaterialPropertyBlock m_Bloc;
+    Material m_BraisesCopie, m_BraisesOrigine;   // copie du matériau des braises (créée par Start, détruite par OnDestroy)
     Color m_Braise, m_Rouge, m_Orange, m_Jaune, m_Blanc, m_Lumiere;
     int m_Version = -1;
     float m_Graine;
@@ -71,12 +72,24 @@ public class ForgeFeu : MonoBehaviour
         if (braises != null)
         {
             // URP peut retirer _EMISSION de l'asset à la réimportation : on l'active sur l'instance (un seul rendu).
-            braises.material.EnableKeyword("_EMISSION");
+            // La copie est gardée pour être détruite avec le feu (sinon elle reste en mémoire).
+            m_BraisesOrigine = braises.sharedMaterial;
+            m_BraisesCopie = braises.material;
+            m_BraisesCopie.EnableKeyword("_EMISSION");
             m_Bloc = new MaterialPropertyBlock();
         }
     }
 
-    void OnDestroy() { if (m_Mesh != null) Destroy(m_Mesh); }
+    void OnDestroy()
+    {
+        if (m_Mesh != null) Destroy(m_Mesh);
+        if (m_BraisesCopie != null)
+        {
+            // Le rendu survit au composant (composant retiré seul) : il reprend son matériau d'origine.
+            if (braises != null && braises.sharedMaterial == m_BraisesCopie) braises.sharedMaterial = m_BraisesOrigine;
+            Destroy(m_BraisesCopie);
+        }
+    }
 
     static float Hash(float x) { float s = Mathf.Sin(x) * 43758.5453f; return s - Mathf.Floor(s); }
 
