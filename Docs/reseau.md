@@ -60,7 +60,8 @@ Scripts/Reseau/
   PartieReseau.cs     monde de la partie (apparu par l'hôte au lancement, détruit avec la scène) : horloge (phase, nuit,
                       temps, envoyé 5 fois par seconde), Nyxessa (PV, détruite), caisse commune, vote (prêts / joueurs),
                       scores et état de chaque joueur (NetworkList<ScoreReseau> : prêt, mort, délai, 7 compteurs),
-                      sorcier (état, position, orientation, vitesse) ; RPC : zones d'apparition, pièces d'or, bouclier
+                      sorcier (état, position, orientation, vitesse ; position 10 fois par seconde au plus,
+                      interpolée chez les clients) ; RPC : zones d'apparition, pièces d'or, bouclier
                       (levé, touché, baissé), invocation du sorcier, missiles en crâne ; vote des clients (PretRpc)
   EnnemiReseau.cs     squelette réseau : chez un client, marionnette (IA et agent coupés, PV recopiés, sortie de terre et
                       désintégration rejouées) ; coups, étourdissements, poussées et provocations relayés vers l'hôte

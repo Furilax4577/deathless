@@ -354,6 +354,12 @@ namespace Deathless.Jeu
         // ----------------------------------------------------------------- Client d'une partie réseau (l'hôte fait foi)
 
         Etat m_EtatVu = Etat.Maison;
+        /// Client : dernière position reçue de l'hôte, et départ du glissement vers elle (position, instant).
+        Vector3 m_CibleVue, m_DepartGlisse;
+        float m_TempsGlisse;
+        /// Durée du glissement vers une position reçue : un peu plus que l'intervalle d'envoi de l'hôte, pour ne pas
+        /// marquer d'arrêt si un envoi arrive en retard.
+        const float DureeGlisse = Deathless.Reseau.PartieReseau.IntervalleSorcier * 1.2f;
 
         /// Client : marionnette du sorcier de l'hôte (état, position, orientation, vitesse de marche : PartieReseau).
         void SuivreHote()
@@ -380,6 +386,7 @@ namespace Deathless.Jeu
                         ArreterBoucle();
                         if (animator != null) animator.SetBool(P_Cone, false);
                         transform.position = r.SorcierPosition.Value;
+                        m_CibleVue = m_DepartGlisse = transform.position;
                         Visible(true);
                         break;
                     case Etat.Incante:
@@ -397,7 +404,11 @@ namespace Deathless.Jeu
             }
             if (m_Etat != Etat.Maison && m_Etat != Etat.Mort)
             {
-                transform.position = Vector3.Lerp(transform.position, r.SorcierPosition.Value, 1f - Mathf.Exp(-Time.deltaTime * 12f));
+                // Position envoyée 10 fois par seconde (PartieReseau.IntervalleSorcier) : à chaque nouvelle valeur, glissement
+                // à vitesse constante de la position affichée vers elle, en DureeGlisse.
+                Vector3 cible = r.SorcierPosition.Value;
+                if (cible != m_CibleVue) { m_CibleVue = cible; m_DepartGlisse = transform.position; m_TempsGlisse = Time.time; }
+                transform.position = Vector3.Lerp(m_DepartGlisse, cible, (Time.time - m_TempsGlisse) / DureeGlisse);
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, r.SorcierLacet.Value, 0f), 1f - Mathf.Exp(-Time.deltaTime * 10f));
             }
             if (animator != null)
