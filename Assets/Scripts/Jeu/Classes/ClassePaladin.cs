@@ -154,7 +154,7 @@ namespace Deathless.Jeu
             m_Combo = 1 - m_Combo;
             H.Tourner(H.AvantCamera);
             // Pas en avant, sauf s'il y a déjà un ennemi au contact devant lui (il ne le pousse pas).
-            m_PasReste = Combat.Ennemis(transform.position, H.AvantCamera, 1.2f, 45f).Count == 0 ? B.epeePas : 0f;
+            m_PasReste = Cibles(transform.position, H.AvantCamera, 1.2f, 45f).Count == 0 ? B.epeePas : 0f;
             if (Anim != null) H.Declencher(m_Combo == 0 ? P_Attack1 : P_Attack2);
             AudioBank.Jouer(SonsDuJeu.EpeeElan, transform.position + Vector3.up, 0.7f);
             Diffuser(E_Elan);
@@ -163,7 +163,7 @@ namespace Deathless.Jeu
         void PorterCoup()
         {
             m_CoupPorte = true;
-            var cibles = Combat.Ennemis(transform.position, transform.forward, B.epeePortee, B.epeeDemiAngle);
+            var cibles = Cibles(transform.position, transform.forward, B.epeePortee, B.epeeDemiAngle);
             for (int i = 0; i < cibles.Count && i < B.epeeCiblesParCoup; i++)
             {
                 H.Frapper(cibles[i], B.epeeDegats * Facteur(0));
@@ -517,7 +517,7 @@ namespace Deathless.Jeu
             dir.y = 0f;
             m_RiposteDir = dir.sqrMagnitude > 0.01f ? dir.normalized : H.AvantCamera;
             // Pas de bond s'il y a déjà un ennemi au contact devant lui (comme le pas de l'épée).
-            m_BondReste = Combat.Ennemis(transform.position, m_RiposteDir, 0.9f, 45f).Count == 0 ? B.paradeParfaiteBond : 0f;
+            m_BondReste = Cibles(transform.position, m_RiposteDir, 0.9f, 45f).Count == 0 ? B.paradeParfaiteBond : 0f;
             m_Garde = false;
             if (Anim != null) Anim.SetBool(P_Guard, false);
             H.Tourner(m_RiposteDir);

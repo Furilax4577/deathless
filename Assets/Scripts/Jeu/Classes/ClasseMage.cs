@@ -106,7 +106,7 @@ namespace Deathless.Jeu
             AudioBank.Jouer(SonsDuJeu.BouleExplosion, point, 1f);
             int n = 0;
             if (direct != null && !direct.Mort) { Toucher(direct, b.bouleDegats * Facteur(0), point, dir); n++; }
-            foreach (var s in Combat.Ennemis(point, dir, b.bouleRayon, 180f))
+            foreach (var s in Cibles(point, dir, b.bouleRayon, 180f))
             {
                 if (s == direct) continue;
                 Toucher(s, b.bouleDegatsZone * Facteur(0), point, dir);
@@ -152,7 +152,7 @@ namespace Deathless.Jeu
                         m_TicCone = Time.time + 0.25f;
                         Vector3 o = pointeBaton != null ? pointeBaton.position : transform.position;
                         o.y = transform.position.y;
-                        foreach (var s in Combat.Ennemis(o, H.AvantCamera, b.conePortee, b.coneDemiAngle))
+                        foreach (var s in Cibles(o, H.AvantCamera, b.conePortee, b.coneDemiAngle))
                         {
                             H.Frapper(s, b.coneDegats * 0.25f, false, s.transform.position + Vector3.up, H.AvantCamera, false, true);
                             Brulure.Allumer(s, H);

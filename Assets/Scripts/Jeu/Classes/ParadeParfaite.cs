@@ -165,6 +165,8 @@ namespace Deathless.Jeu
                 + (Time.time - impact).ToString("+0.00;-0.00") + " s de l'impact de l'hôte");
         }
 
+        static readonly List<Sante> s_Cibles = new List<Sante>();   // tampon de Combat.Ennemis pour Appliquer
+
         /// Autorité : coup de bouclier du paladin `h` vers `direction`. Les ennemis dans le cône (paradeParfaitePortee,
         /// paradeParfaiteDemiAngle) et l'attaquant, s'il est proche, sont repoussés et étourdis (statut Étourdi).
         public static int Appliquer(Heros h, Vector3 direction, Squelette attaquant, string note = null)
@@ -176,7 +178,7 @@ namespace Deathless.Jeu
             direction.Normalize();
             Vector3 o = h.transform.position;
             var touches = new List<Squelette>();
-            foreach (var s in Combat.Ennemis(o, direction, b.paradeParfaitePortee, b.paradeParfaiteDemiAngle))
+            foreach (var s in Combat.Ennemis(o, direction, b.paradeParfaitePortee, b.paradeParfaiteDemiAngle, s_Cibles))
             {
                 var sq = s != null ? s.GetComponent<Squelette>() : null;
                 if (sq != null && sq.Vivant && !touches.Contains(sq)) touches.Add(sq);

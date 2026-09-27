@@ -143,7 +143,7 @@ namespace Deathless.Jeu
             m_DerniereDague = Time.time;
             m_CoupPorte = false;
             m_FurtifAuCoup = m_Furtif;
-            var cibles = Combat.Ennemis(transform.position, H.AvantCamera, B.daguePortee + 0.8f, 70f);
+            var cibles = Cibles(transform.position, H.AvantCamera, B.daguePortee + 0.8f, 70f);
             H.Tourner(cibles.Count > 0 ? cibles[0].transform.position - transform.position : H.AvantCamera);
             if (Anim != null) H.Declencher(P_Stab);
         }
@@ -152,7 +152,7 @@ namespace Deathless.Jeu
         {
             m_CoupPorte = true;
             var b = B;
-            var cibles = Combat.Ennemis(transform.position, transform.forward, b.daguePortee, b.dagueDemiAngle);
+            var cibles = Cibles(transform.position, transform.forward, b.daguePortee, b.dagueDemiAngle);
             if (cibles.Count > 0)
             {
                 var s = cibles[0];
