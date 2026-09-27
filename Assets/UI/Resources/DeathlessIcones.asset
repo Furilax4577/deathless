@@ -21,6 +21,8 @@ MonoBehaviour:
     image: {fileID: 7388822144124034973, guid: 0f1b851836a5f564590bd3e0a15b3524, type: 3}
   - id: assassin_furtif
     image: {fileID: 7388822144124034973, guid: 2e8156b248d993743b585ed687bc12a9, type: 3}
+  - id: assassin_pas_ombre
+    image: {fileID: 7388822144124034973, guid: 8adb0d7c65da3f14bb45616a5b8e245e, type: 3}
   - id: barde_accord_dissonant
     image: {fileID: 7388822144124034973, guid: f3b34c39681fd4f4b91158cda0adb2ad, type: 3}
   - id: barde_ballade_entrainante
@@ -49,6 +51,8 @@ MonoBehaviour:
     image: {fileID: 7388822144124034973, guid: a6981507af13d254a9b66715bd5e1d07, type: 3}
   - id: classe_clochard
     image: {fileID: 7388822144124034973, guid: c33aad2d0ab355c4397286929b3c7183, type: 3}
+  - id: classe_dj_bob
+    image: {fileID: 7388822144124034973, guid: 15ba127bada94274884124fef16e0ab8, type: 3}
   - id: classe_druide
     image: {fileID: 7388822144124034973, guid: b9e21ac8faa78a748a865da71b7a80a7, type: 3}
   - id: classe_mage_feu
@@ -79,6 +83,16 @@ MonoBehaviour:
     image: {fileID: 7388822144124034973, guid: 620acf40a9c0d6040a57f674168025f4, type: 3}
   - id: commun_potion_soin
     image: {fileID: 7388822144124034973, guid: 726cd297b1f252242a52b4e26bb1af57, type: 3}
+  - id: dj_bob_boule_a_facettes
+    image: {fileID: 7388822144124034973, guid: 79b5e16b50fd8e64e8c1735e374a9381, type: 3}
+  - id: dj_bob_drop
+    image: {fileID: 7388822144124034973, guid: 90cc09da86f68f84caf94c076b61392e, type: 3}
+  - id: dj_bob_jauge_tempo
+    image: {fileID: 7388822144124034973, guid: eeb39528caad97d4d904601c23a97f71, type: 3}
+  - id: dj_bob_lancer_vinyle
+    image: {fileID: 7388822144124034973, guid: 77fe40a0c809164428a9006dc408985b, type: 3}
+  - id: dj_bob_scratch
+    image: {fileID: 7388822144124034973, guid: 17c153770e57a2a4b87f1795798aa665, type: 3}
   - id: emote_acclamation
     image: {fileID: 7388822144124034973, guid: 2f5313f3f39b4094584de3006fa945a0, type: 3}
   - id: emote_assis
@@ -133,6 +147,8 @@ MonoBehaviour:
     image: {fileID: 7388822144124034973, guid: a806ef817e6239248882860f486bc9bb, type: 3}
   - id: statut_ivresse
     image: {fileID: 7388822144124034973, guid: e845a4bb5e951c74ca680deccf600bc1, type: 3}
+  - id: statut_peau_de_fer
+    image: {fileID: 7388822144124034973, guid: aa5cf1c00247e6f41b8872bd081c8174, type: 3}
   - id: statut_provoque
     image: {fileID: 7388822144124034973, guid: 2e9ffd1fe3a76ae4a85ae8f0ca165102, type: 3}
   - id: statut_ralenti

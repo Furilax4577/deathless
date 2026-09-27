@@ -124,9 +124,11 @@ namespace Deathless.Reseau
                 {
                     case TypeStatut.Ralenti: intensite = Mathf.Clamp(intensite, 0f, 0.9f); break;
                     case TypeStatut.Etourdi: case TypeStatut.Ivresse: case TypeStatut.Renverse: intensite = 1f; break;
+                    // Peau de fer (27/09/2026) : rugissement du viking, valeurs de l'hôte (réduction et durée de GameBalance).
+                    case TypeStatut.PeauDeFer: intensite = b.peauDeFerReduction; duree = b.peauDeFerDuree; break;
                     default: return s;
                 }
-                return new Statut { type = type, duree = duree, intensite = intensite, origine = origine, sourceId = 0 };
+                return new Statut { type = type, duree = duree, intensite = intensite, origine = origine, sourceId = type == TypeStatut.PeauDeFer ? joueurId : 0 };
             }
             switch (type)
             {

@@ -24,7 +24,183 @@ namespace Deathless.Jeu.Dev
                 case "assassin": s_I.StartCoroutine(s_I.Assassin()); break;
                 case "premierA": s_I.StartCoroutine(s_I.PremierA()); break;
                 case "balistique": s_I.StartCoroutine(s_I.Balistique()); break;
+                // Lissage du 27/09/2026 (Docs/equilibrage-classes.md) : une capture lissage_*.png par point.
+                case "lissage_assassin": s_I.StartCoroutine(s_I.LissageAssassin()); break;
+                case "lissage_rodeur": s_I.StartCoroutine(s_I.LissageRodeur()); break;
+                case "lissage_viking": s_I.StartCoroutine(s_I.LissageViking()); break;
+                case "lissage_paladin": s_I.StartCoroutine(s_I.LissagePaladin()); break;
+                case "lissage_squelette": s_I.StartCoroutine(s_I.LissageSquelette()); break;
             }
+        }
+
+        /// Coup « du héros local » porté sans passer par sa classe (même chemin que ScenariosVie.Frapper) : la riposte
+        /// des squelettes lit InfoDegats.sourceId.
+        static void Frapper(Squelette cible, float montant)
+        {
+            var h = H;
+            if (h == null || cible == null || cible.Sante == null) return;
+            cible.Sante.Encaisser(new InfoDegats { montant = montant, sourceId = h.Id, equipeSource = Equipe.Heros, point = cible.CentreTete, source = h.gameObject });
+        }
+
+        // ================================================================= Lissage du 27/09/2026
+
+        /// Les missiles de Nyxessa (stock de jour) achèveraient les squelettes posés pour ces essais : coupés le temps du
+        /// scénario.
+        static void Missiles(bool actifs) { var d = FindAnyObjectByType<DefenseNyxessa>(); if (d != null) d.enabled = actifs; }
+
+        /// Assassin : Pas de l'ombre vers un guerrier qui lui fait face (arrivée dans son dos), puis Exécution d'une
+        /// cible sous 30 % (achevée net, recharge du bond remise à zéro).
+        IEnumerator LissageAssassin()
+        {
+            Missiles(false);
+            DevPartie.PlacerHeros(Depart, Loin);
+            var h = H; var b = GameBalance.Courant;
+            var cible = DevPartie.PoserDevant(TypeEnnemi.Guerrier, 6f, 0f);
+            yield return Sortir(new[] { cible });
+            Figer(new[] { cible }, 30f);
+            cible.transform.rotation = Quaternion.LookRotation(h.transform.position - cible.transform.position);   // il regarde l'assassin
+            ViserPoint(cible.transform.position + Vector3.up);
+            yield return null;
+            Vector3 depart = h.transform.position;
+            EntreesSimulees.Appui("rightShoulder", 0.1f);
+            yield return new WaitForSeconds(0.1f);
+            DevPartie.Capturer("lissage_assassin_bond");
+            yield return new WaitForSeconds(0.4f);
+            h.Classe.Emplacement(3, out float restant, out float total);
+            Vector3 vers = cible.transform.position - h.transform.position; vers.y = 0f;
+            Log("assassin : bond de " + Vector3.Distance(depart, h.transform.position).ToString("F1") + " m, à " + vers.magnitude.ToString("F1") + " m de la cible, dans son dos " + Combat.DansLeDos(cible.transform, h.transform.position, b.angleDos)
+                + ", face à elle " + (Vector3.Angle(h.transform.forward, vers) < 25f) + ", furtif " + h.Classe.Furtif + ", recharge " + restant.ToString("F1") + "/" + total.ToString("F1") + " s");
+            // Exécution : guerrier ramené à 25 % de vie (coup anonyme), coup de dague.
+            cible.Sante.Encaisser(new InfoDegats { montant = cible.Sante.pvMax * 0.75f + 1f, equipeSource = Equipe.Ennemis, point = cible.CentreTete });
+            float pvAvant = cible.Sante.Pv;
+            EntreesSimulees.Appui("rightTrigger", 0.1f);
+            yield return new WaitForSeconds(0.32f);
+            DevPartie.Capturer("lissage_assassin_execution");
+            yield return new WaitForSeconds(0.3f);
+            h.Classe.Emplacement(3, out restant, out total);
+            Log("assassin : exécution sur " + pvAvant.ToString("F0") + " PV (" + Mathf.RoundToInt(pvAvant / 160f * 100f) + " %), cible morte " + (cible == null || cible.Sante.Mort) + ", recharge du bond " + restant.ToString("F1") + " s");
+            Missiles(true);
+        }
+
+        /// Rôdeur : flèche à pleine charge au corps d'un guerrier libre (Étourdi 1 s), puis nuée sur deux sbires (Ralenti).
+        IEnumerator LissageRodeur()
+        {
+            Missiles(false);
+            DevPartie.PlacerHeros(Depart, Loin);
+            var h = H;
+            var cible = DevPartie.PoserDevant(TypeEnnemi.Guerrier, 9f, 0f);
+            yield return Sortir(new[] { cible });
+            yield return new WaitForSeconds(0.2f);
+            ViserPoint(cible.transform.position + Vector3.up);
+            EntreesSimulees.Maintenir("rightTrigger", true);
+            yield return new WaitForSeconds(1.35f);   // pleine charge (1,2 s)
+            ViserPoint(cible.transform.position + cible.Agent.velocity * 0.2f + Vector3.up);
+            EntreesSimulees.Maintenir("rightTrigger", false);
+            yield return new WaitForSeconds(0.45f);
+            bool etourdi = cible != null && cible.Statuts != null && cible.Statuts.A(TypeStatut.Etourdi);
+            DevPartie.Capturer("lissage_rodeur_etourdi");
+            Log("rôdeur : flèche à pleine charge, étourdi " + etourdi + ", état " + (cible != null ? cible.EtatCourant.ToString() : "?") + ", PV " + (cible != null ? cible.Sante.Pv.ToString("F0") + "/" + cible.Sante.pvMax.ToString("F0") : "?"));
+            yield return new WaitForSeconds(1f);
+            // Nuée : deux sbires figés à 12 m, Ralenti attendu.
+            DevPartie.PlacerHeros(Depart + new Vector3(-3f, 0f, 3f), Loin + new Vector3(-3f, 0f, 3f));
+            var groupe = new List<Squelette> { DevPartie.PoserDevant(TypeEnnemi.Sbire, 12f, -1f), DevPartie.PoserDevant(TypeEnnemi.Sbire, 12f, 1f) };
+            yield return Sortir(groupe);
+            Figer(groupe, 20f);
+            ViserPoint(groupe[0].transform.position);
+            EntreesSimulees.Appui("leftShoulder", 0.1f);
+            yield return new WaitForSeconds(1.35f);
+            DevPartie.Capturer("lissage_rodeur_nuee_ralenti");
+            var s0 = groupe[0];
+            Log("rôdeur : nuée, ralenti " + (s0 != null && s0.Statuts != null && s0.Statuts.A(TypeStatut.Ralenti)) + " (" + (s0 != null && s0.Statuts != null ? Mathf.RoundToInt(s0.Statuts.Intensite(TypeStatut.Ralenti) * 100f) : 0) + " %), PV " + (s0 != null ? s0.Sante.Pv.ToString("F0") : "?"));
+            Missiles(true);
+        }
+
+        /// Viking : rage de départ (plancher 30), rugissement en marchant (couche haute) qui pose Peau de fer, coup reçu
+        /// réduit de 35 %, puis remontée de la rage vers le plancher.
+        IEnumerator LissageViking()
+        {
+            Missiles(false);
+            DevPartie.PlacerHeros(Depart, Loin);
+            var h = H;
+            var loin = new List<Squelette> { DevPartie.PoserDevant(TypeEnnemi.Guerrier, 8f, -2f), DevPartie.PoserDevant(TypeEnnemi.Guerrier, 8f, 2f) };
+            yield return Sortir(loin);
+            Figer(loin, 20f);
+            Log("viking : rage avant le rugissement " + h.Classe.ValeurJauge.ToString("F0"));
+            Vector3 p0 = h.transform.position;
+            EntreesSimulees.Stick(new Vector2(0f, 1f), Vector2.zero, 1.6f);
+            yield return new WaitForSeconds(0.1f);
+            EntreesSimulees.Appui("leftShoulder", 0.1f);
+            yield return new WaitForSeconds(1.15f);   // le cri (1,02 s) est passé : statut posé
+            DevPartie.Capturer("lissage_viking_peau_de_fer");
+            float pv = h.Sante.Pv;
+            DevPartie.Blesser(20f);
+            yield return new WaitForSeconds(0.2f);
+            Log("viking : rugissement en marchant (déplacé de " + Vector3.Distance(p0, h.transform.position).ToString("F1") + " m), Peau de fer " + (h.Statuts != null && h.Statuts.A(TypeStatut.PeauDeFer)) + " (−" + Mathf.RoundToInt((h.Statuts != null ? h.Statuts.Intensite(TypeStatut.PeauDeFer) : 0f) * 100f) + " %), 20 dégâts → " + (pv - h.Sante.Pv).ToString("F1") + " subis, rage " + h.Classe.ValeurJauge.ToString("F0"));
+            yield return new WaitForSeconds(7f);
+            Log("viking : 7 s plus tard, rage " + h.Classe.ValeurJauge.ToString("F0") + " (plancher " + GameBalance.Courant.rageMin + "), Peau de fer " + (h.Statuts != null && h.Statuts.A(TypeStatut.PeauDeFer)));
+            Missiles(true);
+        }
+
+        /// Paladin : soin d'aura sur lui et sur un allié factice (héros mage attaché comme marionnette) à 2 m, blessés.
+        IEnumerator LissagePaladin()
+        {
+            DevPartie.PlacerHeros(Depart, Loin);
+            var h = H; var p = Partie.Instance;
+            var def = ClassesJeu.Courant != null ? ClassesJeu.Courant.Trouver("mage") : null;
+            Heros allie = null;
+            if (def != null && def.prefab != null)
+            {
+                var go = Instantiate(def.prefab, h.transform.position + h.transform.right * 2f + h.transform.forward * 1f, Quaternion.LookRotation(-h.transform.right));
+                go.name = "Heros_allie_test";
+                allie = go.GetComponent<Heros>();
+                p.AttacherHerosDistant(allie, "mage", "Allié", 7);
+                allie.Sante.Encaisser(new InfoDegats { montant = 50f, equipeSource = Equipe.Ennemis, point = allie.transform.position + Vector3.up });
+            }
+            DevPartie.Blesser(60f);
+            yield return new WaitForSeconds(0.3f);
+            float pvP = h.Sante.Pv, pvA = allie != null ? allie.Sante.Pv : 0f;
+            float soins = p.JoueurLocal != null ? p.JoueurLocal.score.soinsProdigues : 0f;
+            EntreesSimulees.Appui("rightShoulder", 0.1f);
+            yield return new WaitForSeconds(0.95f);
+            DevPartie.Capturer("lissage_paladin_aura");
+            yield return new WaitForSeconds(0.3f);
+            Log("paladin : soin d'aura, lui " + pvP.ToString("F0") + " → " + h.Sante.Pv.ToString("F0") + ", allié à 2 m " + pvA.ToString("F0") + " → " + (allie != null ? allie.Sante.Pv.ToString("F0") : "?") + ", soins prodigués +" + ((p.JoueurLocal != null ? p.JoueurLocal.score.soinsProdigues : 0f) - soins).ToString("F0"));
+            yield return new WaitForSeconds(1.5f);
+            if (allie != null) { p.DetacherHeros(7); Destroy(allie.gameObject); }
+        }
+
+        /// Squelette au contact de Nyxessa, frappé deux fois de suite par le héros à moins de 3 m : il se retourne vers lui
+        /// (poursuite bornée), puis revient à Nyxessa.
+        IEnumerator LissageSquelette()
+        {
+            Missiles(false);
+            var p = Partie.Instance; var h = H; var b = GameBalance.Courant;
+            Vector3 nyx = p.nyxessa.transform.position;
+            Vector3 dir = Depart - nyx; dir.y = 0f; dir.Normalize();
+            DevPartie.PlacerHeros(nyx + dir * 5.4f, nyx);
+            var sq = DevPartie.PoserDevant(TypeEnnemi.Sbire, 3f, 0f);
+            yield return Sortir(new[] { sq });
+            // Il marche vers sa place et frappe Nyxessa (préparation lisible).
+            float t = 0f;
+            while (t < 4f && sq != null && !sq.SurNyxessa) { t += Time.deltaTime; yield return null; }
+            // Le héros se rapproche à moins de 3 m et frappe deux fois (coups anonymes de classe : même chemin que la dague).
+            // De côté (pas dans l'axe du pilier de Nyxessa) pour que la caméra voie le squelette se retourner.
+            Vector3 derriere = sq.transform.position + dir * 1.3f + Vector3.Cross(Vector3.up, dir) * 1.5f;
+            DevPartie.PlacerHeros(derriere, sq.transform.position);
+            if (p.cameraJeu != null) p.cameraJeu.lacet = h.transform.eulerAngles.y + 75f;   // vue de trois quarts : le squelette n'est pas caché par le héros
+            Log("squelette : au contact de Nyxessa " + sq.SurNyxessa + " (à " + Vector3.Distance(sq.transform.position, nyx).ToString("F1") + " m d'elle), héros à " + Vector3.Distance(h.transform.position, sq.transform.position).ToString("F1") + " m");
+            Frapper(sq, 5f);
+            yield return new WaitForSeconds(0.4f);
+            Frapper(sq, 5f);
+            yield return new WaitForSeconds(1.0f);
+            Vector3 vers = h.transform.position - sq.transform.position; vers.y = 0f;
+            DevPartie.Capturer("lissage_squelette_riposte");
+            Log("squelette : après deux coups, riposte " + sq.EnRiposte + ", état " + sq.EtatCourant + ", tourné vers le héros " + (Vector3.Angle(sq.transform.forward, vers) < 45f) + " (" + Vector3.Angle(sq.transform.forward, vers).ToString("F0") + "°)");
+            yield return new WaitForSeconds(4f);
+            Log("squelette : 4 s plus tard, riposte " + sq.EnRiposte + ", état " + sq.EtatCourant + ", sur Nyxessa " + sq.SurNyxessa + ", à " + Vector3.Distance(sq.transform.position, nyx).ToString("F1") + " m d'elle");
+            yield return new WaitForSeconds(0.5f);
+            if (sq != null) sq.Desintegrer(true);
+            Missiles(true);
         }
 
         static Heros H => Partie.Instance != null ? Partie.Instance.HerosLocal : null;

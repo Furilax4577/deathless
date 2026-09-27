@@ -50,6 +50,7 @@ Python 3, bibliothèque standard seulement. Le script réécrit tous les SVG et 
 | `assassin_dague` | Dague | RT |
 | `assassin_arbalete` | Arbalète | LT |
 | `assassin_fumigene` | Grenade fumigène | LB |
+| `assassin_pas_ombre` | Pas de l'ombre (27/09/2026) | RB |
 | `assassin_furtif` | Mode furtif (indicateur) | aucun |
 | `viking_hache` | Hache | RT |
 | `viking_attaque_tournante` | Attaque tournante | LT |

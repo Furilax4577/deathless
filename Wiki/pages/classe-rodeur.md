@@ -71,9 +71,10 @@ Les gestes joués en jeu pour chaque action, dans l'ordre où ils s'enchaînent.
 
 | Sujet | Valeur |
 |---|---|
-| Vie | 110 |
-| Nuée de flèches | 5 salves de 10 dégâts, recharge 12 s |
-| Roulade arrière | recul de 4 m, 20 d'endurance, salve de 5 flèches de 15 dégâts, recharge 8 s |
+| Vie | 120 (110 avant le 27/09/2026) |
+| Arc | 10 dégâts sans charge, 50 chargé à fond (40 avant le 27/09/2026) ; tir rapide toutes les 0,15 s ; pleine charge → Étourdi 1 s |
+| Nuée de flèches | 5 salves de 14 dégâts (10 avant le 27/09/2026), recharge 12 s ; la zone ralentit de 40 % qui y reste |
+| Roulade arrière | recul de 4 m, 20 d'endurance, salve de 5 flèches de 18 dégâts (15 avant le 27/09/2026), recharge 8 s |
 
 ## Lissage du 27/09/2026 {décidé}
 
@@ -86,4 +87,6 @@ Suite à l'audit d'équilibrage (`Docs/equilibrage-classes.md`) : le rôdeur ava
 - **Vie** : 110 → **120**.
 
 {dev} `GameBalance` (arc, nuée, salve, PV), `ClasseRodeur` (étourdissement à pleine charge, ralenti de la nuée par le chemin des statuts, hôte fait foi) ; rien de nouveau en réseau.
+
+{{dev: Fait le 27/09/2026. Étourdi : `Squelette.Etourdir(arcEtourdiPleineCharge, joueur)` à l'impact d'une flèche tirée à `charge ≥ 0,999` (relais `EtourdirRpc` depuis un client ; ×0,5 sur Morgrim par `FacteurEtourdissement`). Ralenti : dans `ClasseRodeur.Pluie`, une salve sur deux (toutes les 0,48 s, 5 salves sur 1,2 s), `Statuts.Ajouter(Ralenti, nueeRalentiDuree 1 s, nueeRalentiForce 0,4)` sur chaque ennemi dans le rayon, règle Prolonger : tant qu'il reste dans la zone, il reste ralenti (demande relayée à l'hôte depuis un client, `StatutsReseau.Valider` accepte déjà Ralenti).}}
 

@@ -81,6 +81,9 @@ namespace Deathless.Jeu
             if (info.sourceId != IdLocal || info.equipeSource != Equipe.Heros) return;   // pas mon coup
             var type = info.critique ? TypeChiffreDegat.Critique : info.continu ? TypeChiffreDegat.Brulure : TypeChiffreDegat.Normal;
             Emettre(new EvenementDegat { Point = info.point, Montant = reel, Type = type, Continu = info.continu, CleCible = s.GetInstanceID() });
+            // Exécution de l'assassin (27/09/2026) : le mot « Exécuté », même style que « Paré », au-dessus du chiffre.
+            if (info.execution)
+                Emettre(new EvenementDegat { Point = info.point + Vector3.up * 0.45f, Mot = "Exécuté", Type = TypeChiffreDegat.Mot, CleCible = s.GetInstanceID() });
         }
 
         void OnAnyIntercepte(Sante s, InfoDegats info, Interception r)

@@ -194,6 +194,18 @@ Résultats de l'étape 2 (25/09/2026, hôte Paladin, client Mage, adresse IP) : 
 - **Gardiens** : ils sont posés par l'hôte avec `DirecteurVagues.Poser` puis `Squelette.Garder(poste)`, et répliqués comme les autres squelettes.
 - **Local à chaque poste** : le masquage des étages (capteurs sur le héros local et sa caméra), l'ambiance sombre et l'animation des coffres (couvercle ; plus de cadenas depuis le 26/09/2026).
 
+## Lissage des classes (27/09/2026)
+
+Décisions du wiki (`classe-*.md`, `statuts.md`, `ennemis.md`) reportées dans le code le 27/09/2026 ; ce qui touche au réseau :
+
+- **Peau de fer** (rugissement du viking) : statut sur son propre héros, chemin existant (`HerosReseau.StatutRpc`, prédit puis confirmé) ; `StatutsReseau.Valider` accepte `PeauDeFer` avec les valeurs de l'hôte (`peauDeFerReduction`, `peauDeFerDuree`). L'effet (−35 % sur les coups ennemis) est dans `Sante.absorbeur` du héros, donc là où le coup est appliqué : chez le propriétaire.
+- **Soin d'aura** (paladin) : nouveau RPC hôte → propriétaire `HerosReseau.Soigner(montant, soigneurId)` → `SoignerRpc` (`SendTo.Owner`, même chemin que `Renverser`), qui appelle `Sante.Soigner` chez le vrai propriétaire sans que celui-ci le compte dans ses propres soins (`m_SoinExterne`) ; l'hôte crédite le paladin d'une estimation sur la vie répliquée (`Partie.CompterSoins`). Un client paladin demande l'aura à l'hôte (`DemanderSoinAura` → `SoinAuraRpc`, `SendTo.Server`, montant borné au rang 3 de « Soin fervent ») ; l'hôte juge le rayon de 4 m sur les positions qu'il voit (`ClassePaladin.SoignerAllies`). Le visuel sur chaque allié est joué par chaque poste d'après ses propres positions (effet 6 du paladin, `E_Aura`, déjà diffusé).
+- **Exécution** (assassin) : `InfoDegats.execution` voyage dans `EnnemiReseau.FrapperRpc` ; l'hôte revérifie le seuil (`Squelette.Executable`, 30 % de sa vie) et achève net l'ennemi commun (montant relevé à sa vie), ou garde le ×3 du client sur un élite ou un boss. Le mot « Exécuté » chez le client vient de l'estimation locale (`AnyTouche` sur la branche relais). Pas de nouveau message.
+- **Pas de l'ombre** (assassin) : bond du propriétaire, comme l'esquive ; effet 4 (`E_PasOmbre` : départ, arrivée, durée) et effet 5 (`E_Execution`) rejoués par `ClasseHeros.Diffuser` ; le geste passe par le `NetworkAnimator` (déclencheur `PasOmbre`).
+- **Étourdi de la flèche à pleine charge et Ralenti de la nuée** (rôdeur) : chemins existants (`EtourdirRpc`, relais de `Statuts.Ajouter` validé par `StatutsReseau.Valider`).
+- **Riposte au contact de Nyxessa** : IA de l'hôte seulement (`Squelette.CompterRiposte`), rien de nouveau.
+- Chemins client (aura demandée par un client, exécution relayée) : compilés et relus, pas encore essayés à deux postes.
+
 ## Limites connues
 
 - Pose de l'arc des autres rôdeurs (flèche encochée, corde tendue) et cercle de charge : visibles seulement par le tireur.

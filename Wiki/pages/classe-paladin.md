@@ -20,7 +20,7 @@ Le rempart du village. Il tient la ligne au bouclier, charge pour ouvrir un pass
 | {icone paladin_epee} | RT | Épée |
 | {icone paladin_garde} | LT | Garde, et parade au bon moment |
 | {icone paladin_charge_belier} | LB | Charge bélier |
-| {icone paladin_soin} | RB | Soin sur soi |
+| {icone paladin_soin} | RB | Soin d'aura (lui et les alliés à moins de 4 m ; « soin sur soi » avant le 27/09/2026) |
 Répartition de la charge et du soin sur LB et RB : celle de la version 0.1 {à confirmer}.
 
 Actions communes à toutes les classes : voir [Classes](classes.md#actions-communes).
@@ -83,12 +83,12 @@ Le paladin court derrière son bouclier, penché en avant : les jambes courent, 
 | Endurance | 100, +15 par seconde après 1 s sans effort |
 | Vitesse | 5 m/s, sprint ×1,6 ; ×0,7 en garde ; ×0,4 pendant l'attaque |
 | Esquive | 4 m, 25 d'endurance, invulnérable 0,3 s |
-| Épée | 30 dégâts toutes les 0,75 s, portée 2,6 m, 40° de part et d'autre de l'avant (hache du Viking : 70°), 3 ennemis au plus par coup, pas en avant de 0,6 m |
-| Garde | 1 d'endurance par point de dégât bloqué ; protège seulement devant, 70° de part et d'autre de l'avant ; pas de garde à 0 d'endurance ; si l'endurance manque, la garde est brisée : endurance vidée, le coup passe, paladin étourdi 0,8 s {{dev: (`gardeCoutParDegat`, `gardeDemiAngle`, `gardeBriseeEtourdi`)}} |
+| Épée | 27 dégâts toutes les 0,75 s (30 avant le 27/09/2026), portée 2,6 m, 40° de part et d'autre de l'avant (hache du Viking : 70°), 3 ennemis au plus par coup, pas en avant de 0,6 m |
+| Garde | 0,8 d'endurance par point de dégât bloqué (1 avant le 27/09/2026) ; protège seulement devant, 70° de part et d'autre de l'avant ; pas de garde à 0 d'endurance ; si l'endurance manque, la garde est brisée : endurance vidée, le coup passe, paladin étourdi 0,8 s {{dev: (`gardeCoutParDegat`, `gardeDemiAngle`, `gardeBriseeEtourdi`)}} |
 | Parade | fenêtre de 0,35 s, l'attaquant est étourdi 1 s |
 | Parade parfaite | fenêtre de 0,1 s avant l'impact ; coup de bouclier : bond de 0,7 m, cône de 2,5 m et 60°, repousse de 2 m, étourdit 0,8 s |
 | Charge bélier | recharge 14 s |
-| Soin | +25 % de la vie, recharge 30 s |
+| Soin d'aura | +25 % de la vie du paladin (37,5 PV) pour lui et pour chaque allié vivant à moins de 4 m, recharge 20 s (30 s et sur lui seul avant le 27/09/2026) |
 - La poussée au bouclier et les valeurs chiffrées sont {à confirmer}.
 
 ## Lissage du 27/09/2026 {décidé}
@@ -100,4 +100,6 @@ Suite à l'audit d'équilibrage (`Docs/equilibrage-classes.md`) : le paladin est
 - **Garde** : 1 → **0,8** endurance par point de dégât bloqué.
 
 {dev} `GameBalance` (épée, soin, garde), `ClassePaladin.Soigner` (alliés dans le rayon : chez l'hôte, soin appliqué par le chemin des soins existant, `HerosReseau` : les soins reçus par un client passent déjà par le propriétaire (`Soigne`) ; il faut un RPC hôte → propriétaire pour l'aura sur les marionnettes), effet `AuraSoin` rejoué chez chaque allié soigné (`Diffuser`).
+
+{{dev: Fait le 27/09/2026 (`ClassePaladin.DonnerSoin` / `SoignerAllies`, `GameBalance.soinRayonAura`). Montant : `pvMax du paladin × soinPart × rang de « Soin fervent »`, le même pour chaque allié (pas sa propre vie max). Autorité (solo, hôte) : parcours de `Partie.TousLesHeros`, `Sante.Soigner(montant, soigneurId)` sur un héros local, `HerosReseau.Soigner` (RPC hôte → propriétaire, comme `Renverser`) sur une marionnette. Client paladin : `HerosReseau.DemanderSoinAura` (RPC propriétaire → hôte, montant borné), l'hôte juge le rayon sur les positions qu'il voit. « Soins prodigués » : crédités au **paladin** (`Sante.DernierSoigneur`, `Heros` ; chez l'hôte, estimation sur la vie répliquée pour un allié client, dont le propre compteur ne compte pas ce soin). Visuel : une copie du prefab `AuraSoin` jouée sous chaque allié à portée, sur tous les postes d'après leurs propres positions (`JouerAuraAllies`, aussi dans `EffetDistant(E_Aura)`).}}
 

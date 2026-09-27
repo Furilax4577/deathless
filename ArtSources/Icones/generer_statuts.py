@@ -11,7 +11,9 @@ bienfait) et la jauge de durée. Formes larges et peu nombreuses : lisibles à 2
 - statut_etourdi : trois étoiles d'or sur leur orbite, comme l'indicateur du jeu (Sacré) ;
 - statut_ivresse : chope de bois cerclée de fer qui penche, mousse et bulles de bière (Terre, Fer de Rage, Os, Critique) ;
 - statut_provoque : veine de colère, quatre crochets rouges (Rage) ;
-- statut_renverse : silhouette couchée en os, flèche de bascule qui retombe (Rage) — Renversé, 26/09/2026.
+- statut_renverse : silhouette couchée en os, flèche de bascule qui retombe (Rage) — Renversé, 26/09/2026 ;
+- statut_peau_de_fer : plastron de fer à trois plaques rivetées d'ivoire (Fer de Rage, Ivoire) — bienfait du rugissement
+  du viking, 27/09/2026.
 
 Relançable : `python generer_statuts.py` (écrit Statuts/*.svg ; `--png dossier` ajoute des aperçus PNG à 128, 48 et
 24 px). Les SVG sont copiés dans Assets/UI/Icones/Statuts/ par Deathless > UI > 6. Table des icônes (IconesUIOutil).
@@ -127,7 +129,22 @@ def statut_renverse():
     return ic
 
 
-STATUTS = [statut_brulure, statut_ralenti, statut_etourdi, statut_ivresse, statut_provoque, statut_renverse]
+def statut_peau_de_fer():
+    ic = g.Icone("statut_peau_de_fer", "statuts", "Peau de fer", "Statut : dégâts subis réduits (rugissement du viking) ; "
+        "un bienfait, liseré or.")
+    # Plastron : plaque large en fer, table claire, épaulières et une plaque basse plus étroite.
+    plastron = [(28, 24), (100, 24), (114, 44), (110, 84), (64, 116), (18, 84), (14, 44)]
+    ic.gemme(plastron, FER, table=0.55, teinte_table=g.c("Rage", "Fer"), decalage=0.06)
+    # Trois bandes horizontales de fer sombre : les plaques.
+    for y in (52, 76):
+        ic.bande([(24, y), (104, y)], 6, [g.c("Rage", "Fer sombre"), g.c("Rage", "Fer sombre")])
+    # Rivets d'ivoire aux coins et au centre.
+    for (x, y) in ((34, 40), (94, 40), (34, 64), (94, 64), (64, 92)):
+        ic.gemme(g.regulier((x, y), 6, 6, -90), g.IVOIRE, table=0.4, teinte_table=g.c("Rage", "Ivoire clair"))
+    return ic
+
+
+STATUTS = [statut_brulure, statut_ralenti, statut_etourdi, statut_ivresse, statut_provoque, statut_renverse, statut_peau_de_fer]
 
 
 def main():

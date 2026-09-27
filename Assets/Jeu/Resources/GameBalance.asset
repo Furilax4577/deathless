@@ -96,6 +96,10 @@ MonoBehaviour:
   rayonPlacesNyxessa: 2.4
   vitesseSortieDeTerre: 1.5
   echellePersonnages: 0.8
+  riposteCoups: 2
+  riposteDistance: 3
+  riposteDuree: 3
+  riposteAttaques: 2
   golemPV: 1500
   golemVitesse: 2
   golemDegatsJoueur: 45
@@ -108,18 +112,21 @@ MonoBehaviour:
   morgrimMassueFracasRayon: 3.5
   morgrimMassueFracasDegats: 45
   morgrimMassueFracasDegatsNyxessa: 60
-  morgrimMassueFracasEtourdi: 1.2
+  morgrimMassueFracasOndeVitesse: 6
+  morgrimMassueFracasOndeRayonMax: 14
+  morgrimMassueFracasOndeLargeurBande: 1.4
   morgrimMassueFracasPreparation: 1.6
   morgrimMassueTourbillonRayon: 3
   morgrimMassueTourbillonDegatsParSeconde: 18
   morgrimMassueTourbillonDuree: 1.8
   morgrimMassueTourbillonPreparation: 1
   morgrimMassueTourbillonRecharge: 10
+  morgrimMassueTourbillonRecul: 3
+  morgrimMassueTourbillonReculIntervalle: 0.3
   morgrimMassueChargeDistance: 8
   morgrimMassueChargeVitesse: 9
   morgrimMassueChargeLargeur: 1.6
   morgrimMassueChargeDegats: 50
-  morgrimMassueChargeEtourdi: 1.5
   morgrimMassueChargePreparation: 1.4
   morgrimMassueChargeRecharge: 12
   morgrimMartacheFaucheRayon: 3.2
@@ -134,6 +141,7 @@ MonoBehaviour:
   morgrimMartacheFendSolRalentiForce: 0.4
   morgrimMartacheFendSolPreparation: 1.5
   morgrimMartacheFendSolRecharge: 9
+  morgrimMartacheFendSolFissureDuree: 4
   morgrimMartacheBrecheDegats: 70
   morgrimMartacheBrecheMultiplicateurBouclier: 2
   morgrimMartacheBrechePreparation: 1.2
@@ -249,7 +257,7 @@ MonoBehaviour:
   esquiveCout: 25
   esquiveInvulnerable: 0.3
   esquiveRecharge: 1.2
-  epeeDegats: 30
+  epeeDegats: 27
   epeeIntervalle: 0.75
   epeePortee: 2.6
   epeeDemiAngle: 40
@@ -261,10 +269,24 @@ MonoBehaviour:
   epeeVitesse: 0.4
   gardeDemiAngle: 70
   gardeVitesse: 0.7
-  gardeCoutParDegat: 1
+  gardeCoutParDegat: 0.8
   gardeBriseeEtourdi: 0.8
   paradeFenetre: 0.35
   paradeEtourdi: 1
+  paradeParfaiteFenetre: 0.1
+  paradeParfaiteGrace: 0.05
+  paradeJaugeDuree: 0.8
+  paradeParfaiteBond: 0.7
+  paradeParfaiteBondDuree: 0.14
+  paradeParfaiteInstant: 0.12
+  paradeParfaiteDuree: 0.45
+  paradeParfaitePortee: 2.5
+  paradeParfaiteDemiAngle: 60
+  paradeParfaiteRepousse: 2
+  paradeParfaiteEtourdi: 0.8
+  paradeParfaiteToleranceReseau: 0.3
+  paradeParfaiteSecousse: 0.06
+  paradeParfaiteSecousseDuree: 0.18
   chargeDistance: 7
   chargeDuree: 0.5
   chargeAnticipation: 0.18
@@ -280,7 +302,8 @@ MonoBehaviour:
   chargeCadenceMax: 8
   soinPart: 0.25
   soinIncantation: 0.6
-  soinRecharge: 30
+  soinRecharge: 20
+  soinRayonAura: 4
   magePV: 100
   mageVitesse: 5
   bouleDegats: 25
@@ -303,28 +326,31 @@ MonoBehaviour:
   projectileGravite: 9.81
   aideChuteMax: 3
   projectileVolMax: 200
-  rodeurPV: 110
+  rodeurPV: 120
   rodeurVitesse: 5
   arcCharge: 1.2
   arcDegatsMin: 10
-  arcDegatsMax: 40
+  arcDegatsMax: 50
   arcTete: 2
+  arcEtourdiPleineCharge: 1
   arcVitesseMin: 18
   arcVitesseMax: 55
   arcPortee: 60
-  arcIntervalle: 0.3
+  arcIntervalle: 0.15
   arcVitesseBander: 0.5
   viseeVitesse: 0.6
   nueeRayon: 3
   nueeSalves: 5
-  nueeDegatsSalve: 10
+  nueeDegatsSalve: 14
   nueePortee: 25
   nueeRecharge: 12
+  nueeRalentiForce: 0.4
+  nueeRalentiDuree: 1
   rouladeDistance: 4
   rouladeCout: 20
   salveFleches: 5
   salveEcart: 20
-  salveDegats: 15
+  salveDegats: 18
   salveVitesse: 35
   rouladeRecharge: 8
   assassinPV: 100
@@ -351,6 +377,13 @@ MonoBehaviour:
   grenadeRecharge: 20
   grenadeNuage: 5
   grenadePortee: 8
+  pasOmbreDistance: 7
+  pasOmbreDuree: 0.15
+  pasOmbreArret: 1
+  pasOmbrePorteeCible: 9
+  pasOmbreRecharge: 6
+  executionSeuil: 0.3
+  executionElite: 3
   vikingPV: 140
   vikingVitesse: 5
   hacheDegats: 38
@@ -359,21 +392,24 @@ MonoBehaviour:
   hacheDemiAngle: 70
   hacheInstant: 0.55
   rageMax: 100
+  rageMin: 30
   rageParTouche: 8
   rageBaisse: 6
   rageDelaiBaisse: 4
   tournanteRage: 20
   tournanteRageMin: 15
-  tournanteRageParTic: 2
   tournanteIntervalle: 0.3
+  tournanteRageParTic: 2
   tournanteRayon: 2.3
-  tournanteDegats: 12
+  tournanteDegats: 10
   tournanteVitesse: 0.6
-  rugissementRage: 25
+  rugissementRage: 15
   rugissementRecharge: 12
   rugissementRayon: 10
   rugissementProvocation: 5
-  sautRage: 35
+  peauDeFerReduction: 0.35
+  peauDeFerDuree: 6
+  sautRage: 25
   sautRecharge: 8
   sautDistance: 5
   sautRayon: 3.5
@@ -384,6 +420,14 @@ MonoBehaviour:
   chuteDegatsMax: 80
   chuteRalentiDuree: 3
   chuteRalentiForce: 0.4
+  chuteRenverseSeuil: 7
+  renverseChuteDuree: 0.8
+  renverseAuSolDuree: 0.4
+  renverseReleveDuree: 2.33
+  renverseReleveVitesse: 1.5
+  renverseMartelementReduction: 0.08
+  renverseMartelementIntervalleMaintenir: 0.15
+  renverseMartelementPlafond: 0.5
   reapparitionBase: 8
   reapparitionParMort: 4
   reapparitionInvulnerable: 2

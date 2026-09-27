@@ -55,6 +55,12 @@ namespace Deathless.Jeu
                 type = TypeStatut.Renverse, id = "renverse", nom = "Renversé", icone = "statut_renverse", regle = RegleCumul.Remplacer,
                 effet = s => "Tombe à la renverse puis se relève, sans contrôle. Marteler Saut accélère le relevé (jusqu’à moitié moins).",
             },
+            new DefinitionStatut
+            {
+                type = TypeStatut.PeauDeFer, id = "peau_de_fer", nom = "Peau de fer", icone = "statut_peau_de_fer", regle = RegleCumul.Prolonger,
+                nefaste = false,
+                effet = s => "Dégâts subis réduits de " + Mathf.RoundToInt(s.intensite * 100f) + " % (rugissement).",
+            },
         };
 
         public static DefinitionStatut De(TypeStatut type)

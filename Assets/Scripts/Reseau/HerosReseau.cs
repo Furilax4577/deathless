@@ -98,7 +98,44 @@ namespace Deathless.Reseau
             if (Partie.Instance != null) Partie.Instance.DetacherHeros(OwnerClientId);
         }
 
-        void OnSoigne(float reel) { if (reel > 0f) m_Soins.Value += reel; }
+        /// Soin reçu d'un autre joueur (aura du paladin) : l'hôte l'a déjà crédité au soigneur, il ne compte pas ici.
+        bool m_SoinExterne;
+
+        void OnSoigne(float reel) { if (reel > 0f && !m_SoinExterne) m_Soins.Value += reel; }
+
+        // ----------------------------------------------------------------- Soin d'aura du paladin (27/09/2026)
+
+        /// Hôte : le paladin `soigneurId` soigne cette marionnette de `montant` ; son propriétaire l'applique (RPC hôte →
+        /// propriétaire, même chemin que Renverser). Le soigneur est crédité ici, sur la vie répliquée (estimation).
+        public void Soigner(float montant, int soigneurId)
+        {
+            if (!IsSpawned || !IsServer || Heros == null || Heros.Sante == null || Heros.Sante.Mort) return;
+            float estime = Mathf.Clamp(montant, 0f, Mathf.Max(0f, Heros.Sante.pvMax - Heros.Sante.Pv));
+            if (estime > 0f && Partie.Instance != null) Partie.Instance.CompterSoins(soigneurId, estime);
+            SoignerRpc(montant, soigneurId);
+        }
+
+        [Rpc(SendTo.Owner)]
+        void SoignerRpc(float montant, int soigneurId)
+        {
+            if (Heros == null || Heros.Sante == null) return;
+            m_SoinExterne = true;
+            Heros.Sante.Soigner(montant, soigneurId);
+            m_SoinExterne = false;
+        }
+
+        /// Propriétaire (client paladin) : demande à l'hôte de soigner les alliés autour de sa marionnette
+        /// (ClassePaladin.SoignerAllies chez l'hôte, montant borné à ce que la classe peut donner).
+        public void DemanderSoinAura(float montant) => SoinAuraRpc(montant);
+
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
+        void SoinAuraRpc(float montant)
+        {
+            if (Heros == null || !(Heros.Classe is ClassePaladin) || !Heros.Vivant) return;
+            var b = GameBalance.Courant;
+            montant = Mathf.Clamp(montant, 0f, Heros.Sante.pvMax * b.soinPart * 1.6f + 1f);   // rang 3 de « Soin fervent » au plus
+            ClassePaladin.SoignerAllies(Heros, montant);
+        }
 
         void OnSoinsChange(float avant, float apres)
         {

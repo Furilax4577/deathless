@@ -201,10 +201,14 @@ namespace Deathless.Jeu
             Sante.Initialiser(Classe != null ? Classe.PvMax : B.herosPV);
             Sante.invulnerable = B.joueurInvincible;
             Sante.intercepteur = Intercepter;
+            // Peau de fer (rugissement du viking, 27/09/2026) : part des coups ennemis retirée, lue sur le statut du héros
+            // (posé chez son propriétaire, prédit puis confirmé par l'hôte : le coup est appliqué là aussi).
+            Sante.absorbeur = Absorber;
             Sante.Touche += OnTouche;
             Sante.Intercepte += (i, r) => { if (Classe != null) Classe.SurIntercepte(i, r); };
             Sante.Tue += OnTue;
-            Sante.Soigne += reel => { if (Partie != null) Partie.CompterSoins(Id, reel); };
+            // Soins prodigués : au soigneur s'il y en a un (soin d'aura du paladin), sinon à soi (soin sur soi, potion).
+            Sante.Soigne += reel => { if (Partie != null) Partie.CompterSoins(Sante.DernierSoigneur > 0 ? Sante.DernierSoigneur : Id, reel); };
             m_Endurance = B.endurance;
             if (!Distant) Entrees.Action += OnAction;
         }
@@ -349,13 +353,13 @@ namespace Deathless.Jeu
         }
 
         /// Applique un coup du héros : dégâts, score, retour à la classe (rage, mana). Renvoie les dégâts réels.
-        public float Frapper(Sante s, float degats, bool critique, Vector3 point, Vector3 direction, bool parBoule = false, bool continu = false)
+        public float Frapper(Sante s, float degats, bool critique, Vector3 point, Vector3 direction, bool parBoule = false, bool continu = false, bool execution = false)
         {
             if (s == null || s.Mort) return 0f;
             float reel = s.Encaisser(new InfoDegats
             {
                 montant = degats, sourceId = Id, equipeSource = Equipe.Heros, source = gameObject, critique = critique,
-                point = point, direction = direction, continu = continu
+                point = point, direction = direction, continu = continu, execution = execution
             });
             if (reel > 0f)
             {
@@ -467,6 +471,13 @@ namespace Deathless.Jeu
         {
             if (EstInvulnerable) return Interception.Bloque;   // esquive : coup évité
             return Classe != null ? Classe.Intercepter(info) : Interception.Passe;
+        }
+
+        /// Statut Peau de fer (wiki : statuts.md) : −intensité (0,35 = −35 %) sur tout coup ennemi, parable ou non.
+        float Absorber(InfoDegats info)
+        {
+            float r = Statuts != null ? Statuts.Intensite(TypeStatut.PeauDeFer) : 0f;
+            return r > 0f ? info.montant * Mathf.Clamp01(1f - r) : info.montant;
         }
 
         void OnTouche(InfoDegats info, float reel)

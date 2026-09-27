@@ -589,7 +589,8 @@ namespace Deathless.EditorTools
             Si(debut, fin, "Tourne", false, 0.1f);
             Si(boucle, fin, "Tourne", false, 0.08f);
             Sortie(fin, loco, 0.95f);
-            Declencheur(c, sm, Etat(sm, "Rugissement", Clip(Special, "Skeletons_Taunt_Longer"), new Vector3(650, 360), 1.6f), "Rugir", loco, 0.9f, 0.1f);
+            // Rugissement sur le haut du corps (27/09/2026) : les jambes gardent la locomotion, le viking marche en criant.
+            Declencheur(c, haut, Etat(haut, "Rugissement", Clip(Special, "Skeletons_Taunt_Longer"), new Vector3(450, 120), 1.6f), "Rugir", vide, 0.9f, 0.1f);
             Declencheur(c, sm, Etat(sm, "SautPercutant", Clip(Melee, "Melee_1H_Attack_Jump_Chop"), new Vector3(650, 420), 1.2f), "Saut", loco, 0.9f, 0.05f);
             EditorUtility.SetDirty(c);
         }
@@ -664,6 +665,9 @@ namespace Deathless.EditorTools
             var sStab = Etat(sm, "Stab", stab, new Vector3(650, 0), stab != null ? 0.5f / Mathf.Max(0.05f, b.dagueInstant) : 2f);
             Declencheur(c, sm, sStab, "Stab", loco, 0.8f, 0.05f);
             Declencheur(c, sm, Etat(sm, "Lancer", Clip(General, "Throw"), new Vector3(650, 80)), "Throw", loco, 0.85f, 0.08f);
+            // Pas de l'ombre (RB, 27/09/2026) : Dodge_Forward accéléré sur la durée du bond (déclencheur « PasOmbre »).
+            var bond = Clip(Avance, "Dodge_Forward");
+            Declencheur(c, sm, Etat(sm, "PasOmbre", bond, new Vector3(650, 160), bond != null ? bond.length / Mathf.Max(0.1f, b.pasOmbreDuree + 0.2f) : 1.2f), "PasOmbre", loco, 0.85f, 0.04f);
             // Arbalète en main (couche haute) : visée tenue, tir.
             Booleen(c, "Crossbow");
             var vise = Etat(haut, "CrossbowAim", AssetDatabase.LoadAssetAtPath<AnimationClip>("Assets/WeaponStyles/Clips/Ranged_1H_Aiming_Loop.anim"), new Vector3(450, 0));

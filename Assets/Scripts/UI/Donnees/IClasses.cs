@@ -179,10 +179,10 @@ namespace Deathless.UI.Donnees
             new Classe
             {
                 Id = "assassin", Nom = "Assassin", Role = "Furtif, coups critiques", Arme = "Dague, arbalète dans le dos",
-                Description = "En marchant, il devient furtif. Un coup non détecté ou porté dans le dos est un coup critique.",
+                Description = "En marchant, il devient furtif. Un coup non détecté ou porté dans le dos est un coup critique ; son Pas de l’ombre le porte derrière l’ennemi visé.",
                 Teinte = Hex("#a58ad6"), Embleme = "classe_assassin", Jauge = JaugeClasse.Aucune,
                 Actions = Actions(("Dague", "assassin_dague"), ("Arbalète en main, visée", "assassin_arbalete"),
-                    ("Grenade fumigène", "assassin_fumigene"), Vide),
+                    ("Grenade fumigène", "assassin_fumigene"), ("Pas de l’ombre", "assassin_pas_ombre")),
             },
             new Classe
             {

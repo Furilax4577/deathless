@@ -68,9 +68,10 @@ Les deux coups alternent.
 |---|---|
 | Vie | 140 |
 | Hache | 38 dégâts, touche tous les ennemis de l'arc ; +8 rage par ennemi touché |
-| Attaque tournante | 15 rage au moins pour la lancer ; 12 dégâts toutes les 0,3 s, rayon 2,3 m ; vitesse ×0,6 ; 20 rage par seconde ; chaque tic rend +2 rage par ennemi touché {à équilibrer} : elle ne se paie qu’à partir de 3 ennemis (décidé le 26/09/2026) |
-| Rugissement | 25 rage, recharge 12 s |
-| Saut percutant | 35 rage, 45 dégâts, recharge 8 s |
+| Rage | jauge de 100, plancher 30 (27/09/2026) : rage de départ, et hors combat la jauge revient vers 30 (baisse si au-dessus, remonte si une compétence l'a fait passer dessous, 6 par seconde) |
+| Attaque tournante | 15 rage au moins pour la lancer ; 10 dégâts toutes les 0,3 s (12 avant le 27/09/2026), rayon 2,3 m ; vitesse ×0,6 ; 20 rage par seconde ; chaque tic rend +2 rage par ennemi touché {à équilibrer} : elle ne se paie qu’à partir de 3 ennemis (décidé le 26/09/2026) |
+| Rugissement | 15 rage (25 avant le 27/09/2026), recharge 12 s ; Peau de fer 6 s sur le viking |
+| Saut percutant | 25 rage (35 avant le 27/09/2026), 45 dégâts, recharge 8 s |
 
 ## Lissage du 27/09/2026 {décidé}
 
@@ -81,4 +82,6 @@ Suite à l'audit d'équilibrage (`Docs/equilibrage-classes.md`) : le viking part
 - **Rugissement** : il pose **Peau de fer** sur le viking (statut : **−35 % de dégâts subis pendant 6 s**, bienfait, liseré or dans le HUD) et se joue sur le **haut du corps** : il continue de marcher pendant le cri.
 
 {dev} `GameBalance` (rageMin, coûts), `ClasseViking` (plancher, Peau de fer par le chemin des statuts, couche haute de l'Animator comme la charge du paladin), nouveau statut `PeauDeFer` dans le catalogue (icône à générer), réseau par `HerosReseau.StatutRpc` existant.
+
+{{dev: Fait le 27/09/2026. Plancher : hors combat (4 s sans toucher), `m_Rage` va vers `rageMin` dans les deux sens (`Mathf.MoveTowards`, `rageBaisse`/s) : après un rugissement à 30 (reste 15), la jauge remonte à 30 en 2,5 s ; la tournante seule peut vider la jauge. Peau de fer : posée **au moment du cri** (1 s après l'appui, quand la provocation part), `Statuts.Ajouter(PeauDeFer, peauDeFerDuree 6 s, peauDeFerReduction 0,35, Joueur)` ; effet dans `Sante.absorbeur` du héros (`Heros.Absorber`), donc sur tout coup ennemi, parable ou non, chez le propriétaire (prédit puis confirmé ; `StatutsReseau.Valider` impose les valeurs de l'hôte). Cri sur la couche haute : état `Rugissement` dans `HautDuCorps` du contrôleur `Viking_Jeu` (`ClassesBuilder.ControleurViking`), `ClasseViking.HautDuCorps` vrai pendant le cri, déplacement libre à vitesse normale (plus de `DeplacementImpose` immobile).}}
 

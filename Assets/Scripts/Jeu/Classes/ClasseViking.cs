@@ -5,7 +5,9 @@ namespace Deathless.Jeu
 {
     /// Viking (hache à deux mains) : hache (RT, toutes les cibles de l'arc), attaque tournante maintenue (LT, consomme la
     /// rage en continu, s'arrête quand elle est vide), rugissement (LB : provoque les squelettes proches), saut percutant
-    /// (RB : bond de 5 m, onde de terre à l'impact). Rage (wiki) : monte quand il frappe, redescend lentement hors combat.
+    /// (RB : bond de 5 m, onde de terre à l'impact). Rage (wiki) : monte quand il frappe, redescend lentement hors combat,
+    /// jamais sous le plancher rageMin (27/09/2026). Le rugissement pose Peau de fer (−35 % de dégâts subis 6 s) au
+    /// moment du cri et se joue sur le haut du corps : le viking continue de marcher (lissage du 27/09/2026).
     public class ClasseViking : ClasseHeros
     {
         enum Action { Aucune, Attaque, Tournante, Rugissement, Saut }
@@ -50,6 +52,7 @@ namespace Deathless.Jeu
         public override void Initialiser(Heros heros)
         {
             base.Initialiser(heros);
+            m_Rage = B.rageMin;   // plancher de rage : il a toujours de quoi ouvrir une vague (27/09/2026)
             var fx = EffetsJeu.Instance;
             if (teteHache == null)
             {
@@ -75,7 +78,9 @@ namespace Deathless.Jeu
 
         public override bool Occupe => m_Action != Action.Aucune;
         public override bool PeutEsquiver => m_Action == Action.Aucune || m_Action == Action.Attaque || m_Action == Action.Tournante;
-        public override float FacteurVitesse => m_Action == Action.Tournante ? B.tournanteVitesse : m_Action == Action.Attaque ? 0.25f : m_Action == Action.Aucune ? 1f : 0f;
+        public override float FacteurVitesse => m_Action == Action.Tournante ? B.tournanteVitesse : m_Action == Action.Attaque ? 0.25f : m_Action == Action.Aucune || m_Action == Action.Rugissement ? 1f : 0f;
+        /// Rugissement sur la couche haute (comme la charge du paladin) : les jambes marchent pendant le cri.
+        public override bool HautDuCorps => m_Action == Action.Rugissement;
         public override void RemplirJauge() { m_Rage = B.rageMax; }
         public override JaugeClasse Jauge => JaugeClasse.Rage;
         public override float ValeurJauge => m_Rage;
@@ -135,8 +140,11 @@ namespace Deathless.Jeu
         {
             m_RechargeRugir = Mathf.Max(0f, m_RechargeRugir - dt);
             m_RechargeSaut = Mathf.Max(0f, m_RechargeSaut - dt);
+            // Hors combat, la rage revient vers le plancher (rageMin, 27/09/2026) : elle baisse si elle est au-dessus,
+            // remonte au même rythme si une compétence l'a fait passer dessous ; il a toujours de quoi ouvrir une vague.
+            // La tournante, elle, peut vider la jauge (pas de baisse ni de remontée pendant qu'elle tourne).
             if (Time.time - m_DernierCoup > B.rageDelaiBaisse && m_Action != Action.Tournante)
-                m_Rage = Mathf.Max(0f, m_Rage - B.rageBaisse * dt);
+                m_Rage = Mathf.MoveTowards(m_Rage, B.rageMin, B.rageBaisse * dt);
         }
 
         public override void SurCoupDonne(Sante cible, float reel, bool parBoule, bool continu)
@@ -204,6 +212,9 @@ namespace Deathless.Jeu
                         m_Crie = true;
                         AudioBank.Jouer(SonsDuJeu.Rugissement, transform.position + Vector3.up * 1.6f, 1f);
                         Diffuser(E_RugirCri);
+                        // Peau de fer (27/09/2026) : posée sur lui au cri, le temps de la provocation plus une seconde ;
+                        // chemin des statuts sur son propre héros (prédit chez un client, confirmé par l'hôte).
+                        if (H.Statuts != null) H.Statuts.Ajouter(TypeStatut.PeauDeFer, b.peauDeFerDuree, b.peauDeFerReduction, OrigineStatut.Joueur, H.Id);
                         int n = 0;
                         var dv = DirecteurVagues.Instance;
                         if (dv != null)
@@ -253,8 +264,7 @@ namespace Deathless.Jeu
         public override bool DeplacementImpose(float dt, out Vector3 vitesse)
         {
             vitesse = Vector3.zero;
-            if (m_Action != Action.Saut && m_Action != Action.Rugissement) return false;
-            if (m_Action == Action.Rugissement) return true;
+            if (m_Action != Action.Saut) return false;   // le rugissement laisse le déplacement libre (27/09/2026)
             float t0 = DecollageClip / VitesseSaut, t1 = AtterrissageClip / VitesseSaut;
             if (m_Depuis < t0 || m_Depuis > t1) return true;
             float duree = t1 - t0;

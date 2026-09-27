@@ -13,7 +13,7 @@ namespace Deathless.UI.Donnees
         Recu,       // dégâts reçus par le héros local (rouge)
         Nyxessa,    // dégâts subis par Nyxessa, partagés entre tous les postes (vert, seule exception à « ses coups »)
         Soin,       // soin reçu par le héros local (doré, « +N »)
-        Mot,        // Paré / Bloqué / Esquivé / Immunisé (pas de chiffre)
+        Mot,        // Paré / Bloqué / Esquivé / Immunisé / Exécuté (pas de chiffre)
     }
 
     /// Un coup, un soin ou une issue à afficher en chiffre flottant (interface.md). Struct : un événement par coup,
@@ -24,7 +24,7 @@ namespace Deathless.UI.Donnees
         public Vector3 Point;
         /// Montant à afficher ; ignoré si Mot n'est pas nul.
         public float Montant;
-        /// "Paré", "Bloqué", "Esquivé" ou "Immunisé" ; null pour un chiffre.
+        /// "Paré", "Bloqué", "Esquivé", "Immunisé" ou "Exécuté" (assassin, 27/09/2026) ; null pour un chiffre.
         public string Mot;
         public TypeChiffreDegat Type;
         /// Tic continu (brûlure, tournante) : le HUD le cumule sur le chiffre en cours pour la même cible plutôt que

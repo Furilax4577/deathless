@@ -55,6 +55,7 @@ namespace Deathless.Jeu
             new Amelioration("Lame empoisonnée", "assassin_dague", Sens.Plus, 0.10f, "+10 % de dégâts à la dague"),
             new Amelioration("Rechargement vif", "assassin_arbalete", Sens.Moins, 0.12f, "−12 % de recharge de l’arbalète"),
             new Amelioration("Fumée épaisse", "assassin_fumigene", Sens.Moins, 0.12f, "−12 % de recharge de la grenade fumigène"),
+            new Amelioration("Pas léger", "assassin_pas_ombre", Sens.Moins, 0.12f, "−12 % de recharge du Pas de l’ombre"),
         };
         static readonly Amelioration[] Aucune = new Amelioration[0];
 

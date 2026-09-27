@@ -1,6 +1,18 @@
 {
   "versions": [
     {
+      "version": "0.5.9",
+      "date": "2026-09-27",
+      "titre": "Cinq classes, cinq rôles",
+      "notes": [
+        "Assassin : nouvelle compétence RB, le Pas de l'ombre : un bond de 7 m vers la visée, invulnérable, à travers les ennemis, qui s'arrête 1 m derrière l'ennemi visé face à son dos (recharge 6 s, sans sortir du mode furtif). Passif Exécution : un coup de dague sur un ennemi commun sous 30 % de vie l'achève net (élite ou boss : ×3) et recharge le bond aussitôt.",
+        "Rôdeur : 120 PV, flèche chargée à fond à 50 dégâts qui étourdit 1 s, tir rapide toutes les 0,15 s, nuée à 14 par salve dont la zone ralentit de 40 % qui y reste, salve de la roulade à 18.",
+        "Viking : plancher de rage à 30 (il a toujours de quoi ouvrir une vague), saut à 25 et rugissement à 15 de rage, tournante à 10 par tic. Le rugissement pose Peau de fer (−35 % de dégâts subis pendant 6 s) et se crie en marchant.",
+        "Paladin : épée à 27, garde à 0,8 d'endurance par dégât bloqué, et le soin devient un soin d'aura : lui et les alliés à moins de 4 m reçoivent 37,5 PV, toutes les 20 s.",
+        "Squelettes : un squelette qui frappe Nyxessa, frappé deux fois de suite par le même héros à moins de 3 m, se retourne vers lui quelques secondes avant de revenir à la relique. Plus de coups dans le dos gratuits autour de Nyxessa."
+      ]
+    },
+    {
       "version": "0.5.8",
       "date": "2026-09-27",
       "titre": "Lire le combat",

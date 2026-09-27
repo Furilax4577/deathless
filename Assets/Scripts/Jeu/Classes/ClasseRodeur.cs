@@ -4,7 +4,8 @@ using UnityEngine;
 namespace Deathless.Jeu
 {
     /// Rôdeur (arc et carquois) : visée (LT / clic droit maintenu) avec zoom de caméra (épaule serrée) ; bander et tirer
-    /// (RT / clic gauche maintenu puis relâché : charge 1,2 s, 10 à 40 dégâts, tir à la tête ×2 et critique) ; lâcher la
+    /// (RT / clic gauche maintenu puis relâché : charge 1,2 s, 10 à 50 dégâts, tir à la tête ×2 et critique ; à pleine
+    /// charge la flèche étourdit 1 s, et la zone de la nuée ralentit qui y reste : lissage du 27/09/2026) ; lâcher la
     /// sont indépendants de la visée : on peut bander sans viser, viser sans tirer, ou les deux (Quentin, 26/09/2026 :
     /// « le zoom et le tir sont deux actions distinctes, utilisables ou non ensemble ») ;
     /// nuée de flèches (LB), roulade arrière et salve (RB). Flèches non magiques (modèle
@@ -124,20 +125,23 @@ namespace Deathless.Jeu
             Vector3 depart = m_Encochee != null ? m_Encochee.transform.position : transform.position + Vector3.up * 1.4f + transform.forward * 0.5f;
             float degats = Mathf.Lerp(b.arcDegatsMin, b.arcDegatsMax, charge) * Facteur(0);
             // Vitesse selon la charge : tir rapide lent (retombe vite), charge complète rapide (file loin et tendu).
-            TirerFleche(depart, cible, Mathf.Lerp(b.arcVitesseMin, b.arcVitesseMax, charge), degats, b.arcTete);
+            // Pleine charge (27/09/2026) : la flèche étourdit l'ennemi touché (statut posé par le chemin de l'hôte).
+            TirerFleche(depart, cible, Mathf.Lerp(b.arcVitesseMin, b.arcVitesseMax, charge), degats, b.arcTete, charge >= 0.999f ? b.arcEtourdiPleineCharge : 0f);
             AudioBank.Jouer(charge >= 0.999f ? SonsDuJeu.ArcTirCharge : SonsDuJeu.ArcTir, depart, 0.9f);
             Diffuser(E_Tir, depart, default, charge);
         }
 
-        void TirerFleche(Vector3 depart, Vector3 cible, float vitesse, float degats, float multTete)
+        void TirerFleche(Vector3 depart, Vector3 cible, float vitesse, float degats, float multTete, float etourdi = 0f)
         {
             ProjectileJeu.Tirer(ProjectileJeu.Genre.Fleche, depart, cible, vitesse, B.arcPortee, transform, (point, dir, s) =>
             {
                 AudioBank.Jouer(SonsDuJeu.FlecheImpact, point, 0.7f, 0.05f);
                 if (s == null) return;
-                bool tete = Combat.ALaTete(s.GetComponent<Squelette>(), point, dir);
+                var sq = s.GetComponent<Squelette>();
+                bool tete = Combat.ALaTete(sq, point, dir);
                 if (tete) Critique(point, -dir, false);
                 H.Frapper(s, degats * (tete ? multTete : 1f), tete, point, dir);
+                if (etourdi > 0f && sq != null && sq.Vivant) sq.Etourdir(etourdi, H.Id);   // relayé à l'hôte depuis un client
             });
         }
 
@@ -167,8 +171,14 @@ namespace Deathless.Jeu
             if (!degats) yield break;   // marionnette : visuel et sons seulement
             for (int i = 0; i < b.nueeSalves; i++)
             {
+                // Une salve sur deux (toutes les 0,48 s), la zone ralentit qui y reste (27/09/2026, même règle que la
+                // fissure du Fend-sol : Ralenti court relancé tant qu'on y est ; demande relayée à l'hôte depuis un client).
+                bool ralentit = b.nueeRalentiForce > 0f && i % 2 == 0;
                 foreach (var s in Cibles(centre, Vector3.forward, b.nueeRayon, 180f))
+                {
                     H.Frapper(s, b.nueeDegatsSalve, false, s.transform.position + Vector3.up, Vector3.down);
+                    if (ralentit && !s.Mort) Statuts.De(s)?.Ajouter(TypeStatut.Ralenti, b.nueeRalentiDuree, b.nueeRalentiForce, OrigineStatut.Joueur, H.Id);
+                }
                 yield return new WaitForSeconds(1.2f / b.nueeSalves);
             }
         }

@@ -3,7 +3,8 @@ using UnityEngine;
 
 namespace Deathless.Jeu
 {
-    /// Paladin (épée et bouclier) : épée (RT), garde et parade (LT maintenu), charge bélier (LB), soin sur soi (RB).
+    /// Paladin (épée et bouclier) : épée (RT), garde et parade (LT maintenu), charge bélier (LB), soin d'aura (RB : lui
+    /// et les alliés à moins de soinRayonAura m reçoivent le même montant ; lissage du 27/09/2026, wiki : classe-paladin.md).
     /// Code de la version 0.1, déplacé de Heros sans changement de comportement.
     public class ClassePaladin : ClasseHeros
     {
@@ -268,19 +269,84 @@ namespace Deathless.Jeu
                     CoupDeBouclier();
                     break;
                 case Action.Soin:
-                    if (!m_SoinDonne && m_Depuis >= b.soinIncantation)
-                    {
-                        m_SoinDonne = true;
-                        H.Sante.Soigner(H.Sante.pvMax * b.soinPart * Facteur(3));
-                        if (aura != null) aura.Jouer();
-                        Diffuser(E_Aura);
-                    }
+                    if (!m_SoinDonne && m_Depuis >= b.soinIncantation) DonnerSoin();
                     if (m_Depuis >= b.soinIncantation + 0.5f) m_Action = Action.Aucune;
                     break;
                 case Action.Riposte:
                     if (!m_RiposteFrappee && m_Depuis >= b.paradeParfaiteInstant) FrapperRiposte();
                     if (m_Depuis >= b.paradeParfaiteDuree) m_Action = Action.Aucune;
                     break;
+            }
+        }
+
+        // ----------------------------------------------------------------- Soin d'aura (27/09/2026)
+
+        /// Instant du soin : le paladin, puis les alliés à moins de soinRayonAura m, du même montant. En solo ou chez
+        /// l'hôte, l'aura est appliquée ici (SoignerAllies) ; un client la demande à l'hôte, qui la juge sur les positions
+        /// qu'il voit. Le visuel (aura sur chaque allié) est joué sur tous les postes d'après leurs propres positions.
+        void DonnerSoin()
+        {
+            m_SoinDonne = true;
+            var b = B;
+            float montant = H.Sante.pvMax * b.soinPart * Facteur(3);
+            H.Sante.Soigner(montant, H.Id);
+            if (aura != null) aura.Jouer();
+            var reseau = Deathless.Reseau.HerosReseau.Local(H);
+            if (reseau != null && !reseau.IsServer) reseau.DemanderSoinAura(montant);
+            else SoignerAllies(H, montant);
+            JouerAuraAllies();
+            Diffuser(E_Aura);
+        }
+
+        /// Autorité (solo, hôte) : soigne de `montant` chaque allié vivant à moins de soinRayonAura m du paladin `p` ;
+        /// une marionnette est soignée par son propriétaire (HerosReseau.Soigner, RPC hôte → propriétaire, comme
+        /// Renverser), le paladin est crédité des soins (Sante.DernierSoigneur). Renvoie le nombre d'alliés soignés.
+        public static int SoignerAllies(Heros p, float montant)
+        {
+            var partie = p != null ? p.Partie : null;
+            if (partie == null || montant <= 0f) return 0;
+            float rayon = GameBalance.Courant.soinRayonAura;
+            int n = 0;
+            var tous = partie.TousLesHeros;
+            for (int i = 0; i < tous.Count; i++)
+            {
+                var h = tous[i];
+                if (h == null || h == p || !h.Vivant) continue;
+                Vector3 d = h.transform.position - p.transform.position; d.y = 0f;
+                if (d.magnitude > rayon) continue;
+                var r = h.GetComponent<Deathless.Reseau.HerosReseau>();
+                if (h.Distant && r != null && r.IsSpawned) r.Soigner(montant, p.Id);
+                else h.Sante.Soigner(montant, p.Id);
+                n++;
+            }
+            partie.Journal("Soin d'aura : " + n + " allié(s) à moins de " + rayon + " m, +" + montant.ToString("F0") + " chacun");
+            return n;
+        }
+
+        /// Visuel de l'aura sur chaque allié à portée (positions vues sur ce poste) : une copie de l'aura de soin jouée
+        /// sous ses pieds, retirée après le geste.
+        void JouerAuraAllies()
+        {
+            var partie = H.Partie;
+            if (partie == null) return;
+            float rayon = B.soinRayonAura;
+            var fx = EffetsJeu.Instance;
+            GameObject modele = fx != null && fx.prefabAuraSoin != null ? fx.prefabAuraSoin : aura != null ? aura.gameObject : null;
+            if (modele == null) return;
+            var tous = partie.TousLesHeros;
+            for (int i = 0; i < tous.Count; i++)
+            {
+                var h = tous[i];
+                if (h == null || h == H || !h.Vivant) continue;
+                Vector3 d = h.transform.position - H.transform.position; d.y = 0f;
+                if (d.magnitude > rayon) continue;
+                var go = Instantiate(modele, h.transform);
+                go.name = "AuraSoin_allie";
+                go.transform.localPosition = Vector3.zero;
+                go.transform.localRotation = Quaternion.identity;
+                var a = go.GetComponent<AuraSoin>();
+                if (a != null) a.Jouer();
+                Destroy(go, 4f);
             }
         }
 
@@ -571,7 +637,7 @@ namespace Deathless.Jeu
                 case E_Charge: EffetCharge(a); break;
                 case E_ChargeImpact: EffetChargeImpact(v); break;
                 case E_Soin: AudioBank.Jouer(SonsDuJeu.Soin, transform.position + Vector3.up, 0.9f); break;
-                case E_Aura: if (aura != null) aura.Jouer(); break;
+                case E_Aura: if (aura != null) aura.Jouer(); JouerAuraAllies(); break;
                 case E_Garde:
                     AudioBank.Jouer(v > 0.5f ? SonsDuJeu.Parade : SonsDuJeu.Blocage, transform.position + Vector3.up * 1.2f, 1f);
                     if (v > 0.5f) EffetParade(a, b);

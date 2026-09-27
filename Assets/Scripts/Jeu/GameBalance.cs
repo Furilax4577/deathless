@@ -77,6 +77,13 @@ namespace Deathless.Jeu
         public float vitesseSortieDeTerre = 1.5f;
         [Tooltip("Échelle des personnages Rig_Medium (Knight, squelettes) : 2 m environ.")]
         public float echellePersonnages = 0.8f;
+        [Header("Riposte au contact de Nyxessa (wiki : ennemis.md, Comportement ; décidé 27/09/2026)")]
+        [Tooltip("Un squelette qui frappe Nyxessa, frappé ce nombre de fois de suite par le même héros à moins de riposteDistance m, se retourne vers lui.")]
+        public int riposteCoups = 2;
+        public float riposteDistance = 3f;
+        [Tooltip("Il le poursuit au plus ce temps (s), ou jusqu'à ce nombre de coups portés, puis revient à Nyxessa.")]
+        public float riposteDuree = 3f;
+        public int riposteAttaques = 2;
 
         [Header("Golem (mini-boss, nuit 10)")]
         public float golemPV = 1500f;
@@ -287,7 +294,8 @@ namespace Deathless.Jeu
         public float esquiveInvulnerable = 0.3f;
         public float esquiveRecharge = 1.2f;
         [Header("Épée")]
-        public float epeeDegats = 30f;
+        [Tooltip("30 → 27 : lissage du 27/09/2026 (wiki : classe-paladin.md).")]
+        public float epeeDegats = 27f;
         public float epeeIntervalle = 0.75f;
         [Tooltip("Portée de l'épée (m). 2,6 : un peu plus que la hache à deux mains du Viking (26/09/2026).")]
         public float epeePortee = 2.6f;
@@ -308,8 +316,8 @@ namespace Deathless.Jeu
         public float gardeDemiAngle = 70f;
         [Tooltip("Vitesse en garde (facteur). 0,7 : paladin plus mobile (26/09/2026).")]
         public float gardeVitesse = 0.7f;
-        [Tooltip("Endurance payée par point de dégâts bloqué.")]
-        public float gardeCoutParDegat = 1f;
+        [Tooltip("Endurance payée par point de dégâts bloqué (1 → 0,8 : lissage du 27/09/2026).")]
+        public float gardeCoutParDegat = 0.8f;
         public float gardeBriseeEtourdi = 0.8f;
         public float paradeFenetre = 0.25f;
         public float paradeEtourdi = 1f;
@@ -354,10 +362,13 @@ namespace Deathless.Jeu
         [Tooltip("Cadence des jambes (Running_A) pendant la ruée : vitesse réelle ÷ vitesse des pieds du clip, bornée ici.")]
         public float chargeCadenceMin = 0.8f;
         public float chargeCadenceMax = 8f;   // jambes très rapides, effet cartoon (Quentin, 26/09/2026 : plutôt que des pieds qui glissent)
-        [Header("Soin sur soi")]
+        [Header("Soin d'aura (lissage du 27/09/2026 : le paladin et les alliés à moins de soinRayonAura m reçoivent le même montant)")]
         public float soinPart = 0.25f;
         public float soinIncantation = 0.6f;
-        public float soinRecharge = 30f;
+        [Tooltip("30 → 20 s (27/09/2026).")]
+        public float soinRecharge = 20f;
+        [Tooltip("Rayon de l'aura de soin (m) : les alliés vivants à cette distance sont soignés du même montant que le paladin.")]
+        public float soinRayonAura = 4f;
         [Header("Mage, style feu (valeurs de départ, à équilibrer)")]
         public float magePV = 100f;
         public float mageVitesse = 5f;
@@ -390,31 +401,41 @@ namespace Deathless.Jeu
         [Tooltip("Longueur de vol maximale d'une flèche ou d'un carreau (m) avant de disparaître.")]
         public float projectileVolMax = 200f;
 
-        [Header("Rôdeur (wiki : charge 1,2 s, 10 à 40 dégâts, tête ×2)")]
-        public float rodeurPV = 110f;
+        [Header("Rôdeur (wiki : charge 1,2 s, 10 à 50 dégâts, tête ×2 ; lissage du 27/09/2026)")]
+        [Tooltip("110 → 120 (27/09/2026).")]
+        public float rodeurPV = 120f;
         public float rodeurVitesse = 5f;
         public float arcCharge = 1.2f;
         public float arcDegatsMin = 10f;
-        public float arcDegatsMax = 40f;
+        [Tooltip("40 → 50 (27/09/2026).")]
+        public float arcDegatsMax = 50f;
         public float arcTete = 2f;
+        [Tooltip("Une flèche à pleine charge (100 %) étourdit l'ennemi touché ce temps (s ; moitié sur Morgrim). 0 : aucun.")]
+        public float arcEtourdiPleineCharge = 1f;
         [Tooltip("Vitesse de départ de la flèche selon la charge (m/s) : tir rapide → minimum, charge complète → maximum (wiki : projectiles).")]
         public float arcVitesseMin = 18f;
         public float arcVitesseMax = 55f;
         [Tooltip("Distance du point visé par le réticule (m).")]
         public float arcPortee = 60f;
-        public float arcIntervalle = 0.3f;
+        [Tooltip("Intervalle du tir rapide (s) : 0,3 → 0,15 (27/09/2026).")]
+        public float arcIntervalle = 0.15f;
         public float arcVitesseBander = 0.5f;
         public float viseeVitesse = 0.6f;
         public float nueeRayon = 3f;
         public int nueeSalves = 5;
-        public float nueeDegatsSalve = 10f;
+        [Tooltip("10 → 14 par salve (27/09/2026).")]
+        public float nueeDegatsSalve = 14f;
         public float nueePortee = 25f;
         public float nueeRecharge = 12f;
+        [Tooltip("La zone de la nuée ralentit qui y reste (statut Ralenti, renouvelé une salve sur deux, soit toutes les 0,48 s, comme la fissure du Fend-sol) : part de vitesse retirée et durée de chaque relance (s).")]
+        [Range(0f, 0.9f)] public float nueeRalentiForce = 0.4f;
+        public float nueeRalentiDuree = 1f;
         public float rouladeDistance = 4f;
         public float rouladeCout = 20f;
         public int salveFleches = 5;
         public float salveEcart = 20f;
-        public float salveDegats = 15f;
+        [Tooltip("15 → 18 (27/09/2026).")]
+        public float salveDegats = 18f;
         [Tooltip("Vitesse des flèches de la salve de la roulade (m/s).")]
         public float salveVitesse = 35f;
         public float rouladeRecharge = 8f;
@@ -447,6 +468,18 @@ namespace Deathless.Jeu
         public float grenadeRecharge = 20f;
         public float grenadeNuage = 5f;
         public float grenadePortee = 8f;
+        [Header("Pas de l'ombre et Exécution (assassin, RB ; wiki : classe-assassin.md, décidé 27/09/2026)")]
+        [Tooltip("Bond dans la direction visée (m) et sa durée (s) ; invulnérable pendant, traverse les ennemis, pas les murs.")]
+        public float pasOmbreDistance = 7f;
+        public float pasOmbreDuree = 0.15f;
+        [Tooltip("Réticule sur un ennemi : le bond s'arrête à cette distance derrière lui (m), face à son dos.")]
+        public float pasOmbreArret = 1f;
+        [Tooltip("Portée du réticule pour choisir la cible du bond (m) : un ennemi visé plus loin que le bond n'est pas ciblé.")]
+        public float pasOmbrePorteeCible = 9f;
+        public float pasOmbreRecharge = 6f;
+        [Tooltip("Exécution (passif de la dague) : un ennemi commun sous cette part de vie est achevé net ; un élite ou un boss prend le coup ×executionElite. Chaque exécution remet la recharge du bond à zéro.")]
+        [Range(0f, 1f)] public float executionSeuil = 0.3f;
+        public float executionElite = 3f;
 
         [Header("Viking (valeurs de départ, à équilibrer)")]
         public float vikingPV = 140f;
@@ -457,6 +490,8 @@ namespace Deathless.Jeu
         public float hacheDemiAngle = 70f;
         public float hacheInstant = 0.55f;
         public float rageMax = 100f;
+        [Tooltip("Plancher de rage (27/09/2026) : la rage de départ, et la baisse hors combat ne descend jamais sous cette valeur.")]
+        public float rageMin = 30f;
         public float rageParTouche = 8f;
         public float rageBaisse = 6f;
         public float rageDelaiBaisse = 4f;
@@ -466,13 +501,19 @@ namespace Deathless.Jeu
         [Tooltip("Rage rendue par un tic de la tournante, par ennemi touché (à équilibrer) : à 2, elle se paie à partir de 3 ennemis.")]
         public float tournanteRageParTic = 2f;
         public float tournanteRayon = 2.3f;
-        public float tournanteDegats = 12f;
+        [Tooltip("12 → 10 (27/09/2026).")]
+        public float tournanteDegats = 10f;
         public float tournanteVitesse = 0.6f;
-        public float rugissementRage = 25f;
+        [Tooltip("25 → 15 rage (27/09/2026).")]
+        public float rugissementRage = 15f;
         public float rugissementRecharge = 12f;
         public float rugissementRayon = 10f;
         public float rugissementProvocation = 5f;
-        public float sautRage = 35f;
+        [Tooltip("Peau de fer (27/09/2026) : le rugissement pose ce bienfait sur le viking au moment du cri : part des dégâts subis retirée, durée (s).")]
+        [Range(0f, 0.9f)] public float peauDeFerReduction = 0.35f;
+        public float peauDeFerDuree = 6f;
+        [Tooltip("35 → 25 rage (27/09/2026).")]
+        public float sautRage = 25f;
         public float sautRecharge = 8f;
         public float sautDistance = 5f;
         public float sautRayon = 3.5f;

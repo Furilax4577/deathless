@@ -37,6 +37,10 @@ namespace Deathless.Jeu
         public bool SurNyxessa => m_Etat != Etat.Mort && ((m_Etat == Etat.Preparation && m_CibleNyxessa) || Time.time - m_DernierCoupNyxessa < GameBalance.Courant.surNyxessaDepuis);
         public float DegatsNyxessa => m_Stats.degatsNyxessa;
         public float Intervalle => m_Stats.intervalle;
+        /// Élite, mini-boss ou boss : l'exécution de l'assassin (27/09/2026) fait ×3 au lieu d'achever.
+        public bool EliteOuBoss => elite || type == TypeEnnemi.Golem || type == TypeEnnemi.Necromancien;
+        /// Ennemi commun sous le seuil d'exécution (GameBalance.executionSeuil) : un coup de dague l'achève net.
+        public bool Executable => Vivant && !EliteOuBoss && Sante != null && Sante.Ratio < GameBalance.Courant.executionSeuil;
         /// Progression du coup en préparation (0 hors préparation, vers 1 à l'instant de l'impact). Lisibilité du coup
         /// (piste « yeux qui s'intensifient », prototype temps 1, PreparationLisible.cs) : purement visuel, ne change
         /// rien à l'équité ou au réseau (Frapper reste seul juge de l'impact).
@@ -52,6 +56,16 @@ namespace Deathless.Jeu
         protected float m_SansFrapper;
         protected Vector3 m_Place;
         protected float m_Etourdi;
+        // Riposte au contact de Nyxessa (wiki : ennemis.md, décidé 27/09/2026) : compteur des coups reçus d'un même héros
+        // à moins de riposteDistance ; puis poursuite bornée (riposteDuree s ou riposteAttaques coups) avant le retour.
+        int m_RiposteHerosId;
+        int m_RiposteCoups;
+        float m_RiposteDernierCoup = -99f;
+        float m_RiposteJusque = -99f;
+        int m_RiposteAttaques;
+        protected bool m_EnRiposte;
+        /// Tests : ce squelette poursuit un héros par riposte (au lieu de frapper Nyxessa).
+        public bool EnRiposte => m_EnRiposte;
         Vector3 m_Pousse; float m_PousseReste;
         bool m_Desintegre;
         static int s_Ids;
@@ -123,6 +137,7 @@ namespace Deathless.Jeu
             if (Distant) { m_Reseau.DemanderProvoquer(duree); return; }
             m_Provocateur = h;
             m_ProvoqueJusque = Time.time + duree;
+            m_EnRiposte = false;   // la provocation prend la place d'une riposte en cours
             if (Statuts != null) Statuts.Ajouter(TypeStatut.Provoque, duree, 1f, OrigineStatut.Joueur, h.Id);
             m_Cible = h;
             m_SansFrapper = 0f;
@@ -204,7 +219,8 @@ namespace Deathless.Jeu
                 case Etat.Marche: MajMarche(dt); break;
                 case Etat.Poursuite: MajPoursuite(dt); break;
                 case Etat.Preparation: MajPreparation(); break;
-                case Etat.Recuperation: if (m_EtatDepuis >= RecuperationDuree) Reprendre(); else if (!OrientationFigee) Tourner(CiblePosition()); break;
+                // Riposte décidée pendant un coup sur Nyxessa : la récupération est écourtée, il se retourne vite.
+                case Etat.Recuperation: if (m_EtatDepuis >= RecuperationDuree || (m_EnRiposte && m_EtatDepuis >= 0.25f)) Reprendre(); else if (!OrientationFigee) Tourner(CiblePosition()); break;
                 case Etat.Etourdi:
                     m_Etourdi -= dt;
                     if (m_Etourdi <= 0f) { if (animator != null) animator.SetBool(P_Stun, false); Reprendre(); }
@@ -319,8 +335,17 @@ namespace Deathless.Jeu
         protected virtual void MajPoursuite(float dt)
         {
             if (Provoque) { m_Cible = m_Provocateur; m_SansFrapper = 0f; }
-            else if (m_Cible != null && !Voit(m_Cible)) { m_Cible = null; m_Etat = Etat.Marche; return; }
-            if (!Provoque && DistanceNyxessa() <= RayonContact && (m_Cible == null || !m_Cible.Vivant || Distance(m_Cible.transform.position) > PorteeEngagement(m_Cible)))
+            else if (m_Cible != null && !Voit(m_Cible)) { m_EnRiposte = false; m_Cible = null; m_Etat = Etat.Marche; return; }
+            // Fin de la riposte (temps écoulé, coups portés, héros mort) : retour à Nyxessa.
+            if (m_EnRiposte && (Time.time >= m_RiposteJusque || m_RiposteAttaques >= B.riposteAttaques || m_Cible == null || !m_Cible.Vivant))
+            {
+                m_EnRiposte = false;
+                m_Cible = null;
+                m_Etat = Etat.Marche;
+                if (P != null) P.Journal("Riposte terminée : " + type + " revient à Nyxessa");
+                return;
+            }
+            if (!Provoque && !m_EnRiposte && DistanceNyxessa() <= RayonContact && (m_Cible == null || !m_Cible.Vivant || Distance(m_Cible.transform.position) > PorteeEngagement(m_Cible)))
             {
                 m_Cible = null;
                 m_Etat = Etat.Marche;
@@ -364,6 +389,7 @@ namespace Deathless.Jeu
         {
             m_Cible = cible;
             m_CibleNyxessa = cible == null;
+            if (m_EnRiposte && cible != null) m_RiposteAttaques++;
             m_Etat = Etat.Preparation;
             m_EtatDepuis = 0f;
             m_DernierCoup = Time.time;
@@ -454,15 +480,47 @@ namespace Deathless.Jeu
             AudioBank.Jouer(SonsDuJeu.SqueletteTouche, transform.position + Vector3.up, 0.8f, 0.05f);
             if (animator != null && m_Etat != Etat.Preparation && m_Etat != Etat.SortieDeTerre) animator.SetTrigger(P_Hit);
             // Un joueur qui frappe attire l'attention s'il est proche.
-            if (info.sourceId > 0 && m_Etat == Etat.Marche && P != null)
+            if (info.sourceId > 0 && P != null && m_Etat != Etat.Mort && m_Etat != Etat.SortieDeTerre)
             {
                 var h = P.HerosDe(info.sourceId);
-                if (h != null && Distance(h.transform.position) < B.detectionJoueur && DistanceNyxessa() > RayonContact && !ClasseAssassin.DansLaFumee(h.transform.position))
+                if (h == null || ClasseAssassin.DansLaFumee(h.transform.position)) return;
+                float d = Distance(h.transform.position);
+                if (m_Etat == Etat.Marche && d < B.detectionJoueur && DistanceNyxessa() > RayonContact)
                 {
                     m_Cible = h; m_Etat = Etat.Poursuite; m_SansFrapper = 0f;
                     if (h.Classe is ClasseAssassin a) a.Reperer();
                 }
+                else if (Riposteur && DistanceNyxessa() <= RayonContact && d <= B.riposteDistance) CompterRiposte(h);
             }
+        }
+
+        /// Riposte au contact de Nyxessa (27/09/2026) : sbires et guerriers (élites compris) ; Morgrim et le Nécromancien
+        /// gardent leur propre comportement.
+        protected virtual bool Riposteur => type == TypeEnnemi.Sbire || type == TypeEnnemi.Guerrier;
+
+        /// Compte les coups reçus de `h` (autorité). Au riposteCoups-ième coup de suite du même héros, le squelette se
+        /// retourne vers lui : poursuite tout de suite s'il marche ou récupère ; sinon (coup en préparation, étourdi) dès
+        /// que Reprendre le rend au comportement de base, m_Cible étant déjà posé.
+        void CompterRiposte(Heros h)
+        {
+            if (h.Id != m_RiposteHerosId || Time.time - m_RiposteDernierCoup > 4f) { m_RiposteHerosId = h.Id; m_RiposteCoups = 0; }
+            m_RiposteCoups++;
+            m_RiposteDernierCoup = Time.time;
+            if (m_RiposteCoups < B.riposteCoups || m_EnRiposte || Provoque) return;
+            m_RiposteCoups = 0;
+            m_EnRiposte = true;
+            m_RiposteJusque = Time.time + B.riposteDuree;
+            m_RiposteAttaques = 0;
+            m_Cible = h;
+            m_SansFrapper = 0f;
+            if (m_Etat == Etat.Marche || m_Etat == Etat.Recuperation)
+            {
+                m_Etat = Etat.Poursuite;
+                m_EtatDepuis = 0f;
+                if (Agent.enabled) Agent.isStopped = false;
+            }
+            if (h.Classe is ClasseAssassin a) a.Reperer();
+            if (P != null) P.Journal("Riposte : " + type + (elite ? " élite" : "") + " se retourne vers le joueur " + h.Id);
         }
 
         /// Étourdissement (parade, charge). Crédite au joueur les coups empêchés contre Nyxessa (score).

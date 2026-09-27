@@ -708,6 +708,27 @@ def assassin_fumigene():
     return ic
 
 
+def assassin_pas_ombre():
+    """Pas de l'ombre (RB, 27/09/2026) : silhouette encapuchonnée qui surgit en haut à droite, précédée d'une traînée de
+    gemmes Ombre décroissantes (le bond) et d'un chevron lilas au sol (la direction)."""
+    ic = Icone("assassin_pas_ombre", "assassin", "Pas de l'ombre",
+               "Compétence 2 (RB) : bond de 7 m derrière l'ennemi visé, traînée de gemmes Ombre.")
+    # Traînée : trois gemmes de plus en plus grandes, du bas gauche vers la silhouette.
+    for (x, y, r, n) in ((18, 108, 8, 6), (36, 92, 11, 7), (56, 74, 14, 8)):
+        ic.gemme(regulier((x, y), r, n, -90), OMBRE3, table=0.5, teinte_table=c("Ombre", "Violet"))
+    # Chevron au sol : direction du bond.
+    ic.bande([(24, 122), (72, 122), (92, 106)], 7, OMBRE)
+    ic.gemme([(88, 96), (106, 104), (90, 118)], OMBRE, centre=(94, 106))
+    # Silhouette : capuche pointue, épaules, visage dans la nuit avec deux éclats lilas pour les yeux.
+    capuche = [(86, 14), (108, 44), (102, 62), (68, 62), (62, 44)]
+    ic.gemme(capuche, [c("Ombre", "Violet sombre"), c("Ombre", "Violet"), c("Ombre", "Lilas")], centre=(86, 46))
+    ic.gemme([(72, 46), (100, 46), (98, 60), (74, 60)], [c("Ombre", "Nuit"), c("Ombre", "Nuit")], centre=(86, 53))
+    ic.gemme([(60, 66), (112, 66), (120, 92), (52, 92)], OMBRE3, centre=(86, 78))
+    for x in (79, 93):
+        ic.gemme(regulier((x, 53), 3.5, 6, 0), [c("Ombre", "Lilas"), c("Ombre", "Lilas")])
+    return ic
+
+
 def assassin_furtif():
     ic = Icone("assassin_furtif", "assassin", "Mode furtif", "Indicateur (passif) : œil barré.")
     haut = [(14 + 100 * i / 10, 64 - 34 * math.sin(math.pi * i / 10)) for i in range(11)]
@@ -1721,7 +1742,7 @@ COMPETENCES = [
     paladin_epee, paladin_garde, paladin_charge_belier, paladin_soin,
     mage_boule_de_feu, mage_cone_de_flammes, mage_brulure, jauge_mana,
     rodeur_tir, rodeur_visee, rodeur_nuee_de_fleches, rodeur_roulade_salve,
-    assassin_dague, assassin_arbalete, assassin_fumigene, assassin_furtif,
+    assassin_dague, assassin_arbalete, assassin_fumigene, assassin_pas_ombre, assassin_furtif,
     viking_hache, viking_attaque_tournante, viking_rugissement, viking_saut_percutant, jauge_rage,
     commun_esquive, commun_potion_soin, commun_coup_critique,
     nyxessa_missile, nyxessa_missile_eteint,
@@ -1741,7 +1762,7 @@ BARRES = {
     "rodeur": [("rodeur_tir", "RT", ""), ("rodeur_visee", "LT", "active"),
                ("rodeur_nuee_de_fleches", "LB", "recharge:4:0.35"), ("rodeur_roulade_salve", "RB", "")],
     "assassin": [("assassin_dague", "RT", ""), ("assassin_arbalete", "LT", "recharge:6:0.75"),
-                 ("assassin_fumigene", "LB", ""), (None, "RB", "")],
+                 ("assassin_fumigene", "LB", ""), ("assassin_pas_ombre", "RB", "recharge:4:0.6")],
     "viking": [("viking_hache", "RT", ""), ("viking_attaque_tournante", "LT", ""), ("viking_rugissement", "LB", ""),
                ("viking_saut_percutant", "RB", "recharge:3:0.25")],
 }

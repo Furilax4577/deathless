@@ -121,21 +121,25 @@ namespace Deathless.Reseau
             var s = Squelette.Sante;
             float estime = Mathf.Min(info.montant, s.Pv);
             if (!info.continu) AudioBank.Jouer(SonsDuJeu.SqueletteTouche, transform.position + Vector3.up, 0.8f, 0.05f);
-            FrapperRpc(info.montant, info.critique, info.continu, info.point, info.direction);
+            FrapperRpc(info.montant, info.critique, info.continu, info.execution, info.point, info.direction);
             return estime;
         }
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        void FrapperRpc(float montant, bool critique, bool continu, Vector3 point, Vector3 direction, RpcParams p = default)
+        void FrapperRpc(float montant, bool critique, bool continu, bool execution, Vector3 point, Vector3 direction, RpcParams p = default)
         {
             var s = Squelette.Sante;
             if (s == null || s.Mort) return;
             ulong client = p.Receive.SenderClientId;
             var h = Partie.Instance != null ? Partie.Instance.HerosDe(Partie.IdJoueur(client)) : null;
+            // Exécution de l'assassin (27/09/2026) : l'hôte fait foi sur la vie ; un ennemi commun sous le seuil est achevé
+            // net ici, quelle que soit la vie que le client voyait.
+            if (execution && Squelette.Executable) montant = Mathf.Max(montant, s.Pv + 1f);
+            else if (execution) execution = Squelette.EliteOuBoss;
             float reel = s.Encaisser(new InfoDegats
             {
                 montant = montant, sourceId = Partie.IdJoueur(client), equipeSource = Equipe.Heros, source = h != null ? h.gameObject : null,
-                critique = critique, continu = continu, point = point, direction = direction
+                critique = critique, continu = continu, execution = execution, point = point, direction = direction
             });
             if (reel > 0f && Partie.Instance != null) Partie.Instance.CompterDegats(Partie.IdJoueur(client), reel, critique);
         }

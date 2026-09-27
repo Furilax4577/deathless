@@ -273,3 +273,96 @@ Chaque étape se vérifie en rejouant `python Docs/outils/equilibrage.py` (le ta
 | **Assassin** | Ramener le dos à ×2 (×3 réservé aux élites et aux boss), arbalète 60 / 5 s, grenade 15 s, dague sur 2 cibles : l'exécuteur des cibles qui comptent, plus le premier DPS sur les sbires. | Garder ×3 mais faire retourner les squelettes frappés au contact de Nyxessa (§ 3.6) ; ou la Marque du traqueur si le kit est rouvert. |
 
 Une fois tranché, chaque décision va dans la page de sa classe avec l'étiquette `{décidé}` ou `{à équilibrer}`, les chiffres dans `GameBalance.cs` et l'asset, et le tableau du § 1 est regénéré.
+
+---
+
+## Après le lissage du 27/09/2026
+
+Décisions de Quentin reportées dans `GameBalance.cs`, `Assets/Jeu/Resources/GameBalance.asset` et le code le 27/09/2026 (pages `classe-*.md`, `statuts.md`, `ennemis.md` du wiki, sections « Lissage du 27/09/2026 », « Pas de l'ombre et Exécution », « Riposte au contact de Nyxessa ») :
+
+- **Assassin** : Pas de l'ombre (RB : bond de 7 m en 0,15 s, invulnérable, à travers les ennemis, arrêt 1 m derrière l'ennemi visé face à son dos, recharge 6 s, ne sort pas du furtif) et Exécution (dague sur un ennemi commun sous 30 % : achevé net ; élite ou boss : ×3 ; chaque exécution remet le bond à zéro). Chiffres de la dague, de l'arbalète et de la grenade inchangés (la proposition (a) n'a pas été retenue : le dos ×3 reste la récompense, le bond le moyen d'y arriver).
+- **Rôdeur** : arc 50 à pleine charge (étourdit 1 s), tir rapide 0,15 s, nuée 14 par salve (ralentit −40 % qui y reste), salve 18, 120 PV.
+- **Viking** : plancher de rage 30 (`rageMin` : rage de départ, et hors combat la jauge revient vers 30 dans les deux sens), saut 25, rugissement 15, tournante 10 ; le rugissement pose Peau de fer (−35 % 6 s) au moment du cri et se crie en marchant (couche haute).
+- **Paladin** : épée 27, soin 20 s, garde 0,8 ; le soin devient un soin d'aura (lui et les alliés à moins de 4 m, même montant).
+- **Squelettes** : riposte au contact de Nyxessa (deux coups de suite du même héros à moins de 3 m → il se retourne 3 s ou deux coups, puis revient).
+- **Mage** : inchangé (sa refonte reste à décider, § 3.3).
+
+Vérifié en Play le 27/09/2026 (`ScenariosClasses.Lancer("lissage_*")`, captures `Assets/Screenshots/lissage_*.png`) : bond de 6,9 m à 0,9 m dans le dos d'un guerrier, exécution à 24 % achevée net et bond rechargé ; flèche à pleine charge → Étourdi, nuée → Ralenti 40 % ; viking à 30 de rage au départ, cri en marchant (7,4 m parcourus), Peau de fer −35 % (20 dégâts → 13), rage revenue à 30 ; soin d'aura +38 sur le paladin et sur un allié à 2 m, 75 soins crédités au paladin ; sbire au contact de Nyxessa retourné après deux coups, revenu à Nyxessa 3 s plus tard.
+
+Ce que le tableau ne montre pas : le contrôle du rôdeur et de l'assassin n'entre pas dans le DPS ; la riposte des squelettes coupe le ×3 « gratuit » de l'assassin autour de Nyxessa (il doit relancer son approche par le bond, 6 s), donc les 109 DPS de dos ne sont plus soutenus qu'en alternance : bond → deux ou trois coups dans le dos (0,55 s chacun) → exécution ou repli.
+
+### Tableau du modèle commun (généré par `Docs/outils/equilibrage.py`)
+
+Cible mono : guerrier de la nuit 5 (160 PV, 14 dégâts par coup) ; groupe : 5 sbires serrés (100 PV chacun).
+
+| Classe | PV | DPS mono soutenu (base seule) | DPS groupe (5 sbires) | Pic 3 s mono | Pic 3 s groupe | Guerrier N5 tué en | Contrôle | Survie |
+|---|---|---|---|---|---|---|---|---|
+| Paladin | 150 | **40,3** (36) | 112,3 | 141 | 303 | 4,4 s | étourdi 2,5 s (charge), 1 s (parade), 0,8 s + repousse (parfaite) | 150 PV ; garde (125 dégâts bloqués par jauge, +15/s) ; parade ; soin 37,5 PV / 20 s (aura 4 m) ; esquive |
+| Viking | 140 | **40,2** (34,5) | 200,9 | 121 | 605 | 4,6 s | provocation 5 s à 10 m ; étourdi 1 s en zone (saut) | 140 PV ; Peau de fer −35 % 6 s / 12 s (rugissement) ; esquive ; saut = 5 m de fuite (8 s, 25 rage) |
+| Mage | 100 | **32,8** (27,8) | 119,4 | 115 | 415 | 4,9 s | aucun (brûlure = dégâts seulement) | 100 PV ; portée 30 m ; aucune mitigation ; esquive |
+| Rôdeur | 120 | **43,7** (33,3) | 73,8 | 156 | 490 | 4,8 s | étourdi 1 s par flèche à pleine charge (toutes les 1,5 s) ; ralenti −40 % dans la nuée / 12 s | 120 PV ; portée 60 m ; roulade arrière 4 m (+ esquive) ; plus rapide que tout squelette (5 contre 3,4 m/s) |
+| Assassin | 100 | **43,9** (36,4) | 43,9 | 340 | 340 | 4,4 s | aucun ; fumée = les squelettes perdent leur cible (et repartent vers Nyxessa) ; exécution = un blessé sous 30 % meurt net | 100 PV ; aucune mitigation ; furtivité (pas ciblé hors combat) ; fumée = sortie de combat ; bond invulnérable 0,15 s / 6 s ; esquive |
+
+Lignes à part (dépendent du joueur, pas des chiffres) : Rôdeur tête ×2 → 66,7 DPS soutenu ; Assassin dans le dos ×3 → 109,1 DPS soutenu, ouverture furtif + dos 100 ; Viking attaque tournante 33,3 DPS par cible (plus que la hache en mono : 34,5) tant qu'il a de la rage.
+
+### Compétences : coût, recharge, effet
+
+**Paladin** — mobilité : 5 m/s ; charge 7 m / 14 s ; ×0,7 en garde ; dépendance : aucune.
+
+| Compétence | Coût | Recharge | Effet |
+|---|---|---|---|
+| Épée | aucun | 0,75 s entre deux coups | 27 dégâts, 3 cibles, 2,6 m, ±40° |
+| Garde | 0,8 endurance par dégât bloqué | — | ±70° ; parade 0,25 s → étourdi 1 s ; parfaite 0,1 s → repousse 2 m, étourdi 0,8 s |
+| Charge bélier | aucun | 14 s | 15 à 60 dégâts, 7 m, étourdi 2,5 s (cible) / 0,6 s (traversés) |
+| Soin d'aura | aucun | 20 s | +25 % de la vie (37,5 PV), 1,88 PV/s en moyenne, pour lui et chaque allié à moins de 4 m |
+
+**Viking** — mobilité : 5 m/s ; saut 5 m / 8 s ; ×0,6 en tournante, ×0,25 pendant le coup ; dépendance : rage à 30 (plancher) en début de vague : rugissement et saut tout de suite.
+
+| Compétence | Coût | Recharge | Effet |
+|---|---|---|---|
+| Hache | aucun (+8 rage par cible) | 1,1 s entre deux coups | 38 dégâts, toutes les cibles, 2,4 m, ±70° |
+| Attaque tournante | 20 rage/s (−6,7 par cible et par seconde) ; 15 rage pour lancer | — | 10 dégâts / 0,3 s = 33,3 DPS par cible, 360°, 2,3 m ; se paie à partir de 3 cibles |
+| Rugissement | 15 rage | 12 s | provoque 5 s à 10 m ; Peau de fer −35 % pendant 6 s ; crié en marchant |
+| Saut percutant | 25 rage | 8 s | 45 dégâts, 5 m de bond, rayon 3,5 m, étourdi 1 s |
+
+**Mage** — mobilité : 5 m/s ; ×0,6 en lançant, ×0,4 pendant le cône ; dépendance : aucune ; mais rien ne le protège au contact.
+
+| Compétence | Coût | Recharge | Effet |
+|---|---|---|---|
+| Boule de feu | aucun (+4 mana par cible touchée) | 0,9 s entre deux | 25 dégâts + 15 en zone (2 m) ; brûlure 5/s pendant 3 s ; portée 30 m |
+| Cône de flammes | 14 mana/s (jauge 100 : 7,1 s au plus) ; régénération 1/s hors cône | — | 22 DPS par cible, 6 m, ±20°, vitesse ×0,4 ; brûlure |
+| LB | — | — | vide |
+| RB | — | — | vide |
+
+**Rôdeur** — mobilité : 5 m/s ; roulade 4 m / 8 s ; ×0,5 en bandant ; dépendance : aucune ; sa valeur dépend de la précision (tête ×2).
+
+| Compétence | Coût | Recharge | Effet |
+|---|---|---|---|
+| Arc (charge complète) | aucun | 1,2 s de charge + 0,3 s | 50 dégâts (33,3 DPS), tête ×2 (66,7 DPS), étourdi 1 s ; tir rapide 10 dégâts (28,6 DPS) |
+| Nuée de flèches | aucun | 12 s | 5 salves × 14 = 70 dégâts par cible restée dans 3 m, sur 1,2 s, ralenti −40 % tant qu'on y reste ; portée 25 m ; immobile 1 s |
+| Roulade + salve | 20 endurance | 8 s | 4 m en arrière, invulnérable 0,3 s ; 5 flèches × 18 sur ±20° (tête ×2) |
+| Visée | aucun | — | zoom ; vitesse ×0,6 |
+
+**Assassin** — mobilité : 5 m/s (3,2 furtif) ; bond de 7 m / 6 s ; ×0,4 pendant le coup, ×0,5 arbalète en main ; dépendance : le dos ×3 exige un ennemi occupé ailleurs (Nyxessa, tank) ; le Pas de l'ombre l'y porte ; depuis le 27/09/2026 un squelette sur Nyxessa frappé 2 fois à moins de 3 m se retourne (riposte 3 s).
+
+| Compétence | Coût | Recharge | Effet |
+|---|---|---|---|
+| Dague | aucun | 0,55 s entre deux coups | 20 dégâts, 1 cible, 1,8 m ; furtif ×2 (1 coup), dos ×3 (109,1 DPS), les deux ×5 (100) |
+| Arbalète | aucun | 6 s | 45 dégâts (tête ×2 = 90), 60 m/s, portée 40 m ; vitesse ×0,5 en main |
+| Grenade fumigène | aucun | 20 s | nuage 5 s, portée 8 m : personne n'est vu dedans (alliés compris) ; l'assassin y redevient furtif |
+| Pas de l'ombre | aucun | 6 s (remise à zéro par une exécution) | bond de 7 m en 0,15 s vers la visée, invulnérable, à travers les ennemis ; arrêt 1 m derrière l'ennemi visé, face à son dos ; ne sort pas du furtif |
+| Exécution (passif) | — | — | dague sur un ennemi commun sous 30 % de vie : achevé net ; élite ou boss : ×3 (le meilleur des facteurs, pas le produit) |
+| Furtif (passif) | — | 4 s hors combat | marche à 3,2 m/s ; repéré à 6 m devant (±60°) ou 1,5 m derrière |
+
+### Ce que demandent les nuits (PV ennemis à abattre, 90 s de combat utile par nuit)
+
+| Nuit | Ennemis (solo) | PV ennemis solo | DPS requis solo | PV ennemis à 4 | DPS requis par joueur à 4 |
+|---|---|---|---|---|---|
+| 5 | 25 | 3570 | 39,7 | 9996 | 27,8 |
+| 8 | 38 | 5580 | 62 | 15624 | 43,4 |
+| 10 | 44 | 6996 | 77,7 | 19589 | 54,4 |
+| 12 | 48 | 8256 | 91,7 | 23117 | 64,2 |
+
+Morgrim : 1500 PV (étourdissements ×0,5, non repoussable) ; Nyxar : 1200 PV, reste à 12–18 m. Nyxessa au palier 5 ajoute environ 34,7 DPS sur une nuit (4 160 dégâts / 120 s).
+
+Temps pour abattre Morgrim seul, DPS mono soutenu : Paladin 37 s ; Viking 37 s ; Mage 46 s ; Rôdeur 34 s ; Assassin 34 s ; Assassin dans le dos 14 s ; Rôdeur à la tête 22 s.

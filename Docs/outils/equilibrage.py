@@ -11,7 +11,8 @@ Hypothèses du modèle (les mêmes que dans le document) :
 - cible mono : un guerrier de la nuit 5 (PV × multiplicateurPV[5]) ; groupe : 5 sbires serrés (dans 2,5 m) ;
 - « soutenu » = cycle complet répété sans temps mort, compétences à recharge comptées au prorata (dégâts / recharge) ;
 - « pic 3 s » = meilleure séquence sur 3 s, jauge et recharges pleines, en partant à zéro ;
-- l'attaque tournante et le cône sont bornés par leur jauge ; la rage du viking part à 0 (comme en jeu) ;
+- l'attaque tournante et le cône sont bornés par leur jauge ; la rage du viking part à `rageMin` (plancher, 30 depuis le
+  27/09/2026 ; 0 avant) ;
 - le tir à la tête et le coup dans le dos sont donnés à part (dépendent du joueur, pas des chiffres).
 Le script ne lit pas l'asset `GameBalance.asset` : si l'asset diverge du code, c'est le code qui est audité.
 """
@@ -92,11 +93,12 @@ def modele(b):
             ("Charge bélier", "aucun", "%s s" % f(b["chargeRecharge"]),
              "%s à %s dégâts, %s m, étourdi %s s (cible) / %s s (traversés)" % (
                  f(b["chargeDegatsMin"]), f(b["chargeDegatsMax"]), f(b["chargeDistance"]), f(b["chargeEtourdiCible"]), f(b["chargeEtourdiRepousses"]))),
-            ("Soin sur soi", "aucun", "%s s" % f(b["soinRecharge"]),
-             "+%s %% de la vie (%s PV), %s PV/s en moyenne" % (int(b["soinPart"] * 100), f(b["herosPV"] * b["soinPart"]), f(b["herosPV"] * b["soinPart"] / b["soinRecharge"], 2))),
+            ("Soin d'aura", "aucun", "%s s" % f(b["soinRecharge"]),
+             "+%s %% de la vie (%s PV), %s PV/s en moyenne, pour lui et chaque allié à moins de %s m" % (
+                 int(b["soinPart"] * 100), f(b["herosPV"] * b["soinPart"]), f(b["herosPV"] * b["soinPart"] / b["soinRecharge"], 2), f(b.get("soinRayonAura", 0)))),
         ],
-        survie="%s PV ; garde (%s dégâts bloqués par jauge, +%s/s) ; parade ; soin %s PV / %s s ; esquive" % (
-            f(b["herosPV"]), f(b["endurance"] / b["gardeCoutParDegat"]), f(b["enduranceRegen"]), f(b["herosPV"] * b["soinPart"]), f(b["soinRecharge"])),
+        survie="%s PV ; garde (%s dégâts bloqués par jauge, +%s/s) ; parade ; soin %s PV / %s s (aura %s m) ; esquive" % (
+            f(b["herosPV"]), f(b["endurance"] / b["gardeCoutParDegat"]), f(b["enduranceRegen"]), f(b["herosPV"] * b["soinPart"]), f(b["soinRecharge"]), f(b.get("soinRayonAura", 0))),
         controle="étourdi %s s (charge), %s s (parade), %s s + repousse (parfaite)" % (f(b["chargeEtourdiCible"]), f(b["paradeEtourdi"]), f(b["paradeParfaiteEtourdi"])),
         mobilite="%s m/s ; charge %s m / %s s ; ×%s en garde" % (f(b["vitesse"]), f(b["chargeDistance"]), f(b["chargeRecharge"]), f(b["gardeVitesse"])),
         dependance="aucune",
@@ -127,15 +129,20 @@ def modele(b):
              "%s dégâts / %s s = %s DPS par cible, 360°, %s m ; se paie à partir de %s cibles" % (
                  f(b["tournanteDegats"]), f(b["tournanteIntervalle"], 2), f(tourn_dps), f(b["tournanteRayon"]), f(tourn_seuil, 1))),
             ("Rugissement", "%s rage" % f(b["rugissementRage"]), "%s s" % f(b["rugissementRecharge"]),
-             "provoque %s s à %s m ; immobile ~1,5 s" % (f(b["rugissementProvocation"]), f(b["rugissementRayon"]))),
+             "provoque %s s à %s m ; Peau de fer −%s %% pendant %s s ; crié en marchant" % (
+                 f(b["rugissementProvocation"]), f(b["rugissementRayon"]), int(b.get("peauDeFerReduction", 0) * 100), f(b.get("peauDeFerDuree", 0)))),
             ("Saut percutant", "%s rage" % f(b["sautRage"]), "%s s" % f(b["sautRecharge"]),
              "%s dégâts, %s m de bond, rayon %s m, étourdi %s s" % (f(b["sautDegats"]), f(b["sautDistance"]), f(b["sautRayon"]), f(b["sautEtourdi"]))),
         ],
-        survie="%s PV ; aucune mitigation ; esquive ; saut = 5 m de fuite (%s s, %s rage)" % (f(b["vikingPV"]), f(b["sautRecharge"]), f(b["sautRage"])),
+        survie="%s PV ; Peau de fer −%s %% %s s / %s s (rugissement) ; esquive ; saut = 5 m de fuite (%s s, %s rage)" % (
+            f(b["vikingPV"]), int(b.get("peauDeFerReduction", 0) * 100), f(b.get("peauDeFerDuree", 0)), f(b["rugissementRecharge"]), f(b["sautRecharge"]), f(b["sautRage"])),
         controle="provocation %s s à %s m ; étourdi %s s en zone (saut)" % (f(b["rugissementProvocation"]), f(b["rugissementRayon"]), f(b["sautEtourdi"])),
         mobilite="%s m/s ; saut %s m / %s s ; ×%s en tournante, ×0,25 pendant le coup" % (f(b["vikingVitesse"]), f(b["sautDistance"]), f(b["sautRecharge"]), f(b["tournanteVitesse"])),
-        dependance="rage à 0 en début de vague : %s s de hache sur une cible avant le saut, %s s avant le rugissement" % (
-            f(b["sautRage"] / rage_par_s_mono), f(b["rugissementRage"] / rage_par_s_mono)),
+        dependance="rage à %s (plancher) en début de vague : %s" % (
+            f(b.get("rageMin", 0)),
+            "rugissement et saut tout de suite" if b.get("rageMin", 0) >= max(b["sautRage"], b["rugissementRage"]) else
+            "%s s de hache sur une cible avant le saut, %s s avant le rugissement" % (
+                f(max(0.0, b["sautRage"] - b.get("rageMin", 0)) / rage_par_s_mono), f(max(0.0, b["rugissementRage"] - b.get("rageMin", 0)) / rage_par_s_mono))),
         rage_par_s_mono=rage_par_s_mono, tourn_dps=tourn_dps, tourn_seuil=tourn_seuil,
         rage_vide_en=b["rageDelaiBaisse"] + b["rageMax"] / b["rageBaisse"],
     )
@@ -191,11 +198,11 @@ def modele(b):
         temps_guerrier=guerrier_pv / arc_dps,
         competences=[
             ("Arc (charge complète)", "aucun", "%s s de charge + %s s" % (f(b["arcCharge"]), f(b["arcIntervalle"] + 0.15, 2)),
-             "%s dégâts (%s DPS), tête ×%s (%s DPS) ; tir rapide %s dégâts (%s DPS)" % (
-                 f(b["arcDegatsMax"]), f(arc_dps), f(b["arcTete"]), f(arc_dps * b["arcTete"]), f(b["arcDegatsMin"]), f(arc_rapide_dps))),
+             "%s dégâts (%s DPS), tête ×%s (%s DPS), étourdi %s s ; tir rapide %s dégâts (%s DPS)" % (
+                 f(b["arcDegatsMax"]), f(arc_dps), f(b["arcTete"]), f(arc_dps * b["arcTete"]), f(b.get("arcEtourdiPleineCharge", 0)), f(b["arcDegatsMin"]), f(arc_rapide_dps))),
             ("Nuée de flèches", "aucun", "%s s" % f(b["nueeRecharge"]),
-             "%s salves × %s = %s dégâts par cible restée dans %s m, sur 1,2 s ; portée %s m ; immobile 1 s" % (
-                 int(b["nueeSalves"]), f(b["nueeDegatsSalve"]), f(nuee_total), f(b["nueeRayon"]), f(b["nueePortee"]))),
+             "%s salves × %s = %s dégâts par cible restée dans %s m, sur 1,2 s, ralenti −%s %% tant qu'on y reste ; portée %s m ; immobile 1 s" % (
+                 int(b["nueeSalves"]), f(b["nueeDegatsSalve"]), f(nuee_total), f(b["nueeRayon"]), int(b.get("nueeRalentiForce", 0) * 100), f(b["nueePortee"]))),
             ("Roulade + salve", "%s endurance" % f(b["rouladeCout"]), "%s s" % f(b["rouladeRecharge"]),
              "%s m en arrière, invulnérable %s s ; %s flèches × %s sur ±%s° (tête ×2)" % (
                  f(b["rouladeDistance"]), f(b["esquiveInvulnerable"], 2), int(b["salveFleches"]), f(b["salveDegats"]), int(b["salveEcart"]))),
@@ -203,7 +210,8 @@ def modele(b):
         ],
         survie="%s PV ; portée %s m ; roulade arrière 4 m (+ esquive) ; plus rapide que tout squelette (%s contre %s m/s)" % (
             f(b["rodeurPV"]), f(b["arcPortee"]), f(b["rodeurVitesse"]), f(b["sbire"]["vitesse"])),
-        controle="aucun",
+        controle="étourdi %s s par flèche à pleine charge (toutes les %s s) ; ralenti −%s %% dans la nuée / %s s" % (
+            f(b.get("arcEtourdiPleineCharge", 0)), f(cycle_charge, 2), int(b.get("nueeRalentiForce", 0) * 100), f(b["nueeRecharge"])),
         mobilite="%s m/s ; roulade 4 m / %s s ; ×%s en bandant" % (f(b["rodeurVitesse"]), f(b["rouladeRecharge"]), f(b["arcVitesseBander"])),
         dependance="aucune ; sa valeur dépend de la précision (tête ×2)",
         arc_dps=arc_dps, arc_rapide_dps=arc_rapide_dps,
@@ -231,14 +239,23 @@ def modele(b):
                  f(b["arbaleteDegats"]), f(b["arbaleteTete"]), f(b["arbaleteDegats"] * b["arbaleteTete"]), f(b["arbaleteVitesse"]), f(b["arbaletePortee"]))),
             ("Grenade fumigène", "aucun", "%s s" % f(b["grenadeRecharge"]),
              "nuage %s s, portée %s m : personne n'est vu dedans (alliés compris) ; l'assassin y redevient furtif" % (f(b["grenadeNuage"]), f(b["grenadePortee"]))),
+            ("Pas de l'ombre", "aucun", "%s s (remise à zéro par une exécution)" % f(b.get("pasOmbreRecharge", 0)),
+             "bond de %s m en %s s vers la visée, invulnérable, à travers les ennemis ; arrêt %s m derrière l'ennemi visé, face à son dos ; ne sort pas du furtif" % (
+                 f(b.get("pasOmbreDistance", 0)), f(b.get("pasOmbreDuree", 0), 2), f(b.get("pasOmbreArret", 0)))),
+            ("Exécution (passif)", "—", "—",
+             "dague sur un ennemi commun sous %s %% de vie : achevé net ; élite ou boss : ×%s (le meilleur des facteurs, pas le produit)" % (
+                 int(b.get("executionSeuil", 0) * 100), f(b.get("executionElite", 0)))),
             ("Furtif (passif)", "—", "%s s hors combat" % f(b["horsCombat"]),
              "marche à %s m/s ; repéré à %s m devant (±%s°) ou %s m derrière" % (
                  f(b["marcheDiscrete"]), f(b["assassinDetectionVue"]), int(b["assassinDetectionAngle"]), f(b["assassinDetectionDos"]))),
         ],
-        survie="%s PV ; aucune mitigation ; furtivité (pas ciblé hors combat) ; fumée = sortie de combat ; esquive" % f(b["assassinPV"]),
-        controle="aucun ; fumée = les squelettes perdent leur cible (et repartent vers Nyxessa)",
-        mobilite="%s m/s (%s furtif) ; ×0,4 pendant le coup, ×0,5 arbalète en main" % (f(b["assassinVitesse"]), f(b["marcheDiscrete"])),
-        dependance="forte : le dos ×%s exige un ennemi occupé ailleurs (Nyxessa, tank)" % f(b["critiqueDos"]),
+        survie="%s PV ; aucune mitigation ; furtivité (pas ciblé hors combat) ; fumée = sortie de combat ; bond invulnérable %s s / %s s ; esquive" % (
+            f(b["assassinPV"]), f(b.get("pasOmbreDuree", 0), 2), f(b.get("pasOmbreRecharge", 0))),
+        controle="aucun ; fumée = les squelettes perdent leur cible (et repartent vers Nyxessa) ; exécution = un blessé sous %s %% meurt net" % int(b.get("executionSeuil", 0) * 100),
+        mobilite="%s m/s (%s furtif) ; bond de %s m / %s s ; ×0,4 pendant le coup, ×0,5 arbalète en main" % (
+            f(b["assassinVitesse"]), f(b["marcheDiscrete"]), f(b.get("pasOmbreDistance", 0)), f(b.get("pasOmbreRecharge", 0))),
+        dependance="le dos ×%s exige un ennemi occupé ailleurs (Nyxessa, tank) ; le Pas de l'ombre l'y porte ; depuis le 27/09/2026 un squelette sur Nyxessa frappé %s fois à moins de %s m se retourne (riposte %s s)" % (
+            f(b["critiqueDos"]), int(b.get("riposteCoups", 0)), f(b.get("riposteDistance", 0)), f(b.get("riposteDuree", 0))),
         dos_dps=dos_dps, ouverture=ouverture,
     )
 

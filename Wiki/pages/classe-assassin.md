@@ -20,7 +20,7 @@ Il frappe fort quand on ne le voit pas. Furtif en marchant, il porte ses meilleu
 | {icone assassin_dague} | RT | Dague |
 | {icone assassin_arbalete} | LT | Arbalète en main et visée ; RT tire |
 | {icone assassin_fumigene} | LB | Grenade fumigène |
-|  | RB | Pas de l'ombre (bond derrière l'ennemi visé) {décidé, 27/09/2026} |
+| {icone assassin_pas_ombre} | RB | Pas de l'ombre (bond derrière l'ennemi visé) {décidé, 27/09/2026} |
 | {icone assassin_furtif} |  | Indicateur du mode furtif |
 
 Actions communes à toutes les classes : voir [Classes](classes.md#actions-communes).
@@ -48,7 +48,9 @@ Les gestes joués en jeu pour chaque action, dans l'ordre où ils s'enchaînent.
 
 {video media/classes/assassin/clips/Sneaking.mp4} **Marche discrète** | {dev} `Sneaking` | Arme : dague (arbalète au dos) | boucle · 2,13 s | {dev} seconde locomotion, copie bouclante `Sneaking_Loop`
 
-{dev} RB : vide.
+### Pas de l'ombre
+
+{dev} `Dodge_Forward` (roulade avant commune) accéléré sur la durée du bond (état `PasOmbre`, déclencheur du même nom, corps entier), traînée de gemmes du thème Ombre semée le long du trajet (`ClasseAssassin.EffetPasOmbre`), petit éclat Ombre à chaque exécution.
 
 ## Règles
 
@@ -95,6 +97,7 @@ Décidés le 27/09/2026 (audit d'équilibrage, `Docs/equilibrage-classes.md`) : 
 - **Pas de l'ombre** (RB) : un bond de **7 m** en 0,15 s dans la direction visée, **invulnérable pendant le bond**, qui traverse les ennemis mais pas les murs. Si le réticule est sur un ennemi, le bond s'arrête **1 m derrière lui, face à son dos** : le coup suivant est un coup dans le dos. Recharge **6 s** {à équilibrer}. Le bond ne fait pas sortir du mode furtif ; attaquer, oui.
 - **Exécution** (passif de la dague) : un coup de dague sur un ennemi commun (sbire, guerrier, voleur, mage) sous **30 % de vie** l'**achève net** ; sur un élite ou un boss, le coup fait **×3** sans achever. Chaque exécution **recharge le Pas de l'ombre** aussitôt : bond → dos → exécution → bond, tant qu'il y a des blessés. Seuil {à équilibrer}.
 - {dev} Le bond passe par le propriétaire comme l'esquive (chemin `Diffuser` pour le visuel chez les autres postes, effet du thème Ombre) ; l'exécution passe par le chemin des coups (l'hôte fait foi sur la vie). Animation du bond : la roulade accélérée ou `Dodge_Forward`, avec une traînée de gemmes Ombre.
+- {{dev: Fait le 27/09/2026 (`ClasseAssassin.PasDeLOmbre`, `GameBalance.pasOmbre*`, `execution*`). Cible : l'ennemi sous le réticule (`Combat.PointVise`, portée `pasOmbrePorteeCible` 9 m) s'il est à portée du bond ; sinon bond libre de 7 m vers la visée. Murs : `SphereCast` (rayon 0,35 m, ennemis et héros ignorés), arrêt 0,5 m avant. À l'arrivée derrière une cible, le corps **et la caméra** se tournent vers elle (sinon le coup suivant partirait vers l'ancienne visée). L'exécution passe dans `InfoDegats.execution` : l'hôte revérifie le seuil sur sa propre vie (`EnnemiReseau.FrapperRpc`) et achève net un ennemi commun ; sur un élite ou un boss, le coup vaut le **meilleur** des deux facteurs (dos ×3 ou exécution ×3, pas le produit). Mot « Exécuté » au-dessus du chiffre (`DegatsUI`). Icône `assassin_pas_ombre` (`generer_icones.py`), catalogue `ClassesJouables`, 4e amélioration de l'arbre « Pas léger » (−12 % de recharge par rang).}}
 
 ## Arbalète {décidé}
 

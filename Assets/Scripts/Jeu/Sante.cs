@@ -18,6 +18,9 @@ namespace Deathless.Jeu
         public bool critique;
         /// Dégâts continus (brûlure, tournante) : pas de réaction « touché » (son, animation) à chaque tic.
         public bool continu;
+        /// Exécution de l'assassin (27/09/2026) : ennemi commun sous le seuil achevé net (l'hôte le vérifie), élite ou boss ×3 ;
+        /// mot « Exécuté » dans les chiffres de dégâts.
+        public bool execution;
     }
 
     /// Réponse d'un intercepteur (garde du héros) : le coup passe, est bloqué ou paré.
@@ -118,9 +121,14 @@ namespace Deathless.Jeu
             return reel;
         }
 
-        public float Soigner(float montant)
+        /// Joueur à l'origine du dernier soin (0 : soi-même, potion, taverne) : le soin d'aura du paladin (27/09/2026) crédite
+        /// le soigneur, pas le soigné (Heros.Initialiser → Partie.CompterSoins).
+        public int DernierSoigneur { get; private set; }
+
+        public float Soigner(float montant, int soigneurId = 0)
         {
             if (Mort) return 0f;
+            DernierSoigneur = soigneurId;
             float avant = pv;
             pv = Mathf.Min(pvMax, pv + Mathf.Max(0f, montant));
             float reel = pv - avant;
