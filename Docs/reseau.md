@@ -96,7 +96,7 @@ Brûlure, ralenti, étourdi, ivresse, provoqué : liste, règles et icônes dans
 
 - **L'hôte fait foi.** Il tient la liste de chaque personnage (squelettes et héros), applique les règles de cumul et les fins, et fait les dégâts de la brûlure (crédités au joueur qui l'a posée).
 - **Synchronisation économe.** Chaque personnage a une `NetworkList<StatutReseau>` dans `EnnemiReseau` et `HerosReseau` (15 octets par statut : type, origine, joueur source, intensité, durée, fin en temps serveur).
-  - L'hôte l'écrit seulement quand sa liste change (événement `Statuts.Change`) : ajout, retrait, fin, ou fin déplacée de plus de 0,5 s (`StatutsReseau.Tolerance`). NGO n'envoie que les éléments modifiés.
+  - L'hôte l'écrit seulement quand sa liste change (événement `Statuts.Change`) : ajout, retrait, fin, ou fin déplacée de plus de 0,5 s (`StatutsReseau.Tolerance`). Les éléments sont appariés par type (un seul statut à durée par type) : un retrait n'envoie que ce retrait, sans réécrire les suivants ; NGO n'envoie que les éléments modifiés.
   - Rien n'est envoyé à chaque image : chaque client fait défiler les durées lui-même à partir de la fin en temps serveur. Un cône de flammes qui rafraîchit une brûlure 4 fois par seconde produit au plus 2 petits messages par seconde et par ennemi, et plus rien ensuite.
   - Les statuts de zone (eau du donjon) ne sont pas envoyés : chaque poste les calcule d'après la position.
 - **Demandes des clients.** `Statuts.Ajouter` chez un client devient une demande à l'hôte (`relais`), au plus une toutes les 0,4 s par type. L'hôte la vérifie (`StatutsReseau.Valider`).
