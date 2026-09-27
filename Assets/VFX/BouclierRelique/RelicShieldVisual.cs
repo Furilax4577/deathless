@@ -14,6 +14,11 @@ using UnityEngine;
 // de base, inchangé) — A « intensité » (mêmes gemmes, plus lumineuses et plus saturées, lumière plus forte) et
 // B « quantité » (mur plus dense et gemmes en lévitation autour) ; aperçu hors Play (`apercuEdition`, avec
 // RelicShieldEtat.figer) pour la vitrine du banc. En Play et sans ces réglages, le comportement est celui de Relic.
+// Lecture depuis l'intérieur (décision de Quentin, 27/09/2026) : quand la caméra du joueur local est dans le bouclier
+// (ou à moins de `interieurDistance` m de la paroi, dehors), les gemmes situées devant elle rétrécissent
+// (`interieurFacteur`, transition `interieurDuree` dans les deux sens) pour laisser voir le combat dehors ; celles
+// derrière elle (hors champ) et la vue de tout autre poste ne changent pas : décision purement locale, rien à
+// répliquer. Toujours par la taille (langage « gemmes sans alpha »), couleur de vie et onde des coups conservées.
 [ExecuteAlways]
 [RequireComponent(typeof(RelicShieldEtat))]
 public class RelicShieldVisual : MonoBehaviour
@@ -38,6 +43,18 @@ public class RelicShieldVisual : MonoBehaviour
     public int levitationParPalier = 70;
     [Tooltip("Dessiner hors Play (vitrine du banc : à utiliser avec RelicShieldEtat.figer).")]
     public bool apercuEdition;
+
+    [Header("Lecture depuis l'intérieur (Quentin, 27/09/2026 : voir dehors avec aisance)")]
+    [Tooltip("Facteur de taille des gemmes devant la caméra locale quand elle est dans le bouclier (ou tout près dehors) : la paroi s'éclaircit sans alpha. 1 = aucun effet.")]
+    [Range(0f, 1f)] public float interieurFacteur = 0.3f;
+    [Tooltip("Distance de bascule hors de la paroi (m) : partout dedans et à moins de cette distance dehors, la paroi s'éclaircit (bande de fondu de ±0,5 m). La caméra à l'épaule est 5,5 m derrière le héros : elle est souvent juste dehors quand lui est dedans.")]
+    public float interieurDistance = 1.5f;
+    [Tooltip("Durée de la transition, dans les deux sens (s), gemme par gemme.")]
+    public float interieurDuree = 0.3f;
+    [Tooltip("Décochez pour comparer (paroi pleine même de l'intérieur).")]
+    public bool interieurActif = true;
+    /// Caméra du joueur local, si le jeu veut l'imposer ; sinon Camera.main (« Main Camera » du Village, CameraEpaule).
+    public static Camera cameraLocale;
 
     // Trois teintes par palier, du plus sombre au plus clair, plus un reflet (index 3, HDR : VfxPalette.intensiteEmission
     // du thème, deuxième derrière Nyxessa dans la hiérarchie de luminance de nuit du 26/09/2026 — remplace l'ancien
@@ -86,6 +103,7 @@ public class RelicShieldVisual : MonoBehaviour
     private bool wasUp;
     private readonly Color[] palette = new Color[4];   // palette du moment, fondue selon la vie
     private bool[] levite;          // piste B : gemme en lévitation autour du mur
+    private float[] eclaircie;      // lecture depuis l'intérieur : 0 gemme pleine, 1 rétrécie (lissé par gemme)
     private int total, palierConstruit = -1;
 
     private bool Apercu => !Application.isPlaying;
@@ -106,6 +124,7 @@ public class RelicShieldVisual : MonoBehaviour
         System.Random random = new System.Random(3131);
         float R() => (float)random.NextDouble();
         levite = new bool[gems];
+        eclaircie = new float[gems];
         dir = new Vector3[gems];
         height = new float[gems];
         radial = new float[gems];
@@ -318,6 +337,24 @@ public class RelicShieldVisual : MonoBehaviour
                 palette[k] = c;
             }
         }
+        // Lecture depuis l'intérieur : `dedans` vaut 1 quand la caméra locale est dans le cylindre ou à moins de
+        // `interieurDistance` m de la paroi dehors (fondu de ±0,5 m), 0 au-delà ; s'annule aussi quand elle survole le
+        // rebord (vue plongeante : la paroi ne gêne plus). Hors Play, aucune caméra : la paroi reste pleine.
+        float dedans = 0f;
+        Vector3 camPos = Vector3.zero, camAvant = Vector3.forward;
+        Camera cam = Application.isPlaying && interieurActif ? (cameraLocale != null ? cameraLocale : Camera.main) : null;
+        if (cam != null)
+        {
+            camPos = cam.transform.position;
+            camAvant = cam.transform.forward;
+            Vector3 axe = camPos - basePosition;
+            float hauteurCam = axe.y;
+            axe.y = 0f;
+            float horsParoi = axe.magnitude - radius;   // négatif dedans
+            dedans = 1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(interieurDistance - 0.5f, interieurDistance + 0.5f, horsParoi));
+            dedans *= 1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(wallHeight, wallHeight + 1.5f, hauteurCam));
+        }
+        float pasEclaircie = Time.deltaTime / Mathf.Max(0.01f, interieurDuree);
         // Rotation lente du cylindre entier, dans un sens, et une deuxième couche (une gemme sur trois) dans l'autre.
         float turnA = t * 0.18f, turnB = -t * 0.26f;
         for (int i = 0; i < total; i++)
@@ -348,11 +385,17 @@ public class RelicShieldVisual : MonoBehaviour
                 r += ripple * 0.35f;
             }
             Vector3 position = basePosition + d * r + Vector3.up * y;
+            // Lecture depuis l'intérieur : seules les gemmes devant la caméra (demi-espace de son regard, fondu de
+            // ±0,5 m autour de son plan : la frontière est à 90° du regard, hors champ) rétrécissent, chacune en
+            // `interieurDuree` ; l'onde d'un coup encaissé leur rend leur taille sur son passage, pour rester lisible.
+            float cible = dedans > 0f ? dedans * Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(-0.5f, 0.5f, Vector3.Dot(position - camPos, camAvant))) : 0f;
+            eclaircie[i] = Mathf.MoveTowards(eclaircie[i], cible, pasEclaircie);
+            float taille = Mathf.Lerp(Mathf.Lerp(1f, interieurFacteur, eclaircie[i]), 1f, ripple);
             float glint = Mathf.Pow(0.5f + 0.5f * Mathf.Sin(t * 2f + phase[i] * 3f), 8f);
             int k = i % 3;
             Color color = Color.Lerp(palette[k], palette[3], Mathf.Max(glint * 0.6f, ripple));
             Quaternion spin = Quaternion.AngleAxis(t * (40f + 30f * (i % 5)), spinAxis[i]) * rotation[i];
-            LowPolyGem.Write(vertices, colors, i, position, size[i] * shown, new Vector3(0.7f, 1.3f, 0.7f), spin, color, LowPolyGem.DefaultLight);
+            LowPolyGem.Write(vertices, colors, i, position, size[i] * shown * taille, new Vector3(0.7f, 1.3f, 0.7f), spin, color, LowPolyGem.DefaultLight);
         }
         mesh.vertices = vertices;
         mesh.colors = colors;

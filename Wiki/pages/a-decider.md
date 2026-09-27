@@ -12,3 +12,16 @@ Ce qui reste ouvert. Une ligne quitte cette page quand la règle est tranchée e
 | Statuts | Durées et intensités des statuts ; seuil, dégâts et ralenti de la chute | [Statuts](statuts.md) |
 | Progression | Premier arbre d'améliorations des compétences (proposition), autres améliorations, économie | [Classes](classes.md#menu-du-personnage-et-points-de-competence) |
 | Village | Maisons la nuit : n'y entrer que le jour ? Reconduire les héros dehors au crépuscule ? | [Le village](village.md) |
+
+## Équilibrage des classes (27/09/2026)
+
+Audit chiffré des cinq classes et propositions en trois niveaux (lissage, retouches de kit, refontes) dans `Docs/equilibrage-classes.md` (tableau regénérable par `Docs/outils/equilibrage.py`). Les trois déséquilibres les plus nets : le coup dans le dos de l'Assassin (×3 permanent sur tout squelette qui frappe Nyxessa : 109 dégâts par seconde contre 32 à 44 pour les autres), le Mage sans kit (deux boutons vides, cône moins bon que la boule, aucun contrôle), et la zone du simple au quadruple (Viking 201, Rôdeur 55, Assassin 44) alors que la nuit 12 demande environ 64 dégâts par seconde par joueur. Quentin tranche classe par classe :
+
+| Classe | Recommandation | À trancher |
+|---|---|---|
+| [Paladin](classe-paladin.md) | Le garder dans son rôle, −10 % à l'épée, soin toutes les 20 s, et le soin devient un soin d'aura (alliés à 4 m) pour en faire aussi le soutien du groupe. | Soin d'aura : oui / non (touche au réseau). |
+| [Viking](classe-viking.md) | Plancher de rage à 30 (plus de début de vague à zéro), saut 25 et rugissement 15 de rage, tournante 10 ; le rugissement protège (Peau de fer −35 % 6 s) et se joue sur le haut du corps. | Peau de fer : oui / non ; plancher ou rage de départ. |
+| [Mage](classe-mage.md) | Refondre le kit autour du contrôle de zone : Brasier au sol (LB), Déflagration qui repousse (RB), cône 30 DPS à 10 mana/s qui ralentit, mana 3/s. | Refonte complète, ou seulement chiffres + feu qui ralentit. |
+| [Rôdeur](classe-rodeur.md) | Arc 50 à pleine charge (cadence 0,15), nuée 70, salve 18, 120 PV ; la flèche chargée à fond étourdit 1 s, la nuée ralentit. | Étourdir sur toute flèche chargée, ou seulement à la tête. |
+| [Assassin](classe-assassin.md) | Dos ×2 (×3 réservé aux élites et aux boss), furtif + dos ×4, dague 22 sur 2 cibles, arbalète 60 / 5 s, grenade 15 s. | Kit fermé ({décidé}) ou rouvert pour une Marque du traqueur (RB). |
+| [Ennemis](ennemis.md) | Un squelette au contact de Nyxessa se retourne vers un héros qui l'a frappé deux fois de suite à moins de 3 m (aujourd'hui il ne se retourne jamais). | À juger en jeu après les deux premiers réglages. |
