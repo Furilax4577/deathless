@@ -11,12 +11,32 @@ public class FireballVisual : MonoBehaviour
     private static readonly int EmissionColorId = Shader.PropertyToID("_EmissionColor");
 
     // Emission modérée : trop forte, le tonemapping ramène tout au jaune et les trois teintes se confondent.
-    private static Color Yellow => VfxPalette.Couleur(VfxTheme.Feu, VfxRole.Coeur, new Color(1f, 0.9f, 0.4f));
-    private static Color YellowGlow => VfxPalette.Lueur(Yellow, 2.2f);
-    private static Color Orange => VfxPalette.Couleur(VfxTheme.Feu, VfxRole.Vif, new Color(1f, 0.38f, 0.04f));
-    private static Color OrangeGlow => VfxPalette.Lueur(Orange, 1.1f);
-    private static Color Red => VfxPalette.Couleur(VfxTheme.Feu, VfxRole.Base, new Color(0.8f, 0.12f, 0.03f));
-    private static Color RedGlow => VfxPalette.Lueur(Red, 1f);
+    // Teintes lues une fois par version de palette (VfxPalette.Cache), pas à chaque braise : jaune, orange, rouge, leurs
+    // lueurs, puis le blanc chaud du cœur.
+    private static Color[] Teintes => VfxPalette.Cache("FireballVisual.Feu", () =>
+    {
+        Color jaune = VfxPalette.Couleur(VfxTheme.Feu, VfxRole.Coeur, new Color(1f, 0.9f, 0.4f));
+        Color orange = VfxPalette.Couleur(VfxTheme.Feu, VfxRole.Vif, new Color(1f, 0.38f, 0.04f));
+        Color rouge = VfxPalette.Couleur(VfxTheme.Feu, VfxRole.Base, new Color(0.8f, 0.12f, 0.03f));
+        return new[]
+        {
+            jaune, VfxPalette.Lueur(jaune, 2.2f),
+            orange, VfxPalette.Lueur(orange, 1.1f),
+            rouge, VfxPalette.Lueur(rouge, 1f),
+            VfxPalette.Accent(VfxTheme.Feu, "Blanc chaud", new Color(1f, 0.96f, 0.84f)),
+        };
+    });
+    private static Color Yellow => Teintes[0];
+    private static Color YellowGlow => Teintes[1];
+    private static Color Orange => Teintes[2];
+    private static Color OrangeGlow => Teintes[3];
+    private static Color Red => Teintes[4];
+    private static Color RedGlow => Teintes[5];
+    private static Color BlancChaud => Teintes[6];
+
+    // Bloc de propriétés partagé par toutes les teintes : SetPropertyBlock en copie les valeurs dans le rendu, on peut
+    // donc le réutiliser au lieu d'en allouer un par braise (thread principal seulement, comme toute l'API Unity).
+    private static MaterialPropertyBlock blocTeinte;
 
     private static Mesh bodyMesh;
     private static Mesh coreMesh;
@@ -80,7 +100,8 @@ public class FireballVisual : MonoBehaviour
 
     public static void Tint(Renderer renderer, Color color, Color emission)
     {
-        MaterialPropertyBlock block = new MaterialPropertyBlock();
+        if (blocTeinte == null) blocTeinte = new MaterialPropertyBlock();
+        MaterialPropertyBlock block = blocTeinte;
         block.SetColor(BaseColorId, color);
         block.SetColor(EmissionColorId, emission);
         renderer.SetPropertyBlock(block);
@@ -95,7 +116,7 @@ public class FireballVisual : MonoBehaviour
             for (int k = 0; k < 3; k++)
             {
                 Vector3 p = transform.position + (Random.onUnitSphere * 0.2f + transform.forward * 0.08f) * transform.lossyScale.x;
-                Color c = Random.value < 0.4f ? VfxPalette.Accent(VfxTheme.Feu, "Blanc chaud", new Color(1f, 0.96f, 0.84f)) * 1.8f : Yellow * 1.6f;
+                Color c = Random.value < 0.4f ? BlancChaud * 1.8f : Yellow * 1.6f;
                 coeur.Emettre(p, Vector3.zero, Random.Range(0.03f, 0.055f) * transform.lossyScale.x, Random.Range(0.08f, 0.16f), c, 0f, 0f, 0.02f, 0.3f);
             }
 
