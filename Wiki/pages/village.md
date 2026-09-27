@@ -30,7 +30,8 @@ Les portes des maisons sont à l'échelle du joueur : 2,1 m pour un personnage d
 Maisons générées (cap « sortir de KayKit », retours de Quentin du 27/09/2026 sur la maison du guide de style) {décidé} :
 
 - **Porte** de 1,8 × 2,6 m au clair (un personnage passe sans toucher les bords).
-- **Fondations basses** : une seule assise de pierres, pas deux.
+- **Fondations basses, à la KayKit** : pas d'assise de pierres maçonnées mais une **dalle de pierre basse et lisse** qui déborde du mur, blocs d'angle et perron de deux ou trois marches devant la porte, comme `building_home_B` (retour de Quentin, 27/09/2026).
+- **Une fenêtre par façade** : porte et une fenêtre devant, une derrière, une par pignon (plus la petite fenêtre de pignon sous le faîte). Lanterne au-dessus du niveau des claveaux, entre la porte et la fenêtre.
 - **Plus grandes et plus larges de façade** : on doit pouvoir y entrer à plusieurs sans être à l'étroit, la taverne surtout. Façade à porte et deux fenêtres, plus une fenêtre de pignon.
 - **Des règles communes, une personnalisation par habitant** : même grammaire (proportions, socle, toit, porte, atlas) pour toutes ; chaque maison prend deux ou trois éléments distinctifs selon celui qui l'habite et son activité (taverne, forgeron, mécano, druide, sorcier, maison de décor), et ses propres teintes d'enduit, de volets et de toit. Propositions par maison : dans [À faire](a-faire.md).
 
