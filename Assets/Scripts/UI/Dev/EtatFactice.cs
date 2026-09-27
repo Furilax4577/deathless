@@ -79,6 +79,8 @@ namespace Deathless.UI.Dev
         float m_RelanceDans = -1f;
 
         InputChordResolver m_Accords;
+        /// Action « Gameplay/AttackSecondary », cherchée une fois à l'activation.
+        InputAction m_AttaqueSecondaire;
 
         public const float VieMaxNyx = 1000f;
 
@@ -99,6 +101,7 @@ namespace Deathless.UI.Dev
             {
                 m_Accords = InputChordResolver.ForGameplay(actions);
                 m_Accords.Triggered += OnAction;
+                m_AttaqueSecondaire = actions.FindAction("Gameplay/AttackSecondary");
             }
             if (DonneesUI.Lobby == null) DonneesUI.Lobby = gameObject.AddComponent<LobbyFactice>();   // lobby factice du banc
             if (DonneesUI.Statuts == null) DonneesUI.Statuts = m_Statuts;                                 // statuts factices du banc
@@ -141,7 +144,7 @@ namespace Deathless.UI.Dev
             if (!EstPaladin) foreach (var c in m_CompetencesClasse) c.Avancer(dt);
             SimulerJauge(dt);
             SimulerMissiles(dt);
-            m_Garde.etat = m_Garde.finActive > m_Duree || (m_Accords != null && actions != null && m_Accords.IsHeld(actions.FindAction("Gameplay/AttackSecondary")))
+            m_Garde.etat = m_Garde.finActive > m_Duree || (m_Accords != null && m_AttaqueSecondaire != null && m_Accords.IsHeld(m_AttaqueSecondaire))
                 ? EtatCompetence.Active : EtatCompetence.Prete;
             m_Attaque.etat = m_Attaque.finActive > m_Duree ? EtatCompetence.Active : EtatCompetence.Prete;
             m_Endurance = Mathf.Min(100f, m_Endurance + 6f * dt);
@@ -376,7 +379,7 @@ namespace Deathless.UI.Dev
         void SimulerJauge(float dt)
         {
             if (EstPaladin || m_Classe.Jauge == JaugeClasse.Aucune) return;
-            var maintenue = m_Accords != null && actions != null && m_Accords.IsHeld(actions.FindAction("Gameplay/AttackSecondary"));
+            var maintenue = m_Accords != null && m_AttaqueSecondaire != null && m_Accords.IsHeld(m_AttaqueSecondaire);
             if (m_CompetencesClasse.Count > 1) m_CompetencesClasse[1].etat = maintenue ? EtatCompetence.Active : EtatCompetence.Prete;
             if (m_Classe.Jauge == JaugeClasse.Mana)
                 m_ValeurJauge = Mathf.Clamp(m_ValeurJauge + (maintenue ? -12f : 3f) * dt, 0f, 100f);
