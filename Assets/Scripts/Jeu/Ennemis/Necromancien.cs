@@ -40,11 +40,11 @@ namespace Deathless.Jeu
             float d = Distance(c);
             Tourner(c);
             // Garder ses distances : s'approcher au-delà de la distance haute, reculer en deçà de la distance basse.
-            if (d > b.necroDistance.y) { Agent.isStopped = false; Agent.speed = b.necroVitesse; Agent.SetDestination(c); }
+            if (d > b.necroDistance.y) { Agent.isStopped = false; Agent.speed = b.necroVitesse; Poursuivre(c); }
             else if (d < b.necroDistance.x)
             {
                 Vector3 fuite = transform.position + (transform.position - c).normalized * 5f;
-                if (NavMesh.SamplePosition(fuite, out var hit, 3f, NavMesh.AllAreas)) { Agent.isStopped = false; Agent.speed = b.necroVitesse * 0.8f; Agent.SetDestination(hit.position); }
+                if (NavMesh.SamplePosition(fuite, out var hit, 3f, NavMesh.AllAreas)) { Agent.isStopped = false; Agent.speed = b.necroVitesse * 0.8f; Agent.SetDestination(hit.position); OublierDestination(); }
             }
             else Agent.isStopped = true;
 

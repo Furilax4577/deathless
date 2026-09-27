@@ -293,8 +293,26 @@ namespace Deathless.Jeu
                 return;
             }
             Agent.isStopped = false;
-            if (!Agent.hasPath || (Agent.destination - m_Place).sqrMagnitude > 0.5f) Agent.SetDestination(m_Place);
+            if (!Agent.hasPath || (Agent.destination - m_Place).sqrMagnitude > 0.5f) { Agent.SetDestination(m_Place); OublierDestination(); }
         }
+
+        Vector3 m_DestinationSuivie;
+        float m_DestinationQuand = -99f;
+
+        /// Suit une cible mobile sans recalculer le chemin à chaque image (jusqu'à 60 squelettes) : le chemin n'est
+        /// relancé que si la cible s'est éloignée de plus de 0,5 m de la dernière destination demandée, toutes les
+        /// 0,2 s au plus tard, ou si l'agent n'a plus de chemin. Le premier appel après OublierDestination est immédiat.
+        protected void Poursuivre(Vector3 p)
+        {
+            if (Time.time - m_DestinationQuand < 0.2f && (p - m_DestinationSuivie).sqrMagnitude <= 0.25f
+                && (Agent.hasPath || Agent.pathPending)) return;
+            Agent.SetDestination(p);
+            m_DestinationSuivie = p;
+            m_DestinationQuand = Time.time;
+        }
+
+        /// À appeler après tout autre SetDestination : le prochain Poursuivre relance le chemin tout de suite.
+        protected void OublierDestination() => m_DestinationQuand = -99f;
 
         protected virtual void MajPoursuite(float dt)
         {
@@ -319,7 +337,7 @@ namespace Deathless.Jeu
             else
             {
                 Agent.isStopped = false;
-                Agent.SetDestination(m_Cible.transform.position);
+                Poursuivre(m_Cible.transform.position);
             }
         }
 
