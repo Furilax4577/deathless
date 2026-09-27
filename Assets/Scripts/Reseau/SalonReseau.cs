@@ -32,10 +32,18 @@ namespace Deathless.Reseau
         public static SalonReseau Instance { get; private set; }
 
         public NetworkList<JoueurSalon> Joueurs;
-        public NetworkVariable<float> CompteARebours = new NetworkVariable<float>(-1f);
+        /// Fin du compte à rebours en temps serveur (NetworkManager.ServerTime), -1 sans compte : écrite une fois au
+        /// départ, chaque poste en déduit le restant (Restant) sans autre message.
+        public NetworkVariable<double> FinCompte = new NetworkVariable<double>(-1d);
         public NetworkVariable<bool> Lance = new NetworkVariable<bool>(false);
 
         public const float DureeCompte = 3f;
+
+        /// Un compte à rebours est en cours.
+        public bool EnCompte => FinCompte.Value >= 0d;
+
+        /// Secondes restantes avant le lancement (0 sans compte).
+        public float Restant => EnCompte && NetworkManager != null ? Mathf.Max(0f, (float)(FinCompte.Value - NetworkManager.ServerTime.Time)) : 0f;
 
         void Awake()
         {
@@ -105,7 +113,7 @@ namespace Deathless.Reseau
         void LancerRpc(RpcParams p = default)
         {
             if (p.Receive.SenderClientId != NetworkManager.ServerClientId) return;   // l'hôte seul
-            if (TousPrets()) CompteARebours.Value = 0.01f;
+            if (TousPrets()) FinCompte.Value = NetworkManager.ServerTime.Time + 0.01;
         }
 
         // ----------------------------------------------------------------- Hôte
@@ -134,18 +142,14 @@ namespace Deathless.Reseau
             if (!IsServer || Lance.Value) return;
             if (TousPrets())
             {
-                if (CompteARebours.Value < 0f) CompteARebours.Value = DureeCompte;
-                else
+                if (!EnCompte) FinCompte.Value = NetworkManager.ServerTime.Time + DureeCompte;
+                else if (NetworkManager.ServerTime.Time >= FinCompte.Value)
                 {
-                    CompteARebours.Value = Mathf.Max(0f, CompteARebours.Value - Time.deltaTime);
-                    if (CompteARebours.Value <= 0f)
-                    {
-                        Lance.Value = true;
-                        ReseauJeu.Instance.LancerPartie();
-                    }
+                    Lance.Value = true;
+                    ReseauJeu.Instance.LancerPartie();
                 }
             }
-            else if (CompteARebours.Value >= 0f) CompteARebours.Value = -1f;
+            else if (EnCompte) FinCompte.Value = -1d;
         }
 
         int Index(ulong id)
