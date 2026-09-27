@@ -63,7 +63,11 @@ namespace Deathless.Reseau
             }
         }
 
-        void OnDestroy() { if (ReferenceEquals(DonneesUI.Lobby, this)) DonneesUI.Lobby = null; }
+        void OnDestroy()
+        {
+            Suivre(null);
+            if (ReferenceEquals(DonneesUI.Lobby, this)) DonneesUI.Lobby = null;
+        }
 
         // ----------------------------------------------------------------- Services (Relay, Lobby)
 
@@ -243,11 +247,29 @@ namespace Deathless.Reseau
             ReseauJeu.Journal("erreur : " + message);
         }
 
-        // ----------------------------------------------------------------- Vue (chaque image)
+        // ----------------------------------------------------------------- Vue (reconstruite sur changement)
+
+        /// Salon dont on écoute la liste des joueurs, et vue à reconstruire : la vue (une Vue et deux chaînes par joueur)
+        /// n'est refaite que quand la liste change (NetworkList.OnListChanged), à l'arrivée d'un nouveau salon ou au
+        /// retour dans le salon ; avant, elle l'était à chaque image, partie comprise.
+        SalonReseau m_SalonSuivi;
+        bool m_VueAJour;
+
+        void Suivre(SalonReseau s)
+        {
+            if (ReferenceEquals(m_SalonSuivi, s)) return;
+            if (!ReferenceEquals(m_SalonSuivi, null) && m_SalonSuivi.Joueurs != null) m_SalonSuivi.Joueurs.OnListChanged -= JoueursChanges;
+            m_SalonSuivi = s;
+            if (!ReferenceEquals(s, null) && s.Joueurs != null) s.Joueurs.OnListChanged += JoueursChanges;
+            m_VueAJour = false;
+        }
+
+        void JoueursChanges(NetworkListEvent<JoueurSalon> e) => m_VueAJour = false;
 
         void Update()
         {
             var s = SalonReseau.Instance;
+            Suivre(s);
             if (m_Etat == EtatLobby.Connexion)
             {
                 if (s != null && s.IsSpawned && Contient(s, ReseauJeu.IdLocal)) { m_Etat = EtatLobby.Salon; m_Message = ""; }
@@ -257,14 +279,22 @@ namespace Deathless.Reseau
                     if (m_Attente < 0f) Erreur("L’hôte ne répond pas.");
                 }
             }
-            if (s == null || !s.IsSpawned || m_Etat == EtatLobby.Aucun || m_Etat == EtatLobby.Erreur || m_Etat == EtatLobby.Connexion) return;
-            m_Vue.Clear();
-            foreach (var j in s.Joueurs)
-                m_Vue.Add(new Vue
-                {
-                    Pseudo = j.pseudo.ToString(), ClasseId = j.classeId.ToString(), Pret = j.pret,
-                    EstLocal = j.clientId == ReseauJeu.IdLocal, EstHote = j.clientId == NetworkManager.ServerClientId,
-                });
+            if (s == null || !s.IsSpawned || m_Etat == EtatLobby.Aucun || m_Etat == EtatLobby.Erreur || m_Etat == EtatLobby.Connexion)
+            {
+                m_VueAJour = false;   // la vue a pu être vidée (Entrer, Quitter, Erreur) : refaite au retour dans le salon
+                return;
+            }
+            if (!m_VueAJour)
+            {
+                m_VueAJour = true;
+                m_Vue.Clear();
+                foreach (var j in s.Joueurs)
+                    m_Vue.Add(new Vue
+                    {
+                        Pseudo = j.pseudo.ToString(), ClasseId = j.classeId.ToString(), Pret = j.pret,
+                        EstLocal = j.clientId == ReseauJeu.IdLocal, EstHote = j.clientId == NetworkManager.ServerClientId,
+                    });
+            }
             if (s.Lance.Value) m_Etat = EtatLobby.Lancement;
             else if (s.CompteARebours.Value >= 0f) m_Etat = EtatLobby.CompteARebours;
             else m_Etat = EtatLobby.Salon;
