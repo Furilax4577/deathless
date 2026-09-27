@@ -25,9 +25,13 @@ namespace Deathless.Reseau
         /// Marionnette (client) : l'IA tourne chez l'hôte.
         public bool Distant => IsSpawned && !IsServer;
 
-        void Awake() { Squelette = GetComponent<Squelette>(); m_Statuts = new NetworkList<StatutReseau>(); }
+        /// Échelle du préfab, relevée à l'instanciation (avant toute échelle d'élite ou d'apparition).
+        Vector3 m_EchelleBase;
 
-        /// Hôte, avant l'apparition : type et élite (l'échelle de l'élite suit par le NetworkTransform).
+        void Awake() { Squelette = GetComponent<Squelette>(); m_Statuts = new NetworkList<StatutReseau>(); m_EchelleBase = transform.localScale; }
+
+        /// Hôte, avant l'apparition : type et élite (l'échelle de l'élite est rejouée par chaque client, le
+        /// NetworkTransform ne synchronisant pas l'échelle).
         public void Preparer(TypeEnnemi type, bool elite)
         {
             m_TypePrepare = type;
@@ -52,6 +56,8 @@ namespace Deathless.Reseau
             var sq = Squelette;
             sq.type = (TypeEnnemi)m_Type.Value;
             sq.elite = m_Elite.Value;
+            // Échelle posée en absolu depuis celle du préfab : jamais doublée, quelle que soit l'échelle reçue à l'apparition.
+            transform.localScale = m_EchelleBase * (sq.elite ? Squelette.EchelleElite : 1f);
             sq.MarquerElite();
             sq.enabled = false;                       // IA et animation pilotées chez l'hôte
             if (sq.Agent != null) sq.Agent.enabled = false;

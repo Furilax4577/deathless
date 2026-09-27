@@ -471,6 +471,10 @@ namespace Deathless.Jeu
 
         public virtual bool Repoussable => true;
 
+        /// Échelle d'un élite (wiki : ennemis.md, environ 1,3 fois plus grand) : posée par l'hôte à l'apparition
+        /// (DirecteurVagues), rejouée chez les clients (EnnemiReseau) car l'échelle ne passe pas par le NetworkTransform.
+        public const float EchelleElite = 1.3f;
+
         /// Élite : yeux rouges et légère aura rouge (wiki : ennemis, Élites ; sans éclat de Nyx). Appelé à l'apparition, chez l'hôte comme chez les clients (purement visuel).
         public void MarquerElite()
         {

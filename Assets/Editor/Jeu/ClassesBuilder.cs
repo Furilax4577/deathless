@@ -349,8 +349,19 @@ namespace Deathless.EditorTools
         const string SalonReseauPath = "Assets/Jeu/Resources/Reseau/SalonReseau.prefab";
         const string PartieReseauPath = "Assets/Jeu/Resources/Reseau/PartieReseau.prefab";
 
-        /// Squelette réseau : l'hôte fait foi (NetworkTransform et NetworkAnimator en autorité serveur ; échelle synchronisée
-        /// pour les élites) ; EnnemiReseau fait des clients des marionnettes et relaie leurs coups.
+        /// Seuils d'envoi du NetworkTransform (décision du 27/09/2026) : 1 cm, 1° ; pleine précision, quaternions non
+        /// compressés.
+        static void Seuils(Unity.Netcode.Components.NetworkTransform nt)
+        {
+            nt.PositionThreshold = 0.01f;
+            nt.RotAngleThreshold = 1f;
+            nt.UseHalfFloatPrecision = false;
+            nt.UseQuaternionCompression = false;
+        }
+
+        /// Squelette réseau : l'hôte fait foi (NetworkTransform et NetworkAnimator en autorité serveur ; échelle non
+        /// synchronisée : celle des élites est rejouée par EnnemiReseau) ; EnnemiReseau fait des clients des marionnettes
+        /// et relaie leurs coups.
         static void AjouterReseauEnnemi(GameObject racine)
         {
             if (racine.GetComponent<Unity.Netcode.NetworkObject>() == null) racine.AddComponent<Unity.Netcode.NetworkObject>();
@@ -359,7 +370,8 @@ namespace Deathless.EditorTools
             nt.AuthorityMode = Unity.Netcode.Components.NetworkTransform.AuthorityModes.Server;
             nt.SyncRotAngleX = false;
             nt.SyncRotAngleZ = false;
-            nt.SyncScaleX = nt.SyncScaleY = nt.SyncScaleZ = true;
+            nt.SyncScaleX = nt.SyncScaleY = nt.SyncScaleZ = false;
+            Seuils(nt);
             nt.Interpolate = true;
             var na = racine.GetComponent<Unity.Netcode.Components.NetworkAnimator>();
             if (na == null) na = racine.AddComponent<Unity.Netcode.Components.NetworkAnimator>();
@@ -437,6 +449,7 @@ namespace Deathless.EditorTools
             nt.SyncRotAngleX = false;
             nt.SyncRotAngleZ = false;
             nt.SyncScaleX = nt.SyncScaleY = nt.SyncScaleZ = false;
+            Seuils(nt);
             nt.Interpolate = true;
             var na = racine.GetComponent<Unity.Netcode.Components.NetworkAnimator>();
             if (na == null) na = racine.AddComponent<Unity.Netcode.Components.NetworkAnimator>();
