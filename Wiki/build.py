@@ -71,6 +71,7 @@ MENU = [
     ("commandes", "Commandes"),
     ("interface", "Interface"),
     ("effets", "Effets et couleurs", "dev"),
+    ("direction-artistique", "Direction artistique", "dev"),
     ("animations", "Animations", "dev"),
     ("a-decider", "À décider", "dev"),
     ("a-faire", "À faire", "dev"),
