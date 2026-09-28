@@ -78,6 +78,14 @@ Plans chiffrés à notre échelle : `Docs/da/maisons-plans.md`. Les boutiques fo
 - **Façades** : Grok respecte largeurs et hauteurs quand on lui donne le gabarit. À corriger : il ajoute un étage de fenêtres partout (seuls la taverne et le mécano en ont un), et garde les soubassements maçonnés.
 - **Rendu général** : Grok a basculé la vue, resserré le village et donné la même taille à toutes les maisons. Il sert pour l'ambiance ; pour un rendu général exact, c'est le prototype dans le moteur qui fait foi.
 
+## Rendu 3D low poly à l'échelle, jour et nuit (28/09/2026)
+
+{image media/da/village-3d-lowpoly-jour-20260928-01.jpg} **Village, jour** | Grok sur le gabarit 3D à l'échelle
+{image media/da/village-3d-lowpoly-nuit-20260928-01.jpg} **Village, nuit** | Même scène, la relique domine
+{image media/da/village-3d.png} **Gabarit 3D à l'échelle** | Volumes aux cotes, projection parallèle
+
+**Méthode retenue pour les vues d'ensemble** : `Docs/outils/plan_village_3d.py` dessine les volumes aux vraies cotes (projection parallèle : un mètre vaut le même nombre de pixels partout), avec quatre personnages de 2,3 m près du plateau ; Grok habille ce gabarit (`village-3d-lowpoly-jour`, puis `-nuit` sur l'image de jour). Positions et tailles relatives sont tenues : la taverne est le grand bâtiment, la maison de base le petit, les joueurs restent à leur taille. Restent approximatifs : la grotte, en partie cachée par la maison du sorcier ; les soubassements maçonnés.
+
 ## Rendu réaliste 3D, jour et nuit (28/09/2026)
 
 {image media/da/village-3d-jour-20260928-01.jpg} **Village, rendu réaliste, jour** | D'après le plan à l'échelle
