@@ -8,3 +8,8 @@ World rules that never change: the only green light in the world comes from the 
 magic; fire and lanterns are warm orange. Houses are half-timbered cottages with cream or pale plaster, dark
 red-brown timber frames, clay tile roofs, an arched plank door framed by large plain grey stone blocks, and they sit
 on a low smooth plain stone slab with a couple of steps, never on masonry.
+
+Scale rules that never change: characters are chunky big-headed toy figures, the head is almost half of the body
+height, and they are large compared to the architecture: a character is three quarters as tall as a house door, a
+table top reaches his chest, a stool reaches his knee, a bar counter reaches his shoulders, a single-storey wall is
+less than twice his height. Furniture and doors are oversized and thick to match them.

@@ -25,6 +25,8 @@ Un **sentier de pierre** part du village vers **chacune des trois zones** d'où 
 
 ## Refonte de la carte {décidé}
 
+**Plan cible** {décidé, 28/09/2026} : le plan n° 3 de la page [Direction artistique](direction-artistique.md) (Grok, d'après nos décisions). Il reprend tout ce qui suit et y ajoute un **anneau pavé** autour du plateau d'où partent les allées, et un village plus ramassé. **L'intérieur dicte l'emprise** : chaque bâtiment est d'abord dimensionné par son plan de circulation intérieur, à l'échelle des personnages (2,3 m) et de la caméra ; l'extérieur en découle. Premier fait : la taverne, 16 × 11 m (`Docs/da/taverne-plan.md`).
+
 Chantier ouvert par Quentin le 27/09/2026. **Plan validé sur la maquette grise le 27/09/2026** (`sandbox-level`, scène `VillageV5`, générateur `VillageV5Builder`, captures `v5_*.png`) : maisons sur une couronne à **r = 30 m** (l'axe nord ±20° est réservé à la vue plateau → cascade, les trois couloirs de vagues ±25° restent libres), cascade **plein nord**, falaise en trois gradins (18, 28, 38 m) à r = 34 m, pierrier r 26-34 m, rivière de 4,5 m, ponts de 3 m, gué de 4,5 m ; place du portail à r = 18 m sur l'azimut 60° (rive est, pont nord) ; le pierrier épargne l'emprise des maisons et le terrain est aplani sous chacune. Habillage complet fait dans le bac à sable le 27/09/2026 ; prochaine étape : le report dans `main` (0.6.0).
 
 - **Moins de forêt** : elle reste au sud et à l'ouest, en deux masses qui gardent les couloirs des vagues ; l'est devient une lande (prairie, rochers, souches, arbres isolés).
@@ -74,6 +76,8 @@ Les maisons des villageois ont un **intérieur** où l'on entre par la porte : l
 Le druide, le mécano et le forgeron ont **chacun leur maison**, qui leur sert de boutique : on y entre le jour pour acheter. Le sorcier a aussi sa maison, où il passe la journée ; il ne vend rien. Une maison est la **taverne** (ci-dessous). La dernière reste du décor.
 
 ## Taverne {décidé}
+
+**Refonte du 28/09/2026** {décidé} : la taverne est un lieu convivial, avec de la **musique festive**. La tavernière est **la Bavaroise** ; **le barde** joue sur une estrade ; **le clochard pétomane** est le client récurrent, sur son banc près de l'âtre ; et il y a la place pour les quatre joueurs. Salle de 16 × 11 m à double hauteur, comptoir de 6 m (quatre joueurs de front), galerie de décor au-dessus du service. Plan chiffré : `Docs/da/taverne-plan.md`. {{dev: Les trois restent des candidats jouables ; à la taverne ce sont des villageois.}}
 
 Une des maisons (celle du nord-est de la place) est la **taverne** : comptoir, tonneaux en perce, tables et tabourets, âtre, et le **tavernier** derrière son comptoir. **De jour uniquement**, au comptoir, la touche **Interagir** (E, X, Carré) ouvre son menu ; l'or est pris dans la **caisse commune** :
 

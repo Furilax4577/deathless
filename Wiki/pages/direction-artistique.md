@@ -25,7 +25,9 @@ Tous les prompts sont dans `Docs/da/prompts/` et reprennent le même bloc de sty
 | `maisons-planche` | Les six maisons côte à côte, avec un personnage pour l'échelle |
 | `grotte-portail` | Retouche d'une capture du prototype : la grotte dans la falaise (`--depuis`) |
 
-## Premier jeu d'images (28/09/2026), à trancher par Quentin
+## Premier jeu d'images (28/09/2026)
+
+**Le plan n° 3 est la cible** {décidé, Quentin, 28/09/2026}. Les maisons sont « un bon début », à reprendre une fois leurs intérieurs dimensionnés.
 
 {image media/da/plan-village-20260928-03.jpg} **Plan n° 3** | Le plus fidèle à nos décisions
 {image media/da/plan-village-20260928-01.jpg} **Plan n° 1** | Sept maisons, une dans l'axe nord
@@ -40,6 +42,16 @@ Tous les prompts sont dans `Docs/da/prompts/` et reprennent le même bloc de sty
 - **Plan n° 3** : falaise au nord, cascade plein nord, grotte verte à sa gauche, rivière à l'est du plateau qui sort au sud-ouest, deux ponts (est et sud), gué sous le pont sud, six maisons trois par rive, axe nord dégagé, lande et souches à l'est, forêt au sud et à l'ouest, trois clairières. Écarts : forêt trop dense, maisons à une quinzaine de mètres de la relique (notre prototype : 30 m).
 - **Ce que les images proposent de neuf** : un **anneau pavé** autour du plateau d'où partent les allées ; un village **plus ramassé** ; des maisons **à étage** (taverne, mécano) ; la tour du sorcier à **toit conique** ; le **potager clôturé et le puits** de la maison de décor ; les **lanternes aux ponts**.
 - **Ce qu'on écarte toujours** : les textures (pierres maçonnées, planches peintes), l'enseigne de la fiole en vert (le vert est à Nyxessa), le plateau posé dans l'eau.
+
+## Taverne (28/09/2026)
+
+{image media/da/taverne-coupe-20260928-01.jpg} **Coupe, toit retiré** | Comptoir, galerie, estrade, âtre
+{image media/da/taverne-coupe-20260928-02.jpg} **Coupe, variante** | Charpente apparente
+{image media/da/taverne-ambiance-20260928-01.jpg} **Depuis l'entrée** | À hauteur de joueur
+
+- **On garde** : la salle à double hauteur avec poutres, lustres à bougies et guirlandes de fanions ; le comptoir sous une galerie à balustrade ; l'estrade du barde dans l'angle ; l'âtre massif ; le grand sol nu au milieu ; la Bavaroise au comptoir, le clochard sur son banc près du feu.
+- **On corrige** : **l'échelle**. Grok dessine des personnages de 1,2 m dans un mobilier d'adultes ; les nôtres font 2,3 m, avec une grosse tête. Le plan chiffré (`Docs/da/taverne-plan.md`) fait foi : salle de 16 × 11 m, allée de 3 m, comptoir de 6 m à 1,3 m de haut, 5 m sous poutres pour la caméra. Le bloc de style des prompts porte désormais la règle d'échelle.
+- **On écarte** : la seconde porte latérale, les textures de pierre.
 
 ## Images retenues
 
