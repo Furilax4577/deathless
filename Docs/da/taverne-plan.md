@@ -32,7 +32,7 @@ Intérieur **16 × 11 m** (176 m²), porte au sud, face à Nyxessa. Origine au c
 | Allée principale | x 6,6 à 9,4, de la porte au comptoir | 3 m de large | jamais de meuble dedans |
 | Comptoir | x 8,5 à 14,5 ; y 8,6 à 9,5 | 6 × 0,9 m, 1,3 m de haut | quatre joueurs de front (4 × 1,2 m) ; point d'interaction au milieu |
 | Service | x 8,5 à 16 ; y 9,5 à 11 | 1,5 m de passage | la Bavaroise, quatre tonneaux en perce contre le mur nord, étagères de chopes |
-| Galerie | au-dessus du service et du comptoir | plancher à 3,4 m | décor ; les joueurs ne passent jamais dessous |
+| Galerie | au-dessus du service et du comptoir | plancher à 3,4 m | **décor seulement** (décidé par Quentin le 28/09/2026) ; les joueurs ne passent jamais dessous |
 | Escalier | x 14,8 à 16 ; y 4 à 8,6 | 1,2 m de large | monte à la galerie ; fermé par une corde en haut (décor) |
 | Place des joueurs | x 7 à 14,8 ; y 3,6 à 8,6 | 7,8 × 5 m | sol nu devant le comptoir ; recul de caméra assuré |
 | Estrade | x 0,4 à 4,4 ; y 8 à 11 | 4 × 3 m, 0,4 m de haut | le barde ; piste de 3,4 × 3 m devant (x 4,6 à 8) |
@@ -66,6 +66,5 @@ La taverne est donc **le grand bâtiment du village** : deux fois la largeur d'u
 
 ## Reste à trancher
 
-- La galerie : décor seulement, ou accessible (deuxième niveau jouable, caméra à revoir) ?
 - Clients anonymes en plus (deux ou trois villageois aux tables) ?
 - La taverne la nuit : ouverte, ou fermée comme les boutiques (voir « Maisons la nuit » dans À décider) ?
