@@ -78,6 +78,13 @@ Plans chiffrés à notre échelle : `Docs/da/maisons-plans.md`. Les boutiques fo
 - **Façades** : Grok respecte largeurs et hauteurs quand on lui donne le gabarit. À corriger : il ajoute un étage de fenêtres partout (seuls la taverne et le mécano en ont un), et garde les soubassements maçonnés.
 - **Rendu général** : Grok a basculé la vue, resserré le village et donné la même taille à toutes les maisons. Il sert pour l'ambiance ; pour un rendu général exact, c'est le prototype dans le moteur qui fait foi.
 
+## Rendu réaliste 3D, jour et nuit (28/09/2026)
+
+{image media/da/village-3d-jour-20260928-01.jpg} **Village, rendu réaliste, jour** | D'après le plan à l'échelle
+{image media/da/village-3d-nuit-20260928-01.jpg} **Village, rendu réaliste, nuit** | Même scène, la relique domine
+
+Images d'ambiance, **hors style du jeu** (matières réalistes) : elles servent à juger le lieu et la lumière, et pourront servir à la communication. Elles ne sont pas une cible de modélisation. Écarts avec le plan : un troisième pont, deux toits d'ardoise, des bâtiments de tailles voisines.
+
 ## Images retenues
 
 {image media/da/village-vision-grok-01.webp} **Village, vision du 28/09/2026** | Grok Imagine, par Quentin
