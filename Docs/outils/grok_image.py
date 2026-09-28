@@ -17,7 +17,8 @@ Un prompt est un fichier Markdown de Docs/da/prompts/ : des lignes d'en-tête fa
 (en anglais de préférence). Les lignes qui commencent par `#` sont des commentaires.
 
 Sorties : Docs/references/<nom>-<AAAAMMJJ>-<NN>.<ext> et une ligne dans Docs/da/journal.md (date, prompt, modèle,
-fichiers). Bibliothèque standard seulement.
+fichiers). L'en-tête `base: _style-jeu` reprend le bloc de style commun. Un fichier dont le nom commence par `_`
+est un bloc à inclure, pas un prompt. Bibliothèque standard seulement.
 """
 import argparse
 import base64
@@ -39,8 +40,8 @@ MODELE = "grok-imagine-image-2.0"
 N_MAX = 10
 
 
-def lire_prompt(nom):
-    """Renvoie (texte envoyé, format) à partir de Docs/da/prompts/<nom>.md."""
+def lire_fichier(nom):
+    """En-tête (format, style, eviter, base) et corps d'un fichier de prompt."""
     chemin = os.path.join(PROMPTS, nom + ".md")
     if not os.path.exists(chemin):
         sys.exit("prompt introuvable : " + chemin + " (voir --liste)")
@@ -53,12 +54,27 @@ def lire_prompt(nom):
                 dans_corps = bool(entete) or dans_corps
                 continue
             cle, sep, valeur = ligne.partition(":")
-            if sep and cle.strip().lower() in ("format", "style", "eviter"):
+            if sep and cle.strip().lower() in ("format", "style", "eviter", "base"):
                 entete[cle.strip().lower()] = valeur.strip()
                 continue
             dans_corps = True
         corps.append(ligne)
-    texte = " ".join(l.strip() for l in corps if l.strip())
+    return entete, " ".join(l.strip() for l in corps if l.strip())
+
+
+def lire_prompt(nom):
+    """Renvoie (texte envoyé, format) à partir de Docs/da/prompts/<nom>.md. L'en-tête `base: <fichier>` reprend le
+    style, la liste à éviter et le format d'un autre fichier (le bloc de style commun, `_style-jeu`) ; ce que le
+    prompt déclare lui-même l'emporte, et son `eviter` s'ajoute à celui de la base."""
+    entete, texte = lire_fichier(nom)
+    if entete.get("base"):
+        base, texte_base = lire_fichier(entete["base"])
+        if texte_base:
+            texte = texte + " " + texte_base
+        for cle in ("style", "format"):
+            entete.setdefault(cle, base.get(cle))
+        if base.get("eviter"):
+            entete["eviter"] = base["eviter"] + (", " + entete["eviter"] if entete.get("eviter") else "")
     if entete.get("style"):
         texte = entete["style"].rstrip(". ") + ". " + texte
     if entete.get("eviter"):
@@ -140,7 +156,7 @@ def main():
 
     if a.liste:
         for f in sorted(os.listdir(PROMPTS)) if os.path.isdir(PROMPTS) else []:
-            if f.endswith(".md"):
+            if f.endswith(".md") and not f.startswith("_"):
                 print(f[:-3])
         return
     if not a.prompt and not a.texte:

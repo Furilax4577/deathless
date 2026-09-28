@@ -12,6 +12,35 @@
 
 Grok donne la **composition et les idées** (où sont les choses, les volumes, l'ambiance) ; le **style de surface reste celui du jeu** : facettes plates, une couleur par facette avec le dégradé de l'atlas, aucune texture, formes trapues. Les images de Grok sont belles mais texturées (briques et planches peintes, herbe détaillée) : on n'en copie jamais le rendu (Quentin, 28/09/2026). Pour rester au plus près du jeu, on part d'une **capture du prototype** (`grok_image.py --depuis`) et on demande la variante.
 
+## Le jeu de prompts {dev}
+
+Tous les prompts sont dans `Docs/da/prompts/` et reprennent le même bloc de style (`_style-jeu.md` : facettes plates, aucune texture, formes trapues, vert réservé à la relique, maisons sur dalle lisse) par l'en-tête `base: _style-jeu`.
+
+| Prompt | Ce qu'il produit |
+|---|---|
+| `plan-village` | Le plan vu du dessus, nord en haut (carte du niveau) |
+| `village-jour` | Le village vu du sud, cadrage du menu principal |
+| `village-nuit` | Même cadrage, de nuit : la relique d'abord, fenêtres et lanternes ensuite |
+| `village-joueur` | À hauteur de joueur, depuis le pont sud |
+| `maisons-planche` | Les six maisons côte à côte, avec un personnage pour l'échelle |
+| `grotte-portail` | Retouche d'une capture du prototype : la grotte dans la falaise (`--depuis`) |
+
+## Premier jeu d'images (28/09/2026), à trancher par Quentin
+
+{image media/da/plan-village-20260928-03.jpg} **Plan n° 3** | Le plus fidèle à nos décisions
+{image media/da/plan-village-20260928-01.jpg} **Plan n° 1** | Sept maisons, une dans l'axe nord
+{image media/da/plan-village-20260928-04.jpg} **Plan n° 4** | La rivière serre le plateau
+{image media/da/plan-village-20260928-02.jpg} **Plan n° 2** | Le plateau dans l'eau, forêt clairsemée
+{image media/da/village-jour-20260928-03.jpg} **Village de jour** | Cadrage du menu
+{image media/da/village-jour-20260928-02.jpg} **Village de jour, variante** | Falaise en arc
+{image media/da/village-nuit-20260928-01.jpg} **Village de nuit** | La relique domine, braise verte dans la grotte
+{image media/da/village-joueur-20260928-01.jpg} **Vue du joueur** | À refaire : le plateau est dans l'eau
+{image media/da/maisons-planche-20260928-01.jpg} **Planche des maisons** | Les six métiers
+
+- **Plan n° 3** : falaise au nord, cascade plein nord, grotte verte à sa gauche, rivière à l'est du plateau qui sort au sud-ouest, deux ponts (est et sud), gué sous le pont sud, six maisons trois par rive, axe nord dégagé, lande et souches à l'est, forêt au sud et à l'ouest, trois clairières. Écarts : forêt trop dense, maisons à une quinzaine de mètres de la relique (notre prototype : 30 m).
+- **Ce que les images proposent de neuf** : un **anneau pavé** autour du plateau d'où partent les allées ; un village **plus ramassé** ; des maisons **à étage** (taverne, mécano) ; la tour du sorcier à **toit conique** ; le **potager clôturé et le puits** de la maison de décor ; les **lanternes aux ponts**.
+- **Ce qu'on écarte toujours** : les textures (pierres maçonnées, planches peintes), l'enseigne de la fiole en vert (le vert est à Nyxessa), le plateau posé dans l'eau.
+
 ## Images retenues
 
 {image media/da/village-vision-grok-01.webp} **Village, vision du 28/09/2026** | Grok Imagine, par Quentin
