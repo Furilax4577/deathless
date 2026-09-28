@@ -78,7 +78,7 @@ namespace Deathless.Jeu
             if (cible == null) return;
 
             bool groupe = Groupe(dv, cible) >= b.groupeTaille;
-            bool lourd = cible.elite || cible.type == TypeEnnemi.Golem || cible.type == TypeEnnemi.Necromancien;
+            bool lourd = Lourd(cible);
             if (m_SalveRestante == 0)
             {
                 if (frappee) m_SalveRestante = e.stock;                         // vide tout son stock
@@ -93,6 +93,9 @@ namespace Deathless.Jeu
             Tirer(tir, e, p);
             m_SalveRestante--;
         }
+
+        /// Cible « lourde » (wiki : nyxessa.md, priorité 2) : mage lanceur de crâne (28/09/2026), élite ou boss.
+        static bool Lourd(Squelette s) => s.elite || s.type == TypeEnnemi.Mage || s.type == TypeEnnemi.Golem || s.type == TypeEnnemi.Necromancien;
 
         bool Portee(Squelette s)
         {
@@ -112,7 +115,7 @@ namespace Deathless.Jeu
                 float d = (s.transform.position - transform.position).sqrMagnitude;
                 if (s.SurNyxessa && d < dSur) { dSur = d; sur = s; }
                 // Priorité 2 (wiki : nyxessa.md) : un mage lanceur de crâne, un élite ou un boss (Golem : Morgrim).
-                if ((s.elite || s.type == TypeEnnemi.Golem || s.type == TypeEnnemi.Necromancien) && d < dLourd) { dLourd = d; lourd = s; }
+                if (Lourd(s) && d < dLourd) { dLourd = d; lourd = s; }
                 if (d < dProche) { dProche = d; proche = s; }
             }
             priorite = sur != null ? 1 : lourd != null ? 2 : 3;

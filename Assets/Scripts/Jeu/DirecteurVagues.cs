@@ -7,8 +7,9 @@ namespace Deathless.Jeu
     /// Vagues de la nuit (wiki : deroule) : au crépuscule, tirage et annonce des clairières actives (zones d'apparition) ;
     /// la nuit, vagues à 0 / 40 / 80 s (0 / 30 / 60 / 90 dès la nuit 9), sorties de terre étalées et réparties entre les
     /// clairières actives, plafond de 60 squelettes (au-delà, PV répartis sur les vivants) ; à l'aube, extinction des
-    /// zones et désintégration des squelettes debout. Version 0.1 : sbires et guerriers ; voleurs, mages (dont le mage
-    /// lanceur de crâne de la nuit 6) et élites sont des guerriers ; Golem nuit 10, Nécromancien nuit 12.
+    /// zones et désintégration des squelettes debout. Sbires, guerriers, et depuis le 28/09/2026 voleurs et mages
+    /// (lanceurs de crâne) dès la nuit 3 selon GameBalance.partVoleurs / partMages ; les élites sont des guerriers
+    /// renforcés ; Golem (Morgrim) nuit 10, Nécromancien nuit 12.
     public class DirecteurVagues : MonoBehaviour
     {
         public static DirecteurVagues Instance { get; private set; }
@@ -18,6 +19,8 @@ namespace Deathless.Jeu
         [Tooltip("Zones d'apparition (même ordre que les clairières).")]
         public ZoneApparition[] zones;
         public GameObject prefabSbire, prefabGuerrier, prefabGolem, prefabNecromancien;
+        [Tooltip("Voleur (chasse les isolés) et mage squelette (tireur), 28/09/2026 ; un prefab absent est remplacé par un sbire.")]
+        public GameObject prefabVoleur, prefabMage;
         [Tooltip("Morgrim, mini-boss nuit 10 (wiki : ennemis.md) : deux versions, tirées au sort par l'hôte à chaque nuit 10. " +
             "Remplace prefabGolem si les deux sont renseignés ; prefabGolem reste un repli.")]
         public GameObject prefabMorgrimMassue, prefabMorgrimMartache;
@@ -106,6 +109,8 @@ namespace Deathless.Jeu
             int joueurs = Mathf.Max(1, P.Etat.joueurs.Count);
             int total = Mathf.RoundToInt(GameBalance.ParNuit(b.ennemisParNuit, nuit, 48) * (1f + b.ennemisParJoueurEnPlus * (joueurs - 1)));
             float partGuerriers = GameBalance.ParNuit(b.partGuerriers, nuit, 0.5f);
+            float partVoleurs = GameBalance.ParNuit(b.partVoleurs, nuit, 0f);
+            float partMages = GameBalance.ParNuit(b.partMages, nuit, 0f);
             int elites = nuit >= 7 ? 2 : nuit >= 5 ? 1 : 0;
             m_AFaire.Clear();
             int pose = 0;
@@ -119,7 +124,7 @@ namespace Deathless.Jeu
                     var s = new Sortie
                     {
                         instant = (m_Departs[w] + b.etalementVague * i / Mathf.Max(1, n)) / vit,
-                        type = Random.value < partGuerriers ? TypeEnnemi.Guerrier : TypeEnnemi.Sbire,
+                        type = TirerType(partMages, partVoleurs, partGuerriers),
                         clairiere = v.clairieresActives[i % v.clairieresActives.Count]
                     };
                     m_AFaire.Add(s);
@@ -155,7 +160,24 @@ namespace Deathless.Jeu
             v.vague = 0;
             v.restantsASortir = m_AFaire.Count;
             m_VagueLancee = 0;
-            P.Journal("Nuit " + nuit + " préparée : " + total + " ennemis (+" + (m_AFaire.Count - total) + " boss), " + m_Departs.Length + " vagues, clairières " + string.Join(",", v.clairieresActives));
+            P.Journal("Nuit " + nuit + " préparée : " + total + " ennemis (+" + (m_AFaire.Count - total) + " boss), " + m_Departs.Length + " vagues, clairières " + string.Join(",", v.clairieresActives)
+                + " ; parts mages " + partMages.ToString("0.00") + " voleurs " + partVoleurs.ToString("0.00") + " guerriers " + partGuerriers.ToString("0.00"));
+        }
+
+        /// Type d'une sortie ordinaire (28/09/2026). Les parts de la nuit sont posées bout à bout sur [0, 1[ : un tirage r
+        /// donne un mage si r < pM, un voleur si r < pM + pV, un guerrier si r < pM + pV + pG, un sbire sinon (le reste).
+        /// Si la somme dépasse 1, les parts sont réduites dans l'ordre inverse (guerriers d'abord) : jamais plus de 100 %.
+        /// Les prefabs absents (Poser) retombent sur le sbire, sans changer le tirage.
+        public static TypeEnnemi TirerType(float partMages, float partVoleurs, float partGuerriers)
+        {
+            float pM = Mathf.Clamp01(partMages);
+            float pV = Mathf.Clamp(partVoleurs, 0f, 1f - pM);
+            float pG = Mathf.Clamp(partGuerriers, 0f, 1f - pM - pV);
+            float r = Random.value;
+            if (r < pM) return TypeEnnemi.Mage;
+            if (r < pM + pV) return TypeEnnemi.Voleur;
+            if (r < pM + pV + pG) return TypeEnnemi.Guerrier;
+            return TypeEnnemi.Sbire;
         }
 
         void Update()
@@ -195,16 +217,26 @@ namespace Deathless.Jeu
         {
             var b = B;
             float mult = GameBalance.ParNuit(b.multiplicateurPV, P != null ? P.Etat.nuit : 1, 1f);
-            var stats = type == TypeEnnemi.Guerrier ? b.guerrier : b.sbire;
+            // Voleur ou mage sans prefab (scène pas encore reconstruite) : joué en sbire, comme avant le 28/09/2026.
+            if (type == TypeEnnemi.Voleur && prefabVoleur == null) type = TypeEnnemi.Sbire;
+            if (type == TypeEnnemi.Mage && prefabMage == null) type = TypeEnnemi.Sbire;
+            StatsSquelette stats;
+            GameObject prefab;
+            switch (type)
+            {
+                case TypeEnnemi.Guerrier: stats = b.guerrier; prefab = prefabGuerrier; break;
+                case TypeEnnemi.Voleur: stats = b.voleur; prefab = prefabVoleur; break;
+                case TypeEnnemi.Mage: stats = b.mage; prefab = prefabMage; break;
+                case TypeEnnemi.Golem: stats = b.sbire; prefab = m_PrefabMorgrimChoisi != null ? m_PrefabMorgrimChoisi : prefabGolem; break;
+                case TypeEnnemi.Necromancien: stats = b.sbire; prefab = prefabNecromancien; break;
+                default: stats = b.sbire; prefab = prefabSbire; break;
+            }
             if (compterPlafond && m_Vivants.Count >= b.plafondSquelettes && type != TypeEnnemi.Golem && type != TypeEnnemi.Necromancien)
             {
                 float bonus = stats.pv * mult * (elite ? 3f : 1f);
                 if (m_Vivants.Count > 0) foreach (var s in m_Vivants) s.Sante.Renforcer(bonus / m_Vivants.Count);
                 return null;
             }
-            GameObject prefab = type == TypeEnnemi.Guerrier ? prefabGuerrier
-                : type == TypeEnnemi.Golem ? (m_PrefabMorgrimChoisi != null ? m_PrefabMorgrimChoisi : prefabGolem)
-                : type == TypeEnnemi.Necromancien ? prefabNecromancien : prefabSbire;
             if (prefab == null) return null;
             Vector3 vers = (P != null && P.nyxessa != null ? P.nyxessa.transform.position : Vector3.zero) - point; vers.y = 0f;
             bool reseau = Deathless.Reseau.ReseauJeu.EnPartie;

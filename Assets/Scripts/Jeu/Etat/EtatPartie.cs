@@ -10,7 +10,9 @@ namespace Deathless.Jeu
 
     public enum Equipe { Heros, Ennemis, Relique }
 
-    public enum TypeEnnemi { Sbire, Guerrier, Golem, Necromancien }
+    /// Types de squelettes (wiki : ennemis.md). Voleur et Mage ajoutés le 28/09/2026 en fin de liste : la valeur passe en
+    /// octet sur le réseau (EnnemiReseau) et dans les prefabs, l'ordre des anciens ne doit pas bouger.
+    public enum TypeEnnemi { Sbire, Guerrier, Golem, Necromancien, Voleur, Mage }
 
     /// Statistiques de score d'un joueur (écran de score : sept catégories).
     [Serializable]

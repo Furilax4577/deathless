@@ -565,7 +565,77 @@ namespace Deathless.EditorTools
             PrefabSquelette("Squelette_Guerrier", Skel + "characters/fbx/Skeleton_Warrior.fbx", new[] { "Skeleton_Axe" }, "Skeleton_Shield_Small_A", typeof(Squelette), "Squelette_Jeu", ennemi, null, 0.45f, 1.9f, 0.58f);
             PrefabSquelette("Squelette_Golem", Skel + "characters/fbx/Skeleton_Golem.fbx", new[] { "Skeleton_Golem_Axe_Large" }, null, typeof(Golem), "Golem_Jeu", ennemi, null, 0.9f, 3.6f, 0.9f);
             PrefabSquelette("Squelette_Necromancien", Skel + "characters/fbx/Necromancer.fbx", new[] { "Skeleton_Scythe" }, null, typeof(Necromancien), "Squelette_Jeu", ennemi, MateriauNecromancien(), 0.45f, 2.0f, 0.58f);
+            PrefabsVoleurEtMage(ennemi);
             AssetDatabase.SaveAssets();
+        }
+
+        /// Voleur (Skeleton_Rogue, deux dagues, pas de bouclier) et mage squelette (Skeleton_Mage, bâton), 28/09/2026 ;
+        /// même méthode que les autres squelettes.
+        static void PrefabsVoleurEtMage(Material ennemi)
+        {
+            PrefabSquelette("Squelette_Voleur", Skel + "characters/fbx/Skeleton_Rogue.fbx", new[] { "Skeleton_Dagger" }, "Skeleton_Dagger", typeof(Voleur), "Squelette_Jeu", ennemi, null, 0.4f, 1.8f, 0.58f);
+            PrefabSquelette("Squelette_Mage", Skel + "characters/fbx/Skeleton_Mage.fbx", new[] { "Skeleton_Staff" }, null, typeof(Mage), "Squelette_Jeu", ennemi, null, 0.4f, 1.9f, 0.58f);
+        }
+
+        /// Ajout du voleur et du mage (28/09/2026) sans reconstruire les autres prefabs : les deux prefabs, leurs yeux,
+        /// leurs composants réseau, puis le câblage de DirecteurVagues dans la scène Village (par l'API de l'éditeur :
+        /// la scène ouverte est sauvée par EditorSceneManager, jamais écrite directement sur le disque).
+        [MenuItem("Deathless/Jeu/11. Voleur et mage (prefabs, yeux, réseau, scène)")]
+        public static string VoleurEtMage()
+        {
+            Dossier(PrefabDir);
+            Dossier(MatDir);
+            ReglagesVagues();
+            PrefabsVoleurEtMage(MateriauEnnemi());
+            AssetDatabase.SaveAssets();
+            YeuxSquelettes();
+            ReseauEnnemis(new[] { "Squelette_Voleur", "Squelette_Mage" });
+            string cablage = CablerVoleurEtMage();
+            AssetDatabase.SaveAssets();
+            string r = "Voleur et mage : prefabs Squelette_Voleur et Squelette_Mage construits (yeux, réseau) ; " + cablage;
+            Debug.Log(r);
+            return r;
+        }
+
+        /// Reporte dans GameBalance.asset les tableaux des vagues décidés le 28/09/2026 (valeurs par défaut du code :
+        /// ennemisParNuit densifié, partGuerriers réduite, partVoleurs et partMages, stats du voleur et du mage) ; l'asset
+        /// gardait sinon les anciennes valeurs sérialisées.
+        static void ReglagesVagues()
+        {
+            var b = Reglages();
+            var def = ScriptableObject.CreateInstance<GameBalance>();
+            b.ennemisParNuit = (int[])def.ennemisParNuit.Clone();
+            b.partGuerriers = (float[])def.partGuerriers.Clone();
+            b.partVoleurs = (float[])def.partVoleurs.Clone();
+            b.partMages = (float[])def.partMages.Clone();
+            b.voleur = def.voleur;
+            b.voleurDistanceIsolement = def.voleurDistanceIsolement;
+            b.voleurDistanceChasse = def.voleurDistanceChasse;
+            b.mage = def.mage;
+            b.mageDistanceTir = def.mageDistanceTir;
+            b.mageVitesseMissile = def.mageVitesseMissile;
+            Object.DestroyImmediate(def);
+            EditorUtility.SetDirty(b);
+        }
+
+        /// Câble prefabVoleur / prefabMage sur le DirecteurVagues de la scène Village (ouverte ou non).
+        static string CablerVoleurEtMage()
+        {
+            var scene = EditorSceneManager.GetActiveScene();
+            bool ouverte = scene.IsValid() && scene.path == ScenePath;
+            if (!ouverte)
+            {
+                if (scene.isDirty) return "scène courante non sauvée : DirecteurVagues pas câblé (ouvrir Village.unity et relancer)";
+                scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+            }
+            var dv = Object.FindAnyObjectByType<DirecteurVagues>(FindObjectsInactive.Include);
+            if (dv == null) return "pas de DirecteurVagues dans " + scene.path;
+            dv.prefabVoleur = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabDir + "/Squelette_Voleur.prefab");
+            dv.prefabMage = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabDir + "/Squelette_Mage.prefab");
+            EditorUtility.SetDirty(dv);
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+            return "DirecteurVagues câblé dans " + scene.path + " (voleur " + (dv.prefabVoleur != null) + ", mage " + (dv.prefabMage != null) + ")";
         }
 
         // ================================================================= Yeux des squelettes (wiki : ennemis, Yeux)
@@ -582,9 +652,10 @@ namespace Deathless.EditorTools
             Color vif = VfxPalette.Couleur(VfxTheme.Rage, VfxRole.Vif, new Color32(0xb3, 0x26, 0x1e, 0xff));
             var rouge = MateriauYeux("Yeux_Elite", new Color(vif.r * 1.2f, vif.g * 0.35f, vif.b * 0.35f), 1f);
             int n = 0;
-            foreach (var nom in new[] { "Squelette_Sbire", "Squelette_Guerrier", "Squelette_Golem" })
+            foreach (var nom in new[] { "Squelette_Sbire", "Squelette_Guerrier", "Squelette_Golem", "Squelette_Voleur", "Squelette_Mage" })
             {
                 string chemin = PrefabDir + "/" + nom + ".prefab";
+                if (AssetDatabase.LoadAssetAtPath<GameObject>(chemin) == null) continue;
                 var racine = PrefabUtility.LoadPrefabContents(chemin);
                 if (racine == null) continue;
                 foreach (var r in racine.GetComponentsInChildren<Renderer>(true)) if (r.name.EndsWith("_Eyes")) { r.sharedMaterial = jaune; n++; }
@@ -594,7 +665,7 @@ namespace Deathless.EditorTools
                 PrefabUtility.UnloadPrefabContents(racine);
             }
             AssetDatabase.SaveAssets();
-            string res = "Yeux : " + n + " maillages en jaune-orangé (sbire, guerrier, Morgrim) ; rouge pour les élites (à l'apparition)";
+            string res = "Yeux : " + n + " maillages en jaune-orangé (sbire, guerrier, Morgrim, voleur, mage) ; rouge pour les élites (à l'apparition)";
             Debug.Log(res);
             return res;
         }
@@ -861,6 +932,8 @@ namespace Deathless.EditorTools
             dv.prefabGuerrier = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabDir + "/Squelette_Guerrier.prefab");
             dv.prefabGolem = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabDir + "/Squelette_Golem.prefab");
             dv.prefabNecromancien = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabDir + "/Squelette_Necromancien.prefab");
+            dv.prefabVoleur = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabDir + "/Squelette_Voleur.prefab");
+            dv.prefabMage = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabDir + "/Squelette_Mage.prefab");
 
             // Vue du cycle (ambiance du village, portail, musique).
             var vue = jeu.AddComponent<VueCycle>();

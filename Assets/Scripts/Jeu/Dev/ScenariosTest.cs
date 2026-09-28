@@ -24,7 +24,33 @@ namespace Deathless.Jeu.Dev
                 case "parade": s_I.StartCoroutine(s_I.Parade()); break;
                 case "golem": s_I.StartCoroutine(s_I.GolemTest()); break;
                 case "mouvement": s_I.StartCoroutine(s_I.Mouvement()); break;
+                case "voleurmage": s_I.StartCoroutine(s_I.VoleurEtMage()); break;
             }
+        }
+
+        /// Voleur et mage (28/09/2026) : un voleur posé à 12 m doit se ruer sur le joueur (isolé en solo) ; un mage posé à
+        /// 6 m doit s'arrêter à distance et tirer un crâne ; on relève leurs états et le nombre de missiles créés.
+        IEnumerator VoleurEtMage()
+        {
+            DevPartie.PlacerHeros(new Vector3(0f, 0f, -11f), new Vector3(0f, 0f, -20f));
+            yield return null;
+            var v = DevPartie.PoserDevant(TypeEnnemi.Voleur, 12f, -2f);
+            var m = DevPartie.PoserDevant(TypeEnnemi.Mage, 6f, 2f);
+            Log("posés : voleur " + (v != null ? v.GetType().Name : "null") + ", mage " + (m != null ? m.GetType().Name : "null"));
+            yield return new WaitForSeconds(2.5f);
+            DevPartie.Capturer("v01_voleur_mage_sortie");
+            float t = 0f; bool voleurPoursuit = false; int missiles = 0; float dMin = 999f;
+            while (t < 8f)
+            {
+                t += Time.deltaTime;
+                if (v != null && v.Vivant && v.EtatCourant == Squelette.Etat.Poursuite) voleurPoursuit = true;
+                if (m != null && m.Vivant) dMin = Mathf.Min(dMin, Vector3.Distance(m.transform.position, H.transform.position));
+                missiles = Mathf.Max(missiles, FindObjectsByType<MissileCrane>(FindObjectsSortMode.None).Length);
+                if (t > 4f && t < 4.1f) DevPartie.Capturer("v01_voleur_mage_combat");
+                yield return null;
+            }
+            Log("voleur : poursuite " + voleurPoursuit + " (état " + (v != null ? v.EtatCourant.ToString() : "?") + ", vitesse " + (v != null ? v.Agent.speed.ToString("F1") : "?") + ")"
+                + " ; mage : distance min " + dMin.ToString("F1") + " m, état " + (m != null ? m.EtatCourant.ToString() : "?") + ", missiles vus " + missiles);
         }
 
         static void Log(string t) { Dernier = t; Debug.Log("[Test] " + t + " | " + DevPartie.Etat()); }

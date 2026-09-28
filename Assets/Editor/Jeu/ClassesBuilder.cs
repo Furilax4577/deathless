@@ -380,6 +380,29 @@ namespace Deathless.EditorTools
             if (racine.GetComponent<Deathless.Reseau.EnnemiReseau>() == null) racine.AddComponent<Deathless.Reseau.EnnemiReseau>();
         }
 
+        /// Prefabs de squelettes équipés pour le réseau (voleur et mage ajoutés le 28/09/2026 ; Morgrim a son propre outil).
+        static readonly string[] SquelettesReseau = { "Squelette_Sbire", "Squelette_Guerrier", "Squelette_Golem", "Squelette_Necromancien", "Squelette_Voleur", "Squelette_Mage" };
+
+        /// Composants réseau et identifiant (GlobalObjectIdHash) sur ces prefabs de squelettes ; les absents sont ignorés.
+        static int ReseauEnnemis(string[] noms)
+        {
+            int n = 0;
+            var valider = typeof(Unity.Netcode.NetworkObject).GetMethod("OnValidate", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+            foreach (var nom in noms)
+            {
+                string chemin = PrefabDir + "/" + nom + ".prefab";
+                if (AssetDatabase.LoadAssetAtPath<GameObject>(chemin) == null) continue;
+                var racine = PrefabUtility.LoadPrefabContents(chemin);
+                if (racine == null) continue;
+                AjouterReseauEnnemi(racine);
+                PrefabUtility.SaveAsPrefabAsset(racine, chemin);
+                PrefabUtility.UnloadPrefabContents(racine);
+                Valider(chemin, valider);
+                n++;
+            }
+            return n;
+        }
+
         /// Préfabs réseau : composants réseau des héros (sans reconstruire les prefabs) et objet du salon.
         [MenuItem("Deathless/Jeu/8. Réseau (préfabs des héros et du salon)")]
         public static string Reseau()
@@ -396,16 +419,7 @@ namespace Deathless.EditorTools
                 n++;
             }
             // Squelettes (étape 2) : l'hôte les pilote ; position, échelle (élite) et animations répliquées.
-            foreach (var nom in new[] { "Squelette_Sbire", "Squelette_Guerrier", "Squelette_Golem", "Squelette_Necromancien" })
-            {
-                string chemin = PrefabDir + "/" + nom + ".prefab";
-                var racine = PrefabUtility.LoadPrefabContents(chemin);
-                if (racine == null) continue;
-                AjouterReseauEnnemi(racine);
-                PrefabUtility.SaveAsPrefabAsset(racine, chemin);
-                PrefabUtility.UnloadPrefabContents(racine);
-                n++;
-            }
+            n += ReseauEnnemis(SquelettesReseau);
             Dossier("Assets/Jeu/Resources/Reseau");
             var monde = new GameObject("PartieReseau");
             monde.AddComponent<Unity.Netcode.NetworkObject>();
@@ -420,7 +434,7 @@ namespace Deathless.EditorTools
             // Identifiant réseau des préfabs (GlobalObjectIdHash) : calculé par NetworkObject.OnValidate sur l'asset.
             var valider = typeof(Unity.Netcode.NetworkObject).GetMethod("OnValidate", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
             foreach (var d in s_Defs) Valider(PrefabDir + "/Heros_" + Capitale(d.id) + ".prefab", valider);
-            foreach (var nom in new[] { "Squelette_Sbire", "Squelette_Guerrier", "Squelette_Golem", "Squelette_Necromancien" }) Valider(PrefabDir + "/" + nom + ".prefab", valider);
+            foreach (var nom in SquelettesReseau) Valider(PrefabDir + "/" + nom + ".prefab", valider);
             Valider(SalonReseauPath, valider);
             Valider(PartieReseauPath, valider);
             AssetDatabase.SaveAssets();

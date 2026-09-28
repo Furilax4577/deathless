@@ -32,8 +32,9 @@ namespace Deathless.Jeu
         public int nuitsPourGagner = 12;
 
         [Header("Vagues (wiki : deroule)")]
-        [Tooltip("Ennemis par nuit pour un joueur (nuits 1 à 12).")]
-        public int[] ennemisParNuit = { 8, 12, 16, 20, 25, 30, 34, 38, 42, 44, 46, 48 };
+        [Tooltip("Ennemis par nuit pour un joueur (nuits 1 à 12). Nuits 1 à 5 densifiées le 28/09/2026 (Quentin : « les " +
+            "premières vagues sont trop molles ») : 8/12/16/20/25 → 12/18/22/26/28 ; nuits 6 à 12 inchangées.")]
+        public int[] ennemisParNuit = { 12, 18, 22, 26, 28, 30, 34, 38, 42, 44, 46, 48 };
         [Tooltip("Clairières actives par nuit (nuits 1 à 12).")]
         public int[] clairieresParNuit = { 1, 1, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3 };
         public float[] departsTroisVagues = { 0f, 40f, 80f };
@@ -45,8 +46,15 @@ namespace Deathless.Jeu
         public float[] partsQuatreVagues = { 0.22f, 0.24f, 0.26f, 0.28f };
         [Tooltip("Durée sur laquelle les sorties d'une vague sont étalées (s).")]
         public float etalementVague = 8f;
-        [Tooltip("Part de guerriers par nuit (les voleurs, mages et élites de la 0.1 sont des guerriers).")]
-        public float[] partGuerriers = { 0f, 0.25f, 0.4f, 0.4f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f };
+        [Tooltip("Part de guerriers par nuit (nuits 1 à 12). Depuis le 28/09/2026 les voleurs et les mages ont leur propre part " +
+            "(partVoleurs, partMages) : la part de guerriers, qui les englobait (0,4 dès la nuit 3, 0,5 dès la nuit 5), est " +
+            "ramenée à 0,3 → 0,4 pour que les sbires restent au moins 30 % des sorties. Les élites restent des guerriers renforcés.")]
+        public float[] partGuerriers = { 0f, 0.25f, 0.3f, 0.3f, 0.35f, 0.35f, 0.38f, 0.38f, 0.4f, 0.4f, 0.4f, 0.4f };
+        [Tooltip("Part de voleurs par nuit (nuits 1 à 12 ; wiki : ennemis.md, décidé 28/09/2026) : aucun les nuits 1 et 2, " +
+            "dès la nuit 3 incluse. Tirage d'une sortie (DirecteurVagues.TirerType) : mage, puis voleur, puis guerrier, le reste en sbire.")]
+        public float[] partVoleurs = { 0f, 0f, 0.12f, 0.14f, 0.15f, 0.15f, 0.16f, 0.16f, 0.16f, 0.16f, 0.16f, 0.16f };
+        [Tooltip("Part de mages (lanceurs de crâne) par nuit (nuits 1 à 12 ; décidé 28/09/2026) : dès la nuit 3 incluse.")]
+        public float[] partMages = { 0f, 0f, 0.08f, 0.10f, 0.10f, 0.12f, 0.12f, 0.12f, 0.14f, 0.14f, 0.14f, 0.14f };
         [Tooltip("Multiplicateur de PV par nuit (wiki : +10 % dès la nuit 9, +20 % dès la nuit 11).")]
         public float[] multiplicateurPV = { 1, 1, 1, 1, 1, 1, 1, 1, 1.1f, 1.1f, 1.2f, 1.2f };
         [Tooltip("Joueurs en plus : +60 % d'ennemis par joueur (wiki).")]
@@ -63,6 +71,21 @@ namespace Deathless.Jeu
         [Header("Squelettes ordinaires")]
         public StatsSquelette sbire = new StatsSquelette { pv = 100, vitesse = 3.4f, degatsJoueur = 8, degatsNyxessa = 8, intervalle = 1.8f, preparation = 0.7f, portee = 1.8f };
         public StatsSquelette guerrier = new StatsSquelette { pv = 160, vitesse = 3.0f, degatsJoueur = 14, degatsNyxessa = 14, intervalle = 2.2f, preparation = 0.8f, portee = 2.0f };
+        [Tooltip("Voleur (wiki : ennemis.md ; 28/09/2026, à équilibrer) : rapide, moins solide qu'un guerrier, coup court à préparer ; " +
+            "il chasse les joueurs isolés (Voleur.cs).")]
+        public StatsSquelette voleur = new StatsSquelette { pv = 115, vitesse = 4.4f, degatsJoueur = 12, degatsNyxessa = 10, intervalle = 1.4f, preparation = 0.5f, portee = 1.7f };
+        [Tooltip("Un joueur est « isolé » si aucun autre joueur vivant n'est à moins de cette distance (m) : le voleur le préfère à tout autre.")]
+        public float voleurDistanceIsolement = 10f;
+        [Tooltip("Le voleur repère un joueur isolé jusqu'à cette distance (m), plus loin que la détection ordinaire (detectionJoueur) ; " +
+            "en dessous de abandonPoursuite pour qu'il ne lâche pas la chasse aussitôt.")]
+        public float voleurDistanceChasse = 14f;
+        [Tooltip("Mage squelette, ennemi (wiki : ennemis.md, Mage ; 28/09/2026, à équilibrer ; le mage héros est plus bas : magePV…) : " +
+            "fragile, tire le missile crâne à taille normale. « intervalle » = temps entre deux tirs, « preparation » = incantation " +
+            "avant le départ du crâne, « portee » = portée de tir ; il n'a pas de coup de mêlée.")]
+        public StatsSquelette mage = new StatsSquelette { pv = 70, vitesse = 3.2f, degatsJoueur = 12, degatsNyxessa = 12, intervalle = 2.6f, preparation = 0.45f, portee = 7.5f };
+        [Tooltip("Le mage garde ses distances (m) : il approche au-delà de y, recule en deçà de x (hors du bouclier de Nyxessa, rayon 5,3 m).")]
+        public Vector2 mageDistanceTir = new Vector2(5.5f, 7f);
+        public float mageVitesseMissile = 11f;
         [Tooltip("Un joueur vivant plus proche que ça est poursuivi (m).")]
         public float detectionJoueur = 8f;
         [Tooltip("Abandon de la poursuite au-delà (m).")]

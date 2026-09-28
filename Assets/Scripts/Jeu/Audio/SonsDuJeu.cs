@@ -27,6 +27,10 @@ namespace Deathless.Jeu
         public static readonly string[] SqueletteAube = { "dawn_vaporize" };
         public static readonly string[] GolemCoup = { "golem_coup", "viking_leap_land" };
         public static readonly string[] Invocation = { "necromancien_invocation", "necro_summon" };
+        // Voleur et mage squelette (28/09/2026) : sons du lot 3 (Docs/son-cahier-des-charges.md).
+        public static readonly string[] VoleurElan = { "dl_voleur_elan" };
+        public static readonly string[] MageSqueletteIncantation = { "dl_mage_squelette_incantation" };
+        public static readonly string[] MageSqueletteTir = { "dl_mage_squelette_tir" };
 
         public static readonly string[] MissileVol = { "skull_flight_loop" };
         public static readonly string[] MissileEclat = { "skull_explosion" };

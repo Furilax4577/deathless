@@ -6,8 +6,9 @@ namespace Deathless.Jeu
 {
     /// Squelette (IA côté autorité, version 0.1) : sort de terre, marche vers Nyxessa (une place autour du plateau, dans
     /// son angle d'arrivée), poursuit un joueur proche puis revient, frappe au contact (préparation lisible et parable),
-    /// peut être étourdi ou repoussé (parade, charge bélier), meurt puis se désintègre en gemmes couleur os. Le Golem et le
-    /// Nécromancien en dérivent (coup de zone ; distance, missile, invocation).
+    /// peut être étourdi ou repoussé (parade, charge bélier), meurt puis se désintègre en gemmes couleur os. Le Golem, le
+    /// Nécromancien, le Voleur et le Mage en dérivent (coup de zone ; distance, missile, invocation ; chasse des isolés ;
+    /// tir à distance).
     [RequireComponent(typeof(NavMeshAgent), typeof(Sante))]
     public class Squelette : MonoBehaviour
     {
@@ -145,6 +146,8 @@ namespace Deathless.Jeu
         }
 
         protected bool Provoque => m_Provocateur != null && m_Provocateur.Vivant && Time.time < m_ProvoqueJusque;
+        /// Héros qui a provoqué ce squelette (rugissement), valable tant que Provoque est vrai.
+        protected Heros Provocateur => m_Provocateur;
 
         /// Ce squelette voit-il le héros ? Personne n'est vu dans la fumée d'une grenade ; l'assassin furtif n'est repéré
         /// que dans le cône de vue (wiki : environ 6 m) ou tout près dans le dos (1,5 m). Un repérage le fait sortir du
@@ -274,6 +277,10 @@ namespace Deathless.Jeu
             return meilleur;
         }
 
+        /// Joueur pris pour cible pendant la marche (MajMarche) : le plus proche vu à moins de `rayon` m. Le voleur
+        /// (Voleur.cs, 28/09/2026) préfère un joueur isolé ; les autres types gardent ce choix.
+        protected virtual Heros ChoisirCible(float rayon) => JoueurProche(rayon);
+
         /// Distance de frappe de Nyxessa : bouclier levé, les squelettes frappent la paroi (un peu au-delà de son rayon).
         protected float RayonContact
         {
@@ -302,7 +309,7 @@ namespace Deathless.Jeu
                 else { Agent.isStopped = true; Tourner(Nyxessa.position); }
                 return;
             }
-            var j = JoueurProche(B.detectionJoueur);
+            var j = ChoisirCible(B.detectionJoueur);
             if (j != null)
             {
                 m_Cible = j;
@@ -494,9 +501,9 @@ namespace Deathless.Jeu
             }
         }
 
-        /// Riposte au contact de Nyxessa (27/09/2026) : sbires et guerriers (élites compris) ; Morgrim et le Nécromancien
-        /// gardent leur propre comportement.
-        protected virtual bool Riposteur => type == TypeEnnemi.Sbire || type == TypeEnnemi.Guerrier;
+        /// Riposte au contact de Nyxessa (27/09/2026) : sbires, guerriers et voleurs (élites compris) ; Morgrim, le
+        /// Nécromancien et le mage (qui ne vient pas au contact) gardent leur propre comportement.
+        protected virtual bool Riposteur => type == TypeEnnemi.Sbire || type == TypeEnnemi.Guerrier || type == TypeEnnemi.Voleur;
 
         /// Compte les coups reçus de `h` (autorité). Au riposteCoups-ième coup de suite du même héros, le squelette se
         /// retourne vers lui : poursuite tout de suite s'il marche ou récupère ; sinon (coup en préparation, étourdi) dès
@@ -572,7 +579,13 @@ namespace Deathless.Jeu
                 if (type == TypeEnnemi.Golem) return b.orMorgrim;
                 if (type == TypeEnnemi.Necromancien) return b.orNyxar;
                 if (elite) return b.orElite;
-                return type == TypeEnnemi.Guerrier ? b.orGuerrier : b.orSbire;
+                switch (type)
+                {
+                    case TypeEnnemi.Guerrier: return b.orGuerrier;
+                    case TypeEnnemi.Voleur: return b.orVoleur;
+                    case TypeEnnemi.Mage: return b.orMage;
+                    default: return b.orSbire;
+                }
             }
         }
         public virtual float FacteurEtourdissement => 1f;
