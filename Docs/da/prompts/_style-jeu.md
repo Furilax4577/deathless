@@ -10,6 +10,6 @@ red-brown timber frames, clay tile roofs, an arched plank door framed by large p
 on a low smooth plain stone slab with a couple of steps, never on masonry.
 
 Scale rules that never change: characters are chunky big-headed toy figures, the head is almost half of the body
-height, and they are large compared to the architecture: a character is three quarters as tall as a house door, a
+height, and they are large compared to the architecture: a character is almost as tall as a house door (nine tenths of its height), a
 table top reaches his chest, a stool reaches his knee, a bar counter reaches his shoulders, a single-storey wall is
 less than twice his height. Furniture and doors are oversized and thick to match them.
