@@ -28,7 +28,9 @@ BATIMENTS = {
 RIVIERE = [(0, 36), (6, 28), (12, 18), (13, 6), (12.5, 0), (12, -6), (6, -15), (-6, -20), (-20, -30), (-40, -48), (-64, -70)]
 LARGEUR_RIVIERE = 4.5
 PONTS = [((12.6, 0), 0), ((0, -17.8), 70)]          # centre, lacet du tablier (degrés)
-GUE = (9, -10.5)
+# Passages en eau basse : un par maison de la rive est (druide, forge, mécano), pour ne pas dépendre du seul pont est.
+GUES = [(9, 23.5), (12.8, 11), (9, -10.5)]
+GUE = GUES[-1]
 BASSIN, GROTTE = (0, 38), (-14, 40)
 FALAISE_Y = 40
 CLAIRIERES = [(70, 0), (0, -70), (-70, 0)]
@@ -124,13 +126,14 @@ def plan(taille=1024, demi=80.0, legendes=True):
     d.line([P(*p) for p in RIVIERE_DENSE], fill="#3f7fb3", width=int(LARGEUR_RIVIERE * e), joint="curve")
     d.ellipse([P(BASSIN[0] - 4, BASSIN[1] + 4), P(BASSIN[0] + 4, BASSIN[1] - 4)], fill="#3f7fb3")
     d.rectangle([P(-1.5, 60), P(1.5, BASSIN[1])], fill="#8fc3ea")
-    d.ellipse([P(GUE[0] - 3.2, GUE[1] + 3.2), P(GUE[0] + 3.2, GUE[1] - 3.2)], fill="#a9d4ee")
+    for gx, gy in GUES:
+        d.ellipse([P(gx - 3.2, gy + 3.2), P(gx + 3.2, gy - 3.2)], fill="#a9d4ee")
     # grotte
     d.ellipse([P(GROTTE[0] - 4.5, GROTTE[1] + 5), P(GROTTE[0] + 4.5, GROTTE[1] - 3)], fill="#22262b")
     d.ellipse([P(GROTTE[0] - 2.2, GROTTE[1] + 3), P(GROTTE[0] + 2.2, GROTTE[1] - 1.4)], fill="#3fd06a")
     # allées, anneau pavé, plateau
     pave = "#cfc7b2"
-    cibles = [b["c"] for b in BATIMENTS.values()] + [GROTTE, (12.6, 0), (0, -17.8), GUE]
+    cibles = [b["c"] for b in BATIMENTS.values()] + [GROTTE, (12.6, 0), (0, -17.8)]
     for cx, cy in cibles:
         r = math.hypot(cx, cy)
         fin = 1 - (2 if (cx, cy) == GROTTE else 6) / r
@@ -168,7 +171,8 @@ def plan(taille=1024, demi=80.0, legendes=True):
         d.text(P(0, 46), "Cascade", fill="white", font=f, anchor="mm", stroke_width=2, stroke_fill="#22262b")
         d.text(P(-14, 47), "Grotte du portail", fill="white", font=f, anchor="mm", stroke_width=2, stroke_fill="#22262b")
         d.text(P(0, -3), "Nyxessa", fill="white", font=f, anchor="mm", stroke_width=2, stroke_fill="#22262b")
-        d.text(P(GUE[0] + 7, GUE[1]), "Gué", fill="white", font=f, anchor="mm", stroke_width=2, stroke_fill="#22262b")
+        for gx, gy in GUES:
+            d.text(P(gx + 7, gy), "Gué", fill="white", font=f, anchor="mm", stroke_width=2, stroke_fill="#22262b")
         d.line([P(-76, -76), P(-56, -76)], fill="white", width=3)
         d.text(P(-66, -73), "20 m", fill="white", font=f, anchor="mm", stroke_width=2, stroke_fill="#22262b")
         d.text(P(74, 74), "N", fill="white", font=police(22), anchor="mm", stroke_width=2, stroke_fill="#22262b")

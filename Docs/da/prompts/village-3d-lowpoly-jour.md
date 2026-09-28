@@ -13,7 +13,7 @@ The three wide brown bands coming from the right edge, the bottom edge and the l
 What the volumes are: the grey wall at the back is a massive cliff of big faceted boulders with a narrow waterfall
 falling into a round pool; the dark oval with a green disc at the foot of the cliff, left of the waterfall,
 is the mouth of a shallow cave with a green magic portal; the blue ribbon is a calm flat river, the two brown
-slabs are small wooden plank bridges, the pale blue disc is a shallow ford of flat pebbles; the grey octagon is a
+slabs are small wooden plank bridges, the three pale blue discs on the river are three shallow fords of flat pebbles where the flagstone paths of the right-bank houses cross the water; the grey octagon is a
 three-step stone plateau with a glowing emerald crystal on a dark spire; the pale disc and strips are flagstone
 paving; the four tiny figures next to the plateau are four chunky big-headed adventurers (knight with red cape,
 viking, mage with purple pointed hat, hooded ranger), keep them exactly that small compared to the houses.
@@ -25,4 +25,4 @@ roof and conical tower roof; the green-roofed one is the herbalist cottage, moss
 one with the flat shed is the forge with an open lean-to and an orange glowing hearth; the red-roofed one at the
 bottom right is the tinkerer shop with a large shop window and a gear sign; the small red-roofed one on the
 left is a plain cottage with a fenced vegetable garden and a stone well. The pale yellow ground on the right is
-open heath with rocks and stumps; the green cones and balls are tall trees with bare trunks. Bright daylight.
+open heath with rocks and stumps; every tree is a tall mountain pine with a long bare reddish-brown trunk and a few flat layered tiers of dark green needles at the top, no round leafy trees. Bright daylight.

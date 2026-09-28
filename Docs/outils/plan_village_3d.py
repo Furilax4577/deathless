@@ -93,9 +93,10 @@ def dessiner():
     # rivière, bassin, gué, pavés
     d.line([P(*p) for p in pv.RIVIERE_DENSE], fill="#3f7fb3", width=int(pv.LARGEUR_RIVIERE * E * 0.8), joint="curve")
     d.ellipse([P(-4, 38)[0], P(0, 41)[1], P(4, 38)[0], P(0, 35)[1]], fill="#3f7fb3")
-    d.ellipse([P(pv.GUE[0] - 3.2, 0)[0], P(0, pv.GUE[1] + 3.2)[1], P(pv.GUE[0] + 3.2, 0)[0], P(0, pv.GUE[1] - 3.2)[1]], fill="#a9d4ee")
+    for gx, gy in pv.GUES:
+        d.ellipse([P(gx - 3.2, 0)[0], P(0, gy + 3.2)[1], P(gx + 3.2, 0)[0], P(0, gy - 3.2)[1]], fill="#a9d4ee")
     pave = "#cfc7b2"
-    for cx, cy in [b["c"] for b in pv.BATIMENTS.values()] + [pv.GROTTE, (12.6, 0), (0, -17.8), pv.GUE]:
+    for cx, cy in [b["c"] for b in pv.BATIMENTS.values()] + [pv.GROTTE, (12.6, 0), (0, -17.8)]:
         r = math.hypot(cx, cy)
         g = (cx, cy) == pv.GROTTE
         fin = 1 - (1 if g else 6) / r

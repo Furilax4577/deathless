@@ -78,7 +78,17 @@ Plans chiffrés à notre échelle : `Docs/da/maisons-plans.md`. Les boutiques fo
 - **Façades** : Grok respecte largeurs et hauteurs quand on lui donne le gabarit. À corriger : il ajoute un étage de fenêtres partout (seuls la taverne et le mécano en ont un), et garde les soubassements maçonnés.
 - **Rendu général** : Grok a basculé la vue, resserré le village et donné la même taille à toutes les maisons. Il sert pour l'ambiance ; pour un rendu général exact, c'est le prototype dans le moteur qui fait foi.
 
+## Pins (28/09/2026)
+
+{image media/da/pins-planche-20260928-01.jpg} **Pins, planche 1** | Élancé, parasol, battu par le vent
+{image media/da/pins-planche-20260928-02.jpg} **Pins, planche 2** | Variante
+
+Proposition de Quentin : partir sur du **pin**, plus esthétique et à sa place au pied d'une montagne. Trois silhouettes : **pin élancé** à cinq étages (environ 10 m), **pin parasol** à tronc fourchu et couronne plate (8 à 9 m), **vieux pin battu par le vent**, penché, touffes d'un seul côté (7 à 8 m). Tronc brun-rouge nu sur 3 m et plus (une fois et demie un personnage), moignons de branches, masses d'aiguilles en gros volumes facettés à dessous sombre. {à confirmer} : remplacent-ils les six essences validées le 27/09/2026, ou s'y ajoutent-ils ?
+
 ## Rendu 3D low poly à l'échelle, jour et nuit (28/09/2026)
+
+{image media/da/village-3d-lowpoly-jour-20260928-03.jpg} **Village, jour, avec les gués** | Trois passages en eau basse sur la rive est
+{image media/da/village-3d-lowpoly-nuit-20260928-03.jpg} **Village, nuit, avec les gués** | Même scène
 
 {image media/da/village-3d-lowpoly-jour-20260928-02.jpg} **Village, jour, maquette corrigée** | Trois sentiers d'attaque, route de la grotte
 {image media/da/village-3d-lowpoly-nuit-20260928-02.jpg} **Village, nuit, maquette corrigée** | Même scène
