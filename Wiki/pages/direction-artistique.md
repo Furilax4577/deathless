@@ -53,6 +53,10 @@ Tous les prompts sont dans `Docs/da/prompts/` et reprennent le même bloc de sty
 - **On corrige** : **l'échelle**. Grok dessine des personnages de 1,2 m dans un mobilier d'adultes ; les nôtres font 2,3 m, avec une grosse tête. Le plan chiffré (`Docs/da/taverne-plan.md`) fait foi : salle de 16 × 11 m, allée de 3 m, comptoir de 6 m à 1,3 m de haut, 5 m sous poutres pour la caméra. Le bloc de style des prompts porte désormais la règle d'échelle.
 - **On écarte** : la seconde porte latérale, les textures de pierre.
 
+{image media/da/taverne-interieur-grok-cible.webp} **Intérieur cible, donné par Quentin** | Une seule salle, sans galerie ni escalier
+
+**Cible de l'aménagement** (image de Quentin, 28/09/2026, après le premier volume gris) : une seule grande salle ; âtre sur le mur ouest ; estrade à pan coupé dans le coin nord-ouest ; comptoir droit le long du mur nord ; râtelier de six tonneaux dans le coin nord-est ; tables rondes groupées au sud-est, une table seule près du feu ; grand centre vide. La **galerie et l'escalier disparaissent** : dans le premier volume gris ils gênaient la caméra (poteaux, dessous de galerie à 3,2 m, escalier collé à la place des joueurs). On n'en reprend pas les textures (bois veiné, enduit martelé) : facettes plates, une couleur par facette. Volume gris refait sur cette base, {à confirmer} par Quentin.
+
 ## Les cinq autres intérieurs (28/09/2026)
 
 {image media/da/sorcier-coupe-20260928-01.jpg} **Maison du sorcier** | Carte du village, pupitre, éclat de Nyx, tour
