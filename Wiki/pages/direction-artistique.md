@@ -53,6 +53,19 @@ Tous les prompts sont dans `Docs/da/prompts/` et reprennent le même bloc de sty
 - **On corrige** : **l'échelle**. Grok dessine des personnages de 1,2 m dans un mobilier d'adultes ; les nôtres font 2,3 m, avec une grosse tête. Le plan chiffré (`Docs/da/taverne-plan.md`) fait foi : salle de 16 × 11 m, allée de 3 m, comptoir de 6 m à 1,3 m de haut, 5 m sous poutres pour la caméra. Le bloc de style des prompts porte désormais la règle d'échelle.
 - **On écarte** : la seconde porte latérale, les textures de pierre.
 
+## Les cinq autres intérieurs (28/09/2026)
+
+{image media/da/sorcier-coupe-20260928-01.jpg} **Maison du sorcier** | Carte du village, pupitre, éclat de Nyx, tour
+{image media/da/forge-coupe-20260928-01.jpg} **Forge** | Enclume au centre, foyer, appentis
+{image media/da/druide-coupe-20260928-01.jpg} **Boutique du druide** | Chaudron, comptoir aux fioles, herbes séchées
+{image media/da/mecano-coupe-20260928-01.jpg} **Boutique du mécano** | Comptoir, râteliers d'armes, machine à engrenages
+{image media/da/maison-base-coupe-20260928-01.jpg} **Maison de base** | Puits, potager, étendoir
+
+Plans chiffrés à notre échelle : `Docs/da/maisons-plans.md`. Les boutiques font 11 à 12 m sur 8 à 9 m à l'intérieur (une fois et demie la maison standard actuelle), la maison de base 8 × 6,5 m sur une parcelle de 16 × 10 m avec son puits et son jardin. Partout : point d'intérêt au fond, sol nu d'au moins 6 × 5 m devant lui pour les quatre joueurs, 4,5 m sous poutres.
+
+- **On garde** : les dispositions, les accessoires de métier, la tour ouverte sur la salle du sorcier, l'appentis de la forge.
+- **On corrige** : l'échelle des personnages (toujours trop petits chez Grok), les soubassements maçonnés, le cristal vert au bâton du mage joueur (notre mage est de feu ; le vert est à Nyxessa).
+
 ## Images retenues
 
 {image media/da/village-vision-grok-01.webp} **Village, vision du 28/09/2026** | Grok Imagine, par Quentin
