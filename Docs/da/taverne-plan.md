@@ -32,17 +32,17 @@ Intérieur **16 × 11 m** (176 m²), **une seule grande salle**, porte au sud, f
 |---|---|---|---|
 | Porte double | x 6,4 à 9,6 sur le mur sud | 3,2 × 2,8 m | perron de pierre |
 | Allée principale | x 6,5 à 9,5, de la porte au comptoir | 3 m de large | jamais de meuble dedans |
-| Comptoir | x 6,4 à 12,4 ; y 8,6 à 9,5 | 6 × 0,9 m, 1,3 m de haut | quatre joueurs de front ; la Bavaroise au milieu derrière |
-| Service | derrière le comptoir | 1,5 m de passage | libre, accessible par les deux bouts |
+| Comptoir | x 7,15 à 13,15 ; y 8,6 à 9,5 | 6 × 0,9 m, 1,3 m de haut | quatre joueurs de front ; la Bavaroise au milieu derrière |
+| Service | derrière le comptoir | 1,5 m de passage | libre, 1,74 m d'accès à chaque bout |
 | Râtelier | coin nord-est, contre le mur est (x 14,9 à 16 ; y 8,3 à 11) | six tonneaux Ø 1,2 m sur trois rangs | 4,2 m de haut |
-| Sol nu devant le comptoir | x 6,4 à 12,4 ; y 3,6 à 8,6 | 6 × 5 m au moins (8,4 × 5,9 m mesurés) | recul de caméra assuré |
+| Sol nu devant le comptoir | x 7,15 à 13,15 ; y 3,6 à 8,6 | 6 × 5 m au moins (8,3 × 5,9 m mesurés) | recul de caméra assuré |
 | Estrade | coin nord-ouest, x 0,4 à 5 ; y 8 à 11 | pan coupé, 0,4 m de haut, une marche | le barde |
 | Âtre | mur ouest, y 4,5 à 7,5 | 3 m de large, saillie 1,4 m | feu vivant (`ForgeFeu`), conduit de pierre |
-| Table du clochard | centre (2,4 ; 2,4) | Ø 1,6 m | près du feu, le clochard assis dos au mur ouest |
-| Tables rondes | quart sud-est | Ø 1,6 m, quatre tabourets | **trois tables**, disposées régulièrement (demande de Quentin) |
-| Fenêtres | deux au sud (x 3 et 13), deux à l'ouest, une à l'est | 1,4 × 1,6 m | |
+| Table du clochard | centre (3 ; 3) | Ø 1,6 m | près du feu, le clochard assis dos au mur ouest |
+| Tables rondes | centres (11,6 ; 1,6), (14,4 ; 1,6), (14,4 ; 4,4) | Ø 1,6 m, quatre tabourets | **trois tables** en équerre, à 1,6 m des murs (demande de Quentin) |
+| Fenêtres | sud x 3 et 13, ouest y 3 et 9, est y 3 | 1,4 × 1,6 m | |
 
-Mesures relevées : 5,2 m libres sous entraits ; la caméra à l'épaule garde tout son recul dans 62 % des cas (74 % dans le centre vide) ; dos à un mur à 1 m, elle se colle au joueur (la salle fait 11 m de profondeur) ; le linteau de la porte la gêne entre 2,5 et 5 m après le seuil. À voir à l'étape 4 : le mobilier est haut pour un personnage assis (plateau à 1,05 m, jambes courtes).
+Mesures relevées : 5,2 m libres sous entraits ; la caméra à l'épaule garde tout son recul dans 60 % des cas (72 % dans le centre vide) ; dos à un mur à 1 m, elle se colle au joueur (la salle fait 11 m de profondeur) ; le linteau de la porte la gêne entre 2,5 et 5 m après le seuil. À voir à l'étape 4 : le mobilier est haut pour un personnage assis (plateau à 1,05 m, jambes courtes).
 
 ## Qui est là
 
