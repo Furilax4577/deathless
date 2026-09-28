@@ -85,6 +85,11 @@ Plans chiffrés à notre échelle : `Docs/da/maisons-plans.md`. Les boutiques fo
 
 Proposition de Quentin : partir sur du **pin**, plus esthétique et à sa place au pied d'une montagne. Trois silhouettes : **pin élancé** à cinq étages (environ 10 m), **pin parasol** à tronc fourchu et couronne plate (8 à 9 m), **vieux pin battu par le vent**, penché, touffes d'un seul côté (7 à 8 m). Tronc brun-rouge nu sur 3 m et plus (une fois et demie un personnage), moignons de branches, masses d'aiguilles en gros volumes facettés à dessous sombre. {à confirmer} : remplacent-ils les six essences validées le 27/09/2026, ou s'y ajoutent-ils ?
 
+{image media/da/pins-moteur-rangee.png} **Les trois pins dans le moteur** | Chevalier de 2,3 m et maison standard pour l'échelle
+{image media/da/pins-moteur-bosquet.png} **Bosquet** | Les trois silhouettes mélangées
+
+**Construits et validés** {décidé, 28/09/2026} dans `sandbox-level` (`ArbreStyleBuilderPins`, prefabs `Assets/StyleKayKit/Arbres/Arbre_Pin{Elance,Parasol,Vent}.prefab`). Quentin les a voulus **plus petits, comme sur les planches** : élancé **5,8 m**, parasol **5,0 m**, pin du vent **4,6 m** (2,2, 1,9 et 1,8 fois un personnage), troncs de 0,7 m nus sur 2,6 m, 340 à 436 triangles. Ils restent plus bas que la maison standard (7,9 m).
+
 ## Rendu 3D low poly à l'échelle, jour et nuit (28/09/2026)
 
 {image media/da/village-3d-lowpoly-jour-20260928-03.jpg} **Village, jour, avec les gués** | Trois passages en eau basse sur la rive est
