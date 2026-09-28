@@ -79,6 +79,8 @@ def dessiner():
     d = ImageDraw.Draw(img)
     d.polygon([P(-90, -60), P(90, -60), P(90, 40), P(-90, 40)], fill="#7fa65b")
     d.polygon([P(16, 40), P(90, 40), P(90, -30), P(40, -34), P(18, -8), P(18, 8)], fill="#c8b882")
+    for a, b in pv.SENTIERS:
+        d.line([P(*a), P(*b)], fill="#b08a5e", width=int(pv.LARGEUR_SENTIER * E * 0.7))
     # falaise (30 à 38 m de haut), cascade, grotte
     crete = [(-90, 34), (-60, 38), (-30, 33), (-8, 37), (8, 36), (34, 32), (60, 37), (90, 33)]
     d.polygon([P(-90, 40), P(90, 40)] + [P(x, 40, z) for x, z in reversed(crete)], fill="#8a8d94", outline="#5f6369")
@@ -95,7 +97,9 @@ def dessiner():
     pave = "#cfc7b2"
     for cx, cy in [b["c"] for b in pv.BATIMENTS.values()] + [pv.GROTTE, (12.6, 0), (0, -17.8), pv.GUE]:
         r = math.hypot(cx, cy)
-        d.line([P(cx * pv.ANNEAU / r, cy * pv.ANNEAU / r), P(cx * (1 - 6 / r), cy * (1 - 6 / r))], fill=pave, width=int(2.2 * E * 0.8))
+        g = (cx, cy) == pv.GROTTE
+        fin = 1 - (1 if g else 6) / r
+        d.line([P(cx * pv.ANNEAU / r, cy * pv.ANNEAU / r), P(cx * fin, cy * fin)], fill=pave, width=int((pv.LARGEUR_ROUTE_GROTTE if g else 2.2) * E * 0.8))
     d.ellipse([P(-pv.ANNEAU, 0)[0], P(0, pv.ANNEAU)[1], P(pv.ANNEAU, 0)[0], P(0, -pv.ANNEAU)[1]], fill=pave)
     for (cx, cy), lacet in pv.PONTS:
         a = math.radians(lacet)
@@ -109,7 +113,7 @@ def dessiner():
     objets = []
     for _ in range(420):
         x, y = rnd.uniform(-88, 88), rnd.uniform(-58, 38)
-        if math.hypot(x, y) < 44 or x > 14 and y > -36 or abs(y) < 7 and x < 0 or abs(x) < 7 and y < 0:
+        if math.hypot(x, y) < 46 or x > 14 and y > -36 or abs(y) < 8 and x < 0 or abs(x) < 8 and y < 0 or (x < 0 and y > 0 and abs(x * 40 + y * 14) / 42.4 < 9):
             continue
         if min(math.hypot(x - rx, y - ry) for rx, ry in pv.RIVIERE_DENSE[::6]) < 6:
             continue
@@ -125,7 +129,7 @@ def dessiner():
         elif genre == "batiment":
             batiment(d, v[1], v[0])
             if v[0] == "Sorcier":                                # tour ronde, toit conique
-                x, y0 = v[1]["c"][0] - 7.2, v[1]["c"][1] + 3
+                x, y0 = v[1]["c"][0] - 5.5, v[1]["c"][1] + 6
                 d.rectangle([P(x - 2.25, y0, 7.5)[0], P(x, y0, 7.5)[1], P(x + 2.25, y0)[0], P(x, y0)[1]], fill="#e8d9a8", outline="#3a2a20")
                 d.polygon([P(x - 2.8, y0, 7.5), P(x + 2.8, y0, 7.5), P(x, y0, 12)], fill="#24365c")
             if v[0] == "Forge":                                  # appentis
@@ -133,8 +137,8 @@ def dessiner():
                 d.polygon([P(x - 2.5, y0 - 3, 3.4), P(x + 2.5, y0 - 3, 3.4), P(x + 2.5, y0 + 3, 4.4), P(x - 2.5, y0 + 3, 4.4)], fill="#6e4a30", outline="#3a2a20")
             if v[0] == "Maison":                                 # potager et puits
                 x, y0 = v[1]["c"]
-                d.polygon([P(x - 11, y0 - 3), P(x - 5, y0 - 3), P(x - 5, y0 - 8), P(x - 11, y0 - 8)], fill="#6b4a2c", outline="#3a2a20")
-                d.rectangle([P(x - 5.5, 0)[0], P(0, y0 - 10, 1)[1], P(x - 3.5, 0)[0], P(0, y0 - 10)[1]], fill="#8a8d94")
+                d.polygon([P(x - 12, y0 + 4), P(x - 6, y0 + 4), P(x - 6, y0 - 1), P(x - 12, y0 - 1)], fill="#6b4a2c", outline="#3a2a20")
+                d.rectangle([P(x - 10, 0)[0], P(0, y0 + 7, 1)[1], P(x - 8, 0)[0], P(0, y0 + 7)[1]], fill="#8a8d94")
         elif genre == "plateau":
             for r, z in ((4.2, 0.25), (3.6, 0.5), (3.0, 0.75)):
                 d.polygon([P(r * math.cos(math.radians(22.5 + 45 * k)), r * math.sin(math.radians(22.5 + 45 * k)), z) for k in range(8)],

@@ -7,4 +7,4 @@ Keep this exact scene, camera, buildings, sizes and layout, in the same flat-sha
 deep blue night. The emerald crystal in the center is by far the brightest light and casts a green glow on the
 plateau, the flagstones, the nearby grass and the river. The cave portal is closed: the cave is dark with only a
 faint green ember inside. Warm orange windows, small warm lanterns on posts along the paths and at the bridges,
-the forge hearth glowing orange, thin low ground mist, a few fireflies, the cliff and the trees in dark blue shadow.
+the forge hearth glowing orange, thin low ground mist, a few fireflies, the cliff and the trees in dark blue shadow. The three bare-earth attack trails stay clearly visible as paler bands, and the flagstone road to the cave is lit by its lanterns.

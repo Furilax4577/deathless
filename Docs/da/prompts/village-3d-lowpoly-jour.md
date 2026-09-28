@@ -8,8 +8,10 @@ finished low-poly game scene. Keep the same camera and keep every building, brid
 at exactly the same position and exactly the same size as in the blockout: the buildings have different sizes on
 purpose, do not equalize them, do not move them closer to the center, do not add or remove anything.
 
+The three wide brown bands coming from the right edge, the bottom edge and the left edge are the three enemy attack routes: wide bare-earth trails, kept completely clear, no house, no tree and no rock on them, each ending at the paved ring around the plateau; mark the far end of each with a few dark standing stones and bones. The wide pale strip going from the plateau up to the dark oval is the flagstone road to the cave, wide and completely clear, lined with lantern posts.
+
 What the volumes are: the grey wall at the back is a massive cliff of big faceted boulders with a narrow waterfall
-falling into a round pool; the dark oval with a green disc at the foot of the cliff, behind the blue-roofed house,
+falling into a round pool; the dark oval with a green disc at the foot of the cliff, left of the waterfall,
 is the mouth of a shallow cave with a green magic portal; the blue ribbon is a calm flat river, the two brown
 slabs are small wooden plank bridges, the pale blue disc is a shallow ford of flat pebbles; the grey octagon is a
 three-step stone plateau with a glowing emerald crystal on a dark spire; the pale disc and strips are flagstone
@@ -17,10 +19,10 @@ paving; the four tiny figures next to the plateau are four chunky big-headed adv
 viking, mage with purple pointed hat, hooded ranger), keep them exactly that small compared to the houses.
 
 The six boxes are half-timbered houses with plaster walls, dark timber frames, arched doors, stone chimneys and
-tiled roofs in the colors drawn: the biggest one on the left with the red roof is the two-storey tavern with double
+tiled roofs in the colors drawn: the biggest one at the bottom left with the red roof is the two-storey tavern with double
 doors, a porch, a hanging mug sign and barrels; the blue-roofed one with the small tower is the wizard house, slate
 roof and conical tower roof; the green-roofed one is the herbalist cottage, mossy roof and ivy; the brown-roofed
 one with the flat shed is the forge with an open lean-to and an orange glowing hearth; the red-roofed one at the
-bottom right is the tinkerer shop with a large shop window and a gear sign; the small red-roofed one at the bottom
+bottom right is the tinkerer shop with a large shop window and a gear sign; the small red-roofed one on the
 left is a plain cottage with a fenced vegetable garden and a stone well. The pale yellow ground on the right is
 open heath with rocks and stumps; the green cones and balls are tall trees with bare trunks. Bright daylight.

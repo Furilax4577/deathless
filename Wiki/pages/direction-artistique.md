@@ -80,6 +80,11 @@ Plans chiffrés à notre échelle : `Docs/da/maisons-plans.md`. Les boutiques fo
 
 ## Rendu 3D low poly à l'échelle, jour et nuit (28/09/2026)
 
+{image media/da/village-3d-lowpoly-jour-20260928-02.jpg} **Village, jour, maquette corrigée** | Trois sentiers d'attaque, route de la grotte
+{image media/da/village-3d-lowpoly-nuit-20260928-02.jpg} **Village, nuit, maquette corrigée** | Même scène
+
+**Corrections demandées par Quentin** : les points d'attaque des ennemis doivent se lire, et le chemin de la grotte doit être clair. La maquette porte maintenant **trois sentiers de terre battue de 7 m** (est par le pont, sud par le pont, ouest par la terre ferme), de chaque clairière à l'anneau pavé, sans maison ni arbre dessus ; une **route pavée de 4 m**, bordée de lanternes, du plateau à la grotte ; le sorcier est à gauche de cette route, la taverne au sud-ouest, la maison de base à l'ouest. Versions précédentes ci-dessous.
+
 {image media/da/village-3d-lowpoly-jour-20260928-01.jpg} **Village, jour** | Grok sur le gabarit 3D à l'échelle
 {image media/da/village-3d-lowpoly-nuit-20260928-01.jpg} **Village, nuit** | Même scène, la relique domine
 {image media/da/village-3d.png} **Gabarit 3D à l'échelle** | Volumes aux cotes, projection parallèle

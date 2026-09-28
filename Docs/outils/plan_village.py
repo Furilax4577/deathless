@@ -18,12 +18,12 @@ SORTIE = os.path.join(RACINE, "Docs", "da", "gabarits")
 PERSONNAGE = 2.3
 # nom : (centre x, y ; largeur de façade, profondeur ; hauteur de mur, annexe, teinte du toit)
 BATIMENTS = {
-    "Taverne":  dict(c=(-32, 16), l=16.6, p=11.6, mur=5.4, toit="#b4483a"),
-    "Sorcier":  dict(c=(-15, 29), l=11.6, p=9.6, mur=4.9, toit="#2f4a7a"),
+    "Taverne":  dict(c=(-31, -16), l=16.6, p=11.6, mur=5.4, toit="#b4483a"),
+    "Sorcier":  dict(c=(-27, 28), l=11.6, p=9.6, mur=4.9, toit="#2f4a7a"),
     "Druide":   dict(c=(21, 28), l=11.6, p=8.6, mur=4.9, toit="#7d8a4a"),
     "Forge":    dict(c=(32, 13), l=11.6, p=9.6, mur=4.9, toit="#8a5a3c"),
     "Mecano":   dict(c=(27, -17), l=12.6, p=9.6, mur=4.9, toit="#b4483a"),
-    "Maison":   dict(c=(-25, -15), l=8.6, p=7.1, mur=4.4, toit="#c0553f"),
+    "Maison":   dict(c=(-37, 10), l=8.6, p=7.1, mur=4.4, toit="#c0553f"),
 }
 RIVIERE = [(0, 36), (6, 28), (12, 18), (13, 6), (12.5, 0), (12, -6), (6, -15), (-6, -20), (-20, -30), (-40, -48), (-64, -70)]
 LARGEUR_RIVIERE = 4.5
@@ -33,6 +33,9 @@ BASSIN, GROTTE = (0, 38), (-14, 40)
 FALAISE_Y = 40
 CLAIRIERES = [(70, 0), (0, -70), (-70, 0)]
 PLATEAU, ANNEAU = 4.2, 8.0
+# Sentiers d'attaque en terre battue (7 m de large), de chaque clairière à l'anneau pavé ; route de la grotte (4 m).
+SENTIERS = [[(78, 0), (16, 0)], [(0, -78), (0, -20)], [(-78, 0), (-9, 0)]]
+LARGEUR_SENTIER, LARGEUR_ROUTE_GROTTE = 7.0, 4.0
 
 
 def coins(b, marge=0.0):
@@ -107,7 +110,7 @@ def plan(taille=1024, demi=80.0, legendes=True):
     rnd = random.Random(7)
     for _ in range(420):
         x, y = rnd.uniform(-80, 80), rnd.uniform(-80, 38)
-        if math.hypot(x, y) < 40 or x > 14 and y > -36 or abs(y) < 7 and x < 0 or abs(x) < 7 and y < 0:
+        if math.hypot(x, y) < 46 or x > 14 and y > -36 or abs(y) < 8 and x < 0 or abs(x) < 8 and y < 0 or (x < 0 and y > 0 and abs(x * 40 + y * 14) / 42.4 < 9):
             continue
         if min(math.hypot(x - rx, y - ry) for rx, ry in RIVIERE_DENSE[::6]) < 6:
             continue
@@ -115,6 +118,8 @@ def plan(taille=1024, demi=80.0, legendes=True):
         d.ellipse([P(x - r, y + r), P(x + r, y - r)], fill=rnd.choice(["#3f7a3a", "#4f8f44", "#2f6a4a", "#5d9a3c"]))
     for cx, cy in CLAIRIERES:
         d.ellipse([P(cx - 7, cy + 7), P(cx + 7, cy - 7)], fill="#a9825a")
+    for a, b in SENTIERS:
+        d.line([P(*a), P(*b)], fill="#b08a5e", width=int(LARGEUR_SENTIER * e))
     # rivière, bassin, gué
     d.line([P(*p) for p in RIVIERE_DENSE], fill="#3f7fb3", width=int(LARGEUR_RIVIERE * e), joint="curve")
     d.ellipse([P(BASSIN[0] - 4, BASSIN[1] + 4), P(BASSIN[0] + 4, BASSIN[1] - 4)], fill="#3f7fb3")
@@ -128,7 +133,9 @@ def plan(taille=1024, demi=80.0, legendes=True):
     cibles = [b["c"] for b in BATIMENTS.values()] + [GROTTE, (12.6, 0), (0, -17.8), GUE]
     for cx, cy in cibles:
         r = math.hypot(cx, cy)
-        d.line([P(cx * ANNEAU / r, cy * ANNEAU / r), P(cx * (1 - 6 / r), cy * (1 - 6 / r))], fill=pave, width=int(2.2 * e))
+        fin = 1 - (2 if (cx, cy) == GROTTE else 6) / r
+        d.line([P(cx * ANNEAU / r, cy * ANNEAU / r), P(cx * fin, cy * fin)], fill=pave,
+               width=int((LARGEUR_ROUTE_GROTTE if (cx, cy) == GROTTE else 2.2) * e))
     d.ellipse([P(-ANNEAU, ANNEAU), P(ANNEAU, -ANNEAU)], fill=pave)
     oct8 = [P(PLATEAU * math.cos(math.radians(22.5 + 45 * k)), PLATEAU * math.sin(math.radians(22.5 + 45 * k))) for k in range(8)]
     d.polygon(oct8, fill="#6f757c")
@@ -152,10 +159,10 @@ def plan(taille=1024, demi=80.0, legendes=True):
     fx, fy = BATIMENTS["Forge"]["c"]
     d.polygon([P(fx + 3, fy + 9), P(fx + 8, fy + 6.5), P(fx + 5, fy + 0.5), P(fx + 0, fy + 3)], fill="#6e4a30", outline="#3a2a20")
     sx, sy = BATIMENTS["Sorcier"]["c"]
-    d.ellipse([P(sx - 9.4, sy + 5.2), P(sx - 4.9, sy + 0.7)], fill="#24365c", outline="#3a2a20")
+    d.ellipse([P(sx - 7.7, sy + 8.2), P(sx - 3.2, sy + 3.7)], fill="#24365c", outline="#3a2a20")
     mx, my = BATIMENTS["Maison"]["c"]
-    d.rectangle([P(mx - 11, my - 3), P(mx - 5, my - 8)], fill="#6b4a2c", outline="#3a2a20")
-    d.ellipse([P(mx - 5.5, my - 9), P(mx - 3.5, my - 11)], fill="#8a8d94", outline="#3a2a20")
+    d.rectangle([P(mx - 12, my + 4), P(mx - 6, my - 1)], fill="#6b4a2c", outline="#3a2a20")
+    d.ellipse([P(mx - 10, my + 8), P(mx - 8, my + 6)], fill="#8a8d94", outline="#3a2a20")
     if legendes:
         f = police(14)
         d.text(P(0, 46), "Cascade", fill="white", font=f, anchor="mm", stroke_width=2, stroke_fill="#22262b")
