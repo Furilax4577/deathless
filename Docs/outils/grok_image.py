@@ -93,9 +93,13 @@ def enregistrer(donnees, nom):
     chemins, rang = [], 1
     for image in donnees.get("data", []):
         if image.get("b64_json"):
-            contenu, ext = base64.b64decode(image["b64_json"]), ".png"
+            contenu = base64.b64decode(image["b64_json"])
+            # Extension d'après les premiers octets (l'API renvoie du JPEG, du PNG ou du WebP).
+            ext = ".png" if contenu[:4] == b"\x89PNG" else ".webp" if contenu[8:12] == b"WEBP" else ".jpg"
         elif image.get("url"):
-            with urllib.request.urlopen(image["url"], timeout=180) as r:
+            # Repli si l'API renvoie une URL : le serveur d'images refuse (403) l'agent par défaut de Python.
+            telechargement = urllib.request.Request(image["url"], headers={"User-Agent": "Mozilla/5.0 (Deathless DA)"})
+            with urllib.request.urlopen(telechargement, timeout=180) as r:
                 contenu = r.read()
                 ext = mimetypes.guess_extension((r.headers.get("Content-Type") or "").split(";")[0]) or ".jpg"
             if ext == ".jpe":
@@ -150,10 +154,13 @@ def main():
     nom = a.nom or a.prompt or "essai"
     n = max(1, min(N_MAX, a.n))
     if a.depuis:
-        corps = {"model": MODELE, "prompt": texte, "image": {"url": image_en_donnees(a.depuis), "type": "image_url"}}
+        # response_format b64_json : l'image revient dans la réponse, rien à télécharger ensuite.
+        corps = {"model": MODELE, "prompt": texte, "response_format": "b64_json",
+                 "image": {"url": image_en_donnees(a.depuis), "type": "image_url"}}
         reponse = appeler("edits", corps, cle)
     else:
-        corps = {"model": MODELE, "prompt": texte, "n": n, "aspect_ratio": a.format or format_prompt or "16:9"}
+        corps = {"model": MODELE, "prompt": texte, "n": n, "response_format": "b64_json",
+                 "aspect_ratio": a.format or format_prompt or "16:9"}
         reponse = appeler("generations", corps, cle)
     fichiers = enregistrer(reponse, nom)
     if not fichiers:
