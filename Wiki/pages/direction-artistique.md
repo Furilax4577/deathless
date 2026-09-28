@@ -55,7 +55,9 @@ Tous les prompts sont dans `Docs/da/prompts/` et reprennent le même bloc de sty
 
 {image media/da/taverne-interieur-grok-cible.webp} **Intérieur cible, donné par Quentin** | Une seule salle, sans galerie ni escalier
 
-**Cible de l'aménagement** (image de Quentin, 28/09/2026, après le premier volume gris) : une seule grande salle ; âtre sur le mur ouest ; estrade à pan coupé dans le coin nord-ouest ; comptoir droit le long du mur nord ; râtelier de six tonneaux dans le coin nord-est ; tables rondes groupées au sud-est, une table seule près du feu ; grand centre vide. La **galerie et l'escalier disparaissent** : dans le premier volume gris ils gênaient la caméra (poteaux, dessous de galerie à 3,2 m, escalier collé à la place des joueurs). On n'en reprend pas les textures (bois veiné, enduit martelé) : facettes plates, une couleur par facette. Volume gris refait sur cette base, {à confirmer} par Quentin.
+**Cible de l'aménagement** (image de Quentin, 28/09/2026, après le premier volume gris) : une seule grande salle ; âtre sur le mur ouest ; estrade à pan coupé dans le coin nord-ouest ; comptoir droit le long du mur nord ; râtelier de six tonneaux dans le coin nord-est ; tables rondes groupées au sud-est, une table seule près du feu ; grand centre vide. La **galerie et l'escalier disparaissent** : dans le premier volume gris ils gênaient la caméra (poteaux, dessous de galerie à 3,2 m, escalier collé à la place des joueurs). On n'en reprend pas les textures (bois veiné, enduit martelé) : facettes plates, une couleur par facette. **Volume gris à l'échelle validé par Quentin** {décidé, 28/09/2026}, avec trois tables rondes au sud-est au lieu de quatre, disposées régulièrement. Toit allégé : 40° à demi-croupes, faîtage à 10,8 m (11,75 m à 45°). Plan chiffré : `Docs/da/taverne-plan.md`. Suite : extérieur habillé, puis intérieur meublé.
+
+{image media/da/taverne-volume-v2.png} **Volume gris validé** | Même angle que l'image cible, personnages de 2,3 m
 
 ## Les cinq autres intérieurs (28/09/2026)
 
