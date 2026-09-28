@@ -18,7 +18,7 @@ Conséquences pour tout intérieur :
 - **Hauteur libre d'au moins 4,5 m** là où les joueurs marchent (la caméra est à 3,7 m) : la salle de la taverne est à double hauteur, 5 m sous les poutres.
 - **5 à 6 m de recul libre** derrière un joueur tourné vers ce qu'il regarde (comptoir, estrade) : sinon la caméra se colle à son dos.
 - **Allée principale de 3 m**, allées secondaires de 1,5 m au moins.
-- **Mobilier à l'échelle des personnages** (grosses têtes, corps trapus) : plateau de table à 1,05 m, tabouret 0,6 m, comptoir 1,3 m, tonneau en perce 1,2 m de diamètre.
+- **Mobilier à l'échelle des personnages** (grosses têtes, corps trapus) : plateau de table à 0,8 m (1,05 m essayé : trop haut pour un personnage assis), tabouret 0,6 m, comptoir 1,3 m, tonneau en perce 1,2 m de diamètre.
 
 Les images de Grok dessinent des personnages d'environ 1,2 m dans un mobilier d'adultes : l'ambiance est bonne, les proportions sont à reprendre sur ce plan.
 
@@ -42,7 +42,7 @@ Intérieur **16 × 11 m** (176 m²), **une seule grande salle**, porte au sud, f
 | Tables rondes | centres (11,6 ; 1,6), (14,4 ; 1,6), (14,4 ; 4,4) | Ø 1,6 m, quatre tabourets | **trois tables** en équerre, à 1,6 m des murs (demande de Quentin) |
 | Fenêtres | sud x 3 et 13, ouest y 3 et 9, est y 3 | 1,4 × 1,6 m | |
 
-Mesures relevées : 5,2 m libres sous entraits ; la caméra à l'épaule garde tout son recul dans 60 % des cas (72 % dans le centre vide) ; dos à un mur à 1 m, elle se colle au joueur (la salle fait 11 m de profondeur) ; le linteau de la porte la gêne entre 2,5 et 5 m après le seuil. À voir à l'étape 4 : le mobilier est haut pour un personnage assis (plateau à 1,05 m, jambes courtes).
+Mesures relevées : 5,2 m libres sous entraits ; la caméra à l'épaule garde tout son recul dans 60 % des cas (72 % dans le centre vide) ; dos à un mur à 1 m, elle se colle au joueur (la salle fait 11 m de profondeur) ; le linteau de la porte la gêne entre 2,5 et 5 m après le seuil.
 
 ## Qui est là
 

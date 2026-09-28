@@ -55,13 +55,19 @@ Tous les prompts sont dans `Docs/da/prompts/` et reprennent le même bloc de sty
 
 {image media/da/taverne-interieur-grok-cible.webp} **Intérieur cible, donné par Quentin** | Une seule salle, sans galerie ni escalier
 
-**Cible de l'aménagement** (image de Quentin, 28/09/2026, après le premier volume gris) : une seule grande salle ; âtre sur le mur ouest ; estrade à pan coupé dans le coin nord-ouest ; comptoir droit le long du mur nord ; râtelier de six tonneaux dans le coin nord-est ; tables rondes groupées au sud-est, une table seule près du feu ; grand centre vide. La **galerie et l'escalier disparaissent** : dans le premier volume gris ils gênaient la caméra (poteaux, dessous de galerie à 3,2 m, escalier collé à la place des joueurs). On n'en reprend pas les textures (bois veiné, enduit martelé) : facettes plates, une couleur par facette. **Volume gris à l'échelle validé par Quentin** {décidé, 28/09/2026}, avec trois tables rondes au sud-est au lieu de quatre, disposées régulièrement. Toit allégé : 40° à demi-croupes, faîtage à 10,8 m (11,75 m à 45°). Plan chiffré : `Docs/da/taverne-plan.md`. Suite : intérieur meublé.
+**Cible de l'aménagement** (image de Quentin, 28/09/2026, après le premier volume gris) : une seule grande salle ; âtre sur le mur ouest ; estrade à pan coupé dans le coin nord-ouest ; comptoir droit le long du mur nord ; râtelier de six tonneaux dans le coin nord-est ; tables rondes groupées au sud-est, une table seule près du feu ; grand centre vide. La **galerie et l'escalier disparaissent** : dans le premier volume gris ils gênaient la caméra (poteaux, dessous de galerie à 3,2 m, escalier collé à la place des joueurs). On n'en reprend pas les textures (bois veiné, enduit martelé) : facettes plates, une couleur par facette. **Volume gris à l'échelle validé par Quentin** {décidé, 28/09/2026}, avec trois tables rondes au sud-est au lieu de quatre, disposées régulièrement. Toit allégé : 40° à demi-croupes, faîtage à 10,8 m (11,75 m à 45°). Plan chiffré : `Docs/da/taverne-plan.md`. 
 
 {image media/da/taverne-volume-v2.png} **Volume gris validé** | Même angle que l'image cible, personnages de 2,3 m
 {image media/da/taverne-ext-facade.png} **Extérieur habillé** | À côté d'un pin et de la maison standard
 {image media/da/taverne-ext-nuit.png} **La nuit** | Lanternes et fenêtres chaudes
 
 **Extérieur habillé validé par Quentin** {décidé, 28/09/2026} (`TaverneExterieurBuilder`, scène `Assets/Scenes/TaverneExterieur.unity` de `sandbox-level`) : dalle de pierre lisse et basse, enduit crème, colombage, porte double sous un arc surbaissé et un auvent de tuiles, volets bruns, toit à 40° à demi-croupes, cheminée de pierre sur le pignon ouest, enseigne, lanternes, tonneaux et banc. 23 916 triangles, faîtage à 10,66 m. Même technique que la maison standard (biseaux, atlas en dégradé). À reprendre plus tard : tuiles plus grosses que celles de la maison standard (1,15 m contre 0,86 m), enseigne petite, façade arrière sans fenêtre.
+
+{image media/da/taverne-int-comme_cible.png} **Intérieur meublé** | Même angle que l'image cible
+{image media/da/taverne-int-estrade.png} **Vers l'âtre et l'estrade** | Caméra à l'épaule
+{image media/da/taverne-int-nuit.png} **La nuit** | Feu, lustres et bougies
+
+**Intérieur meublé validé par Quentin** {décidé, 28/09/2026} (`TaverneInterieurBuilder`, scène `Assets/Scenes/Taverne.unity` de `sandbox-level` : la taverne complète). Plancher à larges lames, colombage et charpente apparents, âtre de pierre, estrade à pan coupé, comptoir à panneaux et étagères à chopes, râtelier de six tonneaux, trois tables rondes et celle du clochard, appliques, trois lustres à 4,6 m, fanions rouge brique, bleu ardoise et ocre. **Mobilier à l'échelle des personnages** : tabouret 0,6 m, plateau de table 0,8 m, comptoir 1,3 m. Cinq lumières temps réel à l'intérieur. 52 131 triangles à la validation ; allègement demandé par Quentin (cible 35 000). Bavaroise, barde et clochard sont encore des chevaliers en substitut.
 
 ## Les cinq autres intérieurs (28/09/2026)
 
