@@ -66,6 +66,18 @@ Plans chiffrés à notre échelle : `Docs/da/maisons-plans.md`. Les boutiques fo
 - **On garde** : les dispositions, les accessoires de métier, la tour ouverte sur la salle du sorcier, l'appentis de la forge.
 - **On corrige** : l'échelle des personnages (toujours trop petits chez Grok), les soubassements maçonnés, le cristal vert au bâton du mage joueur (notre mage est de feu ; le vert est à Nyxessa).
 
+## Plan et façades à l'échelle (28/09/2026)
+
+{image media/da/plan-village.png} **Plan à l'échelle** | Dessiné d'après les mesures, fait foi
+{image media/da/facades.png} **Façades à l'échelle** | Personnage de 2,3 m devant chacune
+{image media/da/facades-gabarit-20260928-01.jpg} **Façades habillées par Grok** | Fidèles aux gabarits
+{image media/da/plan-gabarit-20260928-01.jpg} **Rendu général par Grok** | Ambiance seulement : tailles fausses
+
+`Docs/outils/plan_village.py` dessine le plan et les façades au mètre près à partir des mesures des intérieurs, et vérifie les écarts (voisins, rivière, couloirs des vagues, axe nord, falaise). Avec les vraies emprises, la couronne passe à **29 à 36 m** de Nyxessa : taverne et sorcier au nord-ouest (le sorcier près de la grotte), druide et forge au nord-est, mécano au sud-est, maison de base au sud-ouest ; trois bâtiments par rive.
+
+- **Façades** : Grok respecte largeurs et hauteurs quand on lui donne le gabarit. À corriger : il ajoute un étage de fenêtres partout (seuls la taverne et le mécano en ont un), et garde les soubassements maçonnés.
+- **Rendu général** : Grok a basculé la vue, resserré le village et donné la même taille à toutes les maisons. Il sert pour l'ambiance ; pour un rendu général exact, c'est le prototype dans le moteur qui fait foi.
+
 ## Images retenues
 
 {image media/da/village-vision-grok-01.webp} **Village, vision du 28/09/2026** | Grok Imagine, par Quentin
