@@ -21,6 +21,19 @@ Travaux prévus ou notés, pas encore faits. Une ligne quitte cette page quand l
 - **Lissage global des compétences** (27/09/2026, demande de Quentin : « les cinq personnages sont déséquilibrés ») : audit chiffré des cinq classes (rôle, dégâts par seconde, survie, utilité en groupe, dépendance à l'équipe) et propositions de refonte, même profondes, dans `Docs/equilibrage-classes.md` puis [À décider](a-decider.md) ; Quentin tranche classe par classe avant toute implémentation.
 - **Bande-annonce Steam** : v1 tournée le 26/09/2026 (`Docs/trailer-storyboard.md`, outil `Assets/Scripts/Dev/Tournage/`), 39 s, à **écouter et valider** par Quentin ; à retourner quand le décor aura quitté KayKit.
 
+## Retours du test multi 0.7.0 (30/09/2026)
+
+Notés par Quentin après la partie à deux ; rien n'est encore développé.
+
+- **Boss de fin de nuit** {décidé} : Morgrim (nuit 10) et Nyxar (nuit 12) sortent avec la dernière vague, si tard que le soleil se levait sans combat. Désormais le boss arrive en fin de vague et **le jour ne se lève que quand il est mort** : l'aube attend sa chute. Pages à reprendre au développement : [Déroulé d'une partie](deroule.md) et [Ennemis](ennemis.md).
+- **Bug : tirs à travers le bouclier** : les ennemis à distance (mage squelette, crânes) atteignent Nyxessa et les joueurs qui se tiennent dans l'enceinte du bouclier, à travers la paroi.
+- **Bug : ennemis qui passent le bouclier** : en prenant pour cible un joueur posté au bord du bouclier, des squelettes sont entrés dans l'enceinte.
+- **Brûlure qui se cumule en paliers** {décidé} : chaque tic de flamme remplit la jauge de brûlure de l'ennemi ; au-delà de 100 %, la brûlure monte d'un palier (plus forte) et la jauge repart ; elle redescend de palier en palier de la même façon quand on cesse de brûler l'ennemi. Aujourd'hui la brûlure ne se cumule pas (la durée repart de zéro, voir [Statuts](statuts.md)). Chiffres dans [À décider](a-decider.md).
+- **Points faibles des boss cachés sur le wiki** {décidé} : les points faibles et les phases des boss (éclats de Nyxar, etc.) sont masqués par défaut dans le wiki joueur, derrière un avertissement « Attention, spoil » à déplier.
+- **Menu du personnage (Tab)** : Tab doit aussi le fermer (bascule), pas seulement l'ouvrir.
+- **Chemins des monstres trop semblables** : les squelettes empruntent tous le même chemin, ce qui rend les attaques de zone trop faciles ; varier les trajets (dispersion, plusieurs couloirs, écarts dans la file).
+- **Mage : coup critique ?** et **Rôdeur : petit nerf** (critique ou dégâts de base) : à trancher, voir [À décider](a-decider.md).
+
 ## En attente de validation (Quentin)
 
 - **Personnage du mois** : candidats Barde, Bavaroise, Clochard pétomane et **DJ Bob Douville** (26/09/2026, modèles lissés, pages avec rendus et clips). Choisir le premier ; alléger celui qui est retenu (Barde et Bavaroise un peu au-dessus de 8 000 triangles). Barde : l'attaque de base frappe avec le luth comme une massue, animation de jeu du luth à créer.

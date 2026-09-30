@@ -13,6 +13,9 @@ Ce qui reste ouvert. Une ligne quitte cette page quand la règle est tranchée e
 | Statuts | Durées et intensités des statuts ; seuil, dégâts et ralenti de la chute | [Statuts](statuts.md) |
 | Progression | Premier arbre d'améliorations des compétences (proposition), autres améliorations, économie | [Classes](classes.md#menu-du-personnage-et-points-de-competence) |
 | Village | Maisons la nuit : n'y entrer que le jour ? Reconduire les héros dehors au crépuscule ? | [Le village](village.md) |
+| Mage | Donner un coup critique au Mage (30/09/2026) ? Si oui : chance, multiplicateur, sur quels sorts (boule, cône, brûlure). À voir avec sa refonte encore ouverte. | [Mage](classe-mage.md) |
+| Rôdeur | Petit nerf (30/09/2026) : baisser le critique (tir à la tête) ou les dégâts de base, et de combien. | [Rôdeur](classe-rodeur.md) |
+| Statuts | Brûlure en paliers (30/09/2026) : remplissage de la jauge par tic, nombre de paliers, dégâts par palier, vitesse de redescente. | [Statuts](statuts.md) |
 
 ## Équilibrage des classes (27/09/2026)
 
