@@ -58862,6 +58862,7 @@ MonoBehaviour:
   graine: 1
   genererAuDemarrage: 0
   construireNavMesh: 1
+  combiner: 1
 --- !u!114 &653437223
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -119274,7 +119275,7 @@ MonoBehaviour:
   - {fileID: 1808069695}
   - {fileID: 2100315198}
   - {fileID: 1318004867}
-  braisesCouleur: {r: 2.2, g: 0.704, b: 0.176, a: 2.2}
+  eclatBraises: 2.2
 --- !u!1001 &1327852019
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -122670,6 +122671,8 @@ MonoBehaviour:
   prefabGuerrier: {fileID: 5935539975271108772, guid: bdf2373f18a1ee14d84cc4f4798cca58, type: 3}
   prefabGolem: {fileID: 588009689203450280, guid: d56353feaf9a5704a9cd7055cda12bd9, type: 3}
   prefabNecromancien: {fileID: 7874091714259045706, guid: 8a56081ffcce75242a01deb68c3745e6, type: 3}
+  prefabVoleur: {fileID: 5011839729136632972, guid: d5b5acb8dc747874996681e5cc6ef95f, type: 3}
+  prefabMage: {fileID: 1268591782550519860, guid: 0e466988c29ea154a902fc2a797042e2, type: 3}
   prefabMorgrimMassue: {fileID: 7642534684864006856, guid: fbf7d73ab263b7d47960bdd5bdb07133, type: 3}
   prefabMorgrimMartache: {fileID: 5993373600862596061, guid: b70ea074115a7c14e8df90c9ba2b5114, type: 3}
   conteneur: {fileID: 640644663}

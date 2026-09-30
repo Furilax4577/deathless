@@ -122,7 +122,12 @@ Points de vie, dégâts et cadence : {à équilibrer}.
 
 - Le mage squelette tire un **missile en forme de crâne** fait de gemmes {effet validé}. {{dev: Il s'appelait « nécromancien » avant que ce nom ne soit réservé au boss final.}}
 - C'est le même missile que celui de Nyxessa, à taille normale ; celui de Nyxessa est une fois et demie plus gros {décidé}.
-- Modèle : le squelette mage KayKit {décidé}. Sa vie et son comportement sont {à confirmer}.
+- Modèle : le squelette mage KayKit {décidé}.
+- **Comportement** {décidé, 28/09/2026} : tireur fragile, il garde ses distances (il avance au-delà de 7 m, recule en deçà de 5,5 m, donc hors du bouclier de Nyxessa) et tire sur le joueur le plus proche à portée, sinon sur Nyxessa. Pas de coup au corps à corps, ni invocation ni téléportation. Chiffres {à équilibrer} dans le tableau plus bas. {{dev: `Mage.cs` ; `GameBalance.mage`, `mageDistanceTir`, `mageVitesseMissile` 11 m/s ; prefab `Squelette_Mage`. `DefenseNyxessa` le traite en cible lourde.}}
+
+## Voleur
+
+- **Comportement** {décidé, 28/09/2026} : rapide et moins solide qu'un guerrier, il **chasse les joueurs isolés** : un joueur sans autre joueur vivant à moins de 10 m, repéré jusqu'à 14 m (plus loin que la détection ordinaire de 8 m). En solo, le joueur est toujours isolé. Sans joueur isolé, il fait comme les autres squelettes ; il riposte comme eux au contact de Nyxessa. Chiffres {à équilibrer} dans le tableau plus bas. {{dev: `Voleur.cs` ; `GameBalance.voleur`, `voleurDistanceIsolement`, `voleurDistanceChasse` ; prefab `Squelette_Voleur`.}}
 
 ## Comportement et détection
 
@@ -136,11 +141,13 @@ Points de vie, dégâts et cadence : {à équilibrer}.
 |---|---|---|---|---|
 | Sbire | 100 | 3,4 m/s | 8 | prépare son coup 0,7 s |
 | Guerrier | 160 | 3,0 m/s | 14 | prépare son coup 0,8 s |
+| Voleur | 115 | 4,4 m/s | 12 (10 sur Nyxessa) | prépare son coup 0,5 s, un coup toutes les 1,4 s |
+| Mage | 70 | 3,2 m/s | 12 par crâne | tire à 7,5 m au plus, incantation 0,45 s, un tir toutes les 2,6 s |
 | Élite | ×3 | | ×1,5 | portée +0,3 m ; 1 par nuit aux nuits 5 et 6, 2 dès la nuit 7 |
 | Morgrim | 1 500 | 2 m/s | 45 en zone, 60 sur Nyxessa | rayon 3 m, prépare son coup 1,6 s |
 | Nyxar | 1 200 | | 18 par crâne, toutes les 3 s | reste entre 12 et 18 m ; relève 3 sbires toutes les 15 s, 12 au plus |
 
-- **Composition des vagues** {à équilibrer} : vagues de 30, 35 et 35 % des squelettes de la nuit ; avec quatre vagues, 22, 24, 26 et 28 %. La part de guerriers passe de 0 % la nuit 1 à 50 % dès la nuit 5.
+- **Composition des vagues** {à équilibrer} : vagues de 30, 35 et 35 % des squelettes de la nuit ; avec quatre vagues, 22, 24, 26 et 28 %. Chaque sortie est tirée selon les parts de la nuit : mages, puis voleurs, puis guerriers, le reste en sbires (au moins 30 %). Guerriers : 0 % la nuit 1, 25 % la nuit 2, puis de 30 à 40 % (40 % dès la nuit 9). Voleurs : 12 % la nuit 3, puis 14 à 16 %. Mages : 10 % la nuit 5, 12 % dès la nuit 6, 14 % dès la nuit 9. {{dev: `GameBalance.partGuerriers`, `partVoleurs`, `partMages` ; `DirecteurVagues.TirerType`.}}
 - **Or rapporté** par squelette tué, versé à la caisse commune (règle provisoire en attendant le donjon, voir [Déroulé d'une partie](deroule.md)) {à équilibrer} :
 
 | Ennemi | Or |
@@ -151,4 +158,4 @@ Points de vie, dégâts et cadence : {à équilibrer}.
 | Élite | 25 |
 | Morgrim | 150 |
 | Nyxar | 300 |
-- {dev} Dans la version 0.1, voleurs et mages sont encore joués comme des guerriers, et les élites sont des guerriers renforcés.
+- {dev} Les élites sont des guerriers renforcés. Voleurs et mages ont leur propre prefab depuis le 28/09/2026 (avant, ils étaient joués comme des guerriers) ; sans prefab, un voleur ou un mage est posé comme un sbire.

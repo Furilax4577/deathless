@@ -53,8 +53,8 @@ namespace Deathless.Jeu
         [Tooltip("Part de voleurs par nuit (nuits 1 à 12 ; wiki : ennemis.md, décidé 28/09/2026) : aucun les nuits 1 et 2, " +
             "dès la nuit 3 incluse. Tirage d'une sortie (DirecteurVagues.TirerType) : mage, puis voleur, puis guerrier, le reste en sbire.")]
         public float[] partVoleurs = { 0f, 0f, 0.12f, 0.14f, 0.15f, 0.15f, 0.16f, 0.16f, 0.16f, 0.16f, 0.16f, 0.16f };
-        [Tooltip("Part de mages (lanceurs de crâne) par nuit (nuits 1 à 12 ; décidé 28/09/2026) : dès la nuit 3 incluse.")]
-        public float[] partMages = { 0f, 0f, 0.08f, 0.10f, 0.10f, 0.12f, 0.12f, 0.12f, 0.14f, 0.14f, 0.14f, 0.14f };
+        [Tooltip("Part de mages (lanceurs de crâne) par nuit (nuits 1 à 12 ; décidé 28/09/2026, wiki : ennemis.md) : dès la nuit 5 incluse (30/09/2026 : les 8 et 10 % des nuits 3 et 4 retirés), plus nombreux nuit 6.")]
+        public float[] partMages = { 0f, 0f, 0f, 0f, 0.10f, 0.12f, 0.12f, 0.12f, 0.14f, 0.14f, 0.14f, 0.14f };
         [Tooltip("Multiplicateur de PV par nuit (wiki : +10 % dès la nuit 9, +20 % dès la nuit 11).")]
         public float[] multiplicateurPV = { 1, 1, 1, 1, 1, 1, 1, 1, 1.1f, 1.1f, 1.2f, 1.2f };
         [Tooltip("Joueurs en plus : +60 % d'ennemis par joueur (wiki).")]

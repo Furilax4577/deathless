@@ -139,11 +139,11 @@ Pour un joueur :
 
 | Nuit | Clairières | Ennemis | Nouveauté |
 |---|---|---|---|
-| 1 | 1 | 8 | Sbires seulement |
-| 2 | 1 | 12 | Guerriers |
-| 3 | 2 | 16 | Voleurs |
-| 4 | 2 | 20 | |
-| 5 | 3 | 25 | Mages, premier élite |
+| 1 | 1 | 12 | Sbires seulement |
+| 2 | 1 | 18 | Guerriers |
+| 3 | 2 | 22 | Voleurs |
+| 4 | 2 | 26 | |
+| 5 | 3 | 28 | Mages, premier élite |
 | 6 | 3 | 30 | Mages plus nombreux |
 | 7 | 3 | 34 | Deux élites par nuit |
 | 8 | 3 | 38 | |
@@ -152,6 +152,7 @@ Pour un joueur :
 | 11 | 3 | 46 | Points de vie +20 % |
 | 12 | 3 | 48 | Boss final : **Nyxar, le Nécromancien**, victoire à l'aube |
 
+- **Nuits 1 à 5 densifiées** le 28/09/2026 (8/12/16/20/25 → 12/18/22/26/28 : « les premières vagues sont trop molles ») {décidé}.
 - **Nuits 1 à 3** : apprentissage. **Nuits 4 à 7** : pression, pendant qu'on monte les paliers de Nyxessa (un palier toutes les deux nuits environ). **À partir de la nuit 8** : difficile.
 
 ### Règles universelles {décidé}

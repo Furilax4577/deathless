@@ -19,7 +19,7 @@ MonoBehaviour:
   alerteAvantNuit: 15
   compteAReboursPret: 5
   nuitsPourGagner: 12
-  ennemisParNuit: 080000000c0000001000000014000000190000001e00000022000000260000002a0000002c0000002e00000030000000
+  ennemisParNuit: 0c00000012000000160000001a0000001c0000001e00000022000000260000002a0000002c0000002e00000030000000
   clairieresParNuit: 010000000100000002000000020000000300000003000000030000000300000003000000030000000300000003000000
   departsTroisVagues:
   - 0
@@ -44,16 +44,42 @@ MonoBehaviour:
   partGuerriers:
   - 0
   - 0.25
+  - 0.3
+  - 0.3
+  - 0.35
+  - 0.35
+  - 0.38
+  - 0.38
   - 0.4
   - 0.4
-  - 0.5
-  - 0.5
-  - 0.5
-  - 0.5
-  - 0.5
-  - 0.5
-  - 0.5
-  - 0.5
+  - 0.4
+  - 0.4
+  partVoleurs:
+  - 0
+  - 0
+  - 0.12
+  - 0.14
+  - 0.15
+  - 0.15
+  - 0.16
+  - 0.16
+  - 0.16
+  - 0.16
+  - 0.16
+  - 0.16
+  partMages:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0.1
+  - 0.12
+  - 0.12
+  - 0.12
+  - 0.14
+  - 0.14
+  - 0.14
+  - 0.14
   multiplicateurPV:
   - 1
   - 1
@@ -89,6 +115,26 @@ MonoBehaviour:
     intervalle: 2.2
     preparation: 0.8
     portee: 2
+  voleur:
+    pv: 115
+    vitesse: 4.4
+    degatsJoueur: 12
+    degatsNyxessa: 10
+    intervalle: 1.4
+    preparation: 0.5
+    portee: 1.7
+  voleurDistanceIsolement: 10
+  voleurDistanceChasse: 14
+  mage:
+    pv: 70
+    vitesse: 3.2
+    degatsJoueur: 12
+    degatsNyxessa: 12
+    intervalle: 2.6
+    preparation: 0.45
+    portee: 7.5
+  mageDistanceTir: {x: 5.5, y: 7}
+  mageVitesseMissile: 11
   detectionJoueur: 8
   abandonPoursuite: 15
   abandonApres: 4
