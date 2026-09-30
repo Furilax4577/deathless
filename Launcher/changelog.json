@@ -1,6 +1,15 @@
 {
   "versions": [
     {
+      "version": "0.7.2",
+      "date": "2026-09-30",
+      "titre": "Le bouclier tient",
+      "notes": [
+        "Le bouclier de Nyxessa intercepte les tirs des mages squelettes et des crânes ennemis.",
+        "Bouclier levé, les squelettes contournent sa paroi au lieu d'entrer dans l'enceinte."
+      ]
+    },
+    {
       "version": "0.7.1",
       "date": "2026-09-30",
       "titre": "Voleurs et mages pour tous",
