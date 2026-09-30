@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace Deathless.Jeu
 {
@@ -28,6 +29,8 @@ namespace Deathless.Jeu
         public bool Canalise => Leve && PalierActuel >= B.bouclierCanalisationPalier;
 
         RelicShieldVisual m_Visuel;
+        NavMeshObstacle m_Obstacle;
+        bool m_ObstacleActif;
         FiletEnergie m_Filet;
         Transform m_AncrageBaton;
         bool m_CanaliseVu;
@@ -50,6 +53,12 @@ namespace Deathless.Jeu
             Instance = this;
             if (effet == null) effet = GetComponentInChildren<RelicShieldEtat>(true);
             if (effet != null) m_Visuel = effet.GetComponent<RelicShieldVisual>();
+            m_Obstacle = GetComponent<NavMeshObstacle>();
+            if (m_Obstacle == null) m_Obstacle = gameObject.AddComponent<NavMeshObstacle>();
+            m_Obstacle.shape = NavMeshObstacleShape.Capsule;
+            m_Obstacle.carving = true;
+            m_Obstacle.carveOnlyStationary = false;
+            m_Obstacle.enabled = false;
         }
 
         void OnDestroy() { if (Instance == this) Instance = null; }
@@ -62,6 +71,7 @@ namespace Deathless.Jeu
             if (m_Visuel != null) m_Visuel.palierQuantite = Mathf.Clamp(PalierActuel, 1, 5);
             SuivreCanalisation();
             SuivreEtatVie();
+            MettreAJourObstacle();
         }
 
         void SuivreCanalisation()
@@ -124,6 +134,21 @@ namespace Deathless.Jeu
                 effet.radius = B.bouclierRayon;
                 effet.height = B.bouclierHauteur;
                 effet.castSeconds = B.bouclierIncantation;
+            }
+            MettreAJourObstacle();
+        }
+
+        void MettreAJourObstacle()
+        {
+            if (m_Obstacle == null) return;
+            m_Obstacle.radius = Rayon;
+            m_Obstacle.height = B.bouclierHauteur + B.bouclierBase;
+            m_Obstacle.center = Vector3.up * (B.bouclierBase + B.bouclierHauteur * 0.5f);
+            bool actif = Leve;
+            if (m_ObstacleActif != actif)
+            {
+                m_Obstacle.enabled = actif;
+                m_ObstacleActif = actif;
             }
         }
 
