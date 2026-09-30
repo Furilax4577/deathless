@@ -91,6 +91,9 @@ namespace Deathless.Jeu
         /// Effets communs à toutes les classes (numéros 200 et plus ; ceux des classes sont en dessous).
         protected const int EffetCritique = 200;
         public const int EffetEsquive = 201, EffetSaut = 202, EffetTransitDepart = 203, EffetTransitArrivee = 204;
+        /// Attaque armée (RT) : sans visuel ni son, horodate l'attaque sur la marionnette (Heros.DerniereAttaque), pour que
+        /// l'hôte fasse esquiver ses squelettes (30/09/2026).
+        public const int EffetAttaque = 205;
 
         /// DonjonJeu : passage d'un portail (départ, arrivée) à rejouer chez les autres, à la position donnée ; `portail` :
         /// 0 aucun (rappel), 1 portail du village, 2 portail de retour du donjon (DonjonJeu.PortailDe).
@@ -123,6 +126,7 @@ namespace Deathless.Jeu
             else if (effet == EffetSaut) AudioBank.Jouer(SonsDuJeu.Saut, transform.position, 0.5f);
             else if (effet == EffetTransitDepart) DonjonJeu.TransitDistant(H, a, false, Mathf.RoundToInt(v));
             else if (effet == EffetTransitArrivee) DonjonJeu.TransitDistant(H, a, true, Mathf.RoundToInt(v));
+            else if (effet == EffetAttaque) { var h = H != null ? H : GetComponent<Heros>(); if (h != null) h.MarquerAttaque(); }
         }
 
         // ----------------------------------------------------------------- HUD

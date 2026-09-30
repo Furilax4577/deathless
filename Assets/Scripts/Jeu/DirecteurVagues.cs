@@ -39,6 +39,9 @@ namespace Deathless.Jeu
         /// Version de Morgrim tirée au sort pour la nuit en cours (Preparer) : l'hôte décide seul (Docs/reseau.md).
         GameObject m_PrefabMorgrimChoisi;
 
+        /// Tests (ScenariosTest « morgrim ») : impose la version de Morgrim posée ensuite par Poser(Golem).
+        public void ChoisirMorgrim(bool massue) => m_PrefabMorgrimChoisi = massue ? prefabMorgrimMassue : prefabMorgrimMartache;
+
         void Awake() { Instance = this; }
         void OnDestroy() { if (Instance == this) Instance = null; }
 
@@ -86,6 +89,10 @@ namespace Deathless.Jeu
         /// Client : squelettes tenus par l'hôte (marionnettes), pour les classes et les vues de ce poste.
         public void AjouterDistant(Squelette s) { if (s != null && !m_Vivants.Contains(s)) m_Vivants.Add(s); }
         public void RetirerDistant(Squelette s) { m_Vivants.Remove(s); }
+
+        /// Hôte dont le réseau est tombé (Partie.ContinuerSeul) : les squelettes détruits avec les objets réseau sont
+        /// oubliés (Partie les repose ensuite en local) ; les sorties à venir de la nuit restent prévues.
+        public void OublierDisparus() { m_Vivants.RemoveAll(s => s == null); }
 
         /// Crépuscule : plan de la nuit et annonce des clairières actives.
         void Preparer(int nuit)

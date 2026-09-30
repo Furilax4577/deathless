@@ -580,6 +580,26 @@ namespace Deathless.Donjon
             NbCombines = 0;
         }
 
+        readonly Dictionary<Material, Material> m_Decoupes = new Dictionary<Material, Material>();
+
+        /// Matériau découpé autour du héros (CameraEpaule, shader Deathless/DonjonDecoupe) pour une pièce combinée du donjon :
+        /// celui du kit pour les murs KayKit, et pour tout autre matériau URP Lit (poutres, décor Halloween…) une copie au
+        /// même shader, faite une fois. Les autres shaders (eau, gemmes) restent tels quels.
+        Material Decoupe(Material mat)
+        {
+            if (kit.materiauDecoupe == null || mat == null) return mat;
+            if (mat == kit.materiauMurs) return kit.materiauDecoupe;
+            if (m_Decoupes.TryGetValue(mat, out var d)) return d;
+            d = mat;
+            if (mat.shader != null && mat.shader.name == "Universal Render Pipeline/Lit")
+            {
+                d = new Material(mat) { name = mat.name + "_Decoupe" };
+                d.shader = kit.materiauDecoupe.shader;
+            }
+            m_Decoupes[mat] = d;
+            return d;
+        }
+
         /// Un maillage par groupe et par matériau, dans le repère du groupe ; les pièces combinées gardent leur objet (collisions
         /// à part, masquage par pièce pendant les transitions) mais leur rendu s'éteint au profit du combiné.
         void Combiner()
@@ -634,7 +654,8 @@ namespace Deathless.Donjon
                     mesh.CombineMeshes(m_ParMateriau[mat].ToArray(), true, true, false);
                     go.GetComponent<MeshFilter>().sharedMesh = mesh;
                     var rd = go.GetComponent<MeshRenderer>();
-                    rd.sharedMaterial = mat;
+                    // Découpe autour du héros (CameraEpaule, shader Deathless/DonjonDecoupe) : seulement dans le donjon.
+                    rd.sharedMaterial = Decoupe(mat);
                     if (!go.activeSelf) go.SetActive(true);
                     m_Masquage.Combine(g, rd);
                     NbCombines++;

@@ -13,7 +13,9 @@ bienfait) et la jauge de durée. Formes larges et peu nombreuses : lisibles à 2
 - statut_provoque : veine de colère, quatre crochets rouges (Rage) ;
 - statut_renverse : silhouette couchée en os, flèche de bascule qui retombe (Rage) — Renversé, 26/09/2026 ;
 - statut_peau_de_fer : plastron de fer à trois plaques rivetées d'ivoire (Fer de Rage, Ivoire) — bienfait du rugissement
-  du viking, 27/09/2026.
+  du viking, 27/09/2026 ;
+- statut_galvanise : os dressé sous trois chevrons rouges qui montent (Os, Rage) — bienfait du cri de Morgrim sur les
+  squelettes proches, 30/09/2026.
 
 Relançable : `python generer_statuts.py` (écrit Statuts/*.svg ; `--png dossier` ajoute des aperçus PNG à 128, 48 et
 24 px). Les SVG sont copiés dans Assets/UI/Icones/Statuts/ par Deathless > UI > 6. Table des icônes (IconesUIOutil).
@@ -144,7 +146,21 @@ def statut_peau_de_fer():
     return ic
 
 
-STATUTS = [statut_brulure, statut_ralenti, statut_etourdi, statut_ivresse, statut_provoque, statut_renverse, statut_peau_de_fer]
+def statut_galvanise():
+    ic = g.Icone("statut_galvanise", "statuts", "Galvanisé", "Statut : squelette galvanisé par le cri de Morgrim, frappe plus "
+        "fort et va plus vite ; un bienfait, liseré or.")
+    # Os dressé (bas) : fût et deux têtes arrondies.
+    ic.bande([(64, 118), (64, 74)], 12, MOUSSE)
+    for x in (56, 72):
+        ic.gemme(g.regulier((x, 118), 9, 8, 0), MOUSSE)
+        ic.gemme(g.regulier((x, 74), 9, 8, 0), MOUSSE)
+    # Trois chevrons de rage qui montent (haut), du plus large au plus étroit.
+    for y, l in ((58, 40), (38, 32), (18, 24)):
+        ic.bande([(64 - l, y + 16), (64, y), (64 + l, y + 16)], 11, RAGE)
+    return ic
+
+
+STATUTS = [statut_brulure, statut_ralenti, statut_etourdi, statut_ivresse, statut_provoque, statut_renverse, statut_peau_de_fer, statut_galvanise]
 
 
 def main():

@@ -19,6 +19,24 @@ namespace Deathless.Jeu
         AudioSource m_Boucle;
         bool m_Fini;
         bool m_Visuel_Seul;
+        bool m_ParNyxessa;
+        bool m_Compte;   // dégâts comptés dans s_EnVol (retirés à l'arrivée ou à la destruction)
+
+        /// Dégâts des missiles déjà partis vers chaque cible (30/09/2026) : Nyxessa ne tire plus sur un ennemi que les
+        /// missiles en vol suffisent à tuer (DefenseNyxessa.Condamne).
+        static readonly System.Collections.Generic.Dictionary<Sante, float> s_EnVol = new System.Collections.Generic.Dictionary<Sante, float>();
+        public static float DegatsEnVol(Sante s) => s != null && s_EnVol.TryGetValue(s, out var d) ? d : 0f;
+
+        void Decompter()
+        {
+            if (!m_Compte) return;
+            m_Compte = false;
+            if (m_Cible == null || !s_EnVol.TryGetValue(m_Cible, out var d)) return;
+            d -= m_Degats;
+            if (d <= 0.01f) s_EnVol.Remove(m_Cible); else s_EnVol[m_Cible] = d;
+        }
+
+        void OnDestroy() => Decompter();
 
         /// Multijoueur (client) : le même vol que chez l'hôte, sans dégâts (l'hôte les applique).
         public static MissileCrane TirerVisuel(Vector3 depart, Sante cible, float vitesse, float guidage, bool parNyxessa)
@@ -31,6 +49,11 @@ namespace Deathless.Jeu
         public static MissileCrane Tirer(Vector3 depart, Sante cible, float degats, float vitesse, float guidage, Equipe equipe, GameObject source, bool parNyxessa)
         {
             var m = Creer(depart, cible, degats, vitesse, guidage, equipe, source, parNyxessa);
+            if (cible != null && degats > 0f)
+            {
+                s_EnVol[cible] = DegatsEnVol(cible) + degats;
+                m.m_Compte = true;
+            }
             // Multijoueur : l'hôte fait voir le même missile aux clients.
             if (Deathless.Reseau.ReseauJeu.EnPartie && Deathless.Reseau.ReseauJeu.Autorite) Deathless.Reseau.PartieReseau.Instance?.Missile(depart, cible, vitesse, guidage, parNyxessa);
             return m;
@@ -53,6 +76,7 @@ namespace Deathless.Jeu
             m.m_Equipe = equipe;
             m.m_Source = source;
             m.m_Parable = !parNyxessa;
+            m.m_ParNyxessa = parNyxessa;
             var fx = EffetsJeu.Instance;
             if (fx != null && fx.formeCrane != null && fx.gemmes != null)
             {
@@ -95,6 +119,7 @@ namespace Deathless.Jeu
         void Arriver()
         {
             m_Fini = true;
+            Decompter();
             if (!m_Visuel_Seul && m_Cible != null && !m_Cible.Mort && (m_Cible.transform.position + Vector3.up - transform.position).sqrMagnitude < 4f)
             {
                 m_Cible.Encaisser(new InfoDegats
@@ -105,7 +130,7 @@ namespace Deathless.Jeu
             }
             if (m_Visuel != null) m_Visuel.Shatter();
             if (m_Boucle != null) m_Boucle.Stop();
-            AudioBank.Jouer(SonsDuJeu.MissileEclat, transform.position, 0.8f);
+            AudioBank.Jouer(m_ParNyxessa ? SonsDuJeu.MissileEclat : SonsDuJeu.MissileEclatEnnemi, transform.position, 0.8f);
             Destroy(gameObject, 1.5f);
         }
     }

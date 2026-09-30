@@ -143,7 +143,7 @@ MonoBehaviour:
     portee: 0
   - id: kenney_rpg_handlesmallleather
     nom: "Potion \u2014 sortie de la sacoche"
-    statut: utilise
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: d0ac846f8038c5b428386819640e9b98, type: 3}
@@ -160,7 +160,7 @@ MonoBehaviour:
     portee: 0
   - id: bow_shot_v3
     nom: "Arc \u2014 tir"
-    statut: disponible
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 9610b4cbd27c77945abb159a63ba78ca, type: 3}
@@ -178,7 +178,7 @@ MonoBehaviour:
     portee: 0
   - id: bow_shot_v3_charged
     nom: "Arc \u2014 tir charg\xE9"
-    statut: disponible
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: ede56ad1846612b498411883c059c238, type: 3}
@@ -193,7 +193,7 @@ MonoBehaviour:
     portee: 0
   - id: crossbow_shot_v3
     nom: "Arbal\xE8te \u2014 tir"
-    statut: disponible
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: ef3522d9b58874c439a7b4eab2fd71e7, type: 3}
@@ -244,7 +244,7 @@ MonoBehaviour:
     portee: 0
   - id: coup_critique
     nom: Coup critique
-    statut: disponible
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 60cacaf38a04bb84bb15e775905b348b, type: 3}
@@ -253,14 +253,14 @@ MonoBehaviour:
     portee: 0
   - id: coup_critique_meilleur
     nom: "Coup critique \u2014 meilleur critique"
-    statut: disponible
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: f80aa7d4d39a5f74e8a3f9a0e83ab96f, type: 3}
     portee: 0
   - id: arbalete_recharge
     nom: "Arbal\xE8te \u2014 rechargement"
-    statut: disponible
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 208e8927adec70a45954d8638384c402, type: 3}
@@ -309,7 +309,7 @@ MonoBehaviour:
     portee: 0
   - id: brulure
     nom: "Br\xFBlure \u2014 cr\xE9pitement (boucle)"
-    statut: disponible
+    statut: utilise
     boucle: 1
     clips:
     - {fileID: 8300000, guid: bf77e2745cabdfb49b212276609a3e5e, type: 3}
@@ -405,49 +405,49 @@ MonoBehaviour:
     portee: 0
   - id: arc_bander
     nom: "Arc \u2014 bander"
-    statut: disponible
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 467075b2ddeb33f47aa1d85d643d5c78, type: 3}
     portee: 0
   - id: arc_charge_complete
     nom: "Arc \u2014 charg\xE9 \xE0 fond"
-    statut: disponible
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: b0d09bfe01f339a4894e2ce19ff05da7, type: 3}
     portee: 0
   - id: nuee_marqueur
     nom: "Nu\xE9e de fl\xE8ches \u2014 marqueur au sol"
-    statut: disponible
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: ea8dc8c863efe53419aa9fd2d7fa23ac, type: 3}
     portee: 0
   - id: assassin_furtif
     nom: "Assassin \u2014 passage en mode furtif"
-    statut: disponible
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 7230de2c0b3db05458cf38f99450b5c9, type: 3}
     portee: 0
   - id: assassin_furtif_sortie
     nom: "Assassin \u2014 sortie du mode furtif"
-    statut: disponible
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: ef6c5aa4451cd164bb51679f8188255a, type: 3}
     portee: 0
   - id: assassin_repere
     nom: "Assassin \u2014 rep\xE9r\xE9"
-    statut: disponible
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 4009718ac02a94b4ca6c14ece0ce2bd8, type: 3}
     portee: 0
   - id: grenade_lancer
     nom: "Grenade fumig\xE8ne \u2014 lancer"
-    statut: disponible
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 7dcb9eababce0ca47b233b459ee4e310, type: 3}
@@ -663,7 +663,7 @@ MonoBehaviour:
     portee: 0
   - id: necro_summon
     nom: "N\xE9cromancien \u2014 invocation"
-    statut: disponible
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 407f7e87b9d7e6e4dadede54f095818a, type: 3}
@@ -698,7 +698,7 @@ MonoBehaviour:
     portee: 0
   - id: donjon_alerte_nuit
     nom: "Donjon \u2014 alerte avant la nuit"
-    statut: utilise
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 72de0e1ce999b0d4996ccc6ca1d34382, type: 3}
@@ -726,14 +726,14 @@ MonoBehaviour:
     portee: 0
   - id: musique_dedans_donjon
     nom: "Musique \u2014 donjon"
-    statut: utilise
+    statut: disponible
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 3f08a7894b7937e438ddf137baacb89f, type: 3}
     portee: 0
   - id: chest_open
     nom: "Coffre \u2014 ouverture"
-    statut: disponible
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: cef21927c2bde414a828ad68c4d5ec48, type: 3}
@@ -799,7 +799,7 @@ MonoBehaviour:
     portee: 0
   - id: forge_enclume
     nom: "Forge \u2014 marteau sur l'enclume"
-    statut: disponible
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 50712ed10e2f2b4479477b2017295429, type: 3}
@@ -848,7 +848,7 @@ MonoBehaviour:
     portee: 0
   - id: kenney_rpg_cloth
     nom: "Tissu \u2014 froissement"
-    statut: disponible
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 12beca1f6c07aa747a74d4fa63d8faad, type: 3}
@@ -900,21 +900,21 @@ MonoBehaviour:
     portee: 0
   - id: kenney_rpg_metalclick
     nom: "M\xE9tal \u2014 clic"
-    statut: disponible
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 89a69e9820ac2ea48aa7ad838714290a, type: 3}
     portee: 0
   - id: kenney_rpg_metallatch
     nom: "M\xE9tal \u2014 loquet"
-    statut: disponible
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: c5e18563a96884c4a8c178c664478963, type: 3}
     portee: 0
   - id: kenney_rpg_metalpot
     nom: "M\xE9tal \u2014 casserole heurt\xE9e"
-    statut: disponible
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 3d4dd136a84ade349958f394fe467178, type: 3}
@@ -1560,7 +1560,7 @@ MonoBehaviour:
     portee: 0
   - id: dl_interface_survol
     nom: "Interface \u2014 survol d'un bouton (identit\xE9 Deathless)"
-    statut: utilise
+    statut: a_ecouter
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 576e5686f536f8a43bdaccf8360324a4, type: 3}
@@ -1568,7 +1568,7 @@ MonoBehaviour:
     portee: 0
   - id: dl_interface_clic
     nom: "Interface \u2014 clic de validation (identit\xE9 Deathless)"
-    statut: utilise
+    statut: a_ecouter
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 1265d0a3557864c41b2ae1275a6f8e3d, type: 3}
@@ -1576,63 +1576,63 @@ MonoBehaviour:
     portee: 0
   - id: dl_interface_retour
     nom: "Interface \u2014 retour (identit\xE9 Deathless)"
-    statut: utilise
+    statut: a_ecouter
     boucle: 0
     clips:
     - {fileID: 8300000, guid: ac92ae763af43a548b45355ca0e794ed, type: 3}
     portee: 0
   - id: dl_interface_refus
     nom: "Interface \u2014 action refus\xE9e (identit\xE9 Deathless)"
-    statut: utilise
+    statut: a_ecouter
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 8b6bd61d2dab06442b9fb785a7ef3ba6, type: 3}
     portee: 0
   - id: dl_interface_confirmation
     nom: "Interface \u2014 confirmation (identit\xE9 Deathless)"
-    statut: utilise
+    statut: a_ecouter
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 0e61667a3b505d5429eb9dee309c2579, type: 3}
     portee: 0
   - id: dl_interface_decompte
     nom: "Interface \u2014 d\xE9compte (identit\xE9 Deathless)"
-    statut: utilise
+    statut: a_ecouter
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 0064ad9dd0e8ad7429280bae7464a72c, type: 3}
     portee: 0
   - id: dl_interface_onglet
     nom: "Interface \u2014 changement d'onglet (identit\xE9 Deathless)"
-    statut: utilise
+    statut: a_ecouter
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 0a62545905ee4c24fa49322be48ed5ca, type: 3}
     portee: 0
   - id: dl_interface_pret
     nom: "Vote \xAB pr\xEAt \xBB \u2014 joueur pr\xEAt (identit\xE9 Deathless)"
-    statut: utilise
+    statut: a_ecouter
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 5f14094b0152bb04fa9220e6d79d9831, type: 3}
     portee: 0
   - id: dl_interface_pret_annule
     nom: "Vote \xAB pr\xEAt \xBB \u2014 vote annul\xE9 (identit\xE9 Deathless)"
-    statut: utilise
+    statut: a_ecouter
     boucle: 0
     clips:
     - {fileID: 8300000, guid: fd5be8ecd72bc6847aa8df189bf453f5, type: 3}
     portee: 0
   - id: dl_interface_tous_prets
     nom: "Vote \xAB pr\xEAt \xBB \u2014 tout le monde est pr\xEAt (identit\xE9 Deathless)"
-    statut: utilise
+    statut: a_ecouter
     boucle: 0
     clips:
     - {fileID: 8300000, guid: fb4f59167e6212c42bb71968ce235140, type: 3}
     portee: 0
   - id: dl_nyxessa_tir
     nom: "Nyxessa \u2014 tir d'un missile (identit\xE9 Deathless)"
-    statut: utilise
+    statut: a_ecouter
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 55e48aeb18373fc4eae1ede0ceb0d496, type: 3}
@@ -1641,7 +1641,7 @@ MonoBehaviour:
     portee: 60
   - id: dl_nyxessa_frappee
     nom: "Nyxessa \u2014 frapp\xE9e (identit\xE9 Deathless)"
-    statut: utilise
+    statut: a_ecouter
     boucle: 0
     clips:
     - {fileID: 8300000, guid: c87c28e6c4a974c4f863438cf815ff27, type: 3}
@@ -1650,35 +1650,35 @@ MonoBehaviour:
     portee: 40
   - id: dl_nyxessa_alerte
     nom: "Nyxessa \u2014 alerte (identit\xE9 Deathless)"
-    statut: utilise
+    statut: a_ecouter
     boucle: 0
     clips:
     - {fileID: 8300000, guid: cef37fae17abbf9469a308219eb43375, type: 3}
     portee: 0
   - id: dl_nyxessa_palier
     nom: "Nyxessa \u2014 palier am\xE9lior\xE9 (identit\xE9 Deathless)"
-    statut: utilise
+    statut: a_ecouter
     boucle: 0
     clips:
     - {fileID: 8300000, guid: c637c7d551f575044ae4b6d8674e6e07, type: 3}
     portee: 60
   - id: dl_nyxessa_charge_portail
     nom: "Nyxessa \u2014 charge vers le portail (identit\xE9 Deathless)"
-    statut: utilise
+    statut: a_ecouter
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 55f333672d668184a800ed55c2dc64a3, type: 3}
     portee: 60
   - id: dl_nyxessa_retour_energie
     nom: "Nyxessa \u2014 retour de l'\xE9nergie (identit\xE9 Deathless)"
-    statut: utilise
+    statut: a_ecouter
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 8cc427925c1ea774692ea663738da453, type: 3}
     portee: 60
   - id: dl_nyxessa_onde
     nom: "Nyxessa \u2014 onde de la ceinture (identit\xE9 Deathless)"
-    statut: utilise
+    statut: a_ecouter
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 32ce6a738e129854c834d5c64040a896, type: 3}
@@ -1846,8 +1846,488 @@ MonoBehaviour:
     portee: 40
   - id: dl_portail_ferme_refus
     nom: "Portail \u2014 ferm\xE9, refus (identit\xE9 Deathless)"
-    statut: utilise
+    statut: a_ecouter
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 670c8be546b63fd40aed974d93a74005, type: 3}
     portee: 60
+  - id: dl_joueur_touche
+    nom: "Joueur \u2014 coup re\xE7u (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 2c471a1d50d12fd45896b2621c00f75e, type: 3}
+    - {fileID: 8300000, guid: 5b1365de69d4f4840b5b97fd766d3682, type: 3}
+    portee: 40
+  - id: dl_esquive
+    nom: "Joueur \u2014 esquive (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: f313bd58560a38c4aa8c6221856aa1ac, type: 3}
+    portee: 20
+  - id: dl_joueur_mort
+    nom: "Joueur \u2014 mort (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: c8e3fbd5051d3eb4cb73231baae2e475, type: 3}
+    portee: 60
+  - id: dl_potion_boire
+    nom: "Joueur \u2014 potion (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 64aaa1f546f849d45a17c400b1142019, type: 3}
+    portee: 20
+  - id: dl_critique
+    nom: "Coup critique (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 2581f5e195d956d4486eef40778644c3, type: 3}
+    portee: 40
+  - id: dl_critique_meilleur
+    nom: "Coup critique \u2014 le meilleur (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: d16598b969fdba341aaa32f2dd1ce0e8, type: 3}
+    portee: 60
+  - id: dl_epee_elan
+    nom: "Paladin \u2014 \xE9p\xE9e, \xE9lan (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: bb00c2339c9881641acec735228a24c0, type: 3}
+    portee: 20
+  - id: dl_epee_impact
+    nom: "Paladin \u2014 \xE9p\xE9e, impact (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: e9b33dbde47a6f94eb2c0f25de4fe85b, type: 3}
+    portee: 40
+  - id: dl_blocage
+    nom: "Paladin \u2014 coup bloqu\xE9 (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: b9714facbeed17b49963b7d019ff09ea, type: 3}
+    portee: 40
+  - id: dl_parade_parfaite
+    nom: "Paladin \u2014 parade parfaite (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 3640abdb4d77fd94f902d7888bcf4143, type: 3}
+    portee: 60
+  - id: dl_soin
+    nom: "Paladin \u2014 soin sur soi (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 2cf9e8a7a2761ee41a000671661a0336, type: 3}
+    portee: 40
+  - id: dl_hache_elan
+    nom: "Viking \u2014 hache, \xE9lan (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 9b6bb20e12e75f248a968e70c3bb1707, type: 3}
+    portee: 40
+  - id: dl_rugissement
+    nom: "Viking \u2014 rugissement (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: b998227edcc750f43800d2781134a199, type: 3}
+    portee: 60
+  - id: dl_saut_percutant_impact
+    nom: "Viking \u2014 saut percutant, impact (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: ba7ac2158e3da3f4a9d0c3d2cf83761a, type: 3}
+    portee: 60
+  - id: dl_boule_lancer
+    nom: "Mage \u2014 boule de feu, lancer (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 14be78bf27fc0454da4cffde73655bcc, type: 3}
+    portee: 40
+  - id: dl_boule_explosion
+    nom: "Mage \u2014 boule de feu, explosion (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: aa45f0ae18bb44f438d11f2f89db3b9f, type: 3}
+    portee: 60
+  - id: dl_cone
+    nom: "Mage \u2014 c\xF4ne de flammes (boucle) (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 1
+    clips:
+    - {fileID: 8300000, guid: 47d69bd3b8f894f478ca74044b50975b, type: 3}
+    portee: 40
+  - id: dl_arc_tir
+    nom: "R\xF4deur \u2014 tir (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 579d94fe216d28e4c98a170fe722d62c, type: 3}
+    portee: 40
+  - id: dl_arc_tir_charge
+    nom: "R\xF4deur \u2014 tir charg\xE9 (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 0bae856e60c6bc249af9e32efecdc0c7, type: 3}
+    portee: 40
+  - id: dl_fleche_impact_os
+    nom: "R\xF4deur \u2014 fl\xE8che dans l'os (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: b29aeceb0d88c464abab3f1ee8250542, type: 3}
+    portee: 40
+  - id: dl_dague_elan
+    nom: "Assassin \u2014 dague (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 6f6d004a51fee9145bdf7068e72675b0, type: 3}
+    portee: 20
+  - id: dl_furtif_entree
+    nom: "Assassin \u2014 entr\xE9e en furtif (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 6718cb88077cc214fbe2b71e26cdd0e9, type: 3}
+    portee: 0
+  - id: dl_fumee
+    nom: "Assassin \u2014 grenade fumig\xE8ne (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: c245945deedf3cd4bb795e992aa13f88, type: 3}
+    portee: 40
+  - id: dl_squelette_sortie
+    nom: "Squelette \u2014 sortie de terre"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: a854e90e72ed74a4da02ee41764e8470, type: 3}
+    - {fileID: 8300000, guid: a31183eb29c30b24d9e4234e056aa9f3, type: 3}
+    - {fileID: 8300000, guid: 30356b8a4bbdbee47a62e620f5649392, type: 3}
+    portee: 60
+  - id: dl_squelette_preparation
+    nom: "Squelette \u2014 pr\xE9paration d'un coup"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 16262cfba676ebd469cbf6f92a947a4a, type: 3}
+    - {fileID: 8300000, guid: 2279b8a3e7c142c458e40b19abde6822, type: 3}
+    - {fileID: 8300000, guid: 61b29d9f17f79bb4baf13c5f4638c272, type: 3}
+    portee: 40
+  - id: dl_squelette_touche
+    nom: "Squelette \u2014 touch\xE9"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 575afb0db8c920e4d93464de35f57370, type: 3}
+    - {fileID: 8300000, guid: e5565364e94fc614ba59b40c2a726ef2, type: 3}
+    - {fileID: 8300000, guid: eff772715a941fd4ab285f9dc68fb5bc, type: 3}
+    - {fileID: 8300000, guid: be379bc644ecdc841bd9a5219369b606, type: 3}
+    portee: 40
+  - id: dl_squelette_mort
+    nom: "Squelette \u2014 mort"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: c9eeb55fe7803dc4fab37ac7b710523f, type: 3}
+    - {fileID: 8300000, guid: d2178a619053d6848bb409d74622d5dc, type: 3}
+    - {fileID: 8300000, guid: d0bc6c75abdb2c34e9dd1ae0295812e6, type: 3}
+    portee: 40
+  - id: dl_squelette_aube
+    nom: "Squelette \u2014 d\xE9sint\xE9gration \xE0 l'aube"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 20c44b2c3a25c36499a8f332d02a958c, type: 3}
+    - {fileID: 8300000, guid: a55d80f7c3fd2594989493422011b82e, type: 3}
+    portee: 60
+  - id: dl_morgrim_cri
+    nom: "Morgrim \u2014 cri (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: aaf3f597866ab744b9ac11a1086a8e34, type: 3}
+    portee: 60
+  - id: dl_massue_fracas
+    nom: "Morgrim massue \u2014 Fracas (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 08ba411fb08540649a6a2edc067863d9, type: 3}
+    portee: 60
+  - id: dl_massue_onde
+    nom: "Morgrim massue \u2014 onde de choc (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: acb23daba091f2540b1a887c7102574b, type: 3}
+    portee: 60
+  - id: dl_nyxar_arrivee
+    nom: "Nyxar \u2014 arriv\xE9e (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 69f418dcebc0ac6459996e53fa5756c0, type: 3}
+    portee: 0
+  - id: dl_nyxar_eclat_brise
+    nom: "Nyxar \u2014 \xE9clat bris\xE9 (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 557f05f3745cbea4a9d8aef879d974ae, type: 3}
+    portee: 60
+  - id: dl_etourdi
+    nom: "Statut \u2014 \xE9tourdi (boucle) (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 1
+    clips:
+    - {fileID: 8300000, guid: 28f0ef313f3b1e14b95f123643eb9ac9, type: 3}
+    portee: 20
+  - id: dl_brulure
+    nom: "Statut \u2014 br\xFBlure (boucle) (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 1
+    clips:
+    - {fileID: 8300000, guid: 2f9852fd740515043a36364817a80b0a, type: 3}
+    portee: 20
+  - id: dl_renverse_chute
+    nom: "Statut \u2014 renvers\xE9 (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 3f6bd0705173bb84aabff2cfa3c763ee, type: 3}
+    portee: 40
+  - id: dl_ivresse_debut
+    nom: "Statut \u2014 ivresse (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 54c5617eac5473d4e8802fab587e8d5d, type: 3}
+    portee: 0
+  - id: dl_or_caisse
+    nom: "Or \u2014 caisse commune (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: bcaff42ac95228d43b603fc6d17f8d13, type: 3}
+    portee: 0
+  - id: dl_coffre_ouvre
+    nom: "Coffre \u2014 ouverture (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: c232038378d132d4e9fc37488249c6fd, type: 3}
+    portee: 40
+  - id: dl_taverne_biere
+    nom: "Taverne \u2014 bi\xE8re (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: e19821fe0ecf7cc4f95fd7ee682820cd, type: 3}
+    portee: 0
+  - id: dl_crepuscule
+    nom: "Cr\xE9puscule (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: b21a783827e335445937f357102b15a4, type: 3}
+    portee: 0
+  - id: dl_aube
+    nom: "Aube (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 9eb00c6e2a8a3f34e9a8ad0c26fa0067, type: 3}
+    portee: 0
+  - id: dl_vague
+    nom: "Nuit \u2014 nouvelle vague (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 9e578402bb21ecc46b772f598d2e15f1, type: 3}
+    portee: 0
+  - id: dl_victoire
+    nom: "Partie \u2014 victoire (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 1642e5a84adfa51478476c8cdfa87af7, type: 3}
+    portee: 0
+  - id: dl_defaite
+    nom: "Partie \u2014 d\xE9faite (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 5f98303b0eab0fc4b9a42aef53e50fc8, type: 3}
+    portee: 0
+  - id: dl_ambiance_village_nuit
+    nom: "Ambiance \u2014 village la nuit (boucle) (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 1
+    clips:
+    - {fileID: 8300000, guid: ba25ff71d9586d64db9d19951a559ac2, type: 3}
+    portee: 0
+  - id: dl_ambiance_donjon
+    nom: "Ambiance \u2014 donjon (boucle) (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 1
+    clips:
+    - {fileID: 8300000, guid: ed5595f024fec0745aaa996aac81a848, type: 3}
+    portee: 0
+  - id: dl_clochard_pet_defense
+    nom: "Clochard \u2014 pet de d\xE9fense (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 59753f19ae3e34444ad4c8c13e592059, type: 3}
+    portee: 40
+  - id: dl_djbob_scratch
+    nom: "DJ Bob \u2014 scratch (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 75bac7a25dfe9dc4e88541090aa57e3c, type: 3}
+    portee: 40
+  - id: dl_barde_bwoiing
+    nom: "Barde \u2014 \xAB bwoiing \xBB (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 3f7f4f57b13084c4bbfba566cceadfda, type: 3}
+    portee: 40
+  - id: dl_musique_jour
+    nom: "Musique \u2014 village, le jour (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 1
+    clips:
+    - {fileID: 8300000, guid: 87324c5323068f949a53a3ad608788c3, type: 3}
+    portee: 0
+  - id: dl_musique_nuit
+    nom: "Musique \u2014 village, la nuit (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 1
+    clips:
+    - {fileID: 8300000, guid: 3b19ce8d0b6c16b4f8cff91e7f563dc0, type: 3}
+    portee: 0
+  - id: dl_musique_donjon
+    nom: "Musique \u2014 donjon (direction sombre, \xE9chantillon)"
+    statut: a_ecouter
+    boucle: 1
+    clips:
+    - {fileID: 8300000, guid: 80c1397eca188f74bbff73be61099d52, type: 3}
+    portee: 0
+  - id: dl_squelette_pas
+    nom: "Squelette \u2014 pas"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 0a1375d449dfae447af3d471a5ebe231, type: 3}
+    - {fileID: 8300000, guid: 4d0a7bc74a817934fad29e422ed9cbee, type: 3}
+    - {fileID: 8300000, guid: 749fc47a6f9c5cf45a821ccca1577b2b, type: 3}
+    - {fileID: 8300000, guid: 0ff73c44bf593e34ebffe38dfbf57d8e, type: 3}
+    portee: 20
+  - id: dl_squelette_coup
+    nom: "Squelette \u2014 coup (sbire, voleur)"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: e0f5d3c4818b91d43870f1fbd696f261, type: 3}
+    - {fileID: 8300000, guid: cf743b98586d14f418a6dc71372fa07b, type: 3}
+    - {fileID: 8300000, guid: ed915062c6e1e5d498a1278257086ec9, type: 3}
+    portee: 40
+  - id: dl_guerrier_coup
+    nom: "Squelette guerrier \u2014 coup"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 11f45285c39877143b9c7b6657c76f1e, type: 3}
+    - {fileID: 8300000, guid: 61de20d5c5d5a69499bfd5ed4712cc30, type: 3}
+    - {fileID: 8300000, guid: 013fbf92277082a4392ee0484430df5c, type: 3}
+    portee: 40
+  - id: dl_squelette_etourdi
+    nom: "Squelette \u2014 \xE9tourdi"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 21662b6024fea084f999314894a743c5, type: 3}
+    - {fileID: 8300000, guid: 37803efb2523083458b251e1f97dd06d, type: 3}
+    portee: 40
+  - id: dl_squelette_repousse
+    nom: "Squelette \u2014 repouss\xE9"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: de7c9614468c1b2439a55a6283bbbe4f, type: 3}
+    - {fileID: 8300000, guid: c6c6427b0e9be344bbfce3cf72c28dd4, type: 3}
+    - {fileID: 8300000, guid: 4aeac5b3e7480ae428865b9cba63f4b4, type: 3}
+    portee: 40
+  - id: dl_mage_squelette_incantation
+    nom: "Mage squelette \u2014 incantation"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 31061d4fb24bd414aa56590e24a31cf2, type: 3}
+    - {fileID: 8300000, guid: ecdc594bca496b54a95f8de50230d67c, type: 3}
+    portee: 40
+  - id: dl_mage_squelette_tir
+    nom: "Mage squelette \u2014 tir"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 8a9fbd63f08827e45b1d35bc7bae995b, type: 3}
+    - {fileID: 8300000, guid: a2b19dd6b0e87cb4188430844d8b9548, type: 3}
+    portee: 40
+  - id: dl_mage_squelette_missile_vol
+    nom: "Mage squelette \u2014 cr\xE2ne en vol (boucle)"
+    statut: a_ecouter
+    boucle: 1
+    clips:
+    - {fileID: 8300000, guid: b448664e7cc77044e98484a50127f276, type: 3}
+    portee: 40
+  - id: dl_mage_squelette_missile_eclat
+    nom: "Mage squelette \u2014 cr\xE2ne qui \xE9clate"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 8df629a98289e494cac1048f6608c178, type: 3}
+    - {fileID: 8300000, guid: 8d4280ab1703488449302a0f1edf9c7e, type: 3}
+    portee: 40
+  - id: dl_voleur_elan
+    nom: "Squelette voleur \u2014 \xE9lan"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: b848394bcb35d03429295a25425f41d2, type: 3}
+    - {fileID: 8300000, guid: 5f5b2e881f7d5634bb3bff874ee51c1d, type: 3}
+    portee: 40
+  - id: dl_elite_aura
+    nom: "\xC9lite \u2014 aura (boucle)"
+    statut: a_ecouter
+    boucle: 1
+    clips:
+    - {fileID: 8300000, guid: d5c6e49848054234281f7cac6e3a6983, type: 3}
+    portee: 20
+  - id: dl_squelette_danse
+    nom: "Squelettes \u2014 danse (boucle)"
+    statut: a_ecouter
+    boucle: 1
+    clips:
+    - {fileID: 8300000, guid: 8dcc30ce5b06a084dbeffe4e23316168, type: 3}
+    portee: 40

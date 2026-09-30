@@ -25,7 +25,81 @@ namespace Deathless.Jeu.Dev
                 case "golem": s_I.StartCoroutine(s_I.GolemTest()); break;
                 case "mouvement": s_I.StartCoroutine(s_I.Mouvement()); break;
                 case "voleurmage": s_I.StartCoroutine(s_I.VoleurEtMage()); break;
+                case "courseesquive": s_I.StartCoroutine(s_I.CourseEsquive()); break;
+                case "gardiens": s_I.StartCoroutine(s_I.GardiensAgressifs()); break;
             }
+        }
+
+        /// Course et esquive (30/09/2026) : un sbire posé à 14 m doit courir (Court, vitesse > pas de base, Speed > 0,5)
+        /// puis repasser au pas près du héros ; ensuite, chance d'esquive forcée à 1 le temps du test, le héros frappe (RT)
+        /// face au sbire : on compte les esquives et les états vus.
+        IEnumerator CourseEsquive()
+        {
+            DevPartie.PlacerHeros(new Vector3(0f, 0f, -11f), new Vector3(0f, 0f, -20f));
+            yield return null;
+            var s = DevPartie.PoserDevant(TypeEnnemi.Sbire, 14f);
+            yield return new WaitForSeconds(1.8f);
+            float t = 0f, vMax = 0f, speedMax = 0f, vPres = -1f; bool court = false;
+            while (t < 6f && s != null && s.Vivant)
+            {
+                t += Time.deltaTime;
+                if (s.Court) court = true;
+                vMax = Mathf.Max(vMax, s.Agent.velocity.magnitude);
+                if (s.animator != null) speedMax = Mathf.Max(speedMax, s.animator.GetFloat("Speed"));
+                float d = Vector3.Distance(s.transform.position, H.transform.position);
+                if (d < 3.5f && vPres < 0f) vPres = s.Agent.speed;
+                if (t > 0.6f && t < 0.7f) DevPartie.Capturer("v06_squelette_course");
+                if (s.EtatCourant == Squelette.Etat.Preparation) break;
+                yield return null;
+            }
+            Log("course : court " + court + ", vitesse max " + vMax.ToString("F2") + " (pas " + GameBalance.Courant.sbire.vitesse + "), Speed max " + speedMax.ToString("F2")
+                + ", vitesse demandée près du héros " + vPres.ToString("F2"));
+            var b = GameBalance.Courant;
+            float chance = b.esquiveChanceSbire;
+            b.esquiveChanceSbire = 1f;
+            int esquivesAvant = s != null ? s.Esquives : 0; bool vuEsquive = false;
+            float pvAvant = s != null ? s.Sante.Pv : 0f;
+            for (int i = 0; i < 8 && s != null && s.Vivant; i++)
+            {
+                Viser(s.transform);
+                EntreesSimulees.Appui("rightTrigger", 0.1f);
+                float u = 0f;
+                while (u < 0.9f) { u += Time.deltaTime; if (s != null && s.EtatCourant == Squelette.Etat.Esquive) { vuEsquive = true; if (u > 0.15f && u < 0.2f) DevPartie.Capturer("v06_squelette_esquive"); } yield return null; }
+            }
+            b.esquiveChanceSbire = chance;
+            Log("esquive : " + (s != null ? s.Esquives - esquivesAvant : -1) + " esquive(s) sur 8 coups (recharge " + b.esquiveEnnemiRecharge + " s), état Esquive vu " + vuEsquive
+                + ", PV " + pvAvant.ToString("F0") + " -> " + (s != null ? s.Sante.Pv.ToString("F0") : "mort"));
+        }
+
+        /// Gardiens (30/09/2026) : A repère le héros, B (hors détection) est alerté par A. Le héros saute d'un point à
+        /// l'autre : on relève le plus long temps sans frapper en poursuite (au-delà de abandonApres, ils ne lâchent pas) ;
+        /// puis il part à plus de gardienLaisse de leur poste : ils lâchent et rentrent.
+        IEnumerator GardiensAgressifs()
+        {
+            // Côté dégagé du village (vers +x depuis (0 ; -11)) : A à 8 m (repère le héros), B à 14 m (hors détection,
+            // à 6 m de A : alerté).
+            DevPartie.PlacerHeros(new Vector3(0f, 0f, -11f), new Vector3(20f, 0f, -11f));
+            yield return null;
+            var a = DevPartie.PoserDevant(TypeEnnemi.Sbire, 8f);
+            var g = DevPartie.PoserDevant(TypeEnnemi.Sbire, 14f);
+            if (a != null) a.Garder(a.transform.position);
+            if (g != null) g.Garder(g.transform.position);
+            var champ = typeof(Squelette).GetField("m_SansFrapper", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            float t = 0f, sansMax = 0f; bool aVu = false, bVu = false; int saut = 0;
+            while (t < 10f)
+            {
+                t += Time.deltaTime;
+                if (a != null && a.EtatCourant == Squelette.Etat.Poursuite) { aVu = true; sansMax = Mathf.Max(sansMax, (float)champ.GetValue(a)); }
+                if (g != null && g.EtatCourant == Squelette.Etat.Poursuite) { bVu = true; sansMax = Mathf.Max(sansMax, (float)champ.GetValue(g)); }
+                if (aVu && t > 3f + saut * 0.9f) { saut++; DevPartie.PlacerHeros(new Vector3(saut % 2 == 0 ? 0f : -5f, 0f, saut % 4 < 2 ? -11f : -8f), new Vector3(20f, 0f, -11f)); }
+                yield return null;
+            }
+            Log("gardiens : A poursuit " + aVu + ", B (alerté) poursuit " + bVu + ", au bout de 10 s A " + (a != null ? a.EtatCourant.ToString() : "?") + ", B " + (g != null ? g.EtatCourant.ToString() : "?")
+                + ", plus long temps sans frapper en poursuite " + sansMax.ToString("F1") + " s (abandonApres " + GameBalance.Courant.abandonApres + " s)");
+            DevPartie.PlacerHeros(new Vector3(-15f, 0f, -11f), new Vector3(-30f, 0f, -11f));
+            yield return new WaitForSeconds(3f);
+            Log("héros hors laisse : A " + (a != null ? a.EtatCourant.ToString() : "?") + ", B " + (g != null ? g.EtatCourant.ToString() : "?")
+                + ", A à " + (a != null ? Vector3.Distance(a.transform.position, a.Poste).ToString("F1") : "?") + " m de son poste");
         }
 
         /// Voleur et mage (28/09/2026) : un voleur posé à 12 m doit se ruer sur le joueur (isolé en solo) ; un mage posé à

@@ -72,7 +72,7 @@ namespace Deathless.Jeu
 
             // Salve en cours : on continue sur la même cible tant qu'elle vit.
             Squelette cible = null;
-            if (m_SalveRestante > 0 && m_CibleSalve != null && m_CibleSalve.Vivant && Portee(m_CibleSalve)) cible = m_CibleSalve;
+            if (m_SalveRestante > 0 && m_CibleSalve != null && m_CibleSalve.Vivant && Portee(m_CibleSalve) && !Condamne(m_CibleSalve)) cible = m_CibleSalve;
             else m_SalveRestante = 0;
             if (cible == null) cible = Choisir(dv, out _);
             if (cible == null) return;
@@ -94,6 +94,11 @@ namespace Deathless.Jeu
             m_SalveRestante--;
         }
 
+        /// Les missiles déjà en vol vers cet ennemi suffisent à le tuer (30/09/2026, retour de test : le premier missile tuait,
+        /// les deux suivants étaient déjà partis) : on ne tire plus dessus, la salve passe à un autre.
+        /// Invulnérable (Nyxar tant qu'un éclat de Nyx tient, 30/09/2026) : inutile de tirer dessus non plus.
+        static bool Condamne(Squelette s) => s.Sante.invulnerable || MissileCrane.DegatsEnVol(s.Sante) >= s.Sante.Pv;
+
         /// Cible « lourde » (wiki : nyxessa.md, priorité 2) : mage lanceur de crâne (28/09/2026), élite ou boss.
         static bool Lourd(Squelette s) => s.elite || s.type == TypeEnnemi.Mage || s.type == TypeEnnemi.Golem || s.type == TypeEnnemi.Necromancien;
 
@@ -111,7 +116,7 @@ namespace Deathless.Jeu
             for (int iv = 0; iv < vivants.Count; iv++)
             {
                 var s = vivants[iv];
-                if (s == null || !s.Vivant || !Portee(s)) continue;
+                if (s == null || !s.Vivant || !Portee(s) || Condamne(s)) continue;
                 float d = (s.transform.position - transform.position).sqrMagnitude;
                 if (s.SurNyxessa && d < dSur) { dSur = d; sur = s; }
                 // Priorité 2 (wiki : nyxessa.md) : un mage lanceur de crâne, un élite ou un boss (Golem : Morgrim).
@@ -143,7 +148,7 @@ namespace Deathless.Jeu
             for (int iv = 0; iv < vivants.Count; iv++)
             {
                 var s = vivants[iv];
-                if (s == null || !s.Vivant || (s.transform.position - c.transform.position).sqrMagnitude > r2) continue;
+                if (s == null || !s.Vivant || Condamne(s) || (s.transform.position - c.transform.position).sqrMagnitude > r2) continue;
                 if (i++ == rang % Mathf.Max(1, Groupe(dv, c))) return s;
             }
             return c;

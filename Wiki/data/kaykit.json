@@ -1,8 +1,8 @@
 {
   "date": "2026-09-30",
-  "pourcent": 69.3,
+  "pourcent": 69.2,
   "kaykit": 1251,
-  "total": 1804,
+  "total": 1808,
   "familles": [
     {
       "nom": "Modèles 3D",
@@ -19,13 +19,13 @@
     {
       "nom": "Animations",
       "kaykit": 0,
-      "total": 31,
+      "total": 32,
       "pourcent": 0.0
     },
     {
       "nom": "Matériaux et shaders",
       "kaykit": 0,
-      "total": 75,
+      "total": 78,
       "pourcent": 0.0
     },
     {

@@ -45,12 +45,19 @@ namespace Deathless.Donjon
         public GameObject grandCoffre;
         public GameObject coffre;
         public GameObject[] tasOr;
+
         [Tooltip("Modèle du grand coffre sans serrure (Assets/Art/Coffres/…) : posé à la place de grandCoffre dès qu'il est renseigné.")]
         public GameObject grandCoffreSansSerrure;
         [Tooltip("Modèle du coffre sans serrure (Assets/Art/Coffres/…) : posé à la place de coffre dès qu'il est renseigné.")]
         public GameObject coffreSansSerrure;
         [Tooltip("Fin du nom de l'enfant qui sert de couvercle (il bascule à l'ouverture) : « _lid » pour les coffres KayKit.")]
         public string suffixeCouvercle = "_lid";
+
+        [Header("Découpe autour du héros (30/09/2026)")]
+        [Tooltip("Matériau des pièces du donjon (KayKit_Dungeon, URP Lit) remplacé dans les maillages combinés par materiauDecoupe.")]
+        public Material materiauMurs;
+        [Tooltip("Copie de materiauMurs au shader Deathless/DonjonDecoupe : murs et plafonds entre la caméra et le héros découpés en disque.")]
+        public Material materiauDecoupe;
 
         /// Modèles posés par le générateur : les coffres sans serrure quand ils sont renseignés, sinon ceux de KayKit.
         public GameObject ModeleGrandCoffre => grandCoffreSansSerrure != null ? grandCoffreSansSerrure : grandCoffre;

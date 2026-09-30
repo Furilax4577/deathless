@@ -45,10 +45,9 @@ Travaux prévus ou notés, pas encore faits. Une ligne quitte cette page quand l
 
 - Forêt : arbres plus riches et moins nombreux, troncs dégagés jusqu'à 1,5 fois la hauteur des personnages ; **les squelettes traversent la forêt entre les troncs** au lieu de toujours suivre le même chemin (variété des trajets : points de passage au hasard ou coût de chemin bruité). Idée de Quentin, 26/09/2026.
 - Donjon, à équilibrer : montants d'or (120 / 50 / 20, +10 % par nuit), nombre de gardiens (6, dont 35 % de guerriers), ralentissement dans l'eau (×0,6), délai d'alerte (15 s), parts gardées au rappel (0 à 75 %).
-- Morgrim : onde du Fracas réglée en réutilisant l'onde du Golem (un prefab dédié serait plus propre) ; effets au sol du Golem d'origine pas diffusés aux clients.
 - Parade parfaite : la gerbe de gemmes envoyée devant se voit peu depuis la caméra ; chemin à deux joueurs pas testé.
-- À tester à deux joueurs : emotes, charge bélier, statuts, esquive directionnelle, parade parfaite, onde de Morgrim.
+- À tester à deux joueurs : emotes, charge bélier, statuts, esquive directionnelle, parade parfaite, onde de Morgrim (Fracas et Coup écrasé), éclats et téléportation de Nyxar, retour dans une partie par le **code** (Relay) après une vraie coupure.
 - Taverne : breuvages (plus tard).
-- Réseau : penché du buste en visée, arrivée en cours de partie.
+- Réseau : penché du buste en visée ; après une coupure, l'hôte qui continue seul ne peut pas rouvrir sa partie aux autres.
 - Mettre à jour la copie de `CycleJourNuit` du bac à sable du village.
 - Wiki : canne à pêche provisoire, faute de modèle KayKit.

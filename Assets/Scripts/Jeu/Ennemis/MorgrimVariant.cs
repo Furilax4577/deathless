@@ -7,10 +7,209 @@ namespace Deathless.Jeu
     /// tournent pas cette IA (le composant `Squelette` d'une marionnette est désactivé), mais reçoivent quand même la
     /// télégraphie et l'impact au sol par un chemin léger (`EnnemiReseau.DiffuserEffetMorgrim`, un octet de thème et
     /// une forme, pas un RPC par gemme) : c'est purement visuel, comme le reste des effets de squelette.
+    /// Kit commun aux deux versions (30/09/2026) : Balayage, Coup écrasé et Cri, ci-dessous.
     /// Outils communs aux sous-classes : compte des joueurs proches (choix de compétence) et télégraphie / impact au
     /// sol dans le langage gemmes commun (MorgrimEffets : AnneauGemmes pour la préparation, EclatGemmes pour le coup).
     public abstract class MorgrimVariant : Golem
     {
+        // ----------------------------------------------------------------- Kit commun (wiki : ennemis.md, 30/09/2026)
+        // Balayage (arc de hache devant lui, parable, léger recul), Coup écrasé (frappe par-dessus au sol : onde de
+        // choc lente autour de lui, à sauter comme le Fracas) et Cri (galvanise les squelettes proches : statut
+        // Galvanisé). Les deux versions gardent en plus leurs trois compétences propres : CommencerAttaque choisit
+        // d'abord une compétence commune prête (chance GameBalance.morgrimCommunChance), sinon passe la main à la
+        // version (CommencerVariante / FrapperVariante). Le Cri part de lui-même dès que assez de squelettes sont
+        // proches (Update), qu'il ait une cible ou non.
+
+        enum Commune { Aucune, Balayage, Ecrase, Cri }
+
+        Commune m_Commune;
+        float m_ProchainBalayage = -99f, m_ProchainEcrase = -99f, m_ProchainCri;
+        bool m_CriDemande;
+
+        /// Thème des compétences communes : Terre pour la massue, Rage pour la martache.
+        protected virtual VfxTheme ThemeCommun => VfxTheme.Terre;
+
+        public override void Initialiser(StatsSquelette stats, float multiplicateurPV)
+        {
+            base.Initialiser(stats, multiplicateurPV);
+            m_ProchainCri = Time.time + 6f;   // pas de cri dès la sortie de terre
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            if ((m_Etat != Etat.Marche && m_Etat != Etat.Poursuite) || Time.time < m_ProchainCri) return;
+            if (P != null && (P.Etat.phase == Phase.Terminee || P.Etat.nyxessa.detruite)) return;
+            if (SquelettesProches(B.morgrimCriRayon) < B.morgrimCriSquelettesMin) return;
+            m_CriDemande = true;
+            CommencerAttaque(m_Etat == Etat.Poursuite ? m_Cible : null);
+        }
+
+        /// Squelettes ordinaires vivants (ni boss, ni sortant de terre) à moins de `rayon` m.
+        int SquelettesProches(float rayon)
+        {
+            var dv = DirecteurVagues.Instance;
+            if (dv == null) return 0;
+            int n = 0;
+            var vivants = dv.Vivants;
+            for (int i = 0; i < vivants.Count; i++)
+            {
+                var s = vivants[i];
+                if (!Galvanisable(s)) continue;
+                Vector3 d = s.transform.position - transform.position; d.y = 0f;
+                if (d.magnitude <= rayon) n++;
+            }
+            return n;
+        }
+
+        bool Galvanisable(Squelette s) => s != null && s != this && s.Vivant && s.EtatCourant != Etat.SortieDeTerre
+            && s.type != TypeEnnemi.Golem && s.type != TypeEnnemi.Necromancien;
+
+        Commune ChoisirCommune(Heros cible)
+        {
+            var b = B;
+            if (cible == null || Random.value > b.morgrimCommunChance) return Commune.Aucune;
+            float d = Distance(cible.transform.position);
+            if (Time.time >= m_ProchainEcrase && (JoueursProches(b.morgrimEcraseOndeRayonMax * 0.5f) >= 2 || d <= b.morgrimEcraseOndeRayonMax * 0.4f))
+                return Commune.Ecrase;
+            if (Time.time >= m_ProchainBalayage && d <= b.morgrimBalayageRayon) return Commune.Balayage;
+            return Commune.Aucune;
+        }
+
+        protected sealed override void CommencerAttaque(Heros cible)
+        {
+            var b = B;
+            m_Commune = m_CriDemande ? Commune.Cri : ChoisirCommune(cible);
+            m_CriDemande = false;
+            if (m_Commune == Commune.Aucune) { CommencerVariante(cible); return; }
+            Vector3 sol = transform.position + Vector3.up * 0.05f;
+            switch (m_Commune)
+            {
+                case Commune.Balayage:
+                    m_Stats.preparation = b.morgrimBalayagePreparation;
+                    m_ProchainBalayage = Time.time + b.morgrimBalayageRecharge;
+                    DemarrerPreparation(cible);
+                    Telegraphier(sol, ThemeCommun, b.morgrimBalayageRayon, m_Stats.preparation, b.morgrimBalayageAngle);
+                    break;
+                case Commune.Ecrase:
+                    m_Stats.preparation = b.morgrimEcrasePreparation;
+                    m_ProchainEcrase = Time.time + b.morgrimEcraseRecharge;
+                    DemarrerPreparation(cible);
+                    Telegraphier(sol, VfxTheme.Terre, b.morgrimEcraseOndeRayonMax * 0.35f, m_Stats.preparation);
+                    break;
+                default:
+                    m_Stats.preparation = b.morgrimCriPreparation;
+                    m_ProchainCri = Time.time + b.morgrimCriRecharge;
+                    DemarrerPreparation(cible);
+                    Telegraphier(sol, VfxTheme.Rage, b.morgrimCriRayon, m_Stats.preparation);
+                    if (P != null) P.Journal("Morgrim : cri (" + SquelettesProches(b.morgrimCriRayon) + " squelettes proches)");
+                    break;
+            }
+        }
+
+        /// Préparation lisible commune (animation, annonce du coup, arrêt) : Golem puis Squelette.
+        protected void DemarrerPreparation(Heros cible) => base.CommencerAttaque(cible);
+
+        /// Compétence propre à la version (massue ou martache) : règle m_Stats.preparation, appelle DemarrerPreparation
+        /// puis pose sa télégraphie.
+        protected abstract void CommencerVariante(Heros cible);
+
+        protected sealed override void Frapper()
+        {
+            switch (m_Commune)
+            {
+                case Commune.Balayage: FaireBalayage(); break;
+                case Commune.Ecrase: FaireEcrase(); break;
+                case Commune.Cri: FaireCri(); break;
+                default: FrapperVariante(); break;
+            }
+        }
+
+        protected abstract void FrapperVariante();
+
+        /// Balayage : arc de hache devant lui ; touche tous les joueurs dans l'arc (parable) et les repousse un peu.
+        void FaireBalayage()
+        {
+            var b = B;
+            Vector3 o = transform.position;
+            Impact(o + Vector3.up, ThemeCommun, b.morgrimBalayageRayon, transform.forward, b.morgrimBalayageAngle);
+            EffetsBoss.Diffuser(this, EffetBoss.CoupSon, o);
+            float demi = b.morgrimBalayageAngle * 0.5f;
+            if (P == null) return;
+            var tous = P.TousLesHeros;
+            for (int i = 0; i < tous.Count; i++)
+            {
+                var h = tous[i];
+                if (h == null || !h.Vivant) continue;
+                Vector3 d = h.transform.position - o; d.y = 0f;
+                if (d.magnitude > b.morgrimBalayageRayon || (d.sqrMagnitude > 0.01f && Vector3.Angle(transform.forward, d) > demi)) continue;
+                float reel = h.Sante.Encaisser(new InfoDegats
+                {
+                    montant = b.morgrimBalayageDegats, equipeSource = Equipe.Ennemis, source = gameObject, parable = true,
+                    point = h.transform.position + Vector3.up, direction = d.sqrMagnitude > 0.01f ? d.normalized : transform.forward
+                });
+                if (reel > 0f && d.sqrMagnitude > 0.01f) h.Pousser(d.normalized * b.morgrimBalayageRecul);
+            }
+            if (P.nyxessa == null) return;
+            Vector3 dn = P.nyxessa.transform.position - o; dn.y = 0f;
+            var bo = BouclierNyxessa.Instance;
+            if (dn.magnitude > (bo != null && bo.Leve ? RayonContact + 0.8f : b.morgrimBalayageRayon + 1.3f) || Vector3.Angle(transform.forward, dn) > demi) return;
+            m_DernierCoupNyxessa = Time.time;
+            P.nyxessa.Encaisser(new InfoDegats { montant = b.morgrimBalayageDegats, equipeSource = Equipe.Ennemis, source = gameObject, point = o + transform.forward * 2f + Vector3.up * 1.5f, direction = transform.forward });
+        }
+
+        /// Coup écrasé : frappe par-dessus, l'arme s'écrase au sol devant lui et une onde de choc lente part autour de
+        /// lui (OndeChocLente, même règle que le Fracas : seul un saut au passage du front l'évite ; Renversé au sol).
+        void FaireEcrase()
+        {
+            var b = B;
+            Vector3 impact = transform.position + transform.forward * 1.2f;
+            EffetsBoss.Diffuser(this, EffetBoss.Onde, impact, 1f);
+            Impact(impact + Vector3.up * 0.2f, VfxTheme.Terre, 1.4f);
+            LancerOnde(impact, b.morgrimEcraseOndeVitesse, b.morgrimEcraseOndeRayonMax, b.morgrimEcraseOndeLargeurBande, b.morgrimEcraseDegats);
+            if (P == null || P.nyxessa == null) return;
+            Vector3 dn = P.nyxessa.transform.position - impact; dn.y = 0f;
+            var bo = BouclierNyxessa.Instance;
+            if (dn.magnitude > (bo != null && bo.Leve ? RayonContact + 0.8f : b.morgrimEcraseOndeRayonMax * 0.5f)) return;
+            m_DernierCoupNyxessa = Time.time;
+            P.nyxessa.Encaisser(new InfoDegats { montant = b.morgrimEcraseDegatsNyxessa, equipeSource = Equipe.Ennemis, source = gameObject, point = impact + Vector3.up * 1.5f, direction = transform.forward });
+        }
+
+        /// Cri : galvanise les squelettes ordinaires proches (statut Galvanisé : dégâts et vitesse accrus). Statuts
+        /// tenus par l'hôte et envoyés aux clients par le chemin habituel (StatutsReseau) ; son et gerbe par EffetsBoss.
+        void FaireCri()
+        {
+            var b = B;
+            EffetsBoss.Diffuser(this, EffetBoss.Cri, transform.position, 1f);
+            Impact(transform.position + Vector3.up * 0.1f, VfxTheme.Rage, b.morgrimCriRayon * 0.5f);
+            var dv = DirecteurVagues.Instance;
+            if (dv == null) return;
+            int n = 0;
+            var vivants = dv.Vivants;
+            for (int i = 0; i < vivants.Count; i++)
+            {
+                var s = vivants[i];
+                if (!Galvanisable(s)) continue;
+                Vector3 d = s.transform.position - transform.position; d.y = 0f;
+                if (d.magnitude > b.morgrimCriRayon || s.Statuts == null) continue;
+                s.Statuts.Ajouter(TypeStatut.Galvanise, b.morgrimCriDuree, b.morgrimCriBonusDegats, OrigineStatut.Ennemi);
+                n++;
+            }
+            if (P != null) P.Journal("Morgrim : cri, " + n + " squelettes galvanisés");
+        }
+
+        /// Hôte : onde de choc lente (Fracas de la massue, Coup écrasé commun) ; jouée ici et envoyée aux autres postes
+        /// avec la même heure de départ réseau (Docs/reseau.md).
+        protected void LancerOnde(Vector3 centre, float vitesse, float rayonMax, float largeurBande, float degats)
+        {
+            float depart = Deathless.Reseau.EnnemiReseau.TempsReseau();
+            OndeChocLente.Creer(centre, vitesse, rayonMax, largeurBande, degats, depart, m_Reseau);
+            if (m_Reseau != null && m_Reseau.IsSpawned && m_Reseau.IsServer)
+                m_Reseau.DiffuserOndeMorgrim(centre, vitesse, rayonMax, largeurBande, degats, depart);
+        }
+
+        // ----------------------------------------------------------------- Outils communs
+
         /// Joueurs vivants à moins de `rayon` (m, horizontal) : sert au choix de compétence (zone vs cible isolée).
         protected int JoueursProches(float rayon)
         {
@@ -59,8 +258,8 @@ namespace Deathless.Jeu
 
         /// Client (marionnette) : reçoit l'onde de choc lente du Fracas (Morgrim massue, 26/09/2026) et rejoue la même
         /// onde chez lui (visuel partout ; jugement des dégâts en plus sur son propre héros, OndeChocLente.Creer).
-        public void RecevoirOndeDistante(Vector3 centre, float vitesse, float rayonMax, float largeurBande, float depart)
-            => OndeChocLente.Creer(EffetsJeu.Instance != null ? EffetsJeu.Instance.prefabOndeGolem : null, centre, vitesse, rayonMax, largeurBande, depart, m_Reseau);
+        public void RecevoirOndeDistante(Vector3 centre, float vitesse, float rayonMax, float largeurBande, float degats, float depart)
+            => OndeChocLente.Creer(centre, vitesse, rayonMax, largeurBande, degats, depart, m_Reseau);
 
         void JouerTelegraphie(Vector3 point, VfxTheme theme, float rayon, float duree, float angleDeg)
         {

@@ -113,7 +113,7 @@ namespace Deathless.Jeu
                     if (n >= m_PoolBoss.Count) m_PoolBoss.Add(new BossVie());
                     var b = m_PoolBoss[n++];
                     b.Cle = sq.Id;
-                    b.Nom = NomBoss(sq.type);
+                    b.Nom = NomBoss(sq);
                     b.Vie = sq.Sante.Ratio;
                     b.Vivant = sq.Vivant;
                     b.liste.Clear();
@@ -136,7 +136,14 @@ namespace Deathless.Jeu
         static bool EstBoss(TypeEnnemi type) => type == TypeEnnemi.Golem || type == TypeEnnemi.Necromancien;
 
         /// Morgrim, le Roi des os (Golem) ; Nyxar, le Nécromancien (wiki : ennemis.md, univers.md).
-        static string NomBoss(TypeEnnemi type) => type == TypeEnnemi.Necromancien ? "NYXAR" : "MORGRIM";
+        /// Nyxar : éclats de Nyx restants, puis « enragé » (wiki : ennemis.md, trois phases ; 30/09/2026).
+        static string NomBoss(Squelette sq)
+        {
+            if (!(sq is Necromancien n)) return "MORGRIM";
+            int restants = (n.CouronneBrisee ? 0 : 1) + (n.GrimoireBrise ? 0 : 1);
+            if (restants == 0) return "NYXAR · ENRAGÉ";
+            return "NYXAR · " + restants + (restants > 1 ? " ÉCLATS" : " ÉCLAT");
+        }
 
         /// Rendus du squelette actifs (désintégration, étage masqué du donjon : non) — comme StatutsUI.
         static bool RendusVisibles(Squelette sq)

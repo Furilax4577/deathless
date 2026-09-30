@@ -1679,10 +1679,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Deathless.Jeu.Necromancien
   type: 0
   elite: 0
+  yeuxElite: {fileID: 0}
   modele: {fileID: 592465585569031785}
   animator: {fileID: 4577011158026325513}
   dureeSortie: 2.3777778
   instantCoupClip: 0.58
+  modeleGrimoire: {fileID: 919132149155446097, guid: d328c86b38abbbb41b3df223bf87f827, type: 3}
 --- !u!114 &5849784574803138288
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1807,6 +1809,14 @@ MonoBehaviour:
       NameHash: -1299573048
       Synchronize: 1
       ParameterType: 9
+    - name: Dodge
+      NameHash: 1353639306
+      Synchronize: 1
+      ParameterType: 9
+    - name: DodgeDir
+      NameHash: 2082679728
+      Synchronize: 1
+      ParameterType: 3
   AnimatorParametersExpanded: 0
 --- !u!114 &1027324691773496138
 MonoBehaviour:

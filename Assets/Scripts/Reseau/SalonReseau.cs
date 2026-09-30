@@ -69,6 +69,8 @@ namespace Deathless.Reseau
         {
             ulong id = p.Receive.SenderClientId;
             if (Index(id) >= 0) return;
+            // Partie lancée : retour d'un joueur parti ou arrivée en cours de partie (ReseauJeu décide de sa classe).
+            if (Lance.Value) { ReseauJeu.Instance?.PresentationEnCours(id, pseudo.ToString(), classePreferee.ToString()); return; }
             var j = new JoueurSalon { clientId = id, pseudo = pseudo, pret = false };
             string pref = classePreferee.ToString();
             j.classeId = new FixedString32Bytes(ClasseLibre(pref));
@@ -118,16 +120,18 @@ namespace Deathless.Reseau
 
         // ----------------------------------------------------------------- Hôte
 
-        /// Un client est parti : sa place et sa classe sont libérées.
-        public void Retirer(ulong clientId)
+        /// Un client est parti : sa place et sa classe sont libérées (en cours de partie, ReseauJeu les garde pour son
+        /// retour). Renvoie sa ligne, s'il était là.
+        public bool Retirer(ulong clientId, out JoueurSalon joueur)
         {
-            if (!IsServer) return;
+            joueur = default;
+            if (!IsServer) return false;
             int i = Index(clientId);
-            if (i >= 0)
-            {
-                ReseauJeu.Journal("Salon : " + Joueurs[i].pseudo + " quitte le salon");
-                Joueurs.RemoveAt(i);
-            }
+            if (i < 0) return false;
+            joueur = Joueurs[i];
+            ReseauJeu.Journal("Salon : " + joueur.pseudo + " quitte le salon");
+            Joueurs.RemoveAt(i);
+            return true;
         }
 
         public bool TousPrets()

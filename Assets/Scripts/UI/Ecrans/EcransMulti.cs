@@ -290,7 +290,7 @@ namespace Deathless.UI.Ecrans
             // Secours : adresse IP directe (lien secondaire).
             m_ParIp.clicked += () =>
             {
-                Navigateur.Saisie.ConfigurerAdresse("", v => { Navigateur.Fermer(); L?.RejoindreParAdresse(v); });
+                Navigateur.Saisie.ConfigurerAdresse(L != null ? L.DerniereAdresse ?? "" : "", v => { Navigateur.Fermer(); L?.RejoindreParAdresse(v); });
                 Navigateur.Ouvrir(Navigateur.Saisie);
             };
             m_Afficher.clicked += () => m_CodeVisible = !m_CodeVisible;
@@ -362,6 +362,12 @@ namespace Deathless.UI.Ecrans
 
         public override void AuSommet()
         {
+            // Dernier code utilisé pré-rempli (retour dans une partie après une coupure), si rien n'est encore saisi.
+            if (string.IsNullOrEmpty(m_CodeSaisi) && L != null && !string.IsNullOrEmpty(L.DernierCode))
+            {
+                m_CodeSaisi = L.DernierCode;
+                MajCodeSaisi();
+            }
             m_EtatAffiche = (EtatLobby)(-1);
             MiseAJour(0f);
         }

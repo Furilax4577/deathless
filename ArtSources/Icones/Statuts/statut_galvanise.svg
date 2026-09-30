@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+<!-- Deathless : statut_galvanise (Galvanisé). Généré par ArtSources/Icones/generer_icones.py -->
+<polygon fill="#999485" points="70,118 70,74 58,74 58,118"/>
+<polygon fill="#999485" points="64,118 64,74 70,74 70,118"/>
+<polygon fill="#ebe6cc" points="64,118 64,74 58,74 58,118"/>
+<polygon fill="#999485" points="65,118 62.4,124.4 56,127 49.6,124.4 47,118 49.6,111.6 56,109 62.4,111.6"/>
+<polygon fill="#999485" points="56,118 65,118 62.4,124.4 56,127 49.6,124.4"/>
+<polygon fill="#c7bfa8" points="56,118 49.6,124.4 47,118"/>
+<polygon fill="#ebe6cc" points="56,118 47,118 49.6,111.6 56,109 62.4,111.6"/>
+<polygon fill="#c7bfa8" points="56,118 62.4,111.6 65,118"/>
+<polygon fill="#999485" points="65,74 62.4,80.4 56,83 49.6,80.4 47,74 49.6,67.6 56,65 62.4,67.6"/>
+<polygon fill="#999485" points="56,74 65,74 62.4,80.4 56,83 49.6,80.4"/>
+<polygon fill="#c7bfa8" points="56,74 49.6,80.4 47,74"/>
+<polygon fill="#ebe6cc" points="56,74 47,74 49.6,67.6 56,65 62.4,67.6"/>
+<polygon fill="#c7bfa8" points="56,74 62.4,67.6 65,74"/>
+<polygon fill="#999485" points="81,118 78.4,124.4 72,127 65.6,124.4 63,118 65.6,111.6 72,109 78.4,111.6"/>
+<polygon fill="#999485" points="72,118 81,118 78.4,124.4 72,127 65.6,124.4"/>
+<polygon fill="#c7bfa8" points="72,118 65.6,124.4 63,118"/>
+<polygon fill="#ebe6cc" points="72,118 63,118 65.6,111.6 72,109 78.4,111.6"/>
+<polygon fill="#c7bfa8" points="72,118 78.4,111.6 81,118"/>
+<polygon fill="#999485" points="81,74 78.4,80.4 72,83 65.6,80.4 63,74 65.6,67.6 72,65 78.4,67.6"/>
+<polygon fill="#999485" points="72,74 81,74 78.4,80.4 72,83 65.6,80.4"/>
+<polygon fill="#c7bfa8" points="72,74 65.6,80.4 63,74"/>
+<polygon fill="#ebe6cc" points="72,74 63,74 65.6,67.6 72,65 78.4,67.6"/>
+<polygon fill="#c7bfa8" points="72,74 78.4,67.6 81,74"/>
+<polygon fill="#6e1410" points="26,79.1 64,63.5 102,79.1 106,68.9 64,52.5 22,68.9"/>
+<polygon fill="#6e1410" points="24,74 64,58 64,63.5 26,79.1"/>
+<polygon fill="#ff7359" points="24,74 64,58 64,52.5 22,68.9"/>
+<polygon fill="#6e1410" points="64,58 104,74 102,79.1 64,63.5"/>
+<polygon fill="#ff7359" points="64,58 104,74 106,68.9 64,52.5"/>
+<polygon fill="#6e1410" points="34.5,58.9 64,43.5 93.5,58.9 98.5,49.1 64,32.5 29.5,49.1"/>
+<polygon fill="#6e1410" points="32,54 64,38 64,43.5 34.5,58.9"/>
+<polygon fill="#ff7359" points="32,54 64,38 64,32.5 29.5,49.1"/>
+<polygon fill="#b3261e" points="64,38 96,54 93.5,58.9 64,43.5"/>
+<polygon fill="#b3261e" points="64,38 96,54 98.5,49.1 64,32.5"/>
+<polygon fill="#6e1410" points="43.1,38.6 64,23.5 84.9,38.6 91.1,29.4 64,12.5 36.9,29.4"/>
+<polygon fill="#6e1410" points="40,34 64,18 64,23.5 43.1,38.6"/>
+<polygon fill="#ff7359" points="40,34 64,18 64,12.5 36.9,29.4"/>
+<polygon fill="#b3261e" points="64,18 88,34 84.9,38.6 64,23.5"/>
+<polygon fill="#b3261e" points="64,18 88,34 91.1,29.4 64,12.5"/>
+</svg>

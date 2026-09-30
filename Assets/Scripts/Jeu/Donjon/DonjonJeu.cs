@@ -290,7 +290,7 @@ namespace Deathless.Jeu
             {
                 var r = generateur.Butins[i];
                 if (r == null) continue;
-                if (r.visuel != null) r.visuel.SetActive(true);
+                if (r.visuel != null) r.visuel.SetActive(ButinActif(i));
                 var coffre = r.butin != TypeButin.TasOr ? CoffreDe(r.visuel, r.butin == TypeButin.GrandCoffre) : null;
                 if (coffre != null)
                 {
@@ -376,6 +376,9 @@ namespace Deathless.Jeu
 
         public int MontantButin(int index) => generateur != null && index >= 0 && index < generateur.Butins.Length && generateur.Butins[index] != null ? Montant(generateur.Butins[index].butin) : 0;
         public bool ButinPris(int index) => (Pris & (1 << index)) != 0;
+        /// Butin présent dans ce donjon : les tas d'or au sol sont retirés depuis le 30/09/2026 (GameBalance.tasOrDonjon).
+        public bool ButinActif(int index) => generateur != null && index >= 0 && index < generateur.Butins.Length && generateur.Butins[index] != null
+            && (generateur.Butins[index].butin != TypeButin.TasOr || B.tasOrDonjon);
 
         // ================================================================== Gardiens
 
@@ -386,7 +389,7 @@ namespace Deathless.Jeu
             var b = B;
             // Butins du plus riche au plus modeste ; un gardien par butin, puis un deuxième sur les plus riches.
             var ordre = new List<int>();
-            for (int i = 0; i < generateur.Butins.Length; i++) if (generateur.Butins[i] != null) ordre.Add(i);
+            for (int i = 0; i < generateur.Butins.Length; i++) if (ButinActif(i)) ordre.Add(i);
             ordre.Sort((x, y) => ((int)generateur.Butins[x].butin).CompareTo((int)generateur.Butins[y].butin));
             var pris = new HashSet<DonjonRepere>();
             int nb = Mathf.Max(0, b.gardiensDonjon), guerriers = Mathf.RoundToInt(nb * b.partGuerriersDonjon);
@@ -436,7 +439,7 @@ namespace Deathless.Jeu
         /// Autorité : le butin `index` va au joueur `joueurId` (s'il est encore là et que le joueur est à côté).
         public void Accorder(int index, int joueurId)
         {
-            if (!Pret || index < 0 || index >= generateur.Butins.Length || ButinPris(index) || P == null) return;
+            if (!Pret || index < 0 || index >= generateur.Butins.Length || ButinPris(index) || !ButinActif(index) || P == null) return;
             var r = generateur.Butins[index];
             var h = P.HerosDe(joueurId);
             var j = P.Joueur(joueurId);
@@ -570,6 +573,10 @@ namespace Deathless.Jeu
         }
 
         void Dire(string texte, float duree) { m_Message = texte; m_MessageJusqua = Time.time + duree; }
+
+        /// Message court du HUD (même emplacement que les messages du donjon), pour d'autres annonces : réseau perdu et
+        /// partie continuée en solo, retour d'un joueur en cours de partie (Docs/reseau.md).
+        public void Annoncer(string texte, float duree) => Dire(texte, duree);
 
         // ================================================================== Sacs des joueurs morts au donjon
 
@@ -935,7 +942,7 @@ namespace Deathless.Jeu
             for (int i = 0; i < generateur.Butins.Length; i++)
             {
                 var r = generateur.Butins[i];
-                if (r == null || r.butin != TypeButin.TasOr || ButinPris(i)) continue;
+                if (r == null || r.butin != TypeButin.TasOr || ButinPris(i) || !ButinActif(i)) continue;
                 if (Horizontal(h.transform.position, r.transform.position) < B.rayonTasOr && Mathf.Abs(h.transform.position.y - r.transform.position.y) < 1.5f) DemanderButin(i);
             }
             // Sacs des joueurs morts au donjon : on passe dessus aussi (à l'envers : DemanderSac peut en retirer un).

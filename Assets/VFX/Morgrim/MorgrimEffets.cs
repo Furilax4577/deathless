@@ -72,6 +72,13 @@ public class AnneauGemmesComp : MonoBehaviour
     public float angleOuverture = 360f;
     public int capaciteAnneau = 260;
     public int eclats = 26;
+    // Front à vitesse constante (onde de choc de Morgrim, OndeChocLente, 30/09/2026) : le rayon suit exactement la
+    // distance jugée par le jeu, au lieu de l'élan adouci (SmoothStep) de la télégraphie.
+    public bool lineaire;
+    // Durée de vie des éclats de poussière (s) : plus longue pour une onde lente.
+    public float vieEclats = 1f;
+    // Taille des gemmes de l'anneau (m) : plus grosses pour l'onde de choc, bien lisible de loin.
+    public float tailleGemmes = 0.11f;
 
     Mesh mesh; MeshRenderer rendu; Vector3[] vertices; Color[] colors;
     float[] fraction, radial, hauteur, tailleFacteur, phase; Color[] teinte; Quaternion[] rot; Vector3[] axe;
@@ -120,7 +127,7 @@ public class AnneauGemmesComp : MonoBehaviour
             Vector3 dir = new Vector3(Mathf.Cos(a), 0f, Mathf.Sin(a));
             eDepart[i] = dir * 0.5f + Vector3.up * 0.05f;
             eVitesse[i] = dir * vRadiale * (0.55f + (float)rnd.NextDouble() * 0.4f) + Vector3.up * 3.5f;
-            eVie[i] = 0.7f + (float)rnd.NextDouble() * 0.3f;
+            eVie[i] = (0.7f + (float)rnd.NextDouble() * 0.3f) * vieEclats;
             eTaille[i] = 0.06f + (float)rnd.NextDouble() * 0.07f;
             eTeinte[i] = couleurs[i % 2 == 0 ? 0 : 1];
             eRot[i] = Random.rotation;
@@ -132,7 +139,10 @@ public class AnneauGemmesComp : MonoBehaviour
 
     public void Jouer() { debut = Time.time; if (rendu != null) rendu.enabled = true; Appliquer(0f); }
 
-    void Update() { if (debut < 0f) return; float t = Time.time - debut; if (t >= Mathf.Max(duree, 1f)) { if (rendu != null) rendu.enabled = false; return; } Appliquer(t); }
+    // Reprend l'effet déjà commencé depuis `ecoule` s (onde reçue du réseau avec la latence, OndeChocLente).
+    public void JouerDepuis(float ecoule) { debut = Time.time - Mathf.Max(0f, ecoule); if (rendu != null) rendu.enabled = true; Appliquer(Time.time - debut); }
+
+    void Update() { if (debut < 0f) return; float t = Time.time - debut; if (t >= Mathf.Max(duree, vieEclats)) { if (rendu != null) rendu.enabled = false; return; } Appliquer(t); }
 
     // État à t secondes après le départ (Update et captures).
     public void Appliquer(float t)
@@ -140,7 +150,7 @@ public class AnneauGemmesComp : MonoBehaviour
         if (mesh == null) return;
         float ouverture = angleOuverture * Mathf.Deg2Rad;
         float debutArc = Mathf.PI / 2f - ouverture / 2f;
-        float p = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(t / duree));
+        float p = lineaire ? Mathf.Clamp01(t / duree) : Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(t / duree));
         float rExt = Mathf.Lerp(rayonDepart, rayonMax, p);
         float largeur = Mathf.Lerp(largeurDepart, largeurFin, p);
         float extinction = t < duree ? 1f : 0f;
@@ -153,7 +163,7 @@ public class AnneauGemmesComp : MonoBehaviour
             float r = rExt - largeur * 0.5f + radial[i] * largeur;
             Vector3 pos = new Vector3(Mathf.Cos(a) * r, hauteur[i] + 0.05f, Mathf.Sin(a) * r);
             Quaternion spin = Quaternion.AngleAxis(t * 90f + phase[i] * 36f, axe[i]) * rot[i];
-            LowPolyGem.Write(vertices, colors, i, pos, 0.11f * tailleFacteur[i] * extinction, new Vector3(0.8f, 1.2f, 0.8f), spin, teinte[i], LowPolyGem.DefaultLight);
+            LowPolyGem.Write(vertices, colors, i, pos, tailleGemmes * tailleFacteur[i] * extinction, new Vector3(0.8f, 1.2f, 0.8f), spin, teinte[i], LowPolyGem.DefaultLight);
         }
         for (int j = 0; j < eclats; j++)
         {

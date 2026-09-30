@@ -17,6 +17,9 @@ namespace Deathless.Reseau
         readonly NetworkVariable<float> m_PvMax = new NetworkVariable<float>(1f);
         readonly NetworkVariable<bool> m_Elite = new NetworkVariable<bool>(false);
         readonly NetworkVariable<byte> m_Type = new NetworkVariable<byte>(0);
+        /// Nyxar (30/09/2026) : PV de ses deux éclats de Nyx (x : couronne, y : grimoire ; 0 = brisé) ; (-1, -1) pour
+        /// tout autre ennemi. Écrit par l'hôte seulement quand ils changent.
+        readonly NetworkVariable<Vector2> m_Eclats = new NetworkVariable<Vector2>(new Vector2(-1f, -1f));
 
         public Squelette Squelette { get; private set; }
         /// Statuts du squelette, tenus par l'hôte (Docs/reseau.md, « Statuts ») : envoyés seulement quand ils changent.
@@ -50,6 +53,7 @@ namespace Deathless.Reseau
                 m_Elite.Value = m_ElitePrepare;
                 m_Pv.Value = Squelette.Sante.Pv;
                 m_PvMax.Value = Squelette.Sante.pvMax;
+                if (Squelette is Necromancien n0) m_Eclats.Value = n0.PvEclats;
                 BrancherStatuts();
                 return;
             }
@@ -64,6 +68,7 @@ namespace Deathless.Reseau
             sq.Sante.relais = Relayer;
             sq.Sante.Fixer(m_Pv.Value, m_PvMax.Value);
             BrancherStatuts();
+            if (sq is Necromancien nx) { nx.BrancherEclatsDistants(this); nx.RecevoirEclats(m_Eclats.Value); }
             DirecteurVagues.Instance?.AjouterDistant(sq);
             StartCoroutine(SortieVisuelle());
         }
@@ -106,12 +111,14 @@ namespace Deathless.Reseau
             {
                 if (m_Pv.Value != s.Pv) m_Pv.Value = s.Pv;
                 if (m_PvMax.Value != s.pvMax) m_PvMax.Value = s.pvMax;
+                if (Squelette is Necromancien n && m_Eclats.Value != n.PvEclats) m_Eclats.Value = n.PvEclats;
             }
             else if (s.Pv != m_Pv.Value || s.pvMax != m_PvMax.Value)
             {
                 s.Fixer(m_Pv.Value, m_PvMax.Value);
                 if (s.Mort) foreach (var c in GetComponentsInChildren<Collider>()) c.enabled = false;
             }
+            if (!IsServer && Squelette is Necromancien nc) nc.RecevoirEclats(m_Eclats.Value);
         }
 
         // ----------------------------------------------------------------- Client → hôte
@@ -119,6 +126,8 @@ namespace Deathless.Reseau
         float Relayer(InfoDegats info)
         {
             var s = Squelette.Sante;
+            // Invulnérable chez l'hôte (Nyxar tant qu'un éclat de Nyx tient, recopié ici) : rien à envoyer ni à afficher.
+            if (s.invulnerable) return 0f;
             float estime = Mathf.Min(info.montant, s.Pv);
             if (!info.continu) AudioBank.Jouer(SonsDuJeu.SqueletteTouche, transform.position + Vector3.up, 0.8f, 0.05f);
             FrapperRpc(info.montant, info.critique, info.continu, info.execution, info.point, info.direction);
@@ -230,24 +239,25 @@ namespace Deathless.Reseau
         // Hôte : onde de Fracas en cours (une seule à la fois par Morgrim) — centre, vitesse, portée et largeur de bande
         // de détection, heure de départ réseau ; joueurs déjà crédités (une touche par onde).
         Vector3 m_OndeCentre;
-        float m_OndeDepart = -999f, m_OndeVitesse, m_OndeRayonMax, m_OndeLargeurBande;
+        float m_OndeDepart = -999f, m_OndeVitesse, m_OndeRayonMax, m_OndeLargeurBande, m_OndeDegats;
         readonly HashSet<int> m_OndeTouches = new HashSet<int>();
 
         /// Hôte : lance l'onde de Fracas et la diffuse aux autres postes avec l'heure de départ réseau, pour qu'ils
         /// calculent le même front que l'hôte malgré la latence (Docs/reseau.md). Le jugement (au sol ou en l'air) se
         /// fait ensuite chez chaque client, sur l'onde qu'il voit (OndeChocLente) : voir SignalerOndeTouchee.
-        public void DiffuserOndeMorgrim(Vector3 centre, float vitesse, float rayonMax, float largeurBande)
+        /// `degats` : dégâts de cette onde (Fracas de la massue ou Coup écrasé commun, 30/09/2026).
+        public void DiffuserOndeMorgrim(Vector3 centre, float vitesse, float rayonMax, float largeurBande, float degats, float depart)
         {
             if (!IsServer || !IsSpawned) return;
-            m_OndeCentre = centre; m_OndeVitesse = vitesse; m_OndeRayonMax = rayonMax; m_OndeLargeurBande = largeurBande;
-            m_OndeDepart = TempsReseau();
+            m_OndeCentre = centre; m_OndeVitesse = vitesse; m_OndeRayonMax = rayonMax; m_OndeLargeurBande = largeurBande; m_OndeDegats = degats;
+            m_OndeDepart = depart;
             m_OndeTouches.Clear();
-            OndeMorgrimRpc(centre, vitesse, rayonMax, largeurBande, m_OndeDepart);
+            OndeMorgrimRpc(centre, vitesse, rayonMax, largeurBande, degats, m_OndeDepart);
         }
 
         [Rpc(SendTo.NotServer)]
-        void OndeMorgrimRpc(Vector3 centre, float vitesse, float rayonMax, float largeurBande, float depart)
-            => (Squelette as MorgrimVariant)?.RecevoirOndeDistante(centre, vitesse, rayonMax, largeurBande, depart);
+        void OndeMorgrimRpc(Vector3 centre, float vitesse, float rayonMax, float largeurBande, float degats, float depart)
+            => (Squelette as MorgrimVariant)?.RecevoirOndeDistante(centre, vitesse, rayonMax, largeurBande, degats, depart);
 
         /// Client (propriétaire touché) : signale à l'hôte avoir été touché par l'onde en cours, jugé chez lui (au sol
         /// au passage du front — la latence ferait sinon voir à l'hôte les sauts en retard, Docs/reseau.md). L'hôte
@@ -269,13 +279,61 @@ namespace Deathless.Reseau
             Vector3 d = h.transform.position - m_OndeCentre; d.y = 0f;
             if (Mathf.Abs(d.magnitude - rFront) > m_OndeLargeurBande + 1.5f) return;   // vraisemblance : latence tolérée
             m_OndeTouches.Add(joueurId);
-            var b = GameBalance.Courant;
             h.Sante.Encaisser(new InfoDegats
             {
-                montant = b.morgrimMassueFracasDegats, equipeSource = Equipe.Ennemis, source = Squelette.gameObject, parable = false,
+                montant = m_OndeDegats, equipeSource = Equipe.Ennemis, source = Squelette.gameObject, parable = false,
                 point = h.transform.position + Vector3.up, direction = d.sqrMagnitude > 0.0001f ? d.normalized : Squelette.transform.forward
             });
             h.Renverser();
+        }
+
+        // ----------------------------------------------------------------- Boss : effets ponctuels (30/09/2026)
+
+        /// Hôte : fait rejouer un effet de boss (son, terre, gemmes ; EffetsBoss) aux autres postes. Un octet d'effet, un
+        /// point, une taille : pas de message par gemme.
+        public void DiffuserEffetBoss(byte effet, Vector3 point, Vector3 direction, float taille)
+        {
+            if (!IsServer || !IsSpawned) return;
+            EffetBossRpc(effet, point, direction, taille);
+        }
+
+        [Rpc(SendTo.NotServer)]
+        void EffetBossRpc(byte effet, Vector3 point, Vector3 direction, float taille) => EffetsBoss.Jouer((EffetBoss)effet, point, direction, taille);
+
+        // ----------------------------------------------------------------- Nyxar : téléportation, éclats de Nyx (30/09/2026)
+
+        /// Hôte : Nyxar vient de se téléporter (Agent.Warp) ; le NetworkTransform saute sans glisser chez les clients.
+        public void Teleporter()
+        {
+            if (!IsServer || !IsSpawned) return;
+            var nt = GetComponent<Unity.Netcode.Components.NetworkTransform>();
+            if (nt != null && nt.IsSpawned && nt.IsOwner) nt.Teleport(transform.position, transform.rotation, transform.localScale);
+        }
+
+        /// Client : un héros de ce poste frappe un éclat de Nyx (0 : couronne, 1 : grimoire) ; l'hôte applique le coup.
+        public float RelayerEclat(int index, InfoDegats info, float pvEclat)
+        {
+            if (info.montant <= 0f || pvEclat <= 0f) return 0f;
+            if (!info.continu) AudioBank.Jouer(SonsDuJeu.SqueletteTouche, info.point, 0.6f, 0.05f);
+            FrapperEclatRpc((byte)index, info.montant, info.critique, info.continu, info.point, info.direction);
+            return Mathf.Min(info.montant, pvEclat);
+        }
+
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        void FrapperEclatRpc(byte index, float montant, bool critique, bool continu, Vector3 point, Vector3 direction, RpcParams p = default)
+        {
+            if (!(Squelette is Necromancien n)) return;
+            var e = n.Eclat(index);
+            if (e == null || e.Sante == null || e.Sante.Mort) return;
+            ulong client = p.Receive.SenderClientId;
+            int id = Partie.IdJoueur(client);
+            var h = Partie.Instance != null ? Partie.Instance.HerosDe(id) : null;
+            float reel = e.Sante.Encaisser(new InfoDegats
+            {
+                montant = montant, sourceId = id, equipeSource = Equipe.Heros, source = h != null ? h.gameObject : null,
+                critique = critique, continu = continu, point = point, direction = direction
+            });
+            if (reel > 0f && Partie.Instance != null) Partie.Instance.CompterDegats(id, reel, critique);
         }
     }
 }

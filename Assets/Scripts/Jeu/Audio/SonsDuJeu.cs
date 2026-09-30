@@ -27,13 +27,23 @@ namespace Deathless.Jeu
         public static readonly string[] SqueletteAube = { "dawn_vaporize" };
         public static readonly string[] GolemCoup = { "golem_coup", "viking_leap_land" };
         public static readonly string[] Invocation = { "necromancien_invocation", "necro_summon" };
+        // Boss (30/09/2026, EffetsBoss) : échantillons Deathless « à écouter » du catalogue, avec repli sur un son en place.
+        public static readonly string[] MorgrimCri = { "dl_morgrim_cri", "viking_roar" };
+        public static readonly string[] MorgrimOnde = { "dl_massue_onde", "golem_coup", "viking_leap_land" };
+        public static readonly string[] NyxarTeleport = { "dl_portail_depart", "portal_pass" };
+        public static readonly string[] NyxarEclatBrise = { "dl_nyxar_eclat_brise", "shield_break" };
+        public static readonly string[] NyxarEnrage = { "dl_nyxar_arrivee", "necro_summon" };
+        public static readonly string[] NyxarFaux = { "hache_coup", "kenney_rpg_chop" };
         // Voleur et mage squelette (28/09/2026) : sons du lot 3 (Docs/son-cahier-des-charges.md).
         public static readonly string[] VoleurElan = { "dl_voleur_elan" };
         public static readonly string[] MageSqueletteIncantation = { "dl_mage_squelette_incantation" };
         public static readonly string[] MageSqueletteTir = { "dl_mage_squelette_tir" };
 
         public static readonly string[] MissileVol = { "skull_flight_loop" };
-        public static readonly string[] MissileEclat = { "skull_explosion" };
+        // Éclat du crâne (30/09/2026, retour de test : le cri de skull_explosion n'arrive qu'après 0,25 à 0,5 s, on le
+        // percevait une seconde après l'impact) : sons Deathless dont le cri attaque dès la première image.
+        public static readonly string[] MissileEclat = { "dl_nyxessa_missile_eclat", "skull_explosion" };
+        public static readonly string[] MissileEclatEnnemi = { "dl_mage_squelette_missile_eclat", "skull_explosion" };
         public static readonly string[] NyxessaTir = { "dl_nyxessa_tir", "relic_pulse" };
         public static readonly string[] NyxessaFrappee = { "dl_nyxessa_frappee", "relic_hit" };
         public static readonly string[] NyxessaAlerte = { "dl_nyxessa_alerte", "nyxessa_alerte" };

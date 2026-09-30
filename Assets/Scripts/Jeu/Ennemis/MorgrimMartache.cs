@@ -14,6 +14,9 @@ namespace Deathless.Jeu
     {
         enum Competence { Fauche, FendSol, Breche }
 
+        /// Compétences communes (Balayage…) aux accents fer de la martache.
+        protected override VfxTheme ThemeCommun => VfxTheme.Rage;
+
         Competence m_Competence;
         float m_ProchainFendSol = -99f, m_ProchaineBreche = -99f;
 
@@ -28,7 +31,7 @@ namespace Deathless.Jeu
             return Mathf.Min(m_Stats.portee, b.morgrimMartacheFaucheRayon);
         }
 
-        protected override void CommencerAttaque(Heros cible)
+        protected override void CommencerVariante(Heros cible)
         {
             var b = B;
             m_Competence = Choisir(cible);
@@ -46,7 +49,7 @@ namespace Deathless.Jeu
                     m_Stats.preparation = b.morgrimMartacheFauchePreparation;
                     break;
             }
-            base.CommencerAttaque(cible);
+            DemarrerPreparation(cible);
             PoserTelegraphie();
         }
 
@@ -78,7 +81,7 @@ namespace Deathless.Jeu
             }
         }
 
-        protected override void Frapper()
+        protected override void FrapperVariante()
         {
             switch (m_Competence)
             {
@@ -94,7 +97,7 @@ namespace Deathless.Jeu
             var b = B;
             Vector3 impact = transform.position;
             Impact(impact + Vector3.up, VfxTheme.Rage, b.morgrimMartacheFaucheRayon, transform.forward, b.morgrimMartacheFaucheAngle);
-            AudioBank.Jouer(SonsDuJeu.GolemCoup, impact, 1f);
+            EffetsBoss.Diffuser(this, EffetBoss.CoupSon, impact);
             float r = b.morgrimMartacheFaucheRayon;
             float demiAngle = b.morgrimMartacheFaucheAngle * 0.5f;
             if (P == null) return;
@@ -126,9 +129,8 @@ namespace Deathless.Jeu
             var b = B;
             Vector3 origine = transform.position;
             Vector3 dir = transform.forward;
-            if (EffetsJeu.Terre != null) DirtBurst.Spawn(origine + dir * b.morgrimMartacheFendSolLongueur, EffetsJeu.Terre, 0.7f);
+            EffetsBoss.Diffuser(this, EffetBoss.CoupSol, origine + dir * b.morgrimMartacheFendSolLongueur, 0.7f);
             Impact(origine + dir * (b.morgrimMartacheFendSolLongueur * 0.5f) + Vector3.up * 0.05f, VfxTheme.Terre, b.morgrimMartacheFendSolLongueur * 0.5f, dir, 20f);
-            AudioBank.Jouer(SonsDuJeu.GolemCoup, origine, 1f);
             if (P == null) return;
             var tous = P.TousLesHeros;
             for (int i = 0; i < tous.Count; i++)
@@ -187,7 +189,7 @@ namespace Deathless.Jeu
             Vector3 impact = NyxessaImpact();
             Impact(impact, VfxTheme.Rage, 1.6f, transform.forward, 90f);
             // Fer sur verre quand le bouclier encaisse le coup de brèche (lot 2, § 8.2) ; sinon le coup sourd habituel.
-            AudioBank.Jouer(leve ? SonsDuJeu.BouclierBreche : SonsDuJeu.GolemCoup, impact, 1f);
+            EffetsBoss.Diffuser(this, leve ? EffetBoss.Breche : EffetBoss.CoupSon, impact);
             if (P == null || P.nyxessa == null) return;
             m_DernierCoupNyxessa = Time.time;
             P.nyxessa.Encaisser(new InfoDegats { montant = montant, equipeSource = Equipe.Ennemis, source = gameObject, point = impact, direction = transform.forward });

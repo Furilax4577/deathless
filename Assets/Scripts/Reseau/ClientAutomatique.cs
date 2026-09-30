@@ -22,6 +22,9 @@ namespace Deathless.Reseau
     ///   -deathless-competences : le héros enchaîne toutes ses compétences (effets vus par les autres postes)
     ///   -deathless-solo : partie solo lancée aussitôt avec la classe donnée (vérification du build : caméra, héros)
     ///   [-deathless-quitter-salon=5] : quitte le salon 5 s après y être entré (test de la classe libérée), sans se déclarer prêt
+    ///   -deathless-couper=20 : coupure simulée 20 s après le début de la partie (Netcode arrêté sans quitter la session :
+    ///     client, retour au lobby ; hôte, la partie continue en solo)
+    ///   -deathless-revenir=5 : client coupé en partie, revient 5 s plus tard par le même code ou la même adresse
     public class ClientAutomatique : MonoBehaviour
     {
         string m_Adresse, m_Code, m_Classe;
@@ -64,6 +67,8 @@ namespace Deathless.Reseau
             c.m_DossierCaptures = Arg("deathless-capture");
             if (int.TryParse(Arg("deathless-or"), out var or)) c.m_Or = or;
             if (int.TryParse(Arg("deathless-attendre"), out var att)) c.m_Attendre = att;
+            if (float.TryParse(Arg("deathless-couper"), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var cp)) c.m_Couper = cp;
+            if (float.TryParse(Arg("deathless-revenir"), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var rv)) c.m_Revenir = rv;
             c.m_Classe = Arg("deathless-classe") ?? "mage";
             LobbyReseau.PseudoForce = Arg("deathless-pseudo") ?? "Bot";
             LobbyReseau.ClasseForcee = c.m_Classe;
@@ -97,8 +102,18 @@ namespace Deathless.Reseau
                     + (string.IsNullOrEmpty(lobby.CodeSalon) ? "" : " code " + lobby.CodeSalon));
             }
 
-            // Hôte parti ou connexion perdue : on ne reste pas bloqué (le poste de test se ferme au bout de 8 s d'erreur).
+            // Coupé en partie, avec -deathless-revenir : retour par le même code (ou la même adresse), pré-rempli par le lobby.
             m_EnErreur = lobby.Etat == EtatLobby.Erreur ? m_EnErreur + dt : 0f;
+            if (m_Revenir >= 0f && !m_Revenu && m_EnPartieDepuis >= 0f && lobby.Etat == EtatLobby.Erreur && m_EnErreur >= m_Revenir)
+            {
+                m_Revenu = true;
+                m_EnPartieDepuis = -1f; m_PhaseVue = -1; m_EnErreur = 0f;
+                string code = m_Code != null ? lobby.DernierCode : lobby.DerniereAdresse;
+                ReseauJeu.Journal("[auto] retour dans la partie par " + code + " (message du lobby : " + lobby.Message + ")");
+                if (m_Code != null) lobby.Rejoindre(code); else lobby.RejoindreParAdresse(code);
+                return;
+            }
+            // Hôte parti ou connexion perdue : on ne reste pas bloqué (le poste de test se ferme au bout de 8 s d'erreur).
             if (m_EnErreur > 8f) { ReseauJeu.Journal("[auto] lobby en erreur (" + lobby.Message + "), on quitte"); enabled = false; Invoke(nameof(Fermer), 1f); return; }
 
             var salon = SalonReseau.Instance;
@@ -138,6 +153,14 @@ namespace Deathless.Reseau
                     if (m_Or > 0 && ReseauJeu.Autorite) { p.Etat.orEquipe = m_Or; ReseauJeu.Journal("[auto] caisse commune : " + m_Or + " or (test)"); }
                 }
                 m_EnPartieDepuis += dt;
+                if (m_Couper > 0f && !m_Coupe && m_EnPartieDepuis >= m_Couper)
+                {
+                    // Coupure simulée : Netcode s'arrête comme sur une perte du transport (ni Quitter, ni session quittée).
+                    m_Coupe = true;
+                    ReseauJeu.Journal("[auto] coupure simulée (" + (ReseauJeu.Autorite ? "hôte" : "client") + ")");
+                    r.Reseau.Shutdown(true);
+                    return;
+                }
                 if (m_Donjon != null && Donjon(p, p.HerosLocal, m_EnPartieDepuis)) { }
                 else if (m_Achat && Achat(p, m_EnPartieDepuis)) { }
                 else Piloter(p.HerosLocal, m_EnPartieDepuis);
@@ -272,6 +295,8 @@ namespace Deathless.Reseau
             return m_EtapeAchat < 3;
         }
         int m_Or;
+        float m_Couper = -1f, m_Revenir = -1f;
+        bool m_Coupe, m_Revenu;
         int m_EtapeAchat;
 
         // ------------------------------------------------------------ Donjon
@@ -474,6 +499,7 @@ namespace Deathless.Reseau
                 var dv = DirecteurVagues.Instance;
                 t += " | " + p.Etat.phase + " nuit " + p.Etat.nuit + " t=" + p.Etat.tempsPhase.ToString("F0") + " nyx " + (p.nyxessa != null ? p.nyxessa.Pv.ToString("F0") : "?")
                     + " or " + p.Etat.orEquipe + " squelettes " + (dv != null ? dv.Vivants.Count : 0);
+                if (dv != null && dv.zones != null) { t += " zones"; foreach (var z in dv.zones) t += " " + (z != null ? z.Etat.ToString() : "-"); }
                 var j = p.JoueurLocal;
                 if (j != null) t += " | moi pv " + j.pv.ToString("F0") + (j.mort ? " MORT " + j.reapparitionRestante.ToString("F0") + " s" : "") + (j.pret ? " prêt" : "") + " points " + j.pointsCompetence + " tués " + j.score.ennemisTues + " dégâts " + j.score.degatsInfliges.ToString("F0") + " or " + j.score.orRapporte;
                 var so = Sorcier.Instance;

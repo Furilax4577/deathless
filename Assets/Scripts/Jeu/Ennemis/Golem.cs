@@ -31,16 +31,9 @@ namespace Deathless.Jeu
         protected override void Frapper()
         {
             Vector3 impact = PointImpact;
-            if (EffetsJeu.Terre != null) DirtBurst.Spawn(impact, EffetsJeu.Terre, 1f);
-            var fx = EffetsJeu.Instance;
-            if (fx != null && fx.prefabOndeGolem != null)
-            {
-                var onde = Instantiate(fx.prefabOndeGolem, impact + Vector3.up, Quaternion.LookRotation(transform.forward));
-                var o = onde.GetComponent<OndeDeChoc>();
-                if (o != null) o.Jouer();
-                Destroy(onde, 3f);
-            }
-            AudioBank.Jouer(SonsDuJeu.GolemCoup, impact, 1f);
+            // Terre, onde brève et son : joués ici et rejoués chez les clients (EffetsBoss, 30/09/2026 ; avant, seul
+            // l'hôte les voyait).
+            EffetsBoss.Diffuser(this, EffetBoss.OndeGolem, impact);
             float r = m_Stats.portee;
             if (P != null)
             {

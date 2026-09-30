@@ -7,8 +7,13 @@ namespace Deathless.Jeu
     /// assez lentement pour qu'on saute par-dessus. Non parable (pas de garde ni de parade), non esquivable (la roulade
     /// et ses frames d'invulnérabilité n'y font rien) : seul un saut au bon instant évite les dégâts.
     ///
-    /// Visuel : réutilise le prefab d'onde du Golem (OndeDeChoc + OndeGemmes, gemmes Terre déjà en place), dont les
-    /// paramètres publics sont réglés ici en un anneau large et lent au lieu du choc bref habituel.
+    /// Sert aussi au Coup écrasé commun aux deux versions (30/09/2026, onde plus courte autour de lui ; dégâts passés à
+    /// la création).
+    ///
+    /// Visuel propre (30/09/2026, au lieu du prefab d'onde du Golem réglé en onde lente) : anneau épais de gemmes au ras
+    /// du sol, palette Terre, dans le langage commun de Morgrim (AnneauGemmesComp de MorgrimEffets, front linéaire qui
+    /// suit exactement la distance jugée ici, éclats de poussière projetés) ; démarré au même instant réseau sur chaque
+    /// poste (JouerDepuis).
     ///
     /// Réseau : avec la latence, l'hôte verrait les sauts des clients en retard. Le jugement (au sol ou en l'air) se
     /// fait donc côté client propriétaire, sur l'onde qu'il voit (départ et vitesse répliqués par
@@ -20,42 +25,44 @@ namespace Deathless.Jeu
     public class OndeChocLente : MonoBehaviour
     {
         Vector3 m_Centre;
-        float m_Vitesse, m_RayonMax, m_LargeurBande, m_Depart, m_Duree;
+        float m_Vitesse, m_RayonMax, m_LargeurBande, m_Depart, m_Duree, m_Degats;
         Deathless.Reseau.EnnemiReseau m_Reseau;
         bool m_Touche;
 
-        /// Crée (ou réutilise, visuellement, le prefab d'onde du Golem) l'onde à `centre`, réglée en front lent. Appelé
-        /// chez l'hôte (MorgrimMassue.FaireFracas) et chez chaque client (MorgrimVariant.RecevoirOndeDistante).
-        public static GameObject Creer(GameObject prefabVisuel, Vector3 centre, float vitesse, float rayonMax, float largeurBande,
+        /// Crée l'onde à `centre` : front lent, visuel en gemmes Terre, jugement du héros local. Appelé chez l'hôte
+        /// (MorgrimMassue.FaireFracas, MorgrimVariant.FaireEcrase) et chez chaque client (MorgrimVariant.RecevoirOndeDistante),
+        /// avec la même heure de départ réseau `depart`.
+        public static GameObject Creer(Vector3 centre, float vitesse, float rayonMax, float largeurBande, float degats,
             float depart, Deathless.Reseau.EnnemiReseau reseau)
         {
-            GameObject go;
-            if (prefabVisuel != null)
+            var go = new GameObject("OndeChocLente");
+            go.transform.position = centre + Vector3.up * 0.02f;
+            float duree = rayonMax / Mathf.Max(0.1f, vitesse);
+            var mat = EffetsJeu.GemmesMorgrim;
+            if (mat != null)
             {
-                go = Instantiate(prefabVisuel, centre, Quaternion.identity);
-                var onde = go.GetComponentInChildren<OndeDeChoc>();
-                if (onde != null)
-                {
-                    // Front large et lent (au lieu du choc bref habituel) : bien lisible au ras du sol, à hauteur de
-                    // chevilles, « ça se lit comme à sauter » (décision de Quentin) — anneau épais qui ne s'amincit
-                    // presque pas, un peu de poussière (les éclats existants, à la même vitesse que le front).
-                    onde.rayonDepart = 0.5f;
-                    onde.rayonMax = rayonMax;
-                    onde.duree = rayonMax / Mathf.Max(0.1f, vitesse);
-                    onde.angleOuverture = 360f;
-                    onde.largeurDepart = Mathf.Max(largeurBande, 1.3f);
-                    onde.largeurFin = Mathf.Max(largeurBande * 0.7f, 0.9f);
-                    onde.Jouer();
-                }
+                // Anneau large et lent, à hauteur de chevilles : « ça se lit comme à sauter » (décision de Quentin).
+                MorgrimEffets.MateriauGemmes = mat;
+                var anneau = go.AddComponent<AnneauGemmesComp>();
+                anneau.theme = VfxTheme.Terre;
+                anneau.lineaire = true;
+                anneau.rayonDepart = 0f;
+                anneau.rayonMax = rayonMax;
+                anneau.duree = duree;
+                anneau.largeurDepart = Mathf.Max(largeurBande, 1f);
+                anneau.largeurFin = Mathf.Max(largeurBande * 0.8f, 0.8f);
+                anneau.capaciteAnneau = Mathf.Clamp(Mathf.CeilToInt(2f * Mathf.PI * rayonMax * 10f), 200, 1000);
+                anneau.eclats = 40;
+                anneau.vieEclats = 1.4f;
+                anneau.tailleGemmes = 0.17f;
+                anneau.Construire();
+                anneau.JouerDepuis(Deathless.Reseau.EnnemiReseau.TempsReseau() - depart);
             }
-            else go = new GameObject("OndeChocLente");
-            go.name = "OndeChocLente_Fracas";
-            var o = go.GetComponent<OndeChocLente>();
-            if (o == null) o = go.AddComponent<OndeChocLente>();
+            var o = go.AddComponent<OndeChocLente>();
             o.m_Centre = centre; o.m_Vitesse = vitesse; o.m_RayonMax = rayonMax; o.m_LargeurBande = largeurBande;
-            o.m_Depart = depart; o.m_Reseau = reseau;
-            o.m_Duree = rayonMax / Mathf.Max(0.1f, vitesse);
-            Destroy(go, o.m_Duree + 1.2f);
+            o.m_Depart = depart; o.m_Reseau = reseau; o.m_Degats = degats;
+            o.m_Duree = duree;
+            Destroy(go, duree + 1.6f);
             return go;
         }
 
@@ -80,10 +87,9 @@ namespace Deathless.Jeu
             if (m_Reseau == null || !m_Reseau.IsSpawned || m_Reseau.IsServer)
             {
                 // Solo, ou l'hôte pour son propre héros : l'hôte fait déjà foi, appliqué tout de suite.
-                var b = GameBalance.Courant;
                 h.Sante.Encaisser(new InfoDegats
                 {
-                    montant = b.morgrimMassueFracasDegats, equipeSource = Equipe.Ennemis, parable = false,
+                    montant = m_Degats, equipeSource = Equipe.Ennemis, parable = false,
                     point = h.transform.position + Vector3.up, direction = d.sqrMagnitude > 0.0001f ? d.normalized : Vector3.forward
                 });
                 h.Renverser();

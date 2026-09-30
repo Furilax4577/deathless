@@ -28,7 +28,7 @@ namespace Deathless.Jeu
             return m_Stats.portee;
         }
 
-        protected override void CommencerAttaque(Heros cible)
+        protected override void CommencerVariante(Heros cible)
         {
             var b = B;
             m_Competence = Choisir(cible);
@@ -46,7 +46,7 @@ namespace Deathless.Jeu
                     m_Stats.preparation = b.morgrimMassueFracasPreparation;
                     break;
             }
-            base.CommencerAttaque(cible);
+            DemarrerPreparation(cible);
             PoserTelegraphie();
         }
 
@@ -79,7 +79,7 @@ namespace Deathless.Jeu
             }
         }
 
-        protected override void Frapper()
+        protected override void FrapperVariante()
         {
             switch (m_Competence)
             {
@@ -98,16 +98,9 @@ namespace Deathless.Jeu
         {
             var b = B;
             Vector3 impact = transform.position + transform.forward * (b.morgrimMassueFracasRayon * 0.35f);
-            if (EffetsJeu.Terre != null) DirtBurst.Spawn(impact, EffetsJeu.Terre, 1f);
-            AudioBank.Jouer(SonsDuJeu.GolemCoup, impact, 1f);
+            EffetsBoss.Diffuser(this, EffetBoss.Onde, impact, 1f);   // terre et son, vus et entendus partout
             Impact(impact + Vector3.up * 0.2f, VfxTheme.Terre, 1.3f);   // gerbe locale au point d'impact (signal immédiat)
-
-            float depart = Deathless.Reseau.EnnemiReseau.TempsReseau();
-            var fx = EffetsJeu.Instance;
-            OndeChocLente.Creer(fx != null ? fx.prefabOndeGolem : null, impact, b.morgrimMassueFracasOndeVitesse,
-                b.morgrimMassueFracasOndeRayonMax, b.morgrimMassueFracasOndeLargeurBande, depart, m_Reseau);
-            if (m_Reseau != null && m_Reseau.IsSpawned && m_Reseau.IsServer)
-                m_Reseau.DiffuserOndeMorgrim(impact, b.morgrimMassueFracasOndeVitesse, b.morgrimMassueFracasOndeRayonMax, b.morgrimMassueFracasOndeLargeurBande);
+            LancerOnde(impact, b.morgrimMassueFracasOndeVitesse, b.morgrimMassueFracasOndeRayonMax, b.morgrimMassueFracasOndeLargeurBande, b.morgrimMassueFracasDegats);
 
             if (P == null || P.nyxessa == null) return;
             Vector3 dn = P.nyxessa.transform.position - impact; dn.y = 0f;
@@ -124,7 +117,7 @@ namespace Deathless.Jeu
         IEnumerator FaireTourbillon()
         {
             var b = B;
-            AudioBank.Jouer(SonsDuJeu.GolemCoup, transform.position, 1f);
+            EffetsBoss.Diffuser(this, EffetBoss.CoupSon, transform.position);
             float duree = b.morgrimMassueTourbillonDuree;
             float t = 0f, prochainEclat = 0f, prochainRecul = 0f;
             while (t < duree && !Interrompu)
@@ -166,7 +159,7 @@ namespace Deathless.Jeu
         {
             var b = B;
             m_EnCharge = true;
-            AudioBank.Jouer(SonsDuJeu.GolemCoup, transform.position, 1f);
+            EffetsBoss.Diffuser(this, EffetBoss.CoupSon, transform.position);
             float duree = Mathf.Max(0.1f, b.morgrimMassueChargeDistance / Mathf.Max(0.1f, b.morgrimMassueChargeVitesse));
             float t = 0f;
             bool touche = false;

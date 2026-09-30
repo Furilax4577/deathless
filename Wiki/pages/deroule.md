@@ -74,13 +74,14 @@ Le donjon est **régénéré chaque nuit** : chaque jour, le portail mène à un
 **Dans le jeu (26/09/2026)** :
 - **Le donjon du jour** : au lever du jour, l'hôte tire une graine et construit le donjon ; les autres joueurs reçoivent la graine et construisent le même. Le donjon est dans la même scène que le village, loin de lui.
 - **Portails** : de jour, près du portail du village, l'invite « Entrer dans le donjon » s'affiche ; la touche Interagir fait passer. On arrive sur la dalle d'arrivée du donjon. À côté se trouve le portail de retour, le même disque de gemmes vertes que celui du village, toujours ouvert. Près de lui, « Revenir au village » ramène devant le portail du village, du côté de Nyxessa. Le passage se fait avec l'effet de téléportation (le corps part en gemmes vers le portail de départ, puis les gemmes jaillissent du portail d'arrivée et le reforment), vu par tous les joueurs. Pendant le passage, le joueur ne peut plus bouger.
-- **Emplacements de butin** : 7 emplacements, avec les montants suivants.
+- **Butin** : 3 coffres, avec les montants suivants.
 
   | Butin | Nombre | Or | Comment on le prend |
   |---|---|---|---|
-  | Grand coffre | 1 | 120 | Touche Interagir. Il est sur le 2e étage. |
-  | Coffre | 2 | 50 | Touche Interagir. |
-  | Tas d'or | 4 | 20 | On passe dessus. |
+  | Grand coffre | 1 | 160 | Touche Interagir. Il est sur le 2e étage. |
+  | Coffre | 2 | 70 | Touche Interagir. |
+
+  **Plus de tas d'or au sol** {décidé, 30/09/2026} (Quentin : « les tas de pièces dans le donjon c'est ciao ») : leur or (4 × 20) est passé aux coffres, le total du donjon ne change pas (300). {{dev: `GameBalance.tasOrDonjon` = faux : le plan place toujours les 4 emplacements (même tirage, mêmes gardiens), mais `DonjonJeu.ButinActif` les cache et ils ne se ramassent plus ; les gardiens ne gardent que les coffres.}}
 
   **Ouvrir un coffre est gratuit** {décidé} : on ne dépense jamais d'or pour l'ouvrir. Plus tard, certains coffres pourront demander une **clé** {à confirmer}. L'invite dit seulement « Ouvrir le coffre », sans montant.
 
@@ -88,7 +89,7 @@ Le donjon est **régénéré chaque nuit** : chaque jour, le portail mène à un
 
   Un butin n'est pris qu'une fois : c'est l'hôte qui décide. Les montants augmentent de 10 % par nuit déjà passée. Tous les montants sont {à équilibrer}.
 - **Or porté** : l'or pris est **porté** par le joueur. Le HUD l'affiche sous la caisse commune (« or porté · au donjon »). Il est versé à la caisse commune au retour par le portail.
-- **Gardiens** : 6 squelettes gardent le butin, dont 35 % de guerriers et le reste de sbires {à équilibrer}. Ils apparaissent au lever du jour sur les points d'apparition les plus proches du butin. Ils restent à leur poste et poursuivent les joueurs qui approchent. Ils n'attaquent pas Nyxessa, ne rapportent pas d'or et disparaissent au crépuscule.
+- **Gardiens** : 6 squelettes gardent le butin, dont 35 % de guerriers et le reste de sbires {à équilibrer}. Ils apparaissent au lever du jour sur les points d'apparition les plus proches du butin. Ils restent à leur poste et poursuivent sans relâche les joueurs qu'ils voient, en alertant leurs voisins (voir [Le donjon](donjon.md), Gardiens). Ils n'attaquent pas Nyxessa, ne rapportent pas d'or et disparaissent au crépuscule.
 - **Ambiance** : pour le joueur au donjon, le lieu est sombre, éclairé par les torches, sans ciel.
 - **Eau** : ralentissement ×0,6, pour les héros comme pour les squelettes {à équilibrer}.
 - **Mort au donjon** {décidé} (26/09/2026) : un **sac** tombe là où le joueur est mort ; il matérialise tout l'or qu'il portait. N'importe quel joueur peut le **ramasser** tant que le donjon est ouvert ; s'il ne l'est pas, il est **perdu à la fermeture** du donjon. Le joueur réapparaît au village.

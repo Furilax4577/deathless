@@ -32,6 +32,9 @@ namespace Deathless.Jeu
         public float menuPeriode = 50f;
 
         float m_Distance;
+        float m_Decoupe;   // rayon de découpe courant (lissé), fraction de la hauteur de l'écran
+        static readonly int s_DecoupeCentre = Shader.PropertyToID("_DecoupeCentre");
+        static readonly int s_DecoupeRayon = Shader.PropertyToID("_DecoupeRayon");
         readonly RaycastHit[] m_Hits = new RaycastHit[16];
         Camera m_Camera;
         float m_ChampJeu;
@@ -182,6 +185,17 @@ namespace Deathless.Jeu
         readonly Collider[] m_Cols = new Collider[8];
 
         /// La caméra est-elle dans un collider (hors ceux qu'elle ignore) ?
+        /// Globales du shader Deathless/DonjonDecoupe : centre du disque sur le torse du héros (à l'écran), sa profondeur de
+        /// vue, la hauteur de ses pieds ; rayon 0 = pas de découpe.
+        void PoserDecoupe(float rayon)
+        {
+            if (rayon <= 0f || m_Camera == null || cible == null) { Shader.SetGlobalFloat(s_DecoupeRayon, 0f); return; }
+            Vector3 torse = cible.position + Vector3.up * 1.1f;
+            Vector3 v = m_Camera.WorldToViewportPoint(torse);
+            Shader.SetGlobalVector(s_DecoupeCentre, new Vector4(v.x, v.y, v.z, cible.position.y));
+            Shader.SetGlobalFloat(s_DecoupeRayon, rayon);
+        }
+
         bool DansUnCollider(Vector3 p)
         {
             int n = Physics.OverlapSphereNonAlloc(p, RayonLibre, m_Cols, ~0, QueryTriggerInteraction.Ignore);
@@ -194,6 +208,7 @@ namespace Deathless.Jeu
             var b = GameBalance.Courant;
             if (cible == null)
             {
+                PoserDecoupe(0f);
                 Quaternion r = Quaternion.Euler(menuRotation);
                 float s = menuPeriode > 0f ? Mathf.Sin(Time.time * 2f * Mathf.PI / menuPeriode) : 0f;
                 transform.position = menuPosition + r * Vector3.right * (menuBalancement * s);
@@ -205,18 +220,26 @@ namespace Deathless.Jeu
             if (m_Camera != null) m_Camera.fieldOfView = m_ChampJeu * (1f - 0.25f * m_Visee);
             Quaternion rot = Quaternion.Euler(tangage, lacet, 0f);
             Vector3 pivot = cible.position + Vector3.up * b.cameraHauteur;
-            float d = Recul(pivot, rot, b.cameraEpaule * (1f + 0.3f * m_Visee), b.cameraDistance * (1f - 0.3f * m_Visee), m_Hits, out Vector3 epaule);
+            float distanceVoulue = b.cameraDistance * (1f - 0.3f * m_Visee);
+            float d = Recul(pivot, rot, b.cameraEpaule * (1f + 0.3f * m_Visee), distanceVoulue, m_Hits, out Vector3 epaule);
             Vector3 dir = rot * Vector3.back;
+            // Donjon (30/09/2026, « see-through ») : la caméra garde sa distance, les murs et plafonds entre elle et le
+            // héros sont découpés en disque autour de lui (shader Deathless/DonjonDecoupe) au lieu de la rapprocher.
+            bool decoupe = Enceinte.HasValue && b.cameraDecoupeRayon > 0f;
+            if (decoupe) d = distanceVoulue;
             // Enceinte (donjon) : jamais au-delà des murs ni par-dessus.
             if (Enceinte.HasValue) d = Mathf.Max(ReculMin, Mathf.Min(d, Sortie(epaule, dir, Enceinte.Value) - 0.35f));
             m_Distance = m_Distance <= 0f ? d : (d < m_Distance ? d : Mathf.Lerp(m_Distance, d, 1f - Mathf.Exp(-6f * Time.deltaTime)));
             // Dernier filet : si la position retenue est dans un collider (pilier, bord d'un mur que les lancers ont longé),
             // la caméra se rapproche par pas de 0,2 m jusqu'à être libre.
             float recul = Mathf.Max(ReculMin, m_Distance);
-            for (int i = 0; i < 24 && recul > ReculMin && DansUnCollider(epaule + dir * recul); i++) recul = Mathf.Max(ReculMin, recul - 0.2f);
+            if (!decoupe)
+                for (int i = 0; i < 24 && recul > ReculMin && DansUnCollider(epaule + dir * recul); i++) recul = Mathf.Max(ReculMin, recul - 0.2f);
             if (recul < m_Distance) m_Distance = recul;
             transform.position = epaule + dir * recul;
             transform.rotation = rot;
+            m_Decoupe = Mathf.MoveTowards(m_Decoupe, decoupe ? b.cameraDecoupeRayon : 0f, Time.deltaTime * 0.8f);
+            PoserDecoupe(m_Decoupe);
             // Ivresse (taverne) : la caméra tangue doucement, sans toucher à la visée (le centre de l'écran reste le même).
             if (Ivresse.Active)
             {

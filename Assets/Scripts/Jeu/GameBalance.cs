@@ -92,6 +92,40 @@ namespace Deathless.Jeu
         public float abandonPoursuite = 15f;
         [Tooltip("Abandon après ce temps sans pouvoir frapper le joueur (s).")]
         public float abandonApres = 4f;
+
+        [Header("Course et esquive des squelettes (Quentin, 30/09/2026 ; wiki : ennemis.md, à équilibrer)")]
+        [Tooltip("Sbire, guerrier, voleur (pas le mage ni les boss) qui poursuivent un héros loin d'eux : vitesse × ce facteur " +
+            "(30/09/2026). Jamais en marche vers Nyxessa (les vagues gardent leur rythme).")]
+        public float courseFacteur = 1.45f;
+        [Tooltip("Plafond de la course (m/s) : pas plus vite qu'un héros qui court sans sprint (vitesse = 5) ; le sprint distance toujours.")]
+        public float courseVitesseMax = 5f;
+        [Tooltip("Le squelette se met à courir quand sa cible est plus loin que ça (m, horizontal)…")]
+        public float courseDistance = 6f;
+        [Tooltip("… et repasse au pas de charge en deçà de ça (m) : écart pour ne pas alterner à chaque image.")]
+        public float courseDistanceArret = 4f;
+        [Tooltip("Esquive (30/09/2026) : un héros à moins de cette distance (m), tourné vers le squelette, qui arme une attaque " +
+            "(RT : coup de mêlée, tir, boule) peut être esquivé.")]
+        public float esquiveEnnemiDetection = 3.5f;
+        [Tooltip("Le héros « fait face » au squelette si l'écart entre son avant et la direction du squelette est sous cet angle (°).")]
+        public float esquiveEnnemiAngle = 60f;
+        [Tooltip("Délai pendant lequel une attaque armée peut encore déclencher l'esquive (s) : réaction au geste, pas à un vieux coup.")]
+        public float esquiveEnnemiFenetre = 0.3f;
+        [Tooltip("Chance d'esquiver chaque attaque armée, par type (0 à 1) : sbire.")]
+        public float esquiveChanceSbire = 0.10f;
+        [Tooltip("Chance d'esquiver : guerrier (lourd, rarement).")]
+        public float esquiveChanceGuerrier = 0.05f;
+        [Tooltip("Chance d'esquiver : voleur (agile, souvent).")]
+        public float esquiveChanceVoleur = 0.35f;
+        [Tooltip("Recharge de l'esquive d'un squelette après une esquive (s, tirée entre x et y).")]
+        public Vector2 esquiveEnnemiRecharge = new Vector2(4f, 6f);
+        [Tooltip("Longueur du bond d'esquive (m ; le héros : 4).")]
+        public float esquiveEnnemiDistance = 3f;
+        [Tooltip("Durée du bond d'esquive (s ; le héros : 0,35).")]
+        public float esquiveEnnemiDuree = 0.4f;
+        [Tooltip("Invulnérabilité au début du bond (s ; comme le héros : 0,3).")]
+        public float esquiveEnnemiInvulnerable = 0.3f;
+        [Tooltip("Part des esquives sur le côté (le reste : en arrière).")]
+        public float esquiveEnnemiLaterale = 0.7f;
         [Tooltip("Un squelette plus près que ça du centre de Nyxessa la frappe (m, horizontal).")]
         public float rayonContactNyxessa = 3.2f;
         [Tooltip("Rayon des places autour de Nyxessa (m).")]
@@ -183,6 +217,58 @@ namespace Deathless.Jeu
         public int necroInvoquesMax = 12;
         public float necroEchelle = 0.92f;
 
+        [Header("Nyxar, kit complet (wiki : ennemis.md, Nyxar ; 30/09/2026, valeurs à équilibrer)")]
+        [Tooltip("Salve de crânes (grimoire intact) : nombre de crânes par salve et écart entre deux (s). Grimoire brisé : un seul crâne.")]
+        public int nyxarSalveCranes = 3;
+        public float nyxarSalveEcart = 0.3f;
+        [Tooltip("Téléportation (couronne intacte) : un joueur à moins de nyxarTeleportDeclencheur m la déclenche ; il réapparaît à une distance tirée entre x et y m ; recharge (s).")]
+        public float nyxarTeleportDeclencheur = 5f;
+        public Vector2 nyxarTeleportDistance = new Vector2(11f, 16f);
+        public float nyxarTeleportRecharge = 9f;
+        [Tooltip("Il ne s'éloigne pas à plus de ce rayon (m) de Nyxessa en se téléportant.")]
+        public float nyxarTeleportRayonNyxessa = 26f;
+        [Tooltip("Faux au corps à corps (phases 1 et 2) : portée (m), dégâts, préparation et intervalle (s). Parable.")]
+        public float nyxarFauxPortee = 2.6f;
+        public float nyxarFauxDegats = 30f;
+        public float nyxarFauxPreparation = 0.75f;
+        public float nyxarFauxIntervalle = 2.4f;
+        [Tooltip("Éclats de Nyx (couronne et grimoire) : PV de chacun (× multiplicateur de PV de la nuit). Chaque éclat brisé retire un tiers des PV max de Nyxar ; il n'est tuable qu'une fois les deux brisés.")]
+        public float nyxarEclatPV = 320f;
+        [Tooltip("Phase 3 (les deux éclats brisés) : enragé, au corps à corps à la faux. Vitesse (m/s), dégâts aux joueurs et à Nyxessa, préparation, intervalle (s), portée (m).")]
+        public float nyxarEnrageVitesse = 4.2f;
+        public float nyxarEnrageDegats = 38f;
+        public float nyxarEnrageDegatsNyxessa = 40f;
+        public float nyxarEnragePreparation = 0.6f;
+        public float nyxarEnrageIntervalle = 1.7f;
+        public float nyxarEnragePortee = 2.6f;
+
+        [Header("Morgrim, kit commun aux deux versions (wiki : ennemis.md, Morgrim ; 30/09/2026, valeurs à équilibrer)")]
+        [Tooltip("Chance (0-1) qu'une compétence commune prête (Balayage, Coup écrasé) passe avant la compétence de la version.")]
+        [Range(0f, 1f)] public float morgrimCommunChance = 0.45f;
+        [Tooltip("Balayage : arc de hache devant lui (rayon m, angle °), dégâts, recul (m/s), préparation et recharge (s). Parable.")]
+        public float morgrimBalayageRayon = 3.8f;
+        public float morgrimBalayageAngle = 200f;
+        public float morgrimBalayageDegats = 36f;
+        public float morgrimBalayageRecul = 5f;
+        public float morgrimBalayagePreparation = 1.5f;
+        public float morgrimBalayageRecharge = 9f;
+        [Tooltip("Coup écrasé : frappe par-dessus au sol, onde de choc autour de lui (vitesse m/s, rayon m, bande m) ; à sauter comme le Fracas ; dégâts et Renversé au sol.")]
+        public float morgrimEcraseDegats = 34f;
+        public float morgrimEcraseDegatsNyxessa = 45f;
+        public float morgrimEcraseOndeVitesse = 7f;
+        public float morgrimEcraseOndeRayonMax = 8f;
+        public float morgrimEcraseOndeLargeurBande = 1.3f;
+        public float morgrimEcrasePreparation = 1.8f;
+        public float morgrimEcraseRecharge = 14f;
+        [Tooltip("Cri : quand au moins morgrimCriSquelettesMin squelettes sont à moins de morgrimCriRayon m, il crie (préparation s) et les galvanise (statut Galvanisé) : dégâts +bonus, vitesse +bonus, pendant la durée (s). Recharge (s).")]
+        public float morgrimCriRayon = 12f;
+        public int morgrimCriSquelettesMin = 3;
+        public float morgrimCriPreparation = 1.1f;
+        public float morgrimCriRecharge = 22f;
+        public float morgrimCriDuree = 8f;
+        public float morgrimCriBonusDegats = 0.3f;
+        public float morgrimCriBonusVitesse = 0.25f;
+
         [Header("Nyxessa (wiki : nyxessa ; missiles par palier, achetés à la relique)")]
         public float nyxessaPV = 2000f;
         [Tooltip("Part des PV rendue à l'aube (0 : aucune, le wiki n'en parle pas).")]
@@ -255,11 +341,15 @@ namespace Deathless.Jeu
         public const int PalierMax = 5;
 
         [Header("Donjon (wiki : deroule.md, Le donjon ; 26/09/2026, à équilibrer)")]
-        [Tooltip("Or du grand coffre du 2e étage.")]
-        public int orGrandCoffre = 120;
-        [Tooltip("Or d'un coffre (deux par donjon).")]
-        public int orCoffre = 50;
-        [Tooltip("Or d'un tas d'or (quatre par donjon).")]
+        [Tooltip("Or du grand coffre du 2e étage. 30/09/2026 : 120 → 160, il reprend la moitié de l'or des tas retirés.")]
+        public int orGrandCoffre = 160;
+        [Tooltip("Or d'un coffre (deux par donjon). 30/09/2026 : 50 → 70, ils reprennent l'autre moitié de l'or des tas retirés.")]
+        public int orCoffre = 70;
+        [Tooltip("Tas d'or au sol du donjon (quatre par plan, ramassés en passant dessus). Retirés le 30/09/2026 (Quentin : « les " +
+            "tas de pièces dans le donjon c'est ciao ») : le plan les place toujours (même tirage, mêmes gardiens), mais ils ne sont " +
+            "ni montrés ni ramassables et les gardiens ne les gardent plus ; leur or est passé aux coffres.")]
+        public bool tasOrDonjon = false;
+        [Tooltip("Or d'un tas d'or (quatre par donjon), si tasOrDonjon.")]
         public int orTasOr = 20;
         [Tooltip("Hausse de l'or du donjon par nuit déjà passée (0,1 : +10 % par nuit).")]
         public float orDonjonParNuit = 0.1f;
@@ -269,6 +359,13 @@ namespace Deathless.Jeu
         public int gardiensDonjon = 6;
         [Tooltip("Part de guerriers parmi les gardiens.")]
         public float partGuerriersDonjon = 0.35f;
+        [Tooltip("Gardiens plus agressifs (Quentin, 30/09/2026) : un héros vu (ligne de vue, murs compris) à moins de cette distance (m) " +
+            "est poursuivi ; pas d'abandon au bout de abandonApres s sans frapper.")]
+        public float gardienDetection = 12f;
+        [Tooltip("Laisse d'un gardien (m) : il poursuit tant que sa cible reste à moins de ça de son poste, puis y retourne.")]
+        public float gardienLaisse = 20f;
+        [Tooltip("Alerte : un gardien qui repère un héros ou est frappé lance aussi les gardiens à moins de cette distance (m).")]
+        public float gardienAlerte = 8f;
         [Tooltip("Distance horizontale au centre d'un portail pour le passer avec la touche Interagir (m ; Quentin, 26/09/2026 : " +
                  "on n'entre plus en marchant dedans).")]
         public float distancePortail = 3f;
@@ -590,6 +687,9 @@ namespace Deathless.Jeu
         public float cameraDistance = 5.5f;
         public float cameraEpaule = 0.6f;
         public float cameraHauteur = 1.6f;
+        [Tooltip("Donjon (30/09/2026) : rayon de la découpe circulaire autour du héros, en fraction de la hauteur de l'écran " +
+            "(shader Deathless/DonjonDecoupe) ; 0 = pas de découpe (la caméra se rapproche contre les murs comme ailleurs).")]
+        public float cameraDecoupeRayon = 0.24f;
         [Tooltip("Tangage appliqué au début de la partie (CameraEpaule.Suivre), plus robuste que la valeur de scène. " +
             "22° : caméra plus haute (décision de Quentin, 26/09/2026, au lieu de 12° par défaut).")]
         public float cameraTangageDefaut = 22f;

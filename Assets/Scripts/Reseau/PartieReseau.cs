@@ -292,6 +292,44 @@ namespace Deathless.Reseau
         [Rpc(SendTo.NotServer)]
         void ZoneRpc(int index, byte action) => DirecteurVagues.Instance?.ActionZone(index, action);
 
+        /// Hôte : un joueur arrive en cours de partie (retour ou nouveau, Partie.ArriveeEnCours) ; ce qui ne lui arrive
+        /// autrement que par RPC ponctuels lui est rejoué, à lui seul : état des zones d'apparition (4 bits par zone :
+        /// 0 rien, 1 annoncée, 2 active) et bouclier levé (solidité max et restante). Le reste (horloge, Nyxessa, caisse,
+        /// paliers, scores, sorcier, donjon) est déjà dans les NetworkVariable.
+        public void Rattraper(ulong clientId)
+        {
+            if (!IsServer) return;
+            int zones = 0;
+            var dv = DirecteurVagues.Instance;
+            if (dv != null && dv.zones != null)
+                for (int i = 0; i < dv.zones.Length && i < 8; i++)
+                {
+                    var z = dv.zones[i];
+                    int e = z == null ? 0 : z.Etat == EtatZone.Annonce ? 1 : z.Etat == EtatZone.Active ? 2 : 0;
+                    zones |= e << (4 * i);
+                }
+            var bo = BouclierNyxessa.Instance;
+            bool leve = bo != null && (bo.Leve || bo.Incantation);
+            RattrapageRpc(zones, leve, leve ? bo.VieMax : 0f, leve ? bo.Vie : 0f, RpcTarget.Single(clientId, RpcTargetUse.Temp));
+        }
+
+        [Rpc(SendTo.SpecifiedInParams)]
+        void RattrapageRpc(int zones, bool bouclier, float max, float vie, RpcParams p = default)
+        {
+            var dv = DirecteurVagues.Instance;
+            if (dv != null && dv.zones != null)
+                for (int i = 0; i < dv.zones.Length && i < 8; i++)
+                {
+                    int e = (zones >> (4 * i)) & 0xF;
+                    if (e == 1) dv.ActionZone(i, 0);
+                    else if (e == 2) dv.ActionZone(i, 1);
+                }
+            var bo = BouclierNyxessa.Instance;
+            // Bouclier : relevé chez l'arrivant avec la solidité qui lui reste (les coups suivants, BouclierToucheRpc, le
+            // brisent au même moment que chez l'hôte ; seule sa teinte part du bleu, comme un bouclier neuf).
+            if (bouclier && bo != null && !bo.Leve) bo.LeverDistant(vie > 0f ? vie : max);
+        }
+
         public void PieceOr(Vector3 point) { if (IsServer) PieceOrRpc(point); }
 
         [Rpc(SendTo.NotServer)]

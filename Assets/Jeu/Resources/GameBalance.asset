@@ -138,6 +138,21 @@ MonoBehaviour:
   detectionJoueur: 8
   abandonPoursuite: 15
   abandonApres: 4
+  courseFacteur: 1.45
+  courseVitesseMax: 5
+  courseDistance: 6
+  courseDistanceArret: 4
+  esquiveEnnemiDetection: 3.5
+  esquiveEnnemiAngle: 60
+  esquiveEnnemiFenetre: 0.3
+  esquiveChanceSbire: 0.1
+  esquiveChanceGuerrier: 0.05
+  esquiveChanceVoleur: 0.35
+  esquiveEnnemiRecharge: {x: 4, y: 6}
+  esquiveEnnemiDistance: 3
+  esquiveEnnemiDuree: 0.4
+  esquiveEnnemiInvulnerable: 0.3
+  esquiveEnnemiLaterale: 0.7
   rayonContactNyxessa: 3.2
   rayonPlacesNyxessa: 2.4
   vitesseSortieDeTerre: 1.5
@@ -264,8 +279,8 @@ MonoBehaviour:
   orNyxar: 300
   prixPaliers: 64000000c80000005e01000026020000
   achatDistance: 5.2
-  orGrandCoffre: 120
-  orCoffre: 50
+  orGrandCoffre: 160
+  orCoffre: 70
   orTasOr: 20
   orDonjonParNuit: 0.1
   partGardeeRappel:
@@ -276,6 +291,9 @@ MonoBehaviour:
   - 0.75
   gardiensDonjon: 6
   partGuerriersDonjon: 0.35
+  gardienDetection: 12
+  gardienLaisse: 20
+  gardienAlerte: 8
   distancePortail: 3
   rayonTasOr: 1.4
   distanceCoffre: 2.4

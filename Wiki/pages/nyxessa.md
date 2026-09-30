@@ -67,6 +67,8 @@ De **jour**, sur le dessus du plateau de Nyxessa, la touche **Interagir** (E, X,
   - en temps normal, un missile par cible, en gardant un missile en réserve ;
   - contre un groupe de trois ennemis ou plus, ou contre un élite, une salve jusqu'à vider le stock sauf un ;
   - si Nyxessa est frappée, elle vide tout son stock.
+- **Pas de missile gâché** {décidé, 30/09/2026} : Nyxessa ne tire plus sur un ennemi que les missiles déjà en vol suffisent à tuer ; la salve passe à la cible suivante. {{dev: `MissileCrane.DegatsEnVol`, `DefenseNyxessa.Condamne`.}}
+- **Son de l'éclat** : le cri du crâne part à l'impact même (le son de Relic ne criait qu'après un quart à une demi-seconde) {décidé, 30/09/2026}. {{dev: `SonsDuJeu.MissileEclat` → `dl_nyxessa_missile_eclat`, `MissileEclatEnnemi` → `dl_mage_squelette_missile_eclat`.}}
 
 ## Bouclier
 
@@ -84,7 +86,7 @@ Un bouclier cylindrique de gemmes en lévitation protège Nyxessa {effet validé
 - **Riposte** : quand il est frappé, le bouclier **renvoie des dégâts** à l'attaquant.
 - **Canalisation** : au départ, le sorcier tient le bouclier par sa seule incantation. Une **amélioration** du sorcier lui apprend à **canaliser l'énergie de Nyxessa** : un lien d'énergie apparaît entre la relique et son bâton, et il puise dans sa force {décidé}. Elle s'obtient au **palier 4** du bouclier {décidé}.
   - **Effet** {décidé} : le bouclier devient **plus puissant encore**. Le sorcier puise dans l'**énergie** de Nyxessa, **jamais dans sa vie** : la relique ne perd rien. {{dev: Pas encore dans le jeu : seule la recharge des missiles est codée.}}
-  - **Signe visuel** {décidé} : un lien d'énergie se forme entre le **bâton levé** du sorcier et Nyxessa, tant qu'il canalise. Filet de gemmes vertes (thème Nyxessa) qui ondule légèrement, avec des gemmes qui voyagent le long du lien ; il s'illumine brièvement quand un coup fait avancer la recharge d'un missile. {{dev: (`Assets/VFX/FiletEnergie/FiletEnergie.cs`, branché par `BouclierNyxessa.SuivreCanalisation` / `Update` ; fiche `Docs/vfx.md`)}}
+  - **Signe visuel** {décidé} : un lien d'énergie se forme entre le **bâton levé** du sorcier et Nyxessa, tant qu'il canalise. Filet de gemmes vertes (thème Nyxessa) qui se comporte comme un **cordon souple** {décidé, 30/09/2026} : il pend un peu, se balance lentement, traîne quand le sorcier bouge et claque quand un coup fait avancer la recharge d'un missile ; des gemmes voyagent le long du lien ; il s'illumine brièvement quand un coup fait avancer la recharge d'un missile. {{dev: (`Assets/VFX/FiletEnergie/FiletEnergie.cs`, branché par `BouclierNyxessa.SuivreCanalisation` / `Update` ; fiche `Docs/vfx.md`)}}
   - Gain de puissance : {à équilibrer}.
   - **Recharge des missiles** {décidé} : dès ce palier, une part des dégâts que le bouclier encaisse avance aussi la recharge du **prochain missile** de Nyxessa (un gros coup peut en faire gagner plusieurs d'un coup) ; le taux (dégâts encaissés pour 1 s de recharge) est dans `GameBalance.bouclierDegatsParSecondeRecharge` {à équilibrer}. {{dev: (`BouclierNyxessa.Absorber` → `AvancerRechargeMissiles`)}}
 

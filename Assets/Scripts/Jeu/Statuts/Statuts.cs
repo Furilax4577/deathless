@@ -9,7 +9,9 @@ namespace Deathless.Jeu
     /// relevé — ; ce statut n'est que l'affichage réseau/HUD, comme Etourdi).
     /// PeauDeFer (27/09/2026) : bienfait du rugissement du viking, part des dégâts subis retirée (intensité 0,35 = −35 %),
     /// appliquée par Sante.absorbeur du héros (Heros.Initialiser).
-    public enum TypeStatut : byte { Aucun = 0, Brulure = 1, Ralenti = 2, Etourdi = 3, Ivresse = 4, Provoque = 5, Renverse = 6, PeauDeFer = 7 }
+    /// Galvanise (30/09/2026) : bienfait du cri de Morgrim sur les squelettes proches, dégâts portés +intensité (0,3 = +30 %,
+    /// appliqué par Sante.Encaisser d'après la source du coup) et vitesse +GameBalance.morgrimCriBonusVitesse (FacteurVitesse).
+    public enum TypeStatut : byte { Aucun = 0, Brulure = 1, Ralenti = 2, Etourdi = 3, Ivresse = 4, Provoque = 5, Renverse = 6, PeauDeFer = 7, Galvanise = 8 }
 
     /// D'où vient un statut (infobulle du menu du personnage : « Source »).
     public enum OrigineStatut : byte { Inconnue = 0, Joueur = 1, Ennemi = 2, Chute = 3, Taverne = 4, Eau = 5 }
@@ -126,7 +128,10 @@ namespace Deathless.Jeu
             get
             {
                 float r = Intensite(TypeStatut.Ralenti);
-                return r > 0f ? Mathf.Clamp(1f - r, 0.1f, 1f) : 1f;
+                float f = r > 0f ? Mathf.Clamp(1f - r, 0.1f, 1f) : 1f;
+                // Galvanisé (cri de Morgrim) : vitesse accrue.
+                if (A(TypeStatut.Galvanise)) f *= 1f + GameBalance.Courant.morgrimCriBonusVitesse;
+                return f;
             }
         }
 

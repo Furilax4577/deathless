@@ -82,6 +82,11 @@ namespace Deathless.Jeu
         public float Encaisser(InfoDegats info)
         {
             if (Mort || !isActiveAndEnabled) return 0f;
+            // Squelette galvanisé par le cri de Morgrim (statut Galvanisé, 30/09/2026) : ses coups portent plus fort. Avant
+            // le relais : un coup ennemi est calculé chez l'hôte, même s'il vise le héros d'un autre poste.
+            if (info.equipeSource == Equipe.Ennemis && info.source != null && info.montant > 0f && info.source.TryGetComponent<Squelette>(out var sq)
+                && sq.Statuts != null && sq.Statuts.A(TypeStatut.Galvanise))
+                info.montant *= 1f + sq.Statuts.Intensite(TypeStatut.Galvanise);
             if (relais != null)
             {
                 if (info.montant <= 0f) return 0f;

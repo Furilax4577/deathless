@@ -145,6 +145,8 @@ MonoBehaviour:
     image: {fileID: 7388822144124034973, guid: 59292cb6183f7e846a2fe827dac22107, type: 3}
   - id: statut_etourdi
     image: {fileID: 7388822144124034973, guid: a806ef817e6239248882860f486bc9bb, type: 3}
+  - id: statut_galvanise
+    image: {fileID: 7388822144124034973, guid: 4322397d8ac503248a183bcee7730360, type: 3}
   - id: statut_ivresse
     image: {fileID: 7388822144124034973, guid: e845a4bb5e951c74ca680deccf600bc1, type: 3}
   - id: statut_peau_de_fer

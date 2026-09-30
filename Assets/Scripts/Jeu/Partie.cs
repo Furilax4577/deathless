@@ -145,8 +145,9 @@ namespace Deathless.Jeu
             return new EtatJoueur { id = id, nom = nom, classe = def != null ? def.nom : "Paladin", classeId = classeId, enduranceMax = b.endurance, endurance = b.endurance };
         }
 
-        /// Le joueur local et son héros entrent en jeu : la partie commence (jour qui précède la nuit de départ).
-        void Commencer(EtatJoueur j, Heros h)
+        /// Le joueur local et son héros entrent en jeu : la partie commence (jour qui précède la nuit de départ), ou, pour
+        /// un client qui arrive en cours de partie, directement à la phase et à la nuit de l'hôte.
+        void Commencer(EtatJoueur j, Heros h, Phase? phaseHote = null, int nuitHote = 0)
         {
             var b = B;
             ClasseChoisie = j.classeId;
@@ -160,11 +161,11 @@ namespace Deathless.Jeu
                 HerosLocal = h;
                 if (cameraJeu != null) cameraJeu.Suivre(h.transform);
             }
-            Etat.nuit = Mathf.Clamp(b.nuitDeDepart, 1, b.nuitsPourGagner);
+            Etat.nuit = nuitHote > 0 ? Mathf.Clamp(nuitHote, 1, b.nuitsPourGagner) : Mathf.Clamp(b.nuitDeDepart, 1, b.nuitsPourGagner);
             Etat.duree = 0f;
-            Journal("Partie lancée (" + j.classeId + ", nuit de départ " + Etat.nuit + ", vitesse ×" + b.vitesseCycle + ")");
+            Journal("Partie lancée (" + j.classeId + ", nuit " + (phaseHote.HasValue ? "de l'hôte " : "de départ ") + Etat.nuit + ", vitesse ×" + b.vitesseCycle + ")");
             PartieLancee?.Invoke();
-            Passer(b.commencerALaNuit ? Phase.Crepuscule : Phase.Jour);
+            Passer(phaseHote ?? (b.commencerALaNuit ? Phase.Crepuscule : Phase.Jour));
         }
 
         // ----------------------------------------------------------------- Multijoueur (Docs/reseau.md)
@@ -208,12 +209,98 @@ namespace Deathless.Jeu
             }
         }
 
-        /// Le héros de ce poste est apparu (réseau) : la partie commence ici.
+        /// Le héros de ce poste est apparu (réseau) : la partie commence ici. Arrivée en cours de partie (retour après une
+        /// coupure, ou nouveau joueur) : ce poste se cale sur l'horloge de l'hôte (phase, nuit ; le temps suit par
+        /// SuivreHote) au lieu de repartir du jour de départ, et retrouve ses rangs de compétence s'il revient.
         public void LancerReseau(Heros h, string classeId, string pseudo, ulong clientId)
         {
             if (Etat.phase != Phase.Attente || h == null) return;
             var def = Definition(ref classeId);
-            Commencer(NouveauJoueur(IdJoueur(clientId), pseudo, classeId, def), h);
+            var j = NouveauJoueur(IdJoueur(clientId), pseudo, classeId, def);
+            var r = PartieReseau.Instance;
+            var ph = r != null ? (Phase)r.Phase.Value : Phase.Attente;
+            if (ClientReseau && ph != Phase.Attente && ph != Phase.Terminee)
+            {
+                bool retour = Rattraper(j, r.Nuit.Value, ph);
+                Commencer(j, h, ph, r.Nuit.Value);
+                string msg = (retour ? "De retour dans la partie" : "Tu rejoins la partie en cours") + " (nuit " + Etat.nuit + ").";
+                DonjonJeu.Instance?.Annoncer(msg, 6f);
+                ReseauJeu.Journal("arrivée en cours de partie : " + ph + ", nuit " + Etat.nuit + (retour ? ", rangs retrouvés" : "") + ", " + j.pointsCompetence + " point(s)");
+                return;
+            }
+            Commencer(j, h);
+        }
+
+        /// Client qui revient après une coupure : ce que ce poste tenait seul (rangs, points, jours survécus), gardé à la
+        /// déconnexion (GarderPourRetour) pour le code du salon. Survit au rechargement du village.
+        sealed class Retour { public string code, classeId; public int[] rangs; public int points, nuits; }
+        static Retour s_Retour;
+
+        /// Client déconnecté en partie (LobbyReseau.SurDeconnexion) : rangs et points de compétence gardés pour un retour
+        /// par le même code.
+        public void GarderPourRetour(string code)
+        {
+            var j = m_Local;
+            if (j == null || string.IsNullOrEmpty(code)) { s_Retour = null; return; }
+            s_Retour = new Retour { code = code, classeId = j.classeId, rangs = (int[])j.rangs?.Clone(), points = j.pointsCompetence, nuits = j.nuitsSurvecues };
+        }
+
+        /// Arrivée en cours de partie : jours survécus d'après l'horloge de l'hôte (1 point par aube passée depuis la nuit
+        /// de départ) ; au retour du même joueur (même code, même classe), ses rangs et ses points gardés, plus les aubes
+        /// passées pendant son absence. Vrai si c'est un retour.
+        bool Rattraper(EtatJoueur j, int nuit, Phase ph)
+        {
+            var b = B;
+            int nuits = Mathf.Max(0, nuit - Mathf.Clamp(b.nuitDeDepart, 1, b.nuitsPourGagner) + (ph == Phase.Aube ? 1 : 0));
+            var lobby = ReseauJeu.Instance != null ? ReseauJeu.Instance.Lobby : null;
+            var r = s_Retour;
+            s_Retour = null;
+            if (r != null && lobby != null && r.code == lobby.CodeSalon && r.classeId == j.classeId)
+            {
+                if (r.rangs != null) j.rangs = r.rangs;
+                j.nuitsSurvecues = Mathf.Max(r.nuits, nuits);
+                j.pointsCompetence = r.points + Mathf.Max(0, nuits - r.nuits);
+                return true;
+            }
+            j.nuitsSurvecues = nuits;
+            j.pointsCompetence = nuits;
+            return false;
+        }
+
+        /// Hôte : un joueur arrive en cours de partie (ReseauJeu, après sa synchronisation) : son état est remis dans
+        /// Etat.joueurs s'il revient (score, or porté ; nouvel identifiant de poste), puis son héros de sa classe apparaît
+        /// près de Nyxessa ; ce qui n'a été envoyé que par RPC ponctuels (zones, bouclier) lui est rejoué.
+        public void ArriveeEnCours(JoueurSalon js, EtatJoueur ancien)
+        {
+            var nm = ReseauJeu.Instance != null ? ReseauJeu.Instance.Reseau : null;
+            if (nm == null || !nm.IsServer || !nm.ConnectedClients.ContainsKey(js.clientId)) return;
+            string classeId = js.classeId.ToString();
+            var def = Definition(ref classeId);
+            if (def == null || def.prefab == null || def.prefab.GetComponent<Unity.Netcode.NetworkObject>() == null)
+            {
+                Debug.LogError("[Réseau] préfab réseau manquant pour la classe " + classeId);
+                return;
+            }
+            int id = IdJoueur(js.clientId);
+            if (ancien != null)
+            {
+                ancien.id = id;
+                ancien.nom = js.pseudo.ToString();
+                ancien.mort = false;
+                ancien.reapparitionRestante = 0f;
+                ancien.pret = false;
+                if (Joueur(id) == null) Etat.joueurs.Add(ancien);
+            }
+            Vector3 centre = nyxessa != null ? nyxessa.transform.position : Vector3.zero;
+            Vector3 p = PointReapparition(pointDepart != null ? pointDepart.position : centre);
+            Vector3 dehors = new Vector3(p.x - centre.x, 0f, p.z - centre.z);
+            Quaternion rot = dehors.sqrMagnitude > 0.01f ? Quaternion.LookRotation(dehors.normalized) : Quaternion.identity;
+            var go = Instantiate(def.prefab, p, rot);
+            go.GetComponent<HerosReseau>().Preparer(js.pseudo.ToString(), classeId);
+            go.GetComponent<Unity.Netcode.NetworkObject>().SpawnAsPlayerObject(js.clientId, true);
+            PartieReseau.Instance?.Rattraper(js.clientId);
+            DonjonJeu.Instance?.Annoncer(js.pseudo + (ancien != null ? " est de retour." : " rejoint la partie."), 5f);
+            ReseauJeu.Journal("héros de " + js.pseudo + " (" + classeId + ") apparu en cours de partie pour le client " + js.clientId + (ancien != null ? " (retour : score et or gardés)" : ""));
         }
 
         /// Héros d'un autre poste : marionnette (position et animations par le réseau), hors de Etat.joueurs.
@@ -221,7 +308,8 @@ namespace Deathless.Jeu
         {
             if (h == null) return;
             var def = Definition(ref classeId);
-            var j = NouveauJoueur(IdJoueur(clientId), pseudo, classeId, def);
+            // Hôte : un joueur qui revient en cours de partie a déjà son état (score, or porté) remis dans Etat.joueurs.
+            var j = (ReseauJeu.Autorite ? Joueur(IdJoueur(clientId)) : null) ?? NouveauJoueur(IdJoueur(clientId), pseudo, classeId, def);
             h.DevenirDistant();
             h.Initialiser(this, j);
             PoserHeros(j.id, h);
@@ -236,14 +324,119 @@ namespace Deathless.Jeu
             int id = IdJoueur(clientId);
             if (m_Distants.Remove(id)) RetirerHeros(id);
             var j = Joueur(id);
-            if (j != null && j != m_Local) Etat.joueurs.Remove(j);
+            if (j != null && j != m_Local) { Etat.joueurs.Remove(j); m_Detaches[id] = j; }
         }
 
-        /// Hôte : un joueur a quitté la partie (son héros disparaît avec lui).
-        public void JoueurParti(ulong clientId)
+        /// Etats retirés avec leur héros (Netcode despawne le héros d'un client avant d'annoncer son départ) : JoueurParti
+        /// les retrouve pour les garder au retour du joueur.
+        readonly Dictionary<int, EtatJoueur> m_Detaches = new Dictionary<int, EtatJoueur>();
+
+        /// Hôte : un joueur a quitté la partie (son héros disparaît avec lui). Renvoie son état (score, or porté), que
+        /// ReseauJeu garde pour son retour.
+        public EtatJoueur JoueurParti(ulong clientId)
         {
             Journal("Joueur " + IdJoueur(clientId) + " a quitté la partie");
+            int id = IdJoueur(clientId);
+            var j = Joueur(id);
+            if (j == null) m_Detaches.TryGetValue(id, out j);
             DetacherHeros(clientId);
+            m_Detaches.Remove(id);
+            return j != null && j != m_Local ? j : null;
+        }
+
+        // ----------------------------------------------------------------- Perte du réseau (hôte) : la partie continue seule
+
+        struct EnnemiGarde { public TypeEnnemi type; public bool elite; public Vector3 position; public Quaternion rotation; public float pv, pvMax; }
+        readonly List<EnnemiGarde> m_EnnemisGardes = new List<EnnemiGarde>();
+        bool m_HerosGarde, m_HerosGardeMort;
+        Vector3 m_HerosGardePos;
+        Quaternion m_HerosGardeRot;
+        float m_HerosGardePv, m_HerosGardePvMax;
+
+        /// Hôte, juste avant l'arrêt non voulu de Netcode (ReseauJeu, OnPreShutdown) : les objets réseau vont être
+        /// détruits ; on note le héros local (position, vie) et les squelettes vivants (type, élite, position, vie).
+        public void NoterAvantPerteReseau()
+        {
+            m_HerosGarde = false;
+            m_EnnemisGardes.Clear();
+            var h = HerosLocal;
+            if (h != null)
+            {
+                m_HerosGarde = true;
+                m_HerosGardePos = h.transform.position;
+                m_HerosGardeRot = h.transform.rotation;
+                m_HerosGardePv = h.Sante != null ? h.Sante.Pv : 0f;
+                m_HerosGardePvMax = h.Sante != null ? h.Sante.pvMax : 0f;
+                m_HerosGardeMort = m_Local != null && m_Local.mort || !h.Vivant;
+            }
+            var dv = DirecteurVagues.Instance;
+            if (dv != null)
+                foreach (var sq in dv.Vivants)
+                {
+                    // Les gardiens du donjon ne sont pas reposés (le donjon se referme au crépuscule).
+                    if (sq == null || !sq.Vivant || sq.Sante == null || sq.Sante.Mort || sq.Gardien) continue;
+                    m_EnnemisGardes.Add(new EnnemiGarde { type = sq.type, elite = sq.elite, position = sq.transform.position, rotation = sq.transform.rotation, pv = sq.Sante.Pv, pvMax = sq.Sante.pvMax });
+                }
+            Journal("Réseau perdu : héros et " + m_EnnemisGardes.Count + " squelettes notés");
+        }
+
+        /// Hôte, une image après l'arrêt non voulu de Netcode : la partie continue en solo, sans rechargement. Le héros
+        /// local est recréé (objet local, même classe, même état de joueur : score, or, rangs de compétence ; même
+        /// position et même vie, ou au point de réapparition s'il était mort) et suivi par la caméra ; les squelettes
+        /// détruits avec les objets réseau sont reposés ici ; les vagues à venir, Nyxessa, le sorcier et le cycle
+        /// continuent (ce poste faisait déjà autorité).
+        public void ContinuerSeul()
+        {
+            if (ReseauJeu.Actif) return;
+            m_Distants.Clear();
+            for (int i = Etat.joueurs.Count - 1; i >= 0; i--) if (Etat.joueurs[i] != m_Local) Etat.joueurs.RemoveAt(i);
+            for (int i = m_ListeHeros.Count - 1; i >= 0; i--) if (m_ListeHeros[i] == null) m_ListeHeros.RemoveAt(i);
+            var morts = new List<int>();
+            foreach (var kv in m_Heros) if (kv.Value == null) morts.Add(kv.Key);
+            foreach (var k in morts) m_Heros.Remove(k);
+            var j = m_Local;
+            if (j != null && HerosLocal == null && m_HerosGarde)
+            {
+                string classeId = j.classeId;
+                var def = Definition(ref classeId);
+                var prefab = def != null && def.prefab != null ? def.prefab : prefabHeros;
+                if (prefab != null)
+                {
+                    Vector3 p = m_HerosGardeMort ? PointReapparition(m_HerosGardePos) : m_HerosGardePos;
+                    var go = Instantiate(prefab, p, m_HerosGardeRot);
+                    go.name = "Heros_" + classeId;
+                    var h = go.GetComponent<Heros>();
+                    h.Initialiser(this, j);
+                    if (!m_HerosGardeMort && m_HerosGardePvMax > 0f) h.Sante.Fixer(Mathf.Max(1f, m_HerosGardePv), Mathf.Max(h.Sante.pvMax, m_HerosGardePvMax));
+                    j.mort = false;
+                    j.reapparitionRestante = 0f;
+                    h.EcrireEtat(j);
+                    PoserHeros(j.id, h);
+                    HerosLocal = h;
+                    if (cameraJeu != null) cameraJeu.Suivre(h.transform);
+                }
+            }
+            int reposes = 0;
+            var dv = DirecteurVagues.Instance;
+            if (dv != null)
+            {
+                dv.OublierDisparus();
+                if (EnCours)
+                    foreach (var e in m_EnnemisGardes)
+                    {
+                        var sq = dv.Poser(e.type, e.position, e.elite, false);
+                        if (sq == null) continue;
+                        sq.transform.rotation = e.rotation;
+                        if (e.pvMax > 0f) sq.Sante.Fixer(e.pv, e.pvMax);
+                        reposes++;
+                    }
+            }
+            m_EnnemisGardes.Clear();
+            m_HerosGarde = false;
+            Etat.comptePret = false;
+            if (Etat.phase == Phase.Jour) EvaluerPrets();
+            DonjonJeu.Instance?.Annoncer("Connexion perdue : la partie continue en solo.", 8f);
+            ReseauJeu.Journal("partie continuée en solo (" + Etat.phase + ", nuit " + Etat.nuit + ", " + reposes + " squelettes reposés)");
         }
 
         /// Vote « prêt » (jour) ou Rejouer (écran de score).

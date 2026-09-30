@@ -89,5 +89,12 @@ namespace Deathless.UI.Donnees
 
         /// Quitte le salon (retour à l'écran d'entrée).
         void Quitter();
+
+        /// Dernier code de salon utilisé (vide s'il n'y en a pas) : pré-rempli à l'entrée du lobby, pour revenir dans
+        /// une partie en cours après une coupure (Docs/reseau.md).
+        string DernierCode => "";
+
+        /// Dernière adresse IP rejointe (secours), pré-remplie de même.
+        string DerniereAdresse => "";
     }
 }

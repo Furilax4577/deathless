@@ -61,6 +61,12 @@ namespace Deathless.Jeu
                 nefaste = false,
                 effet = s => "Dégâts subis réduits de " + Mathf.RoundToInt(s.intensite * 100f) + " % (rugissement).",
             },
+            new DefinitionStatut
+            {
+                type = TypeStatut.Galvanise, id = "galvanise", nom = "Galvanisé", icone = "statut_galvanise", regle = RegleCumul.Prolonger,
+                nefaste = false,
+                effet = s => "Dégâts portés augmentés de " + Mathf.RoundToInt(s.intensite * 100f) + " % et déplacements plus rapides (cri de Morgrim).",
+            },
         };
 
         public static DefinitionStatut De(TypeStatut type)

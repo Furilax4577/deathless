@@ -11,10 +11,23 @@ Le donjon est décrit dans le [Déroulé d'une partie](deroule.md) (portails, bu
 - **Des murets** : entre deux halls du rez, quelques murets pleins d'un mètre (bloc de pierre), jamais un mur écrasé.
 - **Le dessous des étages est un plafond** : sous chaque plancher d'étage, une dalle de plafond ; sous une mezzanine ou la tour, une lumière d'appoint (torchère).
 - **Les ossements décorent, ils n'accueillent pas** : un ossement est posé près de chaque point d'apparition, à 1,6 m au moins ; un squelette ne sort plus de terre à travers un crâne. Les tonneaux et caisses des coins ne sont jamais sur un point d'apparition.
-- **Un coffre ouvert est vide** : à l'ouverture, une fois l'or crédité, le tas de pièces s'envole en gemmes d'or ; il ne reste rien « à ramasser ». Un tas d'or au sol disparaît en étant ramassé.
+- **Un coffre ouvert est vide** : à l'ouverture, une fois l'or crédité, le tas de pièces s'envole en gemmes d'or ; il ne reste rien « à ramasser ». Il n'y a plus de tas d'or au sol (30/09/2026, voir [Déroulé d'une partie](deroule.md)).
 - **La dalle d'arrivée** : une dalle de bois sombre marque le point d'arrivée. Les grilles d'égout ne sont plus tirées au hasard : une par bloc de hall au plus, jamais sous un point d'apparition ni à l'arrivée.
-- **La caméra reste dans l'enceinte** : jamais dans un mur, un pilier ou un coffre, jamais par-dessus le mur d'enceinte.
+- **La caméra reste dans l'enceinte** : jamais par-dessus le mur d'enceinte.
+- **Découpe autour du héros** {décidé, 30/09/2026} (procédé dit « see-through » ou découpe d'occlusion) : au donjon, la caméra garde sa distance au lieu de se coller aux murs ; les murs, poutres et plafonds qui passent entre elle et le héros sont découpés dans un disque centré sur lui (bord en damier, sans transparence). Le sol qu'il foule et tout ce qui est derrière lui restent pleins. Rayon {à équilibrer} (un quart de la hauteur de l’écran). {{dev: shader `Deathless/DonjonDecoupe` (`Assets/Art/Shaders/DonjonDecoupe.shader` + `DonjonDecoupeCommun.hlsl`, variante d'URP Lit sur le modèle de `ForetDither` ; passes couleur, profondeur et normales découpées, ombre pleine), matériau `KayKit_Dungeon_Decoupe.mat` (`DonjonKit.materiauDecoupe`) et copies à la volée des autres matériaux Lit dans `DonjonGenerateur.Decoupe` ; globales `_DecoupeCentre` / `_DecoupeRayon` posées par `CameraEpaule.PoserDecoupe` ; `GameBalance.cameraDecoupeRayon` 0,24.}}
+- **On ne frappe pas à travers les murs** {décidé, 30/09/2026} : un coup de mêlée ou de zone ne touche qu'un ennemi du même étage (1,8 m d'écart au plus) et sans mur, sol ni plafond entre le torse du héros et le sien. {{dev: `Combat.Ennemis` : `EcartHauteurMax` et `Combat.Degage` (rayon, personnages et feuillage ignorés) ; vaut partout, pas seulement au donjon.}}
 - **Le HUD** : le message du donjon (« Rappelé par Nyxessa… », « N or versés… ») s'affiche sous la pastille de phase et sous la bannière de nuit, jamais dessus ; l'invite « Prêts » du vote n'apparaît pas au donjon.
+
+## Gardiens {décidé, 30/09/2026}
+
+Les gardiens du butin (voir [Déroulé d'une partie](deroule.md)) sont **agressifs** : retour de test de Quentin du 30/09/2026, « les ennemis dans le donjon ne sont pas assez agressifs ».
+
+- **Ils voient plus loin, mais pas à travers les murs** : un joueur en ligne de vue à moins de 12 m est poursuivi {à équilibrer}.
+- **Ils ne lâchent pas** : plus d'abandon au bout de quelques secondes sans frapper ; un gardien poursuit tant que sa cible reste à moins de 20 m de son poste (sa « laisse »), puis y retourne {à équilibrer}.
+- **Ils donnent l'alerte** : un gardien qui repère un joueur ou qui est frappé (de n'importe où dans sa laisse, flèche comprise) lance aussi les gardiens à moins de 8 m {à équilibrer}.
+- **Ils courent et esquivent** comme les squelettes des vagues (voir [Ennemis](ennemis.md), Comportement).
+
+{{dev: `Squelette.Gardien` : `JoueurProche` (ligne de vue `LigneDeVue`, laisse `DansLaLaisse`), `MajPoursuite` (abandon à la laisse seulement), `OnTouche` et `AlerterGardiens` (une seule vague d'alerte, pas de relais). `GameBalance.gardienDetection` 12, `gardienLaisse` 20, `gardienAlerte` 8.}}
 
 ## Notes de développement {dev}
 

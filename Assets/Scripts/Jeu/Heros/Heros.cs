@@ -391,6 +391,12 @@ namespace Deathless.Jeu
             Declencher(P_Dodge);
         }
 
+        /// Dernière attaque armée par ce héros (Time.time de ce poste ; -99 : aucune). Posée chez le propriétaire à l'appui
+        /// de RT (coup de mêlée, tir, boule), et chez les autres postes (l'hôte compris) à la réception de l'effet commun
+        /// EffetAttaque : l'hôte, qui tient les squelettes, y lit qu'un héros arme un coup (esquive des squelettes, 30/09/2026).
+        public float DerniereAttaque { get; private set; } = -99f;
+        public void MarquerAttaque() => DerniereAttaque = Time.time;
+
         /// Pendant une ruée ou un bond, le héros traverse les squelettes (sauf `sauf`) ; seul le décor l'arrête.
         readonly System.Collections.Generic.List<Collider> m_Ignores = new System.Collections.Generic.List<Collider>();
         public void TraverserEnnemis(bool traverser, Squelette sauf = null)
@@ -425,7 +431,12 @@ namespace Deathless.Jeu
                 case "Jump": Sauter(); break;
                 case "Dodge": Esquiver(); break;
                 default:
-                    if (m_EtatCourant == Etat.Libre && Classe != null) Classe.SurAction(action);
+                    if (m_EtatCourant == Etat.Libre && Classe != null)
+                    {
+                        Classe.SurAction(action);
+                        // Attaque armée (RT : coup, tir, boule) : signal lu par l'esquive des squelettes, envoyé à l'hôte.
+                        if (action == "AttackPrimary") { MarquerAttaque(); Classe.DiffuserCommun(ClasseHeros.EffetAttaque); }
+                    }
                     break;
             }
         }

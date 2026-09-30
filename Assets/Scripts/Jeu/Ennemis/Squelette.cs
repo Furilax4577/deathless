@@ -12,7 +12,8 @@ namespace Deathless.Jeu
     [RequireComponent(typeof(NavMeshAgent), typeof(Sante))]
     public class Squelette : MonoBehaviour
     {
-        public enum Etat { SortieDeTerre, Marche, Poursuite, Preparation, Recuperation, Etourdi, Mort }
+        /// Esquive (30/09/2026) : bond latéral ou arrière devant un héros qui arme un coup (ajouté en fin de liste).
+        public enum Etat { SortieDeTerre, Marche, Poursuite, Preparation, Recuperation, Etourdi, Mort, Esquive }
 
         [Header("Réglages (posés par le directeur des vagues)")]
         public TypeEnnemi type;
@@ -77,6 +78,9 @@ namespace Deathless.Jeu
         protected static readonly int P_Hit = Animator.StringToHash("Hit");
         protected static readonly int P_Stun = Animator.StringToHash("Stun");
         protected static readonly int P_Dead = Animator.StringToHash("Dead");
+        protected static readonly int P_Dodge = Animator.StringToHash("Dodge");
+        /// Direction du clip d'esquive par rapport à la face (0 Avant, 1 Droite, 2 Arrière, 3 Gauche ; comme le héros).
+        protected static readonly int P_DodgeDir = Animator.StringToHash("DodgeDir");
 
         protected Partie P => Partie.Instance;
         protected GameBalance B => GameBalance.Courant;
@@ -86,6 +90,8 @@ namespace Deathless.Jeu
         /// Nyxessa et ne rapporte pas d'or (le butin du donjon est dans les coffres).
         public bool Gardien { get; private set; }
         public void Garder(Vector3 poste) { Gardien = true; m_Place = poste; }
+        /// Poste d'un gardien (sa place ; pour les autres, la place autour de Nyxessa).
+        public Vector3 Poste => m_Place;
 
         protected virtual void Awake()
         {
@@ -208,16 +214,21 @@ namespace Deathless.Jeu
             }
             // Eau du donjon (bassin) : ralentit (le NavMesh la contourne déjà quand c'est plus court en temps).
             // Statut Ralenti : même facteur, par-dessus l'eau.
-            if (Agent.enabled && m_Stats.vitesse > 0f) Agent.speed = m_Stats.vitesse * Deathless.Donjon.ZoneEau.FacteurEn(transform.position + Vector3.up * 0.2f)
+            // Course (30/09/2026) : le pas de base devient une course (VitesseCourse) quand la cible est loin (Court).
+            if (Agent.enabled && m_Stats.vitesse > 0f) Agent.speed = (Court ? VitesseCourse : m_Stats.vitesse) * Deathless.Donjon.ZoneEau.FacteurEn(transform.position + Vector3.up * 0.2f)
                 * (Statuts != null ? Statuts.FacteurVitesse : 1f);
-            if (animator != null) animator.SetFloat(P_Speed, Agent.enabled && !Agent.isStopped ? Mathf.Clamp01(Agent.velocity.magnitude / Mathf.Max(0.1f, m_Stats.vitesse)) * 0.5f : 0f);
+            if (animator != null) animator.SetFloat(P_Speed, Agent.enabled && !Agent.isStopped ? VitesseAnimation(Agent.velocity.magnitude) : 0f);
+            // Invulnérable au début du bond d'esquive (comme le héros), recalculé à chaque image : rien ne reste bloqué.
+            Sante.invulnerable = m_Etat == Etat.Esquive && m_EtatDepuis < B.esquiveEnnemiInvulnerable;
             if (P != null && (P.Etat.phase == Phase.Terminee || P.Etat.nyxessa.detruite) && m_Etat != Etat.Mort)
             {
                 Agent.isStopped = true;
                 return;
             }
+            if (PeutEsquiverMaintenant) GuetterAttaques();
             switch (m_Etat)
             {
+                case Etat.Esquive: MajEsquive(dt); break;
                 case Etat.SortieDeTerre: MajSortie(); break;
                 case Etat.Marche: MajMarche(dt); break;
                 case Etat.Poursuite: MajPoursuite(dt); break;
@@ -261,6 +272,130 @@ namespace Deathless.Jeu
             if (Agent.enabled) Agent.isStopped = false;
         }
 
+        // ----------------------------------------------------------------- Course et esquive (Quentin, 30/09/2026)
+
+        bool m_Court;
+        float m_EsquivePossible;          // Time.time à partir duquel une nouvelle esquive est permise (recharge)
+        float m_AttaqueJugee = -99f;      // dernière attaque de héros déjà jugée (une seule chance par attaque)
+        Vector3 m_EsquiveDir;
+        Heros m_EsquiveDe;
+        /// Tests : esquives faites par ce squelette.
+        public int Esquives { get; private set; }
+
+        /// Sbire, guerrier, voleur (élites compris) : courent en poursuite et esquivent. Le mage garde ses distances,
+        /// Morgrim et le Nécromancien ont leur propre comportement.
+        protected virtual bool Agile => type == TypeEnnemi.Sbire || type == TypeEnnemi.Guerrier || type == TypeEnnemi.Voleur;
+
+        /// Court en ce moment : poursuite d'un héros loin de lui (jamais en marche vers Nyxessa).
+        public bool Court => m_Court && m_Etat == Etat.Poursuite && Agile;
+
+        /// Vitesse de course : vitesse × courseFacteur, plafonnée à courseVitesseMax (jamais sous le pas de base).
+        protected float VitesseCourse => Mathf.Max(m_Stats.vitesse, Mathf.Min(m_Stats.vitesse * B.courseFacteur, B.courseVitesseMax));
+
+        /// Paramètre Speed du blend tree : 0 arrêt, 0,5 pas de base (Walking_A), 1 course (Running_A, Squelette_Jeu).
+        float VitesseAnimation(float v)
+        {
+            float vb = Mathf.Max(0.1f, m_Stats.vitesse);
+            if (v <= vb || !Agile) return Mathf.Clamp01(v / vb) * 0.5f;
+            float vc = VitesseCourse;
+            return vc <= vb + 0.05f ? 0.5f : 0.5f + 0.5f * Mathf.Clamp01((v - vb) / (vc - vb));
+        }
+
+        /// Hystérésis de la course : au-delà de courseDistance il court, en deçà de courseDistanceArret il reprend le pas.
+        void MajCourse(float distanceCible)
+        {
+            m_Court = m_Court ? distanceCible > B.courseDistanceArret : distanceCible > B.courseDistance;
+        }
+
+        /// Chance d'esquiver une attaque armée (GameBalance, par type ; 0 : jamais).
+        protected virtual float ChanceEsquive
+        {
+            get
+            {
+                if (!Agile) return 0f;
+                switch (type)
+                {
+                    case TypeEnnemi.Voleur: return B.esquiveChanceVoleur;
+                    case TypeEnnemi.Guerrier: return B.esquiveChanceGuerrier;
+                    default: return B.esquiveChanceSbire;
+                }
+            }
+        }
+
+        /// Hôte seulement (Update ne tourne pas chez les clients) ; jamais pendant son propre coup, étourdi, en sortie de
+        /// terre ou mort ; recharge par squelette.
+        bool PeutEsquiverMaintenant => (m_Etat == Etat.Marche || m_Etat == Etat.Poursuite || m_Etat == Etat.Recuperation)
+            && Time.time >= m_EsquivePossible && Agent.enabled && ChanceEsquive > 0f
+            && (Statuts == null || Statuts.FacteurVitesse > 0.01f);
+
+        /// Un héros proche, tourné vers ce squelette, vient d'armer une attaque (Heros.DerniereAttaque, répliqué à l'hôte
+        /// par l'effet commun EffetAttaque) : une chance d'esquiver par attaque.
+        void GuetterAttaques()
+        {
+            if (P == null) return;
+            var tous = P.TousLesHeros;
+            float r2 = B.esquiveEnnemiDetection * B.esquiveEnnemiDetection;
+            for (int i = 0; i < tous.Count; i++)
+            {
+                var h = tous[i];
+                if (h == null || !h.Vivant || (h.Classe != null && h.Classe.Furtif)) continue;   // furtif : coup non vu venir
+                float t = h.DerniereAttaque;
+                if (t <= m_AttaqueJugee || Time.time - t > B.esquiveEnnemiFenetre) continue;
+                Vector3 d = transform.position - h.transform.position; d.y = 0f;
+                if (d.sqrMagnitude > r2 || Mathf.Abs(transform.position.y - h.transform.position.y) > 1.5f) continue;
+                Vector3 f = h.transform.forward; f.y = 0f;
+                if (d.sqrMagnitude > 0.01f && Vector3.Angle(f, d) > B.esquiveEnnemiAngle) continue;
+                m_AttaqueJugee = t;
+                if (UnityEngine.Random.value < ChanceEsquive) { Esquiver(h); return; }
+            }
+        }
+
+        /// Bond d'esquive (comme le héros) : sur le côté ou en arrière par rapport au héros, vers le côté le plus dégagé
+        /// du NavMesh ; clip Dodge_* selon la direction par rapport à la face ; invulnérable au début.
+        protected void Esquiver(Heros h)
+        {
+            Vector3 loin = transform.position - h.transform.position; loin.y = 0f;
+            loin = loin.sqrMagnitude > 0.01f ? loin.normalized : -transform.forward;
+            Vector3 cote = Vector3.Cross(Vector3.up, loin) * (UnityEngine.Random.value < 0.5f ? 1f : -1f);
+            bool lateral = UnityEngine.Random.value < B.esquiveEnnemiLaterale;
+            Vector3[] essais = lateral ? new[] { cote, -cote, loin } : new[] { loin, cote, -cote };
+            Vector3 dir = essais[0]; float meilleur = -1f;
+            float l = B.esquiveEnnemiDistance;
+            foreach (var e in essais)
+            {
+                float libre = NavMesh.Raycast(transform.position, transform.position + e * l, out var hit, NavMesh.AllAreas) ? hit.distance : l;
+                if (libre >= l * 0.8f) { dir = e; meilleur = libre; break; }
+                if (libre > meilleur) { meilleur = libre; dir = e; }
+            }
+            if (meilleur < 0.8f) return;   // coincé : pas d'esquive
+            m_EsquiveDir = dir;
+            m_EsquiveDe = h;
+            m_Etat = Etat.Esquive;
+            m_EtatDepuis = 0f;
+            m_EsquivePossible = Time.time + UnityEngine.Random.Range(B.esquiveEnnemiRecharge.x, B.esquiveEnnemiRecharge.y);
+            Esquives++;
+            if (Agent.enabled) Agent.isStopped = true;
+            // Face au héros pendant le bond : le clip dépend de la direction par rapport à cette face.
+            Vector3 face = -loin;
+            transform.rotation = Quaternion.LookRotation(face);
+            float a = Vector3.SignedAngle(face, dir, Vector3.up);
+            int clip = a > -45f && a <= 45f ? 0 : a > 45f && a <= 135f ? 1 : a < -45f && a >= -135f ? 3 : 2;
+            if (animator != null) { animator.SetInteger(P_DodgeDir, clip); animator.SetTrigger(P_Dodge); }
+            AudioBank.Jouer(SonsDuJeu.Esquive, transform.position + Vector3.up, 0.6f, 0.1f);
+            // Le héros qui l'arme devient la cible (sauf provocation ou riposte en cours) : l'esquive mène à la contre-attaque.
+            if (!Provoque && !m_EnRiposte && (Gardien || DistanceNyxessa() > RayonContact)) { m_Cible = h; m_SansFrapper = 0f; }
+        }
+
+        void MajEsquive(float dt)
+        {
+            float duree = Mathf.Max(0.05f, B.esquiveEnnemiDuree);
+            float k = Mathf.Clamp01(m_EtatDepuis / duree);
+            float v = 2f * B.esquiveEnnemiDistance / duree * (1f - k);   // départ franc, freinage (intégrale = distance)
+            if (Agent.enabled && k < 1f) Agent.Move(m_EsquiveDir * v * dt);
+            if (m_EsquiveDe != null) Tourner(m_EsquiveDe.transform.position);
+            if (m_EtatDepuis >= duree + 0.1f) Reprendre();
+        }
+
         protected Heros JoueurProche(float rayon)
         {
             if (P == null) return null;
@@ -272,9 +407,53 @@ namespace Deathless.Jeu
                 var h = tous[i];
                 if (h == null || !h.Vivant) continue;
                 float dd = (h.transform.position - transform.position).sqrMagnitude;
-                if (dd < d && Voit(h)) { d = dd; meilleur = h; }
+                if (dd >= d) continue;
+                // Gardien (30/09/2026) : seulement un héros en ligne de vue (murs) et dans la laisse de son poste.
+                if (Gardien && (!DansLaLaisse(h) || !LigneDeVue(h))) continue;
+                if (Voit(h)) { d = dd; meilleur = h; }
             }
             return meilleur;
+        }
+
+        // ----------------------------------------------------------------- Gardiens du donjon (30/09/2026)
+
+        /// Le héros est à moins de gardienLaisse m du poste de ce gardien.
+        protected bool DansLaLaisse(Heros h) => h != null && (h.transform.position - m_Place).sqrMagnitude <= B.gardienLaisse * B.gardienLaisse;
+
+        static readonly RaycastHit[] s_Vue = new RaycastHit[16];
+
+        /// Rien de solide entre les yeux du squelette et le buste du héros : les personnages (tout ce qui porte une Sante)
+        /// ne bloquent pas ; murs, sols, plafonds et gros décors bloquent.
+        protected bool LigneDeVue(Heros h)
+        {
+            Vector3 a = transform.position + Vector3.up * 1.5f, b = h.transform.position + Vector3.up * 1.2f;
+            Vector3 v = b - a;
+            float l = v.magnitude;
+            if (l < 0.05f) return true;
+            int n = Physics.RaycastNonAlloc(a, v / l, s_Vue, l, ~0, QueryTriggerInteraction.Ignore);
+            for (int i = 0; i < n; i++)
+                if (s_Vue[i].collider.GetComponentInParent<Sante>() == null) return false;
+            return true;
+        }
+
+        /// Alerte (gardiens) : les gardiens à moins de gardienAlerte m qui ne poursuivent personne prennent `h` pour cible.
+        /// Une seule vague d'alerte (un gardien alerté ne relaie pas).
+        protected void AlerterGardiens(Heros h)
+        {
+            var dv = DirecteurVagues.Instance;
+            if (!Gardien || dv == null || h == null) return;
+            float r2 = B.gardienAlerte * B.gardienAlerte;
+            int n = 0;
+            foreach (var s in dv.Vivants)
+            {
+                if (s == null || s == this || !s.Gardien || !s.Vivant || s.m_Cible != null) continue;
+                if ((s.transform.position - transform.position).sqrMagnitude > r2) continue;
+                if (s.m_Etat != Etat.Marche && s.m_Etat != Etat.Recuperation) continue;
+                s.m_Cible = h; s.m_SansFrapper = 0f; s.m_Etat = Etat.Poursuite; s.m_EtatDepuis = 0f;
+                if (s.Agent.enabled) s.Agent.isStopped = false;
+                n++;
+            }
+            if (n > 0 && P != null) P.Journal("Donjon : gardien " + Id + " alerte " + n + " gardien(s) contre le joueur " + h.Id);
         }
 
         /// Joueur pris pour cible pendant la marche (MajMarche) : le plus proche vu à moins de `rayon` m. Le voleur
@@ -309,12 +488,13 @@ namespace Deathless.Jeu
                 else { Agent.isStopped = true; Tourner(Nyxessa.position); }
                 return;
             }
-            var j = ChoisirCible(B.detectionJoueur);
+            var j = ChoisirCible(Gardien ? B.gardienDetection : B.detectionJoueur);
             if (j != null)
             {
                 m_Cible = j;
                 m_SansFrapper = 0f;
                 m_Etat = Etat.Poursuite;
+                AlerterGardiens(j);
                 return;
             }
             Agent.isStopped = false;
@@ -361,7 +541,10 @@ namespace Deathless.Jeu
             if (m_Cible == null || !m_Cible.Vivant) { m_Cible = null; m_Etat = Etat.Marche; return; }
             float d = Distance(m_Cible.transform.position);
             m_SansFrapper += dt;
-            if (d > B.abandonPoursuite || m_SansFrapper > B.abandonApres) { m_Cible = null; m_Etat = Etat.Marche; return; }
+            // Gardien (30/09/2026) : pas d'abandon au temps ; il lâche quand la cible sort de sa laisse (poste), puis y retourne.
+            bool abandon = Gardien && !Provoque ? !DansLaLaisse(m_Cible) : d > B.abandonPoursuite || m_SansFrapper > B.abandonApres;
+            if (abandon) { m_Cible = null; m_Court = false; m_Etat = Etat.Marche; return; }
+            MajCourse(d);
             if (d <= PorteeEngagement(m_Cible))
             {
                 Agent.isStopped = true;
@@ -492,7 +675,19 @@ namespace Deathless.Jeu
                 var h = P.HerosDe(info.sourceId);
                 if (h == null || ClasseAssassin.DansLaFumee(h.transform.position)) return;
                 float d = Distance(h.transform.position);
-                if (m_Etat == Etat.Marche && d < B.detectionJoueur && DistanceNyxessa() > RayonContact)
+                // Gardien (30/09/2026) : frappé de n'importe où dans sa laisse (flèche de loin comprise), il se retourne et
+                // alerte les gardiens voisins.
+                if (Gardien)
+                {
+                    if (m_Cible == null && DansLaLaisse(h))
+                    {
+                        m_Cible = h; m_SansFrapper = 0f;
+                        if (m_Etat == Etat.Marche) m_Etat = Etat.Poursuite;
+                        if (h.Classe is ClasseAssassin ag) ag.Reperer();
+                    }
+                    AlerterGardiens(h);
+                }
+                else if (m_Etat == Etat.Marche && d < B.detectionJoueur && DistanceNyxessa() > RayonContact)
                 {
                     m_Cible = h; m_Etat = Etat.Poursuite; m_SansFrapper = 0f;
                     if (h.Classe is ClasseAssassin a) a.Reperer();

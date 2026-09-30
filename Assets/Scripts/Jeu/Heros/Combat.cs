@@ -12,7 +12,13 @@ namespace Deathless.Jeu
         static readonly List<float> s_Distances = new List<float>();
         static readonly HashSet<Sante> s_Vus = new HashSet<Sante>();
 
+        /// Écart de hauteur maximal entre le héros et sa cible de mêlée (30/09/2026, retour de test : au donjon, on frappait
+        /// un ennemi de l'étage au-dessus ou au-dessous à travers le plafond) : un peu plus qu'une marche d'escalier.
+        public const float EcartHauteurMax = 1.8f;
+
         /// Ennemis vivants devant `origine` (portée horizontale, demi-angle autour de `avant`), du plus proche au plus loin.
+        /// Depuis le 30/09/2026 : même étage (EcartHauteurMax) et ligne de vue dégagée (Degage : pas de mur ni de plafond
+        /// entre le torse du héros et celui de l'ennemi).
         /// Alloue une liste neuve : hors des chemins chauds, préférer la surcharge à tampon fourni.
         public static List<Sante> Ennemis(Vector3 origine, Vector3 avant, float portee, float demiAngle)
             => Ennemis(origine, avant, portee, demiAngle, new List<Sante>());
@@ -36,6 +42,8 @@ namespace Deathless.Jeu
                 float dd = Mathf.Max(0f, d.magnitude - r);
                 if (dd > portee) continue;
                 if (demiAngle < 180f && d.sqrMagnitude > 0.04f && Vector3.Angle(avant, d) > demiAngle) continue;
+                if (Mathf.Abs(s.transform.position.y - origine.y) > EcartHauteurMax) continue;
+                if (!Degage(origine + Vector3.up * 1.2f, s.transform.position + Vector3.up * 1f)) continue;
                 int k = 0;
                 while (k < dist.Count && dist[k] < dd) k++;
                 res.Insert(k, s);
@@ -45,10 +53,34 @@ namespace Deathless.Jeu
             return res;
         }
 
+        static readonly RaycastHit[] s_Vue = new RaycastHit[16];
+
+        /// Rien de solide entre `a` et `b` : les personnages (héros, ennemis, Nyxessa) et le feuillage de la forêt ne
+        /// bloquent pas ; murs, sols, plafonds (masqués ou non) et gros décors bloquent.
+        public static bool Degage(Vector3 a, Vector3 b)
+        {
+            Vector3 v = b - a;
+            float l = v.magnitude;
+            if (l < 0.05f) return true;
+            int n = Physics.RaycastNonAlloc(a, v / l, s_Vue, l, ~0, QueryTriggerInteraction.Ignore);
+            for (int i = 0; i < n; i++)
+            {
+                var c = s_Vue[i].collider;
+                if (c.GetComponentInParent<Sante>() != null || FeuillageMasquage.ColliderForet(c)) continue;
+                return false;
+            }
+            return true;
+        }
+
         static float RayonDe(Sante s)
         {
             var sq = s.GetComponent<Squelette>();
-            return sq != null && sq.Agent != null ? sq.Agent.radius : 0.4f;
+            if (sq != null) return sq.Agent != null ? sq.Agent.radius : 0.4f;
+            // Éclat de Nyx de Nyxar (EclatNyx, 30/09/2026) : posé aux pieds de Nyxar, compté un peu plus près que lui
+            // pour qu'une frappe de mêlée à cible unique vise d'abord ce point faible.
+            var e = s.GetComponent<EclatNyx>();
+            if (e != null && e.Proprietaire != null && e.Proprietaire.Agent != null) return e.Proprietaire.Agent.radius + 0.15f;
+            return 0.4f;
         }
 
         /// L'attaquant est dans le dos de la cible (angle > `angleDos` entre l'avant de la cible et la direction vers lui).

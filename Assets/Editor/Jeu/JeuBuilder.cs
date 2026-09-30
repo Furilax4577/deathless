@@ -518,8 +518,53 @@ namespace Deathless.EditorTools
             Sortie(invoc, loco, 0.9f);
             var mort = Etat(sm, "Mort", Clip(Special, "Skeletons_Death"), new Vector3(400, 300), 1.3f);
             DeNimporte(sm, mort, 0.08f).AddCondition(AnimatorConditionMode.If, 0, "Dead");
+            SqueletteCourseEsquive(c);
             EditorUtility.SetDirty(c);
             return c;
+        }
+
+        /// Course et esquive des squelettes (Quentin, 30/09/2026 ; Squelette.cs) : Running_A au bout du blend tree (Speed 1)
+        /// et quatre états Dodge_* (trigger Dodge + DodgeDir : 0 Avant, 1 Droite, 2 Arrière, 3 Gauche, comme le héros).
+        /// Idempotent : appelé par ControleurSquelette, ou seul sur le contrôleur existant (garde son GUID et les prefabs).
+        public static string SqueletteCourseEsquive(AnimatorController c = null)
+        {
+            if (c == null) c = AssetDatabase.LoadAssetAtPath<AnimatorController>(AnimDir + "/Squelette_Jeu.controller");
+            if (c == null) return "Squelette_Jeu.controller introuvable";
+            var b = GameBalance.Courant;
+            var sm = c.layers[0].stateMachine;
+            bool Param(string nom) { foreach (var p in c.parameters) if (p.name == nom) return true; return false; }
+            if (!Param("Dodge")) c.AddParameter("Dodge", AnimatorControllerParameterType.Trigger);
+            if (!Param("DodgeDir")) c.AddParameter("DodgeDir", AnimatorControllerParameterType.Int);
+            AnimatorState loco = null;
+            foreach (var s in sm.states) if (s.state.name == "Locomotion") loco = s.state;
+            if (loco == null || !(loco.motion is BlendTree arbre)) return "Locomotion introuvable";
+            var course = Boucle(Clip(AnimPack + "Rig_Medium_MovementBasic.fbx", "Running_A"), "Running_A_Loop");
+            MesurerCharge(course, null, out float piedsCourse, out _);
+            // Cadence des jambes réglée sur la course d'un sbire (vitesse × courseFacteur, plafonnée).
+            float vCourse = Mathf.Min(b.sbire.vitesse * b.courseFacteur, b.courseVitesseMax);
+            float cadence = Mathf.Clamp(vCourse / Mathf.Max(0.5f, piedsCourse), 0.6f, 1.6f);
+            var enfants = new List<ChildMotion>();
+            foreach (var e in arbre.children) if (e.threshold < 0.99f) enfants.Add(e);
+            enfants.Add(new ChildMotion { motion = course, threshold = 1f, timeScale = cadence, directBlendParameter = "Speed" });
+            arbre.children = enfants.ToArray();
+            EditorUtility.SetDirty(arbre);
+
+            string[] noms = { "Esquive", "EsquiveDroite", "EsquiveArriere", "EsquiveGauche" };
+            string[] clips = { "Dodge_Forward", "Dodge_Right", "Dodge_Backward", "Dodge_Left" };
+            for (int i = 0; i < 4; i++)
+            {
+                foreach (var s in sm.states) if (s.state.name == noms[i]) sm.RemoveState(s.state);
+                var clip = Clip(AnimPack + "Rig_Medium_MovementAdvanced.fbx", clips[i]);
+                var etat = Etat(sm, noms[i], clip, new Vector3(650, i * 60), clip != null ? clip.length / (b.esquiveEnnemiDuree + 0.15f) : 1f);
+                var t = DeNimporte(sm, etat, 0.05f);
+                t.AddCondition(AnimatorConditionMode.If, 0, "Dodge");
+                t.AddCondition(AnimatorConditionMode.Equals, i, "DodgeDir");
+                t.AddCondition(AnimatorConditionMode.IfNot, 0, "Dead");
+                Sortie(etat, loco, 0.9f);
+            }
+            EditorUtility.SetDirty(c);
+            AssetDatabase.SaveAssets();
+            return "Squelette_Jeu : course (pieds " + piedsCourse.ToString("F2") + " m/s, cadence " + cadence.ToString("F2") + ") et 4 esquives";
         }
 
         public static AnimatorController ControleurGolem()
