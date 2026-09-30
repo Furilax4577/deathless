@@ -1,6 +1,19 @@
 {
   "versions": [
     {
+      "version": "0.7.0",
+      "date": "2026-09-30",
+      "titre": "Les boss se réveillent",
+      "notes": [
+        "Nyxar, le Nécromancien (nuit 12) : il se téléporte quand on l'approche, tire des salves de trois crânes et fauche au contact. Tant que ses deux éclats de Nyx (couronne et grimoire) tiennent, il est intouchable : brisez-les, puis achevez-le quand il enrage.",
+        "Morgrim, le Roi des os (nuit 10) : en plus de sa massue ou de sa martache, il balaie, écrase le sol en onde de choc et pousse un cri qui galvanise les squelettes proches (plus forts, plus rapides).",
+        "Squelettes : ils courent vers un héros éloigné et esquivent parfois vos coups (surtout les voleurs). Au donjon, les gardiens vous voient de plus loin (mais pas à travers les murs), vous poursuivent sans lâcher et appellent leurs voisins.",
+        "Réseau : si l'hôte perd la connexion, sa partie continue en solo au lieu de rester bloquée ; un joueur coupé peut revenir dans la partie en cours avec le même code (le dernier code est pré-rempli), avec sa classe, son score et son or.",
+        "Donjon : la caméra ne se colle plus aux murs, ce qui vous cache est découpé en disque autour de votre héros. Plus de tas d'or au sol : leur or est dans les coffres (160 et 70). On ne frappe plus à travers les murs ni les plafonds.",
+        "Nyxessa : elle ne gâche plus de missiles sur un ennemi déjà condamné par ceux en vol, et le cri de l'éclat part à l'impact. Le lien du sorcier est devenu un cordon souple qui ondule et claque."
+      ]
+    },
+    {
       "version": "0.6.0",
       "date": "2026-09-30",
       "titre": "Voleurs et mages",
