@@ -30,7 +30,7 @@ Notés par Quentin après la partie à deux ; rien n'est encore développé.
 - **Bug : ennemis qui passent le bouclier** : en prenant pour cible un joueur posté au bord du bouclier, des squelettes sont entrés dans l'enceinte.
 - **Brûlure qui se cumule en paliers** {décidé} : chaque tic de flamme remplit la jauge de brûlure de l'ennemi ; au-delà de 100 %, la brûlure monte d'un palier (plus forte) et la jauge repart ; elle redescend de palier en palier de la même façon quand on cesse de brûler l'ennemi. Aujourd'hui la brûlure ne se cumule pas (la durée repart de zéro, voir [Statuts](statuts.md)). Chiffres dans [À décider](a-decider.md).
 - **Points faibles des boss cachés sur le wiki** {décidé} : les points faibles et les phases des boss (éclats de Nyxar, etc.) sont masqués par défaut dans le wiki joueur, derrière un avertissement « Attention, spoil » à déplier.
-- **Menu du personnage (Tab)** : Tab doit aussi le fermer (bascule), pas seulement l'ouvrir.
+- **Menu du personnage (Tab)** : Tab doit aussi le fermer (bascule), pas seulement l'ouvrir. {{dev: Fait le 30/09/2026 : Tab / Y / Triangle ferme le menu quand il est déjà au sommet.}}
 - **Chemins des monstres trop semblables** : les squelettes empruntent tous le même chemin, ce qui rend les attaques de zone trop faciles ; varier les trajets (dispersion, plusieurs couloirs, écarts dans la file).
 - **Mage : coup critique ?** et **Rôdeur : petit nerf** (critique ou dégâts de base) : à trancher, voir [À décider](a-decider.md).
 

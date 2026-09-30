@@ -312,7 +312,10 @@ namespace Deathless.UI.Ecrans
         void OuvrirPersonnage()
         {
             var menu = DonneesUI.Personnage;
-            if (menu == null || personnage == null || Sommet != Hud || BasculeRecente) return;
+            if (menu == null || personnage == null || BasculeRecente) return;
+            // Tab / Y / Triangle rebascule le menu s'il est déjà au sommet.
+            if (Sommet == Personnage) { Fermer(); return; }
+            if (Sommet != Hud) return;
             Personnage.Afficher(menu);
             Ouvrir(Personnage);
         }
