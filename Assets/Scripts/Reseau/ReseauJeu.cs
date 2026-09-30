@@ -85,11 +85,14 @@ namespace Deathless.Reseau
             if (salon != null) Reseau.AddNetworkPrefab(salon);
             var monde = Resources.Load<GameObject>("Reseau/PartieReseau");
             if (monde != null) Reseau.AddNetworkPrefab(monde);
-            // Squelettes (étape 2) et les deux variantes de Morgrim, d'après le directeur des vagues du village.
+            // Ennemis : tous les prefabs du directeur des vagues du village (champs GameObject publics), lus par réflexion.
+            // 30/09/2026 : la liste était écrite à la main et le voleur et le mage (0.6.0) n'y avaient pas été ajoutés :
+            // l'hôte les faisait apparaître, les clients ne pouvaient pas les instancier et ne les voyaient pas.
             var dv = FindAnyObjectByType<DirecteurVagues>();
             if (dv != null)
-                foreach (var pf in new[] { dv.prefabSbire, dv.prefabGuerrier, dv.prefabGolem, dv.prefabNecromancien, dv.prefabMorgrimMassue, dv.prefabMorgrimMartache })
-                    if (pf != null && pf.GetComponent<NetworkObject>() != null) Reseau.AddNetworkPrefab(pf);
+                foreach (var f in typeof(DirecteurVagues).GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+                    if (f.FieldType == typeof(GameObject) && f.GetValue(dv) is GameObject pf && pf != null && pf.GetComponent<NetworkObject>() != null)
+                        Reseau.AddNetworkPrefab(pf);
             var classes = ClassesJeu.Courant;
             if (classes != null) foreach (var c in classes.classes) if (c.prefab != null && c.prefab.GetComponent<NetworkObject>() != null) Reseau.AddNetworkPrefab(c.prefab);
             Reseau.ConnectionApprovalCallback = Approuver;

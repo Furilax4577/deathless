@@ -1,6 +1,14 @@
 {
   "versions": [
     {
+      "version": "0.7.1",
+      "date": "2026-09-30",
+      "titre": "Voleurs et mages pour tous",
+      "notes": [
+        "Multijoueur : les voleurs et les mages squelettes n'apparaissaient que chez l'hôte ; les autres joueurs les voient enfin (et prennent leurs coups en connaissance de cause)."
+      ]
+    },
+    {
       "version": "0.7.0",
       "date": "2026-09-30",
       "titre": "Les boss se réveillent",
