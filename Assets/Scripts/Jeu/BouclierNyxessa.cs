@@ -146,6 +146,34 @@ namespace Deathless.Jeu
             if (Deathless.Reseau.ReseauJeu.EnPartie && Deathless.Reseau.ReseauJeu.Autorite) Deathless.Reseau.PartieReseau.Instance?.BouclierBaisse();
         }
 
+        /// Intercepte un projectile ennemi qui traverse la paroi cylindrique du bouclier.
+        public bool IntercepterProjectile(Vector3 depart, Vector3 arrivee, out Vector3 impact)
+        {
+            impact = default;
+            if (!Leve) return false;
+
+            Vector3 centre = Centre;
+            Vector2 origine = new Vector2(depart.x - centre.x, depart.z - centre.z);
+            Vector2 delta = new Vector2(arrivee.x - depart.x, arrivee.z - depart.z);
+            float a = Vector2.Dot(delta, delta);
+            if (a < 0.0001f) return false;
+            float b = 2f * Vector2.Dot(origine, delta);
+            float c = Vector2.Dot(origine, origine) - Rayon * Rayon;
+            if (c < 0f) return false; // seuls les tirs qui viennent de l'extérieur sont arrêtés
+            float discriminant = b * b - 4f * a * c;
+            if (discriminant < 0f) return false;
+
+            float racine = Mathf.Sqrt(discriminant);
+            float tEntree = (-b - racine) / (2f * a);
+            float tSortie = (-b + racine) / (2f * a);
+            float t = tEntree >= 0f ? tEntree : tSortie;
+            if (t < 0f || t > 1f) return false;
+            Vector3 croisement = Vector3.Lerp(depart, arrivee, t);
+            if (croisement.y < centre.y + B.bouclierBase || croisement.y > centre.y + B.bouclierBase + B.bouclierHauteur) return false;
+            impact = croisement;
+            return true;
+        }
+
         /// Coup porté à Nyxessa ou au sorcier : le bouclier levé l'encaisse et renvoie des dégâts à l'attaquant ; renvoie
         /// la part qui passe (0 tant qu'il tient ; le reste du coup qui le brise).
         public float Absorber(InfoDegats info)

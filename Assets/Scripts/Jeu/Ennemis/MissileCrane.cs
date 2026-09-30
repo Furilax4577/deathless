@@ -20,6 +20,7 @@ namespace Deathless.Jeu
         bool m_Fini;
         bool m_Visuel_Seul;
         bool m_ParNyxessa;
+        bool m_BloqueParBouclier;
         bool m_Compte;   // dégâts comptés dans s_EnVol (retirés à l'arrivée ou à la destruction)
 
         /// Dégâts des missiles déjà partis vers chaque cible (30/09/2026) : Nyxessa ne tire plus sur un ennemi que les
@@ -113,14 +114,25 @@ namespace Deathless.Jeu
             // Guidage plus serré en fin de course pour ne pas tourner autour de la cible.
             float g = m_Guidage * (dist < 4f ? 4f : 1f);
             transform.rotation = Quaternion.RotateTowards(transform.rotation, voulu, g * dt);
-            transform.position += transform.forward * Mathf.Min(m_Vitesse * dt, dist);
+            Vector3 depart = transform.position;
+            Vector3 arrivee = depart + transform.forward * Mathf.Min(m_Vitesse * dt, dist);
+            // Les missiles ennemis sont guidés par code et n'ont pas de collision physique : le bouclier
+            // doit donc intercepter leur trajectoire explicitement, y compris sur les clients réseau.
+            if (!m_ParNyxessa && BouclierNyxessa.Instance != null && BouclierNyxessa.Instance.IntercepterProjectile(depart, arrivee, out var impact))
+            {
+                transform.position = impact;
+                m_BloqueParBouclier = true;
+                Arriver();
+                return;
+            }
+            transform.position = arrivee;
         }
 
         void Arriver()
         {
             m_Fini = true;
             Decompter();
-            if (!m_Visuel_Seul && m_Cible != null && !m_Cible.Mort && (m_Cible.transform.position + Vector3.up - transform.position).sqrMagnitude < 4f)
+            if (!m_BloqueParBouclier && !m_Visuel_Seul && m_Cible != null && !m_Cible.Mort && (m_Cible.transform.position + Vector3.up - transform.position).sqrMagnitude < 4f)
             {
                 m_Cible.Encaisser(new InfoDegats
                 {
