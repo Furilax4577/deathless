@@ -81,7 +81,7 @@ Le druide, le mécano et le forgeron ont **chacun leur maison**, qui leur sert d
 
 **Refonte du 28/09/2026** {décidé} : la taverne est un lieu convivial, avec de la **musique festive**. La tavernière est **la Bavaroise** ; **le barde** joue sur une estrade ; **le clochard pétomane** est le client récurrent, sur son banc près de l'âtre ; et il y a la place pour les quatre joueurs. Salle de 16 × 11 m à double hauteur, comptoir de 6 m (quatre joueurs de front), galerie au-dessus du service, **décor seulement** (l'escalier est fermé par une corde) {décidé}. Plan chiffré : `Docs/da/taverne-plan.md`. {{dev: Les trois restent des candidats jouables ; à la taverne ce sont des villageois.}}
 
-**La nuit, les maisons sont fermées** {décidé, 01/10/2026} : on n'y entre que le jour ; au crépuscule, un héros resté dedans est reconduit devant sa porte.
+**Intérieurs en zones à part** {décidé, 01/10/2026} : on entre dans une maison comme dans le donjon : la porte s'ouvre un peu, bruit de porte, fondu au noir, et on arrive dans l'intérieur, une zone séparée du village. Les intérieurs peuvent être plus grands que la maison vue de dehors (cosy) ; dehors, les maisons restent simples pour garder le village lisible pendant les vagues.
 
 Une des maisons (celle du nord-est de la place) est la **taverne** : comptoir, tonneaux en perce, tables et tabourets, âtre, et la **tavernière**, la Bavaroise, derrière son comptoir {décidé, 01/10/2026}. **De jour uniquement**, au comptoir, la touche **Interagir** (E, X, Carré) ouvre son menu ; l'or est pris dans la **caisse commune** :
 

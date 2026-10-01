@@ -51,10 +51,13 @@ Notés par Quentin après la partie à deux ; rien n'est encore développé.
 - **Donjons à retravailler** (todo) : refonte à cadrer avec Quentin (balcons et étages déjà reportés, voir [Donjon](donjon.md)).
 - **Méga boule de feu du Mage à retravailler** (todo) : la Grande boule de feu (LB) ne convainc pas encore ; à cadrer avec Quentin.
 
+## Décidé par Quentin le 01/10/2026 : intérieurs en zones à part
+
+- **Maisons = portes vers une zone à part**, comme le donjon : à la porte, légère animation d'ouverture, bruit de porte, fondu au noir, puis on arrive dans l'intérieur, une zone séparée du village. Les intérieurs peuvent être **plus grands que les maisons vues de dehors** (côté cosy), et les extérieurs restent **simples** pour ne pas charger le village pendant les vagues. Règle dans [Le village](village.md). À faire après l'intégration de la nouvelle carte (reprendre le passage du donjon : `PassagePortail`, `DonjonJeu.Transit`, fondu).
+
 ## Tranché par Claude le 01/10/2026 (Quentin : « tranche, on rééquilibrera »), à coder
 
 - **Assassin en vague** : passif **Gerbe de lames** : chaque exécution libère une gerbe de lames qui frappe les ennemis à 3 m (30 dégâts {à équilibrer}, pas de critique), ce qui récompense l'enchaînement bond → dos → exécution au milieu d'un groupe. Règle dans [Assassin](classe-assassin.md).
-- **Maisons la nuit** : on n'y entre que le jour ; au crépuscule, un héros resté dedans est reconduit devant sa porte (la nuit se joue dehors, autour de Nyxessa). Règle dans [Le village](village.md).
 - **Implantation du village** : le plan « serpente » du 01/10/2026 fait foi (rivière à l'**est**, trois gués, deux ponts), la vue aérienne v2 sert d'ambiance (intégration en cours).
 - **Critique du Mage** : il double aussi la zone de l'explosion (gardé).
 - **Mage trop fort en vague** : recalibré au banc en jeu après la 0.9.0 (attributs en place, regain de mana de la boule déjà retiré).
