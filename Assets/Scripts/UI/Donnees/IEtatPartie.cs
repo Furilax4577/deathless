@@ -41,7 +41,8 @@ namespace Deathless.UI.Donnees
         int OrEquipe { get; }
 
         /// Vote « prêt » (jour seulement). VoteActif est faux si un joueur est au donjon (ou hors du jour) :
-        /// le HUD cache alors l'invite. JoueursPrets / JoueursTotal : « Prêts 1 / 1 ».
+        /// le HUD cache alors l'invite. JoueursPrets / JoueursTotal : compte « 1 / 2 prêts » (multijoueur) ; l'état du
+        /// joueur local vient de IEtatJoueur.EstPret, celui de chaque allié de IAllie.EstPret (01/10/2026).
         bool VoteActif { get; }
         int JoueursPrets { get; }
         int JoueursTotal { get; }

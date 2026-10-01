@@ -612,6 +612,9 @@ namespace Deathless.Jeu
             if (Etat.aubeRetenue) { Etat.bossAttendu = (TypeEnnemi)(attente - 1); Etat.tempsPhase = Mathf.Min(Etat.tempsPhase, Etat.dureePhase); }
             Etat.comptePret = r.ComptePret.Value;
             Etat.orEquipe = r.OrEquipe.Value;
+            // Vagues (01/10/2026) : numéro et total de la nuit, pour le repère du HUD (le directeur ne tourne que chez l'hôte).
+            Etat.vagues.vague = r.Vague.Value;
+            Etat.vagues.total = r.VaguesTotal.Value;
             Etat.nyxessa.palierMissiles = r.PalierMissiles.Value;
             Etat.nyxessa.palierBouclier = r.PalierBouclier.Value;
             SuivreMissiles(r.StockMissiles.Value, r.MissileRegeneration.Value, dt);

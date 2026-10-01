@@ -47,7 +47,8 @@ namespace Deathless.Reseau
     }
 
     /// Monde de la partie réseau (Docs/reseau.md, étape 2), possédé par l'hôte qui fait foi : horloge (phase, nuit, temps),
-    /// Nyxessa, caisse commune, scores et état des joueurs (vote prêt, mort, réapparition), sorcier et bouclier. Les clients
+    /// vagues (numéro et total, pour le HUD), Nyxessa, caisse commune, scores et état des joueurs (vote prêt, mort,
+    /// réapparition), sorcier et bouclier. Les clients
     /// suivent (Partie.SuivreHote, Sorcier.SuivreHote, BouclierNyxessa) ; les événements ponctuels (zones, missiles, pièces
     /// d'or, bouclier) leur sont joués par RPC. Apparu par l'hôte au lancement, détruit avec la scène.
     public class PartieReseau : NetworkBehaviour
@@ -86,6 +87,10 @@ namespace Deathless.Reseau
         public readonly NetworkVariable<bool> NyxDetruite = new NetworkVariable<bool>();
         public readonly NetworkVariable<int> Joueurs = new NetworkVariable<int>(1);
         public readonly NetworkVariable<int> Prets = new NetworkVariable<int>();
+        // Vagues de la nuit (01/10/2026, repère du HUD) : dernière vague lancée et total de la nuit, écrits à chaque
+        // changement seulement (quelques fois par nuit).
+        public readonly NetworkVariable<byte> Vague = new NetworkVariable<byte>();
+        public readonly NetworkVariable<byte> VaguesTotal = new NetworkVariable<byte>();
         // Sorcier (marionnette chez les clients).
         public readonly NetworkVariable<byte> SorcierEtat = new NetworkVariable<byte>();
         public readonly NetworkVariable<Vector3> SorcierPosition = new NetworkVariable<Vector3>();
@@ -134,6 +139,8 @@ namespace Deathless.Reseau
             Ecrire(PalierBouclier, e.nyxessa.palierBouclier);
             Ecrire(Joueurs, Mathf.Max(1, e.joueurs.Count));
             Ecrire(Prets, p.JoueursPrets);
+            Ecrire(Vague, (byte)Mathf.Clamp(e.vagues.vague, 0, 255));
+            Ecrire(VaguesTotal, (byte)Mathf.Clamp(e.vagues.total, 0, 255));
             if (p.nyxessa != null) { Ecrire(NyxPv, p.nyxessa.Pv); Ecrire(NyxPvMax, p.nyxessa.pvMax); }
             Ecrire(NyxDetruite, e.nyxessa.detruite);
             // Temps : 5 fois par seconde (les clients avancent seuls entre deux envois), et à chaque changement de phase.

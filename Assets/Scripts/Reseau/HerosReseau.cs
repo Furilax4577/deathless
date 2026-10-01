@@ -377,5 +377,8 @@ namespace Deathless.Reseau
         public bool EstMort => m_Mort.Value;
         public float TempsAvantReapparition => m_Reapparition.Value;
         public Vector3? PositionTete => transform.position + Vector3.up * hauteurPseudo;
+        /// Vote « prêt » de ce joueur (01/10/2026) : lu dans PartieReseau.Scores (ScoreReseau.pret, écrit par l'hôte à
+        /// chaque changement, déjà répliqué pour l'écran de score) : rien de plus à envoyer. Au plus 4 entrées à parcourir.
+        public bool EstPret => PartieReseau.Instance != null && PartieReseau.Instance.ScoreDe(OwnerClientId, out var s) && s.pret;
     }
 }

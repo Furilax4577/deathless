@@ -123,7 +123,7 @@ Dans le jeu :
 - Pendant le jour, chaque joueur peut se déclarer **prêt**, et annuler son vote.
 - Le vote n'est possible que quand **toute l'équipe est rentrée** au village : si un joueur est au donjon, le vote est inactif.
 - Quand **tous les joueurs** sont prêts, le jour est écourté : le crépuscule commence après un court compte à rebours de 5 s {à équilibrer}.
-- Le HUD affiche le nombre de joueurs prêts, par exemple « Prêts 2 / 3 ».
+- Le HUD montre **qui est prêt** {décidé, 01/10/2026} : un badge « Prêt » devant chaque personnage (sur la ligne de chaque allié à gauche, et sur le portrait du joueur), et pour le joueur lui-même une invite claire à côté de l'horloge : « Se déclarer prêt » tant qu'il n'a pas voté, « Prêt · Annuler » ensuite ; en multijoueur, le compte « 2 / 3 prêts » reste à côté. {{dev: Fait le 01/10/2026 : `EcranHud` (badges `hud-pret-badge`), `IAllie.EstPret` (lu dans `PartieReseau.Scores` chez un client), `IEtatJoueur.EstPret` ; captures `retours0110_vote_*.png`.}}
 
 ## Les nuits {décidé}
 

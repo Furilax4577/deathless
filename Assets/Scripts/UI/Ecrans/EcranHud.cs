@@ -5,9 +5,11 @@ using UnityEngine.UIElements;
 
 namespace Deathless.UI.Ecrans
 {
-    /// HUD en jeu (interface.md) : Nyxessa et son bouclier, temps restant, vote prêt, alerte avant la nuit,
-    /// bannière « NUIT N », indicateur « Nyxessa attaquée », or, joueur, compétences, interaction, mort ; en multijoueur,
-    /// vie des autres joueurs (colonne de gauche) et leur pseudo au-dessus de leur tête.
+    /// HUD en jeu (interface.md) : Nyxessa et son bouclier, temps restant, repère « Jour N » / « Vague x / y »
+    /// (IEtatVagues, 01/10/2026), vote prêt (badge « Prêt » du joueur local et de chaque allié, invite « Se déclarer
+    /// prêt » / « Annuler », 01/10/2026), alerte avant la nuit, bannière « NUIT N », indicateur « Nyxessa attaquée », or,
+    /// joueur, compétences, interaction, mort ; en multijoueur, vie des autres joueurs (colonne de gauche) et leur pseudo
+    /// au-dessus de leur tête.
     /// Lit DonneesUI.Partie (et IEtatEquipe s'il l'implémente) et DonneesUI.Joueur à chaque image.
     public class EcranHud : Ecran
     {
@@ -27,9 +29,18 @@ namespace Deathless.UI.Ecrans
         public override bool CarteUI => false;
         public override bool Opaque => true;
 
+        /// Durée du liseré « nouvelle vague » sur le repère des vagues.
+        public static float DureeNouvelleVague = 2.5f;
+
         VisualElement m_VieNyx, m_PisteBouclier, m_Bouclier;
-        Label m_Temps, m_Prets, m_AlerteBouclier, m_AlerteNuit, m_Or;
-        VisualElement m_BlocPrets, m_BlocAlerteNuit;
+        Label m_Temps, m_Prets, m_PretsCompte, m_AlerteBouclier, m_AlerteNuit, m_Or;
+        VisualElement m_BlocPrets, m_PretsBadge, m_JoueurPret, m_BlocAlerteNuit;
+        VisualElement m_Vague;
+        Label m_VagueTexte;
+        /// Dernier repère des vagues écrit (phase, nuit, vague, total) et instant de la dernière vague vue.
+        PhasePartie m_VaguePhase = (PhasePartie)(-1);
+        int m_VagueNuit = -1, m_VagueAffichee = -1, m_VaguesTotalAffiche = -1;
+        float m_TempsNouvelleVague = -1f;
         IconeJourNuit m_Icone;
         VisualElement m_Banniere;
         Label m_BanniereTitre;
@@ -65,6 +76,8 @@ namespace Deathless.UI.Ecrans
         int m_SecondesTexte = -1, m_NuitTexte = -1;
         string m_AubeTexte;
         int m_BouclierAffiche = -1, m_PretsAffiches = -1, m_TotalAffiche = -1, m_AlerteNuitAffichee = int.MinValue;
+        /// État « prêt » du joueur local tel qu'écrit dans la pastille (-1 : jamais).
+        int m_PretLocalAffiche = -1;
         int m_OrAffiche = int.MinValue, m_MissilesNombreAffiche = -1, m_MissilesMaxAffiche = -1;
         int m_VieAffichee = int.MinValue, m_MortAffichee = int.MinValue, m_OrPorteAffiche = int.MinValue;
         int m_AvantRappelAffiche = int.MinValue, m_PointsAffiches = -1, m_PotionsAffichees = int.MinValue;
@@ -88,7 +101,7 @@ namespace Deathless.UI.Ecrans
 
         sealed class LigneAllie
         {
-            public VisualElement racine, embleme, piste, vie;
+            public VisualElement racine, embleme, piste, vie, pret;
             public Label pseudo, etat;
             public string classe;
             public int reapparitionAffichee = int.MinValue;
@@ -123,6 +136,11 @@ namespace Deathless.UI.Ecrans
             m_Icone = Racine.Q<IconeJourNuit>("temps-icone");
             m_BlocPrets = Racine.Q("prets");
             m_Prets = Racine.Q<Label>("prets-texte");
+            m_PretsCompte = Racine.Q<Label>("prets-compte");
+            m_PretsBadge = Racine.Q("prets-badge");
+            m_JoueurPret = Racine.Q("joueur-pret");
+            m_Vague = Racine.Q("vague");
+            m_VagueTexte = Racine.Q<Label>("vague-texte");
             m_AlerteBouclier = Racine.Q<Label>("alerte-bouclier");
             m_BlocAlerteNuit = Racine.Q("alerte-nuit");
             m_AlerteNuit = Racine.Q<Label>("alerte-nuit-texte");
@@ -199,8 +217,10 @@ namespace Deathless.UI.Ecrans
                 corps.Add(l.pseudo);
                 corps.Add(l.piste);
                 corps.Add(l.etat);
+                l.pret = CreerBadgePret("hud-allie__pret");
                 l.racine.Add(l.embleme);
                 l.racine.Add(corps);
+                l.racine.Add(l.pret);
                 l.racine.style.display = DisplayStyle.None;
                 m_ColonneAllies?.Add(l.racine);
                 m_Allies.Add(l);
@@ -211,6 +231,18 @@ namespace Deathless.UI.Ecrans
                 pseudos?.Add(t);
                 m_PseudosTetes.Add(t);
             }
+        }
+
+        /// Badge « Prêt » (vote du jour, 01/10/2026) : le même sur la ligne d'un allié que sur le portrait du joueur local.
+        static VisualElement CreerBadgePret(string classe)
+        {
+            var badge = new VisualElement { pickingMode = PickingMode.Ignore };
+            badge.AddToClassList("hud-pret-badge");
+            badge.AddToClassList(classe);
+            var texte = new Label("Prêt") { pickingMode = PickingMode.Ignore };
+            texte.AddToClassList("hud-pret-badge__texte");
+            badge.Add(texte);
+            return badge;
         }
 
         /// Appelé par le navigateur quand la source de la partie change.
@@ -234,6 +266,9 @@ namespace Deathless.UI.Ecrans
             m_TempsAttaque = -1f;
             m_MissilesVus = -1;
             m_TempsPopMissile = m_TempsTirMissile = -1f;
+            m_VaguePhase = (PhasePartie)(-1);
+            m_VagueAffichee = -1;
+            m_TempsNouvelleVague = -1f;
         }
 
         void OnNuit(int nuit)
@@ -275,6 +310,8 @@ namespace Deathless.UI.Ecrans
             var n = allies == null ? 0 : Mathf.Min(allies.Count, AlliesMax);
             if (m_ColonneAllies != null) m_ColonneAllies.style.display = n > 0 ? DisplayStyle.Flex : DisplayStyle.None;
             var cam = n > 0 ? Camera.main : null;
+            // Badges « Prêt » : seulement pendant le vote du jour (même règle que la pastille de l'horloge).
+            var vote = n > 0 && VoteVisible(DonneesUI.Partie);
             for (var i = 0; i < m_Allies.Count; i++)
             {
                 var l = m_Allies[i];
@@ -294,6 +331,7 @@ namespace Deathless.UI.Ecrans
                     IconesUI.Poser(l.embleme, c != null ? c.Embleme : IconesUI.RepliClasse);
                 }
                 l.pseudo.text = a.Pseudo;
+                l.pret.EnableInClassList("hud-pret-badge--visible", vote && a.EstPret);
                 l.racine.EnableInClassList("hud-allie--mort", a.EstMort);
                 if (a.EstMort)
                 {
@@ -380,16 +418,34 @@ namespace Deathless.UI.Ecrans
                 }
             }
 
-            // Vote prêt.
-            // Au donjon, le vote est inactif : l'invite « Prêts N / M · F1 » n'a rien à y faire (audit du 27/09/2026, C5).
-            var vote = partie.Phase == PhasePartie.Jour && partie.VoteActif && !(DonneesUI.Donjon != null && DonneesUI.Donjon.AuDonjon);
+            // Repère permanent du jour et des vagues (01/10/2026).
+            MajVague(partie, dt);
+
+            // Vote prêt (01/10/2026 : plus de « Prêts 0 / 2 » ; l'état du joueur local est dit en clair, le compte reste en
+            // multijoueur). Au donjon, le vote est inactif : l'invite n'a rien à y faire (audit du 27/09/2026, C5).
+            var vote = VoteVisible(partie);
             m_BlocPrets.style.display = vote ? DisplayStyle.Flex : DisplayStyle.None;
-            if (vote && (partie.JoueursPrets != m_PretsAffiches || partie.JoueursTotal != m_TotalAffiche))
+            if (vote)
             {
-                m_PretsAffiches = partie.JoueursPrets;
-                m_TotalAffiche = partie.JoueursTotal;
-                m_Prets.text = "Prêts " + m_PretsAffiches + " / " + m_TotalAffiche;
+                var joueur = DonneesUI.Joueur;
+                var pret = joueur != null && joueur.EstPret ? 1 : 0;
+                if (pret != m_PretLocalAffiche)
+                {
+                    m_PretLocalAffiche = pret;
+                    m_Prets.text = pret == 1 ? "Annuler" : "Se déclarer prêt";
+                    m_PretsBadge?.EnableInClassList("hud-pret-badge--visible", pret == 1);
+                    m_BlocPrets.EnableInClassList("hud-prets--pret", pret == 1);
+                }
+                if (partie.JoueursPrets != m_PretsAffiches || partie.JoueursTotal != m_TotalAffiche)
+                {
+                    m_PretsAffiches = partie.JoueursPrets;
+                    m_TotalAffiche = partie.JoueursTotal;
+                    if (m_PretsCompte != null) m_PretsCompte.text = m_PretsAffiches + " / " + m_TotalAffiche + " prêts";
+                    m_BlocPrets.EnableInClassList("hud-prets--multi", m_TotalAffiche > 1);
+                    m_BlocPrets.EnableInClassList("hud-prets--tous", m_TotalAffiche > 1 && m_PretsAffiches >= m_TotalAffiche);
+                }
             }
+            else m_PretLocalAffiche = -1;
 
             // Alerte avant la nuit (clignote).
             // Au donjon, l'alerte du rappel par Nyxessa (même place, plus précise) remplace celle de la nuit.
@@ -436,6 +492,63 @@ namespace Deathless.UI.Ecrans
             var attaque = m_TempsAttaque >= 0f;
             m_Attaque.style.display = attaque ? DisplayStyle.Flex : DisplayStyle.None;
             if (attaque) PlacerAttaque(partie.AngleNyxessa);
+        }
+
+        /// Le vote du jour est affichable : jour, vote actif, et le joueur n'est pas au donjon.
+        static bool VoteVisible(IEtatPartie partie)
+        {
+            return partie != null && partie.Phase == PhasePartie.Jour && partie.VoteActif
+                && !(DonneesUI.Donjon != null && DonneesUI.Donjon.AuDonjon);
+        }
+
+        /// Repère permanent à droite de l'horloge (demande de Quentin, 01/10/2026 : numéro de vague toujours visible) :
+        /// « Jour N » le jour (N = numéro de la nuit à venir), « N vagues » au crépuscule (dès que le directeur les a
+        /// préparées), « Vague x / y » la nuit (liseré or, et éclat blanc un instant à chaque nouvelle vague), « Jour N+1 »
+        /// à l'aube. Sans IEtatVagues sur la source, la nuit se contente de « Nuit N ». Texte reconstruit seulement quand
+        /// la valeur affichée change.
+        void MajVague(IEtatPartie partie, float dt)
+        {
+            if (m_Vague == null || m_VagueTexte == null) return;
+            var vagues = partie as IEtatVagues;
+            var phase = partie.Phase;
+            var nuit = partie.NumeroNuit;
+            int vague = 0, total = 0;
+            if (vagues != null && (phase == PhasePartie.Crepuscule || phase == PhasePartie.Nuit))
+            {
+                vague = Mathf.Max(0, vagues.VagueEnCours);
+                total = Mathf.Max(0, vagues.VaguesTotal);
+            }
+            var visible = phase != PhasePartie.Terminee;
+            m_Vague.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
+            if (!visible) return;
+            // Nouvelle vague lancée (la nuit seulement) : éclat du repère.
+            if (phase == PhasePartie.Nuit && m_VaguePhase == PhasePartie.Nuit && m_VagueNuit == nuit && vague > m_VagueAffichee && m_VagueAffichee >= 0)
+                m_TempsNouvelleVague = 0f;
+            if (phase != m_VaguePhase || nuit != m_VagueNuit || vague != m_VagueAffichee || total != m_VaguesTotalAffiche)
+            {
+                m_VaguePhase = phase;
+                m_VagueNuit = nuit;
+                m_VagueAffichee = vague;
+                m_VaguesTotalAffiche = total;
+                switch (phase)
+                {
+                    case PhasePartie.Jour: m_VagueTexte.text = "Jour " + nuit; break;
+                    case PhasePartie.Crepuscule: m_VagueTexte.text = total > 0 ? total + " vagues" : "Nuit " + nuit; break;
+                    case PhasePartie.Nuit:
+                        m_VagueTexte.text = vague > 0 && total > 0 ? "Vague " + vague + " / " + total
+                            : total > 0 ? total + " vagues" : "Nuit " + nuit;
+                        break;
+                    case PhasePartie.Aube: m_VagueTexte.text = "Jour " + (nuit + 1); break;
+                    default: m_VagueTexte.text = ""; break;
+                }
+                m_Vague.EnableInClassList("hud-vague--nuit", phase == PhasePartie.Nuit || phase == PhasePartie.Crepuscule);
+            }
+            if (m_TempsNouvelleVague >= 0f)
+            {
+                m_TempsNouvelleVague += dt;
+                if (m_TempsNouvelleVague >= DureeNouvelleVague) m_TempsNouvelleVague = -1f;
+            }
+            m_Vague.EnableInClassList("hud-vague--nouvelle", m_TempsNouvelleVague >= 0f);
         }
 
         /// Compteur des missiles de Nyxessa, à droite de sa barre : « 3 / 5 » et icône qui se charge (l'icône allumée,
@@ -571,6 +684,8 @@ namespace Deathless.UI.Ecrans
 
             MajClasse(joueur as IEtatJoueurClasse);
             MajPotions(joueur as IEtatJoueurPotions);
+            // Badge « Prêt » sur le portrait (01/10/2026), le temps du vote du jour.
+            m_JoueurPret?.EnableInClassList("hud-pret-badge--visible", joueur.EstPret && VoteVisible(partie));
 
             if (!ReferenceEquals(m_CompetencesAffichees, joueur.Competences) || m_ClasseBarre != joueur.Classe)
                 ConstruireBarre(joueur.Competences, joueur.Classe);

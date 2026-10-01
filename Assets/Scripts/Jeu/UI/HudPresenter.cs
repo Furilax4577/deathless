@@ -9,7 +9,7 @@ namespace Deathless.Jeu
     /// IEtatJoueur, IScoreFin et ICommandesPartie en lisant Partie.Etat (aucune logique de jeu ici) et s'enregistre dans
     /// DonneesUI. Au chargement : commandes seules (menu principal) ; partie lancée : toutes les sources (HUD) ; fin :
     /// Phase = Terminee puis PartieTerminee (écran de score). Gère aussi le curseur (caché et verrouillé en jeu).
-    public class HudPresenter : MonoBehaviour, IEtatPartie, IEtatJoueur, IEtatJoueurClasse, IScoreFin, ICommandesPartie, IClassesJouables, IEtatEquipe, IEtatMissiles, IEtatBoss
+    public class HudPresenter : MonoBehaviour, IEtatPartie, IEtatJoueur, IEtatJoueurClasse, IScoreFin, ICommandesPartie, IClassesJouables, IEtatEquipe, IEtatMissiles, IEtatBoss, IEtatVagues
     {
         public static readonly Color TeintePaladin = new Color32(0xd9, 0xb2, 0x64, 0xff);
 
@@ -130,6 +130,7 @@ namespace Deathless.Jeu
         public bool VoteActif => P != null && P.EnCours && P.Etat.phase == Jeu.Phase.Jour;
         // Multijoueur : le vote est compté chez l'hôte (PartieReseau), pour tous les postes.
         static Deathless.Reseau.PartieReseau R => Deathless.Reseau.ReseauJeu.EnPartie ? Deathless.Reseau.PartieReseau.Instance : null;
+        // L'état « prêt » de chaque joueur voyage avec son ScoreReseau (HerosReseau.EstPret), le total ici.
         public int JoueursPrets => R != null ? R.Prets.Value : P != null ? P.JoueursPrets : 0;
         public int JoueursTotal => R != null ? Mathf.Max(1, R.Joueurs.Value) : P != null ? Mathf.Max(1, P.Etat.joueurs.Count) : 1;
         public float AngleNyxessa
@@ -152,6 +153,13 @@ namespace Deathless.Jeu
 
         public string AubeAttend => P != null && P.Etat.phase == Jeu.Phase.Nuit && P.Etat.aubeRetenue ? Partie.NomBoss(P.Etat.bossAttendu) : null;
         public event Action<string> BossSurgit;
+
+        // ----------------------------------------------------------------- IEtatVagues (repère du HUD, 01/10/2026)
+
+        /// Vagues de la nuit : chez l'hôte, EtatVagues du directeur des vagues ; chez un client, recopiées de l'hôte par
+        /// Partie.SuivreHote (PartieReseau.Vague / VaguesTotal).
+        public int VagueEnCours => P != null ? P.Etat.vagues.vague : 0;
+        public int VaguesTotal => P != null ? P.Etat.vagues.total : 0;
 
         // ----------------------------------------------------------------- IEtatMissiles (compteur du HUD)
 

@@ -52,8 +52,8 @@ Le navigateur choisit l'écran de base d'après `DonneesUI` : `Partie == null` �
 | `VieNyxessa`, `VieMaxNyxessa` | float | Barre verte. |
 | `Bouclier`, `BouclierMax` | float | Barre du bouclier sous la vie. `BouclierMax = 0` ou `Bouclier = 0` : barre masquée. Couleur selon `Bouclier / BouclierMax` : ≥ 60 % bleu, ≥ 30 % orange, sinon rouge ; sous 50 % : « Bouclier de Nyxessa à N % ». |
 | `OrEquipe` | int | Caisse commune (haut, à droite). |
-| `VoteActif` | bool | Vote « prêt » possible (jour, toute l'équipe au village). Faux : invite et compteur masqués. |
-| `JoueursPrets`, `JoueursTotal` | int | « Prêts 1 / 1 ». |
+| `VoteActif` | bool | Vote « prêt » possible (jour, toute l'équipe au village). Faux : invite, compte et badges masqués. |
+| `JoueursPrets`, `JoueursTotal` | int | Compte « 1 / 2 prêts » dans la pastille de l'horloge, affiché seulement si `JoueursTotal > 1` (or quand tous sont prêts). Depuis le 01/10/2026, l'état du joueur local vient de `IEtatJoueur.EstPret` (badge « Prêt » sur son portrait et dans la pastille, invite « Se déclarer prêt » / « Annuler » avec `Gameplay/Ready`) et celui de chaque allié de `IAllie.EstPret` (badge « Prêt » au bout de sa ligne). |
 | `AngleNyxessa` | float (°) | Nyxessa vue de la caméra : -180 à 180, 0 = devant, positif = à droite. Place l'indicateur « Nyxessa attaquée » : ±35° en haut, au-delà de ±145° en bas, sinon au bord gauche ou droit (plus bas quand elle est plus en arrière). |
 | `event NuitCommencee(int nuit)` | | Début d'une nuit : bannière « NUIT N » (3,5 s). |
 | `event NyxessaFrappee()` | | Nyxessa ou son bouclier touché : indicateur de bord d'écran pendant 3 s après le dernier coup. |
@@ -107,6 +107,10 @@ Cette interface est enregistrée dans `DonneesUI.Donjon` et implémentée par `D
 ### Boss de la nuit : `IEtatBoss` (`Donnees/IEtatBoss.cs`, 01/10/2026)
 
 Interface facultative, comme `IEtatMissiles` (`DonneesUI.Partie as IEtatBoss`) : `AubeAttend` (nom du boss dont l'aube attend la chute, `null` sinon) remplace le compte à rebours de la nuit par « Nuit 10 · l’aube attend la chute de Morgrim » ; `BossSurgit(nom)` montre la bannière à son nom (« MORGRIM », « NYXAR »), comme « NUIT N ». Implémentée par `HudPresenter` ; sans elle, le HUD garde le compte à rebours (à 0:00).
+
+### Vagues : `IEtatVagues` (`Donnees/IEtatVagues.cs`, 01/10/2026)
+
+Interface facultative, comme `IEtatMissiles` (`DonneesUI.Partie as IEtatVagues`), pour le repère permanent à droite de l'horloge (demande de Quentin : le numéro de vague toujours visible) : `VagueEnCours` (dernière vague lancée, 0 avant la première) et `VaguesTotal` (vagues de la nuit, connu dès le crépuscule). Le HUD écrit « Jour N » le jour (N = numéro de la nuit à venir), « N vagues » au crépuscule, « Vague x / y » la nuit (capsule à liseré or, éclat de 2,5 s à chaque nouvelle vague, `EcranHud.DureeNouvelleVague`) et « Jour N+1 » à l'aube ; sans l'interface, la nuit se contente de « Nuit N ». Implémentée par `HudPresenter` (jeu ; chez un client, `PartieReseau.Vague` / `VaguesTotal`) et `EtatFactice` (banc : 3 vagues à 0, 40, 80 s, 4 dès la nuit 9 ; `ForcerVague(n)`). Captures `Assets/Screenshots/retours0110_vague_*.png`.
 
 ### Missiles de Nyxessa : `IEtatMissiles` (`Donnees/IEtatMissiles.cs`, 26/09/2026)
 

@@ -29,10 +29,10 @@ Caméra à l'épaule, en troisième personne (voir [Principes](principes.md)). S
 
 | Zone | Contenu |
 |---|---|
-| Haut, au centre | Vie de Nyxessa et de son bouclier, temps restant avant la nuit ou avant l'aube |
+| Haut, au centre | Vie de Nyxessa et de son bouclier, temps restant avant la nuit ou avant l'aube ; à côté, **toujours visible** {décidé, 01/10/2026} : « Jour N » le jour, « N vagues » au crépuscule, **« Vague 2 / 3 »** la nuit (capsule dorée qui s'éclaire à chaque nouvelle vague) ; puis le vote « prêt » du joueur (badge « Prêt », invite « Se déclarer prêt » / « Annuler », compte « 2 / 3 prêts » en multijoueur) |
 | Haut, au centre, à droite de la barre de Nyxessa | Missiles de Nyxessa : icône du crâne vert qui se remplit pendant la recharge du prochain missile, et le stock (par exemple « 3 / 5 ») |
 | Haut, à droite | Or de l'équipe |
-| Gauche | Vie des autres joueurs |
+| Gauche | Vie des autres joueurs ; pendant le vote du jour, badge « Prêt » au bout de la ligne de chaque allié qui a voté {décidé, 01/10/2026} |
 | Bas, à gauche | Portrait avec l’emblème de la classe et, s’il y en a une, la jauge de la classe en anneau plein autour du portrait (mana ou rage) ; vie en large barre à embouts de gemme (seule à afficher son chiffre) ; endurance en filet fin qui ne s’éclaire vraiment que sous 70 % environ. Ni libellé ni icône sur les barres. Case de la potion à côté, dans le même bloc, avec son nombre et son bouton {{dev: (maquette B du 26/09/2026, `Hud.uxml`). La potion n'est pas encore jouable : la case ne s'affiche qu'avec l'état factice.}} |
 | Bas, à gauche, juste au-dessus de la barre de vie | Statuts du joueur (brûlure, ralenti…) : icône, jauge de durée, secondes restantes |
 | Au-dessus des ennemis | Statuts de chaque ennemi affecté : petites icônes et jauge de durée discrète |

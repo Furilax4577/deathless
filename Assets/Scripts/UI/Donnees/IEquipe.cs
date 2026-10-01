@@ -16,6 +16,9 @@ namespace Deathless.UI.Donnees
         float TempsAvantReapparition { get; }
         /// Point au-dessus de la tête (monde) où le HUD écrit le pseudo ; null : pas d'étiquette (hors scène, banc).
         Vector3? PositionTete { get; }
+        /// Vote « prêt » du jour (01/10/2026) : vrai si cet allié s'est déclaré prêt. Le HUD l'affiche en badge sur sa
+        /// ligne tant que IEtatPartie.VoteActif est vrai.
+        bool EstPret { get; }
     }
 
     /// Équipe vue par le joueur local : les autres joueurs de la partie (vide en solo). Facultatif : l'objet enregistré

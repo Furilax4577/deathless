@@ -14,7 +14,7 @@ namespace Deathless.UI.Dev
     /// réapparition ; fin de partie. Les entrées de jeu (carte Gameplay, via InputChordResolver) déclenchent
     /// les compétences et le vote prêt, comme le ferait le vrai jeu.
     /// Les méthodes Forcer… servent aux tests et aux captures.
-    public class EtatFactice : MonoBehaviour, IEtatPartie, IEtatJoueur, IScoreFin, ICommandesPartie, IClassesJouables, IEtatJoueurClasse, IEtatJoueurPotions, IEtatEquipe, IEtatMissiles
+    public class EtatFactice : MonoBehaviour, IEtatPartie, IEtatJoueur, IScoreFin, ICommandesPartie, IClassesJouables, IEtatJoueurClasse, IEtatJoueurPotions, IEtatEquipe, IEtatMissiles, IEtatVagues
     {
         public InputActionAsset actions;
 
@@ -136,7 +136,7 @@ namespace Deathless.UI.Dev
             var dt = dtReel * acceleration;
             m_Duree += dt;
             m_Reste -= dt;
-            if (m_Phase == PhasePartie.Jour && m_Pret && m_Reste > 5f) m_Reste = 5f;   // tous prêts : compte à rebours de 5 s
+            if (m_Phase == PhasePartie.Jour && m_Pret && JoueursPrets >= JoueursTotal && m_Reste > 5f) m_Reste = 5f;   // tous prêts : compte à rebours de 5 s
             if (m_Reste <= 0f) PhaseSuivante();
             if (m_Phase == PhasePartie.Terminee) return;
 
@@ -552,6 +552,7 @@ namespace Deathless.UI.Dev
             public bool EstMort { get; set; }
             public float TempsAvantReapparition { get; set; }
             public Vector3? PositionTete => null;
+            public bool EstPret { get; set; }
         }
 
         readonly List<IAllie> m_Allies = new List<IAllie>();
@@ -570,6 +571,33 @@ namespace Deathless.UI.Dev
             for (int i = 0; i < Mathf.Clamp(n, 0, modeles.Length); i++) m_Allies.Add(modeles[i]);
         }
 
+        /// Test du vote (01/10/2026) : l'allié `index` (0 à 2) est prêt ou non (badge « Prêt » sur sa ligne).
+        public void ForcerAlliePret(int index, bool pret)
+        {
+            if (index >= 0 && index < m_Allies.Count && m_Allies[index] is AllieFactice a) a.EstPret = pret;
+        }
+
+        // ================================================================== IEtatVagues (repère du HUD, 01/10/2026)
+
+        /// Vagues simulées : 3 par nuit (4 dès la nuit 9), lancées à 0, 40 et 80 s (0, 30, 60, 90 s) comme le wiki.
+        public int VaguesTotal => m_Phase == PhasePartie.Nuit || m_Phase == PhasePartie.Crepuscule ? (m_Nuit >= 9 ? 4 : 3) : 0;
+        public int VagueEnCours
+        {
+            get
+            {
+                if (m_Phase != PhasePartie.Nuit) return 0;
+                if (m_VagueForcee > 0) return m_VagueForcee;
+                var ecoule = dureeNuit - m_Reste;
+                var total = VaguesTotal;
+                var intervalle = total >= 4 ? 30f : 40f;
+                return Mathf.Clamp(1 + Mathf.FloorToInt(ecoule / intervalle), 1, total);
+            }
+        }
+        int m_VagueForcee;
+
+        /// Tests et captures : impose le numéro de vague affiché la nuit (0 : simulation).
+        public void ForcerVague(int vague) => m_VagueForcee = Mathf.Max(0, vague);
+
         // ================================================================== IEtatPartie
 
         public PhasePartie Phase => m_Phase;
@@ -581,8 +609,17 @@ namespace Deathless.UI.Dev
         public float BouclierMax => m_BouclierMax;
         public int OrEquipe => m_Or;
         public bool VoteActif => m_Phase == PhasePartie.Jour;
-        public int JoueursPrets => m_Pret ? 1 : 0;
-        public int JoueursTotal => 1;
+        /// Avec des alliés fictifs (ForcerAllies), le compte les inclut : « 2 / 3 prêts ».
+        public int JoueursPrets
+        {
+            get
+            {
+                int n = m_Pret ? 1 : 0;
+                foreach (var a in m_Allies) if (a.EstPret) n++;
+                return n;
+            }
+        }
+        public int JoueursTotal => 1 + m_Allies.Count;
         public float AngleNyxessa => m_Angle;
         public event Action<int> NuitCommencee;
         public event Action NyxessaFrappee;

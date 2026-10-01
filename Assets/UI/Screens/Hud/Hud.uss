@@ -104,8 +104,67 @@
 .hud-temps__icone { width: 27px; height: 27px; margin-right: 15px; }
 .hud-temps__texte { font-size: var(--dl-text-body); margin: 0; padding: 0; }
 
+/* Repère permanent du jour et des vagues (01/10/2026, demande de Quentin : numéro de vague toujours visible) :
+   petite capsule à droite de l'horloge, « Jour 3 » le jour, « 3 vagues » au crépuscule, « Vague 2 / 3 » la nuit.
+   Nouvelle vague : liseré or le temps d'un instant (.hud-vague--nouvelle, EcranHud). */
+.hud-vague {
+    flex-direction: row;
+    align-items: center;
+    height: 33px;
+    margin-left: 15px;
+    padding: 0 12px;
+    border-radius: 17px;
+    border-width: 1px;
+    border-color: var(--dl-color-border-strong);
+    background-color: rgba(0, 0, 0, 0.32);
+    transition-property: border-color, background-color;
+    transition-duration: 0.3s, 0.3s;
+}
+.hud-vague__texte {
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+    font-size: var(--dl-text-small);
+    color: var(--dl-color-text);
+    margin: 0;
+    padding: 0;
+    white-space: nowrap;
+}
+.hud-vague--nuit { border-color: var(--dl-color-gold); }
+.hud-vague--nuit .hud-vague__texte { color: var(--dl-color-gold); }
+.hud-vague--nouvelle { border-color: #ffd166; background-color: rgba(96, 72, 20, 0.92); }
+.hud-vague--nouvelle .hud-vague__texte { color: #ffffff; }
+
+/* Vote prêt (01/10/2026, demande de Quentin : « prêt » devant chaque personnage, état net du joueur local).
+   Badge commun « Prêt » (liseré or, texte or) : sur la ligne de chaque allié prêt, sur le portrait du joueur local,
+   et dans la pastille de l'horloge où l'invite dit « Se déclarer prêt » ou « Annuler ». */
+.hud-pret-badge {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    padding: 0 10px;
+    border-radius: 15px;
+    border-width: 2px;
+    border-color: var(--dl-color-gold);
+    background-color: rgba(58, 46, 20, 0.92);
+    display: none;
+}
+.hud-pret-badge__texte {
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+    font-size: var(--dl-text-caption);
+    color: var(--dl-color-gold);
+    margin: 0;
+    padding: 0;
+    white-space: nowrap;
+}
+.hud-pret-badge--visible { display: flex; }
+
 .hud-prets { flex-direction: row; align-items: center; margin-left: 18px; }
-.hud-prets__texte { font-size: var(--dl-text-small); color: var(--dl-color-text-muted); margin: 0 9px 0 0; padding: 0; }
+.hud-prets__badge { margin-right: 9px; }
+.hud-prets__texte { font-size: var(--dl-text-small); color: var(--dl-color-text-muted); margin: 0 0 0 9px; padding: 0; white-space: nowrap; }
+.hud-prets--pret .hud-prets__texte { color: var(--dl-color-text-disabled); }
+.hud-prets__compte { font-size: var(--dl-text-caption); color: var(--dl-color-text-muted); margin: 0 0 0 12px; padding: 0; white-space: nowrap; display: none; }
+.hud-prets--multi .hud-prets__compte { display: flex; }
+.hud-prets--tous .hud-prets__compte { color: var(--dl-color-gold); }
 
 .hud-alerte-bouclier {
     font-size: var(--dl-text-small);
@@ -224,6 +283,8 @@
 .hud-allie__piste { height: 8px; margin-top: 6px; border-radius: 4px; background-color: var(--dl-color-well); overflow: hidden; }
 .hud-allie__vie { height: 100%; width: 100%; background-color: var(--dl-color-life); }
 .hud-allie__etat { font-size: var(--dl-text-caption); color: var(--dl-color-text-muted); margin: 2px 0 0 0; padding: 0; display: none; }
+/* Badge « Prêt » de l'allié (01/10/2026), à droite de sa ligne, pendant le vote du jour seulement. */
+.hud-allie__pret { margin-left: 12px; flex-shrink: 0; }
 /* Allié mort : ligne grisée, compte à rebours à la place de la barre. */
 .hud-allie--mort { background-color: rgba(16, 19, 27, 0.6); }
 .hud-allie--mort .hud-allie__embleme { opacity: 0.35; }
@@ -286,6 +347,8 @@
 
 .hud-joueur__furtif { position: absolute; right: -15px; top: -15px; width: 54px; height: 54px; border-radius: 27px; background-color: #2b1840; border-width: 2px; border-color: #5b3a8a; display: none; align-items: center; justify-content: center; }
 .hud-joueur__furtif-icone { width: 40px; height: 40px; }
+/* Badge « Prêt » du joueur local (01/10/2026), accroché en haut à gauche du portrait (le furtif est à droite). */
+.hud-joueur__pret { position: absolute; left: -24px; top: -15px; }
 .hud-potion { align-items: center; margin-left: 15px; display: none; }
 .hud-potion__case { width: 72px; height: 72px; border-radius: 15px; border-width: 3px; border-color: var(--dl-color-border-strong); background-color: var(--dl-color-panel); align-items: center; justify-content: center; margin-bottom: 9px; }
 .hud-potion__icone { position: absolute; left: 9px; top: 9px; right: 9px; bottom: 9px; }

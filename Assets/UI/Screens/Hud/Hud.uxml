@@ -96,9 +96,19 @@
             <ui:VisualElement class="hud-pastille hud-temps">
                 <dl:IconeJourNuit name="temps-icone" class="hud-temps__icone" />
                 <ui:Label name="temps-texte" text="Jour · 1:42 avant la nuit" class="hud-temps__texte" />
+                <!-- Repère permanent (01/10/2026) : « Jour N » le jour, « Vague 2 / 3 » la nuit (IEtatVagues) -->
+                <ui:VisualElement name="vague" class="hud-vague" picking-mode="Ignore">
+                    <ui:Label name="vague-texte" text="Jour 1" class="hud-vague__texte" />
+                </ui:VisualElement>
+                <!-- Vote prêt du joueur local (01/10/2026) : badge « Prêt » quand il a voté, invite et libellé
+                     (« Se déclarer prêt » / « Annuler »), compte « 1 / 2 prêts » en multijoueur -->
                 <ui:VisualElement name="prets" class="hud-prets">
-                    <ui:Label name="prets-texte" text="Prêts 0 / 1" class="hud-prets__texte" />
+                    <ui:VisualElement name="prets-badge" class="hud-pret-badge hud-prets__badge" picking-mode="Ignore">
+                        <ui:Label text="Prêt" class="hud-pret-badge__texte" />
+                    </ui:VisualElement>
                     <dl:InputPrompt action="Gameplay/Ready" class="dl-prompt--small" />
+                    <ui:Label name="prets-texte" text="Se déclarer prêt" class="hud-prets__texte" />
+                    <ui:Label name="prets-compte" text="0 / 2 prêts" class="hud-prets__compte" />
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:Label name="alerte-bouclier" text="Bouclier de Nyxessa à 32 %" class="hud-alerte-bouclier" />
@@ -159,6 +169,10 @@
                     <ui:Label name="portrait-initiale" text="P" class="hud-joueur__initiale" />
                     <ui:VisualElement name="furtif" class="hud-joueur__furtif" tooltip="Furtif">
                         <ui:VisualElement name="furtif-icone" class="dl-icone hud-joueur__furtif-icone" />
+                    </ui:VisualElement>
+                    <!-- Vote prêt (01/10/2026) : même badge que sur les lignes des alliés, accroché au portrait -->
+                    <ui:VisualElement name="joueur-pret" class="hud-pret-badge hud-joueur__pret" picking-mode="Ignore">
+                        <ui:Label text="Prêt" class="hud-pret-badge__texte" />
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
