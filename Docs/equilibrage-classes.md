@@ -586,3 +586,78 @@ Sensibilité, bon joueur à 70 % de tirs à la tête (`--nerf --tete 0.7 --profi
 - **Hors du modèle** : les boss (Morgrim nuit 10, Nyxar nuit 12), le jeu à plusieurs (+60 % d'ennemis par joueur, plafond de 60), les améliorations de l'arbre, le bouclier de Nyxessa et les paliers de missiles au-delà du 1.
 - **Bruit** : cinq tirages ; les indices bougent de ±0,03 d'un jeu de graines à l'autre. Un écart de moins de 0,05 entre deux classes n'est pas significatif.
 - **Le banc en jeu** devra confirmer, dans l'ordre : le taux de tête et de touche du Rôdeur (et de l'arbalète), le DPS mono de chaque classe sur un mannequin, le temps de vidage d'une vague de la nuit 9 ou 12 par classe, et les dégâts reçus ; si ses chiffres s'écartent de plus de 10 % de ceux-ci, ajuster les profils du script (`PROFILS`) avant de trancher.
+
+## Banc en jeu (01/10/2026)
+
+Deuxième outil prévu par la section précédente : les cinq classes jouées **dans le vrai jeu** contre la même vague, pour vérifier le simulateur avant de publier la 0.8.0 (nerf F du Rôdeur, 48 / tête ×1,8, déjà dans `GameBalance` ; nouveau kit du Mage ; brûlure en paliers ; trajets variés). Le banc n'a rien changé dans `GameBalance`.
+
+```
+BancClasses.Lancer("paladin,viking,mage,rodeur,assassin", "6,12", "moyen,bon", 2)   // en Play, par execute_code
+BancClasses.LancerMono("paladin,viking,mage,rodeur,assassin", "moyen,bon", 2)       // mannequin mono-cible, 60 s
+BancClasses.Rapport()                                                                 // réécrit Docs/outils/banc_classes_resultats.md
+```
+
+### Méthode
+
+- **Code** : `Assets/Scripts/Jeu/Dev/BancClasses.cs` (déroulé, mesures, rapport) et `BancClassesBots.cs` (un bot par classe). Une ligne par passage dans `Docs/outils/banc_classes_mesures.tsv` ; tableaux complets (taux, vidages, origine des dégâts) dans `Docs/outils/banc_classes_resultats.md`.
+- **Même vague pour toutes les classes** : chaque passage recharge le village (partie solo neuve), prépare la nuit N pour un joueur avec une graine fixe (`DirecteurVagues.Preparer` : composition, élites, clairières, instants ; boss retirés, comme dans le simulateur), puis le banc pose lui-même chaque sortie au même point et au même instant, avec une graine par squelette (même couloir, même place, même pas). Deux répétitions = deux graines de vague.
+- **Comme le simulateur** : héros immortel (`joueurInvincible` le temps du banc, remis ensuite ; les coups qu'il aurait pris sont comptés, Peau de fer déduite) ; Nyxessa avec ses missiles au palier 1 et des PV hors d'atteinte (coups comptés, ceux pris par le sorcier aussi) ; **bouclier du sorcier jamais levé** (le simulateur ne le modélise pas) ; nuit prolongée de 60 s pour le vidage. Mono : un guerrier aux PV hors d'atteinte posé au contact de Nyxessa, 60 s, sans missiles.
+- **Bots** : ils ne jouent que par la manette virtuelle (`EntreesSimulees` → `InputChordResolver` : boutons, stick gauche) et la caméra (lacet, tangage, comme le stick droit) ; aucune méthode de dégâts n'est appelée. Rotations et seuils des profils du simulateur (rugissement à 4 / 3 squelettes, saut sur 3 / 2, tournante dès 3 à 2,3 m, mur sur 4 / 3, grande boule sur 3 / 2, cône dès 3 et 40 / 20 de mana, nuée, roulade, charge du Paladin à 2,5 / 4 m, soin à 25 % de vie perdue, bond et grenade de l'Assassin une fois sur deux / toujours, contournement et changement de cible du bon Assassin). Distance : poste à 4,5 m de Nyxessa du côté le plus pressé ; mêlée : laisse de 10 m, approche par l'extérieur de l'anneau de Nyxessa. Visée : écart type de 1,6° (moyen, au torse) ou 0,8° (bon, à la tête) tiré à chaque tir, avance sur une cible qui marche (erreur 35 % / 10 %), temps de réaction 0,15 / 0,05 s. **Les taux de touche, de tête et de dos sont mesurés.** Pas de garde ni de parade du Paladin (le simulateur non plus).
+- **Mesures** (abonnements à `Sante.AnyTouche`, `Sante.AnyImmunise`, `ProjectileJeu.Arrivee`) : dégâts du héros par source (méthode de classe qui a appelé `Heros.Frapper`), critiques, tués, DPS de nuit (dégâts avant l'aube ÷ 120 s), DPS en combat, vidage, squelettes et dégâts à Nyxessa, dégâts reçus, coups annulés par une esquive de squelette. Indice = DPS de nuit ÷ moyenne des cinq classes **de la même répétition**.
+- **Garde-fou** (demande de Quentin) : si un écran autre que le HUD passe au sommet pendant la mesure (ou si la carte Gameplay est coupée), le passage est invalidé et relancé (vérifié en ouvrant le menu du personnage pendant un passage). Le passage « Viking, nuit 12, moyen, répétition 1 », faussé par un menu ouvert pendant le banc (214 appuis de tournante pour 1 tournante partie, DPS 31,5), a été écarté et refait (43,6).
+- **Vitesse** : ×3 (`Time.timeScale`), 40 à 50 images par seconde réelles (pas de 0,06 s de jeu). Contrôle à ×1 (nuit 6, bon, répétition 0) : Paladin +2 %, Assassin +2 %, Rôdeur −2 %, Mage −7 %, Viking **+21 %** (un seul passage : le Viking est peut-être un peu sous-estimé à ×3, par le délai d'accord LB / RB de 0,1 s réelle, soit 0,3 s de jeu, et la latence d'une image sur la tournante). Les écarts entre répétitions sont du même ordre.
+
+### Banc et simulateur : indice vague et indice mono (1 = moyenne des cinq classes)
+
+Simulateur : `python Docs/outils/simulateur_vagues.py --nuit 6 --nuit 12` avec les valeurs du jour (variante F déjà appliquée). Banc : moyenne de 2 répétitions à ×3, plage entre crochets.
+
+| Classe | N6 moyen banc | N6 moyen simu | N12 moyen banc | N12 moyen simu | N6 bon banc | N6 bon simu | N12 bon banc | N12 bon simu | Mono moyen banc / simu | Mono bon banc / simu |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Paladin | 0,96 [0,92–0,99] | 0,97 | 0,85 [0,82–0,88] | 0,94 | 0,85 [0,83–0,87] | 0,94 | 0,94 [0,89–0,99] | 0,92 | 0,80 / 0,81 | 0,83 / 0,81 |
+| Viking | 1,15 [1,10–1,20] | 1,02 | 1,30 [1,24–1,35] | 1,26 | 0,99 [0,93–1,06] | 1,00 | 1,27 [1,19–1,34] | 1,13 | 0,92 / 0,90 | 0,91 / 0,86 |
+| Mage | 1,14 [1,10–1,18] | 1,10 | **1,38** [1,36–1,41] | 1,29 | **1,16** [1,14–1,18] | 1,05 | **1,29** [1,26–1,32] | 1,16 | **1,30** / 1,11 | **1,16** / 1,04 |
+| Rôdeur | 1,07 [1,05–1,08] | 1,00 | 0,98 [0,96–0,99] | **0,80** | 1,10 [1,09–1,11] | 1,02 | 0,98 [0,97–0,99] | 0,94 | 1,06 / 0,86 | 1,10 [0,94–1,26] / 1,06 |
+| Assassin | **0,68** [0,60–0,75] | 0,93 | **0,49** [0,48–0,51] | 0,71 | 0,90 [0,85–0,96] | 0,99 | **0,52** [0,36–0,69] | 0,84 | 0,92 / **1,32** | 1,00 / **1,23** |
+
+DPS absolus (bon joueur) : nuit 6, banc 19 à 26 contre 27 à 30 au simulateur ; nuit 12, banc 18 à 44 contre 40 à 55 ; mono, banc 27 à 37 contre 32 à 48. **Le jeu est 15 à 30 % plus lent que le simulateur pour toutes les classes**, jusqu'à 55 % pour l'Assassin à la nuit 12 : déplacements réels (marches du plateau de Nyxessa, foule, NavMesh), esquives et ripostes des squelettes, mages squelettes qui gardent leurs distances hors de la laisse, temps de rotation de la caméra. Les vidages de vague sont 2 à 3 fois plus longs (première vague de la nuit 6 vidée en 90 à 160 s, contre 34 à 46 s au simulateur : un ou deux squelettes s'attardent hors de portée).
+
+### Taux mesurés
+
+| Mesure | Moyen (simu) | Moyen (banc) | Bon (simu) | Bon (banc) |
+|---|---|---|---|---|
+| Flèches qui touchent | 80 % | 81 % (N6), 85 % (N12), 93 % (mono) | 92 % | 86 % (N6), 84 % (N12), 93 % (mono) |
+| … dont à la tête | 25 % | **48 %** (N6), 43 % (N12), 38 % (mono) | 50 % | **64 %** (N6), 47 % (N12), 39 % (mono) |
+| Salve : touche / tête | 75 % / 10 % | **35 %** / 25 % (N6), 67 % / 31 % (N12) | 90 % / 30 % | **30 %** / 23 % (N6), 66 % / 24 % (N12) |
+| Arbalète : touche / tête | 80 % / 25 % | 33 à 100 % / 0 % (1 à 4 tirs par nuit) | 92 % / 50 % | 56 à 100 % / 0 à 60 % |
+| Boule de feu qui touche la cible visée | 75 % | 65 % (N6), 77 % (N12), 97 % (mono) | 92 % | 69 % (N6), 85 % (N12), 94 % (mono) |
+| Coups de dague dans le dos | supposé quand la cible frappe Nyxessa | 7 % (N6), 17 % (N12), 4 % (mono) | idem, en changeant de cible | 23 % (N6), 33 % (N12), 7 % (mono) |
+| Coups de dague qui exécutent | — | 15 à 18 % | — | 20 à 21 % |
+
+- **La tête des squelettes KayKit est grosse** : un tir visé au torse touche la tête une fois sur deux, un tir visé à la tête deux fois sur trois sur une cible qui marche à 10–20 m. Le taux de tête « moyen » du simulateur (25 %) est trop bas ; celui du bon joueur (50 %) est juste en moyenne (64 % à la nuit 6, 47 % à la nuit 12, 39 % sur le mannequin collé à Nyxessa).
+- **La salve de la roulade** (5 flèches en éventail de ±20°) ne met que 30 à 35 % de ses flèches sur des cibles éparses (nuit 6), deux tiers dans la foule de la nuit 12 : le simulateur (75 à 90 %) la surestime.
+- **Le dos de l'Assassin est rare** : 4 à 7 % sur le mannequin (le guerrier riposte et se retourne après deux coups), 7 à 33 % en vague. Le simulateur, qui suppose le dos sur une cible qui frappe Nyxessa, place l'Assassin premier en mono (1,23 à 1,32) ; en jeu il est dans la moyenne (0,92 à 1,00).
+
+### Écarts et causes probables
+
+- **Mage** : au-dessus de la moyenne partout (vague 1,14 à 1,38, mono 1,16 à 1,30), plus que ne le dit le simulateur. La boule touche moins souvent sa cible que prévu, mais l'explosion (2 m) et la brûlure en paliers (22 à 31 % de ses dégâts) suffisent ; la grande boule et le cône pèsent à la nuit 12. Le mur de flammes part peu (1 à 6 fois par nuit) et ne fait pas de dégâts directs.
+- **Viking** : conforme au simulateur à la nuit 6 pour un bon joueur, plus fort pour un joueur moyen (1,15 : la tournante sur les paquets autour de Nyxessa) ; à la nuit 12, 1,27 à 1,30, la tournante fait 76 à 83 % de ses dégâts. Peut-être encore sous-estimé à ×3 (contrôle à ×1 : +21 %).
+- **Paladin** : 0,85 à 0,96, proche du simulateur sauf à la nuit 6 pour le bon joueur (0,85). Épée sur une à trois cibles (une seule la moitié du temps), charge rare (2 à 8 fois par nuit : la cible est souvent déjà au contact).
+- **Assassin** : très en dessous en vague (0,49 à 0,68 pour le joueur moyen, 0,52 à la nuit 12 pour le bon), bien plus bas qu'au simulateur. Il passe une bonne part de la nuit pris dans la foule (jusqu'à 35 déblocages par nuit) ou sans dos ; c'est avec lui que le plus de squelettes frappent Nyxessa (40 à 46 à la nuit 12, 12 000 dégâts). **Une partie de l'écart tient au bot** (placement dans une foule dense, pas d'anticipation des ripostes) : à confirmer en main, mais le sens est celui du simulateur et la ligne « Assassin » de `Wiki/pages/a-decider.md` en sort renforcée.
+- **Rôdeur** : 0,98 à 1,10 en vague et 1,06 à 1,10 en mono, dans la bande ±10 % pour les deux profils ; le joueur moyen est **bien meilleur** que ne le dit le simulateur (nuit 12 : 0,98 contre 0,80), parce que la tête est plus facile à toucher que supposé. La nuée (15 à 34 % de ses dégâts) et la salve (7 à 19 %) pèsent plus à la nuit 12.
+
+### Verdict sur le nerf du Rôdeur (F : 48 / tête ×1,8)
+
+**Confirmé.** Avec F en place, le banc met le Rôdeur entre 0,98 et 1,10 en vague et à 1,06–1,10 en mono pour les deux profils : ni trop fort (au plus +10 %, au bord de la bande pour le bon joueur à la nuit 6 et en mono), ni trop faible (jamais plus de 2 % sous la moyenne, toujours au-dessus du Paladin et de l'Assassin). La règle prévue (« au-delà de 50 % de tirs à la tête pour le bon profil, passer à C : 45 / ×1,8 ») est **atteinte à la nuit 6 (64 %), pas à la nuit 12 (47 %) ni en mono (39 %)** ; sur l'ensemble, le bon joueur est autour de 50 %. Recommandation : **garder F** pour la 0.8.0 ; C (simulateur avec 64 % de têtes : mono 1,08 au lieu de 1,13 avec F) reste l'option si les retours de test trouvent le Rôdeur trop fort entre de bonnes mains. Ce n'est pas le Rôdeur qui déséquilibre les classes en jeu, c'est le **Mage** (au-dessus) et l'**Assassin** (en dessous). `GameBalance` n'a pas été modifié.
+
+### Bugs et anomalies vus pendant le banc
+
+- **Mage squelette bloqué en route** : à chaque nuit, un mage de la dernière vague sorti de la clairière sud-ouest (vers (−40 ; −36)) reste en état Marche sans chemin (`NavMeshAgent.hasPath` faux, vitesse nulle, destination Nyxessa) à 33–63 m d'elle, jusqu'à l'aube. Il ne frappe personne mais retient la fin de la vague (vidages marqués « * » dans les tableaux : ce squelette y est ignoré). `Mage.MajDistance` appelle `Poursuivre(position de Nyxessa)` sans point de passage ; à vérifier (destination hors NavMesh, ou île de NavMesh à cette sortie).
+- **Héros coincé contre les marches du plateau de Nyxessa** (`Plateau/Marche_1…3`) : le héros reste parfois bloqué à leur bord en poussant le stick (le bot saute ou contourne : 0 à 60 « déblocages » par nuit, surtout Paladin et Assassin, qui vont chercher les squelettes collés à Nyxessa). À vérifier en main (pas de 0,35 m du CharacterController contre des marches d'environ 0,25 m).
+- **Aucune compétence qui ne part pas** : pour toutes les classes, chaque appui de compétence prête a donné une compétence (comptes `appui_x` = `x` dans les mesures), et aucune source de dégâts n'est restée à zéro. Coups du héros annulés par une esquive de squelette : 0 à 2 par nuit.
+
+### Limites
+
+- **Les bots ne sont pas des joueurs** : ils suivent les seuils du simulateur et ne lisent pas les ripostes ; en mêlée dans une foule dense (Assassin, Paladin à la nuit 12), ils perdent du temps à se placer. Les indices de mêlée sont sans doute un peu pessimistes, ceux du Mage et du Rôdeur (qui bougent peu) plus sûrs.
+- **Deux répétitions** par cas (plage des indices de ±0,02 à ±0,17, le plus large pour le Rôdeur en mono et l'Assassin à la nuit 12) ; nuits 3 et 9 non passées (le banc les accepte : `Lancer(…, "3,9", …)`).
+- **×3** : contrôle à ×1 sur un seul passage par classe (voir plus haut ; Viking peut-être sous-estimé).
+- **Comme le simulateur** : pas de boss, pas de bouclier du sorcier, héros immortel (l'Assassin touché ne sort donc pas du mode furtif par les coups reçus), un seul joueur, pas d'améliorations.
