@@ -1,31 +1,31 @@
 {
   "date": "2026-10-01",
-  "pourcent": 69.2,
+  "pourcent": 69.0,
   "kaykit": 1251,
-  "total": 1808,
+  "total": 1814,
   "familles": [
     {
       "nom": "Modèles 3D",
       "kaykit": 1155,
-      "total": 1158,
-      "pourcent": 99.7
+      "total": 1160,
+      "pourcent": 99.6
     },
     {
       "nom": "Textures",
       "kaykit": 96,
-      "total": 112,
-      "pourcent": 85.7
+      "total": 113,
+      "pourcent": 85.0
     },
     {
       "nom": "Animations",
       "kaykit": 0,
-      "total": 32,
+      "total": 33,
       "pourcent": 0.0
     },
     {
       "nom": "Matériaux et shaders",
       "kaykit": 0,
-      "total": 78,
+      "total": 80,
       "pourcent": 0.0
     },
     {

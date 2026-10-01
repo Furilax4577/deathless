@@ -3,7 +3,7 @@
 > **Candidat au [personnage du mois](classes.md)** {décidé} : cette classe est une proposition ; si elle est retenue, elle arrivera comme personnage du mois.
 
 {video media/classes/bavaroise/rotation.mp4} **Rendu 3D** {à confirmer} | Proposition en attente de validation, une chope dans chaque main | {dev} prefab `Bavaroise.prefab` (`BavaroiseBuilder`), clip `Idle_A` ; rendu par `RendusClasses` (`sandbox-rig`)
-{image media/classes/bavaroise/portrait.png} **Portrait** {à confirmer} | De 3/4 face
+{image media/classes/bavaroise/portrait.png} **Portrait** {à confirmer} | De 3/4 face, modèle Tripo v3 texturé
 
 {icone-grande classe_bavaroise}
 
@@ -27,7 +27,7 @@
 - **Jauge : Ivresse** : plus elle est haute, plus ses coups font mal, mais elle titube légèrement ; elle redescend avec le temps.
 - **Effets** : mousse et éclaboussures en gemmes crème et ambre ; pas de vert.
 
-{dev} Modèle : créé de zéro dans le style KayKit (`sandbox-rig/Assets/Art/Bavaroise/`), chopes KayKit `mug_full_Large`.
+{dev} Modèle v3 {à confirmer} : généré par Tripo depuis la T-pose de la planche de Quentin, puis chaîne Blender `ArtSources/Personnages/Bavaroise/bavaroise_pipeline.py` (décimation à 6 558 triangles facettés, nœud du tablier dans le dos, squelette KayKit Rig_Medium du Knight inchangé et poids automatiques corrigés, chope modélisée de 442 triangles) ; FBX `Assets/Art/Bavaroise/Tripo/`, prefab `Bavaroise.prefab` monté par `BavaroiseTripo` (menu Deathless > Personnages > Bavaroise (Tripo)). Texture 2048² cuite depuis la version texturée de Tripo (UV du modèle décimé, cuisson Cycles, correction vers la palette de la planche), matériau URP Lit mat. Ancien portrait : `media/classes/bavaroise/portrait_v1.png`.
 
 ## Clips proposés {à confirmer}
 
