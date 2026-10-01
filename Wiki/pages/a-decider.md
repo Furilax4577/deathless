@@ -14,7 +14,7 @@ Ce qui reste ouvert. Une ligne quitte cette page quand la règle est tranchée e
 | Progression | Premier arbre d'améliorations des compétences (proposition), autres améliorations, économie | [Classes](classes.md#menu-du-personnage-et-points-de-competence) |
 | Village | Maisons la nuit : n'y entrer que le jour ? Reconduire les héros dehors au crépuscule ? | [Le village](village.md) |
 | Mage | Donner un coup critique au Mage (30/09/2026) ? Si oui : chance, multiplicateur, sur quels sorts (boule, cône, grande boule, mur, brûlure). Sa refonte est tranchée depuis le 01/10/2026. | [Mage](classe-mage.md) |
-| Rôdeur | Petit nerf, chiffré par le simulateur de vagues le 01/10/2026 (`Docs/equilibrage-classes.md`, « Simulation de vagues ») : **pleine charge 50 → 48, tête ×2 → ×1,8**, tir rapide inchangé (10). Bon tireur : indice mono-cible 1,14–1,17 → 1,06–1,09, indice en vague 0,94–1,06 (dans ±10 % de la moyenne, jamais sous l'Assassin ni le Paladin) ; une flèche à la tête ne tue plus un sbire d'un coup (86 au lieu de 100). Coût : −6 % pour un joueur moyen, déjà sous la moyenne aux nuits 9 et 12. Si le banc en jeu mesure plus de 50 % de tirs à la tête chez un bon joueur : 45 et ×1,8. À valider, puis à confirmer au banc en jeu. | [Rôdeur](classe-rodeur.md) |
+| Assassin | En vague, il tombe sous la moyenne des classes dès la nuit 9 (indice 0,71 à la nuit 12 pour un joueur moyen, simulateur du 01/10/2026) alors qu'il est le plus fort sur une cible seule (1,3) : lui donner de la zone ou un outil contre les groupes (grenade, arbalète perçante, enchaînement d'exécutions…) ? | [Assassin](classe-assassin.md) |
 
 ## Équilibrage des classes (27/09/2026)
 

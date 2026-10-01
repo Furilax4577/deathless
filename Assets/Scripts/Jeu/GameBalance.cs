@@ -609,9 +609,10 @@ namespace Deathless.Jeu
         public float rodeurVitesse = 5f;
         public float arcCharge = 1.2f;
         public float arcDegatsMin = 10f;
-        [Tooltip("40 → 50 (27/09/2026).")]
-        public float arcDegatsMax = 50f;
-        public float arcTete = 2f;
+        [Tooltip("40 → 50 (27/09/2026) → 48 (01/10/2026, nerf variante F du simulateur de vagues).")]
+        public float arcDegatsMax = 48f;
+        [Tooltip("Tir à la tête de l'arc : ×2 → ×1,8 (01/10/2026, variante F : un sbire ne meurt plus d'une flèche à la tête).")]
+        public float arcTete = 1.8f;
         [Tooltip("Une flèche à pleine charge (100 %) étourdit l'ennemi touché ce temps (s ; moitié sur Morgrim). 0 : aucun.")]
         public float arcEtourdiPleineCharge = 1f;
         [Tooltip("Vitesse de départ de la flèche selon la charge (m/s) : tir rapide → minimum, charge complète → maximum (wiki : projectiles).")]

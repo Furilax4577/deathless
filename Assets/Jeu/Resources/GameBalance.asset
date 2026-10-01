@@ -432,8 +432,8 @@ MonoBehaviour:
   rodeurVitesse: 5
   arcCharge: 1.2
   arcDegatsMin: 10
-  arcDegatsMax: 50
-  arcTete: 2
+  arcDegatsMax: 48
+  arcTete: 1.8
   arcEtourdiPleineCharge: 1
   arcVitesseMin: 18
   arcVitesseMax: 55

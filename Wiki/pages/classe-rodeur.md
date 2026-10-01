@@ -66,13 +66,13 @@ Les gestes joués en jeu pour chaque action, dans l'ordre où ils s'enchaînent.
 - **Tir continu** : RT maintenu après un tir rebande l'arc tout seul.
 - **Esquive pendant qu'il bande** : la flèche est reposée, sans tir.
 - **Pas d'esquive pendant la nuée de flèches.**
-- Valeurs de départ : charge complète en **1,2 s** ; **10 dégâts** sans charge, **40** chargé à fond ; tir à la tête **×2**, aussi pour les flèches de la salve {à équilibrer}.
+- Valeurs de départ : charge complète en **1,2 s** ; **10 dégâts** sans charge, **48** chargé à fond ; tir à la tête **×1,8**, aussi pour les flèches de la salve {à équilibrer}.
 - **Valeurs de départ** des compétences, version 0.2 {à équilibrer} {{dev: (réglées dans `Assets/Jeu/Resources/GameBalance.asset`)}} :
 
 | Sujet | Valeur |
 |---|---|
 | Vie | 120 (110 avant le 27/09/2026) |
-| Arc | 10 dégâts sans charge, 50 chargé à fond (40 avant le 27/09/2026) ; tir rapide toutes les 0,15 s ; pleine charge → Étourdi 1 s |
+| Arc | 10 dégâts sans charge, 48 chargé à fond (40 avant le 27/09/2026, 50 jusqu'au 01/10/2026) ; tête ×1,8 (×2 jusqu'au 01/10/2026) ; tir rapide toutes les 0,15 s ; pleine charge → Étourdi 1 s |
 | Nuée de flèches | 5 salves de 14 dégâts (10 avant le 27/09/2026), recharge 12 s ; la zone ralentit de 40 % qui y reste |
 | Roulade arrière | recul de 4 m, 20 d'endurance, salve de 5 flèches de 18 dégâts (15 avant le 27/09/2026), recharge 8 s |
 
@@ -87,6 +87,16 @@ Suite à l'audit d'équilibrage (`Docs/equilibrage-classes.md`) : le rôdeur ava
 - **Vie** : 110 → **120**.
 
 {dev} `GameBalance` (arc, nuée, salve, PV), `ClasseRodeur` (étourdissement à pleine charge, ralenti de la nuée par le chemin des statuts, hôte fait foi) ; rien de nouveau en réseau.
+
+## Nerf du 01/10/2026 {décidé}
+
+Mesuré par le simulateur de vagues (`Docs/outils/simulateur_vagues.py`, section « Simulation de vagues » de `Docs/equilibrage-classes.md`) : le rôdeur ne dépassait les autres que sur une cible seule entre les mains d'un bon tireur (+14 à +17 %), grâce à la tête (près de la moitié de ses dégâts). Décidé par Quentin (variante F) :
+
+- **Flèche à pleine charge** : 50 → **48** dégâts.
+- **Tir à la tête** : ×2 → **×1,8** (une flèche à la tête ne tue plus un sbire d'un coup : 86 au lieu de 100).
+- Tir rapide inchangé (10).
+
+Effet mesuré : bon tireur sur cible seule 1,14–1,17 → 1,06–1,09 de la moyenne des classes ; joueur moyen −6 %. À confirmer au banc en jeu (taux de tête réel).
 
 {{dev: Fait le 27/09/2026. Étourdi : `Squelette.Etourdir(arcEtourdiPleineCharge, joueur)` à l'impact d'une flèche tirée à `charge ≥ 0,999` (relais `EtourdirRpc` depuis un client ; ×0,5 sur Morgrim par `FacteurEtourdissement`). Ralenti : dans `ClasseRodeur.Pluie`, une salve sur deux (toutes les 0,48 s, 5 salves sur 1,2 s), `Statuts.Ajouter(Ralenti, nueeRalentiDuree 1 s, nueeRalentiForce 0,4)` sur chaque ennemi dans le rayon, règle Prolonger : tant qu'il reste dans la zone, il reste ralenti (demande relayée à l'hôte depuis un client, `StatutsReseau.Valider` accepte déjà Ralenti).}}
 
