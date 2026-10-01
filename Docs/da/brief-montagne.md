@@ -4,6 +4,10 @@ La montagne du nord (falaise, cascade, grotte du portail, pierrier) se fait en *
 
 Pourquoi pas une montagne d'un bloc : on ne la voit que du sud (le dos ne sert à rien), elle fait plus de 100 m de large, et Tripo ne tient pas une telle échelle ni des cotes exactes. Pourquoi Tripo quand même : des blocs arrondis et variés sont ce qu'il fait le mieux, et la vue aérienne de Grok du 01/10/2026 en montre le style visé (gros blocs arrondis, mousse, cascade).
 
+## Par où commencer (essai à faible coût)
+
+**Étape 1 : la pièce héros seule** (image A, puis Tripo). C'est la pièce qui compte le plus et le meilleur test : si Grok et Tripo la rendent bien (blocs arrondis, grotte et cascade à leur place, pas de facettes plates), on passe à l'étape 2 (blocs A à E et pierrier). Sinon, on garde la structure procédurale actuelle (blocs générés par code) et on n'a rien perdu : une image Grok, un modèle Tripo. Le reste de la paroi et le pierrier restent générés par code tant que l'étape 2 n'est pas décidée.
+
 ## Ce qu'on commande
 
 | Pièce | Quantité | Dimensions réelles | Vues à demander | Triangles visés |
