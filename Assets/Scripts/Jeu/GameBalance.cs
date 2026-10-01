@@ -526,8 +526,8 @@ namespace Deathless.Jeu
         public float manaMax = 100f;
         [Tooltip("Mana rendu par seconde (01/10/2026, à équilibrer : 1 → 3, refonte du kit du mage).")]
         public float manaRegen = 3f;
-        [Tooltip("Mana rendu par ennemi touché par la boule de feu (wiki : bonus).")]
-        public float manaParTouche = 4f;
+        [Tooltip("Mana rendu par ennemi touché par la boule de feu. 0 depuis le 01/10/2026 (décision de Quentin : plus de regain sur l'attaque primaire, seule la régénération passive manaRegen reste) ; le champ est gardé comme réglage.")]
+        public float manaParTouche = 0f;
         [Tooltip("Mana consommé par seconde de cône (01/10/2026, à équilibrer : 14 → 10).")]
         public float coneMana = 10f;
         [Tooltip("Dégâts par seconde du cône de flammes (01/10/2026, à équilibrer : 22 → 30), en 4 tics par seconde.")]

@@ -388,7 +388,7 @@ MonoBehaviour:
   bouleInstant: 0.28
   manaMax: 100
   manaRegen: 3
-  manaParTouche: 4
+  manaParTouche: 0
   coneMana: 10
   coneDegats: 30
   conePortee: 6

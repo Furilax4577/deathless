@@ -10,8 +10,9 @@ namespace Deathless.Jeu
     /// tant qu'il reste du mana, qui ralentit ce qu'il touche. Kit refondu le 01/10/2026 (décision de Quentin, refonte (c)
     /// de Docs/equilibrage-classes.md) : grande boule de feu (LB : lente, explosion de 5 m, +1 palier de brûlure à tous les
     /// touchés) et mur de flammes (RB : ligne de feu de 8 m posée devant le mage, 5 s, brûle et ralentit qui le traverse).
-    /// Mana (wiki) : 100, remonte de 3 par seconde (pas pendant le cône), +4 à chaque ennemi touché par la boule ; le cône
-    /// en consomme tant qu'il est maintenu, la grande boule et le mur ont un coût fixe et une recharge.
+    /// Mana (wiki) : 100, remonte de 3 par seconde (pas pendant le cône) ; la boule de feu ne rend plus de mana depuis le
+    /// 01/10/2026 (GameBalance.manaParTouche = 0, décision de Quentin) ; le cône en consomme tant qu'il est maintenu, la
+    /// grande boule et le mur ont un coût fixe et une recharge.
     public class ClasseMage : ClasseHeros
     {
         enum Action { Aucune, Boule, Cone, GrandeBoule, Mur }
@@ -168,7 +169,8 @@ namespace Deathless.Jeu
         void Toucher(Sante s, float degats, Vector3 point, Vector3 dir, bool critique)
         {
             float reel = H.Frapper(s, degats, critique, point, dir, true);
-            if (reel > 0f) m_Mana = Mathf.Min(B.manaMax, m_Mana + B.manaParTouche);   // wiki : bonus par ennemi touché
+            // Regain par ennemi touché : 0 depuis le 01/10/2026 (seule la régénération passive reste) ; réglage gardé dans GameBalance.
+            if (reel > 0f && B.manaParTouche > 0f) m_Mana = Mathf.Min(B.manaMax, m_Mana + B.manaParTouche);
             Brulure.Allumer(s, H, B.brulureRemplissageBoule);   // brûlure en paliers : la boule remplit beaucoup d'un coup
         }
 
