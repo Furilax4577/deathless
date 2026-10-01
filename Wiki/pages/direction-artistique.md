@@ -152,3 +152,9 @@ Images d'ambiance, **hors style du jeu** (matières réalistes) : elles servent 
 - **On garde** : la bouche de grotte large encadrée de gros blocs, le portail vert au fond visible du dehors, la lueur verte qui déborde sur le sol et les rochers, l'allée pavée qui y mène.
 - **On écarte** : la maison du nord-ouest que l'image a fait disparaître (la grotte se loge entre les maisons, dans la falaise) ; l'ancien portail resté sur sa place à droite (il déménage dans la grotte).
 - Règles : [Village](village.md#refonte-de-la-carte).
+
+## Vue aérienne (01/10/2026)
+
+{image media/da/village-aerien-grok-20261001-02.webp} **Vue aérienne de Grok** | Pour l'implantation (brief : `Docs/da/prompts/village-aerien.md`, gabarit `Docs/da/gabarits/village-aerien.png`)
+
+Quentin garde cette vue comme **référence d'implantation** : sorcier au nord-ouest près de la grotte, druide au nord-est, forge à l'est, mécano au sud-est, taverne au sud-ouest, grotte verte à gauche de la cascade, escalier à lanternes du plateau à la grotte, anneau pavé et cristal au centre, chemins de terre vers l'ouest, le sud et l'est. **Écarts avec le plan décidé du 28/09/2026** : la rivière passe à l'ouest (deux ponts) au lieu de longer le plateau à l'est, les trois gués ont disparu, la maison de base est au sud et non à l'ouest. {à confirmer} : laquelle fait foi (voir [À décider](a-decider.md)). Écarts de style, sans conséquence pour l'implantation : soubassements de pierre maçonnée (on veut la dalle lisse), grain de bois et mousse sur les toits, quelques feuillus à couronne ronde.
