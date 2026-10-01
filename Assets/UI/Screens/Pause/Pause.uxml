@@ -12,6 +12,10 @@
                 <ui:Label text="Options" class="pause__label" />
                 <dl:InputPrompt action="UI/Submit" class="dl-menu-item__prompt" />
             </ui:Button>
+            <ui:Button name="pause-succes" class="dl-menu-item pause__item">
+                <ui:Label text="Succès" class="pause__label" />
+                <dl:InputPrompt action="UI/Submit" class="dl-menu-item__prompt" />
+            </ui:Button>
             <ui:Button name="pause-quitter-partie" class="dl-menu-item pause__item">
                 <ui:Label text="Quitter la partie" class="pause__label" />
                 <dl:InputPrompt action="UI/Submit" class="dl-menu-item__prompt" />

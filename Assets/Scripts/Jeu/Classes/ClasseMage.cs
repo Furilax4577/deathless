@@ -22,6 +22,9 @@ namespace Deathless.Jeu
         public override string Id => "mage";
         public override float PvMax => B.magePV;
         public override float Vitesse => B.mageVitesse;
+        /// Attributs : les sorts du Mage sont des coups à distance (Perception) ; il tire ses critiques lui-même.
+        public override bool CoupADistance => true;
+        public override bool CritiquePropre => true;
 
         Action m_Action;
         float m_Depuis;
@@ -51,7 +54,7 @@ namespace Deathless.Jeu
         public override void Initialiser(Heros heros)
         {
             base.Initialiser(heros);
-            m_Mana = B.manaMax;
+            m_Mana = JaugeMax;
             if (pointeBaton == null)
             {
                 var baton = MannequinEquip.Trouver(transform, "staff");
@@ -91,13 +94,13 @@ namespace Deathless.Jeu
         public override bool BloqueSprint => m_Action != Action.Aucune;
         public override bool FaceVisee => m_Action != Action.Aucune;
         public override bool HautDuCorps => m_Action != Action.Aucune;
-        public override void RemplirJauge() { m_Mana = B.manaMax; }
+        public override void RemplirJauge() { m_Mana = JaugeMax; }
         public override JaugeClasse Jauge => JaugeClasse.Mana;
         public override float ValeurJauge => m_Mana;
-        public override float JaugeMax => B.manaMax;
+        public override float JaugeMax => B.manaMax * FacteurJauge;   // Esprit gagné : jauge plus grande
 
         /// Améliorations (ArbreCompetences, une par action) : 0 boule, 1 cône, 2 grande boule, 3 mur.
-        float RechargeGrandeTotale => B.grandeBouleRecharge * Facteur(2);
+        float RechargeGrandeTotale => B.grandeBouleRecharge * Facteur(2) * RechargeEsprit;
         float DureeMur => B.murDuree * Facteur(3);
 
         public override void SurAction(string action)
@@ -114,7 +117,7 @@ namespace Deathless.Jeu
 
         void Boule()
         {
-            if (m_Action != Action.Aucune || Time.time - m_DerniereBoule < B.bouleIntervalle) return;
+            if (m_Action != Action.Aucune || Time.time - m_DerniereBoule < B.bouleIntervalle / VitesseAttaque) return;
             m_Action = Action.Boule;
             m_Depuis = 0f;
             m_DerniereBoule = Time.time;
@@ -161,7 +164,8 @@ namespace Deathless.Jeu
         /// ou au point d'explosion. La brûlure ne critique pas (Brulure.Allumer / Monter inchangés).
         bool TirerCritique(Vector3 point, Vector3 dir, Sante direct)
         {
-            bool crit = !H.Distant && Random.value < B.mageCritiqueChance;
+            // Attributs (01/10/2026) : + Chance et Perception gagnées (sorts du Mage : coups à distance).
+            bool crit = !H.Distant && Random.value < B.mageCritiqueChance + Attributs.ChanceCritique(EtatJ, true);
             if (crit) Critique(direct != null && !direct.Mort ? direct.transform.position + Vector3.up * 1.1f : point, -dir, false);
             return crit;
         }
@@ -170,7 +174,7 @@ namespace Deathless.Jeu
         {
             float reel = H.Frapper(s, degats, critique, point, dir, true);
             // Regain par ennemi touché : 0 depuis le 01/10/2026 (seule la régénération passive reste) ; réglage gardé dans GameBalance.
-            if (reel > 0f && B.manaParTouche > 0f) m_Mana = Mathf.Min(B.manaMax, m_Mana + B.manaParTouche);
+            if (reel > 0f && B.manaParTouche > 0f) m_Mana = Mathf.Min(JaugeMax, m_Mana + B.manaParTouche);
             Brulure.Allumer(s, H, B.brulureRemplissageBoule);   // brûlure en paliers : la boule remplit beaucoup d'un coup
         }
 
@@ -225,6 +229,7 @@ namespace Deathless.Jeu
             var b = B;
             ExplosionGrandeBoule(point);
             int n = 0;
+            m_TuesGrande = 0;
             bool crit = TirerCritique(point, dir, direct);
             float k = crit ? b.mageCritiqueMultiplicateur : 1f;
             if (direct != null && !direct.Mort) { ToucherGrande(direct, b.grandeBouleDegats * k, point, dir, crit); n++; }
@@ -234,12 +239,16 @@ namespace Deathless.Jeu
                 ToucherGrande(s, b.grandeBouleDegatsZone * k, point, dir, crit);
                 n++;
             }
+            Deathless.Succes.ServiceSucces.GrandeBoule(H, m_TuesGrande);   // succès « Grande boule, grand ménage »
             if (H.Partie != null) H.Partie.Journal("Grande boule de feu : explose à " + Vector3.Distance(transform.position, point).ToString("F1") + " m" + (direct != null ? ", coup direct" : "") + ", " + n + " touchés" + (crit ? ", critique" : "") + ", mana " + m_Mana.ToString("F0"));
         }
 
+        int m_TuesGrande;   // ennemis achevés par la grande boule en cours d'explosion (succès)
+
         void ToucherGrande(Sante s, float degats, Vector3 point, Vector3 dir, bool critique)
         {
-            H.Frapper(s, degats, critique, point, dir, false);
+            float pvAvant = s.Pv;
+            if (Deathless.Succes.ServiceSucces.Acheve(s, pvAvant, H.Frapper(s, degats, critique, point, dir, false))) m_TuesGrande++;
             Brulure.Monter(s, H);   // +1 palier de brûlure d'un coup (décidé le 01/10/2026)
         }
 
@@ -250,7 +259,7 @@ namespace Deathless.Jeu
             var b = B;
             if (!PeutLancer(m_RechargeMur, b.murMana)) return;
             m_Mana -= b.murMana;
-            m_RechargeMur = b.murRecharge;
+            m_RechargeMur = b.murRecharge * RechargeEsprit;
             m_Action = Action.Mur;
             m_Depuis = 0f;
             m_MurPose = false;
@@ -313,6 +322,7 @@ namespace Deathless.Jeu
                         prochainPalier[s] = Time.time + b.murIntervallePalier;
                     }
                 }
+                Deathless.Succes.ServiceSucces.MurDeFlammes(H, prochainPalier.Count);   // ennemis entrés dans ce mur (succès)
                 yield return new WaitForSeconds(0.25f);
             }
         }
@@ -323,7 +333,7 @@ namespace Deathless.Jeu
         {
             m_RechargeGrande = Mathf.Max(0f, m_RechargeGrande - dt);
             m_RechargeMur = Mathf.Max(0f, m_RechargeMur - dt);
-            if (m_Action != Action.Cone) m_Mana = Mathf.Min(B.manaMax, m_Mana + B.manaRegen * dt);
+            if (m_Action != Action.Cone) m_Mana = Mathf.Min(JaugeMax, m_Mana + B.manaRegen * dt);
         }
 
         public override void Maj(float dt, Vector3 dir)
@@ -335,8 +345,8 @@ namespace Deathless.Jeu
             switch (m_Action)
             {
                 case Action.Boule:
-                    if (!m_BouleLancee && m_Depuis >= b.bouleInstant) LancerBoule();
-                    if (m_Depuis >= Mathf.Min(b.bouleIntervalle, 0.7f)) m_Action = Action.Aucune;
+                    if (!m_BouleLancee && m_Depuis >= b.bouleInstant / VitesseAttaque) LancerBoule();   // Agilité gagnée : lancer plus tôt
+                    if (m_Depuis >= Mathf.Min(b.bouleIntervalle, 0.7f) / VitesseAttaque) m_Action = Action.Aucune;
                     break;
                 case Action.GrandeBoule:
                     if (!m_GrandeLancee && m_Depuis >= b.grandeBouleInstant) LancerGrandeBoule();
@@ -432,8 +442,8 @@ namespace Deathless.Jeu
         {
             ArreterCone();
             // Sort coupé avant de partir (esquive, étourdissement, mort) : mana et recharge rendus.
-            if (m_Action == Action.GrandeBoule && !m_GrandeLancee) { m_Mana = Mathf.Min(B.manaMax, m_Mana + B.grandeBouleMana); m_RechargeGrande = 0f; }
-            if (m_Action == Action.Mur && !m_MurPose) { m_Mana = Mathf.Min(B.manaMax, m_Mana + B.murMana); m_RechargeMur = 0f; }
+            if (m_Action == Action.GrandeBoule && !m_GrandeLancee) { m_Mana = Mathf.Min(JaugeMax, m_Mana + B.grandeBouleMana); m_RechargeGrande = 0f; }
+            if (m_Action == Action.Mur && !m_MurPose) { m_Mana = Mathf.Min(JaugeMax, m_Mana + B.murMana); m_RechargeMur = 0f; }
             m_Action = Action.Aucune;
         }
 
@@ -452,7 +462,7 @@ namespace Deathless.Jeu
                 }
                 case 3:
                 {
-                    var e = Recharge(m_RechargeMur, b.murRecharge, out restant, out total, m_Action == Action.Mur);
+                    var e = Recharge(m_RechargeMur, b.murRecharge * RechargeEsprit, out restant, out total, m_Action == Action.Mur);
                     return e == EtatEmplacement.Pret && m_Mana < b.murMana ? EtatEmplacement.Indisponible : e;
                 }
                 default: return EtatEmplacement.Vide;

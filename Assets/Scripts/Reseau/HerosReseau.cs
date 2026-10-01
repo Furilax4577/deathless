@@ -26,6 +26,10 @@ namespace Deathless.Reseau
         // Soins reçus cumulés, écrits par le propriétaire (le seul à voir Sante.Soigne) : l'hôte crédite la différence
         // au score du joueur (Partie.CompterSoins), sinon les soins d'un client restaient à 0 sur l'écran de score.
         readonly NetworkVariable<float> m_Soins = new NetworkVariable<float>(0f, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        // Attributs (01/10/2026) : points d'attribut gagnés (Attributs.Tasser, 4 bits par attribut), écrits par le
+        // propriétaire qui les dépense comme ses rangs de compétence ; recopiés dans l'EtatJoueur de la marionnette, où
+        // l'hôte les lit pour ce qu'il décide (or ramassé, recul de la parade parfaite).
+        readonly NetworkVariable<int> m_Attributs = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
         /// Héros réseau présents (tous les postes), dans l'ordre d'apparition.
         public static readonly List<HerosReseau> Tous = new List<HerosReseau>();
@@ -155,12 +159,20 @@ namespace Deathless.Reseau
                 if (!Mathf.Approximately(m_VieMax.Value, Heros.Sante.pvMax)) m_VieMax.Value = Heros.Sante.pvMax;
                 bool furtif = Heros.Classe != null && Heros.Classe.Furtif;
                 if (m_Furtif.Value != furtif) m_Furtif.Value = furtif;
+                int attributs = Attributs.Tasser(Heros.EtatJoueur != null ? Heros.EtatJoueur.attributs : null);
+                if (m_Attributs.Value != attributs) m_Attributs.Value = attributs;
             }
             else
             {
                 // Marionnette : vie, furtivité et mort recopiées (les squelettes de l'hôte la visent ou l'ignorent en conséquence).
                 Heros.Sante.Fixer(m_Mort.Value ? 0f : m_Vie.Value, m_VieMax.Value);
                 if (Heros.Classe is ClasseAssassin a) a.ForcerFurtifDistant(m_Furtif.Value);
+                var ej = Heros.EtatJoueur;
+                if (ej != null)
+                {
+                    if (ej.attributs == null || ej.attributs.Length < Attributs.Nombre) System.Array.Resize(ref ej.attributs, Attributs.Nombre);
+                    Attributs.Detasser(m_Attributs.Value, ej.attributs);
+                }
                 if (m_Mort.Value != m_MortVue)
                 {
                     m_MortVue = m_Mort.Value;

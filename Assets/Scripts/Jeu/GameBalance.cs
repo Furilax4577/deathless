@@ -188,13 +188,13 @@ namespace Deathless.Jeu
         public float morgrimMassueFracasOndeVitesse = 6f;
         public float morgrimMassueFracasOndeRayonMax = 14f;
         public float morgrimMassueFracasOndeLargeurBande = 1.4f;
-        public float morgrimMassueFracasPreparation = 1.6f;
+        public float morgrimMassueFracasPreparation = 1.35f;
         [Tooltip("Tourbillon (Massue) : dégâts continus à 360° tant qu'un joueur reste dans le rayon, thème Terre.")]
         public float morgrimMassueTourbillonRayon = 3f;
         public float morgrimMassueTourbillonDegatsParSeconde = 18f;
         public float morgrimMassueTourbillonDuree = 1.8f;
-        public float morgrimMassueTourbillonPreparation = 1f;
-        public float morgrimMassueTourbillonRecharge = 10f;
+        public float morgrimMassueTourbillonPreparation = 0.85f;
+        public float morgrimMassueTourbillonRecharge = 6.5f;
         [Tooltip("Tourbillon : léger recul (wiki : ennemis.md), impulsion vers l'extérieur (m/s, amortie) donnée toutes les morgrimMassueTourbillonReculIntervalle s à qui reste dans le rayon.")]
         public float morgrimMassueTourbillonRecul = 3f;
         public float morgrimMassueTourbillonReculIntervalle = 0.3f;
@@ -203,35 +203,37 @@ namespace Deathless.Jeu
         public float morgrimMassueChargeVitesse = 9f;
         public float morgrimMassueChargeLargeur = 1.6f;
         public float morgrimMassueChargeDegats = 50f;
-        public float morgrimMassueChargePreparation = 1.4f;
-        public float morgrimMassueChargeRecharge = 12f;
+        public float morgrimMassueChargePreparation = 1.15f;
+        public float morgrimMassueChargeRecharge = 7.5f;
         [Tooltip("Fauche (Martache) : coup en cône devant lui, thème Rage.")]
         public float morgrimMartacheFaucheRayon = 3.2f;
         public float morgrimMartacheFaucheAngle = 110f;
         public float morgrimMartacheFaucheDegats = 42f;
         public float morgrimMartacheFaucheDegatsNyxessa = 56f;
-        public float morgrimMartacheFauchePreparation = 1.3f;
+        public float morgrimMartacheFauchePreparation = 1.1f;
         [Tooltip("Fend-sol (Martache) : ligne qui ralentit (Ralenti) les joueurs restés dedans, thème Terre (c'est le sol qui casse).")]
         public float morgrimMartacheFendSolLongueur = 5f;
         public float morgrimMartacheFendSolLargeur = 1.4f;
         public float morgrimMartacheFendSolDegats = 28f;
         public float morgrimMartacheFendSolRalentiDuree = 3f;
         [Range(0f, 0.9f)] public float morgrimMartacheFendSolRalentiForce = 0.4f;
-        public float morgrimMartacheFendSolPreparation = 1.5f;
-        public float morgrimMartacheFendSolRecharge = 9f;
+        public float morgrimMartacheFendSolPreparation = 1.25f;
+        public float morgrimMartacheFendSolRecharge = 6f;
         [Tooltip("Fend-sol : la fissure reste au sol ce temps (s) et ralentit qui s'y tient (Ralenti renouvelé toutes les 0,5 s, force morgrimMartacheFendSolRalentiForce).")]
         public float morgrimMartacheFendSolFissureDuree = 4f;
         [Tooltip("Coup de brèche (Martache) : vise le bouclier de Nyxessa, dégâts renforcés contre lui, thème Rage.")]
         public float morgrimMartacheBrecheDegats = 70f;
         public float morgrimMartacheBrecheMultiplicateurBouclier = 2f;
-        public float morgrimMartacheBrechePreparation = 1.2f;
-        public float morgrimMartacheBrecheRecharge = 8f;
+        public float morgrimMartacheBrechePreparation = 1f;
+        public float morgrimMartacheBrecheRecharge = 5f;
 
         [Header("Nécromancien (boss final, nuit 12)")]
-        public float necroPV = 1200f;
+        [Tooltip("PV du corps de Nyxar (× multiplicateur de la nuit). Depuis le 01/10/2026, il prend des dégâts dès le début (×nyxarEclatMultiplicateur par un éclat).")]
+        public float necroPV = 1800f;
         public float necroVitesse = 2.6f;
         public float necroDegats = 18f;
-        public float necroVitesseMissile = 12f;
+        [Tooltip("Vitesse des crânes de Nyxar (m/s ; 12 avant le 01/10/2026). Le mage squelette a la sienne (mageVitesseMissile).")]
+        public float necroVitesseMissile = 9f;
         public float necroPorteeTir = 22f;
         public float necroIntervalleTir = 3f;
         public Vector2 necroDistance = new Vector2(12f, 18f);
@@ -243,7 +245,13 @@ namespace Deathless.Jeu
         [Header("Nyxar, kit complet (wiki : ennemis.md, Nyxar ; 30/09/2026, valeurs à équilibrer)")]
         [Tooltip("Salve de crânes (grimoire intact) : nombre de crânes par salve et écart entre deux (s). Grimoire brisé : un seul crâne.")]
         public int nyxarSalveCranes = 3;
-        public float nyxarSalveEcart = 0.3f;
+        public float nyxarSalveEcart = 0.6f;
+        [Tooltip("Crânes de Nyxar esquivables (01/10/2026) : guidage (°/s, sans resserrement final ; 90 et ×4 sous 4 m avant), coupé pour de bon " +
+            "à moins de nyxarCraneCoupureDistance m de la cible ou si elle sort de ±nyxarCraneCoupureAngle° devant le crâne ; ensuite il file tout droit " +
+            "(un pas de côté ou une roulade au bon moment le fait rater). Ne touche pas aux crânes de Nyxessa ni du mage squelette.")]
+        public float nyxarCraneGuidage = 45f;
+        public float nyxarCraneCoupureDistance = 7f;
+        public float nyxarCraneCoupureAngle = 55f;
         [Tooltip("Téléportation (couronne intacte) : un joueur à moins de nyxarTeleportDeclencheur m la déclenche ; il réapparaît à une distance tirée entre x et y m ; recharge (s).")]
         public float nyxarTeleportDeclencheur = 5f;
         public Vector2 nyxarTeleportDistance = new Vector2(11f, 16f);
@@ -255,8 +263,11 @@ namespace Deathless.Jeu
         public float nyxarFauxDegats = 30f;
         public float nyxarFauxPreparation = 0.75f;
         public float nyxarFauxIntervalle = 2.4f;
-        [Tooltip("Éclats de Nyx (couronne et grimoire) : PV de chacun (× multiplicateur de PV de la nuit). Chaque éclat brisé retire un tiers des PV max de Nyxar ; il n'est tuable qu'une fois les deux brisés.")]
-        public float nyxarEclatPV = 320f;
+        [Tooltip("Éclats de Nyx (couronne et grimoire) : PV de chacun (× multiplicateur de PV de la nuit). Un coup sur un éclat (01/10/2026) est un " +
+            "critique garanti : ×nyxarEclatMultiplicateur sur Nyxar, et l'éclat s'use du coup de base. Un éclat cède aussi de lui-même à 2/3 puis 1/3 " +
+            "des PV de Nyxar. Brisé : part du kit perdue (pas de PV en moins).")]
+        public float nyxarEclatPV = 200f;
+        public float nyxarEclatMultiplicateur = 2f;
         [Tooltip("Phase 3 (les deux éclats brisés) : enragé, au corps à corps à la faux. Vitesse (m/s), dégâts aux joueurs et à Nyxessa, préparation, intervalle (s), portée (m).")]
         public float nyxarEnrageVitesse = 4.2f;
         public float nyxarEnrageDegats = 38f;
@@ -273,24 +284,37 @@ namespace Deathless.Jeu
         public float morgrimBalayageAngle = 200f;
         public float morgrimBalayageDegats = 36f;
         public float morgrimBalayageRecul = 5f;
-        public float morgrimBalayagePreparation = 1.5f;
-        public float morgrimBalayageRecharge = 9f;
+        public float morgrimBalayagePreparation = 1.25f;
+        public float morgrimBalayageRecharge = 5.5f;
         [Tooltip("Coup écrasé : frappe par-dessus au sol, onde de choc autour de lui (vitesse m/s, rayon m, bande m) ; à sauter comme le Fracas ; dégâts et Renversé au sol.")]
         public float morgrimEcraseDegats = 34f;
         public float morgrimEcraseDegatsNyxessa = 45f;
         public float morgrimEcraseOndeVitesse = 7f;
         public float morgrimEcraseOndeRayonMax = 8f;
         public float morgrimEcraseOndeLargeurBande = 1.3f;
-        public float morgrimEcrasePreparation = 1.8f;
-        public float morgrimEcraseRecharge = 14f;
+        public float morgrimEcrasePreparation = 1.5f;
+        public float morgrimEcraseRecharge = 9f;
         [Tooltip("Cri : quand au moins morgrimCriSquelettesMin squelettes sont à moins de morgrimCriRayon m, il crie (préparation s) et les galvanise (statut Galvanisé) : dégâts +bonus, vitesse +bonus, pendant la durée (s). Recharge (s).")]
         public float morgrimCriRayon = 12f;
         public int morgrimCriSquelettesMin = 3;
-        public float morgrimCriPreparation = 1.1f;
-        public float morgrimCriRecharge = 22f;
+        public float morgrimCriPreparation = 1f;
+        public float morgrimCriRecharge = 15f;
         public float morgrimCriDuree = 8f;
         public float morgrimCriBonusDegats = 0.3f;
         public float morgrimCriBonusVitesse = 0.25f;
+        [Header("Morgrim offensif (retour de Quentin, 01/10/2026 ; valeurs à équilibrer)")]
+        [Tooltip("Il chasse les joueurs : le plus proche vu à moins de morgrimDetection m (ou celui qui l'a frappé depuis moins de " +
+            "morgrimAgressionDuree s, jusqu'à morgrimDetection × 1,5 m) ; Nyxessa seulement quand aucun joueur n'est à portée.")]
+        public float morgrimDetection = 22f;
+        public float morgrimAgressionDuree = 4f;
+        [Tooltip("Cadence de base (s entre deux coups ; 4 pour le Golem d'origine), pas de marche et vitesse de course (m/s) quand sa proie " +
+            "est à plus de morgrimCourseDistance m.")]
+        public float morgrimIntervalle = 2.8f;
+        public float morgrimVitesse = 2.4f;
+        public float morgrimVitesseCourse = 3.4f;
+        public float morgrimCourseDistance = 6f;
+        [Tooltip("Enchaînement : après un coup simple (Fracas, Fauche), si une compétence est prête, elle part après ce délai (s) au lieu de la récupération ordinaire.")]
+        public float morgrimEnchainementDelai = 0.45f;
 
         [Header("Nyxessa (wiki : nyxessa ; missiles par palier, achetés à la relique)")]
         public float nyxessaPV = 2000f;
@@ -760,6 +784,46 @@ namespace Deathless.Jeu
         public float renverseMartelementIntervalleMaintenir = 0.15f;
         [Tooltip("Plafond de réduction, en part de la durée totale du Renversé (0,5 = jamais plus de moitié moins).")]
         [Range(0f, 0.9f)] public float renverseMartelementPlafond = 0.5f;
+
+        [Header("Attributs (wiki : classes.md, Attributs ; décidé 01/10/2026, chiffres à équilibrer)")]
+        [Tooltip("01/10/2026 : répartition de départ des 18 points d'attribut du Paladin (Force, Endurance, Agilité, Perception, Esprit, Chance). " +
+                 "Règle d'équilibre (à confirmer) : les stats actuelles correspondent à cette répartition ; seuls les points gagnés ajoutent les bonus ci-dessous.")]
+        public int[] attributsPaladin = { 4, 6, 2, 1, 3, 2 };
+        [Tooltip("01/10/2026 : répartition de départ du Viking (Force, Endurance, Agilité, Perception, Esprit, Chance).")]
+        public int[] attributsViking = { 6, 5, 3, 1, 2, 1 };
+        [Tooltip("01/10/2026 : répartition de départ du Mage (Force, Endurance, Agilité, Perception, Esprit, Chance).")]
+        public int[] attributsMage = { 1, 2, 3, 3, 6, 3 };
+        [Tooltip("01/10/2026 : répartition de départ du Rôdeur (Force, Endurance, Agilité, Perception, Esprit, Chance).")]
+        public int[] attributsRodeur = { 1, 3, 5, 6, 2, 1 };
+        [Tooltip("01/10/2026 : répartition de départ de l'Assassin (Force, Endurance, Agilité, Perception, Esprit, Chance).")]
+        public int[] attributsAssassin = { 3, 2, 6, 2, 1, 4 };
+        [Tooltip("01/10/2026, Force, par point gagné : part de dégâts au corps à corps ajoutée (0,03 = +3 %).")]
+        public float attributForceDegats = 0.03f;
+        [Tooltip("01/10/2026, Force, par point gagné : part de recul infligé ajoutée (charge bélier, coup de bouclier ; 0,05 = +5 %).")]
+        public float attributForceRecul = 0.05f;
+        [Tooltip("01/10/2026, Endurance, par point gagné : points de vie maximum ajoutés.")]
+        public float attributEndurancePv = 8f;
+        [Tooltip("01/10/2026, Endurance, par point gagné : endurance maximum ajoutée (garde, esquive, course).")]
+        public float attributEnduranceEndurance = 5f;
+        [Tooltip("01/10/2026, Agilité, par point gagné : part de vitesse de déplacement et d'attaque (cadence de l'attaque RT) ajoutée (0,02 = +2 %).")]
+        public float attributAgiliteVitesse = 0.02f;
+        [Tooltip("01/10/2026, Agilité, par point gagné : part de recharge de l'esquive retirée (0,03 = −3 %).")]
+        public float attributAgiliteEsquive = 0.03f;
+        [Tooltip("01/10/2026, Perception, par point gagné : part de dégâts à distance ajoutée (flèches, carreaux, sorts du Mage ; 0,03 = +3 %).")]
+        public float attributPerceptionDegats = 0.03f;
+        [Tooltip("01/10/2026, Perception, par point gagné : chance de critique à distance ajoutée (0,01 = +1 %).")]
+        public float attributPerceptionCritique = 0.01f;
+        [Tooltip("01/10/2026, Esprit, par point gagné : part de la jauge de classe ajoutée à son maximum (mana, rage ; 0,05 = +5 %).")]
+        public float attributEspritJauge = 0.05f;
+        [Tooltip("01/10/2026, Esprit, par point gagné : part de recharge des compétences retirée (LB, RB, arbalète ; 0,02 = −2 %).")]
+        public float attributEspritRecharge = 0.02f;
+        [Tooltip("01/10/2026, Chance, par point gagné : chance de critique ajoutée à tous les coups (0,01 = +1 %).")]
+        public float attributChanceCritique = 0.01f;
+        [Tooltip("01/10/2026, Chance, par point gagné : part d'or ramassé ajoutée (butins du donjon ; 0,03 = +3 %).")]
+        public float attributChanceOr = 0.03f;
+        [Tooltip("01/10/2026 : multiplicateur des dégâts d'un critique tiré grâce aux attributs (coup qui n'était pas déjà critique ; " +
+                 "le Mage garde mageCritiqueMultiplicateur).")]
+        public float attributCritiqueMultiplicateur = 2f;
 
         [Header("Mort et réapparition (wiki : deroule)")]
         public float reapparitionBase = 8f;

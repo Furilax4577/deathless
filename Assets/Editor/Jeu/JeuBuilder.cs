@@ -956,7 +956,7 @@ namespace Deathless.EditorTools
             // Vagues et zones d'apparition sur les clairières.
             var dv = jeu.AddComponent<DirecteurVagues>();
             var spawns = village.Find("Foret/Spawns");
-            dv.clairieres = new[] { spawns.Find("Spawn_Nord"), spawns.Find("Spawn_SudEst"), spawns.Find("Spawn_SudOuest") };
+            dv.clairieres = System.Array.ConvertAll(VillageBuilder.TrailName, n => spawns.Find("Spawn_" + n));   // carte v5 : est, sud, ouest
             var zonesRacine = new GameObject("Zones").transform;
             zonesRacine.SetParent(jeu.transform, false);
             var zonePrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/VFX/ZoneApparition/ZoneApparition.prefab");

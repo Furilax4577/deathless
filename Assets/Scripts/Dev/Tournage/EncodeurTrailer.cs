@@ -15,6 +15,9 @@ namespace Deathless.Dev.Tournage
     /// Les plans sont enchaînés dans le même fichier : pas de concaténation après coup.
     public class EncodeurTrailer : IDisposable
     {
+        // Succès (01/10/2026) : outil de dev utilisé dans ce Play, plus rien ne compte jusqu'à la fin du Play.
+        static EncodeurTrailer() { Deathless.Succes.ServiceSucces.SuspendreDev("EncodeurTrailer"); }
+
         public readonly int largeur, hauteur, ips;
         public string Chemin { get; private set; }
         public int Images { get; private set; }

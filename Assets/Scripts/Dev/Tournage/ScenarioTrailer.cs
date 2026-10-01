@@ -22,6 +22,9 @@ namespace Deathless.Dev.Tournage
     /// essais (Tournage.Lancer("4", apercu: true)) sans recompiler.
     public class ScenarioTrailer
     {
+        // Succès (01/10/2026) : outil de dev utilisé dans ce Play, plus rien ne compte jusqu'à la fin du Play.
+        static ScenarioTrailer() { Deathless.Succes.ServiceSucces.SuspendreDev("ScenarioTrailer"); }
+
         readonly Tournage T;
         CameraTournage Cam => T.Cam;
         HabillageTrailer Hab => T.Hab;

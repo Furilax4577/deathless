@@ -446,8 +446,10 @@ namespace Deathless.Jeu
             if (r == null || h == null || j == null || !h.Vivant) return;
             if (Vector3.Distance(h.transform.position, r.transform.position) > B.distanceCoffre + 1.5f) return;
             Pris |= 1 << index;
-            int or = Montant(r.butin);
+            // Attributs (01/10/2026) : Chance gagnée, +or ramassé (points du joueur reçus par HerosReseau chez l'hôte).
+            int or = Mathf.RoundToInt(Montant(r.butin) * Attributs.FacteurOr(j));
             j.orPorte += or;
+            if (r.butin != TypeButin.TasOr) Deathless.Succes.ServiceSucces.CoffreOuvert(joueurId);   // succès (coffres)
             P.Journal("Donjon : " + j.nom + " prend " + (r.butin == TypeButin.GrandCoffre ? "le grand coffre" : r.butin == TypeButin.Coffre ? "un coffre" : "un tas d'or") + " (" + or + " or ; porté : " + j.orPorte + ")");
         }
 
@@ -607,6 +609,7 @@ namespace Deathless.Jeu
             m_Sacs.RemoveAt(idx);
             if (ReseauJeu.EnPartie) PartieReseau.Instance?.RetirerSacReseau(id);
             j.orPorte += sac.montant;
+            if (sac.nom != j.nom) Deathless.Succes.ServiceSucces.SacAllie(joueurId);   // succès « Ce qui est à toi est à moi »
             P.Journal("Donjon : " + j.nom + " ramasse le sac de " + sac.nom + " (" + sac.montant + " or ; porté : " + j.orPorte + ")");
         }
 
@@ -744,6 +747,7 @@ namespace Deathless.Jeu
             }
             var p = P;
             int porte = p.JoueurLocal != null ? p.JoueurLocal.orPorte : 0;
+            Deathless.Succes.ServiceSucces.PortailRetour();   // succès « Juste à temps » (moins de 3 s avant la fermeture)
             StartCoroutine(Transit(h, SortieVillage, false, PortailRetourVisuel, PortailVillage));
             if (Partie.ClientReseau) PartieReseau.Instance?.DeposerOr();
             else Deposer(h.Id);

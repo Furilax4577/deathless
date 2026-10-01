@@ -92,6 +92,7 @@ namespace Deathless.Jeu
             m_ParfaiteSource = source;
             m_ParfaiteDepuis = Time.time;
             Parfaites++;
+            Deathless.Succes.ServiceSucces.ParadeParfaite(m_H);   // succès « Mur de fer » (cumul)
             if (m_Suivi && source == m_Coup.source) { m_Resultat = ResultatParade.Parfaite; m_ResultatDepuis = Time.time; }
         }
 
@@ -192,7 +193,7 @@ namespace Deathless.Jeu
             {
                 Vector3 d = sq.transform.position - o; d.y = 0f;
                 Vector3 sens = d.sqrMagnitude > 0.04f ? Vector3.Slerp(direction, d.normalized, 0.6f).normalized : direction;
-                sq.Repousser(sens * b.paradeParfaiteRepousse, b.paradeParfaiteEtourdi, h.Id);
+                sq.Repousser(sens * b.paradeParfaiteRepousse * Attributs.FacteurRecul(h.EtatJoueur), b.paradeParfaiteEtourdi, h.Id);   // Force gagnée : +recul
             }
             if (h.Partie != null)
                 h.Partie.Journal("Parade parfaite : " + touches.Count + " repoussé(s) et étourdi(s)" + (note != null ? " (" + note + ")" : ""));

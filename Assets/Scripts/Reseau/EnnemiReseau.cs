@@ -68,7 +68,7 @@ namespace Deathless.Reseau
             sq.Sante.relais = Relayer;
             sq.Sante.Fixer(m_Pv.Value, m_PvMax.Value);
             BrancherStatuts();
-            if (sq is Necromancien nx) { nx.BrancherEclatsDistants(this); nx.RecevoirEclats(m_Eclats.Value); }
+            if (sq is Necromancien nx) nx.RecevoirEclats(m_Eclats.Value);
             DirecteurVagues.Instance?.AjouterDistant(sq);
             StartCoroutine(SortieVisuelle());
         }
@@ -126,7 +126,7 @@ namespace Deathless.Reseau
         float Relayer(InfoDegats info)
         {
             var s = Squelette.Sante;
-            // Invulnérable chez l'hôte (Nyxar tant qu'un éclat de Nyx tient, recopié ici) : rien à envoyer ni à afficher.
+            // Invulnérable : rien à envoyer ni à afficher.
             if (s.invulnerable) return 0f;
             float estime = Mathf.Min(info.montant, s.Pv);
             if (!info.continu) AudioBank.Jouer(SonsDuJeu.SqueletteTouche, transform.position + Vector3.up, 0.8f, 0.05f);
@@ -310,11 +310,12 @@ namespace Deathless.Reseau
             if (nt != null && nt.IsSpawned && nt.IsOwner) nt.Teleport(transform.position, transform.rotation, transform.localScale);
         }
 
-        /// Client : un héros de ce poste frappe un éclat de Nyx (0 : couronne, 1 : grimoire) ; l'hôte applique le coup.
+        /// Client : un héros de ce poste frappe un éclat de Nyx (0 : couronne, 1 : grimoire). Depuis le 01/10/2026, le
+        /// critique sur le corps part par le relais ordinaire (Necromancien.CoupSurEclat → Relayer) ; ici, seulement
+        /// l'usure de l'éclat et l'effet de critique, décidés et diffusés par l'hôte (Necromancien.AbimerEclat).
         public float RelayerEclat(int index, InfoDegats info, float pvEclat)
         {
             if (info.montant <= 0f || pvEclat <= 0f) return 0f;
-            if (!info.continu) AudioBank.Jouer(SonsDuJeu.SqueletteTouche, info.point, 0.6f, 0.05f);
             FrapperEclatRpc((byte)index, info.montant, info.critique, info.continu, info.point, info.direction);
             return Mathf.Min(info.montant, pvEclat);
         }
@@ -323,17 +324,13 @@ namespace Deathless.Reseau
         void FrapperEclatRpc(byte index, float montant, bool critique, bool continu, Vector3 point, Vector3 direction, RpcParams p = default)
         {
             if (!(Squelette is Necromancien n)) return;
-            var e = n.Eclat(index);
-            if (e == null || e.Sante == null || e.Sante.Mort) return;
-            ulong client = p.Receive.SenderClientId;
-            int id = Partie.IdJoueur(client);
+            int id = Partie.IdJoueur(p.Receive.SenderClientId);
             var h = Partie.Instance != null ? Partie.Instance.HerosDe(id) : null;
-            float reel = e.Sante.Encaisser(new InfoDegats
+            n.AbimerEclat(index, new InfoDegats
             {
                 montant = montant, sourceId = id, equipeSource = Equipe.Heros, source = h != null ? h.gameObject : null,
                 critique = critique, continu = continu, point = point, direction = direction
             });
-            if (reel > 0f && Partie.Instance != null) Partie.Instance.CompterDegats(id, reel, critique);
         }
     }
 }

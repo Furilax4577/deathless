@@ -18,6 +18,9 @@ namespace Deathless.Jeu
 
         public override string Id => "assassin";
         public override float PvMax => B.assassinPV;
+        /// Attributs : la dague est au corps à corps (Force), le carreau à distance (Perception), posé le temps du coup.
+        bool m_CoupADistance;
+        public override bool CoupADistance => m_CoupADistance;
         public override float Vitesse => m_Furtif && !H.Sprinte ? B.marcheDiscrete : B.assassinVitesse;
 
         Action m_Action;
@@ -126,6 +129,7 @@ namespace Deathless.Jeu
             // Multijoueur : repéré chez l'hôte (marionnette) ; c'est son propriétaire qui sort du mode furtif.
             if (H != null && H.Distant) { H.GetComponent<Deathless.Reseau.HerosReseau>()?.SignalerRepere(); return; }
             m_DernierCombat = Time.time;
+            Deathless.Succes.ServiceSucces.FurtifRompu(H);   // série « Personne ne m'a vu » rompue
             if (!m_Furtif) return;
             SortirFurtif();
             AudioBank.Jouer(SonsDuJeu.Repere, transform.position + Vector3.up * 1.6f, 0.9f);
@@ -203,7 +207,7 @@ namespace Deathless.Jeu
             m_BondDepart = origine;
             m_BondArrivee = origine + dir * distance;
             m_BondDuree = Mathf.Max(0.05f, b.pasOmbreDuree * Mathf.Clamp01(distance / Mathf.Max(0.1f, b.pasOmbreDistance)));
-            m_RechargePasOmbre = b.pasOmbreRecharge * Facteur(3);
+            m_RechargePasOmbre = b.pasOmbreRecharge * Facteur(3) * RechargeEsprit;
             m_Action = Action.Bond;
             m_Depuis = 0f;
             H.Tourner(dir);
@@ -264,7 +268,7 @@ namespace Deathless.Jeu
 
         void Dague()
         {
-            if (m_Action != Action.Aucune || Time.time - m_DerniereDague < B.dagueIntervalle) return;
+            if (m_Action != Action.Aucune || Time.time - m_DerniereDague < B.dagueIntervalle / VitesseAttaque) return;
             m_Action = Action.Dague;
             m_Depuis = 0f;
             m_DerniereDague = Time.time;
@@ -301,7 +305,9 @@ namespace Deathless.Jeu
                     critique = true;
                 }
                 if (critique) Critique(point, -dir, furtif && dos);
-                H.Frapper(s, degats, critique, point, dir, false, false, execution);
+                float pvAvant = s.Pv;
+                float reel = H.Frapper(s, degats, critique, point, dir, false, false, execution);
+                Deathless.Succes.ServiceSucces.Dague(H, dos, furtif, execution, Deathless.Succes.ServiceSucces.Acheve(s, pvAvant, reel));
                 AudioBank.Jouer(SonsDuJeu.Dague, point, 0.9f);
                 Diffuser(E_Dague, point);
                 if (execution)
@@ -324,7 +330,7 @@ namespace Deathless.Jeu
             var b = B;
             m_Action = Action.Tir;
             m_Depuis = 0f;
-            m_RechargeArbalete = b.arbaleteRecharge * Facteur(1);
+            m_RechargeArbalete = b.arbaleteRecharge * Facteur(1) * RechargeEsprit;
             m_DernierCombat = Time.time;
             SortirFurtif();
             if (Anim != null) H.Declencher(P_Shoot);
@@ -338,7 +344,9 @@ namespace Deathless.Jeu
                 // Seul critique de l'arbalète : la tête (les passifs ne s'appliquent pas aux carreaux, wiki).
                 bool tete = Combat.ALaTete(s.GetComponent<Squelette>(), point, dir);
                 if (tete) Critique(point, -dir, false);
-                H.Frapper(s, b.arbaleteDegats * (tete ? b.arbaleteTete : 1f), tete, point, dir);
+                m_CoupADistance = true;   // attributs : le carreau est un coup à distance (Perception)
+                try { H.Frapper(s, b.arbaleteDegats * (tete ? b.arbaleteTete : 1f), tete, point, dir); }
+                finally { m_CoupADistance = false; }
             });
             AudioBank.Jouer(SonsDuJeu.ArbaleteTir, depart, 1f);
             Invoke(nameof(SonRecharge), 0.6f);
@@ -357,7 +365,7 @@ namespace Deathless.Jeu
             if (d.magnitude < 2f) p = transform.position + H.AvantCamera * 3.5f;
             if (Physics.Raycast(p + Vector3.up * 5f, Vector3.down, out var hit, 20f, ~0, QueryTriggerInteraction.Ignore)) p = hit.point;
             m_CibleGrenade = p;
-            m_RechargeGrenade = b.grenadeRecharge * Facteur(2);
+            m_RechargeGrenade = b.grenadeRecharge * Facteur(2) * RechargeEsprit;
             m_Action = Action.Grenade;
             m_Depuis = 0f;
             m_GrenadeTenue = m_GrenadeLancee = false;
@@ -394,6 +402,7 @@ namespace Deathless.Jeu
         public override void SurTouche(InfoDegats info, float reel)
         {
             m_DernierCombat = Time.time;
+            Deathless.Succes.ServiceSucces.FurtifRompu(H);
             SortirFurtif();
         }
 
@@ -404,8 +413,8 @@ namespace Deathless.Jeu
             switch (m_Action)
             {
                 case Action.Dague:
-                    if (!m_CoupPorte && m_Depuis >= b.dagueInstant) PorterDague();
-                    if (m_Depuis >= b.dagueIntervalle) m_Action = Action.Aucune;
+                    if (!m_CoupPorte && m_Depuis >= b.dagueInstant / VitesseAttaque) PorterDague();   // Agilité gagnée : coup plus tôt
+                    if (m_Depuis >= b.dagueIntervalle / VitesseAttaque) m_Action = Action.Aucune;
                     break;
                 case Action.Tir:
                     if (m_Depuis >= 0.4f) m_Action = Action.Aucune;
@@ -499,9 +508,9 @@ namespace Deathless.Jeu
             switch (i)
             {
                 case 0: return m_Action == Action.Dague ? EtatEmplacement.Actif : EtatEmplacement.Pret;
-                case 1: return Recharge(m_RechargeArbalete, B.arbaleteRecharge * Facteur(1), out restant, out total, m_Arbalete && m_RechargeArbalete <= 0f);
-                case 2: return Recharge(m_RechargeGrenade, B.grenadeRecharge * Facteur(2), out restant, out total, m_Action == Action.Grenade);
-                case 3: return Recharge(m_RechargePasOmbre, B.pasOmbreRecharge * Facteur(3), out restant, out total, m_Action == Action.Bond);
+                case 1: return Recharge(m_RechargeArbalete, B.arbaleteRecharge * Facteur(1) * RechargeEsprit, out restant, out total, m_Arbalete && m_RechargeArbalete <= 0f);
+                case 2: return Recharge(m_RechargeGrenade, B.grenadeRecharge * Facteur(2) * RechargeEsprit, out restant, out total, m_Action == Action.Grenade);
+                case 3: return Recharge(m_RechargePasOmbre, B.pasOmbreRecharge * Facteur(3) * RechargeEsprit, out restant, out total, m_Action == Action.Bond);
                 default: return EtatEmplacement.Vide;
             }
         }

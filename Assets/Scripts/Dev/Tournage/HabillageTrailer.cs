@@ -13,6 +13,9 @@ namespace Deathless.Dev.Tournage
     /// à la fin (Debrancher). Styles : Assets/Scripts/Dev/Tournage/Tournage.uss.
     public class HabillageTrailer : MonoBehaviour
     {
+        // Succès (01/10/2026) : outil de dev utilisé dans ce Play, plus rien ne compte jusqu'à la fin du Play.
+        static HabillageTrailer() { Deathless.Succes.ServiceSucces.SuspendreDev("HabillageTrailer"); }
+
         public const string CheminUss = "Assets/Scripts/Dev/Tournage/Tournage.uss";
 
         sealed class Carton

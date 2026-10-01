@@ -147,7 +147,7 @@ namespace Deathless.Jeu
 
         void Attaquer()
         {
-            if (m_Action != Action.Aucune || Time.time - m_DerniereAttaque < B.epeeIntervalle) return;
+            if (m_Action != Action.Aucune || Time.time - m_DerniereAttaque < B.epeeIntervalle / VitesseAttaque) return;
             m_Action = Action.Attaque;
             m_Depuis = 0f;
             m_DerniereAttaque = Time.time;
@@ -205,7 +205,7 @@ namespace Deathless.Jeu
             }
             m_Action = Action.ChargeAnticipation;
             m_Depuis = 0f;
-            m_RechargeCharge = b.chargeRecharge * Facteur(2);
+            m_RechargeCharge = b.chargeRecharge * Facteur(2) * RechargeEsprit;
             m_Repousses.Clear();
             m_ParcouruCharge = 0f;
             m_CoupLance = false;
@@ -232,7 +232,7 @@ namespace Deathless.Jeu
             m_Action = Action.Soin;
             m_Depuis = 0f;
             m_SoinDonne = false;
-            m_RechargeSoin = B.soinRecharge;
+            m_RechargeSoin = B.soinRecharge * RechargeEsprit;
             if (Anim != null) H.Declencher(P_Heal);
             AudioBank.Jouer(SonsDuJeu.Soin, transform.position + Vector3.up, 0.9f);
             Diffuser(E_Soin);
@@ -258,8 +258,9 @@ namespace Deathless.Jeu
             switch (m_Action)
             {
                 case Action.Attaque:
-                    if (!m_CoupPorte && m_Depuis >= b.epeeInstant) PorterCoup();
-                    if (m_Depuis >= b.epeeIntervalle) m_Action = Action.Aucune;
+                    // Agilité gagnée (attributs) : coup et fin de l'attaque plus tôt.
+                    if (!m_CoupPorte && m_Depuis >= b.epeeInstant / VitesseAttaque) PorterCoup();
+                    if (m_Depuis >= b.epeeIntervalle / VitesseAttaque) m_Action = Action.Aucune;
                     break;
                 case Action.ChargeAnticipation:
                     if (m_Depuis >= b.chargeAnticipation) { m_Action = Action.Charge; m_Depuis = 0f; m_DepartCharge = transform.position; TraverserEnnemis(true); }
@@ -320,6 +321,7 @@ namespace Deathless.Jeu
                 n++;
             }
             partie.Journal("Soin d'aura : " + n + " allié(s) à moins de " + rayon + " m, +" + montant.ToString("F0") + " chacun");
+            Deathless.Succes.ServiceSucces.SoinAura(p, n);   // succès « L'épée et le baume » (3 alliés)
             return n;
         }
 
@@ -415,7 +417,7 @@ namespace Deathless.Jeu
                     m_Repousses.Add(s);
                     Vector3 cote = m_ChargeVisuel != null ? m_ChargeVisuel.Repousser(s.transform, b.chargeEtourdiRepousses) : Vector3.zero;
                     if (cote.sqrMagnitude < 0.01f) cote = lat.sqrMagnitude > 0.01f ? lat.normalized : Vector3.Cross(Vector3.up, m_Dir);
-                    s.Repousser(cote.normalized * b.chargeRepoussement, b.chargeEtourdiRepousses, H.Id);
+                    s.Repousser(cote.normalized * b.chargeRepoussement * Attributs.FacteurRecul(EtatJ), b.chargeEtourdiRepousses, H.Id);
                 }
             }
             if (k >= 1f) FinCharge();
@@ -438,7 +440,7 @@ namespace Deathless.Jeu
                 if (m_CibleCharge.Vivant)
                 {
                     m_CibleCharge.Etourdir(b.chargeEtourdiCible, H.Id);
-                    if (m_CibleCharge.Repoussable) m_CibleCharge.Repousser(m_Dir * 0.6f, b.chargeEtourdiCible, H.Id);
+                    if (m_CibleCharge.Repoussable) m_CibleCharge.Repousser(m_Dir * 0.6f * Attributs.FacteurRecul(EtatJ), b.chargeEtourdiCible, H.Id);
                     if (m_ChargeVisuel != null) m_ChargeVisuel.EtourdirCible(m_CibleCharge.transform, b.chargeEtourdiCible * m_CibleCharge.FacteurEtourdissement);
                 }
                 if (p != null) p.Journal("Charge : " + m_ParcouruCharge.ToString("F1") + " m, force " + force.ToString("F2") + ", " + degats.ToString("F0") + " dégâts sur " + m_CibleCharge.type + ", " + m_Repousses.Count + " repoussés");
@@ -659,8 +661,8 @@ namespace Deathless.Jeu
             {
                 case 0: return m_Action == Action.Attaque ? EtatEmplacement.Actif : EtatEmplacement.Pret;
                 case 1: return m_Garde || m_Action == Action.Riposte ? EtatEmplacement.Actif : H.Endurance <= 0f ? EtatEmplacement.Indisponible : EtatEmplacement.Pret;
-                case 2: return Recharge(m_RechargeCharge, B.chargeRecharge * Facteur(2), out restant, out total, m_Action == Action.Charge || m_Action == Action.ChargeAnticipation);
-                case 3: return Recharge(m_RechargeSoin, B.soinRecharge, out restant, out total, m_Action == Action.Soin);
+                case 2: return Recharge(m_RechargeCharge, B.chargeRecharge * Facteur(2) * RechargeEsprit, out restant, out total, m_Action == Action.Charge || m_Action == Action.ChargeAnticipation);
+                case 3: return Recharge(m_RechargeSoin, B.soinRecharge * RechargeEsprit, out restant, out total, m_Action == Action.Soin);
                 default: return EtatEmplacement.Vide;
             }
         }

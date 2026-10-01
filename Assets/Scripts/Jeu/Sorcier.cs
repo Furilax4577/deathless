@@ -104,7 +104,8 @@ namespace Deathless.Jeu
         void Calculer()
         {
             var maisons = GameObject.Find("Maisons");
-            Transform maison = maisons != null ? maisons.transform.Find(B.sorcierMaison) : null;
+            Transform maison = null;   // modèle de la maison, sous Maisons/Batiment_Sorcier depuis la carte v5 (01/10/2026)
+            if (maisons != null) foreach (var t in maisons.GetComponentsInChildren<Transform>(true)) if (t.name == B.sorcierMaison) { maison = t; break; }
             Vector3 nyx = P != null && P.nyxessa != null ? P.nyxessa.transform.position : Vector3.zero;
             if (maison != null)
             {

@@ -1,0 +1,91 @@
+/* Écran Succès et bannière de déblocage (01/10/2026, Wiki/pages/succes.md). Jetons du thème (Deathless.uss).
+   Conçu à ×2 (1920 × 1080) ; à ×3, panneau élargi et resserré, texte courant inchangé (Docs/ui-socle.md). */
+
+/* ---------- Écran ---------- */
+.succes {
+    position: absolute;
+    left: 50%;
+    top: 54px;
+    bottom: 120px;
+    width: 1320px;
+    translate: -50% 0;
+    padding: 36px 48px 24px 48px;
+    background-color: rgba(35, 42, 58, 0.97);
+    border-radius: 24px;
+}
+
+.succes__entete { flex-direction: row; align-items: flex-end; justify-content: space-between; margin-bottom: var(--dl-space-3); flex-shrink: 0; }
+.succes__titres { flex-shrink: 1; }
+.succes__aide { margin: 3px 0 0 0; }
+.succes__compte { align-items: flex-end; width: 300px; flex-shrink: 0; }
+.succes__compte-valeur { -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); font-size: var(--dl-text-large); color: var(--dl-color-gold); margin: 0 0 6px 0; padding: 0; }
+
+.succes__liste { flex-grow: 1; flex-shrink: 1; }
+.succes__rubrique { margin: var(--dl-space-4) 0 6px 0; }
+.succes__rubrique--premiere { margin-top: 0; }
+
+/* Ligne d'un succès : focusable (la manette parcourt et fait défiler la liste), liseré or au focus. */
+.succes-ligne {
+    flex-direction: row;
+    align-items: center;
+    min-height: 92px;
+    padding: 10px 18px 10px 12px;
+    border-top-width: 1px;
+    border-left-width: 3px;
+    border-color: var(--dl-color-line);
+    border-left-color: rgba(0, 0, 0, 0);
+}
+.succes-ligne:focus { background-color: var(--dl-color-panel-active); border-left-color: var(--dl-color-gold); }
+
+.succes-ligne__icone { width: 64px; height: 64px; margin-right: 18px; flex-shrink: 0; }
+.succes-ligne__textes { flex-grow: 1; flex-shrink: 1; flex-basis: 0; }
+.succes-ligne__nom { -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); font-size: var(--dl-text-body); color: var(--dl-color-text); margin: 0; padding: 0; }
+.succes-ligne__description { font-size: var(--dl-text-small); color: var(--dl-color-text-muted); white-space: normal; margin: 2px 0 0 0; padding: 0; }
+.succes-ligne__etat { width: 270px; flex-shrink: 0; align-items: flex-end; margin-left: var(--dl-space-3); }
+.succes-ligne__statut { font-size: var(--dl-text-small); color: var(--dl-color-text-muted); margin: 0; padding: 0; -unity-text-align: middle-right; }
+.succes-ligne__compteur { font-size: var(--dl-text-small); color: var(--dl-color-text); margin: 0 0 6px 0; padding: 0; }
+
+/* Verrouillé : icône éteinte, nom adouci. Débloqué : statut (date) en or. */
+.succes-ligne--verrouille .succes-ligne__icone { -unity-background-image-tint-color: rgb(90, 96, 112); opacity: 0.7; }
+.succes-ligne--verrouille .succes-ligne__nom { color: var(--dl-color-text-muted); }
+.succes-ligne--debloque .succes-ligne__statut { color: var(--dl-color-gold); }
+.succes-ligne--cache .succes-ligne__nom { letter-spacing: 3px; }
+
+/* Barre de progression (compteurs) */
+.succes-barre { width: 100%; height: 12px; border-radius: 6px; background-color: var(--dl-color-well); overflow: hidden; }
+.succes-barre--large { height: 14px; border-radius: 7px; }
+.succes-barre__remplie { height: 100%; width: 0; border-radius: 6px; background-color: var(--dl-color-gold); }
+
+.dl-scale-3 .succes { top: 18px; bottom: 96px; width: 1380px; padding: 22px 28px 14px 28px; }
+.dl-scale-3 .succes__entete > .succes__titres > .dl-title { font-size: 40px; }
+.dl-scale-3 .succes__aide { display: none; }
+.dl-scale-3 .succes-ligne { min-height: 80px; padding: 8px 12px 8px 8px; }
+.dl-scale-3 .succes-ligne__icone { width: 52px; height: 52px; margin-right: 12px; }
+.dl-scale-3 .succes-ligne__etat { width: 230px; }
+
+/* ---------- Bannière de déblocage (haut, à droite, sous l'or ; même pastille que les messages du HUD) ---------- */
+.succes-banniere {
+    position: absolute;
+    right: 48px;
+    top: 186px;
+    flex-direction: row;
+    align-items: center;
+    min-height: 78px;
+    max-width: 620px;
+    padding: 12px 27px 12px 15px;
+    border-radius: 39px;
+    background-color: rgba(16, 19, 27, 0.88);
+    border-width: 2px;
+    border-color: var(--dl-color-gold);
+    opacity: 0;
+    translate: 40px 0;
+    transition-property: opacity, translate;
+    transition-duration: 0.35s, 0.35s;
+}
+.succes-banniere--visible { opacity: 1; translate: 0 0; }
+.succes-banniere__icone { width: 54px; height: 54px; margin-right: 15px; flex-shrink: 0; }
+.succes-banniere__textes { flex-shrink: 1; }
+.succes-banniere__titre { -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Medium-SDF.asset"); font-size: var(--dl-text-caption); letter-spacing: 2px; color: var(--dl-color-gold); margin: 0; padding: 0; }
+.succes-banniere__nom { -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); font-size: var(--dl-text-body); color: var(--dl-color-text); white-space: normal; margin: 0; padding: 0; }
+
+.dl-scale-3 .succes-banniere { right: 24px; top: 150px; max-width: 520px; }

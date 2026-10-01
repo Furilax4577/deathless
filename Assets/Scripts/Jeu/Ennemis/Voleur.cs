@@ -10,11 +10,15 @@ namespace Deathless.Jeu
     /// celui de Squelette ; stats dans GameBalance.voleur.
     public class Voleur : Squelette
     {
+        /// Dernier joueur isolé que ce voleur a pris en chasse (succès « Le voleur volé »).
+        public Heros Proie { get; private set; }
+
         protected override Heros ChoisirCible(float rayon)
         {
             var isole = JoueurIsole(B.voleurDistanceChasse);
             if (isole != null)
             {
+                Proie = isole;
                 AudioBank.Jouer(SonsDuJeu.VoleurElan, transform.position + Vector3.up, 0.7f, 0.1f);
                 if (P != null) P.Journal("Voleur " + Id + " se rue sur le joueur isolé " + isole.Id);
                 return isole;

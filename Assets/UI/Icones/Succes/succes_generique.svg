@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+<!-- Deathless : succes_generique (Succès, icône générique en attendant une icône par succès ; 01/10/2026). Facettes à plat, palette or. -->
+<polygon fill="#7a2a22" points="40,70 28,120 44,112 52,124 60,78"/>
+<polygon fill="#a8382c" points="40,70 28,120 44,112 50,76"/>
+<polygon fill="#7a2a22" points="88,70 100,120 84,112 76,124 68,78"/>
+<polygon fill="#a8382c" points="88,70 100,120 84,112 78,76"/>
+<polygon fill="#a8803a" points="64.0,54.0 104.7,70.8 80.8,94.7"/>
+<polygon fill="#8a6a2c" points="64.0,54.0 80.8,94.7 47.2,94.7"/>
+<polygon fill="#6e5222" points="64.0,54.0 47.2,94.7 23.3,70.8"/>
+<polygon fill="#8a6a2c" points="64.0,54.0 23.3,70.8 23.3,37.2"/>
+<polygon fill="#c99a48" points="64.0,54.0 23.3,37.2 47.2,13.3"/>
+<polygon fill="#f2d48a" points="64.0,54.0 47.2,13.3 80.8,13.3"/>
+<polygon fill="#e6c06a" points="64.0,54.0 80.8,13.3 104.7,37.2"/>
+<polygon fill="#c99a48" points="64.0,54.0 104.7,37.2 104.7,70.8"/>
+<polygon fill="#fff4d6" points="64.0,54.0 64.0,28.0 70.5,45.1"/>
+<polygon fill="#f2d48a" points="64.0,54.0 70.5,45.1 88.7,46.0"/>
+<polygon fill="#fff4d6" points="64.0,54.0 88.7,46.0 74.5,57.4"/>
+<polygon fill="#d9b264" points="64.0,54.0 74.5,57.4 79.3,75.0"/>
+<polygon fill="#e6c06a" points="64.0,54.0 79.3,75.0 64.0,65.0"/>
+<polygon fill="#d9b264" points="64.0,54.0 64.0,65.0 48.7,75.0"/>
+<polygon fill="#e6c06a" points="64.0,54.0 48.7,75.0 53.5,57.4"/>
+<polygon fill="#f2d48a" points="64.0,54.0 53.5,57.4 39.3,46.0"/>
+<polygon fill="#fff4d6" points="64.0,54.0 39.3,46.0 57.5,45.1"/>
+<polygon fill="#f2d48a" points="64.0,54.0 57.5,45.1 64.0,28.0"/>
+</svg>

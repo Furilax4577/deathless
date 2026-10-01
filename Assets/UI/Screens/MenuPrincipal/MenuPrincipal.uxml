@@ -28,6 +28,13 @@
                 </ui:VisualElement>
                 <dl:InputPrompt action="UI/Submit" class="dl-menu-item__prompt" />
             </ui:Button>
+            <ui:Button name="menu-succes" class="dl-menu-item">
+                <ui:VisualElement class="dl-menu-item__texts">
+                    <ui:Label text="Succès" class="dl-menu-item__label" />
+                    <ui:Label text="Exploits débloqués et compteurs" class="dl-menu-item__desc" />
+                </ui:VisualElement>
+                <dl:InputPrompt action="UI/Submit" class="dl-menu-item__prompt" />
+            </ui:Button>
             <ui:Button name="menu-credits" class="dl-menu-item">
                 <ui:VisualElement class="dl-menu-item__texts">
                     <ui:Label text="Crédits" class="dl-menu-item__label" />

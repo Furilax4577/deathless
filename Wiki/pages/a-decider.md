@@ -8,7 +8,6 @@ Ce qui reste ouvert. Une ligne quitte cette page quand la règle est tranchée e
 | Classes | Valeurs chiffrées, autres styles du mage et façon d'en changer | [Classes](classes.md) |
 | Nouvelles classes | Kits proposés du Barde, de la Bavaroise et du Clochard | [Classes](classes.md) |
 | Ennemis | Équilibrage de la vie, de la vitesse, des dégâts et de l'or rapporté, y compris des deux versions du mini-boss (massue, martache) | [Ennemis](ennemis.md) |
-| Boss (30/09/2026) | Choix faits en codant, à valider par Quentin : un éclat de Nyx brisé retire à Nyxar **un tiers de ses PV max** (sa « puissance ») ; son corps ne prend **aucun dégât** tant qu'un éclat tient ; grimoire brisé : il garde **un crâne unique** par tir (plus de salve) ; la faux sert quand il ne peut pas se téléporter ; le **cri de Morgrim** galvanise les squelettes proches (dégâts +30 %, vitesse +25 %) et joue faute de mieux le clip d'attaque du Golem ; une compétence commune de Morgrim prête passe environ une fois sur deux avant celle de sa version. | [Ennemis](ennemis.md#boss-décidé) |
 | Univers | Origine de Nyxessa, comment elle a échappé au Nécromancien, rôle du donjon, éclat du sorcier pendant la canalisation | [L'univers](univers.md) |
 | Statuts | Durées et intensités des statuts ; seuil, dégâts et ralenti de la chute | [Statuts](statuts.md) |
 | Progression | Premier arbre d'améliorations des compétences (proposition), autres améliorations, économie | [Classes](classes.md#menu-du-personnage-et-points-de-competence) |

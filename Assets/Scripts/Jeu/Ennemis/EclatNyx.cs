@@ -7,7 +7,9 @@ namespace Deathless.Jeu
     /// entière : sa propre Sante (équipe Ennemis) sur un objet enfant de Nyxar posé à ses pieds (distance et hauteur de
     /// Combat.Ennemis comme pour lui), et une petite sphère de collision qui suit l'os (tête ou bassin) avec le visuel :
     /// les frappes de mêlée (Combat.Ennemis le préfère au corps de Nyxar tant qu'il tient) et les projectiles le
-    /// touchent. Brisé : Nyxar perd un tiers de ses PV max et une partie de son kit (Necromancien.EclatBrise).
+    /// touchent. Un coup sur l'éclat (décidé le 01/10/2026) est un critique garanti sur Nyxar (×2, effet et chiffre de
+    /// critique) et abîme l'éclat sans chiffre propre (Sante.renvoi → Necromancien.CoupSurEclat, puis Abimer). Brisé :
+    /// Nyxar perd une partie de son kit (Necromancien.EclatBrise).
     ///
     /// Visuel : grappe de gemmes low poly vertes (thème Nyxessa : l'énergie de la relique), un seul maillage, shader
     /// Relic/VertexColorUnlit (EffetsJeu.Gemmes), pulsation lente ; elle rétrécit un peu à mesure qu'il s'use.
@@ -48,7 +50,8 @@ namespace Deathless.Jeu
             e.Sante = go.AddComponent<Sante>();
             e.Sante.equipe = Equipe.Ennemis;
             e.Sante.Initialiser(1f);
-            e.Sante.Tue += e.OnTue;
+            // Tous les postes : le coup part vers Nyxar (critique) au lieu d'être appliqué à l'éclat.
+            e.Sante.renvoi = info => nyxar.CoupSurEclat(e, info);
 
             var point = new GameObject("Point");
             point.transform.SetParent(go.transform, false);
@@ -126,10 +129,15 @@ namespace Deathless.Jeu
             if (!avant && Sante.Mort) Couper();
         }
 
-        void OnTue(InfoDegats info)
+        /// Hôte : l'éclat s'use de `montant` (sans chiffre ni événement de coup) ; à 0, il se brise (Nyxar.EclatBrise).
+        public void Abimer(float montant, InfoDegats info)
         {
+            if (Sante == null || Brise || montant <= 0f) return;
+            Sante.Fixer(Sante.Pv - montant, Sante.pvMax);
+            if (!Sante.Mort) return;
             Couper();
             if (Proprietaire != null) Proprietaire.EclatBrise(this, info);
+            Deathless.Succes.ServiceSucces.EclatBrise(Index);   // succès (couronne, grimoire, ordre inverse)
         }
 
         void Couper()

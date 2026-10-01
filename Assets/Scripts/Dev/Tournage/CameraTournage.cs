@@ -13,6 +13,9 @@ namespace Deathless.Dev.Tournage
     /// Secouer (impact), roulis supplémentaire par Roulis.
     public class CameraTournage : MonoBehaviour
     {
+        // Succès (01/10/2026) : outil de dev utilisé dans ce Play, plus rien ne compte jusqu'à la fin du Play.
+        static CameraTournage() { Deathless.Succes.ServiceSucces.SuspendreDev("CameraTournage"); }
+
         public struct Pose
         {
             public Vector3 position;

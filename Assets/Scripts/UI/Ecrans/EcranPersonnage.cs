@@ -21,10 +21,20 @@ namespace Deathless.UI.Ecrans
             public string iconePosee;
         }
 
+        /// Ligne d'un attribut (01/10/2026) : valeur, nom, crans (départ, gagnés), effet par point et total gagné.
+        sealed class LigneAttribut
+        {
+            public Button bouton;
+            public Label valeur, nom, desc;
+            public readonly List<VisualElement> crans = new List<VisualElement>();
+        }
+
         IMenuPersonnage m_Menu;
-        VisualElement m_Embleme, m_Carac, m_Ameliorations;
-        Label m_Nom, m_Classe, m_Points, m_Message;
+        IAttributsPersonnage m_MenuAttributs;
+        VisualElement m_Embleme, m_Carac, m_Ameliorations, m_Attributs, m_CarteAttributs;
+        Label m_Nom, m_Classe, m_Points, m_PointsAttributs, m_Message;
         readonly List<Ligne> m_Lignes = new List<Ligne>();
+        readonly List<LigneAttribut> m_LignesAttributs = new List<LigneAttribut>();
         readonly List<(Label libelle, Label valeur)> m_LignesCarac = new List<(Label, Label)>();
         string m_EmblemePose;
         /// Section « Afflictions » (statuts actifs, infobulle ; AfflictionsPersonnage.cs).
@@ -38,6 +48,9 @@ namespace Deathless.UI.Ecrans
             m_Nom = Racine.Q<Label>("perso-nom");
             m_Classe = Racine.Q<Label>("perso-classe");
             m_Points = Racine.Q<Label>("perso-points");
+            m_Attributs = Racine.Q("perso-attributs");
+            m_CarteAttributs = Racine.Q("perso-attributs-carte");
+            m_PointsAttributs = Racine.Q<Label>("perso-points-attributs");
             m_Message = Racine.Q<Label>("perso-message");
             var afflictions = Racine.Q("perso-afflictions");
             if (afflictions != null) m_Afflictions = new SectionAfflictions(afflictions, Racine.Q<Label>("perso-afflictions-vide"), Racine);
@@ -82,12 +95,58 @@ namespace Deathless.UI.Ecrans
                 m_Ameliorations.Add(l.bouton);
                 m_Lignes.Add(l);
             }
-            UINavigation.ChainerVerticalement(m_Lignes.ConvertAll(x => (VisualElement)x.bouton));
-            if (m_Afflictions != null) { m_Afflictions.Reinitialiser(); m_Afflictions.Lier(m_Lignes.ConvertAll(x => (VisualElement)x.bouton)); }
+            ConstruireAttributs(menu as IAttributsPersonnage);
+            // Compétences puis attributs, enchaînés de haut en bas (manette, flèches).
+            var focalisables = m_Lignes.ConvertAll(x => (VisualElement)x.bouton);
+            foreach (var la in m_LignesAttributs) focalisables.Add(la.bouton);
+            UINavigation.ChainerVerticalement(focalisables);
+            if (m_Afflictions != null) { m_Afflictions.Reinitialiser(); m_Afflictions.Lier(focalisables); }
             Rafraichir();
         }
 
-        protected override VisualElement PremierFocus => m_Lignes.Count > 0 ? m_Lignes[0].bouton : null;
+        /// Section « Attributs » : une ligne focalisable par attribut ; Valider y place un point. Masquée si le menu ne
+        /// fournit pas IAttributsPersonnage.
+        void ConstruireAttributs(IAttributsPersonnage menu)
+        {
+            m_MenuAttributs = menu;
+            m_LignesAttributs.Clear();
+            if (m_Attributs == null) return;
+            m_Attributs.Clear();
+            if (m_CarteAttributs != null) m_CarteAttributs.style.display = menu != null ? DisplayStyle.Flex : DisplayStyle.None;
+            if (menu == null) return;
+            var at = menu.Attributs;
+            for (int i = 0; i < at.Count; i++)
+            {
+                int index = i;
+                var l = new LigneAttribut { bouton = new Button { name = "perso-attribut-" + i } };
+                l.bouton.AddToClassList("dl-menu-item");
+                l.bouton.AddToClassList("perso__ligne");
+                l.bouton.AddToClassList("perso__attribut");
+                l.valeur = new Label(); l.valeur.AddToClassList("perso__attribut-valeur");
+                var textes = new VisualElement(); textes.AddToClassList("perso__ligne-textes");
+                var haut = new VisualElement(); haut.AddToClassList("perso__ligne-haut");
+                l.nom = new Label(); l.nom.AddToClassList("dl-menu-item__label"); l.nom.AddToClassList("perso__ligne-nom");
+                var crans = new VisualElement(); crans.AddToClassList("perso__crans");
+                for (int r = 0; r < at[i].Plafond; r++)
+                {
+                    var c = new VisualElement(); c.AddToClassList("perso__cran");
+                    crans.Add(c); l.crans.Add(c);
+                }
+                haut.Add(l.nom); haut.Add(crans);
+                l.desc = new Label(); l.desc.AddToClassList("dl-menu-item__desc"); l.desc.AddToClassList("perso__ligne-desc");
+                textes.Add(haut); textes.Add(l.desc);
+                var invite = new InputPrompt("UI/Submit", ""); invite.AddToClassList("dl-menu-item__prompt");
+                l.bouton.Add(l.valeur); l.bouton.Add(textes); l.bouton.Add(invite);
+                l.bouton.clicked += () => m_MenuAttributs?.AmeliorerAttribut(index);
+                SonDeClic(l.bouton);
+                m_Attributs.Add(l.bouton);
+                m_LignesAttributs.Add(l);
+            }
+        }
+
+        static string TextePoints(int points) => points == 0 ? "Aucun point à dépenser" : points == 1 ? "1 point à dépenser" : points + " points à dépenser";
+
+        protected override VisualElement PremierFocus => m_Lignes.Count > 0 ? m_Lignes[0].bouton : m_LignesAttributs.Count > 0 ? m_LignesAttributs[0].bouton : null;
 
         public override void MiseAJour(float dt)
         {
@@ -130,7 +189,7 @@ namespace Deathless.UI.Ecrans
             }
 
             int points = m.Points;
-            m_Points.text = points == 0 ? "Aucun point à dépenser" : points == 1 ? "1 point à dépenser" : points + " points à dépenser";
+            m_Points.text = TextePoints(points);
             m_Points.EnableInClassList("perso__points--dispo", points > 0);
 
             var am = m.Ameliorations;
@@ -142,6 +201,31 @@ namespace Deathless.UI.Ecrans
                 if (l.iconePosee != a.Icone) { l.iconePosee = a.Icone; IconesUI.Poser(l.icone, a.Icone); }
                 for (int r = 0; r < l.rangs.Count; r++) l.rangs[r].EnableInClassList("perso__rang--plein", r < a.Rang);
                 l.bouton.EnableInClassList("perso__ligne--impossible", !a.Possible);
+            }
+
+            var ma = m_MenuAttributs;
+            if (ma != null)
+            {
+                int pa = ma.PointsAttribut;
+                if (m_PointsAttributs != null)
+                {
+                    m_PointsAttributs.text = TextePoints(pa);
+                    m_PointsAttributs.EnableInClassList("perso__points--dispo", pa > 0);
+                }
+                var at = ma.Attributs;
+                for (int i = 0; i < m_LignesAttributs.Count && i < at.Count; i++)
+                {
+                    var a = at[i]; var l = m_LignesAttributs[i];
+                    l.nom.text = a.Nom;
+                    l.valeur.text = a.Valeur.ToString();
+                    l.desc.text = string.IsNullOrEmpty(a.Actuel) ? a.Effet : a.Effet + " · gagné : " + a.Actuel;
+                    for (int r = 0; r < l.crans.Count; r++)
+                    {
+                        l.crans[r].EnableInClassList("perso__cran--depart", r < a.Depart && r < a.Valeur);
+                        l.crans[r].EnableInClassList("perso__cran--gagne", r >= a.Depart && r < a.Valeur);
+                    }
+                    l.bouton.EnableInClassList("perso__ligne--impossible", !a.Possible);
+                }
             }
 
             bool vide = string.IsNullOrEmpty(m.Message);

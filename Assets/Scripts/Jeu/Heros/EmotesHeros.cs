@@ -291,6 +291,7 @@ namespace Deathless.Jeu
             m_AttendNeutre = m_Heros.Entrees != null && m_Heros.Entrees.Deplacement.sqrMagnitude > 0.01f;
             Anim.SetInteger(P_EmoteNum, numero);
             m_Heros.Declencher(P_Emote);
+            Deathless.Succes.ServiceSucces.Emote(m_Heros);   // succès « Danse de la victoire »
             return true;
         }
 

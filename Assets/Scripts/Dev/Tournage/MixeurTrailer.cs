@@ -22,6 +22,9 @@ namespace Deathless.Dev.Tournage
     /// lue dans AudioSource.timeSamples. Bus : Jeu, Musique, Habillage (gain avec rampe), maître avec limiteur doux.
     public class MixeurTrailer
     {
+        // Succès (01/10/2026) : outil de dev utilisé dans ce Play, plus rien ne compte jusqu'à la fin du Play.
+        static MixeurTrailer() { Deathless.Succes.ServiceSucces.SuspendreDev("MixeurTrailer"); }
+
         public const int Taux = 48000;
 
         public enum Bus { Jeu, Musique, Habillage }

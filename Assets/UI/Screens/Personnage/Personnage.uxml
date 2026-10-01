@@ -25,14 +25,25 @@
                         <ui:VisualElement name="perso-afflictions" class="perso__afflictions" />
                         <ui:Label name="perso-afflictions-vide" text="Aucune affliction." class="dl-text dl-text--muted perso__afflictions-vide" />
                     </ui:VisualElement>
-                    <!-- Les compétences -->
-                    <ui:VisualElement class="dl-panel perso__carte perso__competences">
-                        <ui:VisualElement class="perso__competences-entete">
-                            <ui:Label text="COMPÉTENCES" class="dl-section-label" />
-                            <ui:Label name="perso-points" text="1 point à dépenser" class="perso__points" />
+                    <ui:VisualElement class="perso__milieu">
+                        <!-- Les compétences -->
+                        <ui:VisualElement class="dl-panel perso__carte perso__competences">
+                            <ui:VisualElement class="perso__competences-entete">
+                                <ui:Label text="COMPÉTENCES" class="dl-section-label" />
+                                <ui:Label name="perso-points" text="1 point à dépenser" class="perso__points" />
+                            </ui:VisualElement>
+                            <ui:Label text="1 point de compétence par jour survécu, gagné à l’aube." class="dl-text dl-text--small dl-text--muted perso__regle" />
+                            <ui:VisualElement name="perso-ameliorations" class="perso__ameliorations" />
                         </ui:VisualElement>
-                        <ui:Label text="1 point de compétence par jour survécu, gagné à l’aube." class="dl-text dl-text--small dl-text--muted perso__regle" />
-                        <ui:VisualElement name="perso-ameliorations" class="perso__ameliorations" />
+                        <!-- Les attributs (01/10/2026) : masqués si le menu ne les fournit pas (IAttributsPersonnage) -->
+                        <ui:VisualElement name="perso-attributs-carte" class="dl-panel perso__carte perso__attributs-carte">
+                            <ui:VisualElement class="perso__competences-entete">
+                                <ui:Label text="ATTRIBUTS" class="dl-section-label" />
+                                <ui:Label name="perso-points-attributs" text="1 point à dépenser" class="perso__points" />
+                            </ui:VisualElement>
+                            <ui:Label text="1 point d’attribut par jour survécu, en plus du point de compétence. Maximum 10, sans retour en arrière." class="dl-text dl-text--small dl-text--muted perso__regle" />
+                            <ui:VisualElement name="perso-attributs" class="perso__attributs" />
+                        </ui:VisualElement>
                     </ui:VisualElement>
                     <!-- L'inventaire (vide pour l'instant) -->
                     <ui:VisualElement class="dl-panel perso__carte perso__inventaire">

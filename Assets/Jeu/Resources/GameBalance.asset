@@ -185,41 +185,41 @@ MonoBehaviour:
   morgrimMassueFracasOndeVitesse: 6
   morgrimMassueFracasOndeRayonMax: 14
   morgrimMassueFracasOndeLargeurBande: 1.4
-  morgrimMassueFracasPreparation: 1.6
+  morgrimMassueFracasPreparation: 1.35
   morgrimMassueTourbillonRayon: 3
   morgrimMassueTourbillonDegatsParSeconde: 18
   morgrimMassueTourbillonDuree: 1.8
-  morgrimMassueTourbillonPreparation: 1
-  morgrimMassueTourbillonRecharge: 10
+  morgrimMassueTourbillonPreparation: 0.85
+  morgrimMassueTourbillonRecharge: 6.5
   morgrimMassueTourbillonRecul: 3
   morgrimMassueTourbillonReculIntervalle: 0.3
   morgrimMassueChargeDistance: 8
   morgrimMassueChargeVitesse: 9
   morgrimMassueChargeLargeur: 1.6
   morgrimMassueChargeDegats: 50
-  morgrimMassueChargePreparation: 1.4
-  morgrimMassueChargeRecharge: 12
+  morgrimMassueChargePreparation: 1.15
+  morgrimMassueChargeRecharge: 7.5
   morgrimMartacheFaucheRayon: 3.2
   morgrimMartacheFaucheAngle: 110
   morgrimMartacheFaucheDegats: 42
   morgrimMartacheFaucheDegatsNyxessa: 56
-  morgrimMartacheFauchePreparation: 1.3
+  morgrimMartacheFauchePreparation: 1.1
   morgrimMartacheFendSolLongueur: 5
   morgrimMartacheFendSolLargeur: 1.4
   morgrimMartacheFendSolDegats: 28
   morgrimMartacheFendSolRalentiDuree: 3
   morgrimMartacheFendSolRalentiForce: 0.4
-  morgrimMartacheFendSolPreparation: 1.5
-  morgrimMartacheFendSolRecharge: 9
+  morgrimMartacheFendSolPreparation: 1.25
+  morgrimMartacheFendSolRecharge: 6
   morgrimMartacheFendSolFissureDuree: 4
   morgrimMartacheBrecheDegats: 70
   morgrimMartacheBrecheMultiplicateurBouclier: 2
-  morgrimMartacheBrechePreparation: 1.2
-  morgrimMartacheBrecheRecharge: 8
-  necroPV: 1200
+  morgrimMartacheBrechePreparation: 1
+  morgrimMartacheBrecheRecharge: 5
+  necroPV: 1800
   necroVitesse: 2.6
   necroDegats: 18
-  necroVitesseMissile: 12
+  necroVitesseMissile: 9
   necroPorteeTir: 22
   necroIntervalleTir: 3
   necroDistance: {x: 12, y: 18}
@@ -533,6 +533,24 @@ MonoBehaviour:
   renverseMartelementReduction: 0.08
   renverseMartelementIntervalleMaintenir: 0.15
   renverseMartelementPlafond: 0.5
+  attributsPaladin: 040000000600000002000000010000000300000002000000
+  attributsViking: 060000000500000003000000010000000200000001000000
+  attributsMage: 010000000200000003000000030000000600000003000000
+  attributsRodeur: 010000000300000005000000060000000200000001000000
+  attributsAssassin: 030000000200000006000000020000000100000004000000
+  attributForceDegats: 0.03
+  attributForceRecul: 0.05
+  attributEndurancePv: 8
+  attributEnduranceEndurance: 5
+  attributAgiliteVitesse: 0.02
+  attributAgiliteEsquive: 0.03
+  attributPerceptionDegats: 0.03
+  attributPerceptionCritique: 0.01
+  attributEspritJauge: 0.05
+  attributEspritRecharge: 0.02
+  attributChanceCritique: 0.01
+  attributChanceOr: 0.03
+  attributCritiqueMultiplicateur: 2
   reapparitionBase: 8
   reapparitionParMort: 4
   reapparitionInvulnerable: 2

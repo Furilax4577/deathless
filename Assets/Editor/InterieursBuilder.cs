@@ -148,7 +148,7 @@ public static class InterieursBuilder
         var rapport = new System.Text.StringBuilder("Intérieurs construits :\n");
         for (int i = 0; i < Noms.Length; i++)
         {
-            Transform maison = village.transform.Find("Maisons/" + Maisons[i]);
+            Transform maison = VillageBuilder.TrouverMaison(village.transform, Maisons[i]);   // sous Maisons/Batiment_* (carte v5)
             if (maison == null) { Debug.LogWarning("Intérieurs : maison introuvable " + Maisons[i]); continue; }
             Gabarit g = Maisons[i].EndsWith("_A") ? A : B;
             float s = maison.localScale.x;
@@ -195,9 +195,9 @@ public static class InterieursBuilder
         for (int k = 0; k < 4; k++) { Transform t = village.transform.Find(Racine); if (t == null) break; Object.DestroyImmediate(t.gameObject); }
         Transform ms = village.transform.Find("Maisons");
         if (ms != null)
-            foreach (Transform h in ms)
+            foreach (MeshFilter mf in ms.GetComponentsInChildren<MeshFilter>(true))
             {
-                MeshFilter mf = h.GetComponent<MeshFilter>(); if (mf == null || mf.sharedMesh == null) continue;
+                Transform h = mf.transform; if (mf.sharedMesh == null || !h.name.StartsWith("Maison_")) continue;
                 if (!mf.sharedMesh.name.EndsWith("_Ouverte")) continue;
                 Gabarit g = h.name.EndsWith("_A") ? A : B;
                 GameObject model = AssetDatabase.LoadAssetAtPath<GameObject>(HexBuildings + g.fbx + ".fbx");

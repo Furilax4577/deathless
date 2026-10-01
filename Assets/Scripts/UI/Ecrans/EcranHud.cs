@@ -734,15 +734,20 @@ namespace Deathless.UI.Ecrans
                 if (!string.IsNullOrEmpty(msg)) m_DonjonMessageTexte.text = msg;
             }
 
-            // Points de compétence à dépenser : pastille et invite du menu du personnage (Tab / Y).
+            // Points de compétence et d'attribut (01/10/2026) à dépenser : pastille et invite du menu du personnage (Tab / Y).
             int points = DonneesUI.Personnage != null ? DonneesUI.Personnage.Points : 0;
+            int pointsAttr = DonneesUI.Personnage is IAttributsPersonnage pap ? pap.PointsAttribut : 0;
             if (m_PointsCompetence != null)
             {
-                m_PointsCompetence.style.display = points > 0 ? DisplayStyle.Flex : DisplayStyle.None;
-                if (points > 0 && points != m_PointsAffiches)
+                bool montrer = points > 0 || pointsAttr > 0;
+                m_PointsCompetence.style.display = montrer ? DisplayStyle.Flex : DisplayStyle.None;
+                int cle = points * 1000 + pointsAttr;
+                if (montrer && cle != m_PointsAffiches)
                 {
-                    m_PointsAffiches = points;
-                    m_PointsTexte.text = points == 1 ? "1 point de compétence" : points + " points de compétence";
+                    m_PointsAffiches = cle;
+                    string comp = points == 1 ? "1 point de compétence" : points + " points de compétence";
+                    string attr = pointsAttr == 1 ? "1 point d’attribut" : pointsAttr + " points d’attribut";
+                    m_PointsTexte.text = points > 0 && pointsAttr > 0 ? comp + " · " + attr : points > 0 ? comp : attr;
                 }
             }
 

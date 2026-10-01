@@ -46,6 +46,8 @@ namespace Deathless.Jeu
         public int orPorte;              // or ramassé au donjon, versé à la caisse au retour par le portail
         public int pointsCompetence;     // 1 par jour survécu (crédité à l'aube), dépensés dans le menu du personnage
         public int[] rangs = new int[4]; // rangs des améliorations de compétence (ArbreCompetences), par index
+        public int pointsAttribut;       // 1 par jour survécu (crédité à l'aube, en plus du point de compétence), dépensés dans le menu
+        public int[] attributs = new int[Attributs.Nombre]; // points d'attribut GAGNÉS, par Attribut (la répartition de départ est celle de la classe)
         public ScoreJoueur score = new ScoreJoueur();
     }
 

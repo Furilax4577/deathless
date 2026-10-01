@@ -29,6 +29,9 @@ namespace Deathless.Jeu.Dev
     /// Docs/outils/banc_classes_mesures.tsv ; Rapport() agrège et écrit Docs/outils/banc_classes_resultats.md. Console : [Banc].
     public class BancClasses : MonoBehaviour
     {
+        // Succès (01/10/2026) : outil de dev utilisé dans ce Play, plus rien ne compte jusqu'à la fin du Play.
+        static BancClasses() { Deathless.Succes.ServiceSucces.SuspendreDev("BancClasses"); }
+
         // ================================================================= API (execute_code)
 
         static BancClasses s_I;

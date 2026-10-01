@@ -8,6 +8,9 @@ namespace Deathless.Jeu.Dev
     /// Résultats dans la console (préfixe [Boss]) et dans ScenariosBoss.Dernier ; captures Assets/Screenshots/boss_*.png.
     public class ScenariosBoss : MonoBehaviour
     {
+        // Succès (01/10/2026) : outil de dev utilisé dans ce Play, plus rien ne compte jusqu'à la fin du Play.
+        static ScenariosBoss() { Deathless.Succes.ServiceSucces.SuspendreDev("ScenariosBoss"); }
+
         static ScenariosBoss s_I;
         public static string Dernier = "";
         public static bool Fini;
@@ -22,6 +25,7 @@ namespace Deathless.Jeu.Dev
                 case "nyxar": s_I.StartCoroutine(s_I.Nyxar()); break;
                 case "morgrim_massue": s_I.StartCoroutine(s_I.Morgrim(true)); break;
                 case "morgrim_martache": s_I.StartCoroutine(s_I.Morgrim(false)); break;
+                case "nyxar_esquive": s_I.StartCoroutine(s_I.NyxarEsquive()); break;
             }
         }
 
@@ -84,10 +88,33 @@ namespace Deathless.Jeu.Dev
             Viser(n.transform);
             Photo(n.transform, "boss_nyxar_eclats_face", 3.2f, 1.3f, 20f);
             Photo(n.transform, "boss_nyxar_eclats_cote", 2.6f, 0.9f, -80f);
-            // Coup sur le corps : immunisé.
+            // Coup sur le corps : dégâts normaux (01/10/2026).
             float pv0 = n.Sante.Pv;
-            n.Sante.Encaisser(new InfoDegats { montant = 100f, sourceId = 1, equipeSource = Equipe.Heros, point = n.transform.position + Vector3.up });
-            Log("coup de 100 sur le corps : PV " + pv0.ToString("F0") + " → " + n.Sante.Pv.ToString("F0"));
+            float r0 = h.Frapper(n.Sante, 100f, false, n.transform.position + Vector3.up, n.transform.forward);
+            Log("coup de 100 sur le corps : PV " + pv0.ToString("F0") + " → " + n.Sante.Pv.ToString("F0") + " (rendu " + r0.ToString("F0") + ")");
+            // Coup sur l'éclat de la couronne : critique garanti ×2 sur Nyxar, l'éclat s'use de 100.
+            bool vuCritique = false; float chiffre = 0f;
+            System.Action<Sante, InfoDegats, float> espion = (s, info, reel) => { if (s == n.Sante && info.critique) { vuCritique = true; chiffre = reel; } };
+            Sante.AnyTouche += espion;
+            pv0 = n.Sante.Pv; float pvc0 = n.Eclat(0).Sante.Pv;
+            yield return null;   // autre image : pas le même geste que le coup au corps
+            float r1 = h.Frapper(n.Eclat(0).Sante, 100f, false, n.Eclat(0).Position, n.transform.forward);
+            Sante.AnyTouche -= espion;
+            Log("coup de 100 sur la couronne : Nyxar " + pv0.ToString("F0") + " → " + n.Sante.Pv.ToString("F0") + ", éclat " + pvc0.ToString("F0") + " → "
+                + n.Eclat(0).Sante.Pv.ToString("F0") + ", chiffre critique " + vuCritique + " (" + chiffre.ToString("F0") + "), rendu " + r1.ToString("F0"));
+            // Coup de zone sur le corps et les deux éclats dans la même image : Nyxar ne le prend qu'une fois.
+            yield return null;
+            pv0 = n.Sante.Pv; pvc0 = n.Eclat(0).Sante.Pv; float pvg0 = n.Eclat(1).Sante.Pv;
+            h.Frapper(n.Eclat(0).Sante, 50f, false, n.Eclat(0).Position, n.transform.forward);
+            h.Frapper(n.Eclat(1).Sante, 50f, false, n.Eclat(1).Position, n.transform.forward);
+            h.Frapper(n.Sante, 50f, false, n.transform.position + Vector3.up, n.transform.forward);
+            Log("zone de 50 (couronne, grimoire, corps) : Nyxar −" + (pv0 - n.Sante.Pv).ToString("F0") + ", couronne −" + (pvc0 - n.Eclat(0).Sante.Pv).ToString("F0")
+                + ", grimoire −" + (pvg0 - n.Eclat(1).Sante.Pv).ToString("F0"));
+            // Tranche de vie : sous 2/3 des PV max, l'éclat le plus abîmé cède de lui-même.
+            yield return null;
+            h.Frapper(n.Sante, n.Sante.Pv - (n.Sante.pvMax * 2f / 3f - 1f), false, n.transform.position + Vector3.up, n.transform.forward);
+            Log("tranche 2/3 : PV " + n.Sante.Pv.ToString("F0") + "/" + n.Sante.pvMax.ToString("F0") + ", couronne brisée " + n.CouronneBrisee
+                + ", grimoire brisé " + n.GrimoireBrise + ", phase " + n.PhaseCombat);
             // Cible de mêlée préférée : l'éclat.
             var cibles = Combat.Ennemis(n.transform.position - n.transform.forward * 1.5f, n.transform.forward, 3f, 180f);
             Log("mêlée à 1,5 m : première cible " + (cibles.Count > 0 ? cibles[0].name : "aucune") + " (" + cibles.Count + " cibles)");
@@ -102,7 +129,7 @@ namespace Deathless.Jeu.Dev
             Photo(n.transform, "boss_nyxar_couronne_brisee", 3.2f, 1.3f, 20f);
             // Éclat de la couronne brisé.
             var c = n.Eclat(0);
-            c.Sante.Encaisser(new InfoDegats { montant = 9999f, sourceId = 1, equipeSource = Equipe.Heros, point = c.Position });
+            n.AbimerEclat(0, new InfoDegats { montant = 9999f, sourceId = 1, equipeSource = Equipe.Heros, point = c.Position, continu = true });
             Log("couronne brisée : PV " + n.Sante.Pv.ToString("F0") + "/" + n.Sante.pvMax.ToString("F0") + ", phase " + n.PhaseCombat + ", invulnérable " + n.Sante.invulnerable);
             // Collé à lui sans couronne : faux.
             DevPartie.PlacerHeros(n.transform.position - n.transform.forward * 2f, n.transform.position);
@@ -110,7 +137,7 @@ namespace Deathless.Jeu.Dev
             while (t < 4f) { t += Time.deltaTime; h.Sante.invulnerable = true; if (n.EtatCourant == Squelette.Etat.Preparation) prep = true; yield return null; }
             Log("collé 4 s sans couronne : faux préparée " + prep + ", déplacé de " + Vector3.Distance(p0, n.transform.position).ToString("F1") + " m, héros PV " + h.Sante.Pv.ToString("F0"));
             var g = n.Eclat(1);
-            g.Sante.Encaisser(new InfoDegats { montant = 9999f, sourceId = 1, equipeSource = Equipe.Heros, point = g.Position });
+            n.AbimerEclat(1, new InfoDegats { montant = 9999f, sourceId = 1, equipeSource = Equipe.Heros, point = g.Position, continu = true });
             Log("grimoire brisé : PV " + n.Sante.Pv.ToString("F0") + "/" + n.Sante.pvMax.ToString("F0") + ", phase " + n.PhaseCombat + ", enragé " + n.Enrage + ", invulnérable " + n.Sante.invulnerable);
             DevPartie.PlacerHeros(n.transform.position - n.transform.forward * 7f, n.transform.position);
             t = 0f; float dMin = 99f;
@@ -120,6 +147,56 @@ namespace Deathless.Jeu.Dev
             n.Sante.Encaisser(new InfoDegats { montant = 99999f, sourceId = 1, equipeSource = Equipe.Heros, point = n.transform.position + Vector3.up });
             Log("coup fatal : mort " + n.Sante.Mort);
             h.Sante.invulnerable = false;
+            Fini = true;
+        }
+
+        /// Crânes de Nyxar (01/10/2026) : écart dans la salve, puis touchés immobile contre touchés avec un pas de côté
+        /// (3 m en 0,5 s, lancé quand un crâne arrive à moins de `declenche` m).
+        IEnumerator NyxarEsquive()
+        {
+            var h = H;
+            h.Sante.Fixer(99999f, 99999f);
+            DevPartie.PlacerHeros(new Vector3(0f, 0f, -11f), new Vector3(0f, 0f, -30f));
+            yield return null;
+            var n = DevPartie.PoserDevant(TypeEnnemi.Necromancien, 14f) as Necromancien;
+            if (n == null) { Log("Nyxar non posé"); Fini = true; yield break; }
+            int touches = 0;
+            System.Action<InfoDegats, float> compte = (info, reel) => { if (info.aDistance && info.source == n.gameObject) touches++; };
+            h.Sante.Touche += compte;
+            var vus = new System.Collections.Generic.HashSet<int>();
+            var departs = new System.Collections.Generic.List<float>();
+            for (int passe = 0; passe < 2; passe++)
+            {
+                bool esquive = passe == 1;
+                int t0 = touches, v0 = vus.Count;
+                float t = 0f, finPas = -1f; Vector3 pas = Vector3.zero;
+                while (t < 16f)
+                {
+                    t += Time.deltaTime;
+                    Viser(n.transform);
+                    foreach (var m in FindObjectsByType<MissileCrane>(FindObjectsSortMode.None))
+                    {
+                        if (m.name != "MissileNecromancien") continue;
+                        if (vus.Add(m.GetInstanceID())) departs.Add(Time.time);
+                        Vector3 d = h.transform.position + Vector3.up - m.transform.position;
+                        if (esquive && finPas < 0f && d.magnitude < 4.5f && Vector3.Dot(d, m.transform.forward) > 0f)
+                        {
+                            pas = Vector3.Cross(Vector3.up, m.transform.forward).normalized * 6f;
+                            finPas = 0.5f;
+                        }
+                    }
+                    if (finPas > 0f) { h.CC.Move(pas * Time.deltaTime); finPas -= Time.deltaTime; if (finPas <= 0f) finPas = -0.4f; }
+                    else if (finPas < -0.01f) { finPas += Time.deltaTime; if (finPas >= -0.01f) finPas = -1f; }
+                    // Reste à distance de Nyxar (pas de faux ni de téléportation) : recentré entre deux passes seulement.
+                    yield return null;
+                }
+                Log((esquive ? "avec pas de côté" : "immobile") + " 16 s : " + (vus.Count - v0) + " crânes, " + (touches - t0) + " touchés");
+                DevPartie.PlacerHeros(new Vector3(0f, 0f, -11f), n.transform.position);
+            }
+            float ecartMin = 99f;
+            for (int i = 1; i < departs.Count; i++) { float e = departs[i] - departs[i - 1]; if (e > 0.05f) ecartMin = Mathf.Min(ecartMin, e); }
+            Log("écart minimal entre deux crânes d'une salve : " + ecartMin.ToString("F2") + " s ; vitesse " + GameBalance.Courant.necroVitesseMissile + " m/s");
+            h.Sante.Touche -= compte;
             Fini = true;
         }
 

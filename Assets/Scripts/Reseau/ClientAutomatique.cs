@@ -20,6 +20,7 @@ namespace Deathless.Reseau
     ///   -deathless-capture=dossier : avec -deathless-donjon, images PNG de la caméra du jeu aux étapes des portails
     ///     (rendues hors écran : en -batchmode sans -nographics, rien ne s'affiche et aucune fenêtre ne prend le focus)
     ///   -deathless-competences : le héros enchaîne toutes ses compétences (effets vus par les autres postes)
+    ///   -deathless-attributs : chaque point d'attribut gagné va en Chance (test de la réplication vers l'hôte, 01/10/2026)
     ///   -deathless-solo : partie solo lancée aussitôt avec la classe donnée (vérification du build : caméra, héros)
     ///   [-deathless-quitter-salon=5] : quitte le salon 5 s après y être entré (test de la classe libérée), sans se déclarer prêt
     ///   -deathless-couper=20 : coupure simulée 20 s après le début de la partie (Netcode arrêté sans quitter la session :
@@ -61,6 +62,7 @@ namespace Deathless.Reseau
             c.m_Heberger = heberger;
             c.m_Solo = solo;
             c.m_Competences = Drapeau("deathless-competences");
+            c.m_Attributs = Drapeau("deathless-attributs");
             c.m_Achat = Drapeau("deathless-achat") || Drapeau("deathless-taverne");
             c.m_Taverne = Drapeau("deathless-taverne");
             c.m_Donjon = Arg("deathless-donjon");
@@ -261,7 +263,7 @@ namespace Deathless.Reseau
             }
         }
 
-        bool m_Competences, m_Achat, m_Taverne;
+        bool m_Competences, m_Achat, m_Taverne, m_Attributs;
 
         /// Test de la taverne (-deathless-taverne) : vers 6 s, le héros va au comptoir, ouvre le menu et paie une tournée ;
         /// l'hôte décide, tous les joueurs sont ivres (le journal donne la réponse et l'ivresse).
@@ -502,6 +504,15 @@ namespace Deathless.Reseau
                 if (dv != null && dv.zones != null) { t += " zones"; foreach (var z in dv.zones) t += " " + (z != null ? z.Etat.ToString() : "-"); }
                 var j = p.JoueurLocal;
                 if (j != null) t += " | moi pv " + j.pv.ToString("F0") + (j.mort ? " MORT " + j.reapparitionRestante.ToString("F0") + " s" : "") + (j.pret ? " prêt" : "") + " points " + j.pointsCompetence + " tués " + j.score.ennemisTues + " dégâts " + j.score.degatsInfliges.ToString("F0") + " or " + j.score.orRapporte;
+                // Attributs (01/10/2026) : points à dépenser et gagnés (les miens), et ceux reçus des autres joueurs.
+                if (j != null)
+                {
+                    if (m_Attributs && j.pointsAttribut > 0) p.AmeliorerAttribut((int)Attribut.Chance, out _);
+                    t += " attributs " + j.pointsAttribut + " à dépenser, gagnés " + string.Join(",", j.attributs ?? new int[0]);
+                    foreach (var hr in HerosReseau.Tous)
+                        if (hr != null && !hr.IsOwner && hr.Heros != null && hr.Heros.EtatJoueur != null)
+                            t += " | attributs vus de " + hr.Pseudo + " : " + string.Join(",", hr.Heros.EtatJoueur.attributs ?? new int[0]) + " (PV max " + hr.VieMax.ToString("F0") + ")";
+                }
                 var so = Sorcier.Instance;
                 if (so != null) t += " | sorcier " + so.EtatCourant;
                 var bo = BouclierNyxessa.Instance;

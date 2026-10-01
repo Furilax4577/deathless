@@ -18,6 +18,8 @@ namespace Deathless.Jeu
         public override string Id => "rodeur";
         public override float PvMax => B.rodeurPV;
         public override float Vitesse => B.rodeurVitesse;
+        /// Attributs : flèches (tir, salve, nuée) = coups à distance (Perception).
+        public override bool CoupADistance => true;
 
         Action m_Action;
         float m_Depuis;
@@ -102,7 +104,7 @@ namespace Deathless.Jeu
 
         void Bander()
         {
-            if (m_Action != Action.Aucune || Time.time - m_DernierTir < B.arcIntervalle) return;
+            if (m_Action != Action.Aucune || Time.time - m_DernierTir < B.arcIntervalle / VitesseAttaque) return;
             m_Action = Action.Bander;
             m_Depuis = 0f;
             m_Charge = 0f;
@@ -140,8 +142,10 @@ namespace Deathless.Jeu
                 var sq = s.GetComponent<Squelette>();
                 bool tete = Combat.ALaTete(sq, point, dir);
                 if (tete) Critique(point, -dir, false);
-                H.Frapper(s, degats * (tete ? multTete : 1f), tete, point, dir);
+                float pvAvant = s.Pv;
+                float reel = H.Frapper(s, degats * (tete ? multTete : 1f), tete, point, dir);
                 if (etourdi > 0f && sq != null && sq.Vivant) sq.Etourdir(etourdi, H.Id);   // relayé à l'hôte depuis un client
+                Deathless.Succes.ServiceSucces.FlecheRodeur(H, sq, tete, Deathless.Succes.ServiceSucces.Acheve(s, pvAvant, reel), etourdi);
             });
         }
 
@@ -154,7 +158,7 @@ namespace Deathless.Jeu
             if (d.magnitude > b.nueePortee) p = transform.position + d.normalized * b.nueePortee;
             if (Physics.Raycast(p + Vector3.up * 5f, Vector3.down, out var hit, 20f, ~0, QueryTriggerInteraction.Ignore)) p = hit.point;
             m_CentreNuee = p;
-            m_RechargeNuee = b.nueeRecharge * Facteur(2);
+            m_RechargeNuee = b.nueeRecharge * Facteur(2) * RechargeEsprit;
             m_Action = Action.Nuee;
             m_Depuis = 0f;
             m_NueeLancee = false;
@@ -189,7 +193,7 @@ namespace Deathless.Jeu
         {
             if (!H.PeutAgir || m_RechargeRoulade > 0f || !H.Depenser(B.rouladeCout)) return;
             var b = B;
-            m_RechargeRoulade = b.rouladeRecharge;
+            m_RechargeRoulade = b.rouladeRecharge * RechargeEsprit;
             Vector3 avant = H.AvantCamera;
             H.Tourner(avant);
             H.EsquiveImposee(-avant, true);
@@ -238,7 +242,7 @@ namespace Deathless.Jeu
                     break;
                 case Action.Aucune:
                     // RT maintenu après un tir : il rebande dès que l'intervalle est passé.
-                    if (H.Entrees.AttaqueMaintenue && Time.time - m_DernierTir >= b.arcIntervalle + 0.15f) Bander();
+                    if (H.Entrees.AttaqueMaintenue && Time.time - m_DernierTir >= b.arcIntervalle / VitesseAttaque + 0.15f) Bander();
                     break;
                 case Action.Lacher:
                     if (m_Depuis >= 0.3f) m_Action = Action.Aucune;
@@ -310,8 +314,8 @@ namespace Deathless.Jeu
             {
                 case 0: return m_Action == Action.Bander ? EtatEmplacement.Actif : EtatEmplacement.Pret;
                 case 1: return m_Visee ? EtatEmplacement.Actif : EtatEmplacement.Pret;
-                case 2: return Recharge(m_RechargeNuee, B.nueeRecharge * Facteur(2), out restant, out total, m_Action == Action.Nuee);
-                case 3: return Recharge(m_RechargeRoulade, B.rouladeRecharge, out restant, out total);
+                case 2: return Recharge(m_RechargeNuee, B.nueeRecharge * Facteur(2) * RechargeEsprit, out restant, out total, m_Action == Action.Nuee);
+                case 3: return Recharge(m_RechargeRoulade, B.rouladeRecharge * RechargeEsprit, out restant, out total);
                 default: return EtatEmplacement.Vide;
             }
         }

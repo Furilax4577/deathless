@@ -50,6 +50,12 @@ namespace Deathless.Jeu
         /// les dégâts estimés (pour les jauges de classe du tireur). Null : coup appliqué ici (solo, objet local).
         public Func<InfoDegats, float> relais;
 
+        /// Point faible (éclat de Nyx de Nyxar, 01/10/2026) : le coup est remis à cette fonction avant tout traitement ici
+        /// (relais, garde, événements) ; elle renvoie les dégâts réels. Elle peut rappeler Encaisser sur ce même Sante :
+        /// le coup suit alors le chemin ordinaire (pas de second renvoi).
+        public Func<InfoDegats, float> renvoi;
+        bool m_EnRenvoi;
+
         public event Action<InfoDegats, float> Touche;           // coup appliqué, dégâts réels
         public event Action<InfoDegats, Interception> Intercepte; // coup bloqué ou paré
         public event Action<InfoDegats> Tue;
@@ -82,6 +88,12 @@ namespace Deathless.Jeu
         public float Encaisser(InfoDegats info)
         {
             if (Mort || !isActiveAndEnabled) return 0f;
+            if (renvoi != null && !m_EnRenvoi)
+            {
+                m_EnRenvoi = true;
+                try { return renvoi(info); }
+                finally { m_EnRenvoi = false; }
+            }
             // Squelette galvanisé par le cri de Morgrim (statut Galvanisé, 30/09/2026) : ses coups portent plus fort. Avant
             // le relais : un coup ennemi est calculé chez l'hôte, même s'il vise le héros d'un autre poste.
             if (info.equipeSource == Equipe.Ennemis && info.source != null && info.montant > 0f && info.source.TryGetComponent<Squelette>(out var sq)

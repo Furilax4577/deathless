@@ -198,7 +198,7 @@ namespace Deathless.Jeu
             m_Etat = etat;
             m_Camera = Distant ? null : partie.cameraJeu;
             if (Classe != null) Classe.Initialiser(this);
-            Sante.Initialiser(Classe != null ? Classe.PvMax : B.herosPV);
+            Sante.Initialiser(PvMaxTotal);
             Sante.invulnerable = B.joueurInvincible;
             Sante.intercepteur = Intercepter;
             // Peau de fer (rugissement du viking, 27/09/2026) : part des coups ennemis retirée, lue sur le statut du héros
@@ -209,8 +209,28 @@ namespace Deathless.Jeu
             Sante.Tue += OnTue;
             // Soins prodigués : au soigneur s'il y en a un (soin d'aura du paladin), sinon à soi (soin sur soi, potion).
             Sante.Soigne += reel => { if (Partie != null) Partie.CompterSoins(Sante.DernierSoigneur > 0 ? Sante.DernierSoigneur : Id, reel); };
-            m_Endurance = B.endurance;
+            m_Endurance = EnduranceMax;
+            m_PvBonusApplique = Attributs.BonusPv(m_Etat);
             if (!Distant) Entrees.Action += OnAction;
+        }
+
+        // ----------------------------------------------------------------- Attributs (wiki : classes.md, 01/10/2026)
+
+        /// Vie maximum : celle de la classe, plus les points d'Endurance gagnés (Attributs).
+        public float PvMaxTotal => (Classe != null ? Classe.PvMax : B.herosPV) + Attributs.BonusPv(m_Etat);
+        /// Endurance maximum : GameBalance.endurance, plus les points d'Endurance gagnés.
+        public float EnduranceMax => B.endurance + Attributs.BonusEndurance(m_Etat);
+        float m_PvBonusApplique;
+
+        /// Un point d'attribut vient d'être placé (Partie.AmeliorerAttribut) : la vie maximum suit l'Endurance (la vie
+        /// gagnée est donnée tout de suite) ; les autres effets sont lus au moment du calcul.
+        public void AppliquerAttributs()
+        {
+            if (Distant || Sante == null) return;
+            float bonus = Attributs.BonusPv(m_Etat);
+            float delta = bonus - m_PvBonusApplique;
+            m_PvBonusApplique = bonus;
+            if (Mathf.Abs(delta) > 0.001f) Sante.Fixer(Sante.Mort ? 0f : Sante.Pv + Mathf.Max(0f, delta), Sante.pvMax + delta);
         }
 
         /// Recopie l'état qui fait foi dans l'EtatJoueur (lu par le HUD et, plus tard, par le réseau).
@@ -219,7 +239,7 @@ namespace Deathless.Jeu
             j.pv = Sante.Pv;
             j.pvMax = Sante.pvMax;
             j.endurance = m_Endurance;
-            j.enduranceMax = B.endurance;
+            j.enduranceMax = EnduranceMax;
             if (Classe != null)
             {
                 j.jauge = Classe.ValeurJauge;
@@ -356,6 +376,24 @@ namespace Deathless.Jeu
         public float Frapper(Sante s, float degats, bool critique, Vector3 point, Vector3 direction, bool parBoule = false, bool continu = false, bool execution = false)
         {
             if (s == null || s.Mort) return 0f;
+            // Attributs (01/10/2026) : points gagnés de Force (corps à corps) ou de Perception (à distance), puis critique
+            // tiré par Chance (tout) et Perception (à distance) sur un coup qui n'est pas déjà critique. 0 point gagné :
+            // facteur 1, chance 0, rien ne change. Le Mage tire son critique lui-même (ClasseMage.TirerCritique).
+            if (!Distant && m_Etat != null && Classe != null)
+            {
+                bool distance = Classe.CoupADistance;
+                degats *= distance ? Attributs.FacteurDegatsDistance(m_Etat) : Attributs.FacteurDegatsMelee(m_Etat);
+                if (!critique && !continu && !execution && !Classe.CritiquePropre)
+                {
+                    float chance = Attributs.ChanceCritique(m_Etat, distance);
+                    if (chance > 0f && Random.value < chance)
+                    {
+                        critique = true;
+                        degats *= B.attributCritiqueMultiplicateur;
+                        Classe.MarquerCritique(point, -direction);
+                    }
+                }
+            }
             float reel = s.Encaisser(new InfoDegats
             {
                 montant = degats, sourceId = Id, equipeSource = Equipe.Heros, source = gameObject, critique = critique,
@@ -462,7 +500,7 @@ namespace Deathless.Jeu
             Vector3 face = Classe != null && Classe.FaceVisee ? FaceDeVisee() : transform.forward;
             Vector3 d = DirectionEntree();
             Vector3 dir = d.sqrMagnitude > 0.01f ? d.normalized : -face;
-            m_RechargeEsquive = B.esquiveRecharge;
+            m_RechargeEsquive = B.esquiveRecharge * Attributs.FacteurRechargeEsquive(m_Etat);
             EsquiveImposee(dir, false, DirectionClip(dir, face));
             AudioBank.Jouer(SonsDuJeu.Esquive, transform.position + Vector3.up, 0.8f);
             if (Classe != null) Classe.DiffuserCommun(ClasseHeros.EffetEsquive);
@@ -527,7 +565,7 @@ namespace Deathless.Jeu
             m_EtatCourant = Etat.Reapparition;
             m_EtatDepuis = 0f;
             Sante.Ranimer();
-            m_Endurance = B.endurance;
+            m_Endurance = EnduranceMax;
             CC.enabled = false;
             transform.position = point;
             Vector3 vers = -new Vector3(point.x, 0f, point.z);
@@ -607,7 +645,8 @@ namespace Deathless.Jeu
                     float ralenti = Statuts != null ? Statuts.FacteurVitesse : 1f;
                     float vitesse = (Classe != null ? Classe.Vitesse : b.vitesse) * (m_Sprint ? b.sprintMultiplicateur : 1f) * facteur
                         * Deathless.Donjon.ZoneEau.FacteurEn(transform.position + Vector3.up * 0.2f)   // eau du donjon : × 0,6
-                        * ralenti;
+                        * ralenti
+                        * Attributs.FacteurVitesse(m_Etat);   // Agilité gagnée (attributs, 01/10/2026)
                     if (m_Sprint) { m_Endurance = Mathf.Max(0f, m_Endurance - b.sprintCout * dt); m_EnduranceUtilisee = Time.time; }
                     deplacement = dir * vitesse;
                     Vector3 face = Classe != null && Classe.FaceVisee ? FaceDeVisee() : dir;
@@ -649,7 +688,7 @@ namespace Deathless.Jeu
 
             // Endurance : régénération après un court délai sans dépense.
             if (Time.time - m_EnduranceUtilisee > b.enduranceDelai)
-                m_Endurance = Mathf.Min(b.endurance, m_Endurance + b.enduranceRegen * dt);
+                m_Endurance = Mathf.Min(EnduranceMax, m_Endurance + b.enduranceRegen * dt);
 
             // Gravité et saut.
             bool etaitAuSol = m_AuSol;

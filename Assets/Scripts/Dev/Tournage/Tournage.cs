@@ -21,6 +21,9 @@ namespace Deathless.Dev.Tournage
     /// (Time.captureFramerate), ralentis par Time.timeScale. Un seul encodage continu : les plans se suivent dans le fichier.
     public class Tournage : MonoBehaviour
     {
+        // Succès (01/10/2026) : outil de dev utilisé dans ce Play, plus rien ne compte jusqu'à la fin du Play.
+        static Tournage() { Deathless.Succes.ServiceSucces.SuspendreDev("Tournage"); }
+
         public static Tournage Instance { get; private set; }
         static string s_Etat = "inactif";
         public static string Etat => s_Etat;

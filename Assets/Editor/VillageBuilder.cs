@@ -7,7 +7,7 @@ using UnityEngine;
 // Outil d'éditeur ré-exécutable : menu Deathless > Village > Générer / Vérifier la circulation / Nettoyer.
 // Tout est mesuré depuis le Nexus (origine). Azimuts horaires depuis +Z : nord = 0°, sud-est = 135°, sud-ouest = 225°.
 // Aléa à graine fixe : deux exécutions donnent la même forêt.
-public static class VillageBuilder
+public static partial class VillageBuilder
 {
     // ---------------- Paramètres ----------------
     public const int Seed = 42;
@@ -115,17 +115,17 @@ public static class VillageBuilder
     public static readonly bool KeepSpawnClearings = true;   // clairières de spawn libres d'arbres
     public const float TrailWidth = 4f;
     public const float TrailClear = 3f;          // demi-largeur libre de troncs de part et d'autre de l'axe
-    public const float TrailBendStart = 30f, TrailBendEnd = 64f, TrailBend = 5f;
+    public const float TrailBendStart = 30f, TrailBendEnd = 64f, TrailBend = 0f;   // routes droites depuis la carte v5 (5° avant)
     public const float ClearingR = 70f, ClearingRadius = 7f;
-    public static readonly float[] TrailAz = { 0f, 135f, 225f };
-    public static readonly string[] TrailName = { "Nord", "SudEst", "SudOuest" };
-    public static readonly string[] TrailLabel = { "NORD", "SUD-EST", "SUD-OUEST" };
+    public static readonly float[] TrailAz = { 90f, 180f, 270f };          // carte v5 : est, sud, ouest (v4 : nord, sud-est, sud-ouest)
+    public static readonly string[] TrailName = { "Est", "Sud", "Ouest" };
+    public static readonly string[] TrailLabel = { "EST", "SUD", "OUEST" };
     // Sol (remplace le plan Ground.mat vert uni le 25/09/2026). Technique du terrain de défense de Relic (DefenseDressing :
     // grille de 2 m, diagonales alternées, sommets non partagés donc facettes) + couleur par facette : chaque triangle pointe
     // un texel d'une petite palette (texture générée, filtrage point) rendue par URP Lit, qui garde lumière et ombres.
     // Relief très léger hors du village ; plat (y = 0) sous le village, le plateau, la place du portail et les allées.
-    public const float GroundStep = 2f;
-    public const float GroundFlatRadius = 22f, GroundBlendRadius = 28f;   // plat jusqu'à 22 m, relief complet au-delà de 28 m
+    public const float GroundStep = 1f;   // 1 m depuis la carte v5 (berges de la rivière ; 2 m avant)
+    public const float GroundFlatRadius = 46f, GroundBlendRadius = 54f;   // carte v5 : plat sur tout le village (22 et 28 m avant)
     public const float GroundRelief = 0.12f;                             // amplitude du relief (m, ±)
     public const float GroundEarthTrunk = 1.3f;                          // terre au pied des arbres (rayon, m)
     public const float GroundEarthPaved = 0.8f;                          // liseré de terre autour des pavés et des allées (m)
@@ -135,7 +135,9 @@ public static class VillageBuilder
     // Palette (sRGB) : 0-3 herbes du plus sombre au plus jaune, 4-5 taches claire / sombre, 6-7 terres
     public static readonly Color[] GroundPalette = {
         new Color(0.33f, 0.43f, 0.27f), new Color(0.40f, 0.50f, 0.32f), new Color(0.46f, 0.56f, 0.35f), new Color(0.52f, 0.58f, 0.36f),
-        new Color(0.58f, 0.64f, 0.40f), new Color(0.28f, 0.37f, 0.24f), new Color(0.47f, 0.41f, 0.31f), new Color(0.39f, 0.33f, 0.26f) };
+        new Color(0.58f, 0.64f, 0.40f), new Color(0.28f, 0.37f, 0.24f), new Color(0.47f, 0.41f, 0.31f), new Color(0.39f, 0.33f, 0.26f),
+        // carte v5 : 8 galets du lit, 9-10 sable de la lande (clair, sombre), 11 berge mouillée
+        new Color(0.45f, 0.45f, 0.42f), new Color(0.74f, 0.68f, 0.50f), new Color(0.66f, 0.60f, 0.43f), new Color(0.33f, 0.30f, 0.24f) };
 
     private const string ForestRoot = "Assets/Art/KayKit/KayKit_Forest_Nature_Pack_1.0_FREE/Assets/fbx(unity)/";
     private const string HexBuildings = "Assets/Art/KayKit/KayKit_Medieval_Hexagon_Pack_1.0_FREE/Assets/fbx(unity)/buildings/blue/";
@@ -585,8 +587,9 @@ public static class VillageBuilder
             var boxes = new List<Vector4[]>(); var feet = new List<Vector4[]>(); var names = new List<string>();
             Transform ms = Find("VillageBlockout/Maisons");
             if (ms != null)
-                foreach (Transform h in ms)
+                foreach (MeshFilter hm in ms.GetComponentsInChildren<MeshFilter>())
                 {
+                    Transform h = hm.transform; if (!h.name.StartsWith("Maison_")) continue;
                     BoxCollider bc = h.GetComponent<BoxCollider>(); if (bc == null) continue;
                     Vector3 c = h.TransformPoint(bc.center); float s = h.lossyScale.x;
                     boxes.Add(new Vector4[] { new Vector4(c.x, c.z, h.right.x, h.right.z), new Vector4(h.forward.x, h.forward.z, bc.size.x / 2f * s, bc.size.z / 2f * s) });
@@ -685,11 +688,13 @@ public static class VillageBuilder
     // Hauteur du sol : 0 jusqu'à GroundFlatRadius (village, plateau, place du portail, allées), puis relief de Perlin très léger.
     public static float GroundHeight(float x, float z)
     {
+        float creux = V5Creux(x, z);   // lit de la rivière et du bassin (carte v5)
         float k = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(GroundFlatRadius, GroundBlendRadius, Mathf.Sqrt(x * x + z * z)));
-        if (k <= 0f) return 0f;
+        if (k <= 0f) return creux;
+        if (creux < 0f) k *= Mathf.Clamp01(1f + creux * 3f);
         float n = (Mathf.PerlinNoise(x * 0.07f + 31.7f, z * 0.07f + 12.3f) * 2f - 1f) * 0.75f
                 + (Mathf.PerlinNoise(x * 0.23f + 5.1f, z * 0.23f + 77.9f) * 2f - 1f) * 0.25f;
-        return GroundRelief * k * n;
+        return GroundRelief * k * n + creux;
     }
 
     // Maillage du sol (technique Relic DefenseTerrain) : grille de GroundStep, diagonales alternées, sommets non partagés
@@ -741,7 +746,7 @@ public static class VillageBuilder
             if (m.magnitude < GroundFlatRadius)
             {
                 float dp = 99f;
-                if (m.magnitude < plateauRadius + 0.2f || Vector2.Distance(m, new Vector2(portal.x, portal.z)) < 1f) dp = 0f;
+                if (m.magnitude < plateauRadius + 0.2f || (!V5Actif && Vector2.Distance(m, new Vector2(portal.x, portal.z)) < 1f)) dp = 0f;
                 foreach (Vector4 q in paved)
                 {
                     float dx = Mathf.Max(q.x - m.x, 0f, m.x - q.z), dz = Mathf.Max(q.y - m.y, 0f, m.y - q.w);
@@ -764,6 +769,7 @@ public static class VillageBuilder
                 float dh = FootprintDistance(f, m);
                 if (dh < GroundEarthHouse * (0.5f + 0.7f * r2)) { idx = dh < 0.3f && r2 < 0.5f ? 7 : 6; break; }
             }
+            if (V5Actif) idx = V5Teinte(m, (a.y + b.y + c.y) / 3f, idx, r1, r2);
             hist[idx]++;
             Vector2 u = new Vector2((idx + 0.5f) / GroundPalette.Length, 0.5f);
             Vector3 nrm = Vector3.Cross(b - a, c - a).normalized;
@@ -1131,7 +1137,7 @@ public static class VillageBuilder
         Transform ms = rootGo.transform.Find("Maisons");
         int maisons = 0;
         if (ms != null && houseMat != null)
-            foreach (Transform h in ms) { var mr = h.GetComponent<MeshRenderer>(); if (mr != null) { mr.sharedMaterial = houseMat; maisons++; } }
+            foreach (MeshRenderer mr in ms.GetComponentsInChildren<MeshRenderer>()) if (mr.name.StartsWith("Maison_")) { mr.sharedMaterial = houseMat; maisons++; }
         Material lanterneMat = LanterneAssets.Materiau();
         LanternesReglages reglages = LanterneAssets.Reglages();
         int n = 0;

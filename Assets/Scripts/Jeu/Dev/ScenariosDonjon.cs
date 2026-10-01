@@ -22,6 +22,9 @@ namespace Deathless.Jeu.Dev
     ///   ScenariosDonjon.Perf(120)                 temps d'image, triangles, batches sur N images
     public class ScenariosDonjon : MonoBehaviour
     {
+        // Succès (01/10/2026) : outil de dev utilisé dans ce Play, plus rien ne compte jusqu'à la fin du Play.
+        static ScenariosDonjon() { Deathless.Succes.ServiceSucces.SuspendreDev("ScenariosDonjon"); }
+
         static ScenariosDonjon s_I;
         public static string Dernier = "";
 

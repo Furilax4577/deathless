@@ -3651,5 +3651,16 @@
     "source": "Deathless (synthèse)",
     "licence": "propre",
     "statut": "a_ecouter"
+  },
+  {
+    "id": "village_cascade",
+    "nom": "Village — cascade (boucle)",
+    "categorie": "Jour et nuit",
+    "usage": "Cascade du village (carte v5) : chute d'eau continue au pied de la montagne du nord, jouée en boucle 3D au bassin par CascadeVillage. Grondement, rideau d'eau, éclaboussures. Nouveau (01/10/2026).",
+    "fichier": "Deathless/Village/cascade_boucle.wav",
+    "portee": 45,
+    "source": "Deathless (synthèse)",
+    "licence": "propre",
+    "statut": "a_ecouter"
   }
 ]

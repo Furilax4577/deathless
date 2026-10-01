@@ -1,0 +1,29 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:dl="Deathless.UI" editor-extension-mode="False">
+    <!-- Écran Succès (01/10/2026, Wiki/pages/succes.md) : liste construite par EcranSucces. Chargé par Resources
+         (Succes/Succes) : le NavigateurEcrans du village n'a pas de champ à régler. -->
+    <Style src="/Assets/UI/Screens/V01.uss" />
+    <Style src="Succes.uss" />
+    <ui:VisualElement class="v01-plein v01-voile">
+        <ui:VisualElement class="succes">
+            <ui:VisualElement class="succes__entete">
+                <ui:VisualElement class="succes__titres">
+                    <ui:Label text="Succès" class="dl-title" />
+                    <ui:Label name="succes-aide" text="Les succès cachés se révèlent quand on les débloque." class="dl-text dl-text--muted succes__aide" />
+                </ui:VisualElement>
+                <ui:VisualElement class="succes__compte">
+                    <ui:Label name="succes-compte" text="0 / 41" class="succes__compte-valeur" />
+                    <ui:VisualElement class="succes-barre succes-barre--large">
+                        <ui:VisualElement name="succes-compte-barre" class="succes-barre__remplie" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:ScrollView name="succes-liste" class="succes__liste" mode="Vertical" horizontal-scroller-visibility="Hidden" />
+        </ui:VisualElement>
+        <ui:VisualElement class="dl-prompt-bar">
+            <ui:VisualElement class="dl-prompt-bar__group">
+                <dl:InputPrompt action="UI/Cancel" label="Retour" />
+            </ui:VisualElement>
+            <ui:Label text="Clavier et souris" class="dl-text dl-text--small dl-text--muted dl-device-name" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -376,23 +376,42 @@ namespace Deathless.Reseau
         void SorcierToucheRpc() => Sorcier.Instance?.ToucherDistant();
 
         /// Missile en crâne (Nyxessa ou Nécromancien) : les clients voient le même vol, sans dégâts (l'hôte les applique).
-        public void Missile(Vector3 depart, Sante cible, float vitesse, float guidage, bool parNyxessa)
+        /// `coupureDistance`, `coupureAngle` : crâne esquivable de Nyxar (MissileCrane, 01/10/2026), 0 sinon.
+        public void Missile(Vector3 depart, Sante cible, float vitesse, float guidage, bool parNyxessa, float coupureDistance = 0f, float coupureAngle = 0f)
         {
             if (!IsServer || cible == null) return;
             ulong id = 0; bool nyx = cible == (Partie.Instance != null ? Partie.Instance.nyxessa : null);
             var no = cible.GetComponentInParent<NetworkObject>();
             if (!nyx && (no == null || !no.IsSpawned)) return;
             if (no != null) id = no.NetworkObjectId;
-            MissileRpc(depart, id, nyx, vitesse, guidage, parNyxessa);
+            MissileRpc(depart, id, nyx, vitesse, guidage, parNyxessa, coupureDistance, coupureAngle);
         }
 
         [Rpc(SendTo.NotServer)]
-        void MissileRpc(Vector3 depart, ulong cibleId, bool nyx, float vitesse, float guidage, bool parNyxessa)
+        void MissileRpc(Vector3 depart, ulong cibleId, bool nyx, float vitesse, float guidage, bool parNyxessa, float coupureDistance, float coupureAngle)
         {
             Sante cible = null;
             if (nyx) cible = Partie.Instance != null ? Partie.Instance.nyxessa : null;
             else if (NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(cibleId, out var no)) cible = no.GetComponentInChildren<Sante>();
-            if (cible != null) MissileCrane.TirerVisuel(depart, cible, vitesse, guidage, parNyxessa);
+            if (cible != null) MissileCrane.TirerVisuel(depart, cible, vitesse, guidage, parNyxessa, coupureDistance, coupureAngle);
         }
+
+        // ----------------------------------------------------------------- Succès (01/10/2026, Deathless.Succes)
+
+        /// Succès d'équipe décidé par l'hôte (nuit tenue, boss vaincu…) : donné à tous les joueurs présents ; chaque poste
+        /// le débloque pour son propre compte (ServiceSucces.RecevoirEquipe).
+        public void SuccesEquipe(string fait, int valeur, Vector3 point) { if (IsServer) SuccesEquipeRpc(new FixedString64Bytes(fait ?? ""), valeur, point); }
+
+        [Rpc(SendTo.NotServer)]
+        void SuccesEquipeRpc(FixedString64Bytes fait, int valeur, Vector3 point) => Deathless.Succes.ServiceSucces.RecevoirEquipe(fait.ToString(), valeur, point);
+
+        /// Fait personnel vu par l'hôte seul (butin accordé, ennemi tué, soin d'aura…) : envoyé au poste du joueur concerné.
+        public void FaitPersonnel(ulong clientId, string fait, int valeur)
+        {
+            if (IsServer) FaitPersonnelRpc(new FixedString64Bytes(fait ?? ""), valeur, RpcTarget.Single(clientId, RpcTargetUse.Temp));
+        }
+
+        [Rpc(SendTo.SpecifiedInParams)]
+        void FaitPersonnelRpc(FixedString64Bytes fait, int valeur, RpcParams p = default) => Deathless.Succes.ServiceSucces.RecevoirPersonnel(fait.ToString(), valeur);
     }
 }

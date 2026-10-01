@@ -34,6 +34,23 @@ namespace Deathless.Jeu
         /// Facteur de l'amélioration `index` à son rang actuel (1 sans amélioration ; nombre ajouté pour un ajout).
         protected float Facteur(int index) => ArbreCompetences.Facteur(Id, index, Rang(index));
 
+        // ----------------------------------------------------------------- Attributs (wiki : classes.md, 01/10/2026)
+
+        /// Les coups portés maintenant sont à distance (Perception) ; sinon au corps à corps (Force). Lu par Heros.Frapper.
+        public virtual bool CoupADistance => false;
+        /// La classe tire elle-même ses critiques aléatoires (Mage) : Heros.Frapper n'en tire pas d'autre.
+        public virtual bool CritiquePropre => false;
+        /// Critique tiré par les attributs (Heros.Frapper) : marque jouée ici et chez les autres.
+        public void MarquerCritique(Vector3 point, Vector3 direction) => Critique(point, direction, false);
+
+        protected EtatJoueur EtatJ => H != null ? H.EtatJoueur : null;
+        /// Cadence de l'attaque (RT) : 1 + Agilité gagnée ; diviser les durées de l'attaque par ce facteur.
+        protected float VitesseAttaque => Attributs.FacteurVitesse(EtatJ);
+        /// Recharge des compétences : 1 − Esprit gagné ; multiplier les recharges par ce facteur.
+        protected float RechargeEsprit => Attributs.FacteurRechargeCompetences(EtatJ);
+        /// Jauge de classe (mana, rage) : 1 + Esprit gagné ; multiplier le maximum par ce facteur.
+        protected float FacteurJauge => Attributs.FacteurJauge(EtatJ);
+
         readonly List<Sante> m_Cibles = new List<Sante>();
 
         /// Combat.Ennemis dans un tampon propre à cette classe, réutilisé d'un coup à l'autre (pas d'allocation par coup ni

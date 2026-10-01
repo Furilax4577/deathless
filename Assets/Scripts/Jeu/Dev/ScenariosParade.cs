@@ -12,6 +12,9 @@ namespace Deathless.Jeu.Dev
     /// « parfaite » (appui 0,05 s avant), « tot » (appui 0,45 s avant : trop tôt pour la parade, coup bloqué).
     public class ScenariosParade : MonoBehaviour
     {
+        // Succès (01/10/2026) : outil de dev utilisé dans ce Play, plus rien ne compte jusqu'à la fin du Play.
+        static ScenariosParade() { Deathless.Succes.ServiceSucces.SuspendreDev("ScenariosParade"); }
+
         static ScenariosParade s_I;
         public static string Dernier = "";
 

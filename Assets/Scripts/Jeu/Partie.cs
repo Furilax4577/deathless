@@ -223,6 +223,7 @@ namespace Deathless.Jeu
             {
                 bool retour = Rattraper(j, r.Nuit.Value, ph);
                 Commencer(j, h, ph, r.Nuit.Value);
+                if (retour) Deathless.Succes.ServiceSucces.Reconnexion();   // succès « Je reviens tout de suite »
                 string msg = (retour ? "De retour dans la partie" : "Tu rejoins la partie en cours") + " (nuit " + Etat.nuit + ").";
                 DonjonJeu.Instance?.Annoncer(msg, 6f);
                 ReseauJeu.Journal("arrivée en cours de partie : " + ph + ", nuit " + Etat.nuit + (retour ? ", rangs retrouvés" : "") + ", " + j.pointsCompetence + " point(s)");
@@ -233,7 +234,7 @@ namespace Deathless.Jeu
 
         /// Client qui revient après une coupure : ce que ce poste tenait seul (rangs, points, jours survécus), gardé à la
         /// déconnexion (GarderPourRetour) pour le code du salon. Survit au rechargement du village.
-        sealed class Retour { public string code, classeId; public int[] rangs; public int points, nuits; }
+        sealed class Retour { public string code, classeId; public int[] rangs, attributs; public int points, pointsAttribut, nuits; }
         static Retour s_Retour;
 
         /// Client déconnecté en partie (LobbyReseau.SurDeconnexion) : rangs et points de compétence gardés pour un retour
@@ -242,7 +243,8 @@ namespace Deathless.Jeu
         {
             var j = m_Local;
             if (j == null || string.IsNullOrEmpty(code)) { s_Retour = null; return; }
-            s_Retour = new Retour { code = code, classeId = j.classeId, rangs = (int[])j.rangs?.Clone(), points = j.pointsCompetence, nuits = j.nuitsSurvecues };
+            s_Retour = new Retour { code = code, classeId = j.classeId, rangs = (int[])j.rangs?.Clone(), points = j.pointsCompetence, nuits = j.nuitsSurvecues,
+                attributs = (int[])j.attributs?.Clone(), pointsAttribut = j.pointsAttribut };
         }
 
         /// Arrivée en cours de partie : jours survécus d'après l'horloge de l'hôte (1 point par aube passée depuis la nuit
@@ -260,10 +262,14 @@ namespace Deathless.Jeu
                 if (r.rangs != null) j.rangs = r.rangs;
                 j.nuitsSurvecues = Mathf.Max(r.nuits, nuits);
                 j.pointsCompetence = r.points + Mathf.Max(0, nuits - r.nuits);
+                // Attributs (01/10/2026) : gardés comme les rangs, plus un point par aube passée pendant l'absence.
+                if (r.attributs != null) j.attributs = r.attributs;
+                j.pointsAttribut = r.pointsAttribut + Mathf.Max(0, nuits - r.nuits);
                 return true;
             }
             j.nuitsSurvecues = nuits;
             j.pointsCompetence = nuits;
+            j.pointsAttribut = nuits;
             return false;
         }
 
@@ -388,6 +394,7 @@ namespace Deathless.Jeu
         public void ContinuerSeul()
         {
             if (ReseauJeu.Actif) return;
+            Deathless.Succes.ServiceSucces.HoteSeul();   // succès « Seul contre tous » à la prochaine nuit tenue
             m_Distants.Clear();
             for (int i = Etat.joueurs.Count - 1; i >= 0; i--) if (Etat.joueurs[i] != m_Local) Etat.joueurs.RemoveAt(i);
             for (int i = m_ListeHeros.Count - 1; i >= 0; i--) if (m_ListeHeros[i] == null) m_ListeHeros.RemoveAt(i);
@@ -713,9 +720,11 @@ namespace Deathless.Jeu
             {
                 // Wiki : 1 point de compétence par jour survécu, crédité à l'aube (chaque poste crédite son joueur).
                 m_Local.pointsCompetence++;
+                // Attributs (01/10/2026) : +1 point d'attribut à chaque aube survécue, en plus du point de compétence.
+                m_Local.pointsAttribut++;
                 m_Local.nuitsSurvecues++;
                 PointCompetenceGagne?.Invoke(m_Local.pointsCompetence);
-                Journal("Point de compétence : " + m_Local.pointsCompetence + " à dépenser");
+                Journal("Point de compétence : " + m_Local.pointsCompetence + " à dépenser ; point d'attribut : " + m_Local.pointsAttribut);
             }
             if (nouvelle == Phase.Aube && !ClientReseau)
             {
@@ -744,11 +753,12 @@ namespace Deathless.Jeu
         }
 
         /// Test : fin forcée.
-        public void ForcerFin(Resultat r) => Terminer(r);
+        public void ForcerFin(Resultat r) { Deathless.Succes.ServiceSucces.MarquerPartieTest("fin forcée"); Terminer(r); }
 
         /// Test : saute à une phase (nuit donnée).
         public void ForcerPhase(Phase p, int nuit)
         {
+            Deathless.Succes.ServiceSucces.MarquerPartieTest("phase forcée");   // les succès ne comptent pas
             Etat.nuit = Mathf.Clamp(nuit, 1, B.nuitsPourGagner);
             Passer(p);
         }
@@ -870,6 +880,27 @@ namespace Deathless.Jeu
             refus = false;
             Journal("Compétence améliorée : " + defs[index].nom + " rang " + j.rangs[index]);
             return defs[index].nom + " : rang " + j.rangs[index] + ".";
+        }
+
+        /// Menu du personnage : dépense d'un point d'attribut dans l'attribut `index` (Attribut ; joueur local, plafond
+        /// Attributs.Plafond, pas de réattribution). Les effets sont simulés par son poste ; l'hôte reçoit les points
+        /// gagnés par HerosReseau (recul, or ramassé).
+        public string AmeliorerAttribut(int index, out bool refus)
+        {
+            refus = true;
+            var j = m_Local;
+            if (j == null) return "Aucun personnage.";
+            if (index < 0 || index >= Attributs.Nombre) return "Rien à améliorer ici.";
+            if (j.attributs == null || j.attributs.Length < Attributs.Nombre) System.Array.Resize(ref j.attributs, Attributs.Nombre);
+            var a = (Attribut)index;
+            if (!Attributs.SousPlafond(j, a)) return Attributs.Noms[index] + " est au maximum (" + Attributs.Plafond + ").";
+            if (j.pointsAttribut < Attributs.CoutParPoint) return "Pas de point d’attribut à dépenser.";
+            j.pointsAttribut -= Attributs.CoutParPoint;
+            j.attributs[index]++;
+            refus = false;
+            HerosLocal?.AppliquerAttributs();
+            Journal("Attribut amélioré : " + Attributs.Noms[index] + " " + Attributs.Valeur(j, a) + " (+" + j.attributs[index] + " gagné)");
+            return Attributs.Noms[index] + " : " + Attributs.Valeur(j, a) + ".";
         }
 
         public int PalierDe(Amelioration a) => a == Amelioration.Missiles ? Etat.nyxessa.palierMissiles : Etat.nyxessa.palierBouclier;

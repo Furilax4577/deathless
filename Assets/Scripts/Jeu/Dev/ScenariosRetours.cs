@@ -11,6 +11,9 @@ namespace Deathless.Jeu.Dev
     /// captures dans Assets/Screenshots/&lt;nom&gt;_*.png.
     public class ScenariosRetours : MonoBehaviour
     {
+        // Succès (01/10/2026) : outil de dev utilisé dans ce Play, plus rien ne compte jusqu'à la fin du Play.
+        static ScenariosRetours() { Deathless.Succes.ServiceSucces.SuspendreDev("ScenariosRetours"); }
+
         static ScenariosRetours s_I;
         public static string Dernier = "";
 

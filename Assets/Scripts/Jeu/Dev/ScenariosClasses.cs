@@ -9,6 +9,9 @@ namespace Deathless.Jeu.Dev
     /// dans Assets/Screenshots/classes_*.png.
     public class ScenariosClasses : MonoBehaviour
     {
+        // Succès (01/10/2026) : outil de dev utilisé dans ce Play, plus rien ne compte jusqu'à la fin du Play.
+        static ScenariosClasses() { Deathless.Succes.ServiceSucces.SuspendreDev("ScenariosClasses"); }
+
         static ScenariosClasses s_I;
 
         public static void Lancer(string nom)

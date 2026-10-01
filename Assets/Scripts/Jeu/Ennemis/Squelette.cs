@@ -48,6 +48,9 @@ namespace Deathless.Jeu
         /// rien à l'équité ou au réseau (Frapper reste seul juge de l'impact).
         public float PreparationProgress => m_Etat == Etat.Preparation ? Mathf.Clamp01(m_EtatDepuis / Mathf.Max(0.01f, m_Stats.preparation)) : 0f;
         public event Action<Squelette> Retire;     // désintégré (mort ou aube)
+        /// Joueur poursuivi (null : Nyxessa ou personne) et coup en préparation : succès « Tir ami… presque » (Deathless.Succes).
+        public Heros CibleJoueur => m_Cible;
+        public bool EnPreparation => m_Etat == Etat.Preparation;
 
         protected StatsSquelette m_Stats = new StatsSquelette();
         protected Etat m_Etat = Etat.SortieDeTerre;
@@ -932,6 +935,7 @@ namespace Deathless.Jeu
                 P.CompterTue(info.sourceId);
                 if (surNyx) P.CompterDegatsEvites(info.sourceId, m_Stats.degatsNyxessa * B.fenetreDegatsEvites / Mathf.Max(0.1f, m_Stats.intervalle));
             }
+            Deathless.Succes.ServiceSucces.EnnemiTue(this, info);   // succès (Morgrim, voleur, missile de Nyxessa…)
             if (Agent.enabled) { Agent.isStopped = true; Agent.enabled = false; }
             foreach (var c in GetComponentsInChildren<Collider>()) c.enabled = false;
             if (animator != null) { animator.SetBool(P_Stun, false); animator.SetBool(P_Dead, true); }

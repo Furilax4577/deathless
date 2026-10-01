@@ -25,6 +25,8 @@ namespace Deathless.Jeu
         Commune m_Commune;
         float m_ProchainBalayage = -99f, m_ProchainEcrase = -99f, m_ProchainCri;
         bool m_CriDemande;
+        /// Morgrim a poussé son cri au moins une fois (succès « Pas le temps de crier »).
+        public bool ACrie { get; private set; }
 
         /// Thème des compétences communes : Terre pour la massue, Rage pour la martache.
         protected virtual VfxTheme ThemeCommun => VfxTheme.Terre;
@@ -33,7 +35,110 @@ namespace Deathless.Jeu
         {
             base.Initialiser(stats, multiplicateurPV);
             m_ProchainCri = Time.time + 6f;   // pas de cri dès la sortie de terre
+            // Plus offensif que le Golem d'origine (01/10/2026) : cadence et pas propres.
+            m_Stats.intervalle = B.morgrimIntervalle;
+            m_Stats.vitesse = B.morgrimVitesse;
+            Agent.speed = m_Stats.vitesse;
         }
+
+        // ----------------------------------------------------------------- Offensif (retour de Quentin, 01/10/2026)
+        // Il chasse les joueurs au lieu de marcher surtout vers Nyxessa : proie = le joueur qui vient de le frapper, sinon
+        // le plus proche vu à moins de morgrimDetection m ; Nyxessa seulement sans joueur à portée. Il court quand sa
+        // proie est loin. Après un coup simple (CoupSimple : Fracas, Fauche), si une compétence est prête, il l'enchaîne
+        // après morgrimEnchainementDelai s au lieu de la récupération ordinaire.
+
+        Heros m_Agresseur;
+        float m_AgresseurQuand = -99f, m_ProchainChoixProie;
+        bool m_Enchainer;
+        float m_EnchainerJusque;
+        /// La prochaine attaque doit être une compétence (enchaînement) : lu par les versions dans leur choix.
+        protected bool ForcerCompetence { get; private set; }
+
+        protected override void Awake()
+        {
+            base.Awake();
+            Sante.Touche += SurTouche;
+        }
+
+        void SurTouche(InfoDegats info, float reel)
+        {
+            if (info.sourceId <= 0 || P == null) return;
+            var h = P.HerosDe(info.sourceId);
+            if (h == null) return;
+            m_Agresseur = h;
+            m_AgresseurQuand = Time.time;
+        }
+
+        /// Joueur chassé : l'agresseur récent (jusqu'à morgrimDetection × 1,5 m), sinon le plus proche vu à moins de
+        /// morgrimDetection m (la proie actuelle compte 3 m plus près, pour ne pas hésiter entre deux joueurs).
+        Heros ChoisirProie()
+        {
+            if (P == null) return null;
+            var b = B;
+            if (m_Agresseur != null && m_Agresseur.Vivant && Time.time - m_AgresseurQuand <= b.morgrimAgressionDuree
+                && Voit(m_Agresseur) && Distance(m_Agresseur.transform.position) <= b.morgrimDetection * 1.5f)
+                return m_Agresseur;
+            Heros meilleur = null;
+            float dMin = b.morgrimDetection;
+            var tous = P.TousLesHeros;
+            for (int i = 0; i < tous.Count; i++)
+            {
+                var h = tous[i];
+                if (h == null || !h.Vivant || !Voit(h)) continue;
+                float d = Distance(h.transform.position) - (h == m_Cible ? 3f : 0f);
+                if (d < dMin) { dMin = d; meilleur = h; }
+            }
+            return meilleur;
+        }
+
+        bool Pret => m_Enchainer || Time.time - m_DernierCoup >= m_Stats.intervalle;
+
+        protected override void MajMarche(float dt)
+        {
+            if (!Gardien && !Provoque)
+            {
+                var proie = ChoisirProie();
+                if (proie != null) { m_Cible = proie; m_SansFrapper = 0f; m_Etat = Etat.Poursuite; m_ProchainChoixProie = Time.time + 0.5f; return; }
+            }
+            base.MajMarche(dt);
+        }
+
+        protected override void MajPoursuite(float dt)
+        {
+            if (Gardien || Provoque) { base.MajPoursuite(dt); return; }
+            if (m_Enchainer && Time.time > m_EnchainerJusque) m_Enchainer = false;
+            if (Time.time >= m_ProchainChoixProie || m_Cible == null || !m_Cible.Vivant || !Voit(m_Cible))
+            {
+                m_ProchainChoixProie = Time.time + 0.5f;
+                var proie = ChoisirProie();
+                if (proie == null) { m_Cible = null; m_Enchainer = false; m_Etat = Etat.Marche; return; }
+                m_Cible = proie;
+            }
+            m_SansFrapper = 0f;
+            float d = Distance(m_Cible.transform.position);
+            if (d <= PorteeEngagement(m_Cible))
+            {
+                Agent.isStopped = true;
+                Tourner(m_Cible.transform.position);
+                if (Pret) CommencerAttaque(m_Cible);
+            }
+            else
+            {
+                Agent.isStopped = false;
+                // Squelette.Update vient de poser le pas (eau, statuts compris) : course quand la proie est loin.
+                if (d > B.morgrimCourseDistance) Agent.speed *= B.morgrimVitesseCourse / Mathf.Max(0.1f, m_Stats.vitesse);
+                Poursuivre(m_Cible.transform.position);
+            }
+        }
+
+        /// Après un coup simple : courte récupération si une compétence va s'enchaîner.
+        protected override float RecuperationDuree => m_Enchainer ? Mathf.Max(0.2f, B.morgrimEnchainementDelai) : base.RecuperationDuree;
+
+        /// Vrai si le coup qui part est le coup simple de la version (Fracas, Fauche) : peut être suivi d'un enchaînement.
+        protected abstract bool CoupSimple { get; }
+        /// Une compétence propre à la version est prête (recharge écoulée).
+        protected abstract bool CompetenceVariantePrete { get; }
+        bool CommunePrete => Time.time >= m_ProchainBalayage || Time.time >= m_ProchainEcrase;
 
         protected override void Update()
         {
@@ -68,7 +173,16 @@ namespace Deathless.Jeu
         Commune ChoisirCommune(Heros cible)
         {
             var b = B;
-            if (cible == null || Random.value > b.morgrimCommunChance) return Commune.Aucune;
+            if (cible == null) return Commune.Aucune;
+            // Enchaînement : une commune prête, sans condition de distance ; une chance sur deux si la version en a une aussi.
+            if (ForcerCompetence)
+            {
+                if (CompetenceVariantePrete && Random.value < 0.5f) return Commune.Aucune;
+                if (Time.time >= m_ProchainBalayage && Distance(cible.transform.position) <= b.morgrimBalayageRayon) return Commune.Balayage;
+                if (Time.time >= m_ProchainEcrase) return Commune.Ecrase;
+                return Commune.Aucune;
+            }
+            if (Random.value > b.morgrimCommunChance) return Commune.Aucune;
             float d = Distance(cible.transform.position);
             if (Time.time >= m_ProchainEcrase && (JoueursProches(b.morgrimEcraseOndeRayonMax * 0.5f) >= 2 || d <= b.morgrimEcraseOndeRayonMax * 0.4f))
                 return Commune.Ecrase;
@@ -79,9 +193,12 @@ namespace Deathless.Jeu
         protected sealed override void CommencerAttaque(Heros cible)
         {
             var b = B;
+            ForcerCompetence = m_Enchainer && !m_CriDemande;
+            m_Enchainer = false;
             m_Commune = m_CriDemande ? Commune.Cri : ChoisirCommune(cible);
             m_CriDemande = false;
-            if (m_Commune == Commune.Aucune) { CommencerVariante(cible); return; }
+            if (m_Commune == Commune.Aucune) { CommencerVariante(cible); ForcerCompetence = false; return; }
+            ForcerCompetence = false;
             Vector3 sol = transform.position + Vector3.up * 0.05f;
             switch (m_Commune)
             {
@@ -122,6 +239,12 @@ namespace Deathless.Jeu
                 case Commune.Ecrase: FaireEcrase(); break;
                 case Commune.Cri: FaireCri(); break;
                 default: FrapperVariante(); break;
+            }
+            // Coup simple porté (01/10/2026) : enchaîne une compétence prête, après une récupération courte.
+            if (m_Commune == Commune.Aucune && CoupSimple && m_Cible != null && (CommunePrete || CompetenceVariantePrete))
+            {
+                m_Enchainer = true;
+                m_EnchainerJusque = Time.time + 3f;
             }
         }
 
@@ -180,6 +303,7 @@ namespace Deathless.Jeu
         void FaireCri()
         {
             var b = B;
+            ACrie = true;
             EffetsBoss.Diffuser(this, EffetBoss.Cri, transform.position, 1f);
             Impact(transform.position + Vector3.up * 0.1f, VfxTheme.Rage, b.morgrimCriRayon * 0.5f);
             var dv = DirecteurVagues.Instance;

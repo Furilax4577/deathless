@@ -81,10 +81,10 @@ namespace Deathless.Jeu
         public override float FacteurVitesse => m_Action == Action.Tournante ? B.tournanteVitesse : m_Action == Action.Attaque ? 0.25f : m_Action == Action.Aucune || m_Action == Action.Rugissement ? 1f : 0f;
         /// Rugissement sur la couche haute (comme la charge du paladin) : les jambes marchent pendant le cri.
         public override bool HautDuCorps => m_Action == Action.Rugissement;
-        public override void RemplirJauge() { m_Rage = B.rageMax; }
+        public override void RemplirJauge() { m_Rage = JaugeMax; }
         public override JaugeClasse Jauge => JaugeClasse.Rage;
         public override float ValeurJauge => m_Rage;
-        public override float JaugeMax => B.rageMax;
+        public override float JaugeMax => B.rageMax * FacteurJauge;   // Esprit gagné : jauge plus grande
 
         public override void SurAction(string action)
         {
@@ -98,7 +98,7 @@ namespace Deathless.Jeu
 
         void Attaquer()
         {
-            if (m_Action != Action.Aucune || Time.time - m_DerniereAttaque < B.hacheIntervalle) return;
+            if (m_Action != Action.Aucune || Time.time - m_DerniereAttaque < B.hacheIntervalle / VitesseAttaque) return;
             m_Action = Action.Attaque;
             m_Depuis = 0f;
             m_DerniereAttaque = Time.time;
@@ -114,7 +114,7 @@ namespace Deathless.Jeu
         {
             if (!H.PeutAgir || m_RechargeRugir > 0f || m_Rage < B.rugissementRage) return;
             m_Rage -= B.rugissementRage;
-            m_RechargeRugir = B.rugissementRecharge * Facteur(2);
+            m_RechargeRugir = B.rugissementRecharge * Facteur(2) * RechargeEsprit;
             m_Action = Action.Rugissement;
             m_Depuis = 0f;
             m_Crie = m_VfxCri = false;
@@ -125,7 +125,7 @@ namespace Deathless.Jeu
         {
             if (!H.PeutAgir || m_RechargeSaut > 0f || m_Rage < B.sautRage) return;
             m_Rage -= B.sautRage;
-            m_RechargeSaut = B.sautRecharge;
+            m_RechargeSaut = B.sautRecharge * RechargeEsprit;
             m_Action = Action.Saut;
             m_Depuis = 0f;
             m_Impact = false;
@@ -153,7 +153,7 @@ namespace Deathless.Jeu
             // Les tics de l'attaque tournante (continu) rendent une petite rage (tournanteRageParTic par ennemi touché,
             // toutes les 0,3 s) : seul contre un ennemi elle perd de la rage et s'arrête vite, contre trois ennemis ou
             // plus elle se paie toute seule (compétence de foule ; Quentin, 26/09/2026, entre-deux après la PR #5).
-            m_Rage = Mathf.Min(B.rageMax, m_Rage + (continu ? B.tournanteRageParTic : B.rageParTouche));
+            m_Rage = Mathf.Min(JaugeMax, m_Rage + (continu ? B.tournanteRageParTic : B.rageParTouche));
         }
 
         public override void Maj(float dt, Vector3 dir)
@@ -166,7 +166,7 @@ namespace Deathless.Jeu
             switch (m_Action)
             {
                 case Action.Attaque:
-                    if (!m_CoupPorte && m_Depuis >= b.hacheInstant)
+                    if (!m_CoupPorte && m_Depuis >= b.hacheInstant / VitesseAttaque)   // Agilité gagnée : coup plus tôt
                     {
                         m_CoupPorte = true;
                         bool touche = false;
@@ -177,7 +177,7 @@ namespace Deathless.Jeu
                         }
                         if (touche) { AudioBank.Jouer(SonsDuJeu.Hache, transform.position + transform.forward + Vector3.up, 1f); Diffuser(E_Hache); }
                     }
-                    if (m_Depuis >= b.hacheIntervalle) m_Action = Action.Aucune;
+                    if (m_Depuis >= b.hacheIntervalle / VitesseAttaque) m_Action = Action.Aucune;
                     break;
                 case Action.Tournante:
                     m_Rage -= b.tournanteRage * Facteur(1) * dt;
@@ -198,7 +198,9 @@ namespace Deathless.Jeu
                         {
                             H.Frapper(s, b.tournanteDegats, false, s.transform.position + Vector3.up, (s.transform.position - transform.position).normalized, false, true);
                             touche = true;
+                            m_TouchesTournante.Add(s);
                         }
+                        Deathless.Succes.ServiceSucces.Tournante(H, m_TouchesTournante.Count);   // succès « Berserk »
                         if (touche) { AudioBank.Jouer(SonsDuJeu.Hache, transform.position + Vector3.up, 0.6f, 0.25f); Diffuser(E_TournanteTic); }
                     }
                     if (!tenue || m_Rage <= 0f) Arreter();
@@ -232,9 +234,13 @@ namespace Deathless.Jeu
             }
         }
 
+        /// Ennemis différents touchés par la tournante en cours (succès « Berserk »).
+        readonly System.Collections.Generic.HashSet<Sante> m_TouchesTournante = new System.Collections.Generic.HashSet<Sante>();
+
         void Commencer()
         {
             m_Action = Action.Tournante;
+            m_TouchesTournante.Clear();
             m_Depuis = 0f;
             m_ProchainTic = 0f;
             m_VfxTournante = false;
@@ -347,12 +353,12 @@ namespace Deathless.Jeu
                 case 1: return m_Action == Action.Tournante ? EtatEmplacement.Actif : m_Rage < B.tournanteRageMin ? EtatEmplacement.Indisponible : EtatEmplacement.Pret;
                 case 2:
                 {
-                    var e = Recharge(m_RechargeRugir, B.rugissementRecharge * Facteur(2), out restant, out total, m_Action == Action.Rugissement);
+                    var e = Recharge(m_RechargeRugir, B.rugissementRecharge * Facteur(2) * RechargeEsprit, out restant, out total, m_Action == Action.Rugissement);
                     return e == EtatEmplacement.Pret && m_Rage < B.rugissementRage ? EtatEmplacement.Indisponible : e;
                 }
                 case 3:
                 {
-                    var e = Recharge(m_RechargeSaut, B.sautRecharge, out restant, out total, m_Action == Action.Saut);
+                    var e = Recharge(m_RechargeSaut, B.sautRecharge * RechargeEsprit, out restant, out total, m_Action == Action.Saut);
                     return e == EtatEmplacement.Pret && m_Rage < B.sautRage ? EtatEmplacement.Indisponible : e;
                 }
                 default: return EtatEmplacement.Vide;

@@ -10,6 +10,9 @@ namespace Deathless.Dev.Tournage
     /// n'est pas possible en solo.
     public class LobbyTournage : ILobby
     {
+        // Succès (01/10/2026) : outil de dev utilisé dans ce Play, plus rien ne compte jusqu'à la fin du Play.
+        static LobbyTournage() { Deathless.Succes.ServiceSucces.SuspendreDev("LobbyTournage"); }
+
         sealed class Joueur : IJoueurLobby
         {
             public string Pseudo { get; set; }

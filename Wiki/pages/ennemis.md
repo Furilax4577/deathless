@@ -56,15 +56,24 @@ Un boss a sa **méga barre de vie dans le HUD**, sous celle de Nyxessa, avec son
 
 ### Morgrim, le Roi des os {décidé}
 
-Colosse très résistant et lent, il marche droit sur Nyxessa. Chaque attaque se prépare longtemps, pour laisser le temps de parer ou d'esquiver. Les deux versions (plus bas) ont ce kit commun, en plus de leurs trois compétences propres :
+Colosse très résistant, **offensif** {décidé, 01/10/2026} : il **chasse les joueurs** (celui qui vient de le frapper, sinon le plus proche) et ne marche sur Nyxessa que si personne n'est à portée. Chaque attaque reste télégraphiée, pour laisser le temps de parer ou d'esquiver. Les deux versions (plus bas) ont ce kit commun, en plus de leurs trois compétences propres :
 
 {spoil son kit et ses deux versions}
 
-- **Balayage** de hache en arc devant lui (200°, 3,8 m {à équilibrer}) : touche tous les joueurs dans l'arc et les repousse un peu ; **parable**. Couleurs de la version (Terre pour la massue, Rage pour la martache).
-- **Coup écrasé** au sol (frappe par-dessus), qui fait une **onde de choc autour de lui** : même règle que le Fracas de la massue (front lent à **sauter**, ni parable ni esquivable ; touché au sol : dégâts et [Renversé](statuts.md)), mais plus courte (7 m/s jusqu'à 8 m {à équilibrer}). Thème **Terre**.
-- **Cri** qui renforce les squelettes proches : dès qu'au moins 3 squelettes ordinaires sont à moins de 12 m, il crie et les **galvanise** (statut [Galvanisé](statuts.md) : dégâts +30 %, vitesse +25 %, 8 s ; recharge 22 s ; tout {à équilibrer}). Thème **Rage**.
+- **Balayage** de hache en arc devant lui (200°, 3,8 m ; recharge 5,5 s {à équilibrer}) : touche tous les joueurs dans l'arc et les repousse un peu ; **parable**. Couleurs de la version (Terre pour la massue, Rage pour la martache).
+- **Coup écrasé** au sol (frappe par-dessus), qui fait une **onde de choc autour de lui** : même règle que le Fracas de la massue (front lent à **sauter**, ni parable ni esquivable ; touché au sol : dégâts et [Renversé](statuts.md)), mais plus courte (7 m/s jusqu'à 8 m ; recharge 9 s {à équilibrer}). Thème **Terre**.
+- **Cri** qui renforce les squelettes proches : dès qu'au moins 3 squelettes ordinaires sont à moins de 12 m, il crie et les **galvanise** (statut [Galvanisé](statuts.md) : dégâts +30 %, vitesse +25 %, 8 s ; recharge 15 s ; tout {à équilibrer}). Thème **Rage**.
 
-Choix des coups : une compétence commune prête passe avant celle de la version avec une chance sur deux environ {à équilibrer} ; le cri part de lui-même, cible ou pas. {{dev: `MorgrimVariant.cs` (kit commun, `CommencerAttaque` / `Frapper` scellés qui passent la main à `CommencerVariante` / `FrapperVariante` des deux versions) ; réglages `GameBalance.morgrimCommunChance`, `morgrimBalayage*`, `morgrimEcrase*`, `morgrimCri*`. Pas de clip propre au cri : il joue le clip d'attaque du Golem. Statut `TypeStatut.Galvanise` (icône `statut_galvanise`).}}
+Choix des coups : une compétence commune prête passe avant celle de la version avec une chance sur deux environ {à équilibrer} ; le cri part de lui-même, cible ou pas.
+
+**Offensif** {décidé, 01/10/2026, retour de Quentin après une partie à deux : « trop simple, pas assez offensif »} :
+
+- il **poursuit les joueurs** : sa proie est le joueur qui l'a frappé dans les 4 dernières secondes, sinon le plus proche qu'il voit à moins de 22 m ; il ne va frapper Nyxessa que si aucun joueur n'est à portée ; il **court** (3,4 m/s au lieu de 2,4 m/s) quand sa proie est à plus de 6 m ;
+- il **attaque plus souvent** : un coup toutes les 2,8 s au lieu de 4 s, recharges des compétences réduites d'environ 35 %, préparations un peu plus courtes (environ −15 %, toujours télégraphiées) ;
+- il **enchaîne** : après son coup simple (Fracas de la massue, Fauche de la martache), si une compétence est prête, elle part presque aussitôt (0,45 s) ;
+- tous ces chiffres {à équilibrer}. Mesure au banc (solo, héros immobile au contact) : environ 10 attaques par minute avant, et il finissait par repartir vers Nyxessa ; voir ci-dessous pour après.
+
+{{dev: `MorgrimVariant.cs` (kit commun, `CommencerAttaque` / `Frapper` scellés qui passent la main à `CommencerVariante` / `FrapperVariante` des deux versions) ; réglages `GameBalance.morgrimCommunChance`, `morgrimBalayage*`, `morgrimEcrase*`, `morgrimCri*`. Pas de clip propre au cri : il joue le clip d'attaque du Golem. Statut `TypeStatut.Galvanise` (icône `statut_galvanise`). Offensif (01/10/2026) : `MorgrimVariant.ChoisirProie`, `MajMarche` / `MajPoursuite` (chasse), enchaînement (`CoupSimple`, `CompetenceVariantePrete`, `ForcerCompetence`, `RecuperationDuree`) ; réglages `morgrimDetection`, `morgrimAgressionDuree`, `morgrimIntervalle`, `morgrimVitesse`, `morgrimVitesseCourse`, `morgrimCourseDistance`, `morgrimEnchainementDelai`. Scénario `ScenariosBoss.Lancer("morgrim_massue")` / `("morgrim_martache")`.}}
 
 **Déclinaisons** {décidé, 26/09/2026} : le mini-boss existe en **deux versions**, l'une armée d'une **massue** (boule à pointes), l'autre d'une **martache** (hache-marteau), avec des **comportements et des compétences différents**. Les yeux **bleu glacé** de la martache la distinguent de la massue (yeux jaune-orangé habituels) au premier coup d'œil. **Une des deux versions apparaît au hasard à la nuit 10** ; la graine du tirage vient de l'hôte (voir Multijoueur ci-dessous et `Docs/reseau.md`).
 
@@ -109,13 +118,15 @@ Invocateur qui combat à distance :
 {spoil ses points faibles et ses phases}
 
 - il **garde ses distances** (entre 12 et 18 m) et **se téléporte** quand on l'approche (un joueur à moins de 5 m ; il réapparaît de 11 à 16 m plus loin, loin des joueurs, sans s'éloigner à plus de 26 m de Nyxessa ; recharge 9 s ; tout {à équilibrer}) : gemmes vertes aspirées à son départ, jaillissantes à son arrivée ;
-- il tire des **salves de crânes** : 3 crânes à 0,3 s d'écart, toutes les 3 s {à équilibrer} ;
+- il tire des **salves de crânes** : 3 crânes à 0,6 s d'écart, toutes les 3 s {à équilibrer} ; les crânes sont **esquivables** {décidé, 01/10/2026} : plus lents (9 m/s au lieu de 12), guidage faible qui s'arrête dans la dernière partie de la course (à 7 m de la cible, ou si elle sort du cône devant le crâne), si bien qu'**un pas de côté ou une roulade au bon moment** les fait rater {à équilibrer} ;
 - il **relève des squelettes** du sol autour de lui ;
 - il **fauche à la faux** ceux qui le serrent de près quand il ne peut pas se téléporter (2,6 m, 30 dégâts, parable {à équilibrer}) ;
 - ses **deux éclats de Nyx brillent**, dans le crâne de sa couronne et dans celui de son grimoire à la ceinture : ce sont ses **points faibles** {décidé}. Grappes de gemmes vertes (énergie de Nyxessa) qui pulsent et rétrécissent en s'usant.
-  - Chaque éclat se **brise** sous les coups (320 PV chacun, multipliés comme ceux des ennemis selon la nuit {à équilibrer}) ; une frappe de mêlée à cible unique vise l'éclat le plus proche avant son corps. Chaque éclat brisé lui retire **un tiers de sa puissance** {décidé} : un tiers de ses PV max, et une partie de son kit (tableau ci-dessous) {à équilibrer}.
-  - Il ne peut être **tué qu'une fois ses deux éclats brisés** {décidé} : avant, son corps ne prend aucun dégât (et Nyxessa ne gaspille pas ses missiles sur lui).
+  - Son **corps prend des dégâts** dès le début du combat {décidé, 01/10/2026} (Nyxessa tire aussi sur lui).
+  - Il **perd un éclat par tranche de vie** {décidé, 01/10/2026} : le premier quand il passe sous les 2/3 de ses PV, le second sous 1/3, avec le changement de phase (tableau ci-dessous). Un éclat peut aussi se **briser** sous les coups (200 PV chacun, multipliés comme ceux des ennemis selon la nuit {à équilibrer}) ; une frappe de mêlée à cible unique vise l'éclat le plus proche avant son corps. À chacun de trouver comment tirer parti de ces points faibles.
+  - Un éclat brisé lui retire une partie de son kit (tableau ci-dessous), plus de PV en moins {décidé, 01/10/2026}.
   - Sa méga barre de vie affiche les éclats restants (« NYXAR · 2 ÉCLATS »), puis « ENRAGÉ ».
+  - PV : 1 800 (× nuit) au lieu de 1 200, pour un combat à deux d'environ 2 à 3 minutes {à équilibrer}.
 
 **Trois phases**, selon les éclats brisés {décidé} :
 
@@ -124,7 +135,7 @@ Invocateur qui combat à distance :
 | 1 | Les deux intacts | Kit complet : distance, téléportation, salves de crânes, squelettes relevés, faux de près |
 | 2 | Couronne brisée | Plus de téléportation ni de squelettes relevés |
 | 2 | Grimoire brisé | Plus de salves de crânes (un seul crâne par tir) |
-| 3 | Les deux brisés | Enragé, il se bat au corps à corps à la faux ; il devient tuable |
+| 3 | Les deux brisés | Enragé, il se bat au corps à corps à la faux |
 
 En phase 3, il fonce sur les joueurs et sur Nyxessa comme un squelette de mêlée, plus vite (4,2 m/s) et plus fort (38 dégâts aux joueurs, 40 à Nyxessa, un coup toutes les 1,7 s) {à équilibrer}.
 
@@ -132,7 +143,7 @@ En phase 3, il fonce sur les joueurs et sur Nyxessa comme un squelette de mêlé
 
 Points de vie, dégâts et cadence : {à équilibrer}.
 
-{{dev: `Necromancien.cs` (phases, téléportation, salves, faux, enragé) et `EclatNyx.cs` (éclat : sa propre `Sante` sur un enfant posé à ses pieds, sphère de collision et grappe de gemmes qui suivent l'os de la tête ou du bassin) ; invulnérabilité par `Sante.invulnerable` ; `Combat.RayonDe` fait passer l'éclat avant le corps en mêlée. Réglages `GameBalance.necro*` (PV, distance, tir, invocation) et `nyxar*` (salve, téléportation, faux, éclats, enragé). Grimoire à la ceinture : modèle KayKit `spellbook_closed`, posé sur le prefab par le menu **Deathless > Jeu > 14. Boss (grimoire de Nyxar)** (à relancer après le menu 4). Réseau : PV des éclats dans `EnnemiReseau` (variable `m_Eclats`), coups des clients sur un éclat relayés à l'hôte (`RelayerEclat`), téléportation par `NetworkTransform.Teleport`, effets par `EffetsBoss` ; les crânes passent déjà par `PartieReseau.Missile`. Scénario de vérification : `ScenariosBoss.Lancer("nyxar")`.}}
+{{dev: `Necromancien.cs` (phases, téléportation, salves, faux, enragé) et `EclatNyx.cs` (éclat : sa propre `Sante` sur un enfant posé à ses pieds, sphère de collision et grappe de gemmes qui suivent l'os de la tête ou du bassin) ; coup sur un éclat : `Sante.renvoi` → `Necromancien.CoupSurEclat` (un même geste ne frappe Nyxar qu'une fois), usure `EclatNyx.Abimer` ; rupture par tranche de vie : `Necromancien.VerifierTranches` ; `Combat.RayonDe` fait passer l'éclat avant le corps en mêlée. Crânes esquivables : `MissileCrane` (paramètres de coupure passés par le tireur, aussi au visuel des clients par `PartieReseau.Missile`). Réglages `GameBalance.necro*` (PV, distance, tir, vitesse des crânes, invocation) et `nyxar*` (salve, crânes, téléportation, faux, éclats, enragé). Grimoire à la ceinture : modèle KayKit `spellbook_closed`, posé sur le prefab par le menu **Deathless > Jeu > 14. Boss (grimoire de Nyxar)** (à relancer après le menu 4). Réseau : PV des éclats dans `EnnemiReseau` (variable `m_Eclats`), coups des clients sur un éclat : le corps par le relais ordinaire, l'usure de l'éclat et l'effet vu de tous relayés à l'hôte (`RelayerEclat` → `AbimerEclat`, effet `EffetBoss.Critique`), téléportation par `NetworkTransform.Teleport`, effets par `EffetsBoss` ; les crânes passent déjà par `PartieReseau.Missile`. Scénarios de vérification : `ScenariosBoss.Lancer("nyxar")`, `ScenariosBoss.Lancer("nyxar_esquive")`.}}
 
 ## Mage
 

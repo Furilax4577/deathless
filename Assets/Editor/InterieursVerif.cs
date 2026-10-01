@@ -30,7 +30,7 @@ public static class InterieursVerif
         {
             string nom = it.name.Replace("Interieur_", "");
             int i = System.Array.IndexOf(InterieursBuilder.Noms, nom);
-            Transform maison = GameObject.Find("VillageBlockout/Maisons/" + InterieursBuilder.Maisons[i]).transform;
+            Transform maison = VillageBuilder.TrouverMaison(GameObject.Find("VillageBlockout").transform, InterieursBuilder.Maisons[i]);
             var g = InterieursBuilder.Maisons[i].EndsWith("_A") ? InterieursBuilder.A : InterieursBuilder.B;
             var p = InterieursBuilder.Mesurer(g, maison.localScale.x);
             sb.Append("== " + nom + " (" + InterieursBuilder.Maisons[i] + ")\n");
@@ -316,7 +316,7 @@ public static class InterieursVerif
         {
             string nom = it.name.Replace("Interieur_", "");
             int i = System.Array.IndexOf(InterieursBuilder.Noms, nom);
-            Transform maison = GameObject.Find("VillageBlockout/Maisons/" + InterieursBuilder.Maisons[i]).transform;
+            Transform maison = VillageBuilder.TrouverMaison(GameObject.Find("VillageBlockout").transform, InterieursBuilder.Maisons[i]);
             var g = InterieursBuilder.Maisons[i].EndsWith("_A") ? InterieursBuilder.A : InterieursBuilder.B;
             var p = InterieursBuilder.Mesurer(g, maison.localScale.x);
             Transform ae = it.Find("Ancre_Echange_" + nom);

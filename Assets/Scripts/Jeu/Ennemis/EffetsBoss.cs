@@ -31,6 +31,8 @@ namespace Deathless.Jeu
         Breche = 9,
         /// Coup de zone du Golem d'origine (repli sans prefab Morgrim) : onde brève du prefab du Golem, terre et son.
         OndeGolem = 10,
+        /// Coup sur un éclat de Nyx (critique garanti sur Nyxar, 01/10/2026) : effet et son de critique (Combat.Critique).
+        Critique = 11,
     }
 
     public static class EffetsBoss
@@ -103,6 +105,10 @@ namespace Deathless.Jeu
                     break;
                 case EffetBoss.Breche:
                     AudioBank.Jouer(SonsDuJeu.BouclierBreche, point, 1f);
+                    break;
+                case EffetBoss.Critique:
+                    // `direction` : l'avant du boss, tourné vers le héros ; le coup va dans l'autre sens.
+                    Combat.Critique(point, -direction, false);
                     break;
             }
         }

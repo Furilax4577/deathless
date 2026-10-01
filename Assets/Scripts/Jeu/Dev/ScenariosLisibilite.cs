@@ -12,6 +12,9 @@ namespace Deathless.Jeu.Dev
     /// composant CameraEpaule est désactivé pendant la manœuvre pour qu'il ne recalcule pas par-dessus).
     public class ScenariosLisibilite : MonoBehaviour
     {
+        // Succès (01/10/2026) : outil de dev utilisé dans ce Play, plus rien ne compte jusqu'à la fin du Play.
+        static ScenariosLisibilite() { Deathless.Succes.ServiceSucces.SuspendreDev("ScenariosLisibilite"); }
+
         static ScenariosLisibilite s_I;
 
         public struct Variante { public string nom; public float tangage, distance, epaule, champ; }

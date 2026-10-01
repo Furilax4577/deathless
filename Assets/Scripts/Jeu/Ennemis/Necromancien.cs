@@ -7,14 +7,16 @@ namespace Deathless.Jeu
     /// 30/09/2026, valeurs GameBalance necro* et nyxar*, à équilibrer). Ses yeux brillent en vert Nyxessa.
     ///
     /// Deux éclats de Nyx (EclatNyx), dans le crâne de sa couronne et dans celui de son grimoire à la ceinture, sont
-    /// ses points faibles : tant qu'un éclat tient, il est invulnérable (Sante.invulnerable) ; chaque éclat brisé lui
-    /// retire un tiers de ses PV max et une partie de son kit. Trois phases :
+    /// ses points faibles (décidé le 01/10/2026) : son corps prend des dégâts normalement dès le début ; un coup sur un
+    /// éclat est un critique garanti (×GameBalance.nyxarEclatMultiplicateur, effet et chiffre de critique) et abîme
+    /// l'éclat (CoupSurEclat) ; un éclat se brise aussi de lui-même par tranche de vie (2/3, puis 1/3 des PV max :
+    /// VerifierTranches) ; chaque éclat brisé lui retire une partie de son kit. Trois phases :
     /// - phase 1 (deux éclats) : garde ses distances, se téléporte quand on l'approche, tire des salves de crânes,
     ///   relève des squelettes autour de lui, fauche à la faux qui le serre de près ;
     /// - phase 2, couronne brisée : plus de téléportation ni de squelettes relevés ; grimoire brisé : plus de salves
     ///   (un seul crâne par tir) ;
     /// - phase 3 (deux éclats brisés) : enragé, il se bat au corps à corps à la faux (comportement de base d'un
-    ///   squelette, plus rapide et plus fort) ; il devient tuable.
+    ///   squelette, plus rapide et plus fort).
     /// L'IA tourne chez l'hôte seulement ; les clients voient les crânes (PartieReseau.Missile), les sbires (apparition
     /// réseau), la téléportation et les éclats (EnnemiReseau, EffetsBoss).
     public class Necromancien : Squelette
@@ -51,7 +53,30 @@ namespace Deathless.Jeu
         {
             base.Awake();
             CreerEclats();
+            Sante.renvoi = CoupSurCorps;
+            Sante.Touche += VerifierTranches;
         }
+
+        /// Hôte (Touche n'est levé que là où le coup s'applique) : un éclat se brise de lui-même par tranche de vie
+        /// (décidé le 01/10/2026) — le premier à 2/3 des PV max, le second à 1/3 — s'il n'a pas déjà été brisé par les
+        /// coups. Le premier à céder : celui qui a perdu le plus de PV, sinon la couronne.
+        void VerifierTranches(InfoDegats info, float reel)
+        {
+            if (Distant || !Vivant || Sante.pvMax <= 0f) return;
+            float ratio = Sante.Pv / Sante.pvMax;
+            int voulu = (ratio <= 2f / 3f ? 1 : 0) + (ratio <= 1f / 3f ? 1 : 0);
+            for (int garde = 0; garde < 2 && Brises < voulu; garde++)
+            {
+                EclatNyx a = m_Eclats[0], g = m_Eclats[1];
+                bool aOk = a != null && !a.Brise, gOk = g != null && !g.Brise;
+                EclatNyx e = aOk && gOk ? (g.Sante.Ratio < a.Sante.Ratio ? g : a) : aOk ? a : gOk ? g : null;
+                if (e == null) return;
+                if (P != null) P.Journal("Nyxar : tranche de vie franchie (" + Mathf.RoundToInt(ratio * 100f) + " %), l'éclat cède");
+                e.Abimer(e.Sante.Pv + 1f, info);
+            }
+        }
+
+        int Brises => (CouronneBrisee ? 1 : 0) + (GrimoireBrise ? 1 : 0);
 
         /// Pose les deux éclats sur les os de la tête et du bassin, à partir de la pose de repos du modèle (KayKit
         /// Necromancer : crâne de la couronne devant, en haut ; grimoire à la ceinture, côté gauche).
@@ -86,7 +111,7 @@ namespace Deathless.Jeu
             };
             base.Initialiser(s, multiplicateurPV);
             for (int i = 0; i < m_Eclats.Length; i++) if (m_Eclats[i] != null) m_Eclats[i].Initialiser(b.nyxarEclatPV * multiplicateurPV);
-            Sante.invulnerable = true;
+            Sante.invulnerable = false;
             m_ProchainTir = Time.time + 3f;
             m_ProchaineInvocation = Time.time + 6f;
             m_ProchaineTeleport = Time.time + 4f;
@@ -95,12 +120,12 @@ namespace Deathless.Jeu
 
         // ----------------------------------------------------------------- Éclats de Nyx
 
-        /// Hôte : un éclat vient d'être brisé. Un tiers des PV max en moins ; les deux brisés : enragé et tuable.
+        /// Hôte : un éclat vient d'être brisé (part du kit perdue : CouronneBrisee, GrimoireBrise) ; les deux : enragé.
+        /// Plus de perte de PV max à la rupture depuis le 01/10/2026 (le corps prend des dégâts dès le début).
         public void EclatBrise(EclatNyx e, InfoDegats info)
         {
             if (Distant || !Vivant) return;
             EffetsBoss.Diffuser(this, EffetBoss.EclatBrise, e.Position, 1f);
-            Sante.Fixer(Mathf.Max(1f, Sante.Pv - Sante.pvMax / 3f), Sante.pvMax);
             if (P != null) P.Journal("Nyxar : éclat " + (e.Index == 0 ? "de la couronne" : "du grimoire") + " brisé (joueur " + info.sourceId + "), phase " + PhaseCombat);
             if (CouronneBrisee && GrimoireBrise) Enrager();
         }
@@ -110,7 +135,6 @@ namespace Deathless.Jeu
             if (m_Enrage) return;
             var b = B;
             m_Enrage = true;
-            Sante.invulnerable = false;
             m_SalveRestante = 0; m_SalveDans = -1f;
             m_Stats.vitesse = b.nyxarEnrageVitesse;
             m_Stats.degatsJoueur = b.nyxarEnrageDegats;
@@ -119,41 +143,74 @@ namespace Deathless.Jeu
             m_Stats.intervalle = b.nyxarEnrageIntervalle;
             m_Stats.portee = b.nyxarEnragePortee;
             EffetsBoss.Diffuser(this, EffetBoss.Enrage, transform.position, 1f);
-            if (P != null) P.Journal("Nyxar enragé : corps à corps, tuable (" + Mathf.RoundToInt(Sante.Pv) + " PV)");
+            if (P != null) P.Journal("Nyxar enragé : corps à corps (" +Mathf.RoundToInt(Sante.Pv) + " PV)");
         }
 
-        /// Client : relie les coups de ses héros sur les éclats à l'hôte (EnnemiReseau.OnNetworkSpawn).
-        public void BrancherEclatsDistants(Deathless.Reseau.EnnemiReseau reseau)
+        // Un même geste (même héros, même image) ne frappe Nyxar qu'une fois : un coup de zone qui prend à la fois le
+        // corps et un ou deux éclats (Combat.Ennemis les rend tous) ne compte que le premier touché (l'éclat, plus proche
+        // pour la mêlée) ; les autres éclats s'usent seulement. Valeur : image du dernier coup, négative s'il venait d'un éclat.
+        readonly System.Collections.Generic.Dictionary<int, int> m_DernierGeste = new System.Collections.Generic.Dictionary<int, int>();
+        bool m_DepuisEclat;
+
+        /// Tous les postes (Sante.renvoi du corps) : coup sur le corps, ignoré si le même geste vient de toucher un éclat.
+        float CoupSurCorps(InfoDegats info)
         {
-            for (int i = 0; i < m_Eclats.Length; i++)
+            if (!m_DepuisEclat && info.sourceId > 0)
             {
-                var e = m_Eclats[i];
-                if (e == null || e.Sante == null) continue;
-                int index = i;
-                e.Sante.relais = info => reseau.RelayerEclat(index, info, e.Sante.Pv);
+                if (m_DernierGeste.TryGetValue(info.sourceId, out int g) && g == -Time.frameCount) return 0f;
+                m_DernierGeste[info.sourceId] = Time.frameCount;
             }
+            return Sante.Encaisser(info);   // chemin ordinaire (relais chez un client, garde, événements)
         }
 
-        /// Client : PV des éclats reçus de l'hôte ; invulnérable tant qu'un éclat tient (pas de faux chiffres de dégâts).
+        /// Tous les postes (Sante.renvoi d'un éclat, 01/10/2026) : critique garanti sur Nyxar (×nyxarEclatMultiplicateur,
+        /// sauf coup déjà critique ou continu) et usure de l'éclat. Chez l'hôte : usure et effet de critique diffusé ici ;
+        /// chez un client : le corps part par son relais habituel (chiffre de critique estimé tout de suite), l'usure et
+        /// l'effet par EnnemiReseau.RelayerEclat. Renvoie les dégâts faits à Nyxar (score, jauges de classe).
+        public float CoupSurEclat(EclatNyx e, InfoDegats info)
+        {
+            if (e == null || e.Brise || !Vivant || info.montant <= 0f) return 0f;
+            bool deja = false;
+            if (info.sourceId > 0)
+            {
+                deja = m_DernierGeste.TryGetValue(info.sourceId, out int g) && (g == Time.frameCount || g == -Time.frameCount);
+                if (!deja) m_DernierGeste[info.sourceId] = -Time.frameCount;
+            }
+            var crit = info;
+            if (!info.critique && !info.continu) { crit.montant *= Mathf.Max(1f, B.nyxarEclatMultiplicateur); crit.critique = true; }
+            float reel = 0f;
+            if (!deja)
+            {
+                m_DepuisEclat = true;
+                try { reel = Sante.Encaisser(crit); }
+                finally { m_DepuisEclat = false; }
+            }
+            if (Distant) { if (m_Reseau != null) m_Reseau.RelayerEclat(e.Index, info, e.Sante.Pv); }
+            else AbimerEclat(e.Index, info);
+            return reel;
+        }
+
+        /// Hôte : usure d'un éclat (coup d'un héros d'ici, ou relayé par un client) et effet de critique vu de tous.
+        public void AbimerEclat(int index, InfoDegats info)
+        {
+            if (Distant || !Vivant) return;
+            var e = Eclat(index);
+            if (e == null || e.Brise) return;
+            if (!info.critique && !info.continu) EffetsBoss.Diffuser(this, EffetBoss.Critique, info.point);
+            e.Abimer(info.montant, info);
+        }
+
+        /// Client : PV des éclats reçus de l'hôte ; les deux brisés : enragé.
         public void RecevoirEclats(Vector2 pv)
         {
             if (pv.x < 0f) return;
             float max = B.nyxarEclatPV * Mathf.Max(1f, GameBalance.ParNuit(B.multiplicateurPV, P != null ? P.Etat.nuit : 1, 1f));
             if (m_Eclats[0] != null) m_Eclats[0].Fixer(pv.x, Mathf.Max(max, pv.x));
             if (m_Eclats[1] != null) m_Eclats[1].Fixer(pv.y, Mathf.Max(max, pv.y));
-            Sante.invulnerable = pv.x > 0f || pv.y > 0f;
-            m_Enrage = !Sante.invulnerable;
+            m_Enrage = pv.x <= 0f && pv.y <= 0f;
         }
 
         // ----------------------------------------------------------------- Comportement
-
-        protected override void Update()
-        {
-            base.Update();
-            // Squelette.Update pose Sante.invulnerable pour l'esquive des squelettes : tant qu'un éclat tient, Nyxar
-            // reste invulnérable quoi qu'il en soit.
-            if (!m_Enrage && Vivant) Sante.invulnerable = true;
-        }
 
         protected override void MajMarche(float dt) { if (m_Enrage) base.MajMarche(dt); else MajDistance(dt); }
         protected override void MajPoursuite(float dt) { if (m_Enrage) base.MajPoursuite(dt); else MajDistance(dt); }
@@ -217,7 +274,8 @@ namespace Deathless.Jeu
             }
         }
 
-        /// Salve de crânes en cours : un crâne toutes les nyxarSalveEcart s, départs décalés sur les côtés.
+        /// Salve de crânes en cours : un crâne toutes les nyxarSalveEcart s, départs décalés sur les côtés. Crânes
+        /// esquivables (01/10/2026) : guidage faible (nyxarCraneGuidage), coupé près de la cible ou au-delà d'un angle.
         void MajSalve(float dt)
         {
             if (m_SalveRestante <= 0 || m_SalveDans < 0f) return;
@@ -229,7 +287,8 @@ namespace Deathless.Jeu
             int rang = total - m_SalveRestante;
             float cote = total > 1 ? (rang - (total - 1) * 0.5f) * 0.55f : 0f;
             Vector3 depart = transform.position + Vector3.up * 1.6f + transform.forward * 0.6f + transform.right * cote;
-            MissileCrane.Tirer(depart, m_CibleTir, b.necroDegats, b.necroVitesseMissile, 90f, Equipe.Ennemis, gameObject, false);
+            MissileCrane.Tirer(depart, m_CibleTir, b.necroDegats, b.necroVitesseMissile, b.nyxarCraneGuidage, Equipe.Ennemis, gameObject, false,
+                b.nyxarCraneCoupureDistance, b.nyxarCraneCoupureAngle);
             m_SalveRestante--;
             m_SalveDans = m_SalveRestante > 0 ? b.nyxarSalveEcart : -1f;
         }

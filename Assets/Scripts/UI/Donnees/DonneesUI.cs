@@ -56,6 +56,9 @@ namespace Deathless.UI.Donnees
         /// Chiffres de dégâts flottants, posés par le jeu ; null : rien n'est affiché.
         public static IDegatsSource Degats { get; set; }
 
+        /// Succès du joueur local (module Deathless.Succes, posé au lancement du jeu ; null : écran et bannière vides).
+        public static IListeSucces Succes { get; set; }
+
         /// Appelé à chaque enregistrement ou retrait (les écrans se réabonnent aux événements de IEtatPartie).
         public static event Action Changees;
 

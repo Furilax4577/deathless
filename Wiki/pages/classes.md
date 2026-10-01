@@ -60,7 +60,7 @@ L'esquive des **cinq classes** est **directionnelle** (26/09/2026) : le héros n
 
 ## Menu du personnage et points de compétence
 
-- **Menu du personnage** {décidé} : la touche **Tab** (Y à la manette, Triangle) ouvre un menu avec **le personnage** (vie, endurance, jauge, vitesse, nuits survécues, ennemis tués), **l'inventaire** (vide pour l'instant) et **l'amélioration des compétences**. La partie continue pendant qu'il est ouvert.
+- **Menu du personnage** {décidé} : la touche **Tab** (Y à la manette, Triangle) ouvre un menu avec **le personnage** (vie, endurance, jauge, vitesse, nuits survécues, ennemis tués), **l'inventaire** (vide pour l'instant), **l'amélioration des compétences** et les **[attributs](#attributs)**. La partie continue pendant qu'il est ouvert.
 - **Points de compétence** {décidé} : **1 point par jour survécu**, crédité à l'aube. Le HUD rappelle les points à dépenser au-dessus du portrait.
 - **Premier arbre** {à confirmer} (proposition du 26/09/2026) : une amélioration par action, **3 rangs**, **1 point par rang**.
 
@@ -90,7 +90,7 @@ L'esquive des **cinq classes** est **directionnelle** (26/09/2026) : le héros n
 
 ## Attributs {décidé, 01/10/2026}
 
-Inspirés du S.P.E.C.I.A.L. de Fallout, ramenés à **six attributs** utiles dans Deathless (le Charisme est retiré : pas de dialogues ni de marchands). Pas encore codé.
+Inspirés du S.P.E.C.I.A.L. de Fallout, ramenés à **six attributs** utiles dans Deathless (le Charisme est retiré : pas de dialogues ni de marchands).
 
 - **Départ** : **18 points** pour tous, **répartis par la classe** (le joueur ne les choisit pas). Chaque attribut vaut au moins 1.
 - **Progression** : **+1 point d'attribut par niveau**, c'est-à-dire à chaque aube survécue, **en plus** du point de compétence (deux choix à chaque aube). Le joueur le place où il veut, dans le menu du personnage (Tab).
@@ -115,6 +115,11 @@ Répartition de départ par classe {à équilibrer} :
 | Mage | 1 | 2 | 3 | 3 | 6 | 3 |
 | Rôdeur | 1 | 3 | 5 | 6 | 2 | 1 |
 | Assassin | 3 | 2 | 6 | 2 | 1 | 4 |
+
+- **Ce que touche chaque bonus** {à confirmer} (lecture faite au codage, 01/10/2026) : le **corps à corps** compte l'épée, la charge et le coup de bouclier du Paladin, la hache, l'attaque tournante et le saut percutant du Viking, la dague de l'Assassin ; **à distance** : les flèches du Rôdeur (tir, salve, nuée), le carreau de l'Assassin et tous les sorts du Mage. La **vitesse d'attaque** raccourcit l'attaque principale (RT : coup, tir, boule de feu) ; la **recharge des compétences** vaut pour LB, RB, l'arbalète, la roulade et le soin. Le **critique** gagné par Chance ou Perception s'ajoute aux critiques existants (tête, dos, furtif, 5 % du Mage) sur un coup qui n'est pas déjà critique : dégâts ×2 ; pas de critique sur les dégâts continus (tournante, cône, brûlure). L'**or ramassé** est celui des butins du donjon (tas, coffres), pas le sac d'un allié tombé.
+- **Menu du personnage** : section « Attributs » sous les compétences, une ligne par attribut (valeur, crans de départ et gagnés, effet par point, total gagné) ; Valider y place un point. Le HUD rappelle les points d'attribut à dépenser avec les points de compétence.
+
+{{dev: Fait le 01/10/2026 (0.9.0). Règles et textes dans `Assets/Scripts/Jeu/Heros/Attributs.cs` ; répartitions et bonus dans `GameBalance` (`attributsPaladin`… `attributsAssassin`, `attributForceDegats`… `attributCritiqueMultiplicateur`) ; points gagnés et à dépenser dans `EtatJoueur` (`attributs`, `pointsAttribut`), crédités à l'aube par `Partie.Passer`, dépensés par `Partie.AmeliorerAttribut`. Effets : `Heros` (vie, endurance, vitesse, recharge de l'esquive, dégâts et critiques dans `Frapper`), classes (cadence de RT, recharges, jauge : `ClasseHeros.VitesseAttaque`, `RechargeEsprit`, `FacteurJauge`), recul (`ClassePaladin`, `ParadeParfaite`), or (`DonjonJeu.Accorder`). Réseau : simulés par le poste du joueur comme ses rangs, envoyés à l'hôte (`HerosReseau`, variable écrite par le propriétaire) pour l'or et la parade parfaite, gardés au retour d'un client coupé (`Partie.GarderPourRetour`). Écran : `EcranPersonnage` (`IAttributsPersonnage`), pastille du HUD (`EcranHud`).}}
 
 ## Icônes {décidé}
 

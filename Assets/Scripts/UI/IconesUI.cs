@@ -24,6 +24,8 @@ namespace Deathless.UI
         public const string MissileNyxessaEteint = "nyxessa_missile_eteint";
         /// Emblème de repli d'une classe dont le SVG n'est pas encore là (hexagone vide, Assets/UI/Icones/Repli/).
         public const string RepliClasse = "repli_classe";
+        /// Icône générique des succès (Assets/UI/Icones/Succes/), en attendant une icône par succès.
+        public const string Succes = "succes_generique";
 
         [Serializable]
         public class Entree

@@ -53,9 +53,16 @@ namespace Deathless.Jeu
             PoserTelegraphie();
         }
 
+        protected override bool CoupSimple => m_Competence == Competence.Fauche;
+        protected override bool CompetenceVariantePrete => Time.time >= m_ProchainFendSol
+            || (BouclierLeve && DistanceNyxessa() <= RayonContact + 1.5f && Time.time >= m_ProchaineBreche);
+
         Competence Choisir(Heros cible)
         {
             var b = B;
+            // Enchaînement après une Fauche (01/10/2026) : la compétence prête, sans condition de distance ni de groupe.
+            if (ForcerCompetence && Time.time >= m_ProchainFendSol
+                && !(BouclierLeve && DistanceNyxessa() <= RayonContact + 1.5f && Time.time >= m_ProchaineBreche)) return Competence.FendSol;
             if (BouclierLeve && DistanceNyxessa() <= RayonContact + 1.5f && Time.time >= m_ProchaineBreche) return Competence.Breche;
             int proches = JoueursProches(b.morgrimJoueursProchesRayon);
             float distance = cible != null ? Distance(cible.transform.position) : 0f;

@@ -50,6 +50,10 @@ namespace Deathless.UI.Ecrans
         public EcranPersonnage Personnage { get; private set; }
         /// Roue à emotes (calque du HUD, hors de la pile : la carte Gameplay reste active pendant qu'on la tient).
         public CalqueRoueEmotes RoueEmotes { get; private set; }
+        /// Succès (01/10/2026) : écran ouvert du menu principal et de la pause (UXML par Resources, EcranSucces.Chemin),
+        /// et bannière de déblocage au-dessus de tous les écrans.
+        public EcranSucces Succes { get; private set; }
+        public BanniereSucces BanniereSucces { get; private set; }
 
         readonly List<Ecran> m_Pile = new List<Ecran>();
         readonly List<Ecran> m_Tous = new List<Ecran>();
@@ -86,6 +90,8 @@ namespace Deathless.UI.Ecrans
             Achat = Creer(new EcranAchat(), achat, conteneur);
             Personnage = Creer(new EcranPersonnage(), personnage, conteneur);
             RoueEmotes = new CalqueRoueEmotes(roueEmotes, conteneur);
+            Succes = Creer(new EcranSucces(), Resources.Load<VisualTreeAsset>(EcranSucces.Chemin), conteneur);
+            BanniereSucces = new BanniereSucces(m_Racine);
 
             UINavigation.SetupScreen(m_Racine);
             UIScale.TagRoot(m_Racine);
@@ -131,6 +137,8 @@ namespace Deathless.UI.Ecrans
             m_Pile.Clear();
             RoueEmotes?.Racine.RemoveFromHierarchy();
             RoueEmotes = null;
+            BanniereSucces?.Detruire();
+            BanniereSucces = null;
         }
 
         T Creer<T>(T ecran, VisualTreeAsset uxml, VisualElement conteneur) where T : Ecran
@@ -160,6 +168,7 @@ namespace Deathless.UI.Ecrans
             foreach (var e in m_Tous)
                 if (e.Racine.resolvedStyle.display != DisplayStyle.None) e.MiseAJour(dt);
             RoueEmotes?.MiseAJour(Sommet == Hud ? DonneesUI.RoueEmotes : null);
+            BanniereSucces?.MiseAJour(dt);
             BasculerPersonnage();
         }
 

@@ -8,6 +8,9 @@ namespace Deathless.Jeu.Dev
     /// console (préfixe [Test]) et les captures dans Assets/Screenshots/v01_*.png.
     public class ScenariosTest : MonoBehaviour
     {
+        // Succès (01/10/2026) : outil de dev utilisé dans ce Play, plus rien ne compte jusqu'à la fin du Play.
+        static ScenariosTest() { Deathless.Succes.ServiceSucces.SuspendreDev("ScenariosTest"); }
+
         static ScenariosTest s_I;
         public static string Dernier = "";
 

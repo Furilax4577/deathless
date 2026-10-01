@@ -17,6 +17,31 @@ namespace Deathless.UI.Donnees
         bool Possible { get; }
     }
 
+    /// Un attribut du menu du personnage (Force, Endurance, Agilité, Perception, Esprit, Chance ; 01/10/2026).
+    public interface IAttributPersonnage
+    {
+        string Nom { get; }
+        /// Valeur actuelle (départ de la classe + points gagnés) et plafond (10).
+        int Valeur { get; }
+        int Depart { get; }
+        int Plafond { get; }
+        /// Effet d'un point gagné, en clair, et total déjà gagné (« +6 % dégâts… », vide sans point gagné).
+        string Effet { get; }
+        string Actuel { get; }
+        /// Un point peut y aller maintenant (point disponible, plafond non atteint).
+        bool Possible { get; }
+    }
+
+    /// Section « Attributs » du menu du personnage, facultative (le menu qui l'implémente la montre) : 1 point d'attribut
+    /// par aube survécue, en plus du point de compétence ; plafond 10, pas de réattribution.
+    public interface IAttributsPersonnage
+    {
+        /// Points d'attribut à dépenser.
+        int PointsAttribut { get; }
+        IReadOnlyList<IAttributPersonnage> Attributs { get; }
+        void AmeliorerAttribut(int index);
+    }
+
     /// Menu du personnage (touche Tab, Y, Triangle) : le personnage, l'inventaire (vide pour l'instant) et l'amélioration
     /// des compétences avec les points de compétence (1 par jour survécu). Le jeu l'implémente et le pose dans
     /// DonneesUI.Personnage ; l'écran EcranPersonnage le lit à chaque image.

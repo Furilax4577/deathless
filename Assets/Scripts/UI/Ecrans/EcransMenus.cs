@@ -27,6 +27,8 @@ namespace Deathless.UI.Ecrans
             };
             Racine.Q<Button>("menu-options").clicked += () => Navigateur.Ouvrir(Navigateur.Options);
             Racine.Q<Button>("menu-credits").clicked += () => Navigateur.Ouvrir(Navigateur.Credits);
+            var succes = Racine.Q<Button>("menu-succes");
+            if (succes != null) succes.clicked += () => Navigateur.Ouvrir(Navigateur.Succes);
             Racine.Q<Button>("menu-quitter").clicked += () => DonneesUI.Commandes?.QuitterJeu();
         }
 
@@ -339,6 +341,8 @@ namespace Deathless.UI.Ecrans
             m_Reprendre = Racine.Q<Button>("pause-reprendre");
             m_Reprendre.clicked += () => Navigateur.Fermer();
             Racine.Q<Button>("pause-options").clicked += () => Navigateur.Ouvrir(Navigateur.Options);
+            var succes = Racine.Q<Button>("pause-succes");
+            if (succes != null) succes.clicked += () => Navigateur.Ouvrir(Navigateur.Succes);
             Racine.Q<Button>("pause-quitter-partie").clicked += () => DonneesUI.Commandes?.QuitterPartie();
             Racine.Q<Button>("pause-quitter-jeu").clicked += () => DonneesUI.Commandes?.QuitterJeu();
         }

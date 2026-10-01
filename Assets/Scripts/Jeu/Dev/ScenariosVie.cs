@@ -9,6 +9,9 @@ namespace Deathless.Jeu.Dev
     /// [Vie]) ; captures facultatives dans Assets/Screenshots/&lt;nom&gt;.png.
     public class ScenariosVie : MonoBehaviour
     {
+        // Succès (01/10/2026) : outil de dev utilisé dans ce Play, plus rien ne compte jusqu'à la fin du Play.
+        static ScenariosVie() { Deathless.Succes.ServiceSucces.SuspendreDev("ScenariosVie"); }
+
         static ScenariosVie s_I;
         public static string Dernier = "";
 

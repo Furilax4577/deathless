@@ -7,6 +7,9 @@ namespace Deathless.Jeu.Dev
     /// Raccourcis de test (appelés par execute_code en Play) : poser un squelette, placer le héros, relire l'état, capturer.
     public static class DevPartie
     {
+        // Succès (01/10/2026) : outil de dev utilisé dans ce Play, plus rien ne compte jusqu'à la fin du Play.
+        static DevPartie() { Deathless.Succes.ServiceSucces.SuspendreDev("DevPartie"); }
+
         static Partie P => Partie.Instance;
 
         public static string Etat()

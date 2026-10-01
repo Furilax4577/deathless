@@ -16,7 +16,10 @@
 .perso__carte { margin: 0 12px; padding: 30px 30px 24px 30px; background-color: rgba(35, 42, 58, 0.97); }
 .perso__fiche { width: 440px; flex-shrink: 0; }
 .perso__inventaire { width: 380px; flex-shrink: 0; }
-.perso__competences { flex-grow: 1; flex-shrink: 1; flex-basis: 0; min-width: 560px; }
+/* Colonne du milieu : compétences, puis attributs dessous */
+.perso__milieu { flex-direction: column; flex-grow: 1; flex-shrink: 1; flex-basis: 0; min-width: 584px; }
+.perso__competences { flex-shrink: 0; }
+.perso__attributs-carte { flex-shrink: 0; margin-top: 24px; }
 
 /* Personnage */
 .perso__identite { flex-direction: row; align-items: center; margin: 12px 0 18px 0; }
@@ -92,6 +95,22 @@
 .perso__ligne--impossible .perso__ligne-nom { color: var(--dl-color-text-muted); }
 .perso__ligne .dl-menu-item__prompt { margin-left: var(--dl-space-3); }
 
+/* Attributs (01/10/2026) : valeur dans un losange, 10 crans (gris : départ de la classe, or : points gagnés) */
+.perso__attribut { min-height: 84px; }
+.perso__attribut-valeur {
+    width: 60px; height: 60px; margin-right: 18px; flex-shrink: 0;
+    -unity-text-align: middle-center; padding: 0;
+    border-radius: var(--dl-radius-md); border-width: 2px; border-color: var(--dl-color-gold);
+    background-color: rgba(16, 19, 27, 0.6);
+    font-size: var(--dl-text-large); color: var(--dl-color-gold);
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset");
+}
+.perso__crans { flex-direction: row; align-items: center; flex-wrap: wrap; }
+.perso__cran { width: 14px; height: 14px; margin-right: 6px; border-radius: 3px; rotate: 45deg; border-width: 2px; border-color: var(--dl-color-border-strong); background-color: rgba(0, 0, 0, 0); }
+.perso__cran--depart { background-color: var(--dl-color-text-muted); border-color: var(--dl-color-text-muted); }
+.perso__cran--gagne { background-color: var(--dl-color-gold); border-color: var(--dl-color-gold); }
+.perso__ligne--impossible .perso__attribut-valeur { color: var(--dl-color-text-muted); border-color: var(--dl-color-border-strong); }
+
 /* Message : place réservée en permanence */
 .perso__message { margin: var(--dl-space-3) 0 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--dl-color-text-muted); }
 .perso__message--vide { color: rgba(0, 0, 0, 0); }
@@ -103,5 +122,6 @@
 .dl-scale-3 .perso__aide { display: none; }
 .dl-scale-3 .perso__colonnes { flex-wrap: wrap; }
 .dl-scale-3 .perso__fiche { width: 380px; margin-bottom: 18px; }
-.dl-scale-3 .perso__competences { min-width: 0; margin-bottom: 18px; }
+.dl-scale-3 .perso__milieu { min-width: 0; margin-bottom: 18px; }
+.dl-scale-3 .perso__attributs-carte { margin-top: 18px; }
 .dl-scale-3 .perso__inventaire { width: 100%; }

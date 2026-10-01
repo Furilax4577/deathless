@@ -13,6 +13,9 @@ namespace Deathless.Jeu.Dev
     ///   EntreesSimulees.Stick(gauche, droite, durée), Appui("buttonSouth", durée), Maintenir("leftTrigger", vrai)…
     public class EntreesSimulees : MonoBehaviour
     {
+        // Succès (01/10/2026) : outil de dev utilisé dans ce Play, plus rien ne compte jusqu'à la fin du Play.
+        static EntreesSimulees() { Deathless.Succes.ServiceSucces.SuspendreDev("EntreesSimulees"); }
+
         static EntreesSimulees s_Instance;
         static XInputController s_Pad;
 

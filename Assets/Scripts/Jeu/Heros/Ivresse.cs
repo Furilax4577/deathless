@@ -14,6 +14,7 @@ namespace Deathless.Jeu
         public static void Commencer(float duree)
         {
             float t = Time.time;
+            Deathless.Succes.ServiceSucces.Boire(t < s_Fin);   // succès « La tournée du patron » (verres de suite)
             if (t > s_Fin) s_Debut = t;
             s_Fin = Mathf.Max(s_Fin, t + duree);
             // Statut Ivresse du héros local (HUD, menu du personnage ; chez un client, demandé à l'hôte qui le diffuse).
