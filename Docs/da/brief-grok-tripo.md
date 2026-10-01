@@ -46,7 +46,9 @@ smooth faceting on the hands and shoes/feet as the rest of the body — these ar
 flat facets than the face and torso; round them off just as much.
 ```
 
-**Image B, pour le design** : la planche comme celle de la Bavaroise (3/4 face avec l'arme, face, profil, dos, T-pose). Elle sert de référence pour les couleurs, le dos et les détails cachés ; Tripo ne la prend pas en entrée.
+**Image A bis, T-pose de dos** (01/10/2026) : même cadrage et même pose exacte que l'image A, vue de dos. Nécessaire dès qu'il y a un détail dans le dos que la vue de face ne montre pas (nœud de tablier, carquois, cape, sac à dos…) : sans elle, Tripo invente le dos à l'aveugle, et il a fallu modéliser le nœud du tablier de la Bavaroise à la main dans Blender faute de cette image. À fournir à Tripo en plus de l'image A (vue de face + vue de dos, interface « Image to 3D »).
+
+**Image B, pour le design** : la planche comme celle de la Bavaroise (3/4 face avec l'arme, face, profil, dos, T-pose). Elle sert de référence pour les couleurs et les détails cachés que même les vues A ne montrent pas (dessous, intérieur des plis) ; Tripo ne la prend pas en entrée.
 
 **Arme ou accessoire tenu, à part** (chope, luth, platines de DJ…) : une image dédiée, l'objet seul, de 3/4, même bloc commun, « single prop, not held ».
 
@@ -70,10 +72,12 @@ Puis le style maison du bloc de style du jeu (`_style-jeu.md`) : colombages, end
 ## Vérifications avant d'envoyer à Tripo
 
 - Sujet seul, entier, centré, fond uni, aucune ombre au sol.
-- Personnage en T-pose de face, mains vides.
+- Personnage en T-pose de face, mains vides ; **+ la même T-pose de dos si un détail s'y cache** (nœud, carquois, cape…), pose et cadrage identiques à la vue de face.
 - Lumière égale (pas de face dans l'ombre).
 - Couleurs proches de la palette voulue (Tripo les délave un peu ; on les recale ensuite sur la planche).
 
 ## Réglages Tripo qui ont marché (Bavaroise)
 
 Image to 3D, **Modèle HD**, IA H3.1, **Générer par parties : Équilibré** pour un personnage (aide les couleurs et les poids), **Qualité de maillage Ultra**, **Complétion IA** activée, **Texture 2K**, **Supprimer l'éclairage** activé, PBR désactivé, **Triangle**, **100 000 polygones**, Confidentialité privée. Pas d'auto-rig ni de retopo Tripo. Puis **Texture** sur le modèle par parties, export **FBX avec texture** (archive) dans `ArtSources/References/Personnages/` (ou `ArtSources/References/Decor/` pour le décor).
+
+{dev} La Bavaroise v1/v2 n'a été envoyée qu'en vue de face : Tripo a dû inventer le dos, et le nœud de tablier a été reconstruit à la main dans `bavaroise_pipeline.py` (`noeud_dos`, couleur `BLEU_NOEUD`) parce qu'il n'existait pas dans le maillage Tripo. **Si Tripo accepte une seconde image (dos) dans l'interface « Image to 3D », l'utiliser cette fois** : le dos (et le nœud) devraient sortir directement du maillage généré, et `noeud_dos` deviendrait inutile pour les prochains personnages. À confirmer par Quentin selon ce que propose l'interface Tripo du moment.
