@@ -48,6 +48,10 @@ Les gestes joués en jeu pour chaque action, dans l'ordre où ils s'enchaînent.
 
 {video media/classes/assassin/clips/Sneaking.mp4} **Marche discrète** | {dev} `Sneaking` | Arme : dague (arbalète au dos) | boucle · 2,13 s | {dev} seconde locomotion, copie bouclante `Sneaking_Loop`
 
+### Gerbe de lames {décidé, 01/10/2026}
+
+Passif : chaque **exécution** libère une gerbe de lames qui frappe les ennemis à **3 m** autour de la victime (**30 dégâts** {à équilibrer}, sans critique). Mesuré au banc : l'Assassin tombait sous la moitié de la moyenne des classes en vague ; la gerbe lui donne de quoi entamer un groupe en enchaînant bond, dos et exécution. Pas encore codé.
+
 ### Pas de l'ombre
 
 {dev} `Dodge_Forward` (roulade avant commune) accéléré sur la durée du bond (état `PasOmbre`, déclencheur du même nom, corps entier), traînée de gemmes du thème Ombre semée le long du trajet (`ClasseAssassin.EffetPasOmbre`), petit éclat Ombre à chaque exécution.
