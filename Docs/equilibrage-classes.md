@@ -366,3 +366,221 @@ Lignes à part (dépendent du joueur, pas des chiffres) : Rôdeur tête ×2 → 
 Morgrim : 1500 PV (étourdissements ×0,5, non repoussable) ; Nyxar : 1200 PV, reste à 12–18 m. Nyxessa au palier 5 ajoute environ 34,7 DPS sur une nuit (4 160 dégâts / 120 s).
 
 Temps pour abattre Morgrim seul, DPS mono soutenu : Paladin 37 s ; Viking 37 s ; Mage 46 s ; Rôdeur 34 s ; Assassin 34 s ; Assassin dans le dos 14 s ; Rôdeur à la tête 22 s.
+
+
+---
+
+## Simulation de vagues (01/10/2026)
+
+Demande de Quentin (01/10/2026) : « L'archer (Rôdeur) : je pense qu'on nerf un peu les dégâts de base et les critiques. Il faudrait créer un outil qui compare les dégâts de manière équivalente des personnages soumis à des vagues d'ennemis. » Deux outils sont prévus : ce **simulateur Python** (théorique, ci-dessous) et un banc en jeu dans Unity (à venir), qui doit confirmer ses ordres de grandeur. Le nerf du Rôdeur est **proposé** ici, chiffré après mesure ; rien n'a été changé dans `GameBalance`.
+
+```
+python Docs/outils/simulateur_vagues.py                        # nuits 3, 6, 9, 12, profils moyen et bon (Markdown)
+python Docs/outils/simulateur_vagues.py --nuit 6 --profil bon  # une nuit, un profil (options répétables)
+python Docs/outils/simulateur_vagues.py --classe Rôdeur        # une classe (les indices restent rapportés aux cinq)
+python Docs/outils/simulateur_vagues.py --seuil 15             # marque ▲ / ▼ les classes à plus de ±15 % de la moyenne
+python Docs/outils/simulateur_vagues.py --json                 # mêmes chiffres en JSON
+python Docs/outils/simulateur_vagues.py --surcharge arcDegatsMax=45,arcTete=1.8   # « et si » sans toucher au code
+python Docs/outils/simulateur_vagues.py --nerf                 # variantes du nerf du Rôdeur
+python Docs/outils/simulateur_vagues.py --tete 0.7             # autre taux de tir à la tête (sensibilité)
+python Docs/outils/simulateur_vagues.py --palier 0             # sans les missiles de Nyxessa (défaut : palier 1)
+```
+
+### Méthode
+
+- **Valeurs** : lues dans `Assets/Scripts/Jeu/GameBalance.cs` par l'analyseur de `equilibrage.py` (initialiseurs des champs, tableaux par nuit, `StatsSquelette` des sbires, guerriers, voleurs et mages) ; les élites (PV ×3, dégâts ×1,5, portée +0,3, une dès la nuit 5, deux dès la nuit 7) sont lues dans `DirecteurVagues.cs`, le rayon de la fumée dans `Fumigene.cs`. Une valeur absente ou illisible arrête le script avec la liste de ce qui manque ; rien n'est inventé. Les quelques durées qui ne sont écrites que dans le code des classes (état « lâcher » de l'arc 0,3 s, départ de la nuée, tic du cône 0,25 s, impact du saut, cri du rugissement…) sont regroupées dans `CODE`, en tête du script, avec le fichier d'où elles viennent. Brûlure : le modèle **en paliers** de `Brulure.cs` (jauge remplie par la boule et chaque tic du cône, palier qui monte au-delà de 100 %, redescente après 1 s sans feu), avec les chiffres du jour (paliers 5 / 8 / 12 par seconde, trois au plus ; si les champs disparaissaient, le script reprendrait la brûlure d'avant et le dirait).
+- **Vagues** : le plan exact de `DirecteurVagues.Preparer` pour **un joueur** : nombre d'ennemis de la nuit, parts de mages, voleurs et guerriers tirées sortie par sortie, élites au milieu, clairières actives de la nuit (1, 1, 2, 2 puis 3), départs à 0 / 40 / 80 s (0 / 30 / 60 / 90 dès la nuit 9), sorties étalées sur 8 s, PV × multiplicateur de la nuit. Les squelettes sortent de terre (1 s), marchent environ 68 m (20 s d'un sbire) par l'un des trois couloirs (22 m de large, flou 3 m, écart de vitesse ±8 %) jusqu'à une place à ±55° autour de Nyxessa. **Mêmes vagues pour les cinq classes** (graine de vague commune), cinq tirages moyennés.
+- **Squelettes** (`Squelette.cs`) : ils frappent Nyxessa au contact (3,2 m) ; en route, ils poursuivent le héros qui passe à moins de 8 m (assassin furtif : 6 m devant à ±60°, 1,5 m derrière ; personne dans la fumée), abandonnent à 15 m ou après 4 s sans frapper ; riposte au contact après deux coups de suite à moins de 3 m ; préparation et intervalle de chaque type ; étourdissements et ralentis appliqués ; les mages s'arrêtent à 7 m et tirent sur le héros à 7,5 m, sinon sur Nyxessa ; évitement entre squelettes (capsules de 0,4 m, élites 0,52 m) : pas d'empilement au même point.
+- **Zone** : chaque coup prend ses cibles dans sa forme réelle (secteur de l'épée ±40° à 2,6 m et 3 cibles au plus, hache ±70° à 2,4 m, tournante 2,3 m, saut 3,5 m, boule 2 m, cône ±20° à 6 m, nuée 3 m, éventail de la salve ±20°, charge de 1,4 m de large), comme `Combat.Ennemis` (distance au bord de la capsule). La densité n'est donc pas un paramètre : elle vient des positions des squelettes, serrés au contact de Nyxessa ou étirés le long des couloirs.
+- **Le héros** est seul devant Nyxessa, ne meurt pas (les dégâts qu'il reçoit sont comptés pour information), ne kite pas. Mêlée : il va chercher ce qui frappe (Nyxessa ou lui) dans une laisse de 10 m autour d'elle. Distance : il tient un poste à 4,5 m de Nyxessa, du côté de la clairière la plus pressée. Missiles de Nyxessa au palier 1 (crédités à part, pas au héros). Pas de temps fixe de 0,05 s, graines fixes : le résultat est déterministe.
+- **Rotations** (scriptées, avec les jauges et recharges du code) :
+  - Paladin : épée ; charge bélier sur une cible à au moins 2,5 m (moyen) ou 4 m (bon), dégâts selon la distance parcourue, étourdissement de la cible et des traversés ; soin d'aura quand il a perdu 25 % de sa vie. Ni garde ni parade (pas de dégâts).
+  - Viking : rage de départ 30 (plancher) et ses gains (+8 par cible de la hache, +2 par cible et par tic de la tournante), baisse hors combat ; rugissement s'il y a 4 (moyen) ou 3 (bon) squelettes à 10 m (provocation, Peau de fer) ; saut sur le groupe le plus dense à portée de bond (3 ou 2 squelettes, ou le seul présent) ; tournante dès 3 squelettes à 2,3 m, arrêtée sous 2 ou à rage vide ; hache sinon.
+  - Mage (kit refondu dans `GameBalance` le 01/10/2026 : mana 3/s, cône 30 dégâts/s pour 10 mana/s qui ralentit, grande boule de feu en LB, mur de flammes en RB ; **leur code n'est pas encore écrit** au moment de la simulation : la grande boule et le mur sont modélisés d'après les infobulles de `GameBalance`, et l'on suppose que la grande boule allume la brûlure comme la boule ; si ces champs disparaissent, le script reprend le Mage d'avant) : mur de flammes en travers du groupe qui approche (4 squelettes à 4–14 m pour le joueur moyen, 3 pour le bon) ; grande boule sur le groupe le plus fourni dans ses 5 m (3 ou 2 squelettes) ; boule de feu sur le groupe le plus fourni à 30 m (vol à 18 m/s), +4 mana par cible ; cône dès 3 squelettes dans le cône et 40 (moyen) ou 20 (bon) de mana, arrêté sous 2 cibles ou à mana vide ; brûlure en paliers (le mur monte d'un palier à l'entrée, puis toutes les 1,5 s).
+  - Rôdeur : arc (cible : ce qui frappe Nyxessa ou lui, sinon le plus proche de Nyxessa, à 40 m au plus) ; charge 1,2 s puis 0,3 s avant de rebander (RT tenu) ; flèche pleine charge 50, étourdit 1 s ; nuée dès qu'elle couvre 2 squelettes, ou 1 quand il n'y en a qu'un ou deux à 25 m (moyen : centrée sur le premier venu ; bon : sur le groupe le plus dense) ; roulade et salve quand un squelette est à 5 m (moyen) ou dès qu'une cible est à 20 m (bon), la salve tirée en éventail (chaque flèche touche le premier squelette sur sa ligne).
+  - Assassin : dague (cible, angle du dos et exécution comme `ClasseAssassin.PorterDague`) ; furtif hors combat (4 s) et dans la fumée ; grenade dans la mêlée (3 squelettes à 5 m) ; Pas de l'ombre derrière une cible à 2–9 m (remis à zéro par une exécution) ; arbalète sur ce qui approche quand rien n'est dans la laisse. Bon joueur : change de cible après un coup sur un squelette qui frappe Nyxessa pour garder le dos (la riposte vient au deuxième), contourne sa cible pour la prendre de dos, achève en priorité ce qui est sous 30 %.
+- **Profils** (hypothèses, à confronter au banc) :
+
+| | Moyen | Bon |
+|---|---|---|
+| Temps perdu entre deux actions | 0,15 s | 0,05 s |
+| Flèches qui touchent / dont à la tête | 80 % / 25 % | 92 % / 50 % |
+| Tirs lâchés à pleine charge (sinon 50 %) | 70 % | 95 % |
+| Salve : flèches qui touchent / tête | 75 % / 10 % | 90 % / 30 % |
+| Arbalète : touche / tête | 80 % / 25 % | 92 % / 50 % |
+| Boule de feu qui touche la cible visée (sinon explosion à 1,2 m) | 75 % | 92 % |
+| Assassin : garde le dos en changeant de cible, contourne | non | oui |
+| Assassin : bond et grenade utilisés quand ils sont prêts | une fois sur deux | toujours |
+
+- **Mesures** :
+  - **DPS mono** : un guerrier de la nuit aux PV infinis, au contact de Nyxessa (il la frappe, riposte comprise), 180 s de rotation complète ; pas d'exécution (PV infinis). **Indice mono** : rapporté à la moyenne des cinq classes.
+  - **DPS en combat** : dégâts utiles ÷ temps où un squelette est à portée de l'arme principale (mêlée : à 12,5 m de Nyxessa ; Mage : 30 m ; Rôdeur : 40 m). Donné pour information : la fenêtre n'est pas la même d'une classe à l'autre.
+  - **DPS de nuit** : dégâts utiles du héros avant l'aube ÷ 120 s ; **indice vague** = DPS de nuit ÷ moyenne des cinq. C'est la mesure équivalente pour tous : mêmes squelettes, même durée. Quand toutes les classes vident les vagues (nuits 3 et 6), elle tend vers 1 pour tout le monde (l'offre d'ennemis limite) ; elle départage les classes quand la nuit sature (9 et 12).
+  - **Dégâts utiles** : sans le surplus sur un squelette déjà achevé (une exécution compte la vie qui restait). **Part critiques** : tête, dos, furtif, exécution.
+  - **Vidage** : de la première sortie d'une vague à la mort de son dernier squelette (la nuit est prolongée de 60 s après l'aube pour le mesurer ; « — » : pas vidée). **Survivants à l'aube** : squelettes encore debout à 120 s (désintégrés en jeu). **Ennemis à Nyxessa** : squelettes qui l'ont frappée au moins une fois.
+
+### Résultats (générés le 01/10/2026, `python Docs/outils/simulateur_vagues.py --seuil 15`)
+
+#### Nuit 3, profil moyen (22 squelettes, PV ×1 ; missiles de Nyxessa : palier 1)
+
+| Classe | DPS mono | Indice mono | DPS en combat | DPS de nuit | **Indice vague** | Part critiques | Vidage des vagues (s) | Ennemis à Nyxessa | Dégâts à Nyxessa | Survivants à l'aube | Dégâts reçus |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Paladin | 28,1 | **0,8** ▼ | 36,6 | 19,2 | 0,98 | 0 % | 41 / 39 / 38 | 4,2 | 229 | 0,4 | 559 |
+| Viking | 31,2 | 0,89 | 43,9 | 19,6 | 1 | 0 % | 37 / 36 / 36 | 3,8 | 173 | 0,2 | 297 |
+| Mage | 38,4 | 1,09 | 37,5 | 20 | 1,02 | 0 % | 34 / 34 / 33 | 0 | 0 | 0 | 313 |
+| Rôdeur | 32,5 | 0,93 | 27,6 | 20,1 | 1,02 | 28 % | 40 / 39 / 37 | 0,6 | 9 | 0,2 | 383 |
+| Assassin | 45,6 | **1,3** ▲ | 34,5 | 19 | 0,97 | 45 % | 40 / 43 / 41 | 8 | 395 | 1,2 | 437 |
+
+Origine des dégâts : Paladin épée 88 %, charge 12 % ; Viking tournante 45 %, hache 35 %, saut 20 % ; Mage boule 54 %, grande boule 22 %, brûlure 19 %, cône 6 % ; Rôdeur arc 69 %, nuée 20 %, salve 11 % ; Assassin dague 84 %, arbalète 16 %.
+
+#### Nuit 6, profil moyen (30 squelettes, PV ×1 ; missiles de Nyxessa : palier 1)
+
+| Classe | DPS mono | Indice mono | DPS en combat | DPS de nuit | **Indice vague** | Part critiques | Vidage des vagues (s) | Ennemis à Nyxessa | Dégâts à Nyxessa | Survivants à l'aube | Dégâts reçus |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Paladin | 28,1 | **0,8** ▼ | 34,6 | 26,3 | 0,96 | 0 % | 46 / 75 / 52 | 10,2 | 997 | 4,8 | 1222 |
+| Viking | 31,2 | 0,89 | 44,7 | 27,7 | 1,01 | 0 % | 41 / 46 / 46 | 11,4 | 706 | 3 | 542 |
+| Mage | 38,4 | 1,1 | 43,3 | 29,8 | 1,09 | 0 % | 36 / 43 / 40 | 2,8 | 116 | 0,4 | 697 |
+| Rôdeur | 31,5 | 0,9 | 32,1 | 27,4 | 1 | 23 % | 41 / 49 / 48 | 6,8 | 344 | 4,2 | 921 |
+| Assassin | 45,6 | **1,3** ▲ | 34,3 | 25,3 | 0,93 | 51 % | 46 / 71 / 55 | 17,8 | 1553 | 5,4 | 809 |
+
+Origine des dégâts : Paladin épée 90 %, charge 10 % ; Viking tournante 46 %, hache 36 %, saut 18 % ; Mage boule 52 %, brûlure 22 %, grande boule 22 %, cône 4 % ; Rôdeur arc 66 %, nuée 26 %, salve 9 % ; Assassin dague 90 %, arbalète 10 %.
+
+#### Nuit 9, profil moyen (42 squelettes, PV ×1,1 ; missiles de Nyxessa : palier 1)
+
+| Classe | DPS mono | Indice mono | DPS en combat | DPS de nuit | **Indice vague** | Part critiques | Vidage des vagues (s) | Ennemis à Nyxessa | Dégâts à Nyxessa | Survivants à l'aube | Dégâts reçus |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Paladin | 28,1 | **0,79** ▼ | 41,1 | 34,3 | 0,91 | 0 % | 57 / 81 / 105 / — | 13,8 | 2298 | 16 | 3137 |
+| Viking | 31,2 | 0,88 | 58,1 | 44,9 | **1,19** ▲ | 0 % | 42 / 44 / 62 / 42 | 11,6 | 872 | 8,2 | 1049 |
+| Mage | 38,6 | 1,09 | 54,2 | 45,1 | **1,2** ▲ | 0 % | 38 / 42 / 53 / 42 | 4,2 | 254 | 7,8 | 1610 |
+| Rôdeur | 33 | 0,94 | 36,3 | 33,8 | 0,9 | 28 % | 61 / — / — / — | 23,4 | 4342 | 19,2 | 2475 |
+| Assassin | 45,6 | **1,29** ▲ | 36,7 | 30 | **0,8** ▼ | 54 % | 60 / — / — / — | 29 | 4636 | 19,4 | 3055 |
+
+Origine des dégâts : Paladin épée 92 %, charge 8 % ; Viking tournante 68 %, hache 21 %, saut 12 % ; Mage boule 46 %, brûlure 25 %, grande boule 18 %, cône 11 % ; Rôdeur arc 60 %, nuée 28 %, salve 12 % ; Assassin dague 96 %, arbalète 4 %.
+
+#### Nuit 12, profil moyen (48 squelettes, PV ×1,2 ; missiles de Nyxessa : palier 1)
+
+| Classe | DPS mono | Indice mono | DPS en combat | DPS de nuit | **Indice vague** | Part critiques | Vidage des vagues (s) | Ennemis à Nyxessa | Dégâts à Nyxessa | Survivants à l'aube | Dégâts reçus |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Paladin | 28,1 | **0,8** ▼ | 45 | 39,8 | 0,93 | 0 % | — / — / — / — | 16,6 | 2561 | 20,6 | 5261 |
+| Viking | 31,2 | 0,89 | 63,4 | 53,2 | **1,24** ▲ | 0 % | 43 / 64 / 59 / 48 | 14 | 1214 | 9,2 | 1295 |
+| Mage | 38,2 | 1,09 | 62,4 | 54,5 | **1,28** ▲ | 0 % | 41 / 45 / 55 / 44 | 8 | 484 | 8,4 | 1966 |
+| Rôdeur | 33,1 | 0,94 | 37,7 | 36 | **0,84** ▼ | 22 % | — / — / — / — | 31 | 8101 | 25 | 3093 |
+| Assassin | 45,6 | **1,29** ▲ | 35,3 | 30,2 | **0,71** ▼ | 45 % | — / — / — / — | 31,8 | 7264 | 28,6 | 6260 |
+
+Origine des dégâts : Paladin épée 93 %, charge 7 % ; Viking tournante 68 %, hache 19 %, saut 13 % ; Mage boule 41 %, brûlure 26 %, grande boule 18 %, cône 15 % ; Rôdeur arc 55 %, nuée 32 %, salve 13 % ; Assassin dague 98 %, arbalète 2 %.
+
+#### Nuit 3, profil bon (22 squelettes, PV ×1 ; missiles de Nyxessa : palier 1)
+
+| Classe | DPS mono | Indice mono | DPS en combat | DPS de nuit | **Indice vague** | Part critiques | Vidage des vagues (s) | Ennemis à Nyxessa | Dégâts à Nyxessa | Survivants à l'aube | Dégâts reçus |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Paladin | 31,6 | **0,78** ▼ | 40 | 19,4 | 0,98 | 0 % | 40 / 37 / 37 | 3,8 | 204 | 0,2 | 465 |
+| Viking | 33,8 | **0,83** ▼ | 43,2 | 19,3 | 0,97 | 0 % | 37 / 36 / 37 | 3,4 | 164 | 0,2 | 298 |
+| Mage | 41,1 | 1,02 | 38,5 | 20,1 | 1,01 | 0 % | 34 / 34 / 32 | 0 | 0 | 0 | 229 |
+| Rôdeur | 47,5 | **1,17** ▲ | 37,7 | 21,2 | 1,07 | 58 % | 32 / 34 / 30 | 0,6 | 9 | 0 | 93 |
+| Assassin | 48,1 | **1,19** ▲ | 42,6 | 19,3 | 0,97 | 63 % | 38 / 39 / 36 | 9,4 | 228 | 0,2 | 378 |
+
+Origine des dégâts : Paladin épée 89 %, charge 11 % ; Viking tournante 42 %, hache 39 %, saut 19 % ; Mage boule 58 %, grande boule 22 %, brûlure 20 % ; Rôdeur arc 83 %, nuée 10 %, salve 7 % ; Assassin dague 84 %, arbalète 16 %.
+
+#### Nuit 6, profil bon (30 squelettes, PV ×1 ; missiles de Nyxessa : palier 1)
+
+| Classe | DPS mono | Indice mono | DPS en combat | DPS de nuit | **Indice vague** | Part critiques | Vidage des vagues (s) | Ennemis à Nyxessa | Dégâts à Nyxessa | Survivants à l'aube | Dégâts reçus |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Paladin | 31,6 | **0,79** ▼ | 36,8 | 26,7 | 0,93 | 0 % | 45 / 63 / 48 | 12,6 | 1112 | 3,8 | 813 |
+| Viking | 33,8 | **0,84** ▼ | 44,8 | 28,5 | 0,99 | 0 % | 41 / 46 / 44 | 13 | 725 | 2 | 502 |
+| Mage | 40,9 | 1,02 | 46,3 | 30 | 1,04 | 0 % | 34 / 42 / 37 | 2 | 84 | 0 | 577 |
+| Rôdeur | 45,7 | 1,14 | 40,8 | 30,3 | 1,05 | 50 % | 35 / 43 / 37 | 5,8 | 162 | 0,2 | 389 |
+| Assassin | 48,1 | **1,2** ▲ | 45,1 | 28,1 | 0,98 | 76 % | 40 / 47 / 46 | 20 | 1100 | 2,8 | 377 |
+
+Origine des dégâts : Paladin épée 88 %, charge 12 % ; Viking tournante 43 %, hache 38 %, saut 19 % ; Mage boule 51 %, grande boule 22 %, brûlure 22 %, cône 6 % ; Rôdeur arc 76 %, nuée 16 %, salve 8 % ; Assassin dague 86 %, arbalète 14 %.
+
+#### Nuit 9, profil bon (42 squelettes, PV ×1,1 ; missiles de Nyxessa : palier 1)
+
+| Classe | DPS mono | Indice mono | DPS en combat | DPS de nuit | **Indice vague** | Part critiques | Vidage des vagues (s) | Ennemis à Nyxessa | Dégâts à Nyxessa | Survivants à l'aube | Dégâts reçus |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Paladin | 31,6 | **0,79** ▼ | 43 | 37,1 | 0,91 | 0 % | 58 / 69 / 96 / 71 | 16,4 | 2307 | 14,2 | 2344 |
+| Viking | 33,8 | **0,84** ▼ | 59,1 | 45,8 | 1,12 | 0 % | 41 / 45 / 56 / 41 | 12,2 | 698 | 8 | 1158 |
+| Mage | 41,2 | 1,02 | 56,8 | 45,3 | 1,11 | 0 % | 38 / 39 / 49 / 41 | 4 | 278 | 8,4 | 1208 |
+| Rôdeur | 46,6 | **1,16** ▲ | 44,6 | 40,9 | 1 | 48 % | 39 / 41 / 81 / 58 | 17,6 | 1411 | 12,4 | 1345 |
+| Assassin | 48,1 | **1,19** ▲ | 44,5 | 35,4 | 0,87 | 75 % | 45 / 66 / 95 / 66 | 33 | 3184 | 15,2 | 1608 |
+
+Origine des dégâts : Paladin épée 92 %, charge 8 % ; Viking tournante 65 %, hache 22 %, saut 13 % ; Mage boule 44 %, brûlure 24 %, grande boule 19 %, cône 14 % ; Rôdeur arc 68 %, nuée 23 %, salve 9 % ; Assassin dague 96 %, arbalète 4 %.
+
+#### Nuit 12, profil bon (48 squelettes, PV ×1,2 ; missiles de Nyxessa : palier 1)
+
+| Classe | DPS mono | Indice mono | DPS en combat | DPS de nuit | **Indice vague** | Part critiques | Vidage des vagues (s) | Ennemis à Nyxessa | Dégâts à Nyxessa | Survivants à l'aube | Dégâts reçus |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Paladin | 31,6 | **0,78** ▼ | 48,6 | 44 | 0,92 | 0 % | 85 / 128 / 106 / 77 | 19,8 | 2623 | 18 | 3876 |
+| Viking | 33,8 | **0,84** ▼ | 61,3 | 53,8 | 1,13 | 0 % | 43 / 52 / 67 / 52 | 17,8 | 1414 | 8,2 | 1260 |
+| Mage | 41,3 | 1,02 | 63,7 | 55,4 | **1,16** ▲ | 0 % | 38 / 43 / 53 / 42 | 5,4 | 339 | 7,8 | 1615 |
+| Rôdeur | 47 | **1,17** ▲ | 46,3 | 45,4 | 0,95 | 48 % | 46 / 93 / 102 / 76 | 28,4 | 4083 | 17,2 | 1536 |
+| Assassin | 48,1 | **1,19** ▲ | 48,1 | 40,1 | **0,84** ▼ | 78 % | 80 / 130 / 107 / 76 | 40,2 | 4658 | 20,6 | 2625 |
+
+Origine des dégâts : Paladin épée 93 %, charge 7 % ; Viking tournante 66 %, hache 20 %, saut 14 % ; Mage boule 39 %, brûlure 24 %, grande boule 19 %, cône 18 % ; Rôdeur arc 65 %, nuée 24 %, salve 11 % ; Assassin dague 97 %, arbalète 3 %.
+
+▲ / ▼ : plus de ±15 % de la moyenne des cinq classes.
+
+
+### Lecture
+
+- **Nuits 3 et 6** : toutes les classes vident les vagues (indices vague de 0,93 à 1,09) ; les écarts sont ailleurs. L'Assassin laisse le plus de squelettes frapper Nyxessa (8 à 20, contre 0 à 13 pour les autres) : furtif, il ne retient personne. Le Rôdeur et le Mage la protègent le mieux (ils tuent pendant la marche).
+- **Nuits 9 et 12** (la nuit sature, aucune classe ne vide tout avant l'aube) : la **zone** décide. Viking (tournante : 65 à 68 % de ses dégâts) et Mage (grande boule, cône et brûlure : 54 à 61 % des siens) sont 11 à 28 % au-dessus de la moyenne ; Paladin (3 cibles au plus) 7 à 9 % en dessous ; Assassin (une cible par coup) 13 à 29 % en dessous. Le Rôdeur y est à 0,84–0,90 (moyen) et 0,95–1,00 (bon).
+- **Mono-cible** : l'Assassin est en tête (+19 à +20 % pour le bon joueur, +29 à +30 % pour le moyen : il a deux coups dans le dos avant chaque riposte, et le bon joueur change de cible pour la garder) ; le **Rôdeur bon joueur est à +14 à +17 %** (moyen : −6 à −10 %) ; le Paladin est à −20 % (sa charge n'est pas lancée sur un mannequin collé à lui, et ses 3 cibles ne comptent pas ici). Avec la brûlure en paliers et son nouveau kit, le Mage est au niveau de la moyenne en mono (38 à 41, contre 32,8 dans le modèle du 27/09).
+- **Le Rôdeur, donc** : ce n'est pas en vague qu'il dépasse (il y est dans la moyenne pour un bon joueur, en dessous pour un joueur moyen dès la nuit 9), c'est **sur une cible, entre les mains d'un bon tireur**, et c'est la tête qui fait l'écart : sa part de critiques passe de 22–28 % (moyen) à 48–58 % (bon). À 50 et ×2, une flèche à la tête fait 100 : **un sbire (100 PV) meurt d'une seule flèche** jusqu'à la nuit 8, un mage aussi. Sensibilité : avec 70 % de tirs à la tête (`--tete 0.7`), le Rôdeur bon monte à +25 à +28 % en mono. S'y ajoute ce qu'aucun indice ne compte : entre les mains d'un bon joueur, il reçoit le moins de coups de toutes les classes (93 et 389 dégâts aux nuits 3 et 6, contre 229 à 813 pour les autres), sans même kiter dans le simulateur.
+
+### Proposition de nerf du Rôdeur (à valider par Quentin)
+
+Variantes calculées par `python Docs/outils/simulateur_vagues.py --nerf` (les quatre autres classes ne bougent pas, les moyennes sont recalculées ; 5 tirages ; « < Paladin » : sous le Paladin en dégâts de nuit ; la colonne « Dans ±10 % » exige les deux profils, et aucune variante ne la remplit parce que le joueur moyen est déjà sous la bande aux nuits 9 et 12) :
+
+Indice vague / indice mono du Rôdeur (1 = moyenne des cinq classes ; « < X » : sous X en dégâts de nuit) :
+
+| Variante | N3 moyen | N6 moyen | N9 moyen | N12 moyen | N3 bon | N6 bon | N9 bon | N12 bon | Dans ±10 % | Jamais sous Assassin/Paladin |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Actuel (50, tête ×2, tir rapide 10) | 1,02 / 0,93 | 1 / 0,9 | 0,9 / 0,94 < Paladin | 0,84 / 0,94 < Paladin | 1,07 / 1,17 | 1,05 / 1,14 | 1 / 1,16 | 0,95 / 1,17 | non | non |
+| A : pleine charge 45 | 1,03 / 0,87 | 0,98 / 0,84 | 0,84 / 0,88 < Paladin | 0,79 / 0,88 < Paladin | 1,06 / 1,1 | 1,03 / 1,07 | 0,96 / 1,08 | 0,93 / 1,09 < Paladin | non | non |
+| B : tête ×1,75 | 1,02 / 0,89 | 1 / 0,87 | 0,86 / 0,91 < Paladin | 0,81 / 0,91 < Paladin | 1,06 / 1,11 | 1,03 / 1,08 | 0,94 / 1,09 | 0,91 / 1,1 < Paladin | non | non |
+| C : pleine charge 45, tête ×1,8 | 1,03 / 0,84 | 0,97 / 0,82 | 0,86 / 0,85 < Paladin | 0,78 / 0,86 < Paladin | 1,04 / 1,05 | 1,03 / 1,02 | 0,99 / 1,03 | 0,91 / 1,04 < Paladin | non | non |
+| D : pleine charge 44, tête ×1,75, tir rapide 9 | 1,03 / 0,82 | 0,97 / 0,8 < Paladin | 0,84 / 0,83 < Paladin | 0,79 / 0,84 < Paladin | 1,04 / 1,02 | 1,03 / 1 | 0,95 / 1 | 0,9 / 1,01 < Paladin | non | non |
+| E : pleine charge 42, tête ×1,8 | 1,02 / 0,81 | 0,97 / 0,79 < Paladin | 0,83 / 0,82 < Paladin | 0,79 / 0,82 < Paladin | 1,03 / 1 | 1,02 / 0,98 | 0,95 / 0,99 | 0,9 / 0,99 < Paladin | non | non |
+| F : pleine charge 48, tête ×1,8 | 1,03 / 0,88 | 1 / 0,86 | 0,86 / 0,89 < Paladin | 0,8 / 0,89 < Paladin | 1,06 / 1,09 | 1,02 / 1,06 | 0,94 / 1,08 | 0,94 / 1,08 | non | non |
+| G : pleine charge 47, tête ×1,85 | 1,03 / 0,87 | 0,98 / 0,85 | 0,85 / 0,88 < Paladin | 0,8 / 0,88 < Paladin | 1,06 / 1,09 | 1,02 / 1,06 | 0,94 / 1,07 | 0,93 / 1,08 | non | non |
+| H : C + nuée 16 par salve (compensation de zone) | 1,03 / 0,86 | 0,98 / 0,84 | 0,86 / 0,87 < Paladin | 0,79 / 0,87 < Paladin | 1,05 / 1,06 | 1,02 / 1,04 | 0,99 / 1,05 | 0,9 / 1,06 < Paladin | non | non |
+
+DPS mono du Rôdeur (moyen / bon) et flèches à pleine charge pour abattre (corps / tête) :
+
+| Variante | DPS mono moyen | DPS mono bon | Part critiques (bon) | Sbire 100 PV | Sbire nuit 11 (120) | Voleur 115 | Guerrier 160 | Mage 70 |
+|---|---|---|---|---|---|---|---|---|
+| Actuel (50, tête ×2, tir rapide 10) | 32,5 | 46,7 | 51 % | 2 / 1 | 3 / 2 | 3 / 2 | 4 / 2 | 2 / 1 |
+| A : pleine charge 45 | 30 | 42,8 | 49 % | 3 / 2 | 3 / 2 | 3 / 2 | 4 / 2 | 2 / 1 |
+| B : tête ×1,75 | 31,2 | 43,3 | 49 % | 2 / 2 | 3 / 2 | 3 / 2 | 4 / 2 | 2 / 1 |
+| C : pleine charge 45, tête ×1,8 | 29,1 | 40,4 | 46 % | 3 / 2 | 3 / 2 | 3 / 2 | 4 / 2 | 2 / 1 |
+| D : pleine charge 44, tête ×1,75, tir rapide 9 | 28,3 | 39 | 45 % | 3 / 2 | 3 / 2 | 3 / 2 | 4 / 3 | 2 / 1 |
+| E : pleine charge 42, tête ×1,8 | 27,6 | 38,2 | 45 % | 3 / 2 | 3 / 2 | 3 / 2 | 4 / 3 | 2 / 1 |
+| F : pleine charge 48, tête ×1,8 | 30,5 | 42,5 | 46 % | 3 / 2 | 3 / 2 | 3 / 2 | 4 / 2 | 2 / 1 |
+| G : pleine charge 47, tête ×1,85 | 30,3 | 42,5 | 48 % | 3 / 2 | 3 / 2 | 3 / 2 | 4 / 2 | 2 / 1 |
+| H : C + nuée 16 par salve (compensation de zone) | 29,9 | 41,2 | 45 % | 3 / 2 | 3 / 2 | 3 / 2 | 4 / 2 | 2 / 1 |
+
+Autres classes, indice vague / mono (Rôdeur actuel) : N3 moyen : Paladin 0,98 / 0,8, Viking 1 / 0,89, Mage 1,02 / 1,09, Assassin 0,97 / 1,3 ; N6 moyen : Paladin 0,96 / 0,8, Viking 1,01 / 0,89, Mage 1,09 / 1,1, Assassin 0,93 / 1,3 ; N9 moyen : Paladin 0,91 / 0,79, Viking 1,19 / 0,88, Mage 1,2 / 1,09, Assassin 0,8 / 1,29 ; N12 moyen : Paladin 0,93 / 0,8, Viking 1,24 / 0,89, Mage 1,28 / 1,09, Assassin 0,71 / 1,29 ; N3 bon : Paladin 0,98 / 0,78, Viking 0,97 / 0,83, Mage 1,01 / 1,02, Assassin 0,97 / 1,19 ; N6 bon : Paladin 0,93 / 0,79, Viking 0,99 / 0,84, Mage 1,04 / 1,02, Assassin 0,98 / 1,2 ; N9 bon : Paladin 0,91 / 0,79, Viking 1,12 / 0,84, Mage 1,11 / 1,02, Assassin 0,87 / 1,19 ; N12 bon : Paladin 0,92 / 0,78, Viking 1,13 / 0,84, Mage 1,16 / 1,02, Assassin 0,84 / 1,19.
+
+
+Sensibilité, bon joueur à 70 % de tirs à la tête (`--nerf --tete 0.7 --profil bon`) : indice mono 1,25–1,28 aujourd'hui, 1,15–1,18 avec F, 1,10–1,13 avec C, 1,05–1,08 avec E ; indice vague 0,93–1,07 avec C.
+
+**Variante retenue : F — pleine charge `arcDegatsMax` 50 → 48, tête `arcTete` ×2 → ×1,8, tir rapide `arcDegatsMin` inchangé (10).** C'est le « un peu » de la demande : −4 % sur la flèche au corps, −14 % sur la flèche à la tête.
+
+- Bon joueur : indice mono 1,14–1,17 → **1,06–1,09**, indice vague 0,95–1,07 → **0,94–1,06** : tout dans ±10 % de la moyenne ; jamais sous l'Assassin ni le Paladin (nuit 12 : 0,94 contre 0,92 et 0,84). DPS mono 46,7 → 42,5.
+- Une flèche à la tête fait 86,4 au lieu de 100 : **le sbire ne tombe plus d'une seule flèche** (deux), le mage (70 PV) toujours. Le corps passe de 2 à 3 flèches sur un sbire (48 × 2 = 96). C'est le changement de ressenti le plus net.
+- La salve de la roulade utilise aussi `arcTete` : ses têtes passent de 36 à 32,4. La nuée et la salve au corps ne bougent pas.
+- Coût pour le joueur moyen : −6 % en mono (32,5 → 30,5) ; en vague, nuits 9 et 12 : 0,90 → 0,86 et 0,84 → 0,80. Il y était **déjà sous le Paladin** avant tout nerf : le simulateur dit que le Rôdeur moyen est faible tard, le bon fort sur une cible. Le nerf vise le second ; la faiblesse du premier, si le banc la confirme, se traite par la zone ou le contrôle, pas par l'arc (la variante H, nuée 16 par salve en plus de C, ne la rattrape pas : 0,79 à la nuit 12).
+- Si le banc mesure un taux de tête plus haut que 50 % pour un bon joueur (à 70 %, F laisse le Rôdeur à +15 à +18 % en mono), passer à **C** (45, ×1,8) : bon joueur mono 1,02–1,05 (1,10–1,13 à 70 % de têtes), vague 0,91–1,04, au niveau du Paladin à la nuit 12 (0,91 contre 0,92, dans le bruit) ; joueur moyen −10 %. G (47, ×1,85) donne presque F. Plus forts : **D** (44, ×1,75, tir rapide 9) et **E** (42, ×1,8) passent sous le Paladin à la nuit 12 et retirent 13 à 15 % au joueur moyen ; **A** (45 seul) ou **B** (×1,75 seul) laissent le bon joueur à 1,07–1,11 en mono.
+- À reporter si Quentin valide : `GameBalance.cs` (`arcDegatsMax`, `arcTete`, l'en-tête « 10 à 50 dégâts, tête ×2 » et les infobulles), `Assets/Jeu/Resources/GameBalance.asset`, le commentaire de `ClasseRodeur`, la page `Wiki/pages/classe-rodeur.md` ; puis relancer `simulateur_vagues.py` et `equilibrage.py`.
+
+### Limites du modèle (ce que le banc en jeu devra confirmer)
+
+- **Les mains** : taux de touche, de tête, de dos et choix de cible sont des **hypothèses de profil**, pas des mesures. Le taux de tête du Rôdeur sur un squelette qui marche, à la manette, est le chiffre qui pèse le plus sur la proposition (voir la sensibilité à 70 %) : le banc doit le mesurer.
+- **La survie ne compte pas** : le héros ne meurt pas, n'est pas interrompu par les coups, ne garde pas (Paladin : ni garde ni parade parfaite), ne kite pas (le Rôdeur reste à son poste). Les classes de mêlée encaissent beaucoup (Paladin et Assassin jusqu'à 5 000 à 6 000 dégâts à la nuit 12, soit des dizaines de morts réelles) sans perdre de DPS : en jeu, elles feraient moins ; le Rôdeur, qui fuit, ferait un peu moins aussi (temps de repli) mais mourrait bien moins.
+- **Le contrôle ne compte qu'indirectement** (étourdissements et ralentis appliqués aux squelettes, provocation du Viking) : il se voit dans les dégâts à Nyxessa, pas dans l'indice.
+- **Le Mage est en chantier** : sa grande boule et son mur de flammes sont simulés d'après `GameBalance` avant que leur code existe ; quand `ClasseMage` les aura, relancer le simulateur (la moyenne des cinq, donc les indices des autres, en dépend).
+- **Rotations scriptées** : des seuils simples (nombre de squelettes à portée, mana, rage), pas un joueur qui anticipe ; un vrai bon joueur placerait mieux le cône, le mur, la nuée, le saut.
+- **Géométrie plane** : pas de NavMesh, d'obstacles, de pente ni de hauteur ; vol des projectiles en ligne droite (la touche est un tirage, pas une balistique) ; évitement entre squelettes simplifié ; place du héros à distance fixe (4,5 m).
+- **Hors du modèle** : les boss (Morgrim nuit 10, Nyxar nuit 12), le jeu à plusieurs (+60 % d'ennemis par joueur, plafond de 60), les améliorations de l'arbre, le bouclier de Nyxessa et les paliers de missiles au-delà du 1.
+- **Bruit** : cinq tirages ; les indices bougent de ±0,03 d'un jeu de graines à l'autre. Un écart de moins de 0,05 entre deux classes n'est pas significatif.
+- **Le banc en jeu** devra confirmer, dans l'ordre : le taux de tête et de touche du Rôdeur (et de l'arbalète), le DPS mono de chaque classe sur un mannequin, le temps de vidage d'une vague de la nuit 9 ou 12 par classe, et les dégâts reçus ; si ses chiffres s'écartent de plus de 10 % de ceux-ci, ajuster les profils du script (`PROFILS`) avant de trancher.

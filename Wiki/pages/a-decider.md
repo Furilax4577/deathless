@@ -14,8 +14,7 @@ Ce qui reste ouvert. Une ligne quitte cette page quand la règle est tranchée e
 | Progression | Premier arbre d'améliorations des compétences (proposition), autres améliorations, économie | [Classes](classes.md#menu-du-personnage-et-points-de-competence) |
 | Village | Maisons la nuit : n'y entrer que le jour ? Reconduire les héros dehors au crépuscule ? | [Le village](village.md) |
 | Mage | Donner un coup critique au Mage (30/09/2026) ? Si oui : chance, multiplicateur, sur quels sorts (boule, cône, brûlure). À voir avec sa refonte encore ouverte. | [Mage](classe-mage.md) |
-| Rôdeur | Petit nerf (30/09/2026) : baisser le critique (tir à la tête) ou les dégâts de base, et de combien. | [Rôdeur](classe-rodeur.md) |
-| Statuts | Brûlure en paliers (30/09/2026) : remplissage de la jauge par tic, nombre de paliers, dégâts par palier, vitesse de redescente. | [Statuts](statuts.md) |
+| Rôdeur | Petit nerf, chiffré par le simulateur de vagues le 01/10/2026 (`Docs/equilibrage-classes.md`, « Simulation de vagues ») : **pleine charge 50 → 48, tête ×2 → ×1,8**, tir rapide inchangé (10). Bon tireur : indice mono-cible 1,14–1,17 → 1,06–1,09, indice en vague 0,94–1,06 (dans ±10 % de la moyenne, jamais sous l'Assassin ni le Paladin) ; une flèche à la tête ne tue plus un sbire d'un coup (86 au lieu de 100). Coût : −6 % pour un joueur moyen, déjà sous la moyenne aux nuits 9 et 12. Si le banc en jeu mesure plus de 50 % de tirs à la tête chez un bon joueur : 45 et ×1,8. À valider, puis à confirmer au banc en jeu. | [Rôdeur](classe-rodeur.md) |
 
 ## Équilibrage des classes (27/09/2026)
 
