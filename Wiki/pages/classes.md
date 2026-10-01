@@ -88,6 +88,34 @@ L'esquive des **cinq classes** est **directionnelle** (26/09/2026) : le héros n
 
 {{dev: Arbre dans `Assets/Scripts/Jeu/Heros/ArbreCompetences.cs` ; points et rangs dans `EtatJoueur` ; écran `EcranPersonnage`.}}
 
+## Attributs {décidé, 01/10/2026}
+
+Inspirés du S.P.E.C.I.A.L. de Fallout, ramenés à **six attributs** utiles dans Deathless (le Charisme est retiré : pas de dialogues ni de marchands). Pas encore codé.
+
+- **Départ** : **18 points** pour tous, **répartis par la classe** (le joueur ne les choisit pas). Chaque attribut vaut au moins 1.
+- **Progression** : **+1 point d'attribut par niveau**, c'est-à-dire à chaque aube survécue, **en plus** du point de compétence (deux choix à chaque aube). Le joueur le place où il veut, dans le menu du personnage (Tab).
+- **Plafond** : 10 par attribut. **Pas de réattribution** en cours de partie.
+- **Équilibre** {à confirmer} : les valeurs actuelles des classes correspondent à leur répartition de départ ; seuls les points gagnés en partie ajoutent les bonus ci-dessous (la répartition de départ dit le profil de la classe et fixe la marge avant le plafond).
+
+| Attribut | Par point gagné {à équilibrer} |
+|---|---|
+| **Force** | +3 % de dégâts au corps à corps, +5 % de recul infligé |
+| **Endurance** | +8 points de vie, +5 d'endurance (garde, esquive, course) |
+| **Agilité** | +2 % de vitesse de déplacement et d'attaque, −3 % de recharge de l'esquive |
+| **Perception** | +3 % de dégâts à distance, +1 % de chance de critique à distance (tête, arbalète, boule de feu) |
+| **Esprit** | +5 % de la jauge de classe (mana, rage, ivresse…), −2 % de recharge des compétences |
+| **Chance** | +1 % de chance de critique sur tout, +3 % d'or ramassé |
+
+Répartition de départ par classe {à équilibrer} :
+
+| Classe | Force | Endurance | Agilité | Perception | Esprit | Chance |
+|---|---|---|---|---|---|---|
+| Paladin | 4 | 6 | 2 | 1 | 3 | 2 |
+| Viking | 6 | 5 | 3 | 1 | 2 | 1 |
+| Mage | 1 | 2 | 3 | 3 | 6 | 3 |
+| Rôdeur | 1 | 3 | 5 | 6 | 2 | 1 |
+| Assassin | 3 | 2 | 6 | 2 | 1 | 4 |
+
 ## Icônes {décidé}
 
 Gemmes low poly à facettes, validées le 25/09/2026 : un emblème dans un hexagone coupé en diagonale pour chaque classe, un pictogramme par action. Le soin est blanc et or, le vert reste à Nyxessa. {{dev: Sources et script de génération : `ArtSources/Icones/` ; planche de revue : `Docs/icones/planche.html`.}}

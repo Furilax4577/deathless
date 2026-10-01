@@ -34,6 +34,12 @@ Notés par Quentin après la partie à deux ; rien n'est encore développé.
 - **Chemins des monstres trop semblables** : les squelettes empruntent tous le même chemin, ce qui rend les attaques de zone trop faciles ; varier les trajets (dispersion, plusieurs couloirs, écarts dans la file). {{dev: Fait le 01/10/2026 : couloirs par clairière (point de passage à mi-chemin décalé sur le côté), places d'arrivée plus étalées autour du bouclier et pas propre à chaque squelette ; écart latéral à mi-chemin d'environ 1 m à 6,5 m, trajet +2 %. Règle et chiffres dans [Ennemis](ennemis.md) (Trajets variés).}}
 - **Mage : coup critique ?** et **Rôdeur : petit nerf** (critique ou dégâts de base) : à trancher, voir [À décider](a-decider.md).
 
+## Décidé le 01/10/2026, à coder
+
+- **Attributs** (six, 18 points de départ par classe, +1 par aube, plafond 10) : règles dans [Classes](classes.md#attributs). Code : valeurs dans `EtatJoueur` (réseau compris), bonus appliqués dans les classes et `Heros`, répartition par classe dans `ClassesJeu`, onglet dans le menu du personnage.
+- **Coup critique du Mage** : 5 %, ×2, boule et grande boule ([Mage](classe-mage.md)).
+- **Bugs du banc en jeu** : un mage squelette de la dernière vague bloqué côté sud-ouest jusqu'à l'aube ; héros coincé contre les marches du plateau de Nyxessa.
+
 ## En attente de validation (Quentin)
 
 - **Personnage du mois** : candidats Barde, Bavaroise, Clochard pétomane et **DJ Bob Douville** (26/09/2026, modèles lissés, pages avec rendus et clips). Choisir le premier ; alléger celui qui est retenu (Barde et Bavaroise un peu au-dessus de 8 000 triangles). Barde : l'attaque de base frappe avec le luth comme une massue, animation de jeu du luth à créer.
