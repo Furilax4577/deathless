@@ -239,6 +239,7 @@ public static class VillageBuilder
                 StoneTier(plateau, "Marche_" + (k + 1), radius, k + 1 < PlateauSteps ? radius - StepWidth : 0f, StepHeight * k, StepHeight * (k + 1),
                     PlateauTileScale, PlateauBlockLength, PlateauBlockRows, dungeonMat, dressRng);
             }
+            RampeMarches(plateau);
             // pavés Dungeon sur tout l'anneau autour du plateau (grille de 2 m, cellules dont le centre est sous PaversRadius)
             Transform pavage = Group(nexus, "Pavage_Anneau");
             for (float z = -10f; z <= 10f; z += 2f)
@@ -1171,6 +1172,7 @@ public static class VillageBuilder
             StoneTier(plateau, "Marche_" + (k + 1), radius, k + 1 < PlateauSteps ? radius - StepWidth : 0f, StepHeight * k, StepHeight * (k + 1),
                 PlateauTileScale, PlateauBlockLength, PlateauBlockRows, dungeonMat, dressRng);
         }
+        RampeMarches(plateau);
         int retires = 0;
         Transform pavage = nexus.Find("Pavage_Anneau");
         float apotheme = (PlateauTopRadius + StepWidth * (PlateauSteps - 1)) * Mathf.Cos(Mathf.PI / PlateauSides);
@@ -1184,6 +1186,54 @@ public static class VillageBuilder
         string r = "Plateau refait : marche du bas r = " + (PlateauTopRadius + StepWidth * (PlateauSteps - 1)) + " m (apothème " + apotheme.ToString("F2") + "), sommet " + PlateauTopRadius + " m ; " + retires + " pavés recouverts retirés";
         Debug.Log(r);
         return r;
+    }
+
+    // Rampe invisible des marches (01/10/2026) : le CharacterController du héros (rayon 0,4 m, stepOffset 0,35 m) butait
+    // sur les marches de 0,25 m × 0,3 m quand une image dépasse 1/30 s (banc ×3, petite machine). Tronc d'octogone convexe,
+    // sans rendu, de r = PlateauRampeBas (circonscrit) au sol jusqu'au sommet (r = 5,2 m, y = 0,75 m), 39° de pente
+    // (slopeLimit 45°), qui passe juste au-dessus du nez de chaque marche : le héros glisse dessus, les marches gardent
+    // leur aspect et leurs colliders (NavMesh, projectiles).
+    public const float PlateauRampeBas = 6.2f;
+
+    /// Pose (ou repose) la rampe invisible sous Nexus/Plateau de la scène ouverte, sans toucher au reste.
+    [MenuItem("Deathless/Village/Poser la rampe des marches du plateau")]
+    public static string PoserRampeMarches()
+    {
+        GameObject rootGo = GameObject.Find("VillageBlockout");
+        Transform plateau = rootGo != null ? rootGo.transform.Find("Nexus/Plateau") : null;
+        if (plateau == null) return "Nexus/Plateau introuvable";
+        RampeMarches(plateau);
+        UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(rootGo.scene);
+        return "Rampe des marches posée sous " + plateau.name;
+    }
+
+    private static GameObject RampeMarches(Transform plateau)
+    {
+        Transform ancienne = plateau.Find("Marches_Rampe");
+        if (ancienne != null) Object.DestroyImmediate(ancienne.gameObject);
+        float haut = PlateauSteps * StepHeight, bas = -0.05f;
+        float pente = (PlateauRampeBas - PlateauTopRadius) / haut;           // m de rayon par m de hauteur
+        float rb = PlateauRampeBas - bas * pente, rh = PlateauTopRadius;      // prolongée de 5 cm sous le sol
+        var v = new List<Vector3>(); var t = new List<int>();
+        for (int i = 0; i < PlateauSides; i++)
+        {
+            float a = (i + 0.5f) * 2f * Mathf.PI / PlateauSides;              // mêmes sommets que Prism
+            v.Add(new Vector3(Mathf.Sin(a) * rb, bas, Mathf.Cos(a) * rb));
+            v.Add(new Vector3(Mathf.Sin(a) * rh, haut, Mathf.Cos(a) * rh));
+        }
+        int cb = v.Count; v.Add(new Vector3(0f, bas, 0f)); v.Add(new Vector3(0f, haut, 0f));
+        for (int i = 0; i < PlateauSides; i++)
+        {
+            int j = (i + 1) % PlateauSides, b0 = 2 * i, h0 = 2 * i + 1, b1 = 2 * j, h1 = 2 * j + 1;
+            t.Add(h0); t.Add(b1); t.Add(b0); t.Add(h0); t.Add(h1); t.Add(b1);
+            t.Add(cb + 1); t.Add(h1); t.Add(h0); t.Add(cb); t.Add(b0); t.Add(b1);
+        }
+        Mesh m = new Mesh { name = "Rampe_Marches_" + PlateauSides };
+        m.SetVertices(v); m.SetTriangles(t, 0); m.RecalculateNormals(); m.RecalculateBounds();
+        GameObject go = new GameObject("Marches_Rampe");
+        go.transform.SetParent(plateau, false);
+        MeshCollider mc = go.AddComponent<MeshCollider>(); mc.sharedMesh = m; mc.convex = true;
+        return go;
     }
 
     private static GameObject StoneTier(Transform parent, string name, float radius, float inner, float bottom, float top,

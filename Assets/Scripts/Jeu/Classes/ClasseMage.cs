@@ -142,19 +142,32 @@ namespace Deathless.Jeu
             if (fx != null && fx.gemmes != null) ExplosionFeu.Jouer(point, 2.5f, fx.gemmes);
             AudioBank.Jouer(SonsDuJeu.BouleExplosion, point, 1f);
             int n = 0;
-            if (direct != null && !direct.Mort) { Toucher(direct, b.bouleDegats * Facteur(0), point, dir); n++; }
+            bool crit = TirerCritique(point, dir, direct);
+            float k = crit ? b.mageCritiqueMultiplicateur : 1f;
+            if (direct != null && !direct.Mort) { Toucher(direct, b.bouleDegats * Facteur(0) * k, point, dir, crit); n++; }
             foreach (var s in Cibles(point, dir, b.bouleRayon, 180f))
             {
                 if (s == direct) continue;
-                Toucher(s, b.bouleDegatsZone * Facteur(0), point, dir);
+                Toucher(s, b.bouleDegatsZone * Facteur(0) * k, point, dir, crit);
                 n++;
             }
-            if (H.Partie != null) H.Partie.Journal("Boule de feu : explose à " + Vector3.Distance(transform.position, point).ToString("F1") + " m" + (direct != null ? ", coup direct" : "") + ", " + n + " touchés, mana " + m_Mana.ToString("F0"));
+            if (H.Partie != null) H.Partie.Journal("Boule de feu : explose à " + Vector3.Distance(transform.position, point).ToString("F1") + " m" + (direct != null ? ", coup direct" : "") + ", " + n + " touchés" + (crit ? ", critique" : "") + ", mana " + m_Mana.ToString("F0"));
         }
 
-        void Toucher(Sante s, float degats, Vector3 point, Vector3 dir)
+        /// Coup critique du Mage (décidé le 01/10/2026) : GameBalance.mageCritiqueChance par boule (ou grande boule), tiré une
+        /// fois à l'explosion, par le poste qui tient ce héros (comme les critiques des autres classes ; l'hôte applique les
+        /// dégâts). Marque et son communs (Combat.Critique, rejoués chez les autres par Diffuser), sur la cible du coup direct
+        /// ou au point d'explosion. La brûlure ne critique pas (Brulure.Allumer / Monter inchangés).
+        bool TirerCritique(Vector3 point, Vector3 dir, Sante direct)
         {
-            float reel = H.Frapper(s, degats, false, point, dir, true);
+            bool crit = !H.Distant && Random.value < B.mageCritiqueChance;
+            if (crit) Critique(direct != null && !direct.Mort ? direct.transform.position + Vector3.up * 1.1f : point, -dir, false);
+            return crit;
+        }
+
+        void Toucher(Sante s, float degats, Vector3 point, Vector3 dir, bool critique)
+        {
+            float reel = H.Frapper(s, degats, critique, point, dir, true);
             if (reel > 0f) m_Mana = Mathf.Min(B.manaMax, m_Mana + B.manaParTouche);   // wiki : bonus par ennemi touché
             Brulure.Allumer(s, H, B.brulureRemplissageBoule);   // brûlure en paliers : la boule remplit beaucoup d'un coup
         }
@@ -210,19 +223,21 @@ namespace Deathless.Jeu
             var b = B;
             ExplosionGrandeBoule(point);
             int n = 0;
-            if (direct != null && !direct.Mort) { ToucherGrande(direct, b.grandeBouleDegats, point, dir); n++; }
+            bool crit = TirerCritique(point, dir, direct);
+            float k = crit ? b.mageCritiqueMultiplicateur : 1f;
+            if (direct != null && !direct.Mort) { ToucherGrande(direct, b.grandeBouleDegats * k, point, dir, crit); n++; }
             foreach (var s in Cibles(point, dir, b.grandeBouleRayon, 180f))
             {
                 if (s == direct) continue;
-                ToucherGrande(s, b.grandeBouleDegatsZone, point, dir);
+                ToucherGrande(s, b.grandeBouleDegatsZone * k, point, dir, crit);
                 n++;
             }
-            if (H.Partie != null) H.Partie.Journal("Grande boule de feu : explose à " + Vector3.Distance(transform.position, point).ToString("F1") + " m" + (direct != null ? ", coup direct" : "") + ", " + n + " touchés, mana " + m_Mana.ToString("F0"));
+            if (H.Partie != null) H.Partie.Journal("Grande boule de feu : explose à " + Vector3.Distance(transform.position, point).ToString("F1") + " m" + (direct != null ? ", coup direct" : "") + ", " + n + " touchés" + (crit ? ", critique" : "") + ", mana " + m_Mana.ToString("F0"));
         }
 
-        void ToucherGrande(Sante s, float degats, Vector3 point, Vector3 dir)
+        void ToucherGrande(Sante s, float degats, Vector3 point, Vector3 dir, bool critique)
         {
-            H.Frapper(s, degats, false, point, dir, false);
+            H.Frapper(s, degats, critique, point, dir, false);
             Brulure.Monter(s, H);   // +1 palier de brûlure d'un coup (décidé le 01/10/2026)
         }
 

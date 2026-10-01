@@ -185,7 +185,9 @@ namespace Deathless.Jeu
             }
 
             // Garder ses distances : s'approcher au-delà de la distance haute, reculer en deçà de la distance basse.
-            if (d > b.necroDistance.y) { Agent.isStopped = false; Agent.speed = b.necroVitesse; Poursuivre(c); }
+            // Vers Nyxessa : sa place autour d'elle, pas son centre (îlot du NavMesh hors d'atteinte : chemin « en calcul » des
+            // secondes durant, même cause que le mage squelette figé, 01/10/2026) ; l'aube attend sa chute, il ne doit pas se figer.
+            if (d > b.necroDistance.y) { Agent.isStopped = false; Agent.speed = b.necroVitesse; Poursuivre(P != null && cible == P.nyxessa ? m_Place : c); }
             else if (d < b.necroDistance.x)
             {
                 Vector3 fuite = transform.position + (transform.position - c).normalized * 5f;

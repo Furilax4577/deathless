@@ -313,6 +313,7 @@ namespace Deathless.Jeu
                 return;
             }
             if (PeutEsquiverMaintenant) GuetterAttaques();
+            GarderLaMarche(dt);
             switch (m_Etat)
             {
                 case Etat.Esquive: MajEsquive(dt); break;
@@ -586,7 +587,48 @@ namespace Deathless.Jeu
             }
             Agent.isStopped = false;
             Vector3 but = DestinationMarche();
-            if (!Agent.hasPath || (Agent.destination - but).sqrMagnitude > 0.5f) { Agent.SetDestination(but); OublierDestination(); }
+            m_But = but;
+            // Pas de nouvelle demande pendant qu'un chemin se calcule (01/10/2026) : la relancer à chaque image l'empêchait d'aboutir.
+            if ((!Agent.hasPath && !Agent.pathPending) || (Agent.destination - but).sqrMagnitude > 0.5f) { Agent.SetDestination(but); OublierDestination(); }
+        }
+
+        // Garde-fou de la marche (01/10/2026) : position de référence, temps sans avancer, blocages de suite.
+        Vector3 m_GardeFouPos;
+        Vector3 m_But;   // destination voulue (Agent.destination devient le bout d'un chemin partiel)
+        float m_GardeFouDepuis;
+        int m_GardeFouFois;
+
+        /// En Marche, agent lancé (pas arrêté exprès, comme le mage dans sa bande de tir) et loin de sa destination : s'il
+        /// n'avance pas d'1 m en GameBalance.marcheBloqueeDelai s, il abandonne son point de passage et relance son chemin ;
+        /// à la deuxième fois de suite (ou hors du NavMesh), loin de Nyxessa, il est replacé sur le NavMesh 2 m plus près d'elle.
+        void GarderLaMarche(float dt)
+        {
+            Vector3 pos = transform.position;
+            Vector3 reste = m_But - pos; reste.y = 0f;
+            if (m_Etat != Etat.Marche || !Agent.enabled || Agent.isStopped || reste.sqrMagnitude < 2.25f)
+            {
+                m_GardeFouPos = pos; m_GardeFouDepuis = 0f;
+                if (m_Etat != Etat.Marche) m_GardeFouFois = 0;
+                return;
+            }
+            Vector3 fait = pos - m_GardeFouPos; fait.y = 0f;
+            if (fait.sqrMagnitude > 1f) { m_GardeFouPos = pos; m_GardeFouDepuis = 0f; m_GardeFouFois = 0; return; }
+            m_GardeFouDepuis += dt;
+            if (m_GardeFouDepuis < Mathf.Max(1f, B.marcheBloqueeDelai)) return;
+            m_GardeFouDepuis = 0f;
+            m_GardeFouFois++;
+            m_AvecPassage = false;
+            bool replace = false;
+            var n = Nyxessa;
+            if (n != null && (m_GardeFouFois >= 2 || !Agent.isOnNavMesh) && DistanceNyxessa() > 15f)
+            {
+                Vector3 vers = n.position - pos; vers.y = 0f;
+                if (NavMesh.SamplePosition(pos + vers.normalized * 2f, out var h, 4f, NavMesh.AllAreas)) { Agent.Warp(h.position); replace = true; }
+            }
+            if (Agent.isOnNavMesh) Agent.ResetPath();
+            OublierDestination();
+            if (P != null) P.Journal("Garde-fou : " + type + " " + Id + " bloqué en marche à " + DistanceNyxessa().ToString("F0") + " m de Nyxessa, "
+                + (replace ? "replacé sur le NavMesh" : "chemin relancé"));
         }
 
         Vector3 m_DestinationSuivie;
@@ -597,6 +639,10 @@ namespace Deathless.Jeu
         /// 0,2 s au plus tard, ou si l'agent n'a plus de chemin. Le premier appel après OublierDestination est immédiat.
         protected void Poursuivre(Vector3 p)
         {
+            // Chemin en cours de calcul vers presque la même cible : on attend (01/10/2026). Relancé toutes les 0,2 s, le
+            // calcul d'un long chemin (mage de la clairière sud-ouest vers Nyxessa, ×3 au banc) n'aboutissait jamais.
+            m_But = p;
+            if (Agent.pathPending && (p - m_DestinationSuivie).sqrMagnitude <= 4f) return;
             if (Time.time - m_DestinationQuand < 0.2f && (p - m_DestinationSuivie).sqrMagnitude <= 0.25f
                 && (Agent.hasPath || Agent.pathPending)) return;
             Agent.SetDestination(p);
@@ -605,7 +651,7 @@ namespace Deathless.Jeu
         }
 
         /// À appeler après tout autre SetDestination : le prochain Poursuivre relance le chemin tout de suite.
-        protected void OublierDestination() => m_DestinationQuand = -99f;
+        protected void OublierDestination() { m_DestinationQuand = -99f; m_DestinationSuivie = Vector3.one * 1e6f; }
 
         protected virtual void MajPoursuite(float dt)
         {

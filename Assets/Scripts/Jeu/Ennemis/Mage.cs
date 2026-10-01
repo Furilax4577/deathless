@@ -36,7 +36,10 @@ namespace Deathless.Jeu
             float d = Distance(c);
             Tourner(c);
             // Garder ses distances : approcher au-delà de la distance haute, reculer en deçà de la basse, sinon s'arrêter.
-            if (d > b.mageDistanceTir.y) { Agent.isStopped = false; Poursuivre(c); }
+            // Vers Nyxessa, il marche vers sa place autour d'elle (atteignable), pas vers son centre (01/10/2026) : le centre
+            // est un îlot du NavMesh, hors d'atteinte ; chaque demande de chemin y parcourait tout le NavMesh avant de
+            // rendre un chemin partiel et restait « en calcul » de longues secondes (mage de la clairière sud-ouest figé).
+            if (d > b.mageDistanceTir.y) { Agent.isStopped = false; Poursuivre(P != null && cible == P.nyxessa ? m_Place : c); }
             else if (d < b.mageDistanceTir.x)
             {
                 Vector3 fuite = transform.position + (transform.position - c).normalized * 4f;

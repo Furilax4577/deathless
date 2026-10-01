@@ -66,7 +66,7 @@ Le mage frappe vers le sol avec son bâton ; le mur prend à 0,5 s. {dev} Haut d
   - **Démarrage du cône** : il faut au moins 25 % de son coût par seconde, soit 2,5 de mana, pour le lancer.
   - **Sort coupé** : si une esquive, un étourdissement ou la mort coupe la grande boule ou le mur avant qu'ils partent, le mana et la recharge sont rendus.
   - Dans le HUD, l'emplacement d'une compétence est grisé tant qu'il manque du mana pour la lancer.
-- **Coup critique** {décidé, 01/10/2026} : **5 %** de chance qu'une boule de feu ou une grande boule de feu fasse un **critique ×2** {à équilibrer} (même effet et même son que les autres critiques) ; la brûlure ne critique pas. Pas encore codé.
+- **Coup critique** {décidé, 01/10/2026} : **5 %** de chance qu'une boule de feu ou une grande boule de feu fasse un **critique ×2** {à équilibrer} (même effet et même son que les autres critiques) ; la brûlure ne critique pas. Un seul tirage par boule : un critique double les dégâts de toute l'explosion (coup direct et zone). {{dev: Fait le 01/10/2026 : `GameBalance.mageCritiqueChance` (0,05) et `mageCritiqueMultiplicateur` (2), `ClasseMage.TirerCritique` ; tiré par le poste du mage comme les autres critiques, marque `Combat.Critique` rejouée chez les autres, `InfoDegats.critique` pour le score et les chiffres de dégâts.}}
 - **Pas d'ultime** {décidé} : le mage garde la boule de feu, le cône de flammes, la grande boule, le mur et la brûlure.
 - **Valeurs de départ** {à équilibrer} (01/10/2026) {{dev: (réglées dans `Assets/Jeu/Resources/GameBalance.asset` : `bouleDegats…`, `cone…`, `grandeBoule…`, `mur…`, `mana…`, `brulure…`)}} :
 

@@ -150,6 +150,9 @@ namespace Deathless.Jeu
         [Tooltip("01/10/2026 : angle (degrés, ±) des places d'arrivée autour de Nyxessa, de part et d'autre de la direction d'approche " +
                  "(décalé du côté du couloir) : ils n'arrivent pas tous au même point de la paroi du bouclier. Avant : 35.")]
         public float trajetAngleArrivee = 55f;
+        [Tooltip("01/10/2026 (garde-fou) : un squelette en marche qui n'avance pas d'1 m vers sa destination pendant ce temps (s) abandonne son point de passage " +
+                 "et relance son chemin ; à la deuxième fois de suite, loin de Nyxessa, il est replacé sur le NavMesh 2 m plus près d'elle.")]
+        public float marcheBloqueeDelai = 4f;
         [Tooltip("Vitesse de lecture du clip de sortie de terre.")]
         public float vitesseSortieDeTerre = 1.5f;
         [Tooltip("Échelle des personnages Rig_Medium (Knight, squelettes) : 2 m environ.")]
@@ -556,6 +559,11 @@ namespace Deathless.Jeu
         public float grandeBouleVitesse = 12f;
         [Tooltip("Grande boule de feu (01/10/2026) : taille du visuel en vol (× la boule de feu).")]
         public float grandeBouleTaille = 1.9f;
+        [Tooltip("Coup critique du Mage (décidé le 01/10/2026, à équilibrer) : chance (0,05 = 5 %) qu'une boule de feu ou une grande boule de feu " +
+                 "fasse un critique, tirée une fois par boule à l'explosion (coup direct et zone) ; la brûlure ne critique pas.")]
+        public float mageCritiqueChance = 0.05f;
+        [Tooltip("Coup critique du Mage (décidé le 01/10/2026, à équilibrer) : multiplicateur des dégâts de la boule ou de la grande boule critique.")]
+        public float mageCritiqueMultiplicateur = 2f;
 
         [Header("Mage : mur de flammes (RB, décidé le 01/10/2026, chiffres à équilibrer)")]
         [Tooltip("Mur de flammes (01/10/2026, à équilibrer) : longueur de la ligne de feu (m), perpendiculaire à la visée.")]

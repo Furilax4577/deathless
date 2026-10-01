@@ -163,6 +163,7 @@ MonoBehaviour:
   trajetDistanceMin: 25
   trajetEcartVitesse: 0.08
   trajetAngleArrivee: 55
+  marcheBloqueeDelai: 4
   vitesseSortieDeTerre: 1.5
   echellePersonnages: 0.8
   riposteCoups: 2
@@ -404,6 +405,8 @@ MonoBehaviour:
   grandeBouleDuree: 1.1
   grandeBouleVitesse: 12
   grandeBouleTaille: 1.9
+  mageCritiqueChance: 0.05
+  mageCritiqueMultiplicateur: 2
   murLongueur: 8
   murDistance: 4
   murEpaisseur: 1.4

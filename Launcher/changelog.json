@@ -1,6 +1,17 @@
 {
   "versions": [
     {
+      "version": "0.8.1",
+      "date": "2026-10-01",
+      "titre": "Une bière derrière le comptoir",
+      "notes": [
+        "Taverne : la Bavaroise sert désormais derrière le comptoir, chopes en main.",
+        "Mage : coup critique, 5 % de chance qu'une boule de feu ou une grande boule de feu fasse double dégât.",
+        "Corrigé : un mage squelette de la dernière vague pouvait rester figé loin de Nyxessa jusqu'à l'aube ; Nyxar avait le même défaut, ce qui aurait pu bloquer la nuit 12. Un squelette qui n'avance plus repart de lui-même.",
+        "Corrigé : on pouvait rester coincé contre les marches du plateau de Nyxessa."
+      ]
+    },
+    {
       "version": "0.8.0",
       "date": "2026-10-01",
       "titre": "L'aube attendra",
