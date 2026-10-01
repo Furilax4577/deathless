@@ -41,7 +41,10 @@ namespace Deathless.Jeu
         {
             new Amelioration("Brasier", "mage_boule_de_feu", Sens.Plus, 0.10f, "+10 % de dégâts de la boule de feu"),
             new Amelioration("Souffle économe", "mage_cone_de_flammes", Sens.Moins, 0.12f, "−12 % de mana consommé par le cône de flammes"),
-            new Amelioration("Source de mana", "classe_mage_feu", Sens.Plus, 0.20f, "+20 % de régénération du mana"),
+            // Kit refondu le 01/10/2026 : une amélioration par action, comme les autres classes (LB grande boule, RB mur ;
+            // « Source de mana », +20 % de régénération, est retirée : le mana remonte de 3 par seconde).
+            new Amelioration("Météore", "mage_grande_boule", Sens.Moins, 0.12f, "−12 % de recharge de la grande boule de feu"),
+            new Amelioration("Rempart ardent", "mage_mur_de_flammes", Sens.Plus, 0.20f, "+20 % de durée du mur de flammes"),
         };
         static readonly Amelioration[] Rodeur =
         {

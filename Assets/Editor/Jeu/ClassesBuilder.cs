@@ -622,7 +622,59 @@ namespace Deathless.EditorTools
             var cone = Etat(haut, "Cone", Boucle(Clip(Ranged, "Ranged_Magic_Spellcasting"), "Ranged_Magic_Spellcasting_Loop"), new Vector3(450, 120));
             Si(vide, cone, "Cone", true, 0.12f);
             Si(cone, vide, "Cone", false, 0.15f);
+            AjouterSortsMage(c);
             EditorUtility.SetDirty(c);
+        }
+
+        static readonly string[] s_EtatsSortsMage = { "GrandeBouleCharge", "GrandeBouleTir", "Mur" };
+
+        /// Grande boule de feu (LB) et mur de flammes (RB) du mage (01/10/2026), sur la couche du haut du corps (le mage
+        /// avance au ralenti en lançant). Refait les états s'ils existent déjà : appelé par ControleurMage et, pour mettre à
+        /// jour le contrôleur existant sans le recréer (même GUID, prefab et registre restent branchés), par le menu
+        /// Deathless > Jeu > 7b. Mage : sorts LB et RB.
+        /// - « GrandeBoule » : Ranged_Magic_Raise accéléré (le feu se ramasse au-dessus du bâton) puis Ranged_Magic_Shoot,
+        ///   la boule partant à GameBalance.grandeBouleInstant (~0,8 s).
+        /// - « Mur » : Ranged_Magic_Summon accéléré (le bâton frappe vers le sol), le mur prend à GameBalance.murInstant.
+        public static void AjouterSortsMage(AnimatorController c)
+        {
+            AnimatorStateMachine haut = null;
+            foreach (var l in c.layers) if (l.name == "HautDuCorps") haut = l.stateMachine;
+            if (haut == null) { Debug.LogError("Mage : couche HautDuCorps absente de " + c.name); return; }
+            AnimatorState vide = haut.defaultState;
+            foreach (var e in haut.states) if (e.state.name == "Vide") vide = e.state;
+            // Ancienne version : transitions « n'importe quel état » et états retirés.
+            var anciens = new HashSet<AnimatorState>();
+            foreach (var e in haut.states) if (System.Array.IndexOf(s_EtatsSortsMage, e.state.name) >= 0) anciens.Add(e.state);
+            foreach (var t in haut.anyStateTransitions)
+                if (t.destinationState == null || anciens.Contains(t.destinationState)) haut.RemoveAnyStateTransition(t);
+            foreach (var s in anciens) haut.RemoveState(s);
+
+            var b = GameBalance.Courant;
+            var raise = Clip(Ranged, "Ranged_Magic_Raise");
+            var shoot = Clip(Ranged, "Ranged_Magic_Shoot");
+            // La charge dure grandeBouleInstant - 0,22 s (le tir lâche la boule vers 0,28 s du clip à ×1,3).
+            float charge = Mathf.Max(0.2f, b.grandeBouleInstant - 0.22f);
+            var sCharge = Etat(haut, "GrandeBouleCharge", raise, new Vector3(450, 220), raise != null ? raise.length / charge : 3f);
+            var sTir = Etat(haut, "GrandeBouleTir", shoot, new Vector3(650, 220), 1.3f);
+            Declencheur(c, haut, sCharge, "GrandeBoule", null, 0f, 0.08f);
+            Sortie(sCharge, sTir, 0.98f, 0.04f);
+            Sortie(sTir, vide, 0.9f);
+            var summon = Clip(Ranged, "Ranged_Magic_Summon");
+            var sMur = Etat(haut, "Mur", summon, new Vector3(450, 300), summon != null ? summon.length / Mathf.Max(0.3f, b.murGeste + 0.15f) : 4f);
+            Declencheur(c, haut, sMur, "Mur", vide, 0.92f, 0.08f);
+            EditorUtility.SetDirty(c);
+        }
+
+        [MenuItem("Deathless/Jeu/7b. Mage : sorts LB et RB (contrôleur existant)")]
+        public static string MenuSortsMage()
+        {
+            var c = AssetDatabase.LoadAssetAtPath<AnimatorController>(AnimDir + "/Mage_Jeu.controller");
+            if (c == null) return "Mage_Jeu.controller absent : lancer Deathless > Jeu > 7. Classes";
+            AjouterSortsMage(c);
+            AssetDatabase.SaveAssets();
+            string r = "Mage : grande boule (LB) et mur de flammes (RB) ajoutés à Mage_Jeu.controller (GUID inchangé)";
+            Debug.Log(r);
+            return r;
         }
 
         public static void ControleurRodeur()

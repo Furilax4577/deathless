@@ -20,6 +20,7 @@ namespace Deathless.Jeu.Dev
             {
                 case "viking": s_I.StartCoroutine(s_I.Viking()); break;
                 case "mage": s_I.StartCoroutine(s_I.Mage()); break;
+                case "mage_kit": s_I.StartCoroutine(s_I.MageKit()); break;   // 01/10/2026 : LB, RB, cône qui ralentit, mana 3/s
                 case "rodeur": s_I.StartCoroutine(s_I.Rodeur()); break;
                 case "assassin": s_I.StartCoroutine(s_I.Assassin()); break;
                 case "premierA": s_I.StartCoroutine(s_I.PremierA()); break;
@@ -343,6 +344,118 @@ namespace Deathless.Jeu.Dev
             EntreesSimulees.Maintenir("leftTrigger", false);
             yield return new WaitForSeconds(0.3f);
             Log("mage : cône, mana " + H.Classe.ValeurJauge.ToString("F0"));
+        }
+
+        /// Kit du mage du 01/10/2026 : grande boule (LB) sur un groupe de 5 sbires figés (dégâts, +1 palier de brûlure, l'un
+        /// déjà en brûlure), régénération du mana (3/s), cône (30 DPS, Ralenti), mur de flammes (RB) traversé par une vague
+        /// de sbires qui marchent (brûlure, Ralenti). Captures mage_grande_boule.png, mage_mur.png.
+        IEnumerator MageKit()
+        {
+            Missiles(false);
+            DevPartie.PlacerHeros(Depart, Loin);
+            var h = H; var b = GameBalance.Courant;
+            var mage = h.Classe as ClasseMage;
+            // 1) Grande boule de feu sur 5 sbires figés à 11-13 m ; le deuxième brûle déjà (palier 1, demi-jauge).
+            var groupe = new List<Squelette>
+            {
+                DevPartie.PoserDevant(TypeEnnemi.Sbire, 11f, 0f), DevPartie.PoserDevant(TypeEnnemi.Sbire, 11.5f, -1.6f),
+                DevPartie.PoserDevant(TypeEnnemi.Sbire, 11.5f, 1.6f), DevPartie.PoserDevant(TypeEnnemi.Sbire, 12.8f, -0.8f),
+                DevPartie.PoserDevant(TypeEnnemi.Sbire, 12.8f, 0.9f),
+            };
+            yield return Sortir(groupe);
+            Figer(groupe, 25f);
+            Brulure.Allumer(groupe[1].Sante, h, 0.5f);
+            yield return null;
+            var pv = new float[groupe.Count]; var palierAvant = new int[groupe.Count];
+            for (int i = 0; i < groupe.Count; i++) { pv[i] = groupe[i].Sante.Pv; palierAvant[i] = PalierBrulure(groupe[i]); }
+            h.Classe.RemplirJauge();
+            ViserPoint(groupe[0].transform.position + Vector3.up);
+            yield return null;
+            bool explose = false; Sante direct = null;
+            System.Action<ProjectileJeu.Genre, Vector3, Sante, float> suivi = (g, p, s, haut) => { if (g == ProjectileJeu.Genre.GrandeBouleDeFeu) { explose = true; direct = s; } };
+            ProjectileJeu.Arrivee += suivi;
+            float t0 = Time.time;
+            EntreesSimulees.Appui("leftShoulder", 0.1f);
+            yield return new WaitForSeconds(0.55f);
+            DevPartie.Capturer("mage_grande_boule_lancer");
+            while (!explose && Time.time - t0 < 4f) yield return null;
+            float vol = Time.time - t0;
+            ProjectileJeu.Arrivee -= suivi;
+            yield return new WaitForSeconds(0.12f);
+            DevPartie.Capturer("mage_grande_boule");
+            yield return new WaitForSeconds(0.3f);
+            var sb = new System.Text.StringBuilder();
+            for (int i = 0; i < groupe.Count; i++)
+            {
+                var s = groupe[i];
+                sb.Append(" | sbire " + i + (s.Sante == direct ? " (cible)" : "") + " : " + (pv[i] - s.Sante.Pv).ToString("F0") + " dégâts (brûlure comprise), palier " + palierAvant[i] + " → " + PalierBrulure(s)
+                    + ", à " + Vector3.Distance(s.transform.position, groupe[0].transform.position).ToString("F1") + " m du premier");
+            }
+            h.Classe.Emplacement(2, out float restant, out float total);
+            Log("mage : grande boule, explosion " + vol.ToString("F2") + " s après l'appui, mana " + h.Classe.ValeurJauge.ToString("F0") + "/" + b.manaMax + ", recharge " + restant.ToString("F1") + "/" + total.ToString("F0") + " s" + sb);
+            // 2) Régénération du mana : 2 s sans rien faire.
+            float m0 = h.Classe.ValeurJauge;
+            yield return new WaitForSeconds(2f);
+            Log("mage : mana " + m0.ToString("F1") + " → " + h.Classe.ValeurJauge.ToString("F1") + " en 2 s (" + ((h.Classe.ValeurJauge - m0) / 2f).ToString("F2") + " par seconde, attendu " + b.manaRegen + ")");
+            foreach (var s in groupe) if (s != null) Destroy(s.gameObject);
+            // 3) Cône maintenu 2 s sur un guerrier figé à 3,5 m : dégâts, mana, Ralenti.
+            DevPartie.PlacerHeros(Depart + new Vector3(-3f, 0f, 3f), Loin + new Vector3(-3f, 0f, 3f));
+            var proche = DevPartie.PoserDevant(TypeEnnemi.Guerrier, 3.5f, 0f);
+            yield return Sortir(new[] { proche });
+            Figer(new[] { proche }, 20f);
+            ViserPoint(proche.transform.position + Vector3.up);
+            h.Classe.RemplirJauge();
+            float pvC = proche.Sante.Pv, manaC = h.Classe.ValeurJauge;
+            EntreesSimulees.Maintenir("leftTrigger", true);
+            float ralenti = 0f;
+            for (float t = 0f; t < 2f; t += Time.deltaTime) { if (proche.Statuts != null) ralenti = Mathf.Max(ralenti, proche.Statuts.Intensite(TypeStatut.Ralenti)); yield return null; }
+            float pvApres = proche.Sante.Pv, manaApres = h.Classe.ValeurJauge;
+            EntreesSimulees.Maintenir("leftTrigger", false);
+            Log("mage : cône 2 s, " + (pvC - pvApres).ToString("F0") + " dégâts (attendu ~" + (b.coneDegats * 1.75f).ToString("F0") + " + brûlure), mana " + manaC.ToString("F0") + " → " + manaApres.ToString("F0") + " (attendu −" + (b.coneMana * 2f).ToString("F0") + "), Ralenti " + Mathf.RoundToInt(ralenti * 100f) + " %, brûlure palier " + PalierBrulure(proche));
+            if (proche != null) Destroy(proche.gameObject);
+            yield return new WaitForSeconds(0.5f);
+            // 4) Mur de flammes : une vague de 6 sbires libres arrive de 14-15 m ; le mur se pose à 4 m devant le mage.
+            DevPartie.PlacerHeros(Depart, Loin);
+            var vague = new List<Squelette>();
+            for (int i = 0; i < 6; i++) vague.Add(DevPartie.PoserDevant(TypeEnnemi.Sbire, 14f + (i % 2) * 1.5f, -2.5f + i));
+            yield return Sortir(vague);
+            ViserPoint(h.transform.position + h.transform.forward * 8f);
+            h.Classe.RemplirJauge();
+            yield return null;
+            EntreesSimulees.Appui("rightShoulder", 0.1f);
+            var vuRalenti = new bool[vague.Count]; var palierMax = new int[vague.Count]; var vitMin = new float[vague.Count];
+            for (int i = 0; i < vague.Count; i++) vitMin[i] = 99f;
+            bool capture = false;
+            float debut = Time.time;
+            while (Time.time - debut < b.murInstant + b.murDuree)
+            {
+                for (int i = 0; i < vague.Count; i++)
+                {
+                    var s = vague[i];
+                    if (s == null || s.Statuts == null) continue;
+                    if (s.Statuts.A(TypeStatut.Ralenti)) { vuRalenti[i] = true; if (s.Agent != null && s.Agent.enabled) vitMin[i] = Mathf.Min(vitMin[i], s.Agent.velocity.magnitude); }
+                    palierMax[i] = Mathf.Max(palierMax[i], PalierBrulure(s));
+                }
+                if (!capture && Time.time - debut > b.murInstant + 2.2f) { capture = true; DevPartie.Capturer("mage_mur"); }
+                yield return null;
+            }
+            var sm = new System.Text.StringBuilder();
+            int touches = 0;
+            for (int i = 0; i < vague.Count; i++)
+            {
+                if (vuRalenti[i] || palierMax[i] > 0) touches++;
+                sm.Append(" | sbire " + i + " : ralenti " + vuRalenti[i] + (vitMin[i] < 99f ? " (" + vitMin[i].ToString("F1") + " m/s au plus lent)" : "") + ", palier max " + palierMax[i]);
+            }
+            Log("mage : mur de flammes à " + (mage != null ? Vector3.Distance(Flat(mage.DernierMurCentre), Flat(h.transform.position)).ToString("F1") : "?") + " m, " + touches + "/" + vague.Count + " sbires pris, mana " + h.Classe.ValeurJauge.ToString("F0") + sm);
+            foreach (var s in vague) if (s != null) Destroy(s.gameObject);
+            Missiles(true);
+        }
+
+        static int PalierBrulure(Squelette s)
+        {
+            if (s == null || s.Statuts == null) return 0;
+            foreach (var st in s.Statuts.Liste) if (st.type == TypeStatut.Brulure) return st.PalierCourant;
+            return 0;
         }
 
         // ================================================================= Rôdeur

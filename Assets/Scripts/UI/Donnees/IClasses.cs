@@ -164,9 +164,10 @@ namespace Deathless.UI.Donnees
             new Classe
             {
                 Id = "mage", Nom = "Mage", Role = "Distance, zone", Arme = "Bâton",
-                Description = "Boules de feu et flammes : les ennemis touchés brûlent. Ses sorts coûtent du mana.",
+                Description = "Boules de feu, cône et mur de flammes : les ennemis touchés brûlent et ralentissent. Ses sorts coûtent du mana.",
                 Teinte = Hex("#ff610a"), Embleme = "classe_mage_feu", Jauge = JaugeClasse.Mana,
-                Actions = Actions(("Boule de feu", "mage_boule_de_feu"), ("Cône de flammes (maintenu)", "mage_cone_de_flammes"), Vide, Vide),
+                Actions = Actions(("Boule de feu", "mage_boule_de_feu"), ("Cône de flammes (maintenu)", "mage_cone_de_flammes"),
+                    ("Grande boule de feu", "mage_grande_boule"), ("Mur de flammes", "mage_mur_de_flammes")),
             },
             new Classe
             {

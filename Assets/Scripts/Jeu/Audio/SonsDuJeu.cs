@@ -115,6 +115,13 @@ namespace Deathless.Jeu
         public static readonly string[] BouleVol = { "fireball_flight_loop" };
         public static readonly string[] BouleExplosion = { "fireball_explosion" };
         public static readonly string[] Cone = { "mage_flame_cone_loop" };
+        // Grande boule de feu et mur de flammes du mage (01/10/2026) : sons « à créer » en tête, repli sur la boule de
+        // feu, le cône et la grille à flammes du donjon de Relic.
+        public static readonly string[] GrandeBouleLancer = { "dl_grande_boule_lancer", "fireball_cast" };
+        public static readonly string[] GrandeBouleVol = { "dl_grande_boule_vol", "fireball_flight_loop" };
+        public static readonly string[] GrandeBouleExplosion = { "dl_grande_boule_explosion", "fireball_explosion" };
+        public static readonly string[] MurPose = { "dl_mur_de_flammes_pose", "trap_flames" };
+        public static readonly string[] MurBoucle = { "dl_mur_de_flammes_boucle", "mage_flame_cone_loop" };
         public static readonly string[] Brulure = { "burn_loop", "brulure" };
         public static readonly string[] ArcBander = { "arc_bander" };
         public static readonly string[] ArcPret = { "arc_charge_complete" };

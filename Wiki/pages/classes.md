@@ -76,7 +76,8 @@ L'esquive des **cinq classes** est **directionnelle** (26/09/2026) : le héros n
 | | Chute brutale | +15 % de dégâts du saut percutant |
 | Mage | Brasier | +10 % de dégâts de la boule de feu |
 | | Souffle économe | −12 % de mana consommé par le cône de flammes |
-| | Source de mana | +20 % de régénération du mana |
+| | Météore | −12 % de recharge de la grande boule de feu (01/10/2026) |
+| | Rempart ardent | +20 % de durée du mur de flammes (01/10/2026 ; « Source de mana » retirée avec le nouveau kit) |
 | Rôdeur | Pointes d'acier | +10 % de dégâts du tir bandé (pas la salve ni la nuée) |
 | | Main sûre | −10 % de temps pour bander l'arc à fond |
 | | Nuée drue | −12 % de recharge de la nuée de flèches |

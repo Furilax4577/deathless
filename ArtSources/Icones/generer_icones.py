@@ -591,6 +591,37 @@ def mage_cone_de_flammes():
     return ic
 
 
+def mage_grande_boule():
+    ic = Icone("mage_grande_boule", "mage_feu", "Grande boule de feu",
+               "Compétence 1 (LB, 01/10/2026) : boule plus grosse et plus lente, couronne de flammes, explosion de 5 m.")
+    cen = (70, 58)
+    # Traînée large et courte : la boule est lente.
+    for fin, milieu, large in (((8, 96), (38, 80), 44), ((30, 120), (50, 92), 40), ((6, 122), (36, 92), 54)):
+        ic.bande([cen, milieu, fin], [large, large * 0.6, 0], FEU_EXT)
+    ic.bande([cen, (42, 86), (20, 110)], [36, 18, 0], FEU_MIL)
+    # Couronne de flammes : pointes à facettes tout autour du haut et de l'avant de la boule.
+    for a in (-150, -115, -80, -45, -10, 25):
+        base_g = polaire(cen, 34, a - 13)
+        base_d = polaire(cen, 34, a + 13)
+        pointe = polaire(cen, 52 if a in (-80, -45) else 47, a)
+        ic.gemme([base_g, pointe, base_d, polaire(cen, 28, a)], FEU_MIL)
+    ic.gemme(regulier(cen, 40, 12, -75), FEU_BOULE, table=0.55, teinte_table=c("Feu", "Jaune"))
+    ic.gemme(regulier(add(cen, (-8, -9)), 12, 6, -90), FEU_COEUR)
+    return ic
+
+
+def mage_mur_de_flammes():
+    ic = Icone("mage_mur_de_flammes", "mage_feu", "Mur de flammes",
+               "Compétence 2 (RB, 01/10/2026) : ligne de feu posée au sol, une rangée de flammes sur un lit de braises.")
+    # Lit de braises : une longue gemme basse, d'un bord à l'autre.
+    lit = [(6, 108), (20, 101), (64, 99), (108, 101), (122, 108), (108, 116), (64, 118), (20, 116)]
+    ic.gemme(lit, [c("Feu", "Braise"), c("Feu", "Rouge"), c("Feu", "Orange")], centre=(64, 108))
+    # Rangée de flammes de même famille, hauteurs alternées : un rideau, pas un foyer.
+    for cx, h in ((19, 64), (41, 80), (64, 92), (87, 80), (109, 64)):
+        flamme(ic, cx, 106, h, 14)
+    return ic
+
+
 def mage_brulure():
     ic = Icone("mage_brulure", "mage_feu", "Brûlure", "État des ennemis touchés (pas un emplacement).")
     flamme(ic, 36, 112, 58, 22)
@@ -1740,7 +1771,7 @@ DRUIDE_VARIANTES = [classe_druide_a, classe_druide_b, classe_druide_c]
 DRUIDE_COMPETENCES = [druide_metamorphose, druide_ronces, druide_soin_nature]
 COMPETENCES = [
     paladin_epee, paladin_garde, paladin_charge_belier, paladin_soin,
-    mage_boule_de_feu, mage_cone_de_flammes, mage_brulure, jauge_mana,
+    mage_boule_de_feu, mage_cone_de_flammes, mage_grande_boule, mage_mur_de_flammes, mage_brulure, jauge_mana,
     rodeur_tir, rodeur_visee, rodeur_nuee_de_fleches, rodeur_roulade_salve,
     assassin_dague, assassin_arbalete, assassin_fumigene, assassin_pas_ombre, assassin_furtif,
     viking_hache, viking_attaque_tournante, viking_rugissement, viking_saut_percutant, jauge_rage,
@@ -1757,8 +1788,8 @@ NOMS_CLASSES = {"paladin": "Paladin", "mage_feu": "Mage de feu", "rodeur": "Rôd
 BARRES = {
     "paladin": [("paladin_epee", "RT", ""), ("paladin_garde", "LT", "active"),
                 ("paladin_charge_belier", "LB", "recharge:9:0.62"), ("paladin_soin", "RB", "")],
-    "mage_feu": [("mage_boule_de_feu", "RT", ""), ("mage_cone_de_flammes", "LT", ""), (None, "LB", ""),
-                 (None, "RB", "")],
+    "mage_feu": [("mage_boule_de_feu", "RT", ""), ("mage_cone_de_flammes", "LT", ""),
+                 ("mage_grande_boule", "LB", "recharge:6:0.6"), ("mage_mur_de_flammes", "RB", "")],
     "rodeur": [("rodeur_tir", "RT", ""), ("rodeur_visee", "LT", "active"),
                ("rodeur_nuee_de_fleches", "LB", "recharge:4:0.35"), ("rodeur_roulade_salve", "RB", "")],
     "assassin": [("assassin_dague", "RT", ""), ("assassin_arbalete", "LT", "recharge:6:0.75"),

@@ -521,15 +521,65 @@ namespace Deathless.Jeu
         [Tooltip("Instant où la boule quitte le bâton dans le geste (s, clip Ranged_Magic_Shoot accéléré).")]
         public float bouleInstant = 0.28f;
         public float manaMax = 100f;
-        [Tooltip("Mana rendu par seconde (wiki : environ 1).")]
-        public float manaRegen = 1f;
+        [Tooltip("Mana rendu par seconde (01/10/2026, à équilibrer : 1 → 3, refonte du kit du mage).")]
+        public float manaRegen = 3f;
         [Tooltip("Mana rendu par ennemi touché par la boule de feu (wiki : bonus).")]
         public float manaParTouche = 4f;
-        public float coneMana = 14f;
-        public float coneDegats = 22f;
+        [Tooltip("Mana consommé par seconde de cône (01/10/2026, à équilibrer : 14 → 10).")]
+        public float coneMana = 10f;
+        [Tooltip("Dégâts par seconde du cône de flammes (01/10/2026, à équilibrer : 22 → 30), en 4 tics par seconde.")]
+        public float coneDegats = 30f;
         public float conePortee = 6f;
         public float coneDemiAngle = 20f;
         public float coneVitesse = 0.4f;
+        [Tooltip("Cône de flammes (décidé le 01/10/2026, à équilibrer) : part de vitesse retirée aux ennemis dedans (statut Ralenti, 0,4 = −40 %).")]
+        public float coneRalenti = 0.4f;
+        [Tooltip("Cône de flammes (01/10/2026) : durée du Ralenti posé à chaque tic (s), renouvelé tant que l'ennemi reste dans le cône.")]
+        public float coneRalentiDuree = 0.5f;
+
+        [Header("Mage : grande boule de feu (LB, décidé le 01/10/2026, chiffres à équilibrer)")]
+        [Tooltip("Grande boule de feu (01/10/2026, à équilibrer) : dégâts à la cible touchée (centre de l'explosion).")]
+        public float grandeBouleDegats = 60f;
+        [Tooltip("Grande boule de feu (01/10/2026, à équilibrer) : dégâts aux autres ennemis dans le rayon de l'explosion.")]
+        public float grandeBouleDegatsZone = 35f;
+        [Tooltip("Grande boule de feu (01/10/2026, à équilibrer) : rayon de l'explosion (m).")]
+        public float grandeBouleRayon = 5f;
+        [Tooltip("Grande boule de feu (01/10/2026, à équilibrer) : coût en mana.")]
+        public float grandeBouleMana = 35f;
+        [Tooltip("Grande boule de feu (01/10/2026, à équilibrer) : recharge (s).")]
+        public float grandeBouleRecharge = 10f;
+        [Tooltip("Grande boule de feu (01/10/2026) : temps de lancer (s) — la boule quitte le bâton à cet instant (Ranged_Magic_Raise puis Ranged_Magic_Shoot).")]
+        public float grandeBouleInstant = 0.8f;
+        [Tooltip("Grande boule de feu (01/10/2026) : durée totale du geste (s) ; le mage avance au ralenti pendant ce temps.")]
+        public float grandeBouleDuree = 1.1f;
+        [Tooltip("Grande boule de feu (01/10/2026) : vitesse de vol (m/s), plus lente que la boule (18).")]
+        public float grandeBouleVitesse = 12f;
+        [Tooltip("Grande boule de feu (01/10/2026) : taille du visuel en vol (× la boule de feu).")]
+        public float grandeBouleTaille = 1.9f;
+
+        [Header("Mage : mur de flammes (RB, décidé le 01/10/2026, chiffres à équilibrer)")]
+        [Tooltip("Mur de flammes (01/10/2026, à équilibrer) : longueur de la ligne de feu (m), perpendiculaire à la visée.")]
+        public float murLongueur = 8f;
+        [Tooltip("Mur de flammes (01/10/2026) : distance du milieu du mur devant le mage (m).")]
+        public float murDistance = 4f;
+        [Tooltip("Mur de flammes (01/10/2026) : épaisseur de la zone qui brûle (m), de part et d'autre de la ligne.")]
+        public float murEpaisseur = 1.4f;
+        [Tooltip("Mur de flammes (01/10/2026, à équilibrer) : durée (s).")]
+        public float murDuree = 5f;
+        [Tooltip("Mur de flammes (01/10/2026, à équilibrer) : coût en mana.")]
+        public float murMana = 30f;
+        [Tooltip("Mur de flammes (01/10/2026, à équilibrer) : recharge (s).")]
+        public float murRecharge = 14f;
+        [Tooltip("Mur de flammes (01/10/2026) : instant où le mur prend dans le geste (s, Ranged_Magic_Summon accéléré).")]
+        public float murInstant = 0.5f;
+        [Tooltip("Mur de flammes (01/10/2026) : durée totale du geste (s).")]
+        public float murGeste = 0.85f;
+        [Tooltip("Mur de flammes (01/10/2026, à équilibrer) : part de vitesse retirée aux ennemis qui le traversent ou s'y tiennent (Ralenti).")]
+        public float murRalenti = 0.4f;
+        [Tooltip("Mur de flammes (01/10/2026) : durée du Ralenti posé à chaque tic (s), renouvelé tant que l'ennemi est dans le mur.")]
+        public float murRalentiDuree = 0.6f;
+        [Tooltip("Mur de flammes (01/10/2026, à équilibrer) : un ennemi qui entre dans le mur monte d'un palier de brûlure ; s'il y reste, encore un palier toutes les x s.")]
+        public float murIntervallePalier = 1.5f;
         [Tooltip("Brûlure : dégâts par seconde si brulureDegatsPaliers est vide (sinon le palier 1 de la liste fait foi, 01/10/2026).")]
         public float brulureDegats = 5f;
         [Tooltip("Brûlure : durée minimale (s) après le dernier coup de feu ; plus longue aux paliers hauts, le temps de redescendre (01/10/2026).")]

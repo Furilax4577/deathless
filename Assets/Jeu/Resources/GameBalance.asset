@@ -386,13 +386,35 @@ MonoBehaviour:
   boulePortee: 30
   bouleInstant: 0.28
   manaMax: 100
-  manaRegen: 1
+  manaRegen: 3
   manaParTouche: 4
-  coneMana: 14
-  coneDegats: 22
+  coneMana: 10
+  coneDegats: 30
   conePortee: 6
   coneDemiAngle: 20
   coneVitesse: 0.4
+  coneRalenti: 0.4
+  coneRalentiDuree: 0.5
+  grandeBouleDegats: 60
+  grandeBouleDegatsZone: 35
+  grandeBouleRayon: 5
+  grandeBouleMana: 35
+  grandeBouleRecharge: 10
+  grandeBouleInstant: 0.8
+  grandeBouleDuree: 1.1
+  grandeBouleVitesse: 12
+  grandeBouleTaille: 1.9
+  murLongueur: 8
+  murDistance: 4
+  murEpaisseur: 1.4
+  murDuree: 5
+  murMana: 30
+  murRecharge: 14
+  murInstant: 0.5
+  murGeste: 0.85
+  murRalenti: 0.4
+  murRalentiDuree: 0.6
+  murIntervallePalier: 1.5
   brulureDegats: 5
   brulureDuree: 3
   brulureDegatsPaliers:

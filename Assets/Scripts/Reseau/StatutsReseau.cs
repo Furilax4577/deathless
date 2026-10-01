@@ -144,7 +144,8 @@ namespace Deathless.Reseau
             {
                 // Brûlure en paliers (01/10/2026) : `intensite` porte le remplissage cumulé par le client entre deux demandes
                 // (Statuts.AttiserBrulure) ; plafonné à ce qu'un mage peut remplir en un intervalle de demande, avec marge.
-                case TypeStatut.Brulure: duree = b.brulureDuree; intensite = Mathf.Clamp(intensite, 0f, 1.5f); break;
+                // Brulure.MarqueurPalier (01/10/2026) : un palier d'un coup (grande boule de feu, mur de flammes).
+                case TypeStatut.Brulure: duree = b.brulureDuree; intensite = intensite >= Brulure.MarqueurPalier ? Brulure.MarqueurPalier : Mathf.Clamp(intensite, 0f, 1.5f); break;
                 case TypeStatut.Ralenti: intensite = Mathf.Clamp(intensite, 0f, 0.9f); break;
                 default: return s;
             }

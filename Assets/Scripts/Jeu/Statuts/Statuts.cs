@@ -178,7 +178,8 @@ namespace Deathless.Jeu
         /// Autorité : demande reçue d'un client (déjà validée par le réseau). Brûlure : `intensite` porte le remplissage.
         public void AjouterDemande(Statut s)
         {
-            if (s.type == TypeStatut.Brulure) AttiserBrulure(s.intensite, s.origine, s.sourceId);
+            if (s.type == TypeStatut.Brulure && s.intensite >= Brulure.MarqueurPalier) MonterBrulure(s.origine, s.sourceId);
+            else if (s.type == TypeStatut.Brulure) AttiserBrulure(s.intensite, s.origine, s.sourceId);
             else Ajouter(s.type, s.duree, s.intensite, s.origine, s.sourceId);
         }
 
@@ -203,6 +204,36 @@ namespace Deathless.Jeu
             for (int j = 0; j < m_Liste.Count; j++)
                 if (m_Liste[j].type == TypeStatut.Brulure && !m_Liste[j].Permanent) { i = j; break; }
             var s = Brulure.Attiser(i >= 0 ? m_Liste[i] : default(Statut), i >= 0, remplissage, t);
+            s.origine = origine;
+            s.sourceId = sourceId;
+            s.predit = false;
+            if (i >= 0) m_Liste[i] = s;
+            else m_Liste.Add(s);
+            enabled = true;
+            Change?.Invoke();
+        }
+
+        /// Brûlure : un palier d'un coup (Brulure.MonterPalier : grande boule de feu, mur de flammes, 01/10/2026). Chez un
+        /// client, demande envoyée tout de suite à l'hôte (remplissage = Brulure.MarqueurPalier), sans attendre l'intervalle.
+        public void MonterBrulure(OrigineStatut origine, int sourceId)
+        {
+            if (Sante != null && Sante.Mort) return;
+            if (!Autorite)
+            {
+                if (relais == null) return;
+                DemandesEnvoyees++;
+                relais(new Statut
+                {
+                    type = TypeStatut.Brulure, duree = GameBalance.Courant.brulureDuree, intensite = Brulure.MarqueurPalier,
+                    origine = origine, sourceId = sourceId,
+                });
+                return;
+            }
+            float t = Time.time;
+            int i = -1;
+            for (int j = 0; j < m_Liste.Count; j++)
+                if (m_Liste[j].type == TypeStatut.Brulure && !m_Liste[j].Permanent) { i = j; break; }
+            var s = Brulure.MonterPalier(i >= 0 ? m_Liste[i] : default(Statut), i >= 0, t);
             s.origine = origine;
             s.sourceId = sourceId;
             s.predit = false;

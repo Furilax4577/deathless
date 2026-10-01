@@ -3440,6 +3440,46 @@
     "statut": "a_creer"
   },
   {
+    "id": "dl_grande_boule_lancer",
+    "nom": "Mage — grande boule de feu, lancer",
+    "categorie": "Sorts du mage",
+    "usage": "Grande boule de feu (LB, 01/10/2026, `SonsDuJeu.GrandeBouleLancer`) : le feu se ramasse au bout du bâton pendant 0,8 s, gronde puis part, plus grave et plus lourd que la boule. En attendant : `fireball_cast`.",
+    "fichier": null,
+    "statut": "a_creer"
+  },
+  {
+    "id": "dl_grande_boule_vol",
+    "nom": "Mage — grande boule de feu, vol (boucle)",
+    "categorie": "Sorts du mage",
+    "usage": "Grande boule de feu en vol (`SonsDuJeu.GrandeBouleVol`) : souffle de brasier lent et lourd. En attendant : `fireball_flight_loop`.",
+    "fichier": null,
+    "statut": "a_creer"
+  },
+  {
+    "id": "dl_grande_boule_explosion",
+    "nom": "Mage — grande boule de feu, explosion",
+    "categorie": "Sorts du mage",
+    "usage": "Explosion de la grande boule (`SonsDuJeu.GrandeBouleExplosion`, 5 m) : coup très grave, embrasement large, crépitements longs. En attendant : `fireball_explosion`.",
+    "fichier": null,
+    "statut": "a_creer"
+  },
+  {
+    "id": "dl_mur_de_flammes_pose",
+    "nom": "Mage — mur de flammes, pose",
+    "categorie": "Sorts du mage",
+    "usage": "Mur de flammes (RB, 01/10/2026, `SonsDuJeu.MurPose`) : le bâton frappe le sol et une ligne de feu de 8 m s'embrase d'un bout à l'autre. En attendant : `trap_flames`.",
+    "fichier": null,
+    "statut": "a_creer"
+  },
+  {
+    "id": "dl_mur_de_flammes_boucle",
+    "nom": "Mage — mur de flammes (boucle)",
+    "categorie": "Sorts du mage",
+    "usage": "Mur de flammes qui brûle (5 s, `SonsDuJeu.MurBoucle`) : rideau de feu qui ronfle et crépite, sans chalumeau. En attendant : `mage_flame_cone_loop`.",
+    "fichier": null,
+    "statut": "a_creer"
+  },
+  {
     "id": "dl_squelette_pas",
     "nom": "Squelette — pas",
     "categorie": "Ennemis",

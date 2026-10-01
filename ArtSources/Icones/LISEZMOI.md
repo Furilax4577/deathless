@@ -41,6 +41,8 @@ Python 3, bibliothèque standard seulement. Le script réécrit tous les SVG et 
 | `paladin_soin` | Soin sur soi | RB |
 | `mage_boule_de_feu` | Boule de feu | RT |
 | `mage_cone_de_flammes` | Cône de flammes | LT |
+| `mage_grande_boule` | Grande boule de feu (01/10/2026) | LB |
+| `mage_mur_de_flammes` | Mur de flammes (01/10/2026) | RB |
 | `mage_brulure` | Brûlure (état sur les ennemis) | aucun |
 | `jauge_mana` | Mana | jauge |
 | `rodeur_tir` | Bander et tirer | RT |

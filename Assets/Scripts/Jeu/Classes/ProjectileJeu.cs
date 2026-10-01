@@ -11,7 +11,12 @@ namespace Deathless.Jeu
     /// dans ce qu'elles touchent (suivent le squelette) puis disparaissent.
     public class ProjectileJeu : MonoBehaviour
     {
-        public enum Genre { Fleche, Carreau, BouleDeFeu }
+        /// La valeur sert d'identifiant réseau (octet, HerosReseau.Tir) : ne pas renuméroter. GrandeBouleDeFeu (01/10/2026) :
+        /// LB du mage, même boule en plus grosse et plus lente (GameBalance.grandeBouleTaille), explosion large.
+        public enum Genre { Fleche, Carreau, BouleDeFeu, GrandeBouleDeFeu }
+
+        /// Boule de feu, petite ou grande (feu du mage, pas une flèche).
+        public static bool EstBoule(Genre g) => g == Genre.BouleDeFeu || g == Genre.GrandeBouleDeFeu;
 
         /// Tests (ScenariosClasses « balistique ») : arrivée d'un projectile (genre, point, ennemi touché ou null, hauteur
         /// maximale atteinte au-dessus du départ).
@@ -52,6 +57,7 @@ namespace Deathless.Jeu
                     if (fx != null && fx.gemmes != null) ExplosionFeu.Jouer(point, 2.5f, fx.gemmes);
                     AudioBank.Jouer(SonsDuJeu.BouleExplosion, point, 0.9f);
                 }
+                else if (genre == Genre.GrandeBouleDeFeu) ClasseMage.ExplosionGrandeBoule(point);
                 else AudioBank.Jouer(SonsDuJeu.FlecheImpact, point, 0.6f, 0.05f);
             });
         }
@@ -61,7 +67,7 @@ namespace Deathless.Jeu
         {
             var fx = EffetsJeu.Instance;
             GameObject go;
-            if (genre != Genre.BouleDeFeu && fx != null && fx.modeleFleche != null)
+            if (!EstBoule(genre) && fx != null && fx.modeleFleche != null)
             {
                 go = Instantiate(fx.modeleFleche);
                 if (genre == Genre.Carreau) go.transform.localScale *= 0.85f;
@@ -71,7 +77,7 @@ namespace Deathless.Jeu
             go.name = genre.ToString();
             Vector3 dir = (cible - depart).sqrMagnitude > 0.0001f ? (cible - depart).normalized : tireur.forward;
             var bal = GameBalance.Courant;
-            if (genre != Genre.BouleDeFeu) dir = DirectionBalistique(depart, cible, vitesse, bal.projectileGravite, bal.aideChuteMax, dir);
+            if (!EstBoule(genre)) dir = DirectionBalistique(depart, cible, vitesse, bal.projectileGravite, bal.aideChuteMax, dir);
             go.transform.SetPositionAndRotation(depart, Quaternion.LookRotation(dir));
             var p = go.AddComponent<ProjectileJeu>();
             p.m_Genre = genre;
@@ -79,14 +85,15 @@ namespace Deathless.Jeu
             p.m_Impact = impact;
             p.m_Reste = portee;
             p.m_Depart = depart;
-            if (genre == Genre.BouleDeFeu)
+            if (EstBoule(genre))
             {
                 // Légère cloche (Relic : +1,5 m/s vers le haut, chute 5), visée corrigée pour tomber sur la cible.
                 p.m_Gravite = 5f;
                 float t = Vector3.Distance(depart, cible) / Mathf.Max(1f, vitesse);
                 p.m_Vitesse = dir * vitesse + Vector3.up * (0.5f * p.m_Gravite * t);
-                if (fx != null) FireballVisual.Attach(go.transform, fx.terre, 1f, fx.gemmes);
-                p.m_Boucle = AudioBank.Boucle(SonsDuJeu.BouleVol, go.transform, 0.6f);
+                bool grande = genre == Genre.GrandeBouleDeFeu;
+                if (fx != null) FireballVisual.Attach(go.transform, fx.terre, grande ? Mathf.Max(1f, bal.grandeBouleTaille) : 1f, fx.gemmes);
+                p.m_Boucle = AudioBank.Boucle(grande ? SonsDuJeu.GrandeBouleVol : SonsDuJeu.BouleVol, go.transform, grande ? 0.8f : 0.6f);
             }
             else
             {
@@ -129,7 +136,7 @@ namespace Deathless.Jeu
             if (d < 1e-5f) return;
             Vector3 dir = pas / d;
             Vector3 avant = transform.position + dir * m_DemiLongueur;   // la pointe mène
-            float r = m_Genre == Genre.BouleDeFeu ? 0.25f : 0.08f;
+            float r = m_Genre == Genre.GrandeBouleDeFeu ? 0.25f * Mathf.Max(1f, GameBalance.Courant.grandeBouleTaille) : m_Genre == Genre.BouleDeFeu ? 0.25f : 0.08f;
             int n = Physics.SphereCastNonAlloc(avant, r, dir, s_Hits, d, ~0, QueryTriggerInteraction.Ignore);
             float best = float.MaxValue; int k = -1;
             for (int i = 0; i < n; i++)
@@ -161,7 +168,7 @@ namespace Deathless.Jeu
             Arrivee?.Invoke(m_Genre, point, s, m_Sommet);
             if (m_Trainee != null) m_Trainee.Detacher();
             if (m_Boucle != null) m_Boucle.Stop();
-            if (m_Genre == Genre.BouleDeFeu)
+            if (EstBoule(m_Genre))
             {
                 transform.position = point;
                 m_Impact?.Invoke(point, dir, s);

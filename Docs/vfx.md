@@ -373,6 +373,20 @@ Une paire prefab + script par effet sous `Assets/VFX/<Effet>/`, matériau `Porta
 - Capture : `VfxBench_tournante.png`.
 - **Manque** : emplacement de compétence et durée {à confirmer}.
 
+#### Grande boule de feu du mage (LB) — réutilise la boule de feu (01/10/2026)
+- **Pas de prefab** : la boule de feu de Relic en plus gros. En vol, `FireballVisual.Attach(projectile, FireBurst, GameBalance.grandeBouleTaille (1,9), PortalVoxel)` (projectile `ProjectileJeu.Genre.GrandeBouleDeFeu`, 12 m/s, rayon de collision 0,25 × 1,9) ; à l'impact, `ClasseMage.ExplosionGrandeBoule(point)` : **deux `ExplosionFeu.Jouer`** au même point, l'une au rayon de l'explosion (5 m : éclat plus large, fumée plus haute), l'autre à la moitié (cœur dense), plus une petite secousse de caméra (0,08 m, 0,25 s) si la caméra est à moins de 25 m.
+- **Multijoueur** : `ProjectileJeu.TirerVisuel` rejoue le vol et la même explosion chez les autres (`HerosReseau.Tir`, genre 3).
+- **Palette** : thème **Feu**, comme la boule.
+- Capture : `Assets/Screenshots/mage_grande_boule.png` (explosion sur cinq sbires), `mage_grande_boule_lancer.png` (geste).
+
+#### Mur de flammes du mage (RB) — `Assets/VFX/MurDeFlammes/` (créé dans Deathless le 01/10/2026)
+- **Script** : `MurDeFlammes.cs`, aucun prefab. **API** : `MurDeFlammes.Jouer(centre, axe, longueur, duree, PortalVoxel)` (renvoie le composant ; l'objet se détruit seul 1,2 s après la fin) ; `MurDeFlammes.Sol(point, hauteurRepli)` pose un point sur le NavMesh (pont, gué), sinon sur le décor.
+- **Rendu** (un seul maillage `GemmesVolantes`, gemmes `LowPolyGem`, pas d'alpha) : points d'émission tous les 0,35 m le long de la ligne, posés au sol ; **langues de flamme** (48 par seconde et par mètre) qui naissent au sol et montent en s'étirant (grosses et lentes rouge et orange, petites et vives jaune à blanc chaud), **lit de braises** sombres renouvelé toutes les 0,16 s, rares **étincelles** blanc chaud ; **lumière** Feu moyenne au milieu (`VfxLumiere`). **Embrasement** : le feu court du milieu vers les bouts en 0,3 s ; **fin** : les flammes baissent pendant 0,5 s, des bouts vers le milieu, et s'éteignent par la taille.
+- **Sons** : `SonsDuJeu.MurPose` (à créer `dl_mur_de_flammes_pose`, repli `trap_flames`), boucle `SonsDuJeu.MurBoucle` (à créer, repli `mage_flame_cone_loop`) attachée au mur.
+- **Multijoueur** : effet 5 de `ClasseMage` (centre, axe, durée) rejoué chez les autres ; dégâts et statuts décidés par le poste du mage puis l'hôte.
+- **Palette** : thème **Feu** (Ombre, Base, Vif, Cœur, accent Blanc chaud), jamais en dur.
+- Capture : `Assets/Screenshots/mage_mur.png` (vague de sbires qui traverse le mur).
+
 ### Zone d'apparition des vagues de squelettes (créée dans Deathless, 25/09/2026)
 - **Prefab** : `Assets/VFX/ZoneApparition/ZoneApparition.prefab` (script `ZoneApparition`, matériau `PortalVoxel.mat`), racine au sol au centre de la clairière.
 - **API** : `Annoncer()` (crépuscule : l'empreinte se trace en 3 s — anneau, cercle intérieur, fissures qui poussent vers l'extérieur, runes — et l'aura monte en 6 s jusqu'à 45 %) ; `Activer()` (nuit : aura à pleine intensité en 1,5 s, empreinte plus lumineuse) ; `Pulse()` (à chaque vague : onde de lumière du centre au bord de l'empreinte en 0,55 s, anneau de gemmes projeté au sol, bouffée de gemmes dans l'aura, éclat de lumière) ; `Eteindre()` (aube : l'aura s'arrête, les gemmes déjà parties finissent leur montée, l'empreinte se résorbe en 2,5 s dans l'ordre inverse) ; `Couper()` (tout de suite, sans résorption) ; `Rayon` (propriété, réglable en temps réel, 2 à 20 m, défaut **7 m**) ; `PointAleatoire()` (point au hasard dans 80 % du rayon, au sol : sortie de terre des squelettes) ; `Etat` (`EtatZone` : Eteinte, Annonce, Active, Extinction).

@@ -82,6 +82,41 @@ namespace Deathless.Jeu
             return e;
         }
 
+        /// Réseau : valeur de remplissage qui, dans une demande de brûlure d'un client (Statut.intensite), veut dire
+        /// « monter d'un palier » (MonterPalier) et non un remplissage de jauge (plafonné à 1,5 par StatutsReseau.Valider).
+        public const float MarqueurPalier = 2f;
+
+        /// Autorité : monter la brûlure `e` d'un palier d'un coup (grande boule de feu, mur de flammes ; décidé le
+        /// 01/10/2026). Sans brûlure, elle prend au palier 1 avec sa jauge pleine ; sinon le palier courant monte de 1
+        /// (jusqu'au plafond, jauge alors pleine) en gardant la jauge où elle en était. Même instantané qu'Attiser.
+        public static Statut MonterPalier(Statut e, bool existe, float t)
+        {
+            var b = GameBalance.Courant;
+            int p = 1;
+            float j = 1f;
+            if (existe)
+            {
+                Etat(e, t, out p, out j);
+                if (p < PalierMax) { p++; j = Mathf.Max(j, 0.05f); }   // jauge > 0 : sinon Etat lirait encore le palier d'avant
+                else j = 1f;
+            }
+            e.type = TypeStatut.Brulure;
+            e.palier = (byte)p;
+            e.jauge = j;
+            e.descente = t + b.brulureDelaiDescente;
+            e.duree = Mathf.Max(b.brulureDuree, b.brulureDelaiDescente + (p - 1 + j) / Vitesse);
+            e.fin = t + e.duree;
+            e.intensite = Degats(p);
+            return e;
+        }
+
+        /// Mage : un palier de brûlure d'un coup (grande boule de feu, mur de flammes ; demande à l'hôte chez un client).
+        public static void Monter(Sante cible, Heros source)
+        {
+            if (cible == null || cible.Mort) return;
+            Statuts.De(cible).MonterBrulure(OrigineStatut.Joueur, source != null ? source.Id : 0);
+        }
+
         /// Mage : un coup de feu (boule : brulureRemplissageBoule, tic du cône : brulureRemplissageCone) pose la brûlure
         /// ou remplit sa jauge (demande à l'hôte chez un client).
         public static void Allumer(Sante cible, Heros source, float remplissage)
