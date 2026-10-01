@@ -157,6 +157,8 @@ if __name__ == "__main__":
     # k = écrasement de la profondeur (0,55 = vue de trois quarts ; 1 = vue presque verticale), e = pixels par mètre.
     nom = "village-3d"
     args = sys.argv[1:]
+    if "--serpente" in args:                 # rivière serpentine (plan_village.serpente)
+        pv.serpente()
     for opt, cible in (("--k", "K"), ("--e", "E"), ("--z", "Z")):
         if opt in args:
             globals()[cible] = float(args[args.index(opt) + 1])

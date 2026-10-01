@@ -9,6 +9,7 @@ Repère : Nyxessa à l'origine, x vers l'est, y vers le nord, en mètres. Pillow
 """
 import math
 import os
+import sys
 from PIL import Image, ImageDraw, ImageFont
 
 RACINE = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
@@ -239,11 +240,55 @@ def facades(largeur=1280, hauteur=720, legendes=True):
 
 RIVIERE_DENSE = riviere_dense()
 
+# Variante serpentine (01/10/2026, à la demande de Quentin : « j'aimais bien l'idée de la rivière qui serpente, avec les
+# points de passage dans l'eau »). Même logique que le plan décidé (elle longe le plateau côté est, trois gués devant les
+# maisons de la rive est, deux ponts, sortie au sud-ouest), mais avec de vraies boucles. Le plan décidé reste le défaut :
+# `serpente()` remplace le tracé, les gués et les ponts.
+def _queue_serpentine(debut=(-4, -21), fin=(-64, -70), tours=2.5, amplitude=6.5, n=36):
+    """Queue sud-ouest de la rivière : ondulations nettes dans la forêt (aucun bâtiment de ce côté)."""
+    L = math.hypot(fin[0] - debut[0], fin[1] - debut[1])
+    ux, uy = (fin[0] - debut[0]) / L, (fin[1] - debut[1]) / L
+    vx, vy = -uy, ux
+    pts = []
+    for k in range(1, n + 1):
+        t = k / n
+        off = amplitude * math.sin(2 * math.pi * t * tours) * min(1.0, t * 4)
+        pts.append((round(debut[0] + ux * L * t + vx * off, 1), round(debut[1] + uy * L * t + vy * off, 1)))
+    return pts
+
+
+RIVIERE_SERPENTE = [(0, 36), (4, 32), (8, 27), (10.5, 22), (15, 17.5), (18, 12), (15, 6.5), (13, 1), (14.5, -4.5), (17, -9),
+                    (15, -14), (10, -18), (4, -21.5), (-4, -21)] + _queue_serpentine()
+
+
+def serpente():
+    """Bascule le module sur la rivière serpentine ; gués au point de la rivière le plus proche de chaque maison de la
+    rive est (druide, forge, mécano), ponts là où la rivière coupe le sentier est (y = 0) et le sentier sud (x = 0)."""
+    global RIVIERE, RIVIERE_DENSE, GUES, GUE, PONTS
+    RIVIERE = RIVIERE_SERPENTE
+    RIVIERE_DENSE = riviere_dense()
+    GUES = []
+    for nom in ("Druide", "Forge", "Mecano"):
+        cx, cy = BATIMENTS[nom]["c"]
+        GUES.append(min(RIVIERE_DENSE, key=lambda p: math.hypot(p[0] - cx, p[1] - cy)))
+    GUE = GUES[-1]
+    est = min((p for p in RIVIERE_DENSE if p[0] > 5), key=lambda p: abs(p[1]))
+    sud = min((p for p in RIVIERE_DENSE if p[1] < -10), key=lambda p: abs(p[0]))
+    i = RIVIERE_DENSE.index(sud)
+    a, b = RIVIERE_DENSE[max(0, i - 3)], RIVIERE_DENSE[min(len(RIVIERE_DENSE) - 1, i + 3)]
+    lacet = math.degrees(math.atan2(b[1] - a[1], b[0] - a[0])) + 90       # tablier en travers de la rivière
+    PONTS = [(est, 0), (sud, lacet)]
+
+
 if __name__ == "__main__":
+    if "--serpente" in sys.argv:
+        serpente()
     os.makedirs(SORTIE, exist_ok=True)
-    plan().save(os.path.join(SORTIE, "plan-village.png"))
-    plan(legendes=False).save(os.path.join(SORTIE, "plan-village-muet.png"))
-    facades().save(os.path.join(SORTIE, "facades.png"))
-    facades(legendes=False).save(os.path.join(SORTIE, "facades-muet.png"))
+    suffixe = "-serpente" if "--serpente" in sys.argv else ""
+    plan().save(os.path.join(SORTIE, "plan-village" + suffixe + ".png"))
+    plan(legendes=False).save(os.path.join(SORTIE, "plan-village" + suffixe + "-muet.png"))
+    if not suffixe:
+        facades().save(os.path.join(SORTIE, "facades.png"))
+        facades(legendes=False).save(os.path.join(SORTIE, "facades-muet.png"))
     for l in verifier():
         print(l)
