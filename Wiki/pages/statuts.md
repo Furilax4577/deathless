@@ -8,7 +8,7 @@ On voit les statuts **au-dessus des ennemis affectés**, **dans le HUD** près d
 
 | | Statut | Effet | Durée | Posé par | Nouveau coup |
 |---|---|---|---|---|---|
-| {icone statut_brulure} | **Brûlure** | 5 dégâts par seconde | 3 s | Boule de feu et cône de flammes du [Mage](classe-mage.md) | La durée repart de zéro, pas de cumul |
+| {icone statut_brulure} | **Brûlure** (en paliers, {décidé, 30/09/2026}) | 5, 8 puis 12 dégâts par seconde selon le palier (1 à 3, **3 au plus** {décidé, 01/10/2026}) {à équilibrer} | Au moins 3 s après le dernier coup de feu, plus longue aux paliers hauts (le temps de redescendre) | Boule de feu et cône de flammes du [Mage](classe-mage.md) | Remplit la jauge de brûlure ; pleine, la brûlure monte d'un palier (voir [Brûlure en paliers](#brûlure-en-paliers)) |
 | {icone statut_ralenti} | **Ralenti** | Déplacements ralentis de 40 % | 3 s après une chute ; tant qu'on est dans l'eau du donjon | Une chute de haut (voir plus bas), l'eau du donjon, le Fend-sol de Morgrim martache (voir [Ennemis](ennemis.md)) | La fin la plus lointaine l'emporte ; le ralentissement le plus fort compte |
 | {icone statut_etourdi} | **Étourdi** | Ni déplacement ni attaque | Charge bélier : 2,5 s pour la cible, 0,6 s pour les ennemis repoussés ; parade : 1 s ; parade parfaite : 0,8 s pour les ennemis repoussés par le coup de bouclier ; saut percutant : 1 s ; garde brisée (héros) : 0,8 s ; moitié moins pour le mini-boss | [Paladin](classe-paladin.md), [Viking](classe-viking.md), la garde brisée d'un héros | La fin la plus lointaine l'emporte |
 | {icone statut_ivresse} | **Ivresse** | La vue tangue et la démarche hésite ; attaques et visée inchangées | Bière : 8 s ; tournée : 15 s | La [taverne](village.md#taverne) | La fin la plus lointaine l'emporte |
@@ -19,7 +19,21 @@ On voit les statuts **au-dessus des ennemis affectés**, **dans le HUD** près d
 
 Les durées et les intensités sont {à équilibrer}. L'ivresse, la Peau de fer et Galvanisé ne sont pas des afflictions : leur case a un liseré or, les autres un liseré rouge.
 
-{dev} Code : `Assets/Scripts/Jeu/Statuts/` (`Statuts` : un composant par personnage ; `CatalogueStatuts` : nom, icône, règle et effet de chaque type). Valeurs dans `GameBalance` (`brulureDegats`, `brulureDuree`, `chute*`, `chargeEtourdi*`, `paradeEtourdi`, `paradeParfaiteEtourdi`, `sautEtourdi`, `gardeBriseeEtourdi`, `ivresseBiere`, `ivresseTournee`, `rugissementProvocation`, `renverse*`, `peauDeFerReduction`, `peauDeFerDuree`, `arcEtourdiPleineCharge`, `nueeRalenti*`, `morgrimCri*`). Icônes `statut_*` générées par `ArtSources/Icones/generer_statuts.py`. Galvanisé agit dans `Sante.Encaisser` (d'après le squelette source du coup) et dans `Statuts.FacteurVitesse`. Peau de fer agit dans `Sante.absorbeur` du héros (`Heros.Absorber`) ; en réseau, `StatutsReseau.Valider` l'accepte sur son propre héros avec les valeurs de l'hôte. Depuis le 27/09/2026, la flèche à pleine charge du [Rôdeur](classe-rodeur.md) pose Étourdi (1 s) et la zone de sa nuée pose Ralenti (40 % tant qu'on y reste).
+{dev} Code : `Assets/Scripts/Jeu/Statuts/` (`Statuts` : un composant par personnage ; `CatalogueStatuts` : nom, icône, règle et effet de chaque type). Valeurs dans `GameBalance` (`brulureDegatsPaliers`, `brulureRemplissage*`, `brulureDelaiDescente`, `brulureVitesseDescente`, `brulureDuree`, `chute*`, `chargeEtourdi*`, `paradeEtourdi`, `paradeParfaiteEtourdi`, `sautEtourdi`, `gardeBriseeEtourdi`, `ivresseBiere`, `ivresseTournee`, `rugissementProvocation`, `renverse*`, `peauDeFerReduction`, `peauDeFerDuree`, `arcEtourdiPleineCharge`, `nueeRalenti*`, `morgrimCri*`). Icônes `statut_*` générées par `ArtSources/Icones/generer_statuts.py`. Galvanisé agit dans `Sante.Encaisser` (d'après le squelette source du coup) et dans `Statuts.FacteurVitesse`. Peau de fer agit dans `Sante.absorbeur` du héros (`Heros.Absorber`) ; en réseau, `StatutsReseau.Valider` l'accepte sur son propre héros avec les valeurs de l'hôte. Depuis le 27/09/2026, la flèche à pleine charge du [Rôdeur](classe-rodeur.md) pose Étourdi (1 s) et la zone de sa nuée pose Ralenti (40 % tant qu'on y reste).
+
+## Brûlure en paliers {décidé, 30/09/2026}
+
+La brûlure se cumule : plus on brûle un ennemi, plus il brûle fort.
+
+- **Jauge de brûlure** : chaque coup de feu la remplit. Un tic du cône de flammes (4 par seconde) ajoute **15 %** ; la boule de feu ajoute **40 %** à chaque ennemi touché (coup direct ou explosion) {à équilibrer}.
+- **Monter d'un palier** : au-delà de 100 %, la brûlure passe au palier suivant et la jauge repart du dépassement (110 % → palier suivant, jauge à 10 %), ainsi de suite jusqu'au **palier 4**, le plafond {à équilibrer}. Au plafond, la jauge reste pleine.
+- **Dégâts par palier** : 5, 8 puis 12 dégâts par seconde {à équilibrer} ; **3 paliers au plus** {décidé, 01/10/2026}.
+- **Redescendre** : sans feu reçu pendant **1 s**, la jauge baisse de **75 % par seconde** (un palier en 1,3 s environ) {à équilibrer} ; arrivée à 0, la brûlure descend d'un palier et la jauge repart pleine, ainsi de suite jusqu'au palier 1. La brûlure s'éteint au palier 1 vide, et jamais moins de **3 s** après le dernier coup de feu.
+- Au cône seul, il faut environ 1,7 s pour passer au palier 2 et environ 3 s pour atteindre le palier 3 ; depuis le palier 3, la brûlure s'éteint environ 5 s après le dernier coup de feu.
+- **Lisibilité** : sur l'icône de Brûlure (au-dessus de l'ennemi, dans le HUD, sur la barre d'un boss), une pastille donne le **chiffre du palier** et la petite jauge du bas devient la **jauge de brûlure**, orange feu. Les flammèches sur l'ennemi sont plus fournies et plus grosses à chaque palier, et le crépitement plus fort.
+- **Multijoueur** : l'hôte décide (dégâts, paliers) ; les autres joueurs voient le même palier et la même jauge.
+
+{{dev: `Brulure.Attiser` (montée) et `Brulure.Etat` (redescente calculée à partir de l'instantané du dernier coup de feu : champs `palier`, `jauge`, `descente` du `Statut`), `Statuts.AttiserBrulure` (un client cumule ses remplissages et les envoie à l'hôte au plus toutes les 0,4 s), `StatutReseau` (palier, jauge et début de la redescente en temps serveur : rien n'est envoyé pendant la redescente). Pastille et jauge : `CaseStatut` (`HudStatuts.cs`, classes `statut__palier`, `statut__jauge--cumul` de `Hud.uss`). Valeurs : `GameBalance.brulureDegatsPaliers` (le nombre d'entrées fixe le plafond), `brulureRemplissageCone`, `brulureRemplissageBoule`, `brulureDelaiDescente`, `brulureVitesseDescente`, `brulureDuree`.}}
 
 ## Chute {décidé}
 
@@ -56,7 +70,7 @@ Durées {à équilibrer} (`GameBalance` : `renverseChuteDuree`, `renverseAuSolDu
 
 ## Où les voir
 
-- **Au-dessus des ennemis** : une rangée de petites icônes au-dessus de la tête de chaque ennemi affecté, avec une jauge de durée discrète sous chaque icône. Elle n'apparaît que tant qu'il est affecté, s'il est à l'écran et à moins de 30 m.
+- **Au-dessus des ennemis** : une rangée de petites icônes au-dessus de la tête de chaque ennemi affecté, avec une jauge de durée discrète sous chaque icône (pour la Brûlure : le chiffre du palier et la jauge de brûlure). Elle n'apparaît que tant qu'il est affecté, s'il est à l'écran et à moins de 30 m.
 - **HUD du joueur** : en bas à gauche, au-dessus du portrait et des barres, une case par statut : icône, jauge de durée et secondes restantes.
 - **Menu du personnage** (Tab, Y, Triangle) : section « Afflictions ». Survoler un statut à la souris, ou le sélectionner à la manette, affiche son nom, son effet, sa durée restante et sa source.
 

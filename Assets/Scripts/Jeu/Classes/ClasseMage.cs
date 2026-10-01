@@ -119,7 +119,7 @@ namespace Deathless.Jeu
         {
             float reel = H.Frapper(s, degats, false, point, dir, true);
             if (reel > 0f) m_Mana = Mathf.Min(B.manaMax, m_Mana + B.manaParTouche);   // wiki : bonus par ennemi touché
-            Brulure.Allumer(s, H);
+            Brulure.Allumer(s, H, B.brulureRemplissageBoule);   // brûlure en paliers : la boule remplit beaucoup d'un coup
         }
 
         public override void Temps(float dt)
@@ -155,7 +155,7 @@ namespace Deathless.Jeu
                         foreach (var s in Cibles(o, H.AvantCamera, b.conePortee, b.coneDemiAngle))
                         {
                             H.Frapper(s, b.coneDegats * 0.25f, false, s.transform.position + Vector3.up, H.AvantCamera, false, true);
-                            Brulure.Allumer(s, H);
+                            Brulure.Allumer(s, H, b.brulureRemplissageCone);   // chaque tic remplit la jauge de brûlure
                         }
                     }
                     if (!tenu || m_Mana <= 0f) ArreterCone();

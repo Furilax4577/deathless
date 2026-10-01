@@ -25,8 +25,15 @@ namespace Deathless.Jeu
         {
             new DefinitionStatut
             {
+                // Brûlure en paliers (30/09/2026) : cumul propre (Statuts.AttiserBrulure, Brulure.Attiser) ; la règle ne sert
+                // que si un statut Brûlure est posé par Statuts.Ajouter.
                 type = TypeStatut.Brulure, id = "brulure", nom = "Brûlure", icone = "statut_brulure", regle = RegleCumul.Rafraichir,
-                effet = s => Mathf.RoundToInt(s.intensite) + " dégâts par seconde. Chaque nouveau coup de feu relance la durée.",
+                effet = s =>
+                {
+                    int p = Mathf.Max(1, s.PalierCourant);
+                    return "Palier " + p + " sur " + Brulure.PalierMax + " : " + Mathf.RoundToInt(Brulure.Degats(p)) + " dégâts par seconde. "
+                        + "Chaque coup de feu remplit la jauge ; pleine, la brûlure monte d’un palier. Sans feu, elle redescend palier par palier.";
+                },
             },
             new DefinitionStatut
             {

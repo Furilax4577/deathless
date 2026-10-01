@@ -20,6 +20,10 @@ namespace Deathless.UI.Donnees
         float Duree { get; }
         /// Affliction (liseré rouge) ou bienfait (liseré or).
         bool Nefaste { get; }
+        /// Palier d'un statut qui se cumule (Brûlure : 1 au plafond, chiffre sur l'icône) ; 0 : sans palier.
+        int Palier { get; }
+        /// Jauge de cumul vers le palier suivant (0 à 1, Brûlure), montrée à la place de la jauge de durée ; négatif : aucune.
+        float Jauge { get; }
     }
 
     /// Un ennemi affecté par au moins un statut.

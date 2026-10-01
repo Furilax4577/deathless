@@ -130,6 +130,26 @@ namespace Deathless.Jeu
         public float rayonContactNyxessa = 3.2f;
         [Tooltip("Rayon des places autour de Nyxessa (m).")]
         public float rayonPlacesNyxessa = 2.4f;
+        [Header("Trajets variés vers Nyxessa (wiki : ennemis.md, Comportement ; décidé 30/09/2026, chiffres à équilibrer)")]
+        [Tooltip("01/10/2026 : nombre de couloirs par clairière (sbires, guerriers, voleurs). À sa sortie de terre, chaque squelette en tire un : " +
+                 "point de passage à mi-trajet, décalé sur le côté de l'axe clairière → Nyxessa. 1 = tous sur l'axe (comportement d'avant).")]
+        public int trajetCouloirs = 3;
+        [Tooltip("01/10/2026 : écart latéral (m) entre les couloirs extrêmes, au point de passage (couloirs régulièrement répartis sur cette largeur).")]
+        public float trajetLargeur = 22f;
+        [Tooltip("01/10/2026 : flou (m) autour du point de passage de chaque squelette (le long de l'axe et sur le côté) : la file se défait.")]
+        public float trajetFlou = 3f;
+        [Tooltip("01/10/2026 : position du point de passage sur l'axe (part du trajet, tirée entre x et y).")]
+        public Vector2 trajetPartPassage = new Vector2(0.4f, 0.6f);
+        [Tooltip("01/10/2026 : allongement maximal du chemin par le point de passage (part du chemin direct sur le NavMesh). " +
+                 "Au-delà (rivière, forêt), le couloir est resserré, puis abandonné.")]
+        public float trajetDetourMax = 0.12f;
+        [Tooltip("01/10/2026 : pas de point de passage si la sortie de terre est à moins de ce nombre de m de Nyxessa (invocations du Nécromancien).")]
+        public float trajetDistanceMin = 25f;
+        [Tooltip("01/10/2026 : écart de vitesse de marche par individu (± part du pas de base, tiré à la sortie de terre ; la course n'est pas touchée).")]
+        public float trajetEcartVitesse = 0.08f;
+        [Tooltip("01/10/2026 : angle (degrés, ±) des places d'arrivée autour de Nyxessa, de part et d'autre de la direction d'approche " +
+                 "(décalé du côté du couloir) : ils n'arrivent pas tous au même point de la paroi du bouclier. Avant : 35.")]
+        public float trajetAngleArrivee = 55f;
         [Tooltip("Vitesse de lecture du clip de sortie de terre.")]
         public float vitesseSortieDeTerre = 1.5f;
         [Tooltip("Échelle des personnages Rig_Medium (Knight, squelettes) : 2 m environ.")]
@@ -510,8 +530,20 @@ namespace Deathless.Jeu
         public float conePortee = 6f;
         public float coneDemiAngle = 20f;
         public float coneVitesse = 0.4f;
+        [Tooltip("Brûlure : dégâts par seconde si brulureDegatsPaliers est vide (sinon le palier 1 de la liste fait foi, 01/10/2026).")]
         public float brulureDegats = 5f;
+        [Tooltip("Brûlure : durée minimale (s) après le dernier coup de feu ; plus longue aux paliers hauts, le temps de redescendre (01/10/2026).")]
         public float brulureDuree = 3f;
+        [Tooltip("Brûlure en paliers (décidé le 30/09/2026, chiffres du 01/10/2026 à équilibrer) : dégâts par seconde de chaque palier, du 1 au plafond (le nombre d'entrées est le plafond ; 3 paliers au plus, décidé par Quentin le 01/10/2026).")]
+        public float[] brulureDegatsPaliers = { 5f, 8f, 12f };
+        [Tooltip("Brûlure en paliers (01/10/2026, à équilibrer) : part de jauge remplie par chaque tic du cône de flammes (4 tics par seconde ; 1 = un palier).")]
+        public float brulureRemplissageCone = 0.15f;
+        [Tooltip("Brûlure en paliers (01/10/2026, à équilibrer) : part de jauge remplie par la boule de feu (coup direct ou explosion), par ennemi touché.")]
+        public float brulureRemplissageBoule = 0.4f;
+        [Tooltip("Brûlure en paliers (01/10/2026, à équilibrer) : délai sans feu reçu (s) avant que la jauge ne baisse.")]
+        public float brulureDelaiDescente = 1f;
+        [Tooltip("Brûlure en paliers (01/10/2026, à équilibrer) : vitesse de redescente (jauge par seconde ; 0,75 : un palier en 1,3 s).")]
+        public float brulureVitesseDescente = 0.75f;
 
         [Header("Projectiles (wiki classes.md : vitesse et pesanteur)")]
         [Tooltip("Pesanteur des flèches et carreaux (m/s², réelle : 9,81).")]

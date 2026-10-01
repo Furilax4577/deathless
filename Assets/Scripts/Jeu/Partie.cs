@@ -555,7 +555,20 @@ namespace Deathless.Jeu
                 {
                     case Phase.Jour: Passer(Phase.Crepuscule); break;
                     case Phase.Crepuscule: Passer(Phase.Nuit); break;
-                    case Phase.Nuit: Passer(Phase.Aube); break;
+                    case Phase.Nuit:
+                        // Décision du 30/09/2026 : le jour ne se lève que quand le boss de la nuit (Morgrim nuit 10,
+                        // Nyxar nuit 12) est mort ; d'ici là, la nuit se prolonge, chrono figé à 0:00.
+                        var dv = DirecteurVagues.Instance;
+                        if (dv != null && dv.BossAttendu(out var boss))
+                        {
+                            if (!Etat.aubeRetenue) Journal("Temps de la nuit écoulé : l'aube attend la chute de " + NomBoss(boss));
+                            Etat.aubeRetenue = true;
+                            Etat.bossAttendu = boss;
+                            Etat.tempsPhase = Etat.dureePhase;
+                            dv.DebloquerBoss(Time.deltaTime);
+                        }
+                        else Passer(Phase.Aube);
+                        break;
                     case Phase.Aube:
                         if (Etat.nuit >= B.nuitsPourGagner) Terminer(Resultat.Victoire);
                         else { Etat.nuit++; Passer(Phase.Jour); }
@@ -593,6 +606,10 @@ namespace Deathless.Jeu
             if (r.TempsPhase.Value != m_TempsHote) { m_TempsHote = r.TempsPhase.Value; Etat.tempsPhase = m_TempsHote; Etat.duree = r.Duree.Value; }
             else { Etat.tempsPhase += dt; Etat.duree += dt; }
             Etat.dureePhase = r.DureePhase.Value;
+            // L'aube attend la chute du boss (hôte) : même message ici, chrono figé à 0:00.
+            byte attente = r.AubeAttend.Value;
+            Etat.aubeRetenue = attente != 0 && Etat.phase == Phase.Nuit;
+            if (Etat.aubeRetenue) { Etat.bossAttendu = (TypeEnnemi)(attente - 1); Etat.tempsPhase = Mathf.Min(Etat.tempsPhase, Etat.dureePhase); }
             Etat.comptePret = r.ComptePret.Value;
             Etat.orEquipe = r.OrEquipe.Value;
             Etat.nyxessa.palierMissiles = r.PalierMissiles.Value;
@@ -682,6 +699,7 @@ namespace Deathless.Jeu
             Etat.phase = nouvelle;
             Etat.tempsPhase = 0f;
             Etat.dureePhase = B.Duree(nouvelle);
+            Etat.aubeRetenue = false;
             if (nouvelle == Phase.Jour)
             {
                 m_AlerteDonnee = false;
@@ -731,6 +749,29 @@ namespace Deathless.Jeu
             Etat.nuit = Mathf.Clamp(nuit, 1, B.nuitsPourGagner);
             Passer(p);
         }
+
+        // ----------------------------------------------------------------- Boss de la nuit (30/09/2026)
+
+        /// Un boss de la nuit sort de terre (tous les postes) : bannière du HUD.
+        public event Action<TypeEnnemi> BossSurgi;
+
+        public static string NomBoss(TypeEnnemi t) => t == TypeEnnemi.Necromancien ? "Nyxar" : "Morgrim";
+
+        /// Annonce de la sortie du boss de la nuit (DirecteurVagues : sortie chez l'hôte, arrivée de la marionnette chez
+        /// un client) : cri du boss, message du HUD et bannière ; une fois par nuit et par poste.
+        public void SignalerBoss(TypeEnnemi t)
+        {
+            if (m_BossAnnonce == Etat.nuit) return;
+            m_BossAnnonce = Etat.nuit;
+            AudioBank.Jouer2D(t == TypeEnnemi.Necromancien ? SonsDuJeu.NyxarEnrage : SonsDuJeu.MorgrimCri, 0.9f);
+            DonjonJeu.Instance?.Annoncer(t == TypeEnnemi.Necromancien
+                ? "Nyxar, le Nécromancien, sort de terre : l’aube attendra sa chute."
+                : "Morgrim, le Roi des os, sort de terre : l’aube attendra sa chute.", 7f);
+            Journal("Boss annoncé : " + NomBoss(t) + " (nuit " + Etat.nuit + ")");
+            BossSurgi?.Invoke(t);
+        }
+
+        int m_BossAnnonce = -1;
 
         // ----------------------------------------------------------------- Nyxessa
 

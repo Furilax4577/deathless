@@ -104,6 +104,10 @@ Cette interface est enregistrée dans `DonneesUI.Donjon` et implémentée par `D
 - **`AvantRappel`** : s'il vaut 0 ou plus et que le joueur est au donjon, une alerte rouge pulsée s'affiche (`donjon-alerte`), avec le texte « Le portail se ferme dans N s : rentrez au village ! ». Elle remplace l'alerte de la tombée de la nuit.
 - **`Message`** : une pastille (`donjon-message`) affiche par exemple « 140 or versés à la caisse commune » ou « Rappelé par Nyxessa : 88 or gardés, 132 perdus ».
 
+### Boss de la nuit : `IEtatBoss` (`Donnees/IEtatBoss.cs`, 01/10/2026)
+
+Interface facultative, comme `IEtatMissiles` (`DonneesUI.Partie as IEtatBoss`) : `AubeAttend` (nom du boss dont l'aube attend la chute, `null` sinon) remplace le compte à rebours de la nuit par « Nuit 10 · l’aube attend la chute de Morgrim » ; `BossSurgit(nom)` montre la bannière à son nom (« MORGRIM », « NYXAR »), comme « NUIT N ». Implémentée par `HudPresenter` ; sans elle, le HUD garde le compte à rebours (à 0:00).
+
 ### Missiles de Nyxessa : `IEtatMissiles` (`Donnees/IEtatMissiles.cs`, 26/09/2026)
 
 Interface facultative, à implémenter par l'objet enregistré comme `IEtatPartie` (le HUD la trouve par `DonneesUI.Partie as IEtatMissiles`). Sans elle, ou avec `MissilesMax = 0`, le compteur est masqué. Implémentée par `HudPresenter` (jeu) et `EtatFactice` (banc).
@@ -133,7 +137,7 @@ Posée par le jeu dans `DonneesUI.Statuts` (`Deathless.Jeu.StatutsUI`, créée p
 
 | Membre | Sens |
 |---|---|
-| `StatutsJoueur` | Statuts du joueur local (`IStatutAffiche` : `Nom`, `Icone` « statut_<id> », `Effet` en clair avec ses valeurs, `Source`, `Restant` en s ou négatif sans durée, `Duree`, `Nefaste`). L'eau du donjon y figure comme un « Ralenti » sans durée. |
+| `StatutsJoueur` | Statuts du joueur local (`IStatutAffiche` : `Nom`, `Icone` « statut_<id> », `Effet` en clair avec ses valeurs, `Source`, `Restant` en s ou négatif sans durée, `Duree`, `Nefaste`, et depuis le 01/10/2026 `Palier` (Brûlure : 1 à 4, pastille sur l'icône ; 0 sinon) et `Jauge` (jauge de cumul 0 à 1 montrée à la place de la jauge de durée ; négatif sinon)). L'eau du donjon y figure comme un « Ralenti » sans durée. |
 | `EnnemisAffectes` | Ennemis vivants avec au moins un statut (`IEnnemiAffecte` : `PositionTete` au-dessus du crâne, `Visible` si ses rendus sont affichés, `Statuts`). |
 
 - **HUD** (`Ecrans/HudStatuts.cs`, classe à part : `EcranHud` ne fait que la créer et l'appeler) :

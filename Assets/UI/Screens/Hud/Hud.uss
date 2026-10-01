@@ -517,6 +517,27 @@
 .statut--petit { width: 36px; height: 36px; margin: 0 2px; border-radius: 8px; background-color: rgba(16, 19, 27, 0.78); }
 .statut--petit .statut__icone { left: 3px; top: 2px; right: 3px; bottom: 6px; }
 .statut--petit .statut__jauge { left: 4px; right: 4px; bottom: 2px; height: 3px; border-radius: 2px; }
+/* Brûlure en paliers (01/10/2026) : chiffre du palier en pastille en haut à gauche (couleurs du thème Feu : braise,
+   orange vif, cœur jaune) ; la jauge du bas devient la jauge de cumul, orange feu. */
+.statut__palier {
+    position: absolute;
+    left: -9px;
+    top: -12px;
+    min-width: 27px;
+    height: 27px;
+    margin: 0;
+    padding: 0 4px;
+    border-radius: 14px;
+    border-width: 2px;
+    border-color: #ff610a;
+    background-color: #4a1206;
+    -unity-text-align: middle-center;
+    -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Bold-SDF.asset");
+    font-size: var(--dl-text-caption);
+    color: #ffe666;
+}
+.statut--petit .statut__palier { left: -8px; top: -10px; min-width: 21px; height: 21px; padding: 0 2px; border-radius: 11px; border-width: 1px; font-size: 16px; }
+.statut__jauge--cumul .statut__jauge-remplie { background-color: #ff610a; }
 
 /* ---------- Jauge de parade du paladin (HudParade.cs, 26/09/2026) ----------
    Sous le réticule, seulement quand un coup parable vise le joueur. Impact prévu au bord droit, curseur ivoire qui

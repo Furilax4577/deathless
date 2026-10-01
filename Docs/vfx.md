@@ -249,6 +249,7 @@ Palette : table des `intensiteEmission` par thème dans `Assets/VFX/_Palettes/*.
 ### Flammèches du burn (bac à sable)
 - **Prefab** : `Assets/VFX/BurnFlammeches/BurnFlammeches.prefab`, à parenter au centre de l'ennemi.
 - **API** : trois ParticleSystem bouclés (`Sombre`, `Vif`, `Clair`, `playOnAwake`) : actif = ça brûle ; `Stop()` sur les trois (ou désactiver) à la fin du burn.
+- **Paliers de brûlure** (01/10/2026, `Brulure.Intensifier`) : débit des trois systèmes ×1 / ×1,7 / ×2,5 (3 paliers au plus depuis le 01/10/2026) et taille +14 % par palier au-dessus du 1 ; couleurs inchangées (palette Feu).
 - **Paramètres** : mesh `Flammeche.asset` (tétraèdre, pointe en haut), émission sur un ellipsoïde 1,3 × 2,2 × 1,3 (capsule de 2 m, à adapter à l'ennemi), montée 1 à 2,6 m/s, bruit léger.
 - **Palette** : thème **Feu** (recoloré le 25/09/2026 : sort de feu du mage) — `Sombre` = rouge `#cc1f08`, `Vif` = orange `#ff610a`, `Clair` = jaune `#ffe666` (URP Lit, par l'outil Appliquer les palettes).
 

@@ -48,7 +48,7 @@ Les gestes joués en jeu pour chaque action, dans l'ordre où ils s'enchaînent.
 
 - Bâton. L'attaque de base est une **boule de feu** qui explose à l'impact, puis laisse une fumée à facettes qui se dissipe {effet validé}.
 - **Cône de flammes** maintenu devant le mage {effet validé}.
-- **Brûlure** : les ennemis touchés brûlent pendant un moment {effet validé}. C'est un [statut](statuts.md) : son icône s'affiche au-dessus de l'ennemi, et chaque nouveau coup de feu relance sa durée.
+- **Brûlure** : les ennemis touchés brûlent pendant un moment {effet validé}. C'est un [statut](statuts.md) : son icône s'affiche au-dessus de l'ennemi. Elle **se cumule en paliers** {décidé, 30/09/2026} : chaque coup de feu remplit la jauge de brûlure de l'ennemi, pleine elle monte d'un palier (jusqu'à 4), et sans feu elle redescend palier par palier (voir [Brûlure en paliers](statuts.md#brûlure-en-paliers)).
 - **Mana** {décidé} : jauge de 100. Elle remonte d'environ 1 par seconde, plus un bonus à chaque ennemi touché par la boule de feu. Les compétences coûtent du mana ; le cône de flammes en consomme tant qu'il est maintenu. Valeurs {à équilibrer}.
   - **Pas de régénération pendant le cône** : le mana ne remonte pas tant que le cône est maintenu.
   - **Démarrage du cône** : il faut au moins 25 % de son coût par seconde, soit 3,5 de mana, pour le lancer.
@@ -62,5 +62,5 @@ Les gestes joués en jeu pour chaque action, dans l'ordre où ils s'enchaînent.
 | Boule de feu | 25 dégâts à la cible touchée, 15 aux autres ennemis dans un rayon de 2 m (la cible touchée ne prend pas les 15 en plus) ; une toutes les 0,9 s |
 | Mana | +4 par ennemi touché par la boule de feu |
 | Cône de flammes | 22 dégâts par seconde, 14 mana par seconde |
-| Brûlure | 5 dégâts par seconde pendant 3 s |
+| Brûlure | 5, 8 puis 12 dégâts par seconde selon le palier (1 à 3, 3 au plus) ; jauge : +15 % par tic du cône, +40 % par boule ; redescente après 1 s sans feu, 75 % de jauge par seconde ; au moins 3 s après le dernier coup de feu |
 

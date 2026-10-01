@@ -63,6 +63,7 @@ namespace Deathless.UI.Ecrans
         /// (chaînes allouées) qu'au changement de la valeur affichée.
         PhasePartie m_PhaseTexte = (PhasePartie)(-1);
         int m_SecondesTexte = -1, m_NuitTexte = -1;
+        string m_AubeTexte;
         int m_BouclierAffiche = -1, m_PretsAffiches = -1, m_TotalAffiche = -1, m_AlerteNuitAffichee = int.MinValue;
         int m_OrAffiche = int.MinValue, m_MissilesNombreAffiche = -1, m_MissilesMaxAffiche = -1;
         int m_VieAffichee = int.MinValue, m_MortAffichee = int.MinValue, m_OrPorteAffiche = int.MinValue;
@@ -220,12 +221,14 @@ namespace Deathless.UI.Ecrans
             {
                 m_Partie.NuitCommencee -= OnNuit;
                 m_Partie.NyxessaFrappee -= OnFrappee;
+                if (m_Partie is IEtatBoss bossAvant) bossAvant.BossSurgit -= OnBoss;
             }
             m_Partie = partie;
             if (m_Partie != null)
             {
                 m_Partie.NuitCommencee += OnNuit;
                 m_Partie.NyxessaFrappee += OnFrappee;
+                if (m_Partie is IEtatBoss boss) boss.BossSurgit += OnBoss;
             }
             m_TempsBanniere = -1f;
             m_TempsAttaque = -1f;
@@ -236,6 +239,13 @@ namespace Deathless.UI.Ecrans
         void OnNuit(int nuit)
         {
             m_BanniereTitre.text = "NUIT " + nuit;
+            m_TempsBanniere = 0f;
+        }
+
+        /// Boss de la nuit sorti de terre (IEtatBoss, 30/09/2026) : même bannière que « NUIT N », à son nom.
+        void OnBoss(string nom)
+        {
+            m_BanniereTitre.text = string.IsNullOrEmpty(nom) ? "" : nom.ToUpperInvariant();
             m_TempsBanniere = 0f;
         }
 
@@ -348,16 +358,23 @@ namespace Deathless.UI.Ecrans
             m_Icone.nuit = nuit;
             var secondes = phase == PhasePartie.Jour || phase == PhasePartie.Nuit ? Mathf.Max(0, Mathf.CeilToInt(partie.TempsRestantPhase)) : 0;
             var numeroNuit = partie.NumeroNuit;
-            if (phase != m_PhaseTexte || secondes != m_SecondesTexte || numeroNuit != m_NuitTexte)
+            // Nuit prolongée tant que le boss vit (IEtatBoss, 30/09/2026) : le compte à rebours laisse place au boss attendu.
+            var aubeAttend = phase == PhasePartie.Nuit && partie is IEtatBoss etatBoss ? etatBoss.AubeAttend : null;
+            if (phase != m_PhaseTexte || secondes != m_SecondesTexte || numeroNuit != m_NuitTexte || aubeAttend != m_AubeTexte)
             {
                 m_PhaseTexte = phase;
                 m_SecondesTexte = secondes;
                 m_NuitTexte = numeroNuit;
+                m_AubeTexte = aubeAttend;
                 switch (phase)
                 {
                     case PhasePartie.Jour: m_Temps.text = "Jour · " + Horloge(secondes) + " avant la nuit"; break;
                     case PhasePartie.Crepuscule: m_Temps.text = "Crépuscule · la nuit " + numeroNuit + " tombe"; break;
-                    case PhasePartie.Nuit: m_Temps.text = "Nuit " + numeroNuit + " · " + Horloge(secondes) + " avant l’aube"; break;
+                    case PhasePartie.Nuit:
+                        m_Temps.text = aubeAttend != null
+                            ? "Nuit " + numeroNuit + " · l’aube attend la chute de " + aubeAttend
+                            : "Nuit " + numeroNuit + " · " + Horloge(secondes) + " avant l’aube";
+                        break;
                     case PhasePartie.Aube: m_Temps.text = "Aube · le jour se lève"; break;
                     default: m_Temps.text = ""; break;
                 }

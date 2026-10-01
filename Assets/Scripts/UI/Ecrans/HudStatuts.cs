@@ -6,13 +6,16 @@ using UnityEngine.UIElements;
 namespace Deathless.UI.Ecrans
 {
     /// Case d'un statut : icône (table IconesUI), liseré rouge (affliction) ou or (bienfait), jauge de durée en bas et,
-    /// en grand format, secondes restantes. Sans durée (eau du donjon) : ni jauge ni secondes. Réutilisée d'image en image.
+    /// en grand format, secondes restantes. Sans durée (eau du donjon) : ni jauge ni secondes. Statut qui se cumule en
+    /// paliers (Brûlure, 01/10/2026) : chiffre du palier en pastille en haut à gauche, et la jauge du bas montre la jauge
+    /// de cumul (orange feu) au lieu de la durée. Réutilisée d'image en image.
     public sealed class CaseStatut
     {
         public readonly VisualElement racine;
         readonly VisualElement m_Icone, m_Jauge, m_Remplissage;
-        readonly Label m_Temps;
+        readonly Label m_Temps, m_Palier;
         string m_IconePosee;
+        int m_PalierAffiche;
         /// Clé des secondes affichées (100 + secondes au-dessus d'une seconde, sinon dixièmes) : le texte n'est
         /// reconstruit qu'à son changement (-1 = aucun).
         int m_TempsAffiche = -1;
@@ -32,6 +35,10 @@ namespace Deathless.UI.Ecrans
             m_Jauge.Add(m_Remplissage);
             racine.Add(m_Icone);
             racine.Add(m_Jauge);
+            m_Palier = new Label { pickingMode = PickingMode.Ignore };
+            m_Palier.AddToClassList("statut__palier");
+            m_Palier.style.display = DisplayStyle.None;
+            racine.Add(m_Palier);
             if (!petit)
             {
                 m_Temps = new Label { pickingMode = PickingMode.Ignore };
@@ -49,8 +56,17 @@ namespace Deathless.UI.Ecrans
             }
             racine.EnableInClassList("statut--bienfait", !s.Nefaste);
             bool duree = s.Restant >= 0f && s.Duree > 0f;
-            m_Jauge.style.display = duree ? DisplayStyle.Flex : DisplayStyle.None;
-            if (duree) m_Remplissage.style.width = Length.Percent(Mathf.Clamp01(s.Restant / s.Duree) * 100f);
+            bool cumul = s.Jauge >= 0f;
+            m_Jauge.style.display = duree || cumul ? DisplayStyle.Flex : DisplayStyle.None;
+            m_Jauge.EnableInClassList("statut__jauge--cumul", cumul);
+            if (cumul) m_Remplissage.style.width = Length.Percent(Mathf.Clamp01(s.Jauge) * 100f);
+            else if (duree) m_Remplissage.style.width = Length.Percent(Mathf.Clamp01(s.Restant / s.Duree) * 100f);
+            if (s.Palier != m_PalierAffiche)
+            {
+                m_PalierAffiche = s.Palier;
+                m_Palier.style.display = s.Palier > 0 ? DisplayStyle.Flex : DisplayStyle.None;
+                if (s.Palier > 0) m_Palier.text = s.Palier.ToString();
+            }
             if (m_Temps != null)
             {
                 m_Temps.style.display = duree ? DisplayStyle.Flex : DisplayStyle.None;

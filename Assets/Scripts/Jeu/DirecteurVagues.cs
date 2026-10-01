@@ -9,7 +9,8 @@ namespace Deathless.Jeu
     /// clairières actives, plafond de 60 squelettes (au-delà, PV répartis sur les vivants) ; à l'aube, extinction des
     /// zones et désintégration des squelettes debout. Sbires, guerriers, et depuis le 28/09/2026 voleurs et mages
     /// (lanceurs de crâne) dès la nuit 3 selon GameBalance.partVoleurs / partMages ; les élites sont des guerriers
-    /// renforcés ; Golem (Morgrim) nuit 10, Nécromancien nuit 12.
+    /// renforcés ; Golem (Morgrim) nuit 10, Nécromancien (Nyxar) nuit 12, au début de la dernière vague ; l'aube attend
+    /// leur chute (BossAttendu, 30/09/2026).
     public class DirecteurVagues : MonoBehaviour
     {
         public static DirecteurVagues Instance { get; private set; }
@@ -87,8 +88,62 @@ namespace Deathless.Jeu
         }
 
         /// Client : squelettes tenus par l'hôte (marionnettes), pour les classes et les vues de ce poste.
-        public void AjouterDistant(Squelette s) { if (s != null && !m_Vivants.Contains(s)) m_Vivants.Add(s); }
+        public void AjouterDistant(Squelette s)
+        {
+            if (s == null || m_Vivants.Contains(s)) return;
+            m_Vivants.Add(s);
+            // Boss sorti de terre chez l'hôte la nuit : même annonce ici (bannière, cri, message).
+            if (EstBoss(s.type) && P != null && P.Etat.phase == Phase.Nuit) P.SignalerBoss(s.type);
+        }
+
+        public static bool EstBoss(TypeEnnemi t) => t == TypeEnnemi.Golem || t == TypeEnnemi.Necromancien;
+
+        /// Hôte ou solo : boss de la nuit encore à vaincre, qu'il reste à sortir ou qu'il soit debout. L'aube l'attend
+        /// (Partie.Update, décision du 30/09/2026) : la nuit se prolonge tant qu'il vit.
+        public bool BossAttendu(out TypeEnnemi type)
+        {
+            for (int i = 0; i < m_AFaire.Count; i++)
+                if (EstBoss(m_AFaire[i].type)) { type = m_AFaire[i].type; return true; }
+            for (int i = 0; i < m_Vivants.Count; i++)
+            {
+                var sq = m_Vivants[i];
+                if (sq != null && EstBoss(sq.type) && sq.Vivant && !sq.Gardien && sq.Sante != null && !sq.Sante.Mort) { type = sq.type; return true; }
+            }
+            type = TypeEnnemi.Sbire;
+            return false;
+        }
         public void RetirerDistant(Squelette s) { m_Vivants.Remove(s); }
+
+        Squelette m_BossSuivi;
+        Vector3 m_BossRepere;
+        float m_BossImmobile;
+
+        /// Garde-fou de la nuit prolongée (01/10/2026) : l'aube attend la mort du boss ; un boss coincé (hors du NavMesh,
+        /// ou loin de Nyxessa sans bouger de plus d'1 m pendant 15 s) la retiendrait pour toujours. Il est alors replacé
+        /// sur le NavMesh à 20 m de Nyxessa, de son côté. Appelé par Partie tant que l'aube est retenue (hôte ou solo).
+        public void DebloquerBoss(float dt)
+        {
+            Squelette boss = null;
+            for (int i = 0; i < m_Vivants.Count; i++)
+            {
+                var sq = m_Vivants[i];
+                if (sq != null && EstBoss(sq.type) && sq.Vivant && !sq.Gardien) { boss = sq; break; }
+            }
+            if (boss == null || P == null || P.nyxessa == null) { m_BossSuivi = null; return; }
+            Vector3 pos = boss.transform.position;
+            if (boss != m_BossSuivi || (pos - m_BossRepere).sqrMagnitude > 1f) { m_BossSuivi = boss; m_BossRepere = pos; m_BossImmobile = 0f; }
+            else m_BossImmobile += dt;
+            Vector3 nyx = P.nyxessa.transform.position;
+            Vector3 vers = pos - nyx; vers.y = 0f;
+            bool horsNavMesh = boss.Agent != null && boss.Agent.enabled && !boss.Agent.isOnNavMesh;
+            if (!horsNavMesh && (m_BossImmobile < 15f || vers.magnitude < 25f)) return;
+            Vector3 dir = vers.sqrMagnitude > 0.01f ? vers.normalized : Vector3.forward;
+            if (!NavMesh.SamplePosition(nyx + dir * 20f, out var hit, 8f, NavMesh.AllAreas)) return;
+            if (boss.Agent != null && boss.Agent.enabled) boss.Agent.Warp(hit.position); else boss.transform.position = hit.position;
+            m_BossRepere = hit.position;
+            m_BossImmobile = 0f;
+            P.Journal("Boss coincé pendant la nuit prolongée : replacé à 20 m de Nyxessa");
+        }
 
         /// Hôte dont le réseau est tombé (Partie.ContinuerSeul) : les squelettes détruits avec les objets réseau sont
         /// oubliés (Partie les repose ensuite en local) ; les sorties à venir de la nuit restent prévues.
@@ -143,10 +198,11 @@ namespace Deathless.Jeu
                 int idx = Mathf.Clamp(m_AFaire.Count / 2 + e * 3, 0, m_AFaire.Count - 1);
                 var s = m_AFaire[idx]; s.type = TypeEnnemi.Guerrier; s.elite = true; m_AFaire[idx] = s;
             }
-            // Boss dans la dernière vague.
+            // Boss au début de la dernière vague (décision du 30/09/2026, wiki : deroule.md) : il sort une demi-seconde
+            // après l'impulsion de la vague, parmi les premiers squelettes de cette vague, et l'aube attend sa chute (BossAttendu).
             if (b.bossActives)
             {
-                float dernier = m_Departs[m_Departs.Length - 1] / vit + 1f;
+                float dernier = m_Departs[m_Departs.Length - 1] / vit + 0.5f;
                 int cl = v.clairieresActives[Random.Range(0, v.clairieresActives.Count)];
                 if (nuit == b.nuitGolem)
                 {
@@ -205,7 +261,8 @@ namespace Deathless.Jeu
             {
                 var s = m_AFaire[0];
                 m_AFaire.RemoveAt(0);
-                Poser(s.type, PointDans(s.clairiere), s.elite, true);
+                var pose = Poser(s.type, PointDans(s.clairiere), s.elite, true);
+                if (pose != null && EstBoss(s.type)) P.SignalerBoss(s.type);
             }
             v.restantsASortir = m_AFaire.Count;
             v.ennemisVivants = m_Vivants.Count;

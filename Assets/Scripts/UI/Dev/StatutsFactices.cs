@@ -20,6 +20,9 @@ namespace Deathless.UI.Dev
             /// Décalage dans la boucle ; Duree <= 0 : sans durée.
             public float decalage;
             public float Restant => Duree > 0f ? Duree - Mathf.Repeat(Time.unscaledTime + decalage, Duree) : -1f;
+            /// Brûlure factice en paliers : palier fixe, jauge qui tourne en boucle ; 0 : statut sans palier.
+            public int Palier { get; set; }
+            public float Jauge => Palier > 0 ? Mathf.Repeat(Time.unscaledTime * 0.4f + decalage, 1f) : -1f;
         }
 
         sealed class Ennemi : IEnnemiAffecte
@@ -49,7 +52,7 @@ namespace Deathless.UI.Dev
 
         public StatutsFactices()
         {
-            var brulure = new Statut { Nom = "Brûlure", Icone = "statut_brulure", Effet = "5 dégâts par seconde. Chaque nouveau coup de feu relance la durée.", Source = "Morgane (Mage)", Duree = 3f };
+            var brulure = new Statut { Nom = "Brûlure", Icone = "statut_brulure", Effet = "Palier 2 sur 4 : 8 dégâts par seconde. Chaque coup de feu remplit la jauge ; pleine, la brûlure monte d’un palier. Sans feu, elle redescend palier par palier.", Source = "Morgane (Mage)", Duree = 3f, Palier = 2 };
             var ralenti = new Statut { Nom = "Ralenti", Icone = "statut_ralenti", Effet = "Déplacements ralentis de 40 %.", Source = "Chute", Duree = 6f, decalage = 1.3f };
             var ivresse = new Statut { Nom = "Ivresse", Icone = "statut_ivresse", Effet = "La tête tourne : la vue tangue et la démarche hésite. Attaques et visée inchangées.", Source = "Taverne", Duree = 15f, Nefaste = false, decalage = 4f };
             m_Joueur.Add(brulure);
@@ -57,7 +60,7 @@ namespace Deathless.UI.Dev
             m_Joueur.Add(ivresse);
 
             var e1 = new Ennemi { devant = new Vector3(-2.5f, -0.2f, 9f) };
-            e1.liste.Add(new Statut { Nom = "Brûlure", Icone = "statut_brulure", Effet = "", Source = "Morgane (Mage)", Duree = 3f, decalage = 0.7f });
+            e1.liste.Add(new Statut { Nom = "Brûlure", Icone = "statut_brulure", Effet = "", Source = "Morgane (Mage)", Duree = 3f, decalage = 0.7f, Palier = 3 });
             e1.liste.Add(new Statut { Nom = "Ralenti", Icone = "statut_ralenti", Effet = "", Source = "", Duree = 5f, decalage = 2f });
             var e2 = new Ennemi { devant = new Vector3(3f, 0.3f, 12f) };
             e2.liste.Add(new Statut { Nom = "Étourdi", Icone = "statut_etourdi", Effet = "", Source = "Quentin (Paladin)", Duree = 2.5f });

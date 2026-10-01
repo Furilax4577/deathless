@@ -60,6 +60,8 @@ namespace Deathless.Reseau
         public readonly NetworkVariable<float> DureePhase = new NetworkVariable<float>();
         public readonly NetworkVariable<float> Duree = new NetworkVariable<float>();
         public readonly NetworkVariable<bool> ComptePret = new NetworkVariable<bool>();
+        // Nuit prolongée (30/09/2026) : 0 si l'aube n'attend personne, sinon 1 + TypeEnnemi du boss qu'elle attend.
+        public readonly NetworkVariable<byte> AubeAttend = new NetworkVariable<byte>();
         public readonly NetworkVariable<byte> Resultat = new NetworkVariable<byte>();
         public readonly NetworkVariable<int> NuitAtteinte = new NetworkVariable<int>();
         public readonly NetworkVariable<int> OrEquipe = new NetworkVariable<int>();
@@ -121,6 +123,7 @@ namespace Deathless.Reseau
             Ecrire(Nuit, e.nuit);
             Ecrire(DureePhase, e.dureePhase);
             Ecrire(ComptePret, e.comptePret);
+            Ecrire(AubeAttend, e.aubeRetenue && e.phase == Jeu.Phase.Nuit ? (byte)((int)e.bossAttendu + 1) : (byte)0);
             Ecrire(Resultat, (byte)e.resultat);
             Ecrire(NuitAtteinte, e.nuitAtteinte);
             Ecrire(OrEquipe, e.orEquipe);

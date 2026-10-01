@@ -38,6 +38,8 @@ namespace Deathless.Jeu
             public float Restant { get; set; }
             public float Duree { get; set; }
             public bool Nefaste { get; set; }
+            public int Palier { get; set; }
+            public float Jauge { get; set; }
 
             public void Poser(Statut s)
             {
@@ -48,6 +50,8 @@ namespace Deathless.Jeu
                 Restant = s.Restant;
                 Duree = s.duree;
                 Nefaste = CatalogueStatuts.Nefaste(s.type);
+                Palier = s.PalierCourant;
+                Jauge = s.JaugeCourante;
             }
         }
 

@@ -44,7 +44,7 @@ L'écran rappelle aussi le résultat de l'équipe : victoire ou nuit atteinte, d
 
 ## Victoire {décidé}
 
-La partie est **gagnée en survivant à la nuit 12** et à son boss final, Nyxar, le Nécromancien, à l'aube. Une partie gagnée dure donc 12 cycles, soit environ 50 minutes. La plupart des parties perdues s'arrêtent entre la nuit 8 et la nuit 11.
+La partie est **gagnée en survivant à la nuit 12** et à son boss final, Nyxar, le Nécromancien, à l'aube, qui ne se lève qu'à sa mort. Une partie gagnée dure donc 12 cycles, soit environ 50 minutes. La plupart des parties perdues s'arrêtent entre la nuit 8 et la nuit 11.
 
 ## Le cycle {décidé}
 
@@ -133,6 +133,7 @@ Dans le jeu :
 - **Trajet** : les squelettes mettent environ 20 s pour marcher de leur clairière au village. Chaque vague laisse un temps de combat puis un court répit.
 - **Clairières actives** : une au début, deux à partir de la nuit 3, les trois à partir de la nuit 5. Les clairières actives sont annoncées au crépuscule.
 - **À l'aube** : les squelettes encore debout se désintègrent {effet validé}. L'enjeu est de tenir jusqu'au jour, pas de tout tuer.
+- **Nuits de boss (10 et 12)** {décidé, 30/09/2026} : le boss sort de terre **au début de la dernière vague**, annoncé par une bannière à son nom et son cri. **L'aube attend sa chute** : si le temps de la nuit est écoulé et qu'il vit encore, la nuit se prolonge (l'horloge affiche « l'aube attend la chute de Morgrim » ou « de Nyxar ») ; dès sa mort, le jour se lève et les squelettes restants se désintègrent. À la nuit 12, la mort de Nyxar donne donc la victoire. {{dev: Fait le 01/10/2026 : `DirecteurVagues.BossAttendu` (boss encore à sortir ou debout), `Partie.Update` fige le temps de la nuit tant qu'il vit (`EtatPartie.aubeRetenue`), `PartieReseau.AubeAttend` pour les clients, annonce `Partie.SignalerBoss`, HUD par `IEtatBoss`.}}
 
 ### Montée en difficulté {décidé}
 
@@ -149,9 +150,9 @@ Pour un joueur :
 | 7 | 3 | 34 | Deux élites par nuit |
 | 8 | 3 | 38 | |
 | 9 | 3 | 42 | Quatre vagues, points de vie +10 % |
-| 10 | 3 | 44 | Mini-boss : **Morgrim, le Roi des os** |
+| 10 | 3 | 44 | Mini-boss : **Morgrim, le Roi des os**, au début de la dernière vague ; l'aube attend sa chute {décidé, 30/09/2026} |
 | 11 | 3 | 46 | Points de vie +20 % |
-| 12 | 3 | 48 | Boss final : **Nyxar, le Nécromancien**, victoire à l'aube |
+| 12 | 3 | 48 | Boss final : **Nyxar, le Nécromancien**, au début de la dernière vague ; victoire à l'aube, qui attend sa chute {décidé, 30/09/2026} |
 
 - **Nuits 1 à 5 densifiées** le 28/09/2026 (8/12/16/20/25 → 12/18/22/26/28 : « les premières vagues sont trop molles ») {décidé}.
 - **Nuits 1 à 3** : apprentissage. **Nuits 4 à 7** : pression, pendant qu'on monte les paliers de Nyxessa (un palier toutes les deux nuits environ). **À partir de la nuit 8** : difficile.

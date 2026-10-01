@@ -155,6 +155,14 @@ MonoBehaviour:
   esquiveEnnemiLaterale: 0.7
   rayonContactNyxessa: 3.2
   rayonPlacesNyxessa: 2.4
+  trajetCouloirs: 3
+  trajetLargeur: 22
+  trajetFlou: 3
+  trajetPartPassage: {x: 0.4, y: 0.6}
+  trajetDetourMax: 0.12
+  trajetDistanceMin: 25
+  trajetEcartVitesse: 0.08
+  trajetAngleArrivee: 55
   vitesseSortieDeTerre: 1.5
   echellePersonnages: 0.8
   riposteCoups: 2
@@ -387,6 +395,14 @@ MonoBehaviour:
   coneVitesse: 0.4
   brulureDegats: 5
   brulureDuree: 3
+  brulureDegatsPaliers:
+  - 5
+  - 8
+  - 12
+  brulureRemplissageCone: 0.15
+  brulureRemplissageBoule: 0.4
+  brulureDelaiDescente: 1
+  brulureVitesseDescente: 0.75
   projectileGravite: 9.81
   aideChuteMax: 3
   projectileVolMax: 200

@@ -89,7 +89,7 @@ namespace Deathless.Jeu
         /// Gardien du butin au donjon : il reste à son poste, poursuit les joueurs qui approchent, n'attaque jamais
         /// Nyxessa et ne rapporte pas d'or (le butin du donjon est dans les coffres).
         public bool Gardien { get; private set; }
-        public void Garder(Vector3 poste) { Gardien = true; m_Place = poste; }
+        public void Garder(Vector3 poste) { Gardien = true; m_Place = poste; m_AvecPassage = false; m_FacteurPas = 1f; }
         /// Poste d'un gardien (sa place ; pour les autres, la place autour de Nyxessa).
         public Vector3 Poste => m_Place;
 
@@ -184,10 +184,90 @@ namespace Deathless.Jeu
             Vector3 c = n != null ? n.position : Vector3.zero;
             Vector3 dir = transform.position - c; dir.y = 0f;
             if (dir.sqrMagnitude < 0.01f) dir = Vector3.forward;
-            dir = Quaternion.Euler(0f, UnityEngine.Random.Range(-35f, 35f), 0f) * dir.normalized;
+            // Trajets variés (01/10/2026) : couloir tiré, place d'arrivée décalée du même côté, pas propre à chacun.
+            bool varie = TrajetVarie;
+            int couloirs = Mathf.Max(1, B.trajetCouloirs);
+            int couloir = varie ? UnityEngine.Random.Range(0, couloirs) : 0;
+            float cote = couloirs > 1 ? couloir / (float)(couloirs - 1) * 2f - 1f : 0f;   // -1 … 1
+            float angle = varie ? Mathf.Clamp(cote * B.trajetAngleArrivee * 0.5f + UnityEngine.Random.Range(-0.5f, 0.5f) * B.trajetAngleArrivee, -B.trajetAngleArrivee, B.trajetAngleArrivee)
+                                : UnityEngine.Random.Range(-35f, 35f);
+            // Côté du couloir vu depuis la clairière (droite = +) ; la place est vue depuis Nyxessa : même côté = angle inverse.
+            dir = Quaternion.Euler(0f, -angle, 0f) * dir.normalized;
             m_Place = c + dir * B.rayonPlacesNyxessa;
             if (NavMesh.SamplePosition(m_Place, out var hit, 2f, NavMesh.AllAreas)) m_Place = hit.position;
+            m_FacteurPas = varie ? 1f + UnityEngine.Random.Range(-1f, 1f) * Mathf.Clamp(B.trajetEcartVitesse, 0f, 0.5f) : 1f;
+            m_AvecPassage = varie && ChoisirPassage(cote);
             CommencerSortie();
+        }
+
+        // ----------------------------------------------------------------- Trajets variés (Quentin, 30/09/2026)
+
+        float m_FacteurPas = 1f;
+        Vector3 m_Passage;
+        bool m_AvecPassage;
+        static NavMeshPath s_Chemin;
+
+        /// Tests : point de passage (couloir) de ce squelette vers Nyxessa, s'il en a un et ne l'a pas encore atteint.
+        public bool AvecPassage => m_AvecPassage;
+        public Vector3 Passage => m_Passage;
+        public float FacteurPas => m_FacteurPas;
+
+        /// Sbire, guerrier, voleur (élites compris) en marche vers Nyxessa ; pas les boss, le mage (MajDistance), les gardiens.
+        protected virtual bool TrajetVarie => Agile && !Gardien;
+
+        /// Pas de marche de ce squelette (pas de base × son facteur individuel, en marche seulement).
+        float PasDeBase => m_Stats.vitesse * (m_Etat == Etat.Marche ? m_FacteurPas : 1f);
+
+        static float LongueurChemin(Vector3 a, Vector3 b)
+        {
+            if (s_Chemin == null) s_Chemin = new NavMeshPath();
+            if (!NavMesh.CalculatePath(a, b, NavMesh.AllAreas, s_Chemin) || s_Chemin.status != NavMeshPathStatus.PathComplete) return -1f;
+            var coins = s_Chemin.corners;
+            float l = 0f;
+            for (int i = 1; i < coins.Length; i++) l += Vector3.Distance(coins[i - 1], coins[i]);
+            return l;
+        }
+
+        /// Point de passage sur le couloir `cote` (-1 … 1) : à mi-trajet de l'axe clairière → place, décalé sur le côté, posé
+        /// sur le NavMesh ; refusé si le chemin par lui dépasse le chemin direct de plus de trajetDetourMax (rivière, forêt
+        /// impraticable) : le décalage est alors réduit de moitié, puis abandonné.
+        bool ChoisirPassage(float cote)
+        {
+            Vector3 depart = transform.position;
+            Vector3 axe = m_Place - depart; axe.y = 0f;
+            float d = axe.magnitude;
+            if (d < Mathf.Max(5f, B.trajetDistanceMin)) return false;
+            float direct = LongueurChemin(depart, m_Place);
+            if (direct <= 0f) return false;
+            axe /= d;
+            Vector3 droite = Vector3.Cross(Vector3.up, axe);
+            float part = UnityEngine.Random.Range(B.trajetPartPassage.x, B.trajetPartPassage.y);
+            float flou = B.trajetFlou;
+            float lateral = cote * B.trajetLargeur * 0.5f + UnityEngine.Random.Range(-flou, flou);
+            float long_ = UnityEngine.Random.Range(-flou, flou);
+            for (int essai = 0; essai < 3; essai++)
+            {
+                Vector3 p = depart + axe * (d * part + long_) + droite * lateral;
+                if (NavMesh.SamplePosition(p, out var h, 3f, NavMesh.AllAreas))
+                {
+                    float l1 = LongueurChemin(depart, h.position), l2 = l1 > 0f ? LongueurChemin(h.position, m_Place) : -1f;
+                    if (l2 > 0f && l1 + l2 <= direct * (1f + B.trajetDetourMax)) { m_Passage = h.position; return true; }
+                }
+                lateral *= 0.5f;
+            }
+            return false;
+        }
+
+        /// Destination de la marche : le point de passage tant qu'il n'est pas atteint (ou dépassé, après une poursuite),
+        /// puis la place autour de Nyxessa.
+        Vector3 DestinationMarche()
+        {
+            if (!m_AvecPassage) return m_Place;
+            Vector3 v = m_Passage - transform.position; v.y = 0f;
+            Vector3 c = Nyxessa != null ? Nyxessa.position : m_Place;
+            Vector3 pc = m_Passage - c, sc = transform.position - c; pc.y = 0f; sc.y = 0f;
+            if (v.sqrMagnitude < 9f || sc.sqrMagnitude < pc.sqrMagnitude) m_AvecPassage = false;
+            return m_AvecPassage ? m_Passage : m_Place;
         }
 
         protected virtual void CommencerSortie()
@@ -222,7 +302,7 @@ namespace Deathless.Jeu
             // Eau du donjon (bassin) : ralentit (le NavMesh la contourne déjà quand c'est plus court en temps).
             // Statut Ralenti : même facteur, par-dessus l'eau.
             // Course (30/09/2026) : le pas de base devient une course (VitesseCourse) quand la cible est loin (Court).
-            if (Agent.enabled && m_Stats.vitesse > 0f) Agent.speed = (Court ? VitesseCourse : m_Stats.vitesse) * Deathless.Donjon.ZoneEau.FacteurEn(transform.position + Vector3.up * 0.2f)
+            if (Agent.enabled && m_Stats.vitesse > 0f) Agent.speed = (Court ? VitesseCourse : PasDeBase) * Deathless.Donjon.ZoneEau.FacteurEn(transform.position + Vector3.up * 0.2f)
                 * (Statuts != null ? Statuts.FacteurVitesse : 1f);
             if (animator != null) animator.SetFloat(P_Speed, Agent.enabled && !Agent.isStopped ? VitesseAnimation(Agent.velocity.magnitude) : 0f);
             // Invulnérable au début du bond d'esquive (comme le héros), recalculé à chaque image : rien ne reste bloqué.
@@ -302,7 +382,7 @@ namespace Deathless.Jeu
         /// Paramètre Speed du blend tree : 0 arrêt, 0,5 pas de base (Walking_A), 1 course (Running_A, Squelette_Jeu).
         float VitesseAnimation(float v)
         {
-            float vb = Mathf.Max(0.1f, m_Stats.vitesse);
+            float vb = Mathf.Max(0.1f, PasDeBase);
             if (v <= vb || !Agile) return Mathf.Clamp01(v / vb) * 0.5f;
             float vc = VitesseCourse;
             return vc <= vb + 0.05f ? 0.5f : 0.5f + 0.5f * Mathf.Clamp01((v - vb) / (vc - vb));
@@ -505,7 +585,8 @@ namespace Deathless.Jeu
                 return;
             }
             Agent.isStopped = false;
-            if (!Agent.hasPath || (Agent.destination - m_Place).sqrMagnitude > 0.5f) { Agent.SetDestination(m_Place); OublierDestination(); }
+            Vector3 but = DestinationMarche();
+            if (!Agent.hasPath || (Agent.destination - but).sqrMagnitude > 0.5f) { Agent.SetDestination(but); OublierDestination(); }
         }
 
         Vector3 m_DestinationSuivie;

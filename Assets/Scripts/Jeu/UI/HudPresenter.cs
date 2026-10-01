@@ -9,7 +9,7 @@ namespace Deathless.Jeu
     /// IEtatJoueur, IScoreFin et ICommandesPartie en lisant Partie.Etat (aucune logique de jeu ici) et s'enregistre dans
     /// DonneesUI. Au chargement : commandes seules (menu principal) ; partie lancée : toutes les sources (HUD) ; fin :
     /// Phase = Terminee puis PartieTerminee (écran de score). Gère aussi le curseur (caché et verrouillé en jeu).
-    public class HudPresenter : MonoBehaviour, IEtatPartie, IEtatJoueur, IEtatJoueurClasse, IScoreFin, ICommandesPartie, IClassesJouables, IEtatEquipe, IEtatMissiles
+    public class HudPresenter : MonoBehaviour, IEtatPartie, IEtatJoueur, IEtatJoueurClasse, IScoreFin, ICommandesPartie, IClassesJouables, IEtatEquipe, IEtatMissiles, IEtatBoss
     {
         public static readonly Color TeintePaladin = new Color32(0xd9, 0xb2, 0x64, 0xff);
 
@@ -45,6 +45,7 @@ namespace Deathless.Jeu
             if (P == null) return;
             P.PartieLancee += () => { ConstruireEmplacements(); DonneesUI.Enregistrer(this, this, this, this); };
             P.NuitCommencee += n => NuitCommencee?.Invoke(n);
+            P.BossSurgi += t => BossSurgit?.Invoke(Partie.NomBoss(t));
             P.PointCompetenceGagne += n => AudioBank.Jouer2D(SonsDuJeu.PointGagne, 0.7f);
             P.NyxessaTouchee += (d, p) => NyxessaFrappee?.Invoke();
             P.PartieTerminee += () => PartieTerminee?.Invoke();
@@ -146,6 +147,11 @@ namespace Deathless.Jeu
         public event Action<int> NuitCommencee;
         public event Action NyxessaFrappee;
         public event Action PartieTerminee;
+
+        // ----------------------------------------------------------------- IEtatBoss (boss de la nuit, 30/09/2026)
+
+        public string AubeAttend => P != null && P.Etat.phase == Jeu.Phase.Nuit && P.Etat.aubeRetenue ? Partie.NomBoss(P.Etat.bossAttendu) : null;
+        public event Action<string> BossSurgit;
 
         // ----------------------------------------------------------------- IEtatMissiles (compteur du HUD)
 

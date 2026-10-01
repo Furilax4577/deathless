@@ -82,6 +82,8 @@ namespace Deathless.Jeu
         public int nuit = 1;             // nuit en cours (Nuit, Aube) ou prochaine (Jour, Crépuscule)
         public float duree;              // durée de la partie (s)
         public bool comptePret;          // tous prêts : le jour a été ramené au compte à rebours
+        public bool aubeRetenue;         // temps de la nuit écoulé, l'aube attend la chute du boss (30/09/2026)
+        public TypeEnnemi bossAttendu;   // ce boss (Golem : Morgrim, Necromancien : Nyxar), si aubeRetenue
         public Resultat resultat;
         public int nuitAtteinte;
         public int orEquipe;             // caisse commune (or rapporté du donjon : 0 tant qu'il n'y a pas de donjon)

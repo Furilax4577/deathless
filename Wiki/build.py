@@ -25,6 +25,8 @@
 # grille. Le fichier est copié dans <version>/videos/ (site/ et public/). Dans la version joueur, une partie de légende
 # qui porte {dev} est retirée (ex. le nom technique du clip), et toute la carte si {dev} est dans sa première partie ;
 # une carte {à confirmer} y est retirée comme toute ligne {à confirmer}.
+# Spoil : un bloc entre une ligne {spoil Libellé} et une ligne {/spoil} est replié derrière « Attention, spoil Libellé »
+# (à déplier d'un clic, dans les deux versions) ; ses titres ne vont pas dans le sommaire.
 # Images : une ligne qui commence par {image chemin} (chemin relatif à Wiki/, ex. media/classes/clochard/face.png) devient
 # une carte image carrée (même légende et mêmes règles {dev} / {à confirmer} que les vidéos, un clic ouvre l'image entière) ;
 # les lignes {video} et {image} consécutives forment une même grille. Le fichier est copié dans <version>/images/.
@@ -513,6 +515,20 @@ def convertir(md):
                 i += 1
             out.append('<div class="grille-videos">%s</div>' % "".join(cartes))
             continue
+        ms = re.match(r"^\{spoil\s*([^}]*)\}\s*$", l.strip())
+        if ms:
+            # Bloc replié « Attention, spoil » (01/10/2026, points faibles et phases des boss) : tout jusqu'à {/spoil},
+            # converti à part ; ses titres ne vont pas dans le sommaire (ils trahiraient le contenu).
+            bloc = []
+            i += 1
+            while i < len(lignes) and lignes[i].strip() != "{/spoil}":
+                bloc.append(lignes[i])
+                i += 1
+            i += 1
+            _, _, interieur = convertir(chr(10).join(bloc))
+            out.append('<details class="spoil"><summary><span class="spoil__alerte">Attention, spoil</span> %s</summary>'
+                       '<div class="spoil__corps">%s</div></details>' % (inline(ms.group(1).strip()), interieur))
+            continue
         m = re.match(r"^(#{1,3}) (.+)$", l)
         if m:
             n = len(m.group(1)); txt = m.group(2).strip()
@@ -618,6 +634,10 @@ table.sons audio{display:block;width:210px;height:32px}
 .jauge-kaykit__table{width:100%;border-collapse:collapse}.jauge-kaykit__table td{padding:4px 8px 4px 0;font-size:13px}.jauge-kaykit__table td:first-child{width:11em;color:var(--doux)}
 .jauge{display:flex;align-items:center;gap:8px}.jauge__piste{flex:1;height:10px;border-radius:5px;background:var(--code);overflow:hidden}
 .jauge__remplissage{height:100%;background:var(--wait);border-radius:5px}.jauge__valeur{min-width:4em;font-weight:600}.jauge small{color:var(--doux);font-size:12px}
+.spoil{margin:12px 0 16px;border:1px solid var(--ligne);border-radius:12px;background:var(--surface)}
+.spoil summary{cursor:pointer;padding:10px 14px;font-weight:600;list-style:none}.spoil summary::-webkit-details-marker{display:none}
+.spoil summary::before{content:"B8";display:inline-block;margin-right:8px;transition:transform .15s}.spoil[open] summary::before{transform:rotate(90deg)}
+.spoil__alerte{color:var(--wait);margin-right:6px}.spoil__corps{padding:0 14px 12px}
 @media (max-width:760px){.cadre{grid-template-columns:minmax(0,1fr)}nav{position:static;height:auto;border-right:0;border-bottom:1px solid var(--ligne)}}
 """
 

@@ -50,11 +50,15 @@ Valeurs exactes : {à équilibrer}.
 | 10 | **Morgrim, le Roi des os**, mini-boss (le Golem) | Grand squelette massif, hache géante |
 | 12 | **Nyxar, le Nécromancien**, boss final, ancien possesseur de Nyxessa (voir [L'univers](univers.md)) | Couronne à crâne, robe violette, grimoire, grande faux et faucille, **yeux verts** qui brillent de la force de Nyxessa |
 
+**Apparition** {décidé, 30/09/2026} : le boss sort de terre dans une clairière active **au début de la dernière vague** de sa nuit, annoncé par une bannière à son nom et son cri ; **le jour ne se lève qu'à sa mort** (la nuit se prolonge tant qu'il vit, voir [Déroulé d'une partie](deroule.md)).
+
 Un boss a sa **méga barre de vie dans le HUD**, sous celle de Nyxessa, avec son nom et ses statuts ; elle se déploie à son entrée en scène (voir [Interface](interface.md#barres-de-vie-des-ennemis), 26/09/2026).
 
 ### Morgrim, le Roi des os {décidé}
 
 Colosse très résistant et lent, il marche droit sur Nyxessa. Chaque attaque se prépare longtemps, pour laisser le temps de parer ou d'esquiver. Les deux versions (plus bas) ont ce kit commun, en plus de leurs trois compétences propres :
+
+{spoil son kit et ses deux versions}
 
 - **Balayage** de hache en arc devant lui (200°, 3,8 m {à équilibrer}) : touche tous les joueurs dans l'arc et les repousse un peu ; **parable**. Couleurs de la version (Terre pour la massue, Rage pour la martache).
 - **Coup écrasé** au sol (frappe par-dessus), qui fait une **onde de choc autour de lui** : même règle que le Fracas de la massue (front lent à **sauter**, ni parable ni esquivable ; touché au sol : dégâts et [Renversé](statuts.md)), mais plus courte (7 m/s jusqu'à 8 m {à équilibrer}). Thème **Terre**.
@@ -94,11 +98,15 @@ Coups plus rapides et plus précis que la massue, avec une compétence dédiée 
 
 {dev} **Reporté dans `main` le 26/09/2026** (mêmes chemins et GUID) : `Assets/VFX/Morgrim/` (`MorgrimEffets.cs`, `MorgrimGemmes.mat`), `Assets/Jeu/Materiaux/Yeux_Glace.mat` ; les armes `Skeleton_Mace_Large.fbx` et `Skeleton_Golem_Axe_Large.fbx` étaient déjà présentes dans `main` (pack KayKit Skeletons EXTRA), rien à copier. Comportement en jeu : `Assets/Scripts/Jeu/Ennemis/MorgrimVariant.cs` (base commune : joueurs proches, télégraphie et impact en gemmes), `MorgrimMassue.cs` (Fracas, Tourbillon, Charge écrasante) et `MorgrimMartache.cs` (Fauche, Fend-sol, Coup de brèche), dérivées de `Golem.cs` ; valeurs dans `GameBalance` (préfixes `morgrimMassue*` / `morgrimMartache*`, {à équilibrer}). Deux prefabs `Assets/Jeu/Prefabs/Morgrim_Massue.prefab` et `Morgrim_Martache.prefab`, construits à partir de `Squelette_Golem.prefab` par l'outil relançable `Assets/Editor/Morgrim/MorgrimPrefabBuilder.cs` (menu **Deathless > Jeu > Morgrim**). `DirecteurVagues` tire l'une des deux versions au hasard à la nuit 10 (`prefabMorgrimMassue` / `prefabMorgrimMartache`), tirage fait par l'hôte seul (Docs/reseau.md). « Renversé » (charge écrasante, et l'onde du Fracas non sautée) est le statut [Renversé](statuts.md) (26/09/2026, knockdown complet : chute, au sol, relevé, sans contrôle), plus l'ancien étourdissement court. Le Coup de brèche inflige des dégâts renforcés au [bouclier de Nyxessa](vfx.md) quand il est levé. **Onde du Fracas** (26/09/2026) : `OndeChocLente.cs`, front lent (`GameBalance.morgrimMassueFracasOnde*`), jugement « au sol ou en l'air » fait côté client propriétaire (`Docs/reseau.md`). Depuis le 30/09/2026, l'onde a son propre visuel (anneau de gemmes Terre `AnneauGemmesComp` à front linéaire, calé sur l'heure réseau du départ) au lieu du prefab d'onde du Golem, et sert aussi au Coup écrasé commun. Sons, terre projetée et coups sourds de Morgrim (et du Golem de repli) sont rejoués chez les clients par `EffetsBoss` (`EnnemiReseau.DiffuserEffetBoss`). Prefabs `Morgrim_Massue` et `Morgrim_Martache` générés et câblés dans `Assets/Scenes/Village.unity` (champs `prefabMorgrimMassue` / `prefabMorgrimMartache` de `DirecteurVagues`) ; vérification en Play : à confirmer par Quentin.
 
+{/spoil}
+
 Points de vie et dégâts : {à équilibrer}.
 
 ### Nyxar, le Nécromancien {décidé}
 
 Invocateur qui combat à distance :
+
+{spoil ses points faibles et ses phases}
 
 - il **garde ses distances** (entre 12 et 18 m) et **se téléporte** quand on l'approche (un joueur à moins de 5 m ; il réapparaît de 11 à 16 m plus loin, loin des joueurs, sans s'éloigner à plus de 26 m de Nyxessa ; recharge 9 s ; tout {à équilibrer}) : gemmes vertes aspirées à son départ, jaillissantes à son arrivée ;
 - il tire des **salves de crânes** : 3 crânes à 0,3 s d'écart, toutes les 3 s {à équilibrer} ;
@@ -119,6 +127,8 @@ Invocateur qui combat à distance :
 | 3 | Les deux brisés | Enragé, il se bat au corps à corps à la faux ; il devient tuable |
 
 En phase 3, il fonce sur les joueurs et sur Nyxessa comme un squelette de mêlée, plus vite (4,2 m/s) et plus fort (38 dégâts aux joueurs, 40 à Nyxessa, un coup toutes les 1,7 s) {à équilibrer}.
+
+{/spoil}
 
 Points de vie, dégâts et cadence : {à équilibrer}.
 
@@ -142,6 +152,7 @@ Points de vie, dégâts et cadence : {à équilibrer}.
 - **Course** {décidé, 30/09/2026} : les squelettes ordinaires (sbire, guerrier, voleur, élites compris) **courent un peu** quand ils poursuivent un joueur loin d'eux, et repassent au pas de charge près de lui. Ils ne courent jamais en marchant vers Nyxessa : les vagues gardent leur rythme d'arrivée. Le mage (qui garde ses distances), Morgrim et Nyxar ne courent pas. Chiffres {à équilibrer} : course au-delà de 6 m de la cible, retour au pas en deçà de 4 m ; vitesse × 1,45, plafonnée à 5 m/s (pas plus vite qu'un joueur qui court : le sprint le distance toujours). {{dev: `Squelette.Court`, `MajCourse`, `VitesseCourse` ; `GameBalance.courseFacteur`, `courseVitesseMax`, `courseDistance`, `courseDistanceArret` ; blend tree `Squelette_Jeu` : Skeletons_Idle 0, Walking_A 0,5, Running_A (copie bouclée `Running_A_Loop`) 1 (`JeuBuilder.SqueletteCourseEsquive`). Sbire 4,9 m/s, guerrier 4,35 m/s, voleur 5 m/s en course.}}
 - **Esquive** {décidé, 30/09/2026} : comme les joueurs, les squelettes ordinaires peuvent **esquiver** : quand un joueur proche, tourné vers eux, arme une attaque (coup, tir, boule), ils ont une chance de faire un bond sur le côté ou en arrière, brièvement intouchables, puis reprennent (le joueur qui les a menacés devient leur cible). Jamais pendant leur propre coup, ni étourdis ; un temps de recharge par squelette. Chiffres {à équilibrer} : joueur à moins de 3,5 m et à moins de 60° de face ; chance par attaque 35 % (voleur), 10 % (sbire), 5 % (guerrier) ; recharge 4 à 6 s ; bond de 3 m en 0,4 s, intouchable 0,3 s ; 70 % sur le côté. Un joueur furtif n'est pas esquivé. {{dev: `Squelette.GuetterAttaques`, `Esquiver`, `MajEsquive`, état `Etat.Esquive` ; `Heros.DerniereAttaque` posé à l'appui de RT et envoyé aux autres postes par l'effet commun `ClasseHeros.EffetAttaque` (205) : l'hôte, qui tient les squelettes, juge l'esquive ; clips Dodge_Forward/Right/Backward/Left (trigger `Dodge`, `DodgeDir`) répliqués par le NetworkAnimator. `GameBalance.esquiveEnnemi*`, `esquiveChanceSbire/Guerrier/Voleur`.}}
 - **Cible prioritaire** {décidé} : les squelettes marchent vers Nyxessa. Un joueur qui les frappe, ou qui passe à moins de 4 m, devient leur cible pendant quelques secondes, puis ils reprennent leur route. Le voleur fait exception : il chasse les joueurs isolés. Distance et durée {à équilibrer}.
+- **Trajets variés** {décidé, 30/09/2026} : les squelettes d'une même clairière ne suivent plus tous le même chemin vers Nyxessa, ce qui rendait les attaques de zone trop faciles. À sa sortie de terre, chaque sbire, guerrier ou voleur (élites compris) prend l'un des **couloirs** de sa clairière : il passe par un point à mi-chemin, décalé sur le côté, puis rejoint une place autour de Nyxessa du même côté ; son pas varie aussi un peu d'un squelette à l'autre, ce qui étire la file. Le rythme des vagues ne change pas (détour de 12 % au plus, sur les chemins praticables : jamais dans la rivière). Le mage, les boss et les gardiens du donjon ne sont pas concernés. Chiffres {à équilibrer} : 3 couloirs par clairière, 22 m entre les couloirs extrêmes à mi-chemin (± 3 m de flou par squelette), point de passage entre 40 et 60 % du trajet ; pas de couloir à moins de 25 m de Nyxessa (invocations de Nyxar) ; pas de marche ± 8 % ; places d'arrivée jusqu'à 55° de part et d'autre de la direction d'approche (avant : 35°). {{dev: Fait le 01/10/2026 : `Squelette.Initialiser` (tirage du couloir, de la place et du pas), `ChoisirPassage` (point posé sur le NavMesh par `NavMesh.SamplePosition`, refusé si le chemin par lui dépasse le chemin direct de plus de `trajetDetourMax` : décalage réduit de moitié, puis abandonné), `DestinationMarche` (le point de passage est oublié une fois atteint ou dépassé, par exemple après une poursuite), `PasDeBase` ; `GameBalance.trajet*`. IA de l'hôte seulement, positions répliquées : rien à faire en réseau. Mesure en Play (18 squelettes depuis la clairière nord, 70 m) : écart latéral moyen à mi-chemin 1,0 à 1,3 m avant, 6,3 à 6,7 m après (écart-type 1,2 à 2,5 m avant, 7,5 m après) ; trajet moyen 22,8 à 23,2 s avant, 23,4 à 23,7 s après (+2 %).}}
 - **Détection de l'assassin furtif** {décidé} : cône de vue d'environ 6 m devant le squelette, 1,5 m dans son dos. Voir [Classes](classes.md).
 - **Valeurs de départ** de la version 0.1 {à équilibrer} {{dev: (réglées dans `Assets/Jeu/Resources/GameBalance.asset`)}} :
 
