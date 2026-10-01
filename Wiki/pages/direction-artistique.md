@@ -162,3 +162,9 @@ Quentin garde cette vue comme **référence d'implantation** : sorcier au nord-o
 {image media/da/village-aerien-grok-20261001-03.webp} **Vue aérienne v2 (rivière serpentine)** | Brief v2 avec le gabarit `village-aerien-serpente.png`
 
 **Deuxième essai, nettement plus fidèle** : la rivière est de nouveau à l'**est** du plateau, part du bassin sous la cascade, serpente en grandes boucles vers le sud-ouest ; les trois routes d'attaque (ouest, sud, est) sont larges avec leurs clairières, pierres levées et os ; maison de base à l'ouest avec son potager et son puits ; style plus lisse, plâtre et colombage simples. **Reste à corriger** : les **trois gués dans l'eau ne sont pas rendus** (Grok a mis un troisième pont au nord-est et une file de pierres plates sur l'herbe au sud du plateau) ; quelques **feuillus à couronne ronde** au nord-ouest ; soubassements encore un peu maçonnés (sorcier, taverne).
+
+## Montagne du nord (01/10/2026)
+
+{image media/da/montagne-heros-grok-20261001-01.webp} **Pièce héros de la montagne** | Grok, premier essai : grotte du portail à gauche, cascade et bassin au centre
+
+Approche **hybride** {décidé, 01/10/2026} (brief : `Docs/da/brief-montagne.md`) : la structure de jeu reste procédurale (gradins de la falaise à 18, 28 et 38 m, crête infranchissable, pierrier), Grok puis Tripo fournissent l'habillage. **Étape 1 : la pièce héros seule** (cette image, modèle Tripo déposé dans `ArtSources/References/Decor/montagne_heros_tripo/`) ; si le résultat est bon, étape 2 : blocs de falaise et rochers du pierrier. La cascade et le bassin sont des effets dans le moteur, pas dans le modèle. Échelle : pour une grotte de 8 m, la pièce entière fait 80 à 100 m de large, c'est la bande de falaise du village.
