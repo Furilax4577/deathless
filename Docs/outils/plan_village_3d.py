@@ -8,6 +8,7 @@ de 2,3 m près de Nyxessa.
 import math
 import os
 import random
+import sys
 from PIL import Image, ImageDraw
 
 import plan_village as pv
@@ -152,6 +153,17 @@ def dessiner():
 
 
 if __name__ == "__main__":
+    # Variante aérienne (01/10/2026) : python Docs/outils/plan_village_3d.py --k 0.9 --e 7.4 --nom village-aerien
+    # k = écrasement de la profondeur (0,55 = vue de trois quarts ; 1 = vue presque verticale), e = pixels par mètre.
+    nom = "village-3d"
+    args = sys.argv[1:]
+    for opt, cible in (("--k", "K"), ("--e", "E"), ("--z", "Z")):
+        if opt in args:
+            globals()[cible] = float(args[args.index(opt) + 1])
+    if "--nom" in args:
+        nom = args[args.index("--nom") + 1]
+    if "--cy" in args:
+        CY = float(args[args.index("--cy") + 1])
     os.makedirs(pv.SORTIE, exist_ok=True)
-    dessiner().save(os.path.join(pv.SORTIE, "village-3d.png"))
-    print("Docs/da/gabarits/village-3d.png")
+    dessiner().save(os.path.join(pv.SORTIE, nom + ".png"))
+    print("Docs/da/gabarits/" + nom + ".png")
