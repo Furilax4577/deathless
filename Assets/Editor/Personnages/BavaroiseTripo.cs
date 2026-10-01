@@ -19,7 +19,8 @@ using Object = UnityEngine.Object;
 //   enfant « Modele » = Chope_Tripo ;
 // - Bavaroise.prefab (GUID gardé) : Bavaroise_Tripo dépaqueté, matériau Bavaroise_Texture.mat (URP Lit mat, texture cuite
 //   Tripo/Bavaroise_Texture.png ; repli Bavaroise.mat, couleurs de sommet), chopes en Bavaroise.mat (Deathless/VertexColorLit),
-//   Animator + Bavaroise.controller (vérification), une chope sous chaque handslot (style DeuxChopes) ;
+//   Animator + Bavaroise.controller (vérification) ; mains vides (ChopesEnMain = false ; sinon une chope sous chaque
+//   handslot, style DeuxChopes) ;
 // - vérification : chemins, positions et rotations de repos des os comparés à ceux du Knight (les clips KayKit se lient
 //   par chemin et contiennent des courbes de position).
 public static class BavaroiseTripo
@@ -36,6 +37,9 @@ public static class BavaroiseTripo
     // corps ; le socket gauche est en miroir (demi-tour autour de Z pour garder la mousse en haut).
     public static readonly Vector3 RotationChopeDroite = new Vector3(-50f, 0f, 0f);
     public static readonly Vector3 RotationChopeGauche = (Quaternion.Euler(0f, 0f, 180f) * Quaternion.Euler(50f, 0f, 0f)).eulerAngles;
+
+    // Les chopes ne sont plus dans les mains de la Bavaroise (retour de Quentin du 01/10/2026) ; le prefab reste disponible.
+    public const bool ChopesEnMain = false;
 
     [MenuItem("Deathless/Personnages/Bavaroise (Tripo)")]
     public static void Menu() { Debug.Log(Construire()); }
@@ -89,12 +93,18 @@ public static class BavaroiseTripo
         var droite = Trouver(inst.transform, "handslot.r");
         var gauche = Trouver(inst.transform, "handslot.l");
         if (droite == null || gauche == null) { Object.DestroyImmediate(inst); return "Bavaroise (Tripo) : sockets handslot introuvables"; }
-        var cd = (GameObject)PrefabUtility.InstantiatePrefab(prefabChope, droite);
-        cd.name = "Chope_Droite";
-        cd.transform.localPosition = Vector3.zero; cd.transform.localRotation = Quaternion.Euler(RotationChopeDroite); cd.transform.localScale = Vector3.one;
-        var cg = (GameObject)PrefabUtility.InstantiatePrefab(prefabChope, gauche);
-        cg.name = "Chope_Gauche";
-        cg.transform.localPosition = Vector3.zero; cg.transform.localRotation = Quaternion.Euler(RotationChopeGauche); cg.transform.localScale = Vector3.one;
+        // Mains vides (décision de Quentin, 01/10/2026 : « elle n'a pas les mêmes mains que les autres personnages »). Le
+        // prefab Chope_Bavaroise et le style DeuxChopes restent générés pour un usage futur ; passer ChopesEnMain à true
+        // remet une chope sous chaque handslot.
+        if (ChopesEnMain)
+        {
+            var cd = (GameObject)PrefabUtility.InstantiatePrefab(prefabChope, droite);
+            cd.name = "Chope_Droite";
+            cd.transform.localPosition = Vector3.zero; cd.transform.localRotation = Quaternion.Euler(RotationChopeDroite); cd.transform.localScale = Vector3.one;
+            var cg = (GameObject)PrefabUtility.InstantiatePrefab(prefabChope, gauche);
+            cg.name = "Chope_Gauche";
+            cg.transform.localPosition = Vector3.zero; cg.transform.localRotation = Quaternion.Euler(RotationChopeGauche); cg.transform.localScale = Vector3.one;
+        }
 
         var ctrl = Controleur();
         var anim = inst.GetComponent<Animator>();

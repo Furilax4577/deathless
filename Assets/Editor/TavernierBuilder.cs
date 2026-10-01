@@ -4,7 +4,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 
 // Tavernière de la taverne (Maison_1_A, Interieur_Taverne) : la Bavaroise (prefab Assets/Art/Bavaroise/Bavaroise.prefab,
-// modèle Tripo v4 du 01/10/2026, chopes en main ; avant : le Rogue KayKit, texture alternative A), debout derrière le comptoir à Ancre_Villageois_Taverne, face à la salle. Au repos (Idle_A),
+// modèle Tripo v4 du 01/10/2026, mains vides depuis le 01/10/2026 ; avant : le Rogue KayKit, texture alternative A), debout derrière le comptoir à Ancre_Villageois_Taverne, face à la salle. Au repos (Idle_A),
 // il fait de temps en temps un geste (Interact : il essuie le comptoir, sert). Runtime : VillageoisOccupe. Relancé par
 // InterieursBuilder.Construire ; menu seul : Deathless > Niveau > Tavernier.
 public static class TavernierBuilder
@@ -39,7 +39,7 @@ public static class TavernierBuilder
         var modele = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(Modele), racine.transform);
         modele.name = "Modele";
         modele.transform.localPosition = Vector3.zero; modele.transform.localRotation = Quaternion.identity; modele.transform.localScale = Vector3.one * 1.18f;   // Bavaroise v4 1,82 m → ~2,15 m, la taille d'un héros (Paladin 2,18 m) ; la v3 (1,95 m) était à 1,1, le Rogue à 0,8
-        // La Bavaroise garde ses matériaux (texture Tripo cuite, chopes) : plus de matériau du Rogue.
+        // La Bavaroise garde ses matériaux (texture Tripo cuite) : plus de matériau du Rogue.
 
         AnimationClip repos = null, geste = null;
         foreach (var o in AssetDatabase.LoadAllAssetsAtPath(Anims))
