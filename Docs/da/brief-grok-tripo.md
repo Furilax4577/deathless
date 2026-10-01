@@ -11,6 +11,10 @@ Pour que les images de Grok passent directement dans la chaîne **Grok → Tripo
 
 Verdict de Quentin : « low poly trop de surfaces planes et d'angles ». Comparée aux personnages KayKit déjà dans le jeu (chevalier, viking, rôdeur, assassin, sorcière, mécano), la première Bavaroise a de **grandes facettes plates bien visibles** (visage en gros pans, cheveux en blocs hexagonaux, tablier en damier géométrique taillé dans la géométrie) qui donnent un effet « taille de pierre précieuse », alors que les personnages KayKit ont un facettage **beaucoup plus fin et dense**, qui se lit presque lisse et rond à distance de jeu. L'ancien bloc commun demandait explicitement « large readable facets » et « few large readable shapes » : c'est l'inverse de ce qu'il faut. Nouveau bloc ci-dessous. {dev} La décimation Blender (`ArtSources/Personnages/*/`\*`_pipeline.py`, normales plates, budget ~6 000 triangles) est probablement une deuxième cause du même effet : à revoir une fois qu'on aura confirmé que l'image Grok seule s'améliore.
 
+![Bavaroise, second essai avec le nouveau bloc commun](../../ArtSources/References/Personnages/bavaroise_grok_v2_tpose.jpg) **Bavaroise, second essai** | Facettage dense, silhouette ronde
+
+**Validé par Quentin** (« top ») : visage, cheveux, buste et jupe lisses et ronds, bien plus proches des personnages KayKit. **Seul reste perfectible** : les chaussures, encore un peu en blocs à grandes facettes (« à la rigueur ») — à rappeler explicitement dans le prompt des personnages (mains et pieds souvent moins soignés par Grok que le reste du corps).
+
 ## Bloc commun (toujours)
 
 ```
@@ -37,7 +41,9 @@ World color rule: the only green light in the world is the emerald relic magic; 
 Full-body character, front view, perfect symmetric T-pose: arms straight out horizontally, palms down, fingers
 together, legs straight and slightly apart, feet flat, looking at the camera, neutral relaxed expression with the
 character's usual face. Hands EMPTY: no weapon, no prop, no bag in hands. Orthographic-like front camera at chest
-height. Head about 40-45 % of total height (chibi), thick limbs, simple readable silhouette.
+height. Head about 40-45 % of total height (chibi), thick limbs, simple readable silhouette. Keep the SAME dense
+smooth faceting on the hands and shoes/feet as the rest of the body — these are often left chunkier with bigger
+flat facets than the face and torso; round them off just as much.
 ```
 
 **Image B, pour le design** : la planche comme celle de la Bavaroise (3/4 face avec l'arme, face, profil, dos, T-pose). Elle sert de référence pour les couleurs, le dos et les détails cachés ; Tripo ne la prend pas en entrée.
