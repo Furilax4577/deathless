@@ -13,6 +13,7 @@ Ce qui reste ouvert. Une ligne quitte cette page quand la règle est tranchée e
 | Statuts | Durées et intensités des statuts ; seuil, dégâts et ralenti de la chute | [Statuts](statuts.md) |
 | Progression | Premier arbre d'améliorations des compétences (proposition), autres améliorations, économie | [Classes](classes.md#menu-du-personnage-et-points-de-competence) |
 | Village | Maisons la nuit : n'y entrer que le jour ? Reconduire les héros dehors au crépuscule ? | [Le village](village.md) |
+| Succès | Trier la liste proposée le 01/10/2026 (garder, renommer, retirer), puis décider quand coder le module (local d'abord, Steam plus tard). | [Succès](succes.md) |
 | Mage | Donner un coup critique au Mage (30/09/2026) ? Si oui : chance, multiplicateur, sur quels sorts (boule, cône, grande boule, mur, brûlure). Sa refonte est tranchée depuis le 01/10/2026. | [Mage](classe-mage.md) |
 | Assassin | En vague, il tombe sous la moyenne des classes dès la nuit 9 (indice 0,71 à la nuit 12 pour un joueur moyen, simulateur du 01/10/2026) alors qu'il est le plus fort sur une cible seule (1,3) : lui donner de la zone ou un outil contre les groupes (grenade, arbalète perçante, enchaînement d'exécutions…) ? | [Assassin](classe-assassin.md) |
 

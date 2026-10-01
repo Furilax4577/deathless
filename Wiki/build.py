@@ -72,6 +72,7 @@ MENU = [
     ("statuts", "Statuts"),
     ("commandes", "Commandes"),
     ("interface", "Interface"),
+    ("succes", "Succès", "dev"),
     ("effets", "Effets et couleurs", "dev"),
     ("direction-artistique", "Direction artistique", "dev"),
     ("animations", "Animations", "dev"),
