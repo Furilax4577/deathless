@@ -21,6 +21,7 @@ namespace Deathless.Jeu
         bool m_Visuel_Seul;
         bool m_ParNyxessa;
         bool m_BloqueParBouclier;
+        bool m_TireDehors;   // tiré par un ennemi hors de l'enceinte du bouclier (01/10/2026)
         bool m_Compte;   // dégâts comptés dans s_EnVol (retirés à l'arrivée ou à la destruction)
 
         /// Dégâts des missiles déjà partis vers chaque cible (30/09/2026) : Nyxessa ne tire plus sur un ennemi que les
@@ -78,6 +79,12 @@ namespace Deathless.Jeu
             m.m_Source = source;
             m.m_Parable = !parNyxessa;
             m.m_ParNyxessa = parNyxessa;
+            // Un mage plaqué contre la paroi tire depuis une main déjà dans le cylindre : on retient d'où vient le tir
+            // (le tireur, ou à défaut le point de départ) pour arrêter le crâne même s'il naît à l'intérieur.
+            var bo = BouclierNyxessa.Instance;
+            // Chez un client (missile visuel, sans tireur connu), un départ à moins de 0,8 m de la paroi compte comme du dehors.
+            m.m_TireDehors = !parNyxessa && bo != null
+                && (source != null ? !bo.Contient(source.transform.position + Vector3.up, -0.05f) : !bo.Contient(depart, 0.8f));
             var fx = EffetsJeu.Instance;
             if (fx != null && fx.formeCrane != null && fx.gemmes != null)
             {
@@ -118,7 +125,15 @@ namespace Deathless.Jeu
             Vector3 arrivee = depart + transform.forward * Mathf.Min(m_Vitesse * dt, dist);
             // Les missiles ennemis sont guidés par code et n'ont pas de collision physique : le bouclier
             // doit donc intercepter leur trajectoire explicitement, y compris sur les clients réseau.
-            if (!m_ParNyxessa && BouclierNyxessa.Instance != null && BouclierNyxessa.Instance.IntercepterProjectile(depart, arrivee, out var impact))
+            var bouclier = BouclierNyxessa.Instance;
+            bool bloque = false;
+            Vector3 impact = arrivee;
+            if (!m_ParNyxessa && bouclier != null)
+            {
+                if (bouclier.IntercepterProjectile(depart, arrivee, out var croisement)) { bloque = true; impact = croisement; }
+                else if (m_TireDehors && bouclier.Contient(arrivee)) bloque = true;   // né dans la paroi, tiré du dehors
+            }
+            if (bloque)
             {
                 transform.position = impact;
                 m_BloqueParBouclier = true;
@@ -132,6 +147,13 @@ namespace Deathless.Jeu
         {
             m_Fini = true;
             Decompter();
+            // Arrêté par le bouclier (01/10/2026) : la paroi encaisse le crâne comme un coup de mêlée (l'hôte seul).
+            if (m_BloqueParBouclier && !m_Visuel_Seul && BouclierNyxessa.Instance != null)
+                BouclierNyxessa.Instance.Absorber(new InfoDegats
+                {
+                    montant = m_Degats, equipeSource = m_Equipe, source = m_Source, parable = false, aDistance = true,
+                    point = transform.position, direction = transform.forward
+                });
             if (!m_BloqueParBouclier && !m_Visuel_Seul && m_Cible != null && !m_Cible.Mort && (m_Cible.transform.position + Vector3.up - transform.position).sqrMagnitude < 4f)
             {
                 m_Cible.Encaisser(new InfoDegats

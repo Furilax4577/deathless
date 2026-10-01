@@ -2,11 +2,12 @@
   "versions": [
     {
       "version": "0.7.2",
-      "date": "2026-09-30",
+      "date": "2026-10-01",
       "titre": "Le bouclier tient",
       "notes": [
-        "Le bouclier de Nyxessa intercepte les tirs des mages squelettes et des crânes ennemis.",
-        "Bouclier levé, les squelettes contournent sa paroi au lieu d'entrer dans l'enceinte."
+        "Le bouclier de Nyxessa arrête les crânes des mages squelettes et de Nyxar : les héros abrités dedans ne sont plus touchés, et chaque crâne arrêté entame le bouclier comme un coup.",
+        "Bouclier levé, les squelettes ne passent plus la paroi en poursuivant un héros posté au bord : ils glissent le long et continuent de la frapper.",
+        "Menu du personnage : Tab (Y, Triangle) le referme aussi."
       ]
     },
     {

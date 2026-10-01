@@ -160,6 +160,7 @@ namespace Deathless.UI.Ecrans
             foreach (var e in m_Tous)
                 if (e.Racine.resolvedStyle.display != DisplayStyle.None) e.MiseAJour(dt);
             RoueEmotes?.MiseAJour(Sommet == Hud ? DonneesUI.RoueEmotes : null);
+            BasculerPersonnage();
         }
 
         // ------------------------------------------------------------------ Pile
@@ -309,6 +310,18 @@ namespace Deathless.UI.Ecrans
         }
 
         /// Le jeu demande le menu du personnage (Tab / Y) : ouvert par-dessus le HUD seulement.
+        /// Bascule du menu du personnage (01/10/2026) : dans les menus seule la carte UI est active, l'action
+        /// Gameplay/CharacterMenu (Tab, Y, Triangle) ne se déclenche donc plus ; on lit ses touches directement, telles
+        /// que le joueur les a liées, tant que le menu du personnage est au sommet.
+        void BasculerPersonnage()
+        {
+            if (Personnage == null || Sommet != Personnage || BasculeRecente || m_CarteJeu == null) return;
+            var action = m_CarteJeu.FindAction("CharacterMenu");
+            if (action == null) return;
+            foreach (var c in action.controls)
+                if (c is UnityEngine.InputSystem.Controls.ButtonControl bouton && bouton.wasPressedThisFrame) { Fermer(); return; }
+        }
+
         void OuvrirPersonnage()
         {
             var menu = DonneesUI.Personnage;

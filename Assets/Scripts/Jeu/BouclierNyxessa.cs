@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.AI;
 
 namespace Deathless.Jeu
 {
@@ -29,8 +28,6 @@ namespace Deathless.Jeu
         public bool Canalise => Leve && PalierActuel >= B.bouclierCanalisationPalier;
 
         RelicShieldVisual m_Visuel;
-        NavMeshObstacle m_Obstacle;
-        bool m_ObstacleActif;
         FiletEnergie m_Filet;
         Transform m_AncrageBaton;
         bool m_CanaliseVu;
@@ -53,12 +50,6 @@ namespace Deathless.Jeu
             Instance = this;
             if (effet == null) effet = GetComponentInChildren<RelicShieldEtat>(true);
             if (effet != null) m_Visuel = effet.GetComponent<RelicShieldVisual>();
-            m_Obstacle = GetComponent<NavMeshObstacle>();
-            if (m_Obstacle == null) m_Obstacle = gameObject.AddComponent<NavMeshObstacle>();
-            m_Obstacle.shape = NavMeshObstacleShape.Capsule;
-            m_Obstacle.carving = true;
-            m_Obstacle.carveOnlyStationary = false;
-            m_Obstacle.enabled = false;
         }
 
         void OnDestroy() { if (Instance == this) Instance = null; }
@@ -71,7 +62,6 @@ namespace Deathless.Jeu
             if (m_Visuel != null) m_Visuel.palierQuantite = Mathf.Clamp(PalierActuel, 1, 5);
             SuivreCanalisation();
             SuivreEtatVie();
-            MettreAJourObstacle();
         }
 
         void SuivreCanalisation()
@@ -135,21 +125,21 @@ namespace Deathless.Jeu
                 effet.height = B.bouclierHauteur;
                 effet.castSeconds = B.bouclierIncantation;
             }
-            MettreAJourObstacle();
         }
 
-        void MettreAJourObstacle()
+        /// Ennemi au sol entré dans l'enceinte du bouclier levé (01/10/2026, retour du test 0.7.0 : des squelettes qui
+        /// poursuivaient un joueur posté au bord passaient la paroi) : décalage horizontal qui le ramène juste dehors,
+        /// à `rayonEnnemi` de la paroi ; zéro s'il est dehors ou si le bouclier est baissé. Remplace l'obstacle NavMesh
+        /// du 30/09/2026 : en découpant le NavMesh jusqu'à 5,8 m (rayon + rayon des agents), il empêchait les squelettes
+        /// d'arriver à portée de frappe de la paroi (5,7 m) et ôtait le sol sous le sorcier, posté à 4,3 m.
+        public Vector3 Repousser(Vector3 position, float rayonEnnemi)
         {
-            if (m_Obstacle == null) return;
-            m_Obstacle.radius = Rayon;
-            m_Obstacle.height = B.bouclierHauteur + B.bouclierBase;
-            m_Obstacle.center = Vector3.up * (B.bouclierBase + B.bouclierHauteur * 0.5f);
-            bool actif = Leve;
-            if (m_ObstacleActif != actif)
-            {
-                m_Obstacle.enabled = actif;
-                m_ObstacleActif = actif;
-            }
+            if (!Leve) return Vector3.zero;
+            Vector3 d = position - Centre; d.y = 0f;
+            float r = Rayon + rayonEnnemi, l = d.magnitude;
+            if (l >= r) return Vector3.zero;
+            Vector3 dir = l > 0.01f ? d / l : Vector3.forward;
+            return dir * (r - l);
         }
 
         /// Le sorcier lève le bouclier (incantation, puis pleine solidité du palier).
@@ -169,6 +159,16 @@ namespace Deathless.Jeu
             if (effet == null) return;
             effet.Baisser();
             if (Deathless.Reseau.ReseauJeu.EnPartie && Deathless.Reseau.ReseauJeu.Autorite) Deathless.Reseau.PartieReseau.Instance?.BouclierBaisse();
+        }
+
+        /// Point dans l'enceinte du bouclier levé (cylindre de la paroi, entre sa base et son sommet), à `marge` près.
+        public bool Contient(Vector3 p, float marge = 0f)
+        {
+            if (!Leve) return false;
+            Vector3 c = Centre;
+            Vector3 d = p - c; float y = d.y; d.y = 0f;
+            float r = Rayon - marge;
+            return d.sqrMagnitude < r * r && y >= B.bouclierBase && y <= B.bouclierBase + B.bouclierHauteur;
         }
 
         /// Intercepte un projectile ennemi qui traverse la paroi cylindrique du bouclier.

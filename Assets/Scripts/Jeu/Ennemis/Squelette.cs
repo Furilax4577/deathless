@@ -212,6 +212,13 @@ namespace Deathless.Jeu
                 Agent.Move(m_Pousse * (k / 0.2f));
                 m_PousseReste -= k;
             }
+            // Bouclier levé : jamais dans l'enceinte (01/10/2026), le squelette glisse le long de la paroi.
+            var bouclier = BouclierNyxessa.Instance;
+            if (bouclier != null && Agent.enabled && Agent.isOnNavMesh && m_Etat != Etat.Mort)
+            {
+                Vector3 dehors = bouclier.Repousser(transform.position, Agent.radius * 0.5f);
+                if (dehors != Vector3.zero) Agent.Move(dehors);
+            }
             // Eau du donjon (bassin) : ralentit (le NavMesh la contourne déjà quand c'est plus court en temps).
             // Statut Ralenti : même facteur, par-dessus l'eau.
             // Course (30/09/2026) : le pas de base devient une course (VitesseCourse) quand la cible est loin (Court).
