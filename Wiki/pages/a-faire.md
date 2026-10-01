@@ -40,6 +40,16 @@ Notés par Quentin après la partie à deux ; rien n'est encore développé.
 - **Coup critique du Mage** : 5 %, ×2, boule et grande boule ([Mage](classe-mage.md)). {{dev: Fait le 01/10/2026 (0.8.1) : un tirage par boule à l'explosion, dégâts ×2 sur le coup direct et la zone, brûlure inchangée ; `mageCritiqueChance`, `mageCritiqueMultiplicateur` (`GameBalance`), `ClasseMage.TirerCritique`.}}
 - **Bugs du banc en jeu** : un mage squelette de la dernière vague bloqué côté sud-ouest jusqu'à l'aube ; héros coincé contre les marches du plateau de Nyxessa. {{dev: Fait le 01/10/2026 (0.8.1). **Mage** : il visait le centre de Nyxessa, îlot du NavMesh hors d'atteinte ; chaque demande de chemin parcourait tout le NavMesh avant de rendre un chemin partiel, et restait « en calcul » (`pathPending`) des secondes, d'autant que `Squelette.Poursuivre` la relançait toutes les 0,2 s (et `MajMarche` à chaque image) : de loin (clairière sud-ouest), elle n'aboutissait jamais. Le mage marche désormais vers sa place autour de Nyxessa (`m_Place`, atteignable) et une demande en cours n'est plus relancée ; garde-fou `Squelette.GarderLaMarche` : en marche sans avancer d'1 m en `marcheBloqueeDelai` (4 s), le squelette abandonne son point de passage et relance son chemin, puis, la fois suivante, est replacé sur le NavMesh 2 m plus près de Nyxessa (journal « Garde-fou »). **Marches** : le CharacterController (rayon 0,4 m, stepOffset 0,35 m) se plantait sur la première marche (0,25 m × 0,3 m) dès qu'une image dépasse 1/30 s ; rampe invisible `Plateau/Marches_Rampe` (tronc d'octogone convexe, 39°, juste au-dessus du nez des marches), posée par `VillageBuilder` (menu Deathless > Village > Poser la rampe des marches du plateau) ; aspect et NavMesh inchangés.}}
 
+## Notés par Quentin le 01/10/2026
+
+- **Numéro de vague affiché en permanence** (HUD) : en jeu, toujours visible.
+- **Vote « prêt » plus lisible** : au lieu de « Prêts 0/2 », un marqueur **« prêt » devant chaque personnage**, et un état plus net pour le joueur courant (a-t-il voté ou non ?). Règles du vote dans [Déroulé d'une partie](deroule.md#vote-prêt).
+- **Emote bière** : la chope est minuscule, on ne voit pas qu'il boit ; la grossir et la porter à la bouche.
+- **Mage : plus de regain de mana sur l'attaque primaire** {décidé} : la boule de feu ne rend plus de mana ; seule la régénération passive (3 par seconde) en rend. Voir [Mage](classe-mage.md).
+- **Bouclier de Nyxessa trop encombrant** (todo) : on ne voit toujours rien à travers, même avec la paroi éclaircie vue de l'intérieur (27/09/2026) ; à retravailler (transparence, dôme plus bas ou en grille, silhouette des ennemis lisible à travers).
+- **Donjons à retravailler** (todo) : refonte à cadrer avec Quentin (balcons et étages déjà reportés, voir [Donjon](donjon.md)).
+- **Méga boule de feu du Mage à retravailler** (todo) : la Grande boule de feu (LB) ne convainc pas encore ; à cadrer avec Quentin.
+
 ## En attente de validation (Quentin)
 
 - **Personnage du mois** : candidats Barde, Bavaroise, Clochard pétomane et **DJ Bob Douville** (26/09/2026, modèles lissés, pages avec rendus et clips). Choisir le premier ; alléger celui qui est retenu (Barde et Bavaroise un peu au-dessus de 8 000 triangles). Barde : l'attaque de base frappe avec le luth comme une massue, animation de jeu du luth à créer.
