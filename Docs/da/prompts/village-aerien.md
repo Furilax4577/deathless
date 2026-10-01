@@ -19,10 +19,12 @@ THE RIVER, a winding serpentine river: the blue ribbon starts at the round pool 
 between the central plateau and the three right-hand houses with gentle bends, passes under the small plank
 bridge of the east trail and the small plank bridge of the south trail, then leaves toward the bottom left through
 the forest in wide, lazy S-shaped loops, like a real meandering stream, with pebble banks, clear shallow water and
-a few reeds. The three pale blue discs on the river are the three shallow fords, the crossing points inside the water:
-each one is a short row of flat stepping stones and a bar of flat pebbles right across the clear shallow water, where
-the pale paved path of the herbalist, of the blacksmith forge and of the tinkerer shop reaches the river; draw them
-clearly visible, one in front of each of these three houses, so that a person could wade across. The two brown
+a few reeds. The three pale blue discs on the river, each with a row of five white stones, are the three shallow fords, the crossing points inside the water:
+each one is a row of five flat stepping stones and a bar of flat pebbles right across the clear shallow water, exactly where
+the pale paved path of the herbalist, of the blacksmith forge and of the tinkerer shop meets the river: the path of the house
+goes straight down into the water, crosses it on the stepping stones, and continues on the other bank to the paved
+ring around the plateau; there is NO bridge at the fords, people simply wade across on the stones. Draw the three fords
+clearly visible, one in front of each of these three houses. The two brown
 slabs are small wooden plank bridges with a stone abutment on each bank.
 
 The grey band at the top is a massive impassable mountain cliff of big rounded boulders in three steps, with a

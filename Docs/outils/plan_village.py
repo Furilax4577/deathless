@@ -239,6 +239,7 @@ def facades(largeur=1280, hauteur=720, legendes=True):
 
 
 RIVIERE_DENSE = riviere_dense()
+SERPENTE = False
 
 # Variante serpentine (01/10/2026, à la demande de Quentin : « j'aimais bien l'idée de la rivière qui serpente, avec les
 # points de passage dans l'eau »). Même logique que le plan décidé (elle longe le plateau côté est, trois gués devant les
@@ -264,7 +265,8 @@ RIVIERE_SERPENTE = [(0, 36), (4, 32), (8, 27), (10.5, 22), (15, 17.5), (18, 12),
 def serpente():
     """Bascule le module sur la rivière serpentine ; gués au point de la rivière le plus proche de chaque maison de la
     rive est (druide, forge, mécano), ponts là où la rivière coupe le sentier est (y = 0) et le sentier sud (x = 0)."""
-    global RIVIERE, RIVIERE_DENSE, GUES, GUE, PONTS
+    global RIVIERE, RIVIERE_DENSE, GUES, GUE, PONTS, SERPENTE
+    SERPENTE = True
     RIVIERE = RIVIERE_SERPENTE
     RIVIERE_DENSE = riviere_dense()
     GUES = []

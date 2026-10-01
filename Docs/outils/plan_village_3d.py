@@ -96,6 +96,16 @@ def dessiner():
     d.ellipse([P(-4, 38)[0], P(0, 41)[1], P(4, 38)[0], P(0, 35)[1]], fill="#3f7fb3")
     for gx, gy in pv.GUES:
         d.ellipse([P(gx - 3.2, 0)[0], P(0, gy + 3.2)[1], P(gx + 3.2, 0)[0], P(0, gy - 3.2)[1]], fill="#a9d4ee")
+        if pv.SERPENTE:                       # gué explicite : cinq pierres plates en travers de l'eau peu profonde
+            dense = pv.RIVIERE_DENSE
+            i = min(range(len(dense)), key=lambda k: math.hypot(dense[k][0] - gx, dense[k][1] - gy))
+            a, b = dense[max(0, i - 3)], dense[min(len(dense) - 1, i + 3)]
+            n = math.hypot(b[0] - a[0], b[1] - a[1]) or 1.0
+            nx, ny = -(b[1] - a[1]) / n, (b[0] - a[0]) / n
+            for t in (-2.2, -1.1, 0.0, 1.1, 2.2):
+                sx, sy = gx + nx * t, gy + ny * t
+                d.ellipse([P(sx - 0.7, sy)[0], P(sx, sy + 0.7)[1], P(sx + 0.7, sy)[0], P(sx, sy - 0.7)[1]],
+                          fill="#e4e7ea", outline="#6f757c")
     pave = "#cfc7b2"
     for cx, cy in [b["c"] for b in pv.BATIMENTS.values()] + [pv.GROTTE, (12.6, 0), (0, -17.8)]:
         r = math.hypot(cx, cy)
