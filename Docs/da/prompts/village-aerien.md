@@ -19,19 +19,20 @@ THE RIVER, a winding serpentine river: the blue ribbon starts at the round pool 
 between the central plateau and the three right-hand houses with gentle bends, passes under the small plank
 bridge of the east trail and the small plank bridge of the south trail, then leaves toward the bottom left through
 the forest in wide, lazy S-shaped loops, like a real meandering stream, with pebble banks, clear shallow water and
-a few reeds. The three pale blue discs on the river, each with a row of five white stones, are the three shallow fords, the crossing points inside the water:
-each one is a row of five flat stepping stones and a bar of flat pebbles right across the clear shallow water, exactly where
-the pale paved path of the herbalist, of the blacksmith forge and of the tinkerer shop meets the river: the path of the house
-goes straight down into the water, crosses it on the stepping stones, and continues on the other bank to the paved
-ring around the plateau; there is NO bridge at the fords, people simply wade across on the stones. Draw the three fords
-clearly visible, one in front of each of these three houses. The two brown
+a few reeds. The three pale blue discs on the river, each with a row of five white stones, are the three shallow fords, extra crossing
+points inside the water: each one is a row of five flat stepping stones and a bar of flat pebbles right across the clear
+shallow water, in front of the herbalist cottage, of the blacksmith forge and of the tinkerer shop; people simply wade
+across on the stones. No paved road leads into the fords and there is NO bridge at the fords. Draw the three fords
+clearly visible. The three right-hand houses (herbalist, forge, tinkerer) do not have a paved path to the central ring:
+each of them has a pale paved path that runs along the EAST bank of the river, on the heath side, curving gently, and
+the three paths join the east trail right at the east plank bridge, which is the main bridge. The two brown
 slabs are small wooden plank bridges with a stone abutment on each bank.
 
 The grey band at the top is a massive impassable mountain cliff of big rounded boulders in three steps, with a
 narrow waterfall falling into the round pool; at its foot, left of the waterfall, the dark oval with a green disc is
 the mouth of a shallow cave with a swirling green magic portal and a soft green glow (the only green light besides
 the crystal). The grey octagon in the center is a three-step round stone plateau carrying a glowing emerald crystal
-on a dark spire, surrounded by a paved ring of pale flagstones from which the pale paved paths radiate to each house;
+on a dark spire, surrounded by a paved ring of pale flagstones from which the pale paved paths radiate to the three houses on the west side (wizard, tavern, small cottage) and to the cave;
 the wide pale paved strip going from the ring up to the cave is the lantern-lined flagstone road to the cave,
 completely clear. The four tiny figures next to the plateau are four chunky big-headed adventurers (knight with red
 cape, viking, mage with purple pointed hat, hooded ranger): keep them exactly that small compared to the houses.

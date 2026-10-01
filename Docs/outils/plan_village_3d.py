@@ -91,6 +91,36 @@ def dessiner():
     gx = pv.GROTTE[0]
     d.ellipse([P(gx - 4, 40, 5)[0], P(gx, 40, 5)[1], P(gx + 4, 40)[0], P(gx, 40, -0.5)[1]], fill="#22262b")
     d.ellipse([P(gx - 2, 40, 3.6)[0], P(gx, 40, 3.6)[1], P(gx + 2, 40)[0], P(gx, 40, 0.2)[1]], fill="#3fd06a")
+    # Variante serpentine (annotation de Quentin, 01/10/2026) : les trois maisons de la rive est ne sont plus reliées à
+    # l'anneau par des bandes qui traversent la rivière (elles se lisaient comme un pont) ; leurs chemins longent la rive
+    # est et convergent vers le pont principal, sur le sentier est. Les gués restent de simples passages dans l'eau.
+    ROUTES_EST = {
+        "Druide": [(17.4, 23.2), (21, 17), (21.5, 10), (19.5, 4), (17, 0.5)],
+        "Forge": [(26.4, 10.7), (23, 7), (20, 3), (17, 0.5)],
+        "Mecano": [(21.9, -13.8), (22, -9), (21, -4), (18.5, -1), (17, -0.5)],
+    }
+
+    def chemins_paves():
+        pave = "#cfc7b2"
+        cibles = [(n_, b_["c"]) for n_, b_ in pv.BATIMENTS.items()] + [("Grotte", pv.GROTTE), ("Pont", (12.6, 0)), ("Pont", (0, -17.8))]
+        if pv.SERPENTE:
+            cibles = [(n_, c_) for n_, c_ in cibles if n_ not in ROUTES_EST]
+            for pts in ROUTES_EST.values():
+                chemin = []
+                for (x0, y0), (x1, y1) in zip(pts, pts[1:]):
+                    chemin += [(x0 + (x1 - x0) * k / 8, y0 + (y1 - y0) * k / 8) for k in range(8)]
+                chemin.append(pts[-1])
+                d.line([P(*q) for q in chemin], fill="#a39b88", width=int(3.0 * E * 0.8), joint="curve")
+                d.line([P(*q) for q in chemin], fill=pave, width=int(2.2 * E * 0.8), joint="curve")
+        for _, (cx, cy) in cibles:
+            r = math.hypot(cx, cy)
+            g = (cx, cy) == pv.GROTTE
+            fin = 1 - (1 if g else 6) / r
+            d.line([P(cx * pv.ANNEAU / r, cy * pv.ANNEAU / r), P(cx * fin, cy * fin)], fill=pave, width=int((pv.LARGEUR_ROUTE_GROTTE if g else 2.2) * E * 0.8))
+        d.ellipse([P(-pv.ANNEAU, 0)[0], P(0, pv.ANNEAU)[1], P(pv.ANNEAU, 0)[0], P(0, -pv.ANNEAU)[1]], fill=pave)
+
+    if pv.SERPENTE:                           # variante serpentine : les chemins passent SOUS l'eau, seules les pierres du gué traversent
+        chemins_paves()
     # rivière, bassin, gué, pavés
     d.line([P(*p) for p in pv.RIVIERE_DENSE], fill="#3f7fb3", width=int(pv.LARGEUR_RIVIERE * E * 0.8), joint="curve")
     d.ellipse([P(-4, 38)[0], P(0, 41)[1], P(4, 38)[0], P(0, 35)[1]], fill="#3f7fb3")
@@ -106,13 +136,8 @@ def dessiner():
                 sx, sy = gx + nx * t, gy + ny * t
                 d.ellipse([P(sx - 0.7, sy)[0], P(sx, sy + 0.7)[1], P(sx + 0.7, sy)[0], P(sx, sy - 0.7)[1]],
                           fill="#e4e7ea", outline="#6f757c")
-    pave = "#cfc7b2"
-    for cx, cy in [b["c"] for b in pv.BATIMENTS.values()] + [pv.GROTTE, (12.6, 0), (0, -17.8)]:
-        r = math.hypot(cx, cy)
-        g = (cx, cy) == pv.GROTTE
-        fin = 1 - (1 if g else 6) / r
-        d.line([P(cx * pv.ANNEAU / r, cy * pv.ANNEAU / r), P(cx * fin, cy * fin)], fill=pave, width=int((pv.LARGEUR_ROUTE_GROTTE if g else 2.2) * E * 0.8))
-    d.ellipse([P(-pv.ANNEAU, 0)[0], P(0, pv.ANNEAU)[1], P(pv.ANNEAU, 0)[0], P(0, -pv.ANNEAU)[1]], fill=pave)
+    if not pv.SERPENTE:
+        chemins_paves()
     for (cx, cy), lacet in pv.PONTS:
         a = math.radians(lacet)
         ux, uy, vx, vy = math.cos(a), math.sin(a), -math.sin(a), math.cos(a)
