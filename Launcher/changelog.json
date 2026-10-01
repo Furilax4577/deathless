@@ -1,6 +1,20 @@
 {
   "versions": [
     {
+      "version": "0.8.0",
+      "date": "2026-10-01",
+      "titre": "L'aube attendra",
+      "notes": [
+        "Boss : Morgrim (nuit 10) et Nyxar (nuit 12) sortent au début de la dernière vague, et le jour ne se lève plus tant qu'ils sont debout. La nuit 12 se gagne en abattant Nyxar.",
+        "Mage : nouveau kit. LB, Grande boule de feu (explosion de 5 m, fait monter la brûlure d'un palier) ; RB, Mur de flammes (ligne de feu de 8 m qui brûle et ralentit ce qui la traverse). Le cône fait plus mal, coûte moins et ralentit ; le mana remonte trois fois plus vite.",
+        "Brûlure en paliers : chaque coup de feu remplit une jauge ; pleine, la brûlure monte d'un palier (3 au plus : 5, 8 puis 12 dégâts par seconde), puis redescend palier par palier. Le palier s'affiche sur l'icône.",
+        "Squelettes : ils ne suivent plus tous le même chemin vers Nyxessa ; plusieurs couloirs, des arrivées étalées, des pas plus ou moins rapides.",
+        "Rôdeur : flèche à pleine charge 50 → 48, tir à la tête ×2 → ×1,8 (un sbire ne meurt plus d'une seule flèche à la tête).",
+        "Roue à emotes à la souris : la sélection ne repart plus au centre quand on arrête de bouger la souris.",
+        "Wiki : les points faibles et les phases des boss sont cachés derrière « Attention, spoil »."
+      ]
+    },
+    {
       "version": "0.7.2",
       "date": "2026-10-01",
       "titre": "Le bouclier tient",
