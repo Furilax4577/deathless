@@ -82,4 +82,11 @@ Image to 3D, **Modèle HD**, IA H3.1, **Générer par parties : Équilibré** po
 
 {dev} La Bavaroise v1/v2 n'a été envoyée qu'en vue de face : Tripo a dû inventer le dos, et le nœud de tablier a été reconstruit à la main dans `bavaroise_pipeline.py` (`noeud_dos`, couleur `BLEU_NOEUD`) parce qu'il n'existait pas dans le maillage Tripo.
 
+**Pièges rencontrés le 01/10/2026 (Bavaroise v4, face + dos)** :
+- **« Générer par parties » : rester en « Équilibré ».** « Détaillé » découpe le personnage en **46 pièces** (293 000 triangles) au lieu des 12 que `bavaroise_pipeline.py` attend (`PARTIES`, `tripo_part_0..11`) : le script ne passe pas.
+- **« Générer par parties » désactive la texture dans le panneau de génération** (normal). La couleur vient de l'outil **Texture** de Tripo, lancé ensuite sur le modèle généré, puis export FBX avec texture dans `ArtSources/References/Personnages/bavaroise_tripo_texture/`. Sans cette version texturée, le script retombe sur des couleurs unies par partie (`--couleurs-par-face`, vérification du rig seulement).
+- **PBR désactivé**, **Qualité de maillage Ultra activée**, **100 000 à 300 000 polygones** (Blender redécime de toute façon à ~6 000 triangles ; 1 à 2 millions ne font que ralentir).
+
+{dev} **Blender sur le PC du 01/10/2026** (différent de celui où la v3 a été faite) : pas installé au chemin du script (`C:/Program Files/Blender Foundation/Blender 5.2/`) ; Blender 5.2.2 LTS portable installé dans `C:/Users/Furilax/Tools/blender-5.2.2-windows-x64/blender.exe` (zip officiel, SHA-256 vérifié). Lancement : `"C:/Users/Furilax/Tools/blender-5.2.2-windows-x64/blender.exe" -b --python ArtSources/Personnages/Bavaroise/bavaroise_pipeline.py -- [options]`.
+
 **Confirmé le 01/10/2026 : Tripo a bien un mode multivue pour un seul personnage.** Dans l'onglet **Modèle** (icône cube, pas l'icône « Images par lots » qui génère des modèles séparés), l'image principale (face) a trois emplacements optionnels en dessous : **Gauche**, **Droite**, et un troisième (dos). À utiliser systématiquement dès qu'un personnage a un détail dans le dos : le dos (et le nœud, le cas échéant) devrait alors sortir directement du maillage généré, et `noeud_dos` devient inutile pour les prochains personnages avec ce traitement.
