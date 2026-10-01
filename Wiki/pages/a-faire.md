@@ -42,10 +42,10 @@ Notés par Quentin après la partie à deux ; rien n'est encore développé.
 
 ## Notés par Quentin le 01/10/2026
 
-- **Numéro de vague affiché en permanence** (HUD) : en jeu, toujours visible.
-- **Vote « prêt » plus lisible** : au lieu de « Prêts 0/2 », un marqueur **« prêt » devant chaque personnage**, et un état plus net pour le joueur courant (a-t-il voté ou non ?). Règles du vote dans [Déroulé d'une partie](deroule.md#vote-prêt).
-- **Emote bière** : la chope est minuscule, on ne voit pas qu'il boit ; la grossir et la porter à la bouche.
-- **Mage : plus de regain de mana sur l'attaque primaire** {décidé} : la boule de feu ne rend plus de mana ; seule la régénération passive (3 par seconde) en rend. Voir [Mage](classe-mage.md).
+- **Numéro de vague affiché en permanence** (HUD) : en jeu, toujours visible. {{dev: Fait le 01/10/2026 : capsule à droite de l'horloge, « Jour N » le jour, « N vagues » au crépuscule, « Vague 2 / 3 » la nuit (éclat à chaque nouvelle vague) ; `IEtatVagues`, `PartieReseau.Vague` / `VaguesTotal` pour les clients ; captures `retours0110_vague_*.png`.}}
+- **Vote « prêt » plus lisible** : au lieu de « Prêts 0/2 », un marqueur **« prêt » devant chaque personnage**, et un état plus net pour le joueur courant (a-t-il voté ou non ?). Règles du vote dans [Déroulé d'une partie](deroule.md#vote-prêt). {{dev: Fait le 01/10/2026 : badge « Prêt » sur le portrait du joueur et sur la ligne de chaque allié prêt, invite « Se déclarer prêt » / « Prêt · Annuler » à côté de l'horloge, compte « 2 / 3 prêts » en multijoueur seulement ; `IAllie.EstPret` ; captures `retours0110_vote_*.png`, `retours0110_hud_allies_prets.png`.}}
+- **Emote bière** : la chope est minuscule, on ne voit pas qu'il boit ; la grossir et la porter à la bouche. {{dev: Fait le 01/10/2026 : chope à 22 % de la hauteur du personnage (13 % avant), dôme de mousse blanche, et pendant la boisson elle bascule de 40° vers la tête et son bord est amené à la bouche (os `head`), sur tous les postes et toutes les classes (`EmotesHeros.MajChope`, réglages dans `Emotes.asset`) ; captures `retours0110_boire_*.png`.}}
+- **Mage : plus de regain de mana sur l'attaque primaire** {décidé} : la boule de feu ne rend plus de mana ; seule la régénération passive (3 par seconde) en rend. Voir [Mage](classe-mage.md). {{dev: Fait le 01/10/2026 : `GameBalance.manaParTouche` à 0.}}
 - **Bouclier de Nyxessa trop encombrant** (todo) : on ne voit toujours rien à travers, même avec la paroi éclaircie vue de l'intérieur (27/09/2026) ; à retravailler (transparence, dôme plus bas ou en grille, silhouette des ennemis lisible à travers).
 - **Donjons à retravailler** (todo) : refonte à cadrer avec Quentin (balcons et étages déjà reportés, voir [Donjon](donjon.md)).
 - **Méga boule de feu du Mage à retravailler** (todo) : la Grande boule de feu (LB) ne convainc pas encore ; à cadrer avec Quentin.

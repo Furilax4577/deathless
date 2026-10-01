@@ -27,7 +27,8 @@ namespace Deathless.EditorTools
         static readonly Vector3 s_ChopePosition = Vector3.zero;
         static readonly Vector3 s_ChopeRotation = Vector3.zero;
         /// Hauteur de la chope, en fraction de la hauteur du personnage (Knight) : l'échelle en découle.
-        const float ChopeHauteurRelative = 0.13f;
+        /// 0,13 → 0,22 le 01/10/2026 (Quentin : « la chope est toute petite ») : lisible à 5,5 m de caméra.
+        const float ChopeHauteurRelative = 0.22f;
 
         [MenuItem("Deathless/Jeu/11. Emotes (roue : contrôleurs des héros, chope)")]
         public static string Emotes()
@@ -64,11 +65,13 @@ namespace Deathless.EditorTools
             float hChope = Hauteur(cat.chopePleine);
             // Sous le socket, la chope hérite de l'échelle du modèle du héros : on vise une fraction de sa hauteur.
             cat.echelle = hPerso > 0.01f && hChope > 0.001f ? ChopeHauteurRelative * hPerso / hChope : 1f;
-            Debug.Log("Emotes : chope de " + hChope.ToString("F3") + " (unités du modèle), personnage de " + hPerso.ToString("F2")
+            cat.hauteurBord = HautDuModele(cat.chopePleine);
+            Debug.Log("Emotes : chope de " + hChope.ToString("F3") + " (unités du modèle, bord à " + cat.hauteurBord.ToString("F3") + "), personnage de " + hPerso.ToString("F2")
                 + " : échelle " + cat.echelle.ToString("F2"));
-            MesurerBoire(AssetDatabase.LoadAssetAtPath<AnimationClip>(ClipBoire), out bool gauche, out float vide);
+            MesurerBoire(AssetDatabase.LoadAssetAtPath<AnimationClip>(ClipBoire), out bool gauche, out float vide, out float bouche);
             cat.mainGauche = gauche;
             cat.instantVide = vide;
+            cat.instantBouche = bouche;
             EditorUtility.SetDirty(cat);
             return cat;
         }
@@ -356,13 +359,33 @@ namespace Deathless.EditorTools
             finally { Object.DestroyImmediate(go); }
         }
 
+        /// Haut (axe Y, unités du modèle) des rendus d'un modèle posé à l'origine : hauteur du bord de la chope au-dessus
+        /// de son pivot.
+        static float HautDuModele(GameObject modele)
+        {
+            if (modele == null) return 0f;
+            var go = Object.Instantiate(modele);
+            go.hideFlags = HideFlags.HideAndDontSave;
+            try
+            {
+                go.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+                go.transform.localScale = Vector3.one;
+                float haut = 0f;
+                foreach (var r in go.GetComponentsInChildren<Renderer>(true)) haut = Mathf.Max(haut, r.bounds.max.y);
+                return haut;
+            }
+            finally { Object.DestroyImmediate(go); }
+        }
+
         /// Use_Item sur le Knight, clip échantillonné hors jeu : la main qui s'approche le plus de la tête tient la chope ;
         /// elle « quitte la bouche » quand, après le moment où elle en est le plus près, elle s'en est éloignée du tiers du
-        /// chemin qui la ramène à sa distance de repos. Renvoie cet instant en temps normalisé du clip.
-        static void MesurerBoire(AnimationClip clip, out bool gauche, out float instantVide)
+        /// chemin qui la ramène à sa distance de repos. Renvoie cet instant en temps normalisé du clip, et l'instant où la
+        /// main est au plus près (instantBouche : début de la boisson pour EmotesHeros.MajChope).
+        static void MesurerBoire(AnimationClip clip, out bool gauche, out float instantVide, out float instantBouche)
         {
             gauche = false;
             instantVide = 0.6f;
+            instantBouche = 0.45f;
             var modele = AssetDatabase.LoadAssetAtPath<GameObject>(KnightPath);
             if (modele == null || clip == null || clip.length <= 0f) return;
             var go = Object.Instantiate(modele);
@@ -394,6 +417,7 @@ namespace Deathless.EditorTools
                 gauche = minG < minD;
                 var d = gauche ? dG : dD;
                 int iMin = System.Array.IndexOf(d, gauche ? minG : minD);
+                instantBouche = (float)iMin / n;
                 float repos = d[n];
                 float seuil = d[iMin] + (Mathf.Max(repos, d[0]) - d[iMin]) / 3f;
                 for (int i = iMin; i <= n; i++)

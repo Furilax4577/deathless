@@ -17,5 +17,16 @@ MonoBehaviour:
   mainGauche: 0
   position: {x: 0, y: 0, z: 0}
   rotation: {x: 0, y: 0, z: 0}
-  echelle: 0.64498496
+  echelle: 1.091513
   instantVide: 0.7125
+  instantBouche: 0.4625
+  fondu: 0.1
+  bascule: 40
+  rapprochement: 1
+  boucheAvant: 0.34
+  boucheHaut: 0.17
+  hauteurBord: 0.30951944
+  mousse: 1
+  mousseHauteur: 0.3
+  mousseLargeur: 0.95
+  mousseCouleur: {r: 0.97, g: 0.95, b: 0.88, a: 1}

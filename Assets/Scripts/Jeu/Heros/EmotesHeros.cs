@@ -19,7 +19,10 @@ namespace Deathless.Jeu
     ///   passe par Heros.Declencher et l'entier par le NetworkAnimator du propriétaire : les autres postes jouent l'emote.
     /// - **Chope** (Boire un coup, tous les postes) : déduite de l'état « Boire » de l'Animator, comme le penché de la
     ///   charge : la chope remplace l'arme de la main qui la tient, pleine puis vide dès qu'elle quitte la bouche
-    ///   (CatalogueEmotes.instantVide). Rien à diffuser en plus.
+    ///   (CatalogueEmotes.instantVide). Depuis le 01/10/2026 (retour de Quentin : « la chope est toute petite, on ne voit
+    ///   pas qu'il boit »), elle est plus grosse (échelle du catalogue), coiffée d'un dôme de mousse, et pendant la
+    ///   boisson (instantBouche → instantVide) elle bascule vers la tête et son bord est amené à la bouche (os « head »),
+    ///   quelle que soit la silhouette du héros (MajChope). Rien à diffuser en plus.
     [DisallowMultipleComponent]
     public class EmotesHeros : MonoBehaviour, IRoueEmotes
     {
@@ -88,9 +91,11 @@ namespace Deathless.Jeu
         bool m_Vue, m_AttendNeutre, m_Releve;
         float m_Depuis, m_ReleveDepuis;
         // Chope (tous les postes)
-        Transform m_Main;
+        Transform m_Main, m_Tete;
         GameObject m_Chope, m_Pleine, m_Vide;
         bool m_ChopeVisible;
+        /// Matériau de la mousse (un pour tous les héros).
+        static Material s_Mousse;
         readonly List<(GameObject, bool)> m_Armes = new List<(GameObject, bool)>();
         static bool s_AvertiParametres, s_AvertiCatalogue;
 
@@ -378,18 +383,69 @@ namespace Deathless.Jeu
                 return;
             }
             string socket = cat.mainGauche ? "handslot.l" : "handslot.r";
-            foreach (var t in anim.GetComponentsInChildren<Transform>(true)) if (t.name == socket) { m_Main = t; break; }
+            foreach (var t in anim.GetComponentsInChildren<Transform>(true))
+            {
+                if (t.name == socket) m_Main = t;
+                else if (t.name == "head") m_Tete = t;
+            }
             if (m_Main == null) return;
+            // Construite à l'origine (identité) : les bornes des rendus sont alors celles du modèle, et la mousse se pose
+            // sur le haut de la chope pleine sans dépendre de la pose de la main.
             m_Chope = new GameObject("Chope");
             m_Chope.layer = m_Main.gameObject.layer;
+            m_Chope.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+            m_Pleine = Modele(cat.chopePleine, "Pleine");
+            m_Vide = cat.chopeVide != null ? Modele(cat.chopeVide, "Vide") : null;
+            if (cat.mousse) PoserMousse(cat);
             m_Chope.transform.SetParent(m_Main, false);
             m_Chope.transform.localPosition = cat.position;
             m_Chope.transform.localRotation = Quaternion.Euler(cat.rotation);
             m_Chope.transform.localScale = Vector3.one * (cat.echelle > 0f ? cat.echelle : 1f);
-            m_Pleine = Modele(cat.chopePleine, "Pleine");
-            m_Vide = cat.chopeVide != null ? Modele(cat.chopeVide, "Vide") : null;
             m_Chope.SetActive(false);
         }
+
+        /// Dôme de mousse blanche sur la chope pleine (01/10/2026) : une sphère aplatie, à moitié enfoncée dans le haut du
+        /// modèle, matériau Lit uni (le modèle KayKit n'a qu'un disque pâle). Rien sur la chope vide.
+        void PoserMousse(CatalogueEmotes cat)
+        {
+            if (m_Pleine == null || cat.mousseHauteur <= 0f) return;
+            bool etaitActif = m_Pleine.activeSelf;
+            m_Pleine.SetActive(true);
+            bool premier = true;
+            var b = new Bounds();
+            foreach (var r in m_Pleine.GetComponentsInChildren<Renderer>(true))
+            {
+                if (premier) { b = r.bounds; premier = false; } else b.Encapsulate(r.bounds);
+            }
+            m_Pleine.SetActive(etaitActif);
+            if (premier || b.size.y <= 0.0001f) return;
+            if (s_Mousse == null)
+            {
+                var shader = Shader.Find("Universal Render Pipeline/Lit");
+                if (shader == null) return;
+                s_Mousse = new Material(shader) { name = "Mousse (emote)" };
+                s_Mousse.SetFloat("_Smoothness", 0.25f);
+            }
+            s_Mousse.color = cat.mousseCouleur;
+            var mousse = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            mousse.name = "Mousse";
+            mousse.layer = m_Chope.layer;
+            foreach (var c in mousse.GetComponents<Collider>()) Destroy(c);
+            mousse.GetComponent<Renderer>().sharedMaterial = s_Mousse;
+            // La chope KayKit a une anse sur un côté : la mousse se centre sur la partie étroite (le corps), pas sur la boîte
+            // entière, en prenant la plus petite des deux largeurs.
+            float largeur = Mathf.Min(b.size.x, b.size.z) * cat.mousseLargeur;
+            float hauteur = b.size.y * cat.mousseHauteur;
+            mousse.transform.SetParent(m_Pleine.transform, true);
+            mousse.transform.position = new Vector3(b.center.x, b.max.y - hauteur * 0.15f, b.center.z);
+            mousse.transform.rotation = Quaternion.identity;
+            mousse.transform.localScale = Vector3.Scale(mousse.transform.localScale, new Vector3(largeur, hauteur, largeur));
+            // Hauteur du bord (pivot de la chope à son haut) mesurée ici si le catalogue ne la donne pas (MajChope).
+            m_HauteurBord = cat.hauteurBord > 0f ? cat.hauteurBord : b.max.y;
+        }
+
+        /// Hauteur du bord de la chope au-dessus de son pivot (unités du modèle).
+        float m_HauteurBord = 0.3f;
 
         GameObject Modele(GameObject source, string nom)
         {
@@ -433,6 +489,36 @@ namespace Deathless.Jeu
                 bool vide = m_Vide != null && cat != null && t >= cat.instantVide;
                 if (m_Pleine.activeSelf == vide) m_Pleine.SetActive(!vide);
                 if (m_Vide != null && m_Vide.activeSelf != vide) m_Vide.SetActive(vide);
+                if (cat != null) MajChope(cat, t);
+            }
+        }
+
+        /// Pose de la chope pendant le geste (01/10/2026). Hors de la boisson : la pose du catalogue dans la main. Pendant la
+        /// boisson (de instantBouche à instantVide, fondus de part et d'autre) : elle bascule de `bascule` degrés vers la
+        /// tête, puis son bord (pivot + hauteurBord × échelle, le long de son axe) est amené vers la bouche (os « head »,
+        /// un peu devant et en dessous) de la part `rapprochement` du chemin restant. Le clip porte déjà la main vers la
+        /// tête (Use_Item_Boire) ; ceci comble ce qui manque selon la silhouette du héros, sur tous les postes.
+        void MajChope(CatalogueEmotes cat, float t)
+        {
+            var tr = m_Chope.transform;
+            tr.localPosition = cat.position;
+            tr.localRotation = Quaternion.Euler(cat.rotation);
+            if (m_Tete == null || cat.instantVide <= cat.instantBouche) return;
+            float fondu = Mathf.Max(0.01f, cat.fondu);
+            float w = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(cat.instantBouche - fondu, cat.instantBouche, t))
+                * (1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(cat.instantVide, cat.instantVide + fondu, t)));
+            if (w <= 0.001f) return;
+            Vector3 bouche = m_Tete.position + transform.forward * cat.boucheAvant + Vector3.up * cat.boucheHaut;
+            Vector3 versBouche = bouche - tr.position;
+            if (versBouche.sqrMagnitude > 0.0001f && Mathf.Abs(cat.bascule) > 0.01f)
+            {
+                Vector3 axe = Vector3.Cross(tr.up, versBouche.normalized);
+                if (axe.sqrMagnitude > 0.0001f) tr.rotation = Quaternion.AngleAxis(cat.bascule * w, axe.normalized) * tr.rotation;
+            }
+            if (cat.rapprochement > 0f)
+            {
+                Vector3 bord = tr.position + tr.up * ((cat.hauteurBord > 0f ? cat.hauteurBord : m_HauteurBord) * tr.lossyScale.y);
+                tr.position += (bouche - bord) * (cat.rapprochement * w);
             }
         }
 
