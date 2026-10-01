@@ -1557,7 +1557,9 @@ public static class InterieursBuilder
         Poser(c, DungeonDir + "bottle_A_brown", new Vector3(0.95f, yc, -1.1f), 0f, 0.28f, false);
         Poser(c, DungeonDir + "bottle_B_green", new Vector3(0.93f, yc, -0.98f), 30f, 0.28f, false);
         Poser(c, DungeonDir + "plate_food_A", new Vector3(0.87f, yc, -0.45f), 15f, 0.22f, false);
-        Lumiere(c, "Lampe_Comptoir", new Vector3(1.0f, y + 1.9f, -0.2f), new Color(1f, 0.72f, 0.42f), 1.0f, 3.6f, false);
+        // lampe au-dessus du comptoir : à 2,5 m, au-dessus de la tête de la tavernière (Bavaroise v4, 2,15 m ; à 1,9 m la lampe
+        // était dans ses cheveux et lui faisait une tête lumineuse)
+        Lumiere(c, "Lampe_Comptoir", new Vector3(0.85f, y + 2.5f, -0.2f), new Color(1f, 0.72f, 0.42f), 1.0f, 3.6f, false);
         Bougie(c, new Vector3(0.9f, yc, 0.8f), 0.26f, true);
         // tonneaux en perce dans l'angle du fond, derrière le comptoir ; pile de tonnelets au fond à gauche
         Poser(c, DungeonDir + "keg", new Vector3(1.3f, y, -1.82f), -90f, 0.4f, true);

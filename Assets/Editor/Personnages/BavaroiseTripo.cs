@@ -4,15 +4,17 @@ using UnityEditor.Animations;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-// Bavaroise, version 3 (01/10/2026) : modèle Tripo (généré par Quentin depuis la T-pose de sa planche
-// ArtSources/References/Personnages/bavaroise_planche.jpg) passé par la chaîne Blender
-// ArtSources/Personnages/Bavaroise/bavaroise_pipeline.py : décimation (~6 500 triangles, facettes), nœud du tablier dans
-// le dos, texture cuite depuis la version texturée de Tripo (UV, cuisson, correction vers la palette de la planche),
-// armature Rig_Medium du Knight (Adventurers 2.0) gardée telle quelle et poids automatiques corrigés, chope modélisée.
+// Bavaroise, version 4 (01/10/2026) : modèle Tripo (image Grok v2 « facettage dense », vues de face et de dos, 8 pièces
+// texturées, ArtSources/References/Personnages/bavaroise_v4_tripo/) passé par la chaîne Blender
+// ArtSources/Personnages/Bavaroise/bavaroise_v4_pipeline.py : décimation par pièce (~11 800 triangles), normales lissées
+// (arêtes dures au-delà de 60°, normales pondérées par l'aire), atlas de texture cuit depuis les 8 textures Tripo sur les UV
+// Tripo (une tuile par pièce, 2048²), nœud du tablier présent dans le maillage, armature Rig_Medium du Knight
+// (Adventurers 2.0) gardée telle quelle et poids automatiques corrigés par règles géométriques, chope modélisée (v3).
+// La v3 (bavaroise_pipeline.py, facettes plates, ~6 500 triangles) reste reproductible.
 //
 // Ce script ne fait que le montage Unity :
 // - réglages d'import des deux FBX (Assets/Art/Bavaroise/Tripo/) : comme le Knight (Generic, sans Avatar), sans clips,
-//   sans matériaux importés, normales du fichier (plates) ;
+//   sans matériaux importés, normales du fichier (lissées par Blender ; le journal vérifie qu'elles le sont) ;
 // - Chope_Bavaroise.prefab (GUID gardé) : racine = repère du socket (anse à l'origine, haut selon +X, corps selon +Z),
 //   enfant « Modele » = Chope_Tripo ;
 // - Bavaroise.prefab (GUID gardé) : Bavaroise_Tripo dépaqueté, matériau Bavaroise_Texture.mat (URP Lit mat, texture cuite
@@ -72,12 +74,18 @@ public static class BavaroiseTripo
         inst.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
         int tris = 0;
         var matCorps = MateriauTexture();
+        int sommets = 0, lisses = 0, nSmr = 0;
         foreach (var smr in inst.GetComponentsInChildren<SkinnedMeshRenderer>(true))
         {
             smr.sharedMaterial = matCorps != null ? matCorps : mat;
             smr.updateWhenOffscreen = false;
             tris += smr.sharedMesh.triangles.Length / 3;
+            sommets += smr.sharedMesh.vertexCount;
+            lisses += SommetsLisses(smr.sharedMesh);
+            nSmr++;
         }
+        journal.Append(nSmr).Append(" SkinnedMeshRenderer, ").Append(sommets).Append(" sommets dont ").Append(lisses)
+            .Append(" lissés (normale à plus de 5° d'une face voisine ; plats = facettes) ; ");
         var droite = Trouver(inst.transform, "handslot.r");
         var gauche = Trouver(inst.transform, "handslot.l");
         if (droite == null || gauche == null) { Object.DestroyImmediate(inst); return "Bavaroise (Tripo) : sockets handslot introuvables"; }
@@ -107,8 +115,24 @@ public static class BavaroiseTripo
         return "Bavaroise (Tripo) : " + journal;
     }
 
+    // Normales importées : un sommet est « lissé » si sa normale s'écarte de plus de 5° de la normale géométrique d'une de ses
+    // faces (sur un maillage à facettes plates, toutes les normales sont celles des faces : 0 lissé).
+    static int SommetsLisses(Mesh m)
+    {
+        var v = m.vertices; var n = m.normals; var t = m.triangles;
+        if (n == null || n.Length != v.Length) return 0;
+        var lisse = new bool[v.Length];
+        for (int i = 0; i < t.Length; i += 3)
+        {
+            var fn = Vector3.Cross(v[t[i + 1]] - v[t[i]], v[t[i + 2]] - v[t[i]]).normalized;
+            for (int k = 0; k < 3; k++) if (Vector3.Angle(n[t[i + k]], fn) > 5f) lisse[t[i + k]] = true;
+        }
+        int c = 0; foreach (var b in lisse) if (b) c++;
+        return c;
+    }
+
     // Texture cuite par la chaîne Blender (Tripo/Bavaroise_Texture.png) : matériau URP Lit sans brillance ni reflets
-    // (aspect mat de la planche) ; les facettes viennent des normales plates du FBX. Sans texture : null (couleurs de
+    // (aspect mat de la planche) ; le volume vient des normales lissées du FBX. Sans texture : null (couleurs de
     // sommet et Bavaroise.mat).
     public const string Texture = Dossier + "/Tripo/Bavaroise_Texture.png";
     static Material MateriauTexture()
@@ -135,7 +159,8 @@ public static class BavaroiseTripo
         return m;
     }
 
-    // Comme le Knight : Generic sans Avatar ; pas de clip ni de matériau importé ; normales du fichier (facettes).
+    // Comme le Knight : Generic sans Avatar ; pas de clip ni de matériau importé ; normales du fichier (lissées par Blender,
+    // arêtes dures gardées : « Calculate » les recalculerait sans les coutures choisies).
     static bool ReglerImport(string chemin, bool squelette)
     {
         var imp = AssetImporter.GetAtPath(chemin) as ModelImporter;
