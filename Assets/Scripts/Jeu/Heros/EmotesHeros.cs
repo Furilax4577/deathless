@@ -79,6 +79,10 @@ namespace Deathless.Jeu
         Vector2 m_Curseur;
         int m_Pointee = -1;
         float m_CentreDepuis;
+        // La roue est pilotée à la souris (01/10/2026) : quand la souris s'arrête, l'action Look n'a plus de contrôle actif
+        // et RegardBrut ne la reconnaît plus ; sans ce drapeau on la prenait pour un stick revenu au centre et le curseur
+        // repartait au milieu après GraceStick, juste avant que le joueur ne relâche B.
+        bool m_RoueSouris;
         // Emote en cours (héros local)
         int m_Active;
         bool m_Vue, m_AttendNeutre, m_Releve;
@@ -195,6 +199,7 @@ namespace Deathless.Jeu
             m_Curseur = Vector2.zero;
             m_Pointee = -1;
             m_CentreDepuis = 0f;
+            m_RoueSouris = false;
         }
 
         void FermerRoue()
@@ -223,12 +228,18 @@ namespace Deathless.Jeu
             Vector2 v = entrees.RegardBrut(out bool souris);
             if (souris)
             {
+                m_RoueSouris = true;
                 m_Curseur = Vector2.ClampMagnitude(m_Curseur + v / Mathf.Max(1f, PixelsRoue), 1f);
             }
             else if (v.magnitude >= 0.5f)
             {
+                m_RoueSouris = false;   // le stick reprend la main
                 m_Curseur = Vector2.ClampMagnitude(v, 1f);
                 m_CentreDepuis = 0f;
+            }
+            else if (m_RoueSouris)
+            {
+                // Souris immobile : le curseur reste où le joueur l'a laissé.
             }
             else if (m_Curseur != Vector2.zero)
             {
