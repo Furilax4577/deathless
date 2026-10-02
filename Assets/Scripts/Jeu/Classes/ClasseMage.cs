@@ -15,7 +15,9 @@ namespace Deathless.Jeu
     /// grande boule et le mur ont un coût fixe et une recharge.
     public class ClasseMage : ClasseHeros
     {
-        enum Action { Aucune, Boule, Cone, GrandeBoule, Mur }
+        enum Action { Aucune, Boule, Cone, GrandeBoule, Mur, Viser }
+        /// Sorts à visée au sol (VisiereZone.Sort) : le lancement part à la confirmation (clic gauche, RT), pas à l'appui sur la compétence.
+        const int V_Grande = 1, V_Mur = 2;
 
         public Transform pointeBaton;
 
@@ -37,6 +39,7 @@ namespace Deathless.Jeu
         float m_TicCone;
         float m_RechargeGrande, m_RechargeMur;
         bool m_GrandeLancee, m_MurPose;
+        Vector3 m_PointGrande, m_CentreMur, m_AxeMur;   // point et axe confirmés par la visée
 
         // Effets diffusés aux autres postes (ClasseHeros.Diffuser).
         const int E_Boule = 1, E_ConeDebut = 2, E_ConeFin = 3, E_GrandeBoule = 4, E_Mur = 5;
@@ -87,6 +90,7 @@ namespace Deathless.Jeu
                     case Action.Boule: return 0.6f;
                     case Action.GrandeBoule: return 0.35f;
                     case Action.Mur: return 0.3f;
+                    case Action.Viser: return B.viseeZoneVitesse;
                     default: return 1f;
                 }
             }
@@ -105,6 +109,7 @@ namespace Deathless.Jeu
 
         public override void SurAction(string action)
         {
+            if (ViseeSurAction(action)) return;   // visée ouverte : clic gauche / RT confirme, clic droit / LT annule
             switch (action)
             {
                 case "AttackPrimary": Boule(); break;
@@ -180,30 +185,72 @@ namespace Deathless.Jeu
 
         // ----------------------------------------------------------------- Grande boule de feu (LB, 01/10/2026)
 
-        bool PeutLancer(float recharge, float cout) => H.PeutAgir && m_Action == Action.Aucune && recharge <= 0f && m_Mana >= cout;
+        /// Peut lancer (ou ouvrir la visée de) un sort à coût : libre d'agir, pas d'autre action en cours (sauf une visée, qu'on
+        /// peut changer pour une autre), recharge finie, assez de mana.
+        bool PeutLancer(float recharge, float cout)
+            => H.EtatCourant == Heros.Etat.Libre && H.Vivant && H.EnJeu && !H.EnTransit
+               && (m_Action == Action.Aucune || m_Action == Action.Viser) && recharge <= 0f && m_Mana >= cout;
+
+        /// Ouvre la visée au sol d'un sort (02/10/2026) : ni mana ni recharge avant la confirmation. Le geste de visée est
+        /// la pose d'incantation du cône (couche haut du corps), sans particules ; le mage marche au ralenti.
+        void Viser(int sort, ZoneVisee.Forme forme, float a, float b, float portee)
+        {
+            if (m_Action == Action.Viser) AnnulerVisee(false);   // autre sort visé : on change, sans bruit d'annulation
+            m_Action = Action.Viser;
+            m_Depuis = 0f;
+            if (Anim != null) Anim.SetBool(P_Cone, true);
+            CommencerVisee(sort, forme, VfxTheme.Feu, a, b, portee);
+        }
+
+        public override string LibelleVisee => SortVise == V_Mur ? "Mur de flammes" : "Grande boule de feu";
+
+        protected override void ViseeAnnulee(int sort)
+        {
+            if (m_Action == Action.Viser)
+            {
+                m_Action = Action.Aucune;
+                if (Anim != null) Anim.SetBool(P_Cone, false);
+            }
+        }
+
+        protected override bool ViseeConfirmee(int sort, Vector3 point, Vector3 axe)
+        {
+            if (m_Action != Action.Viser) return false;
+            return sort == V_Grande ? ConfirmerGrande(point) : ConfirmerMur(point, axe);
+        }
 
         void GrandeBoule()
         {
             var b = B;
+            if (EnVisee && SortVise == V_Grande) return;   // déjà en visée de ce sort
             if (!PeutLancer(m_RechargeGrande, b.grandeBouleMana)) return;
+            Viser(V_Grande, ZoneVisee.Forme.Cercle, b.grandeBouleRayon, 0f, b.grandeBoulePortee);
+        }
+
+        /// Confirmation de la visée : le mana et la recharge partent ici (pas avant), la boule sera lancée sur ce point.
+        bool ConfirmerGrande(Vector3 point)
+        {
+            var b = B;
+            if (m_RechargeGrande > 0f || m_Mana < b.grandeBouleMana) return false;
             m_Mana -= b.grandeBouleMana;
             m_RechargeGrande = RechargeGrandeTotale;
             m_Action = Action.GrandeBoule;
             m_Depuis = 0f;
             m_GrandeLancee = false;
-            H.Tourner(H.AvantCamera);
-            if (Anim != null) H.Declencher(P_GrandeBoule);
+            m_PointGrande = point;
+            if (Anim != null) { Anim.SetBool(P_Cone, false); H.Declencher(P_GrandeBoule); }
             AudioBank.Jouer(SonsDuJeu.GrandeBouleLancer, transform.position + Vector3.up * 1.5f, 0.9f);
             Diffuser(E_GrandeBoule);
+            return true;
         }
 
         void LancerGrandeBoule()
         {
             m_GrandeLancee = true;
             var b = B;
-            Vector3 cible = Combat.PointVise(H.CameraJeu, transform, b.boulePortee, out Sante visee);
-            if (H.Partie != null) H.Partie.Journal("Grande boule de feu : visée à " + Vector3.Distance(transform.position, cible).ToString("F1") + " m" + (visee != null ? " sur un ennemi" : ""));
-            ProjectileJeu.Tirer(ProjectileJeu.Genre.GrandeBouleDeFeu, DepartSort, cible, b.grandeBouleVitesse, b.boulePortee + 5f, transform, ExploserGrande);
+            if (H.Partie != null) H.Partie.Journal("Grande boule de feu : lancée sur le point visé, à " + Vector3.Distance(transform.position, m_PointGrande).ToString("F1") + " m");
+            // Tir en cloche sur le point confirmé (ProjectileJeu : rien n'arrête la boule en route, elle tombe au centre du cercle).
+            ProjectileJeu.Tirer(ProjectileJeu.Genre.GrandeBouleDeFeu, DepartSort, m_PointGrande, b.grandeBouleVitesse, b.grandeBoulePortee + 5f, transform, ExploserGrande);
         }
 
         /// Visuel et son de l'explosion de la grande boule (tous postes : ici et ProjectileJeu.TirerVisuel) : l'explosion de
@@ -230,6 +277,15 @@ namespace Deathless.Jeu
             ExplosionGrandeBoule(point);
             int n = 0;
             m_TuesGrande = 0;
+            // La boule tombe sur un point, pas sur un ennemi : le « coup direct » va à l'ennemi le plus proche du centre, s'il est
+            // dans le cœur de l'explosion (GameBalance.grandeBouleCoeur) ; viser juste rapporte les gros dégâts.
+            if (direct == null)
+                foreach (var s in Cibles(point, dir, b.grandeBouleRayon, 180f))
+                {
+                    Vector3 e = s.transform.position - point; e.y = 0f;
+                    if (e.magnitude <= b.grandeBouleCoeur) direct = s;
+                    break;   // la liste est triée du plus proche au plus loin
+                }
             bool crit = TirerCritique(point, dir, direct);
             float k = crit ? b.mageCritiqueMultiplicateur : 1f;
             if (direct != null && !direct.Mort) { ToucherGrande(direct, b.grandeBouleDegats * k, point, dir, crit); n++; }
@@ -257,25 +313,34 @@ namespace Deathless.Jeu
         void Mur()
         {
             var b = B;
+            if (EnVisee && SortVise == V_Mur) return;   // déjà en visée de ce sort
             if (!PeutLancer(m_RechargeMur, b.murMana)) return;
+            // Visée au sol (02/10/2026) : la ligne de 8 m se pose en travers de la ligne mage → point visé, au plus à murPortee.
+            Viser(V_Mur, ZoneVisee.Forme.Ligne, b.murLongueur, b.murEpaisseur, b.murPortee);
+        }
+
+        /// Confirmation de la visée du mur : le mana et la recharge partent ici ; le mur se posera à l'instant du geste.
+        bool ConfirmerMur(Vector3 point, Vector3 axe)
+        {
+            var b = B;
+            if (m_RechargeMur > 0f || m_Mana < b.murMana) return false;
             m_Mana -= b.murMana;
             m_RechargeMur = b.murRecharge * RechargeEsprit;
             m_Action = Action.Mur;
             m_Depuis = 0f;
             m_MurPose = false;
-            H.Tourner(H.AvantCamera);
-            if (Anim != null) H.Declencher(P_Mur);
+            m_CentreMur = point;
+            m_AxeMur = axe;
+            if (Anim != null) { Anim.SetBool(P_Cone, false); H.Declencher(P_Mur); }
+            return true;
         }
 
         void PoserMur()
         {
             m_MurPose = true;
             var b = B;
-            Vector3 f = H.AvantCamera; f.y = 0f;
-            if (f.sqrMagnitude < 0.0001f) f = transform.forward;
-            f.Normalize();
-            Vector3 centre = MurDeFlammes.Sol(transform.position + f * b.murDistance, transform.position.y);
-            Vector3 axe = Vector3.Cross(Vector3.up, f).normalized;   // perpendiculaire à la visée
+            Vector3 centre = m_CentreMur;   // le point confirmé, déjà au sol (Combat.PointViseSol)
+            Vector3 axe = m_AxeMur;         // en travers de la ligne mage → point visé
             float duree = DureeMur;
             DernierMurCentre = centre;
             DernierMurAxe = axe;
@@ -340,7 +405,8 @@ namespace Deathless.Jeu
         {
             var b = B;
             m_Depuis += dt;
-            bool tenu = H.Entrees.GardeMaintenue;
+            ViseeMaj();   // visée au sol : annulations (menu, étourdi…), indicateur
+            bool tenu = H.Entrees.GardeMaintenue && GardeLibre;   // LT qui vient d'annuler une visée ne lance pas le cône
             if (m_Action == Action.Aucune && tenu && m_Mana >= b.coneMana * 0.25f) CommencerCone();
             switch (m_Action)
             {
@@ -356,6 +422,8 @@ namespace Deathless.Jeu
                     if (!m_MurPose && m_Depuis >= b.murInstant) PoserMur();
                     if (m_Depuis >= Mathf.Max(b.murGeste, b.murInstant + 0.05f)) m_Action = Action.Aucune;
                     break;
+                case Action.Viser:
+                    break;   // la visée est tenue par ViseeMaj ; le lancement part à la confirmation
                 case Action.Cone:
                     m_Mana -= b.coneMana * Facteur(1) * dt;
                     if (pointeBaton != null && m_ConeGo != null)
@@ -441,6 +509,7 @@ namespace Deathless.Jeu
         public override void Interrompre()
         {
             ArreterCone();
+            AnnulerVisee(false);   // visée coupée (esquive, étourdissement, mort, menu) : rien n'a été dépensé
             // Sort coupé avant de partir (esquive, étourdissement, mort) : mana et recharge rendus.
             if (m_Action == Action.GrandeBoule && !m_GrandeLancee) { m_Mana = Mathf.Min(JaugeMax, m_Mana + B.grandeBouleMana); m_RechargeGrande = 0f; }
             if (m_Action == Action.Mur && !m_MurPose) { m_Mana = Mathf.Min(JaugeMax, m_Mana + B.murMana); m_RechargeMur = 0f; }
@@ -457,12 +526,12 @@ namespace Deathless.Jeu
                 case 1: return m_Action == Action.Cone ? EtatEmplacement.Actif : m_Mana < b.coneMana * 0.25f ? EtatEmplacement.Indisponible : EtatEmplacement.Pret;
                 case 2:
                 {
-                    var e = Recharge(m_RechargeGrande, RechargeGrandeTotale, out restant, out total, m_Action == Action.GrandeBoule);
+                    var e = Recharge(m_RechargeGrande, RechargeGrandeTotale, out restant, out total, m_Action == Action.GrandeBoule || (m_Action == Action.Viser && SortVise == V_Grande));
                     return e == EtatEmplacement.Pret && m_Mana < b.grandeBouleMana ? EtatEmplacement.Indisponible : e;
                 }
                 case 3:
                 {
-                    var e = Recharge(m_RechargeMur, b.murRecharge * RechargeEsprit, out restant, out total, m_Action == Action.Mur);
+                    var e = Recharge(m_RechargeMur, b.murRecharge * RechargeEsprit, out restant, out total, m_Action == Action.Mur || (m_Action == Action.Viser && SortVise == V_Mur));
                     return e == EtatEmplacement.Pret && m_Mana < b.murMana ? EtatEmplacement.Indisponible : e;
                 }
                 default: return EtatEmplacement.Vide;

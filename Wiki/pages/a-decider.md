@@ -14,6 +14,10 @@ Ce qui reste ouvert. Une ligne quitte cette page quand la règle est tranchée e
 | Succès | Trier la liste proposée le 01/10/2026 (garder, renommer, retirer), puis décider quand coder le module (local d'abord, Steam plus tard). | [Succès](succes.md) |
 | Mage (banc en jeu, 01/10/2026) | Avec son nouveau kit, le Mage est au-dessus de la moyenne des classes partout : +14 à +38 % en vague (nuits 6 et 12), +16 à +30 % sur une cible (boule et brûlure en paliers). Le réduire avant ou après la 0.8.0, et par quoi (dégâts de la boule, paliers de brûlure, mana) ? Détail : `Docs/equilibrage-classes.md`, « Banc en jeu ». | [Mage](classe-mage.md) |
 
+## Visée au sol (02/10/2026)
+
+Quentin a demandé que le mage voie où son sort va tomber (clic gauche confirme, clic droit annule, même mécanique que la nuée du rôdeur). Construit et décrit dans [Mage](classe-mage.md#règles), [Rôdeur](classe-rodeur.md#règles) et [Commandes](commandes.md#viser-une-zone-au-sol). Restent {à confirmer} : le ralenti à 50 % pendant la visée, les portées (20 m grande boule, 14 m mur, 25 m nuée), le mur posé en travers de la ligne mage → point, l'ennemi du « cœur » de la grande boule (1,5 m), LT (et non B) comme bouton d'annulation à la manette (B reste l'esquive, qui ferme aussi la visée), la visée aussi appliquée à la nuée du rôdeur.
+
 ## Équilibrage des classes (27/09/2026)
 
 Audit chiffré des cinq classes et propositions en trois niveaux (lissage, retouches de kit, refontes) dans `Docs/equilibrage-classes.md` (tableau regénérable par `Docs/outils/equilibrage.py`). Les trois déséquilibres les plus nets : le coup dans le dos de l'Assassin (×3 permanent sur tout squelette qui frappe Nyxessa : 109 dégâts par seconde contre 32 à 44 pour les autres), le Mage sans kit (deux boutons vides, cône moins bon que la boule, aucun contrôle), et la zone du simple au quadruple (Viking 201, Rôdeur 55, Assassin 44) alors que la nuit 12 demande environ 64 dégâts par seconde par joueur. Quentin tranche classe par classe :

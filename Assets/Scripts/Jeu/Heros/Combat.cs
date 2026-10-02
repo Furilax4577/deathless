@@ -113,6 +113,82 @@ namespace Deathless.Jeu
             AudioBank.Jouer(meilleur ? SonsDuJeu.CritiqueMeilleur : SonsDuJeu.Critique, point, 1f);
         }
 
+
+        static readonly RaycastHit[] s_HitsSol = new RaycastHit[24];
+
+        /// Premier sol sous (x, z) en partant de `hauteurDepart` : ni les personnages, ni les troncs de la forêt, ni les
+        /// étages masqués du donjon ne comptent (comme la caméra). Faux : pas de sol trouvé.
+        static bool SolSous(float x, float z, float hauteurDepart, Transform ignorer, out Vector3 sol)
+        {
+            sol = new Vector3(x, hauteurDepart, z);
+            int n = Physics.RaycastNonAlloc(new Vector3(x, hauteurDepart, z), Vector3.down, s_HitsSol, 40f, ~0, QueryTriggerInteraction.Ignore);
+            float best = float.MaxValue;
+            bool trouve = false;
+            for (int i = 0; i < n; i++)
+            {
+                var h = s_HitsSol[i];
+                if (h.distance >= best || IgnorerPourSol(h.collider, ignorer)) continue;
+                best = h.distance; sol = h.point; trouve = true;
+            }
+            return trouve;
+        }
+
+        /// Colliders qui ne comptent pas quand on cherche le sol d'une zone visée (personnages, forêt, étages masqués).
+        public static bool IgnorerPourSol(Collider c, Transform ignorer = null)
+        {
+            if (ignorer != null && c.transform.IsChildOf(ignorer)) return true;
+            if (c.GetComponentInParent<Sante>() != null) return true;
+            if (FeuillageMasquage.ColliderForet(c)) return true;
+            return Deathless.Donjon.DonjonMasquage.ColliderMasque(c);
+        }
+
+        /// Point au sol visé par le réticule pour un sort de zone (grande boule, mur, nuée ; visée du 02/10/2026) : le point
+        /// du décor que le centre de l'écran traverse (un ennemi visé compte à ses pieds), ramené au sol, et gardé entre
+        /// `distanceMin` et `portee` du héros (en projection horizontale). Si le réticule vise le ciel ou l'horizon, le
+        /// point est à la portée maximale dans la direction de la caméra. Faux : aucun sol sous le point (vide), le sort
+        /// ne peut pas partir là ; `point` reste alors posé à la hauteur du héros.
+        public static bool PointViseSol(Camera cam, Transform heros, float portee, float distanceMin, out Vector3 point)
+        {
+            Vector3 pos = heros.position;
+            Vector3 avant = heros.forward; avant.y = 0f;
+            if (avant.sqrMagnitude < 0.0001f) avant = Vector3.forward;
+            if (cam == null) { point = pos + avant.normalized * Mathf.Clamp(portee * 0.5f, distanceMin, portee); return SolSous(point.x, point.z, pos.y + 2.5f, heros, out point); }
+            Ray r = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+            // Départ du rayon au niveau du héros (la caméra est derrière lui : on ne vise pas ce qui est entre les deux).
+            float avance = Vector3.Dot(pos - r.origin, r.direction);
+            if (avance > 0f) r.origin += r.direction * avance;
+            int n = Physics.RaycastNonAlloc(r, s_HitsSol, 400f, ~0, QueryTriggerInteraction.Ignore);
+            float best = float.MaxValue;
+            Vector3 p = default;
+            bool touche = false, parSol = false;
+            for (int i = 0; i < n; i++)
+            {
+                var h = s_HitsSol[i];
+                if (h.distance >= best || h.collider.transform.IsChildOf(heros)) continue;
+                if (FeuillageMasquage.ColliderForet(h.collider) || Deathless.Donjon.DonjonMasquage.ColliderMasque(h.collider)) continue;
+                best = h.distance; p = h.point; touche = true;
+                parSol = h.collider.GetComponentInParent<Sante>() == null && h.normal.y > 0.55f;
+            }
+            Vector3 dirPlate = r.direction; dirPlate.y = 0f;
+            if (dirPlate.sqrMagnitude < 0.0001f) dirPlate = avant;
+            dirPlate.Normalize();
+            float yRef;
+            if (!touche) { p = pos + dirPlate * portee; yRef = pos.y; }
+            else yRef = p.y;
+            Vector3 d = p - pos; d.y = 0f;
+            float l = d.magnitude;
+            Vector3 dir = l > 0.05f ? d / l : dirPlate;
+            float lc = Mathf.Clamp(l, distanceMin, portee);
+            bool borne = !touche || Mathf.Abs(lc - l) > 0.001f;
+            Vector3 q = pos + dir * lc;
+            if (!borne && parSol) { point = p; return true; }
+            // Hauteur de départ du rayon vers le bas : celle du point visé, restée près du héros (plafonds exclus).
+            float depart = Mathf.Clamp(yRef + 0.4f, pos.y + 1.5f, pos.y + 4.5f);
+            if (SolSous(q.x, q.z, depart, heros, out point)) return true;
+            point = new Vector3(q.x, pos.y, q.z);
+            return false;
+        }
+
         static readonly RaycastHit[] s_Hits = new RaycastHit[32];
 
         /// Point visé par le réticule (centre de l'écran), en ignorant `ignorer` (le héros) : premier obstacle ou ennemi

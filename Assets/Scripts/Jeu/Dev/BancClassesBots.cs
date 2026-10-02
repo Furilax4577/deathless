@@ -67,7 +67,15 @@ namespace Deathless.Jeu.Dev
             if (!H.Vivant) return;
             Jouer(dt);
             if (Visee != null) Viser(Visee());
+            // Sorts de zone à visée au sol (02/10/2026) : le bot ouvre la visée (LB / RB), puis confirme (RT) quand l'accord est passé.
+            if (m_Confirmer > 0f && Time.time >= m_Confirmer)
+            {
+                m_Confirmer = 0f;
+                if (H.Classe.EnVisee) EntreesSimulees.Appui("rightTrigger", 0.1f);
+            }
         }
+
+        float m_Confirmer;
 
         protected abstract void Jouer(float dt);
 
@@ -102,6 +110,7 @@ namespace Deathless.Jeu.Dev
             EntreesSimulees.Appui(controle, 0.1f);
             Banc.Usage("appui_" + usage);
             bool accord = controle == "leftShoulder" || controle == "rightShoulder";
+            if (usage == "mur" || usage == "grande_boule" || usage == "nuee") m_Confirmer = Time.time + 0.2f * Time.timeScale;   // visée au sol : RT confirme
             ProchaineAction = Time.time + Mathf.Max(Reaction, 0.12f) + (accord ? 0.12f * Time.timeScale : 0f);
         }
 
@@ -466,7 +475,7 @@ namespace Deathless.Jeu.Dev
             // Grande boule.
             if (Pret(2) && mana >= b.grandeBouleMana)
             {
-                var s = PlusDense(b.boulePortee, b.grandeBouleRayon, out int n);
+                var s = PlusDense(Mathf.Min(b.boulePortee, b.grandeBoulePortee), b.grandeBouleRayon, out int n);
                 if (s != null && n >= (Bon ? 2 : 3) && D(s.transform.position, Pos) > 3f)
                 {
                     m_CibleTir = s; m_Err = Tirer(1.4f); m_Grande = true;

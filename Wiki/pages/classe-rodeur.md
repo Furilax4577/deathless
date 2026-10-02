@@ -19,7 +19,7 @@ L'archer. Plus il vise juste et bande fort, plus il fait mal : une flèche charg
 |---|---|---|
 | {icone rodeur_visee} | LT / clic droit maintenu | Viser (zoom de la caméra) |
 | {icone rodeur_tir} | RT / clic gauche | Bander l'arc, relâcher pour tirer (avec ou sans visée) |
-| {icone rodeur_nuee_de_fleches} | LB | Nuée de flèches |
+| {icone rodeur_nuee_de_fleches} | LB, puis RT | Nuée de flèches : LB ouvre la **visée** de la zone (cercle au sol), RT / clic gauche confirme, LT / clic droit annule |
 | {icone rodeur_roulade_salve} | RB | Roulade arrière avec salve |
 
 Actions communes à toutes les classes : voir [Classes](classes.md#actions-communes).
@@ -53,6 +53,7 @@ Les gestes joués en jeu pour chaque action, dans l'ordre où ils s'enchaînent.
 
 - Arc et carquois {décidé} : au repos, l'arc est tenu le long du corps ; il se lève et se bande pour viser.
 - **Compétence 1 : Nuée de flèches** {décidé} : un marqueur apparaît au sol, puis une pluie de flèches tombe sur la zone ciblée.
+  - **Visée de la zone** {décidé, 02/10/2026} (« mécanique à reprendre avec l'archer » : c'est la visée de zone du [Mage](classe-mage.md#règles), construite une seule fois et appliquée aussi ici) : LB ne lance plus la nuée, il **ouvre la visée**. Un cercle de la taille de la pluie (3 m de rayon, couleurs de chasse) suit le point que le réticule vise, jusqu'à **25 m**. **RT / clic gauche confirme** et la pluie tombe là ; **LT / clic droit annule**, sans recharge. Détails {à confirmer} : le rôdeur marche à 50 % pendant la visée, la recharge (12 s) part à la confirmation, l'esquive, un étourdissement, la mort ou un menu ferment la visée sans coût ; pas de zoom de caméra pendant la visée (LT y sert à annuler) ; le clic de confirmation ne bande pas l'arc tant qu'il n'est pas relâché ; le bandeau du HUD donne les deux invites. Voir [Commandes](commandes.md#viser-une-zone-au-sol).
 - **Compétence 2 : Roulade arrière** {décidé} : le rôdeur roule en arrière pour reprendre ses distances et tire en même temps une **salve de flèches devant lui**. Nombre de flèches, écart et dégâts {à équilibrer}.
 - **Visée récompensée** {décidé} : un tir plus précis rapporte davantage.
   - **Tir à la tête** : une flèche dans la tête est un **coup critique**.

@@ -13,7 +13,9 @@ namespace Deathless.Jeu
     /// et blendshape `Draw` pilotés ici (mêmes valeurs que BowStance).
     public class ClasseRodeur : ClasseHeros
     {
-        enum Action { Aucune, Bander, Lacher, Nuee }
+        enum Action { Aucune, Bander, Lacher, Nuee, Viser }
+        /// Sort à visée au sol (VisiereZone.Sort) : la nuée part à la confirmation (clic gauche, RT), pas à l'appui sur LB.
+        const int V_Nuee = 1;
 
         public override string Id => "rodeur";
         public override float PvMax => B.rodeurPV;
@@ -35,6 +37,7 @@ namespace Deathless.Jeu
         NueeDeFleches m_Nuee;
         Vector3 m_CentreNuee;
         bool m_NueeLancee;
+        bool m_AttenteRelache;   // RT a confirmé la visée : pas de nouvel arc bandé tant qu'il n'est pas relâché
 
         // Effets diffusés aux autres postes (ClasseHeros.Diffuser).
         const int E_Bander = 1, E_Tir = 2, E_Nuee = 3, E_Roulade = 4, E_Salve = 5;
@@ -72,7 +75,7 @@ namespace Deathless.Jeu
 
         public override bool Occupe => m_Action != Action.Aucune;
         public override bool PeutEsquiver => m_Action != Action.Nuee;
-        public override float FacteurVitesse => m_Action == Action.Nuee ? 0f : m_Action != Action.Aucune ? B.arcVitesseBander : m_Visee ? B.viseeVitesse : 1f;
+        public override float FacteurVitesse => m_Action == Action.Nuee ? 0f : m_Action == Action.Viser ? B.viseeZoneVitesse : m_Action != Action.Aucune ? B.arcVitesseBander : m_Visee ? B.viseeVitesse : 1f;
         public override bool BloqueSprint => m_Visee || m_Action != Action.Aucune;
         public override bool FaceVisee => m_Visee || m_Action != Action.Aucune;
         public override bool HautDuCorps => m_Action == Action.Bander || m_Action == Action.Lacher;
@@ -94,6 +97,7 @@ namespace Deathless.Jeu
 
         public override void SurAction(string action)
         {
+            if (ViseeSurAction(action)) return;   // visée de la nuée ouverte : clic gauche / RT confirme, clic droit / LT annule
             switch (action)
             {
                 case "AttackPrimary": Bander(); break;   // RT bande, visée ou non
@@ -149,21 +153,40 @@ namespace Deathless.Jeu
             });
         }
 
+        /// LB : ouvre la visée de la zone (02/10/2026, même mécanique que les sorts de zone du mage : VisiereZone). Le cercle
+        /// de la zone (rayon de la pluie, thème Chasse) suit le réticule jusqu'à nueePortee ; clic gauche / RT confirme et lance
+        /// la nuée sur ce point, clic droit / LT annule sans recharge. Avant, la nuée partait aussitôt sur le point visé.
         void Nuee()
         {
-            if (!H.PeutAgir || m_RechargeNuee > 0f) return;
+            if (EnVisee || !H.PeutAgir || m_RechargeNuee > 0f) return;
             var b = B;
-            Vector3 p = Combat.PointVise(H.CameraJeu, transform, b.nueePortee, out _);
-            Vector3 d = p - transform.position; d.y = 0f;
-            if (d.magnitude > b.nueePortee) p = transform.position + d.normalized * b.nueePortee;
-            if (Physics.Raycast(p + Vector3.up * 5f, Vector3.down, out var hit, 20f, ~0, QueryTriggerInteraction.Ignore)) p = hit.point;
-            m_CentreNuee = p;
+            m_Action = Action.Viser;
+            m_Depuis = 0f;
+            CommencerVisee(V_Nuee, ZoneVisee.Forme.Cercle, VfxTheme.Chasse, b.nueeRayon, 0f, b.nueePortee);
+        }
+
+        public override string LibelleVisee => "Nuée de flèches";
+
+        protected override void ViseeAnnulee(int sort)
+        {
+            if (m_Action == Action.Viser) m_Action = Action.Aucune;
+        }
+
+        /// Confirmation : la recharge part ici (pas avant) et la pluie tombera sur le point visé.
+        protected override bool ViseeConfirmee(int sort, Vector3 point, Vector3 axe)
+        {
+            if (m_Action != Action.Viser || m_RechargeNuee > 0f) return false;
+            var b = B;
+            Vector3 d = point - transform.position; d.y = 0f;
+            m_CentreNuee = point;
             m_RechargeNuee = b.nueeRecharge * Facteur(2) * RechargeEsprit;
             m_Action = Action.Nuee;
             m_Depuis = 0f;
             m_NueeLancee = false;
+            m_AttenteRelache = H.Entrees.AttaqueMaintenue;   // le clic de confirmation ne rebande pas l'arc en traînant
             H.Tourner(d);
             if (Anim != null) H.Declencher(P_TirHaut);
+            return true;
         }
 
         IEnumerator Pluie(Vector3 centre, bool degats = true)
@@ -225,7 +248,7 @@ namespace Deathless.Jeu
             m_RechargeNuee = Mathf.Max(0f, m_RechargeNuee - dt);
             m_RechargeRoulade = Mathf.Max(0f, m_RechargeRoulade - dt);
             AppliquerPose();
-            m_Visee = H.Vivant && H.EnJeu && H.Entrees.GardeMaintenue;
+            m_Visee = H.Vivant && H.EnJeu && H.Entrees.GardeMaintenue && GardeLibre && !EnVisee;   // pas de zoom pendant la visée d'une zone : LT y annule
             if (H.CameraEpaule != null) H.CameraEpaule.viseeVoulue = m_Visee ? 1f : 0f;   // zoom pendant la visée (Quentin, 26/09/2026)
         }
 
@@ -233,16 +256,21 @@ namespace Deathless.Jeu
         {
             var b = B;
             m_Depuis += dt;
+            ViseeMaj();   // visée au sol : annulations (menu, étourdi…), indicateur
             switch (m_Action)
             {
+                case Action.Viser:
+                    break;   // la visée est tenue par ViseeMaj ; la nuée part à la confirmation
                 case Action.Bander:
                     m_Charge = Mathf.Clamp01(m_Depuis / (b.arcCharge * Facteur(1)));
                     if (m_Cercle != null) m_Cercle.Charge = m_Charge;
                     if (!H.Entrees.AttaqueMaintenue) Lacher();              // relâcher RT tire, visée ou non
                     break;
                 case Action.Aucune:
-                    // RT maintenu après un tir : il rebande dès que l'intervalle est passé.
-                    if (H.Entrees.AttaqueMaintenue && Time.time - m_DernierTir >= b.arcIntervalle / VitesseAttaque + 0.15f) Bander();
+                    // RT maintenu après un tir : il rebande dès que l'intervalle est passé (pas après la confirmation de la nuée,
+                    // tant que RT n'est pas relâché).
+                    if (m_AttenteRelache) { if (!H.Entrees.AttaqueMaintenue) m_AttenteRelache = false; }
+                    else if (H.Entrees.AttaqueMaintenue && Time.time - m_DernierTir >= b.arcIntervalle / VitesseAttaque + 0.15f) Bander();
                     break;
                 case Action.Lacher:
                     if (m_Depuis >= 0.3f) m_Action = Action.Aucune;
@@ -283,7 +311,7 @@ namespace Deathless.Jeu
         /// Arc repos / visée (rotation dans handslot.l), flèche encochée visible en bandant, tension du blendshape `Draw`.
         void AppliquerPose()
         {
-            bool vise = m_Action == Action.Bander || m_Action == Action.Nuee;
+            bool vise = m_Action == Action.Bander || m_Action == Action.Nuee || m_Action == Action.Viser;
             m_Pose = Mathf.MoveTowards(m_Pose, vise ? 1f : 0f, Time.deltaTime / 0.15f);
             float k = Mathf.SmoothStep(0f, 1f, m_Pose);
             if (m_Arc != null) m_Arc.localRotation = Quaternion.Slerp(Quaternion.Euler(ReposEuler), Quaternion.Euler(ViseeEuler), k);
@@ -303,6 +331,7 @@ namespace Deathless.Jeu
 
         public override void Interrompre()
         {
+            AnnulerVisee(false);   // visée coupée (esquive, étourdissement, mort, menu) : rien n'a été dépensé
             if (m_Action == Action.Bander) Reposer();
             m_Action = Action.Aucune;
         }
@@ -314,7 +343,7 @@ namespace Deathless.Jeu
             {
                 case 0: return m_Action == Action.Bander ? EtatEmplacement.Actif : EtatEmplacement.Pret;
                 case 1: return m_Visee ? EtatEmplacement.Actif : EtatEmplacement.Pret;
-                case 2: return Recharge(m_RechargeNuee, B.nueeRecharge * Facteur(2) * RechargeEsprit, out restant, out total, m_Action == Action.Nuee);
+                case 2: return Recharge(m_RechargeNuee, B.nueeRecharge * Facteur(2) * RechargeEsprit, out restant, out total, m_Action == Action.Nuee || m_Action == Action.Viser);
                 case 3: return Recharge(m_RechargeRoulade, B.rouladeRecharge * RechargeEsprit, out restant, out total);
                 default: return EtatEmplacement.Vide;
             }

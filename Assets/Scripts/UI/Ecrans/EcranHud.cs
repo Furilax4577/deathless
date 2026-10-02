@@ -87,6 +87,8 @@ namespace Deathless.UI.Ecrans
         HudStatuts m_Statuts;
         /// Jauge de relevé du Renversé (classe à part : HudRelevage.cs).
         HudRelevage m_Relevage;
+        /// Bandeau de la visée d'une zone au sol (classe à part : HudVisee.cs, 02/10/2026).
+        HudVisee m_Visee;
         /// Jauge de parade du paladin, sous le réticule (classe à part : HudParade.cs).
         HudParade m_Parade;
         /// Barres de vie des ennemis et méga barre du/des boss (classe à part : HudVieEnnemis.cs).
@@ -190,6 +192,7 @@ namespace Deathless.UI.Ecrans
             ConstruireAllies();
             m_Statuts = new HudStatuts(Racine);
             m_Relevage = new HudRelevage(Racine);
+            m_Visee = new HudVisee(Racine);
             m_Parade = new HudParade(Racine);
             m_VieEnnemis = new HudVieEnnemis(Racine);
             m_Degats = new HudDegats(Racine);
@@ -296,6 +299,7 @@ namespace Deathless.UI.Ecrans
             MajEquipe(partie as IEtatEquipe);
             m_Statuts?.Maj(joueur == null || joueur.EstMort);
             m_Relevage?.Maj();
+            m_Visee?.Maj();
             m_Parade?.Maj(joueur == null || joueur.EstMort);
             m_VieEnnemis?.Maj(dt);
             m_Degats?.Suivre();

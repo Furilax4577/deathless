@@ -12,7 +12,9 @@ namespace Deathless.Jeu
     public class ProjectileJeu : MonoBehaviour
     {
         /// La valeur sert d'identifiant réseau (octet, HerosReseau.Tir) : ne pas renuméroter. GrandeBouleDeFeu (01/10/2026) :
-        /// LB du mage, même boule en plus grosse et plus lente (GameBalance.grandeBouleTaille), explosion large.
+        /// LB du mage, même boule en plus grosse et plus lente (GameBalance.grandeBouleTaille), explosion large. Depuis la
+        /// visée au sol (02/10/2026) elle est lancée en cloche sur un point précis et n'est arrêtée par rien en route :
+        /// elle tombe exactement au centre du cercle de visée (ici et chez les autres postes, où le tir est rejoué).
         public enum Genre { Fleche, Carreau, BouleDeFeu, GrandeBouleDeFeu }
 
         /// Boule de feu, petite ou grande (feu du mage, pas une flèche).
@@ -34,6 +36,10 @@ namespace Deathless.Jeu
         AudioSource m_Boucle;
         bool m_Fini;
         float m_DemiLongueur;
+        // Tir en cloche sur un point (grande boule) : durée du vol, temps écoulé, point d'arrivée.
+        bool m_Tombe;
+        float m_DureeVol, m_Ecoule;
+        Vector3 m_Cible;
         static readonly RaycastHit[] s_Hits = new RaycastHit[16];
 
         public static ProjectileJeu Tirer(Genre genre, Vector3 depart, Vector3 cible, float vitesse, float portee, Transform tireur,
@@ -88,10 +94,11 @@ namespace Deathless.Jeu
             if (EstBoule(genre))
             {
                 // Légère cloche (Relic : +1,5 m/s vers le haut, chute 5), visée corrigée pour tomber sur la cible.
-                p.m_Gravite = 5f;
+                bool grande = genre == Genre.GrandeBouleDeFeu;
+                p.m_Gravite = grande ? 9.81f : 5f;   // la grande boule retombe en vraie cloche sur le point visé
                 float t = Vector3.Distance(depart, cible) / Mathf.Max(1f, vitesse);
                 p.m_Vitesse = dir * vitesse + Vector3.up * (0.5f * p.m_Gravite * t);
-                bool grande = genre == Genre.GrandeBouleDeFeu;
+                if (grande) { p.m_Tombe = true; p.m_DureeVol = Mathf.Max(0.05f, t); p.m_Cible = cible; }
                 if (fx != null) FireballVisual.Attach(go.transform, fx.terre, grande ? Mathf.Max(1f, bal.grandeBouleTaille) : 1f, fx.gemmes);
                 p.m_Boucle = AudioBank.Boucle(grande ? SonsDuJeu.GrandeBouleVol : SonsDuJeu.BouleVol, go.transform, grande ? 0.8f : 0.6f);
             }
@@ -134,6 +141,22 @@ namespace Deathless.Jeu
             Vector3 pas = m_Vitesse * dt;
             float d = pas.magnitude;
             if (d < 1e-5f) return;
+            if (m_Tombe)
+            {
+                // Cloche sur un point : pas de balayage, le décor et les ennemis en route n'arrêtent pas la boule ; elle arrive
+                // au point visé à l'instant calculé (l'explosion est centrée sur le cercle de visée).
+                m_Ecoule += dt;
+                if (m_Ecoule >= m_DureeVol)
+                {
+                    transform.position = m_Cible;
+                    Arriver(m_Cible, pas / d, null);
+                    return;
+                }
+                transform.position += pas;
+                m_Sommet = Mathf.Max(m_Sommet, transform.position.y - m_Depart.y);
+                transform.rotation = Quaternion.LookRotation(pas / d);
+                return;
+            }
             Vector3 dir = pas / d;
             Vector3 avant = transform.position + dir * m_DemiLongueur;   // la pointe mène
             float r = m_Genre == Genre.GrandeBouleDeFeu ? 0.25f * Mathf.Max(1f, GameBalance.Courant.grandeBouleTaille) : m_Genre == Genre.BouleDeFeu ? 0.25f : 0.08f;

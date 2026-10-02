@@ -103,6 +103,94 @@ namespace Deathless.Jeu
         /// Heros a heurté le décor sur le côté pendant un déplacement imposé.
         public virtual void SurCollisionCote() { }
 
+        // ----------------------------------------------------------------- Visée d'une zone au sol (02/10/2026)
+
+        /// Visée d'un sort de zone (mage : grande boule, mur ; rôdeur : nuée) : voir VisiereZone. Commune aux classes.
+        protected readonly VisiereZone Visiere = new VisiereZone();
+        /// Une visée de zone est ouverte : la classe est « occupée » (pas de saut, pas d'autre action), marche au ralenti.
+        public bool EnVisee => Visiere.Actif;
+        /// Marque (VisiereZone.Sort) du sort visé, ou 0 sans visée.
+        public int SortVise => Visiere.Actif ? Visiere.Sort : 0;
+        /// Nom du sort visé, pour le bandeau du HUD (IViseeZone).
+        public virtual string LibelleVisee => string.Empty;
+        /// Tests : point visé, axe et validité de la visée en cours.
+        public Vector3 PointVise => Visiere.Point;
+        public Vector3 AxeVise => Visiere.Axe;
+        public bool PointViseValide => Visiere.Valide;
+        /// LT (clic droit) vient d'annuler une visée et reste enfoncé : il ne doit pas déclencher aussitôt l'action maintenue
+        /// de la classe (cône de flammes du mage, visée zoomée du rôdeur) ; levé au relâchement.
+        bool m_GardeBloquee;
+        protected bool GardeLibre => !m_GardeBloquee;
+
+        /// Ouvre la visée du sort `sort` (cercle de rayon `a`, ou ligne de longueur `a` et de largeur `b`) : l'indicateur de
+        /// zone suit le réticule jusqu'à `portee` m. Rien ne coûte ici : le coût part à la confirmation (ViseeConfirmee).
+        protected void CommencerVisee(int sort, ZoneVisee.Forme forme, VfxTheme theme, float a, float b, float portee)
+        {
+            if (H == null || H.Distant) return;
+            Visiere.Commencer(H, sort, forme, theme, a, b, portee);
+            AudioBank.Jouer(SonsDuJeu.ViseeDebut, H.transform.position + Vector3.up * 1.2f, 0.6f);
+        }
+
+        /// Referme la visée sans lancer (annulation, esquive, étourdissement, mort, menu) : ni mana, ni recharge.
+        protected void AnnulerVisee(bool son = true)
+        {
+            if (!Visiere.Actif) return;
+            int sort = Visiere.Sort;
+            Visiere.Terminer(false);
+            if (son && H != null) AudioBank.Jouer(SonsDuJeu.ViseeAnnule, H.transform.position + Vector3.up * 1.2f, 0.6f);
+            ViseeAnnulee(sort);
+        }
+
+        /// À appeler en tête de SurAction : pendant une visée, RT / clic gauche confirme (vrai, action consommée), LT / clic
+        /// droit annule. Les touches de compétence restent à la classe (changer de sort visé). Faux : pas de visée.
+        protected bool ViseeSurAction(string action)
+        {
+            if (!Visiere.Actif) return false;
+            switch (action)
+            {
+                case "AttackPrimary":
+                    ConfirmerVisee();
+                    return true;
+                case "AttackSecondary":
+                    m_GardeBloquee = true;
+                    AnnulerVisee();
+                    return true;
+            }
+            return false;
+        }
+
+        void ConfirmerVisee()
+        {
+            if (!Visiere.Actif) return;
+            if (!Visiere.Valide) { AudioBank.Jouer(SonsDuJeu.ViseeAnnule, H.transform.position + Vector3.up * 1.2f, 0.4f); return; }   // pas de sol sous le point : refus, la visée reste ouverte
+            int sort = Visiere.Sort;
+            Vector3 point = Visiere.Point, axe = Visiere.Axe;
+            if (!ViseeConfirmee(sort, point, axe)) return;
+            Visiere.Terminer(true);
+        }
+
+        /// À appeler à chaque image, dans Maj : lève le verrou de LT, et referme la visée si le héros ne peut plus viser
+        /// (mort, hors jeu, portail, esquive ou étourdissement, menu ou roue à emotes ouverts), puis met l'indicateur à jour.
+        protected void ViseeMaj()
+        {
+            if (H == null) return;
+            if (m_GardeBloquee && !H.Entrees.GardeMaintenue) m_GardeBloquee = false;
+            if (!Visiere.Actif) return;
+            if (!H.Vivant || !H.EnJeu || H.EnTransit || H.EtatCourant != Heros.Etat.Libre || !H.Entrees.CarteJeuActive
+                || (H.Emotes != null && H.Emotes.RoueOuverte))
+            {
+                AnnulerVisee();
+                return;
+            }
+            Visiere.Maj(H);
+        }
+
+        /// La classe lance son sort sur le point confirmé (coût, recharge, geste). Faux : refusé (pas assez de mana…), la
+        /// visée reste ouverte. `axe` : direction de la ligne (mur) ou de la visée.
+        protected virtual bool ViseeConfirmee(int sort, Vector3 point, Vector3 axe) => true;
+        /// La visée vient d'être annulée ou coupée (retire l'animation de visée).
+        protected virtual void ViseeAnnulee(int sort) { }
+
         // ----------------------------------------------------------------- Effets visibles par tous (multijoueur)
 
         /// Effets communs à toutes les classes (numéros 200 et plus ; ceux des classes sont en dessous).

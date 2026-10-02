@@ -140,6 +140,10 @@ namespace Deathless.Jeu
         public static readonly string[] ArcTirCharge = { "bow_shot_v3_charged", "bow_shot_charged" };
         public static readonly string[] FlecheImpact = { "arrow_impact" };
         public static readonly string[] NueeMarqueur = { "nuee_marqueur" };
+        // Visée d'une zone au sol (02/10/2026, mage et rôdeur) : ouverture (le marqueur de la nuée, déjà dans le catalogue) et
+        // annulation (le « retour » de l'interface) ; « à créer » en tête. La confirmation joue le son du sort lui-même.
+        public static readonly string[] ViseeDebut = { "dl_visee_debut", "nuee_marqueur" };
+        public static readonly string[] ViseeAnnule = { "dl_visee_annule", "ui_retour" };
         public static readonly string[] Nuee = { "arrow_rain" };
         public static readonly string[] Dague = { "dague_coup", "kenney_rpg_knifeslice" };
         public static readonly string[] ArbaleteTir = { "crossbow_shot_v3", "crossbow_shot" };

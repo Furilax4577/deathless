@@ -24,6 +24,8 @@ namespace Deathless.Jeu.Dev
                 case "viking": s_I.StartCoroutine(s_I.Viking()); break;
                 case "mage": s_I.StartCoroutine(s_I.Mage()); break;
                 case "mage_kit": s_I.StartCoroutine(s_I.MageKit()); break;   // 01/10/2026 : LB, RB, cône qui ralentit, mana 3/s
+                case "mage_visee": s_I.StartCoroutine(s_I.MageVisee()); break;     // 02/10/2026 : visée au sol (grande boule, mur)
+                case "rodeur_visee": s_I.StartCoroutine(s_I.RodeurVisee()); break; // 02/10/2026 : visée au sol de la nuée
                 case "rodeur": s_I.StartCoroutine(s_I.Rodeur()); break;
                 case "assassin": s_I.StartCoroutine(s_I.Assassin()); break;
                 case "premierA": s_I.StartCoroutine(s_I.PremierA()); break;
@@ -112,6 +114,8 @@ namespace Deathless.Jeu.Dev
             Figer(groupe, 20f);
             ViserPoint(groupe[0].transform.position);
             EntreesSimulees.Appui("leftShoulder", 0.1f);
+            yield return new WaitForSeconds(0.3f);
+            EntreesSimulees.Appui("rightTrigger", 0.1f);   // visée au sol (02/10/2026) : RT confirme la nuée
             yield return new WaitForSeconds(1.35f);
             DevPartie.Capturer("lissage_rodeur_nuee_ralenti");
             var s0 = groupe[0];
@@ -377,8 +381,10 @@ namespace Deathless.Jeu.Dev
             bool explose = false; Sante direct = null;
             System.Action<ProjectileJeu.Genre, Vector3, Sante, float> suivi = (g, p, s, haut) => { if (g == ProjectileJeu.Genre.GrandeBouleDeFeu) { explose = true; direct = s; } };
             ProjectileJeu.Arrivee += suivi;
-            float t0 = Time.time;
             EntreesSimulees.Appui("leftShoulder", 0.1f);
+            yield return new WaitForSeconds(0.3f);
+            float t0 = Time.time;
+            EntreesSimulees.Appui("rightTrigger", 0.1f);   // visée au sol (02/10/2026) : RT confirme
             yield return new WaitForSeconds(0.55f);
             DevPartie.Capturer("mage_grande_boule_lancer");
             while (!explose && Time.time - t0 < 4f) yield return null;
@@ -426,6 +432,8 @@ namespace Deathless.Jeu.Dev
             h.Classe.RemplirJauge();
             yield return null;
             EntreesSimulees.Appui("rightShoulder", 0.1f);
+            yield return new WaitForSeconds(0.3f);
+            EntreesSimulees.Appui("rightTrigger", 0.1f);   // visée au sol (02/10/2026) : RT confirme le mur
             var vuRalenti = new bool[vague.Count]; var palierMax = new int[vague.Count]; var vitMin = new float[vague.Count];
             for (int i = 0; i < vague.Count; i++) vitMin[i] = 99f;
             bool capture = false;
@@ -453,6 +461,235 @@ namespace Deathless.Jeu.Dev
             foreach (var s in vague) if (s != null) Destroy(s.gameObject);
             Missiles(true);
         }
+
+
+        // ================================================================= Visée d'une zone au sol (02/10/2026)
+
+        /// Appui sur une compétence de zone (LB, RB), puis confirmation par RT (ou annulation par LT) : la visée du mage
+        /// (grande boule, mur) et du rôdeur (nuée) s'ouvre à l'appui sur la compétence, le sort part à la confirmation.
+        static IEnumerator ViseeZone(string controle, float attente = 0.3f)
+        {
+            EntreesSimulees.Appui(controle, 0.1f);
+            yield return new WaitForSeconds(attente);
+        }
+
+        /// Point du sol (plan y = `y`) que le centre de l'écran traverse : la vérité terrain de l'indicateur de visée.
+        static Vector3 PointSurLePlan(float y)
+        {
+            var cam = H.CameraJeu;
+            Ray r = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+            float t = (y - r.origin.y) / r.direction.y;
+            return r.origin + r.direction * t;
+        }
+
+        /// Retire les ennemis en place (le Play garde les sorties du jour) et pose le décor d'essai.
+        static void Nettoyer()
+        {
+            var dv = DirecteurVagues.Instance;
+            if (dv == null) return;
+            foreach (var s in new List<Squelette>(dv.Vivants)) if (s != null) Destroy(s.gameObject);
+        }
+
+        /// Mage : visée de la grande boule (cercle de 5 m qui suit le réticule), annulation sans coût (LT), confirmation (RT) :
+        /// la boule tombe au centre du cercle ; visée du mur (ligne de 8 m en travers), changement de sort en cours de visée,
+        /// annulation par l'esquive et par l'étourdissement, boule de feu primaire et cône inchangés.
+        IEnumerator MageVisee()
+        {
+            Missiles(false);
+            Nettoyer();
+            var h = H; var b = GameBalance.Courant;
+            var mage = h.Classe as ClasseMage;
+            DevPartie.PlacerHeros(Depart, Loin);
+            yield return null;
+            var sol = h.transform.position;
+            Vector3 avant = Flat(h.transform.forward).normalized, droite = Flat(h.transform.right).normalized;
+            var groupe = new List<Squelette>
+            {
+                DevPartie.PoserDevant(TypeEnnemi.Sbire, 10f, 0f), DevPartie.PoserDevant(TypeEnnemi.Sbire, 10.6f, -1.4f),
+                DevPartie.PoserDevant(TypeEnnemi.Sbire, 10.6f, 1.4f), DevPartie.PoserDevant(TypeEnnemi.Sbire, 12.5f, 0.3f),
+                DevPartie.PoserDevant(TypeEnnemi.Sbire, 17f, 4.5f),   // hors du cercle : ne doit rien subir
+            };
+            yield return Sortir(groupe);
+            Figer(groupe, 60f);
+            h.Classe.RemplirJauge();
+            Vector3 centreGroupe = (groupe[0].transform.position + groupe[1].transform.position + groupe[2].transform.position + groupe[3].transform.position) / 4f;
+            ViserPoint(new Vector3(centreGroupe.x, sol.y, centreGroupe.z));
+            yield return null;
+
+            // 1) LB : la visée s'ouvre, rien n'est dépensé, le cercle suit le réticule.
+            float mana0 = h.Classe.ValeurJauge;
+            yield return ViseeZone("leftShoulder");
+            h.Classe.Emplacement(2, out float rest, out _);
+            Vector3 vrai = PointSurLePlan(sol.y);
+            Log("mage visée 1 : visée " + h.Classe.EnVisee + " (sort " + h.Classe.SortVise + "), occupé " + h.Classe.Occupe + ", mana " + mana0.ToString("F0") + " → " + h.Classe.ValeurJauge.ToString("F0")
+                + ", recharge " + rest.ToString("F1") + " s, point " + h.Classe.PointVise.ToString("F2") + " (réticule/sol " + vrai.ToString("F2") + ", écart " + Vector3.Distance(Flat(vrai), Flat(h.Classe.PointVise)).ToString("F2") + " m), valide " + h.Classe.PointViseValide
+                + ", distance " + Vector3.Distance(Flat(sol), Flat(h.Classe.PointVise)).ToString("F1") + " m");
+            DevPartie.Capturer("mage_visee_grande");
+            yield return new WaitForSeconds(0.2f);
+
+            // 2) Le point suit la caméra et reste limité à la portée.
+            ViserPoint(sol + avant * 6f + droite * 3f);
+            yield return new WaitForSeconds(0.15f);
+            Log("mage visée 2 : point proche " + Vector3.Distance(Flat(sol), Flat(h.Classe.PointVise)).ToString("F1") + " m (attendu 6,7)");
+            ViserPoint(sol + avant * 60f + Vector3.up * 12f);   // vers l'horizon : au plus loin
+            yield return new WaitForSeconds(0.15f);
+            Log("mage visée 2 : point lointain " + Vector3.Distance(Flat(sol), Flat(h.Classe.PointVise)).ToString("F1") + " m (portée " + b.grandeBoulePortee + ")");
+            ViserPoint(new Vector3(centreGroupe.x, sol.y, centreGroupe.z));
+            yield return new WaitForSeconds(0.2f);
+
+            // 3) LT annule : ni mana ni recharge, le cône ne part pas.
+            EntreesSimulees.Appui("leftTrigger", 0.1f);
+            yield return new WaitForSeconds(0.3f);
+            h.Classe.Emplacement(2, out rest, out _);
+            Log("mage visée 3 : annulée par LT, visée " + h.Classe.EnVisee + ", occupé " + h.Classe.Occupe + ", mana " + h.Classe.ValeurJauge.ToString("F0") + ", recharge " + rest.ToString("F1") + " s (attendu : aucune visée, 100, 0)");
+            // LT maintenu longuement après une annulation : le cône ne doit pas partir tant que LT n'est pas relâché.
+            yield return ViseeZone("leftShoulder");
+            EntreesSimulees.Maintenir("leftTrigger", true);
+            yield return new WaitForSeconds(0.5f);
+            Log("mage visée 3 : LT maintenu après l'annulation, visée " + h.Classe.EnVisee + ", occupé " + h.Classe.Occupe + " (attendu : fermée, libre)");
+            EntreesSimulees.Maintenir("leftTrigger", false);
+            yield return new WaitForSeconds(0.3f);
+
+            // 3 bis) Changer de sort en visant : RB (mur) puis LB (grande boule) puis annulation.
+            yield return ViseeZone("rightShoulder");
+            int s1 = h.Classe.SortVise;
+            yield return ViseeZone("leftShoulder");
+            int s2 = h.Classe.SortVise;
+            EntreesSimulees.Appui("leftTrigger", 0.1f);
+            yield return new WaitForSeconds(0.3f);
+            EntreesSimulees.Maintenir("leftTrigger", false);
+            Log("mage visée 3 : RB puis LB en visant, sorts " + s1 + " puis " + s2 + " (attendu 2 puis 1), annulée " + !h.Classe.EnVisee + ", mana " + h.Classe.ValeurJauge.ToString("F0"));
+            yield return new WaitForSeconds(0.3f);
+
+            // 4) LB puis RT : la boule part sur le point, tombe au centre du cercle ; les gros dégâts vont à l'ennemi du cœur.
+            yield return ViseeZone("leftShoulder");
+            Vector3 cible = h.Classe.PointVise;
+            var pv = new float[groupe.Count];
+            for (int i = 0; i < groupe.Count; i++) pv[i] = groupe[i].Sante.Pv;
+            Vector3 arrivee = Vector3.zero; bool tombee = false;
+            System.Action<ProjectileJeu.Genre, Vector3, Sante, float> suivi = (g, p, s, haut) => { if (g == ProjectileJeu.Genre.GrandeBouleDeFeu) { tombee = true; arrivee = p; } };
+            ProjectileJeu.Arrivee += suivi;
+            float t0 = Time.time;
+            EntreesSimulees.Appui("rightTrigger", 0.1f);
+            yield return new WaitForSeconds(0.2f);
+            h.Classe.Emplacement(2, out rest, out float total);
+            Log("mage visée 4 : confirmée, visée " + h.Classe.EnVisee + ", mana " + h.Classe.ValeurJauge.ToString("F0") + " (attendu " + (mana0 - b.grandeBouleMana).ToString("F0") + "), recharge " + rest.ToString("F1") + "/" + total.ToString("F0") + " s");
+            yield return new WaitForSeconds(0.5f);
+            DevPartie.Capturer("mage_visee_grande_vol");
+            while (!tombee && Time.time - t0 < 5f) yield return null;
+            ProjectileJeu.Arrivee -= suivi;
+            yield return new WaitForSeconds(0.1f);
+            DevPartie.Capturer("mage_visee_grande_explosion");
+            yield return new WaitForSeconds(0.2f);
+            var sb = new System.Text.StringBuilder();
+            for (int i = 0; i < groupe.Count; i++) sb.Append(" | sbire " + i + " : " + (pv[i] - groupe[i].Sante.Pv).ToString("F0") + " dégâts, à " + Vector3.Distance(Flat(groupe[i].transform.position), Flat(cible)).ToString("F1") + " m du centre");
+            Log("mage visée 4 : explosion " + (Time.time - t0).ToString("F2") + " s après l'appui, tombée " + tombee + " en " + arrivee.ToString("F2") + " (visé " + cible.ToString("F2") + ", écart " + Vector3.Distance(arrivee, cible).ToString("F2") + " m)" + sb);
+
+            // 5) Mur : RB ouvre la visée de la ligne ; changer de sort en visant ; RT confirme, le mur se pose au point visé.
+            h.Classe.RemplirJauge();
+            yield return new WaitForSeconds(0.3f);
+            ViserPoint(sol + avant * 9f + droite * 2f);
+            yield return ViseeZone("rightShoulder");
+            Log("mage visée 5 : mur, visée " + h.Classe.EnVisee + " (sort " + h.Classe.SortVise + "), axe " + h.Classe.AxeVise.ToString("F2") + " (en travers de la visée), mana " + h.Classe.ValeurJauge.ToString("F0"));
+            DevPartie.Capturer("mage_visee_mur");
+            Vector3 centreVise = h.Classe.PointVise, axeVise = h.Classe.AxeVise;
+            EntreesSimulees.Appui("rightTrigger", 0.1f);
+            yield return new WaitForSeconds(b.murInstant + 0.5f);
+            DevPartie.Capturer("mage_visee_mur_pose");
+            Log("mage visée 5 : mur posé en " + (mage != null ? mage.DernierMurCentre.ToString("F2") : "?") + " (visé " + centreVise.ToString("F2") + ", écart " + (mage != null ? Vector3.Distance(mage.DernierMurCentre, centreVise).ToString("F2") : "?") + " m), axe " + (mage != null ? mage.DernierMurAxe.ToString("F2") : "?") + " (visé " + axeVise.ToString("F2") + "), mana " + h.Classe.ValeurJauge.ToString("F0") + " (attendu " + (100f - b.murMana).ToString("F0") + ")");
+            yield return new WaitForSeconds(b.murDuree);
+
+            // 6) Esquive et étourdissement coupent la visée sans rien dépenser.
+            h.Classe.RemplirJauge();
+            yield return new WaitForSeconds(1.2f);
+            float m1 = h.Classe.ValeurJauge;
+            yield return ViseeZone("leftShoulder");
+            EntreesSimulees.Appui("buttonEast", 0.1f);
+            yield return new WaitForSeconds(0.2f);
+            Log("mage visée 6 : esquive pendant la visée, visée " + h.Classe.EnVisee + ", mana " + m1.ToString("F0") + " → " + h.Classe.ValeurJauge.ToString("F0") + ", état " + h.EtatCourant);
+            yield return new WaitForSeconds(0.8f);
+            yield return ViseeZone("leftShoulder");
+            h.Etourdir(0.4f);
+            yield return new WaitForSeconds(0.2f);
+            Log("mage visée 6 : étourdi pendant la visée, visée " + h.Classe.EnVisee + ", mana " + h.Classe.ValeurJauge.ToString("F0") + ", état " + h.EtatCourant);
+            yield return new WaitForSeconds(0.8f);
+
+            // 7) Pas de régression : RT seul lance la boule de feu ; LT maintenu fait le cône ; plus de visée ouverte.
+            ViserPoint(new Vector3(centreGroupe.x, sol.y + 1f, centreGroupe.z));
+            yield return null;
+            bool explose = false;
+            System.Action<ProjectileJeu.Genre, Vector3, Sante, float> suiviB = (g, p, s, haut) => { if (g == ProjectileJeu.Genre.BouleDeFeu) explose = true; };
+            ProjectileJeu.Arrivee += suiviB;
+            EntreesSimulees.Appui("rightTrigger", 0.1f);
+            float t1 = Time.time;
+            while (!explose && Time.time - t1 < 3f) yield return null;
+            ProjectileJeu.Arrivee -= suiviB;
+            Log("mage visée 7 : boule de feu primaire (RT) lancée et explosée " + explose + " en " + (Time.time - t1).ToString("F2") + " s, visée ouverte " + h.Classe.EnVisee);
+            EntreesSimulees.Maintenir("leftTrigger", true);
+            yield return new WaitForSeconds(0.6f);
+            Log("mage visée 7 : cône (LT maintenu), occupé " + h.Classe.Occupe + ", visée ouverte " + h.Classe.EnVisee + ", mana " + h.Classe.ValeurJauge.ToString("F0"));
+            EntreesSimulees.Maintenir("leftTrigger", false);
+            foreach (var s in groupe) if (s != null) Destroy(s.gameObject);
+            Missiles(true);
+        }
+
+        /// Rôdeur : la nuée de flèches passe par la même visée (cercle de la pluie, thème Chasse) ; annulation sans recharge ;
+        /// confirmation : la pluie tombe sur le point visé ; arc bandé (RT) et visée zoomée (LT) inchangés.
+        IEnumerator RodeurVisee()
+        {
+            Missiles(false);
+            Nettoyer();
+            var h = H; var b = GameBalance.Courant;
+            DevPartie.PlacerHeros(Depart, Loin);
+            yield return null;
+            var sol = h.transform.position;
+            var groupe = new List<Squelette>
+            {
+                DevPartie.PoserDevant(TypeEnnemi.Sbire, 12f, -1.2f), DevPartie.PoserDevant(TypeEnnemi.Sbire, 12f, 1.2f), DevPartie.PoserDevant(TypeEnnemi.Sbire, 13.2f, 0f),
+            };
+            yield return Sortir(groupe);
+            Figer(groupe, 60f);
+            Vector3 centreGroupe = (groupe[0].transform.position + groupe[1].transform.position + groupe[2].transform.position) / 3f;
+            ViserPoint(new Vector3(centreGroupe.x, sol.y, centreGroupe.z));
+            yield return null;
+            // 1) LB : visée ouverte, aucune recharge ; LT annule.
+            yield return ViseeZone("leftShoulder");
+            h.Classe.Emplacement(2, out float rest, out _);
+            Log("rôdeur visée 1 : visée " + h.Classe.EnVisee + ", occupé " + h.Classe.Occupe + ", recharge " + rest.ToString("F1") + " s, point " + h.Classe.PointVise.ToString("F2") + " (écart au sol visé " + Vector3.Distance(Flat(PointSurLePlan(sol.y)), Flat(h.Classe.PointVise)).ToString("F2") + " m)");
+            DevPartie.Capturer("rodeur_visee_nuee");
+            EntreesSimulees.Appui("leftTrigger", 0.1f);
+            yield return new WaitForSeconds(0.3f);
+            h.Classe.Emplacement(2, out rest, out _);
+            Log("rôdeur visée 1 : annulée par LT, visée " + h.Classe.EnVisee + ", recharge " + rest.ToString("F1") + " s (attendu : fermée, 0)");
+            // 2) LB, RT : la pluie tombe sur le point visé ; la recharge part à la confirmation.
+            yield return ViseeZone("leftShoulder");
+            Vector3 cible = h.Classe.PointVise;
+            EntreesSimulees.Appui("rightTrigger", 0.1f);
+            yield return new WaitForSeconds(0.25f);
+            h.Classe.Emplacement(2, out rest, out float total);
+            Log("rôdeur visée 2 : confirmée, visée " + h.Classe.EnVisee + ", recharge " + rest.ToString("F1") + "/" + total.ToString("F0") + " s, arc bandé (ne doit pas l'être) " + h.Classe.Emplacement(0, out _, out _));
+            yield return new WaitForSeconds(0.9f);
+            DevPartie.Capturer("rodeur_visee_nuee_pluie");
+            yield return new WaitForSeconds(1.2f);
+            var s0 = groupe[0];
+            Log("rôdeur visée 2 : ralenti " + (s0 != null && s0.Statuts != null && s0.Statuts.A(TypeStatut.Ralenti)) + ", PV " + (s0 != null ? s0.Sante.Pv.ToString("F0") + "/" + s0.Sante.pvMax.ToString("F0") : "?") + ", point visé " + cible.ToString("F2"));
+            // 3) Arc bandé (RT) et visée zoomée (LT) toujours là.
+            yield return new WaitForSeconds(0.6f);
+            ViserPoint(groupe[0].transform.position + Vector3.up);
+            EntreesSimulees.Maintenir("rightTrigger", true);
+            yield return new WaitForSeconds(0.5f);
+            Log("rôdeur visée 3 : RT maintenu → arc bandé " + h.Classe.Emplacement(0, out _, out _) + ", visée de zone " + h.Classe.EnVisee);
+            EntreesSimulees.Maintenir("rightTrigger", false);
+            yield return new WaitForSeconds(0.6f);
+            EntreesSimulees.Maintenir("leftTrigger", true);
+            yield return new WaitForSeconds(0.4f);
+            Log("rôdeur visée 3 : LT maintenu → visée zoomée " + h.Classe.Emplacement(1, out _, out _) + ", visée de zone " + h.Classe.EnVisee);
+            EntreesSimulees.Maintenir("leftTrigger", false);
+            foreach (var s in groupe) if (s != null) Destroy(s.gameObject);
+            Missiles(true);
+        }
+
+
 
         static int PalierBrulure(Squelette s)
         {
@@ -498,6 +735,8 @@ namespace Deathless.Jeu.Dev
             Figer(groupe, 20f);
             ViserPoint(groupe[0].transform.position);
             EntreesSimulees.Appui("leftShoulder", 0.1f);
+            yield return new WaitForSeconds(0.3f);
+            EntreesSimulees.Appui("rightTrigger", 0.1f);   // visée au sol (02/10/2026) : RT confirme la nuée
             yield return new WaitForSeconds(1.1f);
             DevPartie.Capturer("classes_rodeur_nuee");
             yield return new WaitForSeconds(1.2f);

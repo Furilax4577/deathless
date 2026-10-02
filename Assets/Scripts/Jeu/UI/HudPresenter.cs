@@ -34,6 +34,7 @@ namespace Deathless.Jeu
             DonneesUI.Personnage = new MenuPersonnage();   // menu du personnage (Tab / Y)
             DonneesUI.Statuts = new StatutsUI();           // statuts du joueur et des ennemis (HUD, menu du personnage)
             DonneesUI.Relevage = new RelevageUI();         // jauge de relevé du Renversé (héros local)
+            DonneesUI.Visee = new ViseeUI();               // bandeau de la visée d'une zone au sol (mage, rôdeur)
             DonneesUI.VieEnnemis = new VieEnnemisUI();     // barres de vie des ennemis et méga barre des boss
             DonneesUI.Degats = m_Degats = new DegatsUI();  // chiffres de dégâts flottants (option AfficherDegats)
         }

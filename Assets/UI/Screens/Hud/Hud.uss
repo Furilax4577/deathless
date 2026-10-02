@@ -657,6 +657,16 @@
 .hud-parade--bloque .hud-parade__piste { border-color: var(--dl-color-text-disabled); }
 .hud-parade--touche .hud-parade__piste { border-color: var(--dl-color-life); }
 
+/* ---------- Visée d'une zone au sol (HudVisee.cs, 02/10/2026) ----------
+   Pastille au-dessus de la barre de compétences, tant qu'une visée de zone est ouverte (mage : grande boule, mur ; rôdeur :
+   nuée) : nom du sort, puis les invites Confirmer (attaque principale) et Annuler (attaque secondaire). Liseré or ; sans sol
+   sous le point visé, liseré rouge d'affliction. */
+.hud-visee { position: absolute; bottom: 186px; left: 50%; translate: -50% 0; height: 54px; border-width: 2px; border-color: var(--dl-color-gold); }
+.hud-visee__sort { font-size: var(--dl-text-body); color: var(--dl-color-gold); margin: 0 18px 0 0; padding: 0; -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); }
+.hud-visee__invite { margin: 0 0 0 12px; }
+.hud-visee--refus { border-color: var(--dl-color-life); }
+.dl-scale-3 .hud-visee { bottom: 48px; }
+
 /* ---------- Jauge de relevé du Renversé (HudRelevage.cs, 26/09/2026) ----------
    Sous le héros local le temps qu'il est à terre (statut Renversé) : invite du bouton Saut à marteler, jauge de
    martelage en dessous qui se remplit à mesure qu'on approche le plafond (50 % de réduction au plus). Liseré rouge

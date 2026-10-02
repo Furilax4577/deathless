@@ -49,6 +49,9 @@ namespace Deathless.UI.Donnees
         /// Jauge de relevé du Renversé du héros local (posée par le jeu ; null : pas de jauge).
         public static IJaugeRelevage Relevage { get; set; }
 
+        /// Visée d'une zone au sol du héros local (mage, rôdeur ; posée par le jeu ; null : pas de bandeau).
+        public static IViseeZone Visee { get; set; }
+
         /// Vie des ennemis (barres au-dessus de la tête) et des boss (méga barre du HUD), posée par le jeu ; null :
         /// rien n'est affiché.
         public static IEtatVieEnnemis VieEnnemis { get; set; }
@@ -91,6 +94,7 @@ namespace Deathless.UI.Donnees
             RoueEmotes = null;
             Parade = null;
             Relevage = null;
+            Visee = null;
             VieEnnemis = null;
             Degats = null;
             Changees = null;

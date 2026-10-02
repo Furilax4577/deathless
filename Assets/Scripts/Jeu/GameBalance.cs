@@ -583,6 +583,10 @@ namespace Deathless.Jeu
         public float grandeBouleVitesse = 12f;
         [Tooltip("Grande boule de feu (01/10/2026) : taille du visuel en vol (× la boule de feu).")]
         public float grandeBouleTaille = 1.9f;
+        [Tooltip("Grande boule de feu (02/10/2026, à confirmer) : portée de la visée au sol (m) ; le cercle de visée se pose au plus loin à cette distance du mage.")]
+        public float grandeBoulePortee = 20f;
+        [Tooltip("Grande boule de feu (02/10/2026, à confirmer) : rayon du « cœur » de l'explosion (m) ; l'ennemi le plus proche du point visé, s'il est dans ce rayon, prend les gros dégâts (grandeBouleDegats), les autres ceux de la zone.")]
+        public float grandeBouleCoeur = 1.5f;
         [Tooltip("Coup critique du Mage (décidé le 01/10/2026, à équilibrer) : chance (0,05 = 5 %) qu'une boule de feu ou une grande boule de feu " +
                  "fasse un critique, tirée une fois par boule à l'explosion (coup direct et zone) ; la brûlure ne critique pas.")]
         public float mageCritiqueChance = 0.05f;
@@ -594,6 +598,8 @@ namespace Deathless.Jeu
         public float murLongueur = 8f;
         [Tooltip("Mur de flammes (01/10/2026) : distance du milieu du mur devant le mage (m).")]
         public float murDistance = 4f;
+        [Tooltip("Mur de flammes (02/10/2026, à confirmer) : portée de la visée au sol (m) ; le mur se pose au plus loin à cette distance du mage, en travers de la ligne qui va de lui au point visé.")]
+        public float murPortee = 14f;
         [Tooltip("Mur de flammes (01/10/2026) : épaisseur de la zone qui brûle (m), de part et d'autre de la ligne.")]
         public float murEpaisseur = 1.4f;
         [Tooltip("Mur de flammes (01/10/2026, à équilibrer) : durée (s).")]
@@ -656,6 +662,11 @@ namespace Deathless.Jeu
         public float arcIntervalle = 0.15f;
         public float arcVitesseBander = 0.5f;
         public float viseeVitesse = 0.6f;
+        [Header("Visée d'une zone au sol (mage : grande boule et mur ; rôdeur : nuée ; 02/10/2026, à confirmer)")]
+        [Tooltip("Facteur de vitesse de marche pendant la visée d'une zone (comme l'arc bandé : 0,5).")]
+        public float viseeZoneVitesse = 0.5f;
+        [Tooltip("Distance minimale entre le héros et le centre d'une zone visée (m) : pas de zone sous ses propres pieds.")]
+        public float viseeZoneDistanceMin = 1.5f;
         public float nueeRayon = 3f;
         public int nueeSalves = 5;
         [Tooltip("10 → 14 par salve (27/09/2026).")]

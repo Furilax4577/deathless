@@ -12,8 +12,8 @@ Le jeu se joue à la manette Xbox ou PlayStation, ou au clavier et à la souris.
 | Esquive, roulade | B | Rond | Ctrl | {décidé} |
 | Interagir, parler | X | Carré | E | {décidé} |
 | Menu du personnage (inventaire, compétences) | Y | Triangle | Tab | {décidé} |
-| Attaque principale | RT | R2 | Clic gauche | {décidé} |
-| Attaque secondaire, garde, parade, visée | LT | L2 | Clic droit | {décidé} |
+| Attaque principale (pendant une visée de zone : **confirmer**) | RT | R2 | Clic gauche | {décidé} |
+| Attaque secondaire, garde, parade, visée (pendant une visée de zone : **annuler**) | LT | L2 | Clic droit | {décidé} |
 | Compétence 1 | LB | L1 | A | {décidé} |
 | Compétence 2 | RB | R1 | R | {décidé} |
 | Compétence 3 | LB + RB | L1 + R1 | F | {décidé} |
@@ -30,6 +30,22 @@ Au clavier, les touches sont données sur une disposition AZERTY. Le déplacemen
 La combinaison LB + RB utilise un **court délai** : quand on appuie sur LB, le jeu attend environ 0,1 s {à équilibrer}. Si RB arrive dans ce délai, c'est la compétence 3 ; sinon, la compétence 1 part. Aucune compétence ne part par erreur, et le délai reste imperceptible.
 
 {dev} Plus d'ultime ni d'accroupissement {décidé} : les actions `Ultimate` et `Crouch` et l'accord L3 + R3 ont été retirés de `DeathlessControls` et de `InputChordResolver`. R3 reste libre.
+
+## Viser une zone au sol {décidé, 02/10/2026}
+
+Les sorts qui tombent sur un endroit précis (grande boule de feu et mur de flammes du [Mage](classe-mage.md), nuée de flèches du [Rôdeur](classe-rodeur.md)) ne partent plus à l'appui sur la compétence : l'appui **ouvre une visée**. Un cercle (ou une ligne) à la taille réelle de la zone suit le point que le réticule vise, limité à la portée du sort ; le HUD affiche le nom du sort et les deux invites. On confirme ou on annule :
+
+| Pendant la visée | Xbox | PlayStation | Clavier et souris |
+|---|---|---|---|
+| Ouvrir la visée (compétence 1 ou 2) | LB, RB | L1, R1 | A, R |
+| **Confirmer** : le sort part sur le point visé, le mana et la recharge sont dépensés | RT | R2 | Clic gauche |
+| **Annuler** : rien n'est dépensé | LT | L2 | Clic droit |
+| Annuler en esquivant (l'esquive ferme aussi la visée) | B | Rond | Ctrl |
+| Changer de sort visé (mage) | LB ↔ RB | L1 ↔ R1 | A ↔ R |
+
+Règles communes {à confirmer} : le héros marche à 50 % pendant la visée, sans sprint ni saut ; ni mana ni recharge avant la confirmation ; un étourdissement, la mort, un portail, l'ouverture d'un menu ou de la roue à emotes ferment la visée sans coût ; LT, après avoir annulé, ne déclenche pas l'action maintenue de la classe (cône de flammes du mage, visée zoomée du rôdeur) tant qu'il n'est pas relâché ; l'indicateur n'est vu que du joueur qui vise.
+
+{dev} Code commun : `VisiereZone`, `ClasseHeros.ViseeSurAction` (confirmation par `AttackPrimary`, annulation par `AttackSecondary`, résolus par `InputChordResolver`), invites `HudVisee` (`InputPrompt` sur `Gameplay/AttackPrimary` et `Gameplay/AttackSecondary`, qui suivent le dernier appareil).
 
 ## Dans les menus {décidé}
 

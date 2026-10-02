@@ -185,6 +185,10 @@ Posée par le jeu dans `DonneesUI.Parade` (`Deathless.Jeu.ParadeParfaite`, cré�
 - **Pourquoi sous le réticule** : en mêlée, le regard est au centre ; au-dessus de l'attaquant, la jauge bougerait avec lui et se mêlerait aux rangées de statuts des ennemis.
 - Pas encore de version factice dans le banc UIv01 (`EtatFactice`) ; vérification dans le Village avec `Deathless.Jeu.Dev.ScenariosParade`.
 
+### Visée d'une zone au sol : `IViseeZone` (`Donnees/IViseeZone.cs`, 02/10/2026)
+
+Posée par le jeu dans `DonneesUI.Visee` (`Deathless.Jeu.ViseeUI`, créée par `HudPresenter` ; lit le héros local, jamais une marionnette), lue à chaque image par `HudVisee` : tant que le héros local vise une zone (grande boule de feu et mur de flammes du mage, nuée de flèches du rôdeur), une pastille au-dessus de la barre de compétences donne le nom du sort (`Sort`) et deux `InputPrompt` : « Confirmer » (`Gameplay/AttackPrimary` : RT, clic gauche) et « Annuler » (`Gameplay/AttackSecondary` : LT, clic droit), qui suivent le dernier appareil. `Valide` faux (pas de sol sous le point) : liseré rouge et « pas de sol ici ». Absente : rien n'est affiché. Règles : Wiki `commandes.md`, « Viser une zone au sol ».
+
 ### Jauge de relevé : `IJaugeRelevage` (`Donnees/IJaugeRelevage.cs`, 26/09/2026)
 
 Posée par le jeu dans `DonneesUI.Relevage` (`Deathless.Jeu.RelevageUI`, créée par `HudPresenter` ; lit le héros local, jamais une marionnette), lue à chaque image par `HudRelevage` : petite jauge sous le héros à terre (statut Renversé), avec l'invite de Saut à marteler. Absente : rien n'est affiché. Règles : Wiki `statuts.md`, « Renversé ».
