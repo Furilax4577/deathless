@@ -735,36 +735,60 @@ namespace Deathless.Jeu
         public float hachePortee = 2.4f;
         public float hacheDemiAngle = 70f;
         public float hacheInstant = 0.55f;
+        [Header("Rage et Furie (viking ; wiki : classe-viking.md ; décidé par Quentin le 03/10/2026 : la rage monte au combat, les compétences sont gratuites avec recharge, ultime à la rage pleine ; valeurs à équilibrer)")]
         public float rageMax = 100f;
-        [Tooltip("Plancher de rage (27/09/2026) : la rage de départ, et la baisse hors combat ne descend jamais sous cette valeur.")]
-        public float rageMin = 30f;
+        [Tooltip("Plancher de rage {à confirmer}. Les compétences ne coûtent plus de rage (03/10/2026) : le plancher de 30 (27/09/2026) n'a plus lieu d'être, 0 = la rage repart de zéro hors combat.")]
+        public float rageMin = 0f;
+        [Tooltip("Rage gagnée par ennemi touché avec la hache.")]
         public float rageParTouche = 8f;
+        [Tooltip("Rage gagnée en encaissant des dégâts (03/10/2026) : par point de dégât subi (après Peau de fer) ; chute et brûlure ne comptent pas. {à équilibrer}")]
+        public float rageParDegatRecu = 0.5f;
+        [Tooltip("Plafond de la rage gagnée par un seul coup reçu. {à équilibrer}")]
+        public float rageRecuMax = 12f;
+        [Tooltip("Baisse de la rage hors combat (par seconde), après rageDelaiBaisse sans toucher ni être touché.")]
         public float rageBaisse = 6f;
         public float rageDelaiBaisse = 4f;
-        public float tournanteRage = 20f;
-        public float tournanteRageMin = 15f;
+        [Tooltip("Rage rendue par un tic de la tournante, par ennemi touché (2 → 1, 03/10/2026 : la tournante est gratuite, elle ne doit pas remplir la jauge seule) {à équilibrer}.")]
+        public float tournanteRageParTic = 1f;
+        [Tooltip("Attaque tournante (03/10/2026) : maintien maximal (s) puis recharge (s) comptée depuis la fin du tourbillon, relâché ou non. {à équilibrer}")]
+        public float tournanteDureeMax = 3f;
+        public float tournanteRecharge = 10f;
         public float tournanteIntervalle = 0.3f;
-        [Tooltip("Rage rendue par un tic de la tournante, par ennemi touché (à équilibrer) : à 2, elle se paie à partir de 3 ennemis.")]
-        public float tournanteRageParTic = 2f;
         public float tournanteRayon = 2.3f;
         [Tooltip("12 → 10 (27/09/2026).")]
         public float tournanteDegats = 10f;
         public float tournanteVitesse = 0.6f;
-        [Tooltip("25 → 15 rage (27/09/2026).")]
-        public float rugissementRage = 15f;
         public float rugissementRecharge = 12f;
         public float rugissementRayon = 10f;
         public float rugissementProvocation = 5f;
         [Tooltip("Peau de fer (27/09/2026) : le rugissement pose ce bienfait sur le viking au moment du cri : part des dégâts subis retirée, durée (s).")]
         [Range(0f, 0.9f)] public float peauDeFerReduction = 0.35f;
         public float peauDeFerDuree = 6f;
-        [Tooltip("35 → 25 rage (27/09/2026).")]
-        public float sautRage = 25f;
         public float sautRecharge = 8f;
         public float sautDistance = 5f;
         public float sautRayon = 3.5f;
         public float sautDegats = 45f;
         public float sautEtourdi = 1f;
+        [Tooltip("Recul de la hache (03/10/2026) : déplacement (m) infligé à chaque ennemi touché par un coup de hache (hors boss), multiplié par la Force gagnée et par furieRecul. {à équilibrer}")]
+        public float hacheRecul = 0.4f;
+
+        [Header("Furie, ultime du viking (03/10/2026 ; entrée automatique à la rage pleine {à confirmer} ; valeurs à équilibrer)")]
+        [Tooltip("Durée de la Furie (s) : la jauge se vide à vitesse fixe, de pleine à vide, et ne monte plus.")]
+        public float furieDuree = 10f;
+        [Tooltip("Échelle du modèle du viking en Furie (lissée, modèle visuel seul).")]
+        public float furieEchelle = 1.15f;
+        [Tooltip("Vitesse de déplacement en Furie (×).")]
+        public float furieVitesse = 1.2f;
+        [Tooltip("Cadence de la hache en Furie (×) : coup plus tôt et animation plus rapide.")]
+        public float furieCadence = 1.15f;
+        [Tooltip("Recul de la hache en Furie (×).")]
+        public float furieRecul = 1.5f;
+        [Tooltip("Dégâts du viking en Furie (×), tous ses coups.")]
+        public float furieDegats = 1.1f;
+        [Tooltip("Vitesse de recharge des compétences en Furie (×) : le temps de recharge s'écoule plus vite.")]
+        public float furieRecharge = 1.5f;
+        [Tooltip("Rage à partir de laquelle le HUD avertit que la Furie approche (part de la jauge).")]
+        [Range(0.5f, 0.99f)] public float furieSignal = 0.85f;
 
         [Header("Chute (wiki : statuts.md ; valeurs à équilibrer)")]
         [Tooltip("Hauteur de chute sans dégâts (m) : un saut sur place monte à 1,2 m ; un niveau du donjon fait 4 m.")]

@@ -78,6 +78,7 @@ Tous les sorts émettent de la lumière de la même façon : composant commun `A
 | Coup critique / meilleur critique | Critique | petite / moyenne | maintien 0,04 s / 0,12 s |
 | Éclat de la parade (paladin) | Sacre | petite | maintien 0,03 s |
 | Attaque tournante | Rage | moyenne, portée par la tête de hache | tenue de `Commencer` à `Arreter` |
+| Furie du viking (`AuraFurie`) | Rage | petite, au centre du corps | tenue pendant toute la Furie, éteinte à la sortie |
 | Filet d'énergie (canalisation, palier 4+) | Nyxessa | petite | tenue tant que la canalisation est active, `facteur` × 1,4 pendant 0,35 s à chaque `Pulse()` |
 | Grenade fumigène (éclosion du nuage) | Ombre | petite | maintien 0,05 s |
 | Arc bandé (cercle de charge compris), nuée de flèches, carreaux, traînées d'air, mode furtif | — | aucune (flèches non magiques ; l'assassin n'éclaire pas) | — |
@@ -376,6 +377,16 @@ Une paire prefab + script par effet sous `Assets/VFX/<Effet>/`, matériau `Porta
 - **Son** (26/09/2026) : un souffle de hache (« whoosh ») à **chaque tour complet** (même cadence que l'anneau de gemmes au sol), en plus de la boucle continue `whirlwind_loop` déjà lancée par `Commencer()`. `ClasseViking.Maj` compare `AttaqueTournante.Tours` d'une image à l'autre (le compte de tours de la VFX, sans dépendance ajoutée sur ce composant visual-only) et joue `SonsDuJeu.TournanteVent` (catalogue `hache_vent`, 3 variantes tirées au hasard) à chaque incrément, diffusé aux autres postes (`E_TournanteVent`).
 - Capture : `VfxBench_tournante.png`.
 - **Manque** : emplacement de compétence et durée {à confirmer}.
+
+#### Furie du viking (ultime) — `Assets/Scripts/Jeu/Classes/AuraFurie.cs` (créée dans Deathless le 03/10/2026)
+- **Pas de prefab** : composant `AuraFurie` ajouté au viking par `ClasseViking.Initialiser` (héros local et marionnettes). Un seul maillage de gemmes (`GemmesVolantes`, 160 gemmes, matériau `EffetsJeu.Gemmes` = `PortalVoxel.mat`), sans alpha, sans lumière d'ombre.
+- **API** : `Commencer()` (entrée en Furie : gerbe de 40 gemmes en couronne à hauteur de poitrine, lumière allumée, émission continue), `Arreter(braises)` (sortie : lumière éteinte, 14 braises qui retombent), `Echelle(e)` (la gerbe et le halo suivent la taille du modèle), `Actif`.
+- **Rendu** : 48 gemmes par seconde sur un cylindre de 0,5 m de rayon et 1,9 m de haut (× l'échelle du modèle), qui montent en tournant doucement (0,9 à 1,8 m/s), 0,6 à 1,2 s de vie, apparition et disparition par la taille.
+- **Palette** : thème **Rage**, jamais de vert : rouge vif (`Vif`, 50 %), rouge pâle orangé (`Cœur`, 30 %, les étincelles) et rouge sombre (`Base`, 20 %, la profondeur). Lumière `VfxLumiere` du thème Rage, classe petite (1,5 ; 3,5 m).
+- **Corps** : le modèle du viking (enfant portant l'Animator) passe à **×1,15** en douceur (`ClasseViking.LateUpdate`, constante de temps d'environ 0,15 s) ; ni la racine, ni la capsule, ni la caméra, ni les ancres ne bougent.
+- **Multijoueur** : l'état est répliqué par `HerosReseau` (variable `m_Furie`, écrite par le propriétaire) ; chaque poste joue l'aura et la taille sur la marionnette. Les sons passent par l'effet diffusé (`E_FurieDebut`, `E_FurieFin`).
+- **HUD** : l'anneau de rage rougit pendant la Furie et pulse quand elle est prête ; bandeau « FURIE prête » + invite, puis « FURIE 7 s » (`Hud.uxml`, `EcranHud.MajUltime`).
+- Captures : `Assets/Screenshots/viking_furie_avant.png`, `viking_furie_active.png`, `viking_furie_prete_hud.png`, `viking_furie_apres.png`, `viking_furie_cote_a_cote.png`.
 
 #### Grande boule de feu du mage (LB) — réutilise la boule de feu (01/10/2026)
 - **Pas de prefab** : la boule de feu de Relic en plus gros. En vol, `FireballVisual.Attach(projectile, FireBurst, GameBalance.grandeBouleTaille (1,9), PortalVoxel)` (projectile `ProjectileJeu.Genre.GrandeBouleDeFeu`, 12 m/s, rayon de collision 0,25 × 1,9) ; à l'impact, `ClasseMage.ExplosionGrandeBoule(point)` : **deux `ExplosionFeu.Jouer`** au même point, l'une au rayon de l'explosion (5 m : éclat plus large, fumée plus haute), l'autre à la moitié (cœur dense), plus une petite secousse de caméra (0,08 m, 0,25 s) si la caméra est à moins de 25 m.

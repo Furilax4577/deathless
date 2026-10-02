@@ -348,6 +348,8 @@ namespace Deathless.Jeu
             base.Frapper();
         }
 
+        public override void Pousser(Vector3 deplacement) => base.Pousser(deplacement * 0.6f);
+
         public override void Repousser(Vector3 deplacement, float etourdi, int sourceId) { if (RelaiRepousser(deplacement, etourdi)) return; base.Repousser(deplacement * 0.6f, etourdi, sourceId); }
     }
 }

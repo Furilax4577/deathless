@@ -85,7 +85,7 @@ namespace Deathless.Jeu
 
         // ----------------------------------------------------------------- Événements
 
-        /// Action résolue par InputChordResolver (AttackPrimary, AttackSecondary, Skill1, Skill2, Skill3).
+        /// Action résolue par InputChordResolver (AttackPrimary, AttackSecondary, Skill1, Skill2, Skill3, Ultimate).
         public virtual void SurAction(string action) { }
         /// Chaque image tant que le héros est vivant (recharges, jauges), même pendant une esquive ou un étourdissement.
         public virtual void Temps(float dt) { }
@@ -100,6 +100,11 @@ namespace Deathless.Jeu
         public virtual void SurCoupDonne(Sante cible, float reel, bool parBoule, bool continu) { }
         /// Esquive, mort, étourdissement : l'action en cours s'arrête proprement (effets, sons, animation).
         public virtual void Interrompre() { }
+        /// Le héros vient de mourir (après Interrompre) : fin des états de classe qui ne survivent pas à la mort (Furie du viking).
+        public virtual void SurMort() { }
+        /// Facteur appliqué à tous les dégâts infligés par ce héros (Heros.Frapper), après les attributs : 1 par défaut ;
+        /// Furie du viking (+10 %).
+        public virtual float FacteurDegats => 1f;
         /// Heros a heurté le décor sur le côté pendant un déplacement imposé.
         public virtual void SurCollisionCote() { }
 
@@ -240,6 +245,12 @@ namespace Deathless.Jeu
         public virtual float ValeurJauge => 0f;
         public virtual float JaugeMax => 0f;
         public virtual bool Furtif => false;
+        /// Ultime de la classe (Furie du viking, 03/10/2026 ; aucune autre classe n'en a) : actif (en cours), prêt (jauge
+        /// pleine, le joueur le déclenche par l'action Ultimate : R3, G) ou proche (la jauge approche du plein : signal du HUD).
+        public virtual bool UltimeActif => false;
+        public virtual bool UltimePret => false;
+        public virtual bool UltimeProche => false;
+        public virtual string NomUltime => string.Empty;
         /// Tests : remplit la jauge de la classe (mana, rage).
         public virtual void RemplirJauge() { }
 

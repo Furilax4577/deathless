@@ -17,6 +17,7 @@ Le jeu se joue à la manette Xbox ou PlayStation, ou au clavier et à la souris.
 | Compétence 1 | LB | L1 | A | {décidé} |
 | Compétence 2 | RB | R1 | R | {décidé} |
 | Compétence 3 | LB + RB | L1 + R1 | F | {décidé} |
+| **Furie** (ultime du Viking, rage pleine ; sans effet avant 100 et pour les autres classes) | R3 (clic du stick droit) | R3 | G | {décidé, Quentin 03/10/2026} |
 | Sprinter | L3 | L3 | Maj | {décidé} |
 | Boire une potion | Croix directionnelle haut | Croix directionnelle haut | 1 | {décidé} |
 | Roue à emotes (maintenir, pointer, relâcher ; voir [Interface](interface.md)) | Croix directionnelle bas | Croix directionnelle bas | B | {décidé} |
@@ -25,11 +26,13 @@ Le jeu se joue à la manette Xbox ou PlayStation, ou au clavier et à la souris.
 
 Au clavier, les touches sont données sur une disposition AZERTY. Le déplacement se fait avec ZQSD et la caméra avec la souris.
 
+Touche de la Furie (R3, G) {à confirmer} : proposée faute de mieux, R3 étant libre depuis le retrait de l'accroupissement.
+
 ## Combinaisons à la manette {décidé}
 
 La combinaison LB + RB utilise un **court délai** : quand on appuie sur LB, le jeu attend environ 0,1 s {à équilibrer}. Si RB arrive dans ce délai, c'est la compétence 3 ; sinon, la compétence 1 part. Aucune compétence ne part par erreur, et le délai reste imperceptible.
 
-{dev} Plus d'ultime ni d'accroupissement {décidé} : les actions `Ultimate` et `Crouch` et l'accord L3 + R3 ont été retirés de `DeathlessControls` et de `InputChordResolver`. R3 reste libre.
+{dev} Plus d'accroupissement {décidé} : l'action `Crouch` et l'accord L3 + R3 ont été retirés de `DeathlessControls` et de `InputChordResolver`. **L'ultime revient pour le Viking seulement** (03/10/2026) : une action `Ultimate` simple (pas d'accord, pas de délai) lie R3 et G ; le résolveur la relaie comme les autres boutons, le code de jeu la lit par `Triggered` (jamais par `performed`). Le Viking la lit dans `ClasseViking.SurAction("Ultimate")` ; les autres classes l'ignorent.
 
 ## Viser une zone au sol {décidé, 02/10/2026}
 

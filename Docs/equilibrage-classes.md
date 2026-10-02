@@ -284,7 +284,7 @@ Décisions de Quentin reportées dans `GameBalance.cs`, `Assets/Jeu/Resources/Ga
 
 - **Assassin** : Pas de l'ombre (RB : bond de 7 m en 0,15 s, invulnérable, à travers les ennemis, arrêt 1 m derrière l'ennemi visé face à son dos, recharge 6 s, ne sort pas du furtif) et Exécution (dague sur un ennemi commun sous 30 % : achevé net ; élite ou boss : ×3 ; chaque exécution remet le bond à zéro). Chiffres de la dague, de l'arbalète et de la grenade inchangés (la proposition (a) n'a pas été retenue : le dos ×3 reste la récompense, le bond le moyen d'y arriver).
 - **Rôdeur** : arc 50 à pleine charge (étourdit 1 s), tir rapide 0,15 s, nuée 14 par salve (ralentit −40 % qui y reste), salve 18, 120 PV.
-- **Viking** : plancher de rage 30 (`rageMin` : rage de départ, et hors combat la jauge revient vers 30 dans les deux sens), saut 25, rugissement 15, tournante 10 ; le rugissement pose Peau de fer (−35 % 6 s) au moment du cri et se crie en marchant (couche haute).
+- **Viking** (**refondu le 03/10/2026** : rage qui monte au combat, compétences gratuites avec recharge, Furie ; plancher et coûts ci-dessous supprimés, voir `Wiki/pages/classe-viking.md#rage-et-furie`) : plancher de rage 30 (`rageMin` : rage de départ, et hors combat la jauge revient vers 30 dans les deux sens), saut 25, rugissement 15, tournante 10 ; le rugissement pose Peau de fer (−35 % 6 s) au moment du cri et se crie en marchant (couche haute).
 - **Paladin** : épée 27, soin 20 s, garde 0,8 ; le soin devient un soin d'aura (lui et les alliés à moins de 4 m, même montant).
 - **Squelettes** : riposte au contact de Nyxessa (deux coups de suite du même héros à moins de 3 m → il se retourne 3 s ou deux coups, puis revient).
 - **Mage** : inchangé (sa refonte reste à décider, § 3.3).

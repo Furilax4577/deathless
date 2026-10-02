@@ -21,6 +21,9 @@ namespace Deathless.Reseau
         readonly NetworkVariable<float> m_Vie = new NetworkVariable<float>(100f, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         readonly NetworkVariable<float> m_VieMax = new NetworkVariable<float>(100f, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         readonly NetworkVariable<bool> m_Furtif = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        // Furie du viking (03/10/2026) : état écrit par le propriétaire (qui simule ses bonus), lu par les marionnettes qui
+        // grossissent et rougeoient (ClasseViking.ForcerFurieDistante), comme le mode furtif de l'assassin.
+        readonly NetworkVariable<bool> m_Furie = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         readonly NetworkVariable<float> m_Reapparition = new NetworkVariable<float>(0f);
         readonly NetworkVariable<bool> m_Mort = new NetworkVariable<bool>(false);
         // Soins reçus cumulés, écrits par le propriétaire (le seul à voir Sante.Soigne) : l'hôte crédite la différence
@@ -159,6 +162,8 @@ namespace Deathless.Reseau
                 if (!Mathf.Approximately(m_VieMax.Value, Heros.Sante.pvMax)) m_VieMax.Value = Heros.Sante.pvMax;
                 bool furtif = Heros.Classe != null && Heros.Classe.Furtif;
                 if (m_Furtif.Value != furtif) m_Furtif.Value = furtif;
+                bool furie = Heros.Classe != null && Heros.Classe.UltimeActif;
+                if (m_Furie.Value != furie) m_Furie.Value = furie;
                 int attributs = Attributs.Tasser(Heros.EtatJoueur != null ? Heros.EtatJoueur.attributs : null);
                 if (m_Attributs.Value != attributs) m_Attributs.Value = attributs;
             }
@@ -167,6 +172,7 @@ namespace Deathless.Reseau
                 // Marionnette : vie, furtivité et mort recopiées (les squelettes de l'hôte la visent ou l'ignorent en conséquence).
                 Heros.Sante.Fixer(m_Mort.Value ? 0f : m_Vie.Value, m_VieMax.Value);
                 if (Heros.Classe is ClasseAssassin a) a.ForcerFurtifDistant(m_Furtif.Value);
+                if (Heros.Classe is ClasseViking v) v.ForcerFurieDistante(m_Furie.Value);
                 var ej = Heros.EtatJoueur;
                 if (ej != null)
                 {

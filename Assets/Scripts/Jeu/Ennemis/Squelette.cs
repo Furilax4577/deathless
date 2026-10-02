@@ -902,6 +902,18 @@ namespace Deathless.Jeu
             Etourdir(etourdi, sourceId);
         }
 
+        /// Recul simple (hache du viking, 03/10/2026) : déplacement horizontal sur 0,2 s, sans étourdissement ni animation.
+        /// Relayé à l'hôte depuis un client ; ignoré par les ennemis non repoussables (Morgrim).
+        public virtual void Pousser(Vector3 deplacement)
+        {
+            if (Distant) { m_Reseau.DemanderPousser(deplacement); return; }
+            if (!Repoussable || m_Etat == Etat.Mort || m_Etat == Etat.SortieDeTerre) return;
+            deplacement.y = 0f;
+            if (m_PousseReste > 0f && deplacement.sqrMagnitude <= m_Pousse.sqrMagnitude) return;   // le plus fort l'emporte
+            m_Pousse = deplacement;
+            m_PousseReste = 0.2f;
+        }
+
         public virtual bool Repoussable => true;
 
         /// Échelle d'un élite (wiki : ennemis.md, environ 1,3 fois plus grand) : posée par l'hôte à l'apparition

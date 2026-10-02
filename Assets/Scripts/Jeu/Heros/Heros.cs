@@ -379,6 +379,7 @@ namespace Deathless.Jeu
             // Attributs (01/10/2026) : points gagnés de Force (corps à corps) ou de Perception (à distance), puis critique
             // tiré par Chance (tout) et Perception (à distance) sur un coup qui n'est pas déjà critique. 0 point gagné :
             // facteur 1, chance 0, rien ne change. Le Mage tire son critique lui-même (ClasseMage.TirerCritique).
+            if (!Distant && Classe != null) degats *= Classe.FacteurDegats;   // Furie du viking (03/10/2026)
             if (!Distant && m_Etat != null && Classe != null)
             {
                 bool distance = Classe.CoupADistance;
@@ -539,7 +540,7 @@ namespace Deathless.Jeu
 
         void OnTue(InfoDegats info)
         {
-            if (Classe != null) Classe.Interrompre();
+            if (Classe != null) { Classe.Interrompre(); Classe.SurMort(); }
             if (!Distant) Ivresse.Arreter();   // l'ivresse (joueur local) s'arrête à la mort
             m_EtatCourant = Etat.Mort;
             m_EtatDepuis = 0f;

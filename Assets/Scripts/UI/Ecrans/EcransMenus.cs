@@ -111,7 +111,7 @@ namespace Deathless.UI.Ecrans
         }
 
         static readonly string[] s_Emplacements =
-            { "Gameplay/AttackPrimary", "Gameplay/AttackSecondary", "Gameplay/Skill1", "Gameplay/Skill2", "Gameplay/Skill3" };
+            { "Gameplay/AttackPrimary", "Gameplay/AttackSecondary", "Gameplay/Skill1", "Gameplay/Skill2", "Gameplay/Skill3", "Gameplay/Ultimate" };
 
         protected override void Construire()
         {
@@ -140,7 +140,8 @@ namespace Deathless.UI.Ecrans
             m_Prise = new Label { name = "fiche-prise" };
             m_Prise.AddToClassList("choix__prise");
             m_Role.parent.Add(m_Prise);
-            // Cinq lignes fixes (attaque, attaque secondaire, compétences 1 à 3) : l'invite suit l'appareil.
+            // Six lignes fixes (attaque, attaque secondaire, compétences 1 à 3, ultime) : l'invite suit l'appareil. La sixième
+            // (ultime, Viking seulement) n'est montrée que pour une classe qui en a une.
             foreach (var action in s_Emplacements)
             {
                 var ligne = new VisualElement();
@@ -307,7 +308,7 @@ namespace Deathless.UI.Ecrans
             m_Actions.style.display = ouverte;
             m_InviteValider?.EnableInClassList("dl-prompt--inactive", c.Verrouillee);
             m_Jauge.text = c.Jauge == JaugeClasse.Mana ? "Jauge de mana : les sorts en consomment."
-                : c.Jauge == JaugeClasse.Rage ? "Jauge de rage : elle monte quand il frappe." : "";
+                : c.Jauge == JaugeClasse.Rage ? "Jauge de rage : elle monte au combat, la Furie la vide." : "";
             m_Jauge.style.display = c.Jauge == JaugeClasse.Aucune ? DisplayStyle.None : DisplayStyle.Flex;
             for (var i = 0; i < m_LignesActions.Count; i++)
             {
@@ -317,6 +318,7 @@ namespace Deathless.UI.Ecrans
                 IconesUI.Poser(m_LignesActions[i].icone, vide ? null : c.Actions[i].Icone);
                 m_LignesActions[i].icone.style.display = DisplayStyle.Flex;   // garde la colonne alignée
                 m_LignesActions[i].ligne.EnableInClassList("choix-action--vide", vide);
+                if (i == s_Emplacements.Length - 1) m_LignesActions[i].ligne.style.display = vide ? DisplayStyle.None : DisplayStyle.Flex;
             }
         }
 
@@ -399,6 +401,7 @@ namespace Deathless.UI.Ecrans
             ("Gameplay/Skill1", "Compétence 1"),
             ("Gameplay/Skill2", "Compétence 2"),
             ("Gameplay/Skill3", "Compétence 3"),
+            ("Gameplay/Ultimate", "Furie (ultime du Viking)"),
             ("Gameplay/Sprint", "Sprinter"),
             ("Gameplay/DrinkPotion", "Boire une potion"),
             ("Gameplay/Emote", "Roue à emotes (maintenir)"),

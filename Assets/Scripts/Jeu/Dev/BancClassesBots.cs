@@ -346,8 +346,9 @@ namespace Deathless.Jeu.Dev
 
     // ===================================================================== Viking
 
-    /// Hache ; rugissement s'il y a 4 (moyen) ou 3 (bon) squelettes à 10 m ; saut sur le groupe le plus dense à portée de
-    /// bond (3 ou 2 squelettes, ou le seul présent) ; tournante dès 3 squelettes à 2,3 m, arrêtée sous 2 ou à rage vide.
+    /// Hache ; Furie dès que la rage est pleine (R3) ; rugissement s'il y a 4 (moyen) ou 3 (bon) squelettes à 10 m ; saut sur
+    /// le groupe le plus dense à portée de bond (3 ou 2 squelettes, ou le seul présent) ; tournante dès 3 squelettes à
+    /// 2,3 m, arrêtée sous 2 (ou par ses 3 s de maintien). Compétences gratuites, limitées par leur recharge (03/10/2026).
     class BotViking : Bot
     {
         Squelette m_Cible;
@@ -363,7 +364,7 @@ namespace Deathless.Jeu.Dev
                 int n = Compter(Pos, b.tournanteRayon + 0.3f);
                 Vector3 centre = Centre(Pos, 4f);
                 Visee = () => centre + Vector3.up;
-                if (n < 2 || Jauge <= 0.5f) { EntreesSimulees.Maintenir("leftTrigger", false); ProchaineAction = Time.time + Reaction; }
+                if (n < 2) { EntreesSimulees.Maintenir("leftTrigger", false); ProchaineAction = Time.time + Reaction; }
                 Bouger(c != null ? c.transform.position : centre, 0.8f);
                 return;
             }
@@ -372,8 +373,10 @@ namespace Deathless.Jeu.Dev
             Visee = () => c != null ? c.transform.position + Vector3.up * 1.1f : Pos + H.transform.forward * 5f;
             if (Libre)
             {
-                if (Pret(2) && Jauge >= b.rugissementRage && Compter(Pos, b.rugissementRayon) >= (Bon ? 3 : 4)) { Appuyer("leftShoulder", "rugissement"); return; }
-                if (Pret(3) && Jauge >= b.sautRage)
+                // Furie : déclenchée dès que la rage est pleine et qu'un squelette est à portée du combat (R3).
+                if (H.Classe.UltimePret) { Appuyer("rightStickPress", "furie"); return; }
+                if (Pret(2) && Compter(Pos, b.rugissementRayon) >= (Bon ? 3 : 4)) { Appuyer("leftShoulder", "rugissement"); return; }
+                if (Pret(3))
                 {
                     Squelette best = null; int bn = 0;
                     foreach (var s in V)
@@ -394,7 +397,7 @@ namespace Deathless.Jeu.Dev
                         return;
                     }
                 }
-                if (Jauge >= b.tournanteRageMin && Compter(Pos, b.tournanteRayon) >= 3) { EntreesSimulees.Maintenir("leftTrigger", true); Banc.Usage("appui_tournante"); ProchaineAction = Time.time + 0.3f; return; }
+                if (Pret(1) && Compter(Pos, b.tournanteRayon) >= 3) { EntreesSimulees.Maintenir("leftTrigger", true); Banc.Usage("appui_tournante"); ProchaineAction = Time.time + 0.3f; return; }
                 if (d <= b.hachePortee - 0.2f) Appuyer("rightTrigger", "hache");
             }
             if (d <= b.hachePortee - 0.6f) Arret(); else Bouger(Approche(c), 0.4f);

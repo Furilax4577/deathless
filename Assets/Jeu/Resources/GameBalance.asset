@@ -227,6 +227,55 @@ MonoBehaviour:
   necroSbiresParInvocation: 3
   necroInvoquesMax: 12
   necroEchelle: 0.92
+  nyxarSalveCranes: 3
+  nyxarSalveEcart: 0.6
+  nyxarCraneGuidage: 45
+  nyxarCraneCoupureDistance: 7
+  nyxarCraneCoupureAngle: 55
+  nyxarTeleportDeclencheur: 5
+  nyxarTeleportDistance: {x: 11, y: 16}
+  nyxarTeleportRecharge: 9
+  nyxarTeleportRayonNyxessa: 26
+  nyxarFauxPortee: 2.6
+  nyxarFauxDegats: 30
+  nyxarFauxPreparation: 0.75
+  nyxarFauxIntervalle: 2.4
+  nyxarEclatPV: 200
+  nyxarEclatMultiplicateur: 2
+  nyxarEnrageVitesse: 4.2
+  nyxarEnrageDegats: 38
+  nyxarEnrageDegatsNyxessa: 40
+  nyxarEnragePreparation: 0.6
+  nyxarEnrageIntervalle: 1.7
+  nyxarEnragePortee: 2.6
+  morgrimCommunChance: 0.45
+  morgrimBalayageRayon: 3.8
+  morgrimBalayageAngle: 200
+  morgrimBalayageDegats: 36
+  morgrimBalayageRecul: 5
+  morgrimBalayagePreparation: 1.25
+  morgrimBalayageRecharge: 5.5
+  morgrimEcraseDegats: 34
+  morgrimEcraseDegatsNyxessa: 45
+  morgrimEcraseOndeVitesse: 7
+  morgrimEcraseOndeRayonMax: 8
+  morgrimEcraseOndeLargeurBande: 1.3
+  morgrimEcrasePreparation: 1.5
+  morgrimEcraseRecharge: 9
+  morgrimCriRayon: 12
+  morgrimCriSquelettesMin: 3
+  morgrimCriPreparation: 1
+  morgrimCriRecharge: 15
+  morgrimCriDuree: 8
+  morgrimCriBonusDegats: 0.3
+  morgrimCriBonusVitesse: 0.25
+  morgrimDetection: 22
+  morgrimAgressionDuree: 4
+  morgrimIntervalle: 2.8
+  morgrimVitesse: 2.4
+  morgrimVitesseCourse: 3.4
+  morgrimCourseDistance: 6
+  morgrimEnchainementDelai: 0.45
   nyxessaPV: 2000
   nyxessaRegenAube: 0
   missilesStockPaliers: 0200000003000000040000000600000008000000
@@ -290,6 +339,7 @@ MonoBehaviour:
   achatDistance: 5.2
   orGrandCoffre: 160
   orCoffre: 70
+  tasOrDonjon: 0
   orTasOr: 20
   orDonjonParNuit: 0.1
   partGardeeRappel:
@@ -405,10 +455,13 @@ MonoBehaviour:
   grandeBouleDuree: 1.1
   grandeBouleVitesse: 12
   grandeBouleTaille: 1.9
+  grandeBoulePortee: 20
+  grandeBouleCoeur: 1.5
   mageCritiqueChance: 0.05
   mageCritiqueMultiplicateur: 2
   murLongueur: 8
   murDistance: 4
+  murPortee: 14
   murEpaisseur: 1.4
   murDuree: 5
   murMana: 30
@@ -444,6 +497,8 @@ MonoBehaviour:
   arcIntervalle: 0.15
   arcVitesseBander: 0.5
   viseeVitesse: 0.6
+  viseeZoneVitesse: 0.5
+  viseeZoneDistanceMin: 1.5
   nueeRayon: 3
   nueeSalves: 5
   nueeDegatsSalve: 14
@@ -497,29 +552,38 @@ MonoBehaviour:
   hacheDemiAngle: 70
   hacheInstant: 0.55
   rageMax: 100
-  rageMin: 30
+  rageMin: 0
   rageParTouche: 8
+  rageParDegatRecu: 0.5
+  rageRecuMax: 12
   rageBaisse: 6
   rageDelaiBaisse: 4
-  tournanteRage: 20
-  tournanteRageMin: 15
+  tournanteRageParTic: 1
+  tournanteDureeMax: 3
+  tournanteRecharge: 10
   tournanteIntervalle: 0.3
-  tournanteRageParTic: 2
   tournanteRayon: 2.3
   tournanteDegats: 10
   tournanteVitesse: 0.6
-  rugissementRage: 15
   rugissementRecharge: 12
   rugissementRayon: 10
   rugissementProvocation: 5
   peauDeFerReduction: 0.35
   peauDeFerDuree: 6
-  sautRage: 25
   sautRecharge: 8
   sautDistance: 5
   sautRayon: 3.5
   sautDegats: 45
   sautEtourdi: 1
+  hacheRecul: 0.4
+  furieDuree: 10
+  furieEchelle: 1.15
+  furieVitesse: 1.2
+  furieCadence: 1.15
+  furieRecul: 1.5
+  furieDegats: 1.1
+  furieRecharge: 1.5
+  furieSignal: 0.85
   chuteSeuil: 3.5
   chuteDegatsParMetre: 12
   chuteDegatsMax: 80
@@ -559,6 +623,7 @@ MonoBehaviour:
   cameraDistance: 5.5
   cameraEpaule: 0.85
   cameraHauteur: 1.9
+  cameraDecoupeRayon: 0.24
   cameraTangageDefaut: 22
   cameraTangage: {x: -30, y: 60}
   sensibiliteSouris: 0.12

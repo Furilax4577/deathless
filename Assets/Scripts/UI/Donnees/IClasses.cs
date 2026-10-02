@@ -75,6 +75,24 @@ namespace Deathless.UI.Donnees
         bool Furtif { get; }
     }
 
+    /// Ultime du joueur local (Furie du viking, 03/10/2026 ; facultatif, rétrocompatible) : l'objet enregistré comme
+    /// IEtatJoueur l'implémente si sa classe a un ultime ; le HUD montre alors le bandeau « FURIE prête » (invite de
+    /// Gameplay/Ultimate), « FURIE » avec les secondes restantes pendant l'ultime, et fait pulser l'anneau de la jauge
+    /// de classe quand elle approche du plein.
+    public interface IEtatJoueurUltime
+    {
+        /// Nom affiché en capitales (« Furie »).
+        string UltimeNom { get; }
+        /// L'ultime est en cours.
+        bool UltimeActif { get; }
+        /// Jauge pleine : le joueur peut le déclencher.
+        bool UltimePret { get; }
+        /// La jauge approche du plein (signal discret).
+        bool UltimeProche { get; }
+        /// Secondes restantes de l'ultime actif.
+        float UltimeRestant { get; }
+    }
+
     /// Aperçu 3D de la classe dans l'écran de choix (facultatif, fourni par le jeu : DonneesUI.ApercuClasse). Une caméra
     /// dédiée rend le héros de la classe (modèle, arme, pose de repos) sur un socle, dans une RenderTexture que l'écran
     /// affiche. La caméra n'est active que pendant Montrer … Cacher.
@@ -137,13 +155,18 @@ namespace Deathless.UI.Donnees
         static IActionClasse[] Actions((string, string) rt, (string, string) lt, (string, string) lb, (string, string) rb) =>
             Actions(rt, lt, lb, rb, Vide);
 
-        static IActionClasse[] Actions((string, string) rt, (string, string) lt, (string, string) lb, (string, string) rb, (string, string) lbrb) => new IActionClasse[]
+        static IActionClasse[] Actions((string, string) rt, (string, string) lt, (string, string) lb, (string, string) rb, (string, string) lbrb) =>
+            Actions(rt, lt, lb, rb, lbrb, Vide);
+
+        /// Sixième action : l'ultime (Gameplay/Ultimate : R3, G), propre au Viking (Furie, 03/10/2026) ; vide pour les autres classes.
+        static IActionClasse[] Actions((string, string) rt, (string, string) lt, (string, string) lb, (string, string) rb, (string, string) lbrb, (string, string) ultime) => new IActionClasse[]
         {
             new ActionClasse("Gameplay/AttackPrimary", rt),
             new ActionClasse("Gameplay/AttackSecondary", lt),
             new ActionClasse("Gameplay/Skill1", lb),
             new ActionClasse("Gameplay/Skill2", rb),
             new ActionClasse("Gameplay/Skill3", lbrb),
+            new ActionClasse("Gameplay/Ultimate", ultime),
         };
 
         static Color Hex(string hex) => ColorUtility.TryParseHtmlString(hex, out var c) ? c : Color.gray;
@@ -188,10 +211,10 @@ namespace Deathless.UI.Donnees
             new Classe
             {
                 Id = "viking", Nom = "Viking", Role = "Mêlée, zone", Arme = "Hache à deux mains",
-                Description = "Chaque coup fait monter sa rage, que ses compétences consomment.",
+                Description = "Sa rage monte quand il frappe et quand il encaisse. À rage pleine, il déclenche sa Furie : plus grand, plus rapide, plus violent.",
                 Teinte = Hex("#b3261e"), Embleme = "classe_viking", Jauge = JaugeClasse.Rage,
                 Actions = Actions(("Hache", "viking_hache"), ("Attaque tournante (maintenue)", "viking_attaque_tournante"),
-                    ("Rugissement", "viking_rugissement"), ("Saut percutant", "viking_saut_percutant")),
+                    ("Rugissement", "viking_rugissement"), ("Saut percutant", "viking_saut_percutant"), Vide, ("Furie (rage pleine)", IconesUI.Rage)),
             },
             // Classes à venir (Wiki : interface.md, classes.md) : verrouillées, étiquette « Bientôt ».
             new Classe

@@ -594,6 +594,12 @@ namespace Deathless.EditorTools
             var b = GameBalance.Courant;
             Declencheur(c, sm, Etat(sm, "Attaque1", chop, new Vector3(650, -60), chop != null ? chop.length / (b.hacheIntervalle + 0.2f) : 1.4f), "Attack1", loco, 0.85f, 0.05f);
             Declencheur(c, sm, Etat(sm, "Attaque2", slice, new Vector3(650, 0), slice != null ? slice.length / (b.hacheIntervalle + 0.2f) : 1.4f), "Attack2", loco, 0.85f, 0.05f);
+            // Cadence de la hache (Agilité gagnée, Furie, 03/10/2026) : la vitesse des états d'attaque est multipliée par le
+            // paramètre « VitesseAttaque » (1 par défaut), écrit par ClasseViking.
+            if (System.Array.FindIndex(c.parameters, p => p.name == "VitesseAttaque") < 0) c.AddParameter("VitesseAttaque", AnimatorControllerParameterType.Float);
+            var psV = c.parameters; foreach (var p in psV) if (p.name == "VitesseAttaque") p.defaultFloat = 1f; c.parameters = psV;
+            foreach (var e in sm.states)
+                if (e.state.name == "Attaque1" || e.state.name == "Attaque2") { e.state.speedParameterActive = true; e.state.speedParameter = "VitesseAttaque"; }
             // Attaque tournante maintenue : début du Spin, Spinning en boucle tant que « Tourne », fin du Spin.
             Booleen(c, "Tourne");
             var spin = Clip(Melee, "Melee_2H_Attack_Spin");

@@ -53,7 +53,11 @@ namespace Deathless.UI.Ecrans
         VisualElement m_VieRemplissage, m_EndurancePiste, m_EnduranceRemplissage;
         Label m_VieValeur;
         AnneauJauge m_Anneau;
-        VisualElement m_Furtif, m_Potion;
+        VisualElement m_Furtif, m_Potion, m_Furie;
+        Label m_FurieTexte;
+        int m_FurieSecondes = -1;
+        bool m_FuriePulse;
+        string m_AnneauCouleur;
         Label m_PotionNombre;
         string m_ClasseBarre;
         JaugeClasse m_JaugeAffichee = (JaugeClasse)(-1);
@@ -160,6 +164,8 @@ namespace Deathless.UI.Ecrans
             m_EndurancePiste = Racine.Q("joueur-endurance-piste");
             m_EnduranceRemplissage = Racine.Q("joueur-endurance");
             m_Furtif = Racine.Q("furtif");
+            m_Furie = Racine.Q("furie");
+            m_FurieTexte = Racine.Q<Label>("furie-texte");
             IconesUI.Poser(Racine.Q("furtif-icone"), IconesUI.Furtif);
             m_Potion = Racine.Q("potion");
             m_PotionNombre = Racine.Q<Label>("potion-nombre");
@@ -689,7 +695,7 @@ namespace Deathless.UI.Ecrans
             m_EnduranceRemplissage.style.width = Length.Percent(enduranceRatio * 100f);
             m_EndurancePiste.EnableInClassList("hud-joueur__endurance-piste--active", enduranceRatio < 0.7f);
 
-            MajClasse(joueur as IEtatJoueurClasse);
+            MajClasse(joueur as IEtatJoueurClasse, joueur as IEtatJoueurUltime);
             MajPotions(joueur as IEtatJoueurPotions);
             // Badge « Prêt » sur le portrait (01/10/2026), le temps du vote du jour.
             m_JoueurPret?.EnableInClassList("hud-pret-badge--visible", joueur.EstPret && VoteVisible(partie));
@@ -767,17 +773,45 @@ namespace Deathless.UI.Ecrans
 
         /// Jauge de classe (mana, rage) en anneau plein autour du portrait (maquette B) et œil barré du mode furtif :
         /// seulement si la source du joueur implémente IEtatJoueurClasse (facultatif). Pas d'anneau sans jauge.
-        void MajClasse(IEtatJoueurClasse classe)
+        void MajClasse(IEtatJoueurClasse classe, IEtatJoueurUltime ultime)
         {
             var jauge = classe != null ? classe.Jauge : JaugeClasse.Aucune;
             if (jauge != m_JaugeAffichee)
             {
                 m_JaugeAffichee = jauge;
                 m_Anneau.style.display = jauge == JaugeClasse.Aucune ? DisplayStyle.None : DisplayStyle.Flex;
-                m_Anneau.couleur = jauge == JaugeClasse.Rage ? "#ff8c1a" : "#4a8fe0";
+                m_AnneauCouleur = null;
             }
             if (jauge != JaugeClasse.Aucune) m_Anneau.value = classe.ValeurJauge / Mathf.Max(1f, classe.JaugeMax);
             m_Furtif.style.display = classe != null && classe.Furtif ? DisplayStyle.Flex : DisplayStyle.None;
+            MajUltime(jauge, ultime);
+        }
+
+        /// Ultime (Furie du viking) : l'anneau de rage devient rouge-orangé pendant la Furie, pulse (orange ↔ ivoire, 3 fois
+        /// par seconde) quand la jauge approche du plein et quand la Furie est prête ; le bandeau « FURIE prête » + invite
+        /// s'affiche à rage pleine, « FURIE 7 s » pendant l'ultime.
+        void MajUltime(JaugeClasse jauge, IEtatJoueurUltime ultime)
+        {
+            bool actif = ultime != null && ultime.UltimeActif;
+            bool pret = ultime != null && ultime.UltimePret;
+            bool proche = ultime != null && ultime.UltimeProche;
+            bool pulse = (pret || proche) && Mathf.Repeat(Time.unscaledTime * 3f, 1f) < 0.5f;
+            string couleur = jauge == JaugeClasse.Rage ? (actif ? "#ff3b1a" : pulse ? "#fff0c8" : "#ff8c1a") : "#4a8fe0";
+            if (couleur != m_AnneauCouleur) { m_AnneauCouleur = couleur; m_Anneau.couleur = couleur; }
+            if (m_Furie == null) return;
+            m_Furie.EnableInClassList("hud-furie--visible", actif || pret);
+            m_Furie.EnableInClassList("hud-furie--prete", pret);
+            m_Furie.EnableInClassList("hud-furie--active", actif);
+            bool pulsePret = pulse && pret;
+            if (pulsePret != m_FuriePulse) { m_FuriePulse = pulsePret; m_Furie.EnableInClassList("hud-furie--pulse", pulsePret); }
+            if (!actif && !pret) return;
+            int secondes = actif ? Mathf.CeilToInt(ultime.UltimeRestant) : -2;
+            if (secondes != m_FurieSecondes)
+            {
+                m_FurieSecondes = secondes;
+                string nom = (ultime.UltimeNom ?? "").ToUpperInvariant();
+                m_FurieTexte.text = actif ? nom + " " + secondes + " s" : nom + " prête";
+            }
         }
 
         /// Potion (croix haut) : seulement si la source du joueur implémente IEtatJoueurPotions.

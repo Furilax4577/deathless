@@ -22,6 +22,8 @@ namespace Deathless.Jeu.Dev
             switch (nom)
             {
                 case "viking": s_I.StartCoroutine(s_I.Viking()); break;
+                case "viking_furie": s_I.StartCoroutine(s_I.VikingFurie()); break;
+                case "viking_furie_distant": s_I.StartCoroutine(s_I.VikingFurieDistant()); break;   // marionnette en Furie à côté du viking local   // 03/10/2026 : rage, recharges, Furie (ultime)
                 case "mage": s_I.StartCoroutine(s_I.Mage()); break;
                 case "mage_kit": s_I.StartCoroutine(s_I.MageKit()); break;   // 01/10/2026 : LB, RB, cône qui ralentit, mana 3/s
                 case "mage_visee": s_I.StartCoroutine(s_I.MageVisee()); break;     // 02/10/2026 : visée au sol (grande boule, mur)
@@ -289,7 +291,6 @@ namespace Deathless.Jeu.Dev
                 yield return new WaitForSeconds(0.7f);
             }
             Log("viking : hache, rage " + H.Classe.ValeurJauge.ToString("F0"));
-            H.Classe.RemplirJauge();
             EntreesSimulees.Maintenir("leftTrigger", true);
             yield return new WaitForSeconds(1.1f);
             DevPartie.Capturer("classes_viking_tournante");
@@ -297,8 +298,7 @@ namespace Deathless.Jeu.Dev
             EntreesSimulees.Maintenir("leftTrigger", false);
             yield return new WaitForSeconds(0.6f);
             Log("viking : tournante, rage " + H.Classe.ValeurJauge.ToString("F0"));
-            // Rugissement : deux guerriers à 8 m, provoqués.
-            H.Classe.RemplirJauge();
+            // Rugissement : deux guerriers à 8 m, provoqués (gratuit, 03/10/2026).
             var loin = new List<Squelette> { DevPartie.PoserDevant(TypeEnnemi.Guerrier, 8f, -2f), DevPartie.PoserDevant(TypeEnnemi.Guerrier, 8f, 2f) };
             yield return Sortir(loin);
             EntreesSimulees.Appui("leftShoulder", 0.1f);
@@ -312,12 +312,217 @@ namespace Deathless.Jeu.Dev
             var cibleSaut = new List<Squelette> { DevPartie.PoserDevant(TypeEnnemi.Sbire, 5.5f, -0.8f), DevPartie.PoserDevant(TypeEnnemi.Sbire, 5.8f, 0.8f) };
             yield return Sortir(cibleSaut);
             Figer(cibleSaut, 10f);
-            H.Classe.RemplirJauge();
             EntreesSimulees.Appui("rightShoulder", 0.1f);
             yield return new WaitForSeconds(0.1f + 0.79f / 1.2f + 0.25f);
             DevPartie.Capturer("classes_viking_saut");
             yield return new WaitForSeconds(0.8f);
             Log("viking : saut percutant");
+        }
+
+
+        // ================================================================= Viking : rage, recharges, Furie (03/10/2026)
+
+        /// Hits portés par le héros local (hors tics continus) : instants, pour mesurer la cadence.
+        static readonly List<float> s_InstantsCoups = new List<float>();
+        static Squelette s_CibleMesure;
+        static void CompterCoups(Sante cible, InfoDegats info, float reel) { if (H != null && s_CibleMesure != null && cible == s_CibleMesure.Sante && info.sourceId == H.Id && !info.continu && reel > 0f) s_InstantsCoups.Add(Time.time); }
+
+        /// Furie : déclenchée si elle n'est pas en cours (rage remplie puis R3).
+        static IEnumerator AssurerFurie(ClasseViking v)
+        {
+            if (v.EnFurie) yield break;
+            v.RemplirJauge();
+            yield return new WaitForSeconds(0.25f);
+            EntreesSimulees.Appui("rightStickPress", 0.1f);
+            yield return new WaitForSeconds(0.4f);
+        }
+
+        static string Emp(Heros h, int i) { var e = h.Classe.Emplacement(i, out float r, out float t); return e + (e == EtatEmplacement.Recharge ? " " + r.ToString("F1") + "/" + t.ToString("F0") : ""); }
+
+        /// Cadence : coups portés pendant `duree` s en martelant RT sur une cible figée à PV énormes.
+        static IEnumerator Marteler(Squelette cible, float duree, System.Action<float> fin)
+        {
+            s_InstantsCoups.Clear();
+            s_CibleMesure = cible;
+            Sante.AnyTouche += CompterCoups;
+            float t0 = Time.time;
+            while (Time.time - t0 < duree)
+            {
+                cible.Etourdir(5f);
+                EntreesSimulees.Appui("rightTrigger", 0.03f);
+                yield return new WaitForSeconds(0.07f);
+            }
+            Sante.AnyTouche -= CompterCoups;
+            float intervalle = s_InstantsCoups.Count > 1 ? (s_InstantsCoups[s_InstantsCoups.Count - 1] - s_InstantsCoups[0]) / (s_InstantsCoups.Count - 1) : 0f;
+            fin(intervalle);
+        }
+
+        /// Viking : la rage monte en frappant et en encaissant, les compétences sont gratuites (recharge seule), la Furie
+        /// ne part pas avant 100, puis Ultimate (R3) : taille, vitesse, cadence, recul mesurés avant et pendant ; sortie à 0.
+        IEnumerator VikingFurie()
+        {
+            Missiles(false);
+            DevPartie.PlacerHeros(Depart, Loin);
+            yield return new WaitForSeconds(0.5f);
+            var h = H; var v = h.Classe as ClasseViking; var b = GameBalance.Courant;
+            if (v == null) { Log("viking_furie : le héros local n'est pas un viking"); Missiles(true); yield break; }
+            var modele = h.animator.transform;
+            Log("furie : départ, rage " + v.ValeurJauge.ToString("F0") + "/" + v.JaugeMax.ToString("F0") + ", vitesse " + v.Vitesse.ToString("F2") + ", échelle modèle " + modele.localScale.y.ToString("F3") + ", capsule " + h.CC.height.ToString("F2") + ", prête " + v.UltimePret);
+
+            // 1. Impossible avant 100.
+            EntreesSimulees.Appui("rightStickPress", 0.1f);
+            yield return new WaitForSeconds(0.4f);
+            Log("furie : R3 à rage " + v.ValeurJauge.ToString("F0") + " → en furie " + v.EnFurie + " (attendu : non)");
+
+            // 2. Rage en frappant : trois sbires figés dans l'arc, deux coups de hache.
+            var groupe = new List<Squelette> { DevPartie.PoserDevant(TypeEnnemi.Sbire, 2.0f, -0.8f), DevPartie.PoserDevant(TypeEnnemi.Sbire, 2.0f, 0f), DevPartie.PoserDevant(TypeEnnemi.Sbire, 2.0f, 0.8f) };
+            yield return Sortir(groupe);
+            foreach (var s in groupe) if (s != null) s.Sante.Fixer(100000f, 100000f);
+            Figer(groupe, 20f);
+            float r0 = v.ValeurJauge;
+            Vector3 p0 = groupe[1].transform.position;
+            EntreesSimulees.Appui("rightTrigger", 0.1f);
+            yield return new WaitForSeconds(0.9f);
+            Log("furie : un coup de hache sur 3 ennemis : rage " + r0.ToString("F0") + " → " + v.ValeurJauge.ToString("F0") + " (attendu +24), recul de la cible centrale " + Vector3.Distance(p0, groupe[1].transform.position).ToString("F2") + " m (base " + b.hacheRecul + ")");
+            float recul0 = Vector3.Distance(p0, groupe[1].transform.position);
+
+            // 3. Rage en encaissant : 20 dégâts, puis un coup énorme plafonné.
+            float rb = v.ValeurJauge;
+            DevPartie.Blesser(20f);
+            yield return new WaitForSeconds(0.2f);
+            float apres20 = v.ValeurJauge;
+            DevPartie.Blesser(60f);
+            yield return new WaitForSeconds(0.2f);
+            Log("furie : encaissé 20 dégâts : rage " + rb.ToString("F0") + " → " + apres20.ToString("F0") + " (attendu +10) ; encaissé 60 : → " + v.ValeurJauge.ToString("F0") + " (plafond " + b.rageRecuMax + " par coup)");
+
+            // 4. Compétences gratuites, limitées par leur recharge : LB, RB, LT (tournante) sans toucher à la rage.
+            float rc = v.ValeurJauge;
+            EntreesSimulees.Appui("leftShoulder", 0.1f);
+            yield return new WaitForSeconds(2.4f);
+            EntreesSimulees.Appui("rightShoulder", 0.1f);
+            yield return new WaitForSeconds(1.6f);
+            EntreesSimulees.Maintenir("leftTrigger", true);
+            yield return new WaitForSeconds(1.5f);
+            string actif = Emp(h, 1);
+            yield return new WaitForSeconds(2.2f);   // 3 s de maintien : s'arrête seule
+            EntreesSimulees.Maintenir("leftTrigger", false);
+            yield return new WaitForSeconds(0.3f);
+            Log("furie : rugissement, saut, tournante lancés sans coût ; icônes : tournante pendant « " + actif + " », puis tournante " + Emp(h, 1) + ", rugissement " + Emp(h, 2) + ", saut " + Emp(h, 3) + " ; rage " + rc.ToString("F0") + " → " + v.ValeurJauge.ToString("F0") + " (monte avec les tics, jamais de coût)");
+            EntreesSimulees.Maintenir("leftTrigger", true);
+            yield return new WaitForSeconds(0.5f);
+            EntreesSimulees.Maintenir("leftTrigger", false);
+            yield return new WaitForSeconds(0.3f);
+            Log("furie : tournante relancée pendant sa recharge → action " + v.Occupe + " (attendu : non), état " + Emp(h, 1));
+
+            // 5. Mesures avant la Furie : cadence (6 s de martelage), vitesse, taille.
+            foreach (var s in groupe) if (s != null && s.Vivant) s.Sante.Encaisser(new InfoDegats { montant = 1e9f, equipeSource = Equipe.Heros });
+            DevPartie.PlacerHeros(Depart, Loin);
+            var cible = DevPartie.PoserDevant(TypeEnnemi.Guerrier, 1.6f, 0f);
+            yield return Sortir(new List<Squelette> { cible });
+            cible.Sante.Fixer(100000f, 100000f);
+            float intervalleAvant = 0f;
+            yield return Marteler(cible, 6f, i => intervalleAvant = i);
+            Log("furie : AVANT — intervalle moyen entre coups " + intervalleAvant.ToString("F3") + " s (hacheIntervalle " + b.hacheIntervalle + "), vitesse " + v.Vitesse.ToString("F2") + ", échelle " + modele.localScale.y.ToString("F3") + ", rage " + v.ValeurJauge.ToString("F0"));
+            DevPartie.Capturer("viking_furie_avant");
+            yield return new WaitForSeconds(0.4f);
+            cible.Sante.Encaisser(new InfoDegats { montant = 1e9f, equipeSource = Equipe.Heros });
+
+            DevPartie.PlacerHeros(Depart, Loin);
+            Vector3 d0 = h.transform.position;
+            EntreesSimulees.Stick(new Vector2(0f, 1f), Vector2.zero, 1.5f);
+            yield return new WaitForSeconds(1.6f);
+            float vitesseAvant = Vector3.Distance(d0, h.transform.position) / 1.5f;
+            Log("furie : AVANT — vitesse mesurée " + vitesseAvant.ToString("F2") + " m/s");
+
+            // 6. Rage pleine : prête (jauge, HUD), puis R3.
+            DevPartie.PlacerHeros(Depart, Loin);
+            v.RemplirJauge();
+            yield return new WaitForSeconds(0.5f);
+            Log("furie : rage pleine → prête " + v.UltimePret + " (en furie " + v.EnFurie + ")");
+            DevPartie.Capturer("viking_furie_prete_hud");
+            yield return new WaitForSeconds(0.3f);
+            EntreesSimulees.Appui("rightStickPress", 0.1f);
+            yield return new WaitForSeconds(1.2f);
+            Log("furie : R3 à rage pleine → en furie " + v.EnFurie + ", échelle modèle " + modele.localScale.y.ToString("F3") + " (cible " + b.furieEchelle + "), capsule " + h.CC.height.ToString("F2") + ", vitesse " + v.Vitesse.ToString("F2") + ", dégâts ×" + v.FacteurDegats.ToString("F2") + ", rage " + v.ValeurJauge.ToString("F0"));
+            DevPartie.Capturer("viking_furie_active");
+            yield return new WaitForSeconds(0.4f);
+
+            // 7. Pendant la Furie (10 s : chaque mesure la redéclenche si besoin) : recul, cadence, vitesse.
+            DevPartie.PlacerHeros(Depart, Loin);
+            var sb = DevPartie.PoserDevant(TypeEnnemi.Sbire, 1.8f, 0f);
+            yield return Sortir(new List<Squelette> { sb });
+            sb.Sante.Fixer(100000f, 100000f);
+            sb.Etourdir(10f);
+            yield return AssurerFurie(v);
+            Vector3 q0 = sb.transform.position;
+            EntreesSimulees.Appui("rightTrigger", 0.1f);
+            yield return new WaitForSeconds(1.0f);
+            float reculFurie = Vector3.Distance(q0, sb.transform.position);
+            Log("furie : PENDANT — recul d'un coup " + reculFurie.ToString("F2") + " m (hors Furie " + recul0.ToString("F2") + " m, ×" + (reculFurie / Mathf.Max(0.01f, recul0)).ToString("F2") + ") ; en furie " + v.EnFurie + ", rage " + v.ValeurJauge.ToString("F0"));
+            sb.Sante.Encaisser(new InfoDegats { montant = 1e9f, equipeSource = Equipe.Heros });
+
+            DevPartie.PlacerHeros(Depart, Loin);
+            var cible2 = DevPartie.PoserDevant(TypeEnnemi.Guerrier, 1.6f, 0f);
+            yield return Sortir(new List<Squelette> { cible2 });
+            cible2.Sante.Fixer(100000f, 100000f);
+            yield return AssurerFurie(v);
+            float rageAvantCoups = v.ValeurJauge;
+            float intervalleFurie = 0f;
+            yield return Marteler(cible2, 4.5f, i => intervalleFurie = i);
+            Log("furie : PENDANT — intervalle moyen entre coups " + intervalleFurie.ToString("F3") + " s (avant " + intervalleAvant.ToString("F3") + ", ×" + (intervalleAvant / Mathf.Max(0.01f, intervalleFurie)).ToString("F2") + " de cadence), rage avant les coups " + rageAvantCoups.ToString("F0") + ", après " + v.ValeurJauge.ToString("F0") + " (elle baisse seule, les coups ne la font pas monter), en furie " + v.EnFurie + ", échelle " + modele.localScale.y.ToString("F3"));
+            DevPartie.Capturer("viking_furie_combat");
+            yield return new WaitForSeconds(0.3f);
+            cible2.Sante.Encaisser(new InfoDegats { montant = 1e9f, equipeSource = Equipe.Heros });
+
+            DevPartie.PlacerHeros(Depart, Loin);
+            yield return AssurerFurie(v);
+            yield return new WaitForSeconds(1.3f);   // fin du geste de hache (vitesse ×0,25 pendant le coup)
+            Vector3 f0 = h.transform.position;
+            EntreesSimulees.Stick(new Vector2(0f, 1f), Vector2.zero, 1.5f);
+            yield return new WaitForSeconds(1.6f);
+            float vitesseFurie = Vector3.Distance(f0, h.transform.position) / 1.5f;
+            Log("furie : PENDANT — vitesse mesurée " + vitesseFurie.ToString("F2") + " m/s (avant " + vitesseAvant.ToString("F2") + ", ×" + (vitesseFurie / Mathf.Max(0.01f, vitesseAvant)).ToString("F2") + "), en furie " + v.EnFurie + ", rage " + v.ValeurJauge.ToString("F0"));
+
+            // 8. Sortie : la rage tombe à 0, taille normale.
+            float t = 0f;
+            while (v.EnFurie && t < 14f) { t += Time.deltaTime; yield return null; }
+            yield return new WaitForSeconds(1.2f);
+            Log("furie : SORTIE après " + t.ToString("F1") + " s depuis la mesure ; en furie " + v.EnFurie + ", rage " + v.ValeurJauge.ToString("F0") + ", échelle " + modele.localScale.y.ToString("F3") + ", vitesse " + v.Vitesse.ToString("F2"));
+            DevPartie.Capturer("viking_furie_apres");
+            Missiles(true);
+        }
+
+        /// Réseau (simulé) : un viking marionnette (héros d'un autre poste) reçoit l'état de Furie de son propriétaire
+        /// (HerosReseau.m_Furie → ClasseViking.ForcerFurieDistante) : il grossit et rougeoie, sans simuler de bonus. À côté du
+        /// viking local resté normal : capture « côte à côte ».
+        IEnumerator VikingFurieDistant()
+        {
+            Missiles(false);
+            DevPartie.PlacerHeros(Depart, Loin);
+            var h = H; var p = Partie.Instance;
+            var def = ClassesJeu.Courant != null ? ClassesJeu.Courant.Trouver("viking") : null;
+            if (def == null || def.prefab == null) { Log("furie distant : prefab du viking introuvable"); Missiles(true); yield break; }
+            var go = Instantiate(def.prefab, h.transform.position + h.transform.right * 1.5f + h.transform.forward * 0.2f, h.transform.rotation);
+            go.name = "Heros_allie_viking_test";
+            var allie = go.GetComponent<Heros>();
+            p.AttacherHerosDistant(allie, "viking", "Allié", 7);
+            var va = allie.Classe as ClasseViking;
+            var ml = h.animator.transform; var ma = allie.animator.transform;
+            yield return new WaitForSeconds(0.8f);
+            Log("furie distant : avant, échelle locale " + ml.localScale.y.ToString("F3") + ", marionnette " + ma.localScale.y.ToString("F3") + ", en furie " + va.EnFurie);
+            DevPartie.Capturer("viking_furie_cote_a_cote_avant");
+            va.ForcerFurieDistante(true);
+            yield return new WaitForSeconds(1.0f);
+            Log("furie distant : état reçu → marionnette en furie " + va.EnFurie + ", échelle " + ma.localScale.y.ToString("F3") + " (cible " + (0.8f * GameBalance.Courant.furieEchelle).ToString("F3") + "), local " + ml.localScale.y.ToString("F3") + ", capsule marionnette " + allie.CC.height.ToString("F2"));
+            DevPartie.Capturer("viking_furie_cote_a_cote");
+            yield return new WaitForSeconds(0.8f);
+            va.EffetDistant(11, Vector3.zero, Vector3.zero, 0f);   // son d'entrée (E_FurieDebut)
+            va.ForcerFurieDistante(false);
+            yield return new WaitForSeconds(1.2f);
+            Log("furie distant : fin reçue → échelle " + ma.localScale.y.ToString("F3") + ", en furie " + va.EnFurie);
+            p.DetacherHeros(7);
+            Destroy(go);
+            Missiles(true);
         }
 
         // ================================================================= Mage

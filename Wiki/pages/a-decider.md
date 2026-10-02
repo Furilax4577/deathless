@@ -12,6 +12,7 @@ Ce qui reste ouvert. Une ligne quitte cette page quand la règle est tranchée e
 | Statuts | Durées et intensités des statuts ; seuil, dégâts et ralenti de la chute | [Statuts](statuts.md) |
 | Progression | Premier arbre d'améliorations des compétences (proposition), autres améliorations, économie | [Classes](classes.md#menu-du-personnage-et-points-de-competence) |
 | Succès | Trier la liste proposée le 01/10/2026 (garder, renommer, retirer), puis décider quand coder le module (local d'abord, Steam plus tard). | [Succès](succes.md) |
+| Viking : Furie (03/10/2026) | Valeurs de départ de la rage et de la Furie à équilibrer : rage gagnée en encaissant (0,5 par point, 12 au plus par coup), 1 par tic de tournante, plancher de rage 0, durée 10 s, taille ×1,15, vitesse +20 %, cadence +15 %, recul ×1,5 (base 0,4 m), dégâts +10 %, recharges ×1,5 ; tournante 3 s puis 10 s de recharge ; touche de la Furie (R3 / G) ; sons dédiés. | [Viking](classe-viking.md#rage-et-furie) |
 | Mage (banc en jeu, 01/10/2026) | Avec son nouveau kit, le Mage est au-dessus de la moyenne des classes partout : +14 à +38 % en vague (nuits 6 et 12), +16 à +30 % sur une cible (boule et brûlure en paliers). Le réduire avant ou après la 0.8.0, et par quoi (dégâts de la boule, paliers de brûlure, mana) ? Détail : `Docs/equilibrage-classes.md`, « Banc en jeu ». | [Mage](classe-mage.md) |
 
 ## Clés, crochetage et potions du village (03/10/2026, proposition à valider)

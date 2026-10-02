@@ -120,7 +120,7 @@ Décision du 25/09/2026 : **court délai**. `Deathless.Controls.InputChordResolv
 
 - Au premier appui sur LB (ou RB), l'action seule attend `chordWindow` = **0,1 s** (`InputChordResolver.DefaultChordWindow`, à équilibrer ; dans la démo : champ `chordWindow` de `UISocleDemo`).
 - Si l'autre bouton arrive dans ce délai, **Compétence 3** part, et ni la 1 ni la 2. Sinon **Compétence 1** (ou 2) part à la fin du délai, même si le bouton a déjà été relâché. L'ordre des deux boutons est libre.
-- **Pas d'accord L3 + R3** (décision de Quentin, 25/09/2026 : aucune classe n'a d'ultime, personne ne s'accroupit ; actions `Ultimate` et `Crouch` retirées). L3 est Sprinter seul, relayé sans délai ; R3 est libre.
+- **Pas d'accord L3 + R3** (décision de Quentin, 25/09/2026 : personne ne s'accroupit ; action `Crouch` retirée). L3 est Sprinter seul, relayé sans délai. **Ultime du Viking (03/10/2026)** : l'action `Ultimate` est de retour, simple (R3 et G), relayée sans délai comme les autres boutons ; seul le Viking l'utilise (Furie).
 - Au clavier (A, R, F), tout part immédiatement.
 - Le délai est mesuré sur l'horodatage des événements (`CallbackContext.time`) et vérifié après chaque mise à jour de l'Input System (`InputSystem.onAfterUpdate`) : le résultat ne dépend pas de la fréquence d'images.
 
@@ -220,7 +220,7 @@ Schémas : **Gamepad** (`<Gamepad>`) et **KeyboardMouse** (`<Keyboard>` + `<Mous
 ## Décisions prises (25/09/2026)
 
 - Accord de la manette : court délai (section « Accord de la manette »).
-- **Pas d'ultime ni d'accroupissement** : actions `Ultimate` (L3 + R3, G) et `Crouch` (R3, C) retirées de DeathlessControls et du résolveur ; R3, G et C sont libres.
+- **Pas d'accroupissement** : l'action `Crouch` (R3, C) est retirée de DeathlessControls et du résolveur ; l'action `Ultimate` (L3 + R3, G) l'a été aussi le 25/09/2026, puis **recréée le 03/10/2026 pour la Furie du Viking** sous une forme simple : `Gameplay/Ultimate`, type Button, liée à R3 (`<Gamepad>/rightStickPress`) et à G, relayée sans délai par `InputChordResolver`. C reste libre. Invites : `InputPrompt` sur `Gameplay/Ultimate` (bandeau « FURIE prête » du HUD, sixième ligne de la fiche du Viking dans le choix de classe, tableau des commandes des options). Interface facultative `IEtatJoueurUltime` (`Deathless.UI.Donnees`) pour le HUD.
 - **DualSense : le bouton Create déclare aussi « prêt »**, en plus du pavé tactile (liaison `<Gamepad>/select` gardée volontairement ; l'invite affiche le pavé tactile).
 - Taille de l'interface : ×1 = 0,8, ×2 = 1, ×3 = 1,35.
 - **DeathlessControls est l'asset d'actions du projet** (Project Settings > Input System > Project-wide Actions) dans main ; `Assets/InputSystem_Actions.inputactions` du gabarit a été retiré de main (aucune référence). Le bac à sable garde l'ancien réglage.

@@ -91,10 +91,10 @@ REQUIS = [
     "arbaletePortee", "arbaleteRecharge", "grenadeRecharge", "grenadeNuage", "grenadePortee", "pasOmbreDistance",
     "pasOmbreDuree", "pasOmbreArret", "pasOmbrePorteeCible", "pasOmbreRecharge", "executionSeuil", "executionElite",
     "vikingPV", "hacheDegats", "hacheIntervalle", "hachePortee", "hacheDemiAngle", "hacheInstant", "rageMax", "rageMin",
-    "rageParTouche", "rageBaisse", "rageDelaiBaisse", "tournanteRage", "tournanteRageMin", "tournanteIntervalle",
-    "tournanteRageParTic", "tournanteRayon", "tournanteDegats", "tournanteVitesse", "rugissementRage",
+    "rageParTouche", "rageBaisse", "rageDelaiBaisse", "tournanteDureeMax", "tournanteRecharge", "tournanteIntervalle",
+    "tournanteRageParTic", "tournanteRayon", "tournanteDegats", "tournanteVitesse",
     "rugissementRecharge", "rugissementRayon", "rugissementProvocation", "peauDeFerReduction", "peauDeFerDuree",
-    "sautRage", "sautRecharge", "sautDistance", "sautRayon", "sautDegats", "sautEtourdi",
+    "sautRecharge", "sautDistance", "sautRayon", "sautDegats", "sautEtourdi",
 ]
 # Brûlure en paliers (01/10/2026) : si ces champs manquent, la brûlure d'avant (brulureDegats pendant brulureDuree) fait foi.
 BRULURE_PALIERS = ["brulureDegatsPaliers", "brulureRemplissageCone", "brulureRemplissageBoule", "brulureDelaiDescente",
@@ -894,7 +894,9 @@ class Viking(Heros):
         self.dernier_coup = -99.0
         self.rech_rugir = 0.0
         self.rech_saut = 0.0
+        self.rech_tournante = 0.0
         self.tournante = False
+        self.debut_tournante = 0.0
         self.prochain_tic = 0.0
 
     def gagner(self, n, continu=False):
@@ -906,6 +908,9 @@ class Viking(Heros):
         b, sim = self.b, self.sim
         self.rech_rugir = max(0.0, self.rech_rugir - dt)
         self.rech_saut = max(0.0, self.rech_saut - dt)
+        self.rech_tournante = max(0.0, self.rech_tournante - dt)
+        # Refonte du 03/10/2026 : compétences gratuites avec recharge (tournante 3 s au plus puis recharge), rage qui sert
+        # à la Furie. La Furie (ultime) et la rage gagnée en encaissant ne sont PAS modélisées ici (le banc en jeu les voit).
         if t - self.dernier_coup > b["rageDelaiBaisse"] and not self.tournante:
             if self.rage > b["rageMin"]:
                 self.rage = max(b["rageMin"], self.rage - b["rageBaisse"] * dt)
@@ -913,7 +918,6 @@ class Viking(Heros):
                 self.rage = min(b["rageMin"], self.rage + b["rageBaisse"] * dt)
         autour = lambda r: [e for e in sim.presents() if dist(e.pos, self.pos) - e.rayon <= r]
         if self.tournante:
-            self.rage -= b["tournanteRage"] * dt
             e = self.choisir_melee()
             if e is not None and dist(e.pos, self.pos) > 1.2:
                 self.aller_vers(e.pos, dt, b["tournanteVitesse"], arret=1.0)
@@ -923,22 +927,21 @@ class Viking(Heros):
                 for x in touches:
                     sim.frapper(x, b["tournanteDegats"], melee=True, continu=True, source="tournante")
                 self.gagner(len(touches), continu=True)
-            if self.rage <= 0 or len(autour(b["tournanteRayon"] + 0.5)) < 2:
+            if t - self.debut_tournante >= b["tournanteDureeMax"] or len(autour(b["tournanteRayon"] + 0.5)) < 2:
                 self.tournante = False
-                self.rage = max(0.0, self.rage)
+                self.rech_tournante = b["tournanteRecharge"]
                 self.finir_dans(0.0)
             return
         if self.occupe():
             return
         # Rugissement : provoque ce qui est à rugissementRayon m ; Peau de fer.
-        if self.rech_rugir <= 0 and self.rage >= b["rugissementRage"] and len(autour(b["rugissementRayon"])) >= self.p["rugir_seuil"]:
-            self.rage -= b["rugissementRage"]
+        if self.rech_rugir <= 0 and len(autour(b["rugissementRayon"])) >= self.p["rugir_seuil"]:
             self.rech_rugir = b["rugissementRecharge"]
             self.finir_dans(CODE["cri_fin"])
             sim.plus_tard(CODE["cri"], self._cri)
             return
         # Saut percutant : vers le groupe le plus dense à portée de bond.
-        if self.rech_saut <= 0 and self.rage >= b["sautRage"]:
+        if self.rech_saut <= 0:
             meilleur = None
             for c in sim.presents():
                 dc = dist(c.pos, self.pos)
@@ -949,7 +952,6 @@ class Viking(Heros):
                     meilleur = (n, c)
             proches = sum(1 for x in sim.presents() if math.hypot(*x.pos) <= LAISSE + 2)
             if meilleur and meilleur[0] >= min(self.p["saut_seuil"], max(1, proches)):
-                self.rage -= b["sautRage"]
                 self.rech_saut = b["sautRecharge"]
                 c = meilleur[1]
                 self.viser(c)
@@ -958,8 +960,9 @@ class Viking(Heros):
                 self.finir_dans(CODE["saut_fin"])
                 sim.plus_tard(CODE["saut_impact"], lambda a=arrivee: self._atterrir(a))
                 return
-        if self.rage >= b["tournanteRageMin"] and len(autour(b["tournanteRayon"])) >= self.p["tournante_seuil"]:
+        if self.rech_tournante <= 0 and len(autour(b["tournanteRayon"])) >= self.p["tournante_seuil"]:
             self.tournante = True
+            self.debut_tournante = t
             self.prochain_tic = t
             return
         e = self.choisir_melee()

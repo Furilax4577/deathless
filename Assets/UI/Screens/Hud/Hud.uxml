@@ -175,6 +175,13 @@
                         <ui:Label text="Prêt" class="hud-pret-badge__texte" />
                     </ui:VisualElement>
                 </ui:VisualElement>
+                <!-- Ultime (Furie du viking, 03/10/2026) : « FURIE prête » + invite (rage pleine), « FURIE 7 s » pendant l'ultime -->
+                <ui:VisualElement name="furie" class="hud-furie" picking-mode="Ignore">
+                    <ui:VisualElement name="furie-pastille" class="hud-furie__pastille" picking-mode="Ignore">
+                        <ui:Label name="furie-texte" text="FURIE prête" class="hud-furie__texte" />
+                        <dl:InputPrompt name="furie-invite" action="Gameplay/Ultimate" class="hud-furie__invite" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement class="hud-joueur__colonne">
                 <!-- Statuts du joueur (brûlure, ralenti… ; HudStatuts), juste au-dessus de la barre de vie -->

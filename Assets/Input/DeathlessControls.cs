@@ -251,6 +251,16 @@ public partial class @DeathlessControls: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""initialStateCheck"": false,
                     ""priority"": 0
+                },
+                {
+                    ""name"": ""Ultimate"",
+                    ""type"": ""Button"",
+                    ""id"": ""e41b7f20-6c3a-4d85-9a17-8b2d5c0f3e96"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false,
+                    ""priority"": 0
                 }
             ],
             ""bindings"": [
@@ -680,6 +690,28 @@ public partial class @DeathlessControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""KeyboardMouse"",
                     ""action"": ""Emote"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7a9d3e18-2f64-4b0c-a5e7-1c8f6b4d2a30"",
+                    ""path"": ""<Gamepad>/rightStickPress"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Ultimate"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b05c8a47-9e12-4f36-8d71-3a6e0b9c5d24"",
+                    ""path"": ""<Keyboard>/g"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""KeyboardMouse"",
+                    ""action"": ""Ultimate"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1137,6 +1169,7 @@ public partial class @DeathlessControls: IInputActionCollection2, IDisposable
         m_Gameplay_Ready = m_Gameplay.FindAction("Ready", throwIfNotFound: true);
         m_Gameplay_Pause = m_Gameplay.FindAction("Pause", throwIfNotFound: true);
         m_Gameplay_Emote = m_Gameplay.FindAction("Emote", throwIfNotFound: true);
+        m_Gameplay_Ultimate = m_Gameplay.FindAction("Ultimate", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1248,6 +1281,7 @@ public partial class @DeathlessControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Gameplay_Ready;
     private readonly InputAction m_Gameplay_Pause;
     private readonly InputAction m_Gameplay_Emote;
+    private readonly InputAction m_Gameplay_Ultimate;
     /// <summary>
     /// Provides access to input actions defined in input action map "Gameplay".
     /// </summary>
@@ -1324,6 +1358,10 @@ public partial class @DeathlessControls: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @Emote => m_Wrapper.m_Gameplay_Emote;
         /// <summary>
+        /// Provides access to the underlying input action "Gameplay/Ultimate".
+        /// </summary>
+        public InputAction @Ultimate => m_Wrapper.m_Gameplay_Ultimate;
+        /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
         public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
@@ -1397,6 +1435,9 @@ public partial class @DeathlessControls: IInputActionCollection2, IDisposable
             @Emote.started += instance.OnEmote;
             @Emote.performed += instance.OnEmote;
             @Emote.canceled += instance.OnEmote;
+            @Ultimate.started += instance.OnUltimate;
+            @Ultimate.performed += instance.OnUltimate;
+            @Ultimate.canceled += instance.OnUltimate;
         }
 
         /// <summary>
@@ -1456,6 +1497,9 @@ public partial class @DeathlessControls: IInputActionCollection2, IDisposable
             @Emote.started -= instance.OnEmote;
             @Emote.performed -= instance.OnEmote;
             @Emote.canceled -= instance.OnEmote;
+            @Ultimate.started -= instance.OnUltimate;
+            @Ultimate.performed -= instance.OnUltimate;
+            @Ultimate.canceled -= instance.OnUltimate;
         }
 
         /// <summary>
@@ -1851,6 +1895,13 @@ public partial class @DeathlessControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnEmote(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Ultimate" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnUltimate(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

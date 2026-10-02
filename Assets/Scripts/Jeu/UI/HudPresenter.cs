@@ -9,7 +9,7 @@ namespace Deathless.Jeu
     /// IEtatJoueur, IScoreFin et ICommandesPartie en lisant Partie.Etat (aucune logique de jeu ici) et s'enregistre dans
     /// DonneesUI. Au chargement : commandes seules (menu principal) ; partie lancée : toutes les sources (HUD) ; fin :
     /// Phase = Terminee puis PartieTerminee (écran de score). Gère aussi le curseur (caché et verrouillé en jeu).
-    public class HudPresenter : MonoBehaviour, IEtatPartie, IEtatJoueur, IEtatJoueurClasse, IScoreFin, ICommandesPartie, IClassesJouables, IEtatEquipe, IEtatMissiles, IEtatBoss, IEtatVagues, IEtatApercu
+    public class HudPresenter : MonoBehaviour, IEtatPartie, IEtatJoueur, IEtatJoueurClasse, IEtatJoueurUltime, IScoreFin, ICommandesPartie, IClassesJouables, IEtatEquipe, IEtatMissiles, IEtatBoss, IEtatVagues, IEtatApercu
     {
         public static readonly Color TeintePaladin = new Color32(0xd9, 0xb2, 0x64, 0xff);
 
@@ -286,6 +286,14 @@ namespace Deathless.Jeu
         public float ValeurJauge => J != null ? J.jauge : 0f;
         public float JaugeMax => J != null ? Mathf.Max(1f, J.jaugeMax) : 1f;
         public bool Furtif => J != null && J.furtif;
+
+        // ----------------------------------------------------------------- IEtatJoueurUltime (Furie du viking)
+
+        public string UltimeNom => H != null && H.Classe != null ? H.Classe.NomUltime : string.Empty;
+        public bool UltimeActif => H != null && H.Classe != null && H.Classe.UltimeActif;
+        public bool UltimePret => H != null && H.Classe != null && H.Classe.UltimePret;
+        public bool UltimeProche => H != null && H.Classe != null && H.Classe.UltimeProche;
+        public float UltimeRestant => UltimeActif ? ValeurJauge / JaugeMax * GameBalance.Courant.furieDuree : 0f;
         public void BasculerPret() { if (P != null) P.BasculerPret(J != null ? J.id : 1); }
         public void QuitterPartie() { if (P != null) P.QuitterPartie(); }
         public void QuitterJeu() { if (P != null) P.QuitterJeu(); }

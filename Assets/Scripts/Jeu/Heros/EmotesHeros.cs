@@ -167,7 +167,7 @@ namespace Deathless.Jeu
                     OuvrirRoue();
                     return true;
                 case "Jump": case "Dodge": case "AttackPrimary": case "AttackSecondary":
-                case "Skill1": case "Skill2": case "Skill3": case "DrinkPotion":
+                case "Skill1": case "Skill2": case "Skill3": case "Ultimate": case "DrinkPotion":
                     if (m_Ouverte && !m_RoueTest) FermerRoue();
                     Interrompre(true);
                     return false;

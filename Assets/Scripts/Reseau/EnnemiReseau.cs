@@ -163,6 +163,12 @@ namespace Deathless.Reseau
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         void RepousserRpc(Vector3 deplacement, float etourdi, RpcParams p = default) => Squelette.Repousser(deplacement, etourdi, Partie.IdJoueur(p.Receive.SenderClientId));
 
+        /// Recul simple (hache du viking, 03/10/2026) demandé par un client ; l'hôte borne la distance (3 m).
+        public void DemanderPousser(Vector3 deplacement) => PousserRpc(deplacement);
+
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        void PousserRpc(Vector3 deplacement) => Squelette.Pousser(Vector3.ClampMagnitude(deplacement, 3f));
+
         public void DemanderProvoquer(float duree) => ProvoquerRpc(duree);
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]

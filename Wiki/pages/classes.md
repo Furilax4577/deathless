@@ -1,6 +1,6 @@
 # Classes
 
-Cinq classes jouables, et bientôt le **druide** et le **mécanicien**. Chaque classe a un style d'arme, et ses compétences sont réparties sur trois emplacements au plus. Aucune classe n'a d'ultime {décidé}. Les rôles, les armes et leurs animations sont fixés {décidé}. En multijoueur, **chaque classe est unique** : jamais deux joueurs sur la même classe {décidé}.
+Cinq classes jouables, et bientôt le **druide** et le **mécanicien**. Chaque classe a un style d'arme, et ses compétences sont réparties sur trois emplacements au plus. Aucune classe n'a d'ultime, **sauf le Viking** : sa **Furie**, déclenchée à la rage pleine {décidé par Quentin 03/10/2026 : la rage monte au combat, les compétences sont gratuites avec recharge, ultime quand la rage est à fond ; déclenchée par le joueur (R3 / G, touche à confirmer)}, voir [Viking](classe-viking.md#rage-et-furie). Les rôles, les armes et leurs animations sont fixés {décidé}. En multijoueur, **chaque classe est unique** : jamais deux joueurs sur la même classe {décidé}.
 
 | | Classe | Style d'arme | Rôle |
 |---|---|---|---|
@@ -71,7 +71,7 @@ L'esquive des **cinq classes** est **directionnelle** (26/09/2026) : le héros n
 | | Bélier infatigable | −12 % de recharge de la charge bélier |
 | | Soin fervent | +20 % de vie rendue par le soin |
 | Viking | Hache lourde | +10 % de dégâts au coup de hache (pas à l'attaque tournante) |
-| | Tourbillon | −15 % de rage consommée par l'attaque tournante |
+| | Tourbillon | −15 % de recharge de l'attaque tournante (03/10/2026 : elle ne consomme plus de rage) |
 | | Cri de guerre | −12 % de recharge du rugissement |
 | | Chute brutale | +15 % de dégâts du saut percutant |
 | Mage | Brasier | +10 % de dégâts de la boule de feu |

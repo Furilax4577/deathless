@@ -108,7 +108,7 @@ def modele(b):
     hache_dps = b["hacheDegats"] / b["hacheIntervalle"]
     tourn_dps = b["tournanteDegats"] / b["tournanteIntervalle"]
     tourn_rage_par_cible = b["tournanteRageParTic"] / b["tournanteIntervalle"]
-    tourn_seuil = b["tournanteRage"] / tourn_rage_par_cible
+    tourn_seuil = 0.0   # tournante gratuite depuis le 03/10/2026 (plus de seuil de rentabilité en rage)
     rage_par_s_mono = b["rageParTouche"] / b["hacheIntervalle"]
     # Pic 3 s (rage pleine) : saut (impact à 0,66 s) puis coups de hache.
     saut_impact = 0.79 / 1.2 + 0.35
@@ -124,25 +124,21 @@ def modele(b):
         competences=[
             ("Hache", "aucun (+%s rage par cible)" % f(b["rageParTouche"]), "%s s entre deux coups" % f(b["hacheIntervalle"], 2),
              "%s dégâts, toutes les cibles, %s m, ±%s°" % (f(b["hacheDegats"]), f(b["hachePortee"]), int(b["hacheDemiAngle"]))),
-            ("Attaque tournante", "%s rage/s (−%s par cible et par seconde) ; %s rage pour lancer" % (
-                f(b["tournanteRage"]), f(tourn_rage_par_cible, 1), f(b["tournanteRageMin"])), "—",
-             "%s dégâts / %s s = %s DPS par cible, 360°, %s m ; se paie à partir de %s cibles" % (
-                 f(b["tournanteDegats"]), f(b["tournanteIntervalle"], 2), f(tourn_dps), f(b["tournanteRayon"]), f(tourn_seuil, 1))),
-            ("Rugissement", "%s rage" % f(b["rugissementRage"]), "%s s" % f(b["rugissementRecharge"]),
+            ("Attaque tournante", "gratuite (+%s rage par cible et par seconde)" % f(tourn_rage_par_cible, 1), "%s s de recharge, %s s de maintien au plus" % (f(b["tournanteRecharge"]), f(b["tournanteDureeMax"])),
+             "%s dégâts / %s s = %s DPS par cible, 360°, %s m" % (
+                 f(b["tournanteDegats"]), f(b["tournanteIntervalle"], 2), f(tourn_dps), f(b["tournanteRayon"]))),
+            ("Rugissement", "gratuit", "%s s" % f(b["rugissementRecharge"]),
              "provoque %s s à %s m ; Peau de fer −%s %% pendant %s s ; crié en marchant" % (
                  f(b["rugissementProvocation"]), f(b["rugissementRayon"]), int(b.get("peauDeFerReduction", 0) * 100), f(b.get("peauDeFerDuree", 0)))),
-            ("Saut percutant", "%s rage" % f(b["sautRage"]), "%s s" % f(b["sautRecharge"]),
+            ("Saut percutant", "gratuit", "%s s" % f(b["sautRecharge"]),
              "%s dégâts, %s m de bond, rayon %s m, étourdi %s s" % (f(b["sautDegats"]), f(b["sautDistance"]), f(b["sautRayon"]), f(b["sautEtourdi"]))),
         ],
-        survie="%s PV ; Peau de fer −%s %% %s s / %s s (rugissement) ; esquive ; saut = 5 m de fuite (%s s, %s rage)" % (
-            f(b["vikingPV"]), int(b.get("peauDeFerReduction", 0) * 100), f(b.get("peauDeFerDuree", 0)), f(b["rugissementRecharge"]), f(b["sautRecharge"]), f(b["sautRage"])),
+        survie="%s PV ; Peau de fer −%s %% %s s / %s s (rugissement) ; esquive ; saut = 5 m de fuite (recharge %s s)" % (
+            f(b["vikingPV"]), int(b.get("peauDeFerReduction", 0) * 100), f(b.get("peauDeFerDuree", 0)), f(b["rugissementRecharge"]), f(b["sautRecharge"])),
         controle="provocation %s s à %s m ; étourdi %s s en zone (saut)" % (f(b["rugissementProvocation"]), f(b["rugissementRayon"]), f(b["sautEtourdi"])),
         mobilite="%s m/s ; saut %s m / %s s ; ×%s en tournante, ×0,25 pendant le coup" % (f(b["vikingVitesse"]), f(b["sautDistance"]), f(b["sautRecharge"]), f(b["tournanteVitesse"])),
-        dependance="rage à %s (plancher) en début de vague : %s" % (
-            f(b.get("rageMin", 0)),
-            "rugissement et saut tout de suite" if b.get("rageMin", 0) >= max(b["sautRage"], b["rugissementRage"]) else
-            "%s s de hache sur une cible avant le saut, %s s avant le rugissement" % (
-                f(max(0.0, b["sautRage"] - b.get("rageMin", 0)) / rage_par_s_mono), f(max(0.0, b["rugissementRage"] - b.get("rageMin", 0)) / rage_par_s_mono))),
+        dependance="compétences gratuites (recharge seule) ; rage = Furie (ultime, non modélisée) : %s s de hache sur une cible pour la remplir" % (
+            f((b["rageMax"] - b.get("rageMin", 0)) / rage_par_s_mono)),
         rage_par_s_mono=rage_par_s_mono, tourn_dps=tourn_dps, tourn_seuil=tourn_seuil,
         rage_vide_en=b["rageDelaiBaisse"] + b["rageMax"] / b["rageBaisse"],
     )

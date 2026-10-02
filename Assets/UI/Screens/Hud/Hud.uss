@@ -347,6 +347,18 @@
 
 .hud-joueur__furtif { position: absolute; right: -15px; top: -15px; width: 54px; height: 54px; border-radius: 27px; background-color: #2b1840; border-width: 2px; border-color: #5b3a8a; display: none; align-items: center; justify-content: center; }
 .hud-joueur__furtif-icone { width: 40px; height: 40px; }
+/* Ultime (Furie du viking, 03/10/2026) : bandeau accroché sous le portrait, aux couleurs du thème Rage (rouge, jamais
+   vert). Prête : plus clair, il pulse (--pulse, basculé par EcranHud) et montre l'invite du bouton ; active : sombre,
+   avec les secondes restantes. L'anneau de rage (jauge de classe) change de couleur aux mêmes étapes. */
+.hud-furie { position: absolute; left: -30px; right: -30px; bottom: -24px; align-items: center; display: none; }
+.hud-furie--visible { display: flex; }
+.hud-furie__pastille { flex-direction: row; align-items: center; justify-content: center; height: 36px; padding: 0 15px; border-radius: 18px; border-width: 3px; border-color: #ff7359; background-color: rgba(110, 20, 16, 0.95); }
+.hud-furie__texte { -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Bold-SDF.asset"); font-size: var(--dl-text-caption); color: #fff5e0; margin: 0; padding: 0; white-space: nowrap; }
+.hud-furie__invite { margin-left: 9px; height: 27px; }
+.hud-furie--prete .hud-furie__pastille { border-color: #ffd27a; background-color: rgba(179, 38, 30, 0.97); }
+.hud-furie--pulse .hud-furie__pastille { border-color: #fff5e0; background-color: rgba(255, 115, 89, 0.97); }
+.hud-furie--active .hud-furie__pastille { border-color: #ff3b1a; background-color: rgba(58, 10, 8, 0.95); }
+.hud-furie--active .hud-furie__invite { display: none; }
 /* Badge « Prêt » du joueur local (01/10/2026), accroché en haut à gauche du portrait (le furtif est à droite). */
 .hud-joueur__pret { position: absolute; left: -24px; top: -15px; }
 .hud-potion { align-items: center; margin-left: 15px; display: none; }

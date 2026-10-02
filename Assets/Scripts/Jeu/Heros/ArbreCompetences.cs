@@ -33,7 +33,7 @@ namespace Deathless.Jeu
         static readonly Amelioration[] Viking =
         {
             new Amelioration("Hache lourde", "viking_hache", Sens.Plus, 0.10f, "+10 % de dégâts à la hache"),
-            new Amelioration("Tourbillon", "viking_attaque_tournante", Sens.Moins, 0.15f, "−15 % de rage consommée par l’attaque tournante"),
+            new Amelioration("Tourbillon", "viking_attaque_tournante", Sens.Moins, 0.15f, "−15 % de recharge de l’attaque tournante"),   // 03/10/2026 : la tournante est gratuite, l'amélioration raccourcit sa recharge
             new Amelioration("Cri de guerre", "viking_rugissement", Sens.Moins, 0.12f, "−12 % de recharge du rugissement"),
             new Amelioration("Chute brutale", "viking_saut_percutant", Sens.Plus, 0.15f, "+15 % de dégâts du saut percutant"),
         };
