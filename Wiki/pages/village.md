@@ -39,6 +39,7 @@ Chantier ouvert par Quentin le 27/09/2026. **Plan validé sur la maquette grise 
 - Maquette : `Docs/references/` et le fil de discussion ; générateur du village en v5 dans `sandbox-level`, circulation revérifiée (72 azimuts, remontée aux ponts).
 
 {{dev: **Reportée dans main le 02/10/2026** (plan serpentin `Docs/outils/plan_village.py --serpente`, comparaison `Assets/Screenshots/carte_v5_aerien.png`) : générateur `Assets/Editor/VillageV5Builder.cs`, menu Deathless > Village > v5 (étapes 1 à 7, Tout appliquer, Vérifier).
+- **Aperçu de la nouvelle carte (02/10/2026)** : la v5 vit dans sa propre scène `Assets/Scenes/CarteV5.unity` (sol, palette et NavMesh à elle) ; `Village.unity` reste l'ancienne carte du solo et du multijoueur. Le menu principal offre « Nouvelle carte (aperçu) » : héros solo (dernière classe), jour figé à midi, ni vagues, ni nuit, ni défaite ; Pause > Quitter ramène au menu sur l'ancienne carte.
 - Maisons aux cotes du plan, une racine par bâtiment `Maisons/Batiment_<Rôle>` (pivot au sol au centre de l'emprise, avant vers Nyxessa, zone `Porte` séparée du modèle) ; intérieurs et lanternes déplacés avec elles.
 - Montagne : pièce héros Tripo (`ArtSources/Decor/Montagne/montagne_pipeline.py`, 122 × 40 × 20,5 m) et falaise procédurale en gradins (18, 28, 38 m) derrière et sur les flancs, jamais marchable ; une seule grotte. Emplacements prévus pour deux pièces de flanc (`V5FlancsFbx`, `V5FlancsPose`).
 - Grotte : replat du fond à 2,15 m, escalier ; le portail au fond, sur son socle ; aller-retour au donjon vérifié en jeu.

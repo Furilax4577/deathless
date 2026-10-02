@@ -24,6 +24,7 @@
 .menu__titres { position: absolute; left: 108px; top: 108px; }
 .menu__sous-titre { font-size: 26px; margin-top: 3px; }
 .menu__liste { position: absolute; left: 90px; top: 390px; width: 600px; }
+.menu__liste .dl-menu-item { min-height: 72px; margin-bottom: 6px; }   /* sept entrées depuis « Nouvelle carte (aperçu) » */
 .menu__classe { position: absolute; right: 84px; bottom: 144px; width: 495px; padding: 27px 30px; background-color: rgba(22, 26, 36, 0.94); }
 .menu__note { margin-top: var(--dl-space-2); white-space: normal; }
 .menu__version { position: absolute; right: 60px; top: 36px; font-size: var(--dl-text-small); color: #e9eef5; margin: 0; padding: 0; }
@@ -273,6 +274,7 @@
 .dl-scale-3 .menu__titres { left: 60px; top: 50px; }
 .dl-scale-3 .menu__titres .dl-display { font-size: 72px; }
 .dl-scale-3 .menu__liste { left: 42px; top: 220px; width: 560px; }
+.dl-scale-3 .menu__liste .dl-menu-item { min-height: 62px; margin-bottom: 4px; }
 .dl-scale-3 .menu__classe { right: 36px; bottom: 120px; width: 420px; }
 .dl-scale-3 .pause { top: 60px; }
 .dl-scale-3 .choix { padding: 30px 48px 0 48px; }

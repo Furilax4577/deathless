@@ -7,8 +7,11 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.AI;
 
+// ATTENTION (02/10/2026) : la carte v5 vit dans sa propre scène, Assets/Scenes/CarteV5.unity (NavMesh dans Assets/Scenes/CarteV5/,
+// sol dans SolVillage_V5.asset / SolVillage_Palette_V5.png / SolVillage_V5.mat). Ce fichier ne doit JAMAIS modifier Village.unity
+// ni les assets de l'ancienne carte (solo et multijoueur) : toutes les étapes refusent de s'exécuter hors de CarteV5.unity.
 // Carte v5 du village (report dans main du 01/10/2026 ; wiki : village.md, Refonte de la carte). Appliquée à la scène
-// ouverte (Village.unity), sans regénérer le reste (Nyxessa, plateau et sa rampe, intérieurs, taverne, cycle) :
+// ouverte (CarteV5.unity), sans regénérer le reste (Nyxessa, plateau et sa rampe, intérieurs, taverne, cycle) :
 //   Deathless > Village > v5 > Tout appliquer (les étapes 1 à 7, puis le NavMesh), ou une étape à la fois.
 // Cotes : plan serpentin, Docs/outils/plan_village.py --serpente (x vers l'est, y vers le nord, en m ; Unity (x, 0, y)).
 // Montagne : pièce héros Tripo préparée par ArtSources/Decor/Montagne/montagne_pipeline.py (Assets/Art/Decor/Montagne/).
@@ -204,10 +207,22 @@ public static partial class VillageBuilder
         return idx;
     }
 
+    // ------------------------------------------------------------------ scène et assets propres à la carte v5
+    public const string V5ScenePath = "Assets/Scenes/CarteV5.unity";
+    public const string V5SolMesh = "Assets/Art/Meshes/SolVillage_V5.asset";
+    public const string V5SolTex = "Assets/Art/Textures/SolVillage_Palette_V5.png";
+    public const string V5SolMat = "Assets/Art/Materials/SolVillage_V5.mat";
+
+    static bool V5SceneOk() { return EditorSceneManager.GetActiveScene().path == V5ScenePath; }
+
+    [MenuItem("Deathless/Village/v5/Ouvrir CarteV5.unity")]
+    public static void V5Ouvrir() { EditorSceneManager.OpenScene(V5ScenePath, OpenSceneMode.Single); }
+
     // ------------------------------------------------------------------ menus
     [MenuItem("Deathless/Village/v5/Tout appliquer")]
     public static string V5ToutAppliquer()
     {
+        if (!V5SceneOk()) return "Refusé : ouvrir " + V5ScenePath + " (la carte v5 ne touche jamais Village.unity)";
         var sb = new StringBuilder("Carte v5 :\n");
         Transform root = Find("VillageBlockout");
         if (root == null) return "VillageBlockout introuvable";
@@ -236,6 +251,7 @@ public static partial class VillageBuilder
 
     static string Etape(System.Func<Transform, string> f)
     {
+        if (!V5SceneOk()) return "Refusé : ouvrir " + V5ScenePath + " (la carte v5 ne touche jamais Village.unity)";
         Transform root = Find("VillageBlockout");
         if (root == null) return "VillageBlockout introuvable";
         s_V5Axe = null;
@@ -1094,11 +1110,15 @@ public static partial class VillageBuilder
     // ------------------------------------------------------------------ 7. sol
     public static string V5Sol(Transform root)
     {
+        if (!V5SceneOk()) return "Refusé : ouvrir " + V5ScenePath;
         V5EmprisesMaisons(root);
         Transform sol = root.Find("Sol");
         Kill(root.Find("Sol/Sol_Village"));
         Transform arbres = root.Find("Foret/Arbres");
-        BuildGround(sol != null ? sol : root, arbres != null ? arbres : Group(root, "_vide"), root);
+        string m0 = GroundMeshPath, t0 = GroundTexPath, x0 = GroundMatPath;
+        GroundMeshPath = V5SolMesh; GroundTexPath = V5SolTex; GroundMatPath = V5SolMat;   // assets propres à la v5
+        try { BuildGround(sol != null ? sol : root, arbres != null ? arbres : Group(root, "_vide"), root); }
+        finally { GroundMeshPath = m0; GroundTexPath = t0; GroundMatPath = x0; }
         Kill(root.Find("_vide"));
         Physics.SyncTransforms();
         return "Sol : " + GroundStats;

@@ -14,6 +14,13 @@
                 </ui:VisualElement>
                 <dl:InputPrompt action="UI/Submit" class="dl-menu-item__prompt" />
             </ui:Button>
+            <ui:Button name="menu-nouvelle-carte" class="dl-menu-item">
+                <ui:VisualElement class="dl-menu-item__texts">
+                    <ui:Label text="Nouvelle carte (aperçu)" class="dl-menu-item__label" />
+                    <ui:Label text="Explorer la carte v5 en solo, sans vagues ni nuit" class="dl-menu-item__desc" />
+                </ui:VisualElement>
+                <dl:InputPrompt action="UI/Submit" class="dl-menu-item__prompt" />
+            </ui:Button>
             <ui:Button name="menu-multijoueur" class="dl-menu-item">
                 <ui:VisualElement class="dl-menu-item__texts">
                     <ui:Label text="Multijoueur" class="dl-menu-item__label" />

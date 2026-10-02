@@ -19,6 +19,8 @@ namespace Deathless.UI.Ecrans
         {
             m_Solo = Racine.Q<Button>("menu-solo");
             m_Solo.clicked += () => Navigateur.ChoixClasse.OuvrirSolo();
+            var carte = Racine.Q<Button>("menu-nouvelle-carte");
+            if (carte != null) carte.clicked += () => Partie.OuvrirCarteExploration();
             Racine.Q<Button>("menu-multijoueur").clicked += () =>
             {
                 // Pas encore de réseau : à défaut d'un lobby posé par le jeu, un lobby factice (Deathless.UI.Dev).

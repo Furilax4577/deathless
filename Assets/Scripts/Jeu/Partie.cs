@@ -58,8 +58,30 @@ namespace Deathless.Jeu
         public event Action<int> JoueurReapparu;
         public event Action<int, Vector3> OrGagne;          // montant, point
 
+        // ----------------------------------------------------------------- Mode exploration (aperçu de la nouvelle carte)
+        /// Mode exploration (02/10/2026) : héros solo sur la scène CarteV5, jour figé à midi, ni vagues ni nuit ni défaite,
+        /// pas de vote « prêt », pas de multijoueur. Demandé par le menu principal (OuvrirCarteExploration), lu une fois au
+        /// chargement de la scène : tout autre chargement (retour au menu) le remet à faux.
+        public static bool Exploration { get; private set; }
+        static bool s_ExplorationDemandee;
+        public const string SceneCarteExploration = "CarteV5";
+
+        /// Menu principal > Nouvelle carte (aperçu) : charge la scène de la carte v5 en mode exploration, avec la dernière
+        /// classe choisie (Paladin à défaut).
+        public static void OuvrirCarteExploration()
+        {
+            if (ReseauJeu.Actif) return;
+            var c = Deathless.UI.Donnees.ClassesJouables.Derniere;
+            ClasseChoisie = c != null && !string.IsNullOrEmpty(c.Id) ? c.Id : "paladin";
+            s_ExplorationDemandee = true;
+            LancerAuChargement = false;
+            SceneManager.LoadScene(SceneCarteExploration);
+        }
+
         void Awake()
         {
+            Exploration = s_ExplorationDemandee;
+            s_ExplorationDemandee = false;
             Instance = this;
             Ivresse.Reinitialiser();
             if (reglages != null) GameBalance.Courant = reglages;
@@ -84,7 +106,12 @@ namespace Deathless.Jeu
             }
             Etat.nyxessa.pvMax = B.nyxessaPV;
             Etat.nyxessa.pv = B.nyxessaPV;
-            if (ReseauJeu.EnPartie)
+            if (Exploration)
+            {
+                LancerAuChargement = false;
+                StartCoroutine(LancerApresUneImage());
+            }
+            else if (ReseauJeu.EnPartie)
             {
                 // Partie réseau : le village vient d'être chargé par l'hôte ; la partie commence quand le héros de ce
                 // poste apparaît (HerosReseau → LancerReseau).
@@ -165,7 +192,8 @@ namespace Deathless.Jeu
             Etat.duree = 0f;
             Journal("Partie lancée (" + j.classeId + ", nuit " + (phaseHote.HasValue ? "de l'hôte " : "de départ ") + Etat.nuit + ", vitesse ×" + b.vitesseCycle + ")");
             PartieLancee?.Invoke();
-            Passer(phaseHote ?? (b.commencerALaNuit ? Phase.Crepuscule : Phase.Jour));
+            Passer(Exploration ? Phase.Jour : phaseHote ?? (b.commencerALaNuit ? Phase.Crepuscule : Phase.Jour));
+            if (Exploration) { Etat.nuit = 1; Etat.tempsPhase = Etat.dureePhase * 0.5f; Journal("Mode exploration : jour figé, pas de vagues"); }
         }
 
         // ----------------------------------------------------------------- Multijoueur (Docs/reseau.md)
@@ -450,6 +478,7 @@ namespace Deathless.Jeu
         public void BasculerPret(int joueurId = 1)
         {
             // Client : le vote part vers l'hôte, qui le compte (son état revient par PartieReseau).
+            if (Exploration) return;
             if (ClientReseau) { PartieReseau.Instance?.DemanderPret(); return; }
             var j = Joueur(joueurId);
             if (j == null) return;
@@ -501,6 +530,14 @@ namespace Deathless.Jeu
         {
             // Multijoueur : on quitte d'abord la session (l'hôte la ferme pour tous), puis retour au menu en solo.
             if (ReseauJeu.Actif && ReseauJeu.Instance.Lobby != null) ReseauJeu.Instance.Lobby.Quitter();
+            if (Exploration)
+            {
+                // Retour au menu principal, sur l'ancienne carte (Village.unity, première scène du build).
+                Exploration = false;
+                LancerAuChargement = false;
+                SceneManager.LoadScene(0);
+                return;
+            }
             Recharger(false);
         }
 
@@ -544,6 +581,13 @@ namespace Deathless.Jeu
                 return;
             }
             Etat.duree += dt;
+            if (Exploration)
+            {
+                // Jour figé à midi : ni alerte, ni crépuscule, ni vagues.
+                Etat.tempsPhase = Etat.dureePhase * 0.5f;
+                MettreAJourJoueurs(dt);
+                return;
+            }
             Etat.tempsPhase += dt;
 
             // Alerte avant la nuit (wiki : 15 s avant le crépuscule).

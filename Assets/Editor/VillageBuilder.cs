@@ -129,9 +129,9 @@ public static partial class VillageBuilder
     public const float GroundRelief = 0.12f;                             // amplitude du relief (m, ±)
     public const float GroundEarthTrunk = 1.3f;                          // terre au pied des arbres (rayon, m)
     public const float GroundEarthPaved = 0.8f;                          // liseré de terre autour des pavés et des allées (m)
-    public const string GroundMeshPath = "Assets/Art/Meshes/SolVillage.asset";
-    public const string GroundTexPath = "Assets/Art/Textures/SolVillage_Palette.png";
-    public const string GroundMatPath = "Assets/Art/Materials/SolVillage.mat";
+    public static string GroundMeshPath = "Assets/Art/Meshes/SolVillage.asset";
+    public static string GroundTexPath = "Assets/Art/Textures/SolVillage_Palette.png";
+    public static string GroundMatPath = "Assets/Art/Materials/SolVillage.mat";
     // Palette (sRGB) : 0-3 herbes du plus sombre au plus jaune, 4-5 taches claire / sombre, 6-7 terres
     public static readonly Color[] GroundPalette = {
         new Color(0.33f, 0.43f, 0.27f), new Color(0.40f, 0.50f, 0.32f), new Color(0.46f, 0.56f, 0.35f), new Color(0.52f, 0.58f, 0.36f),
