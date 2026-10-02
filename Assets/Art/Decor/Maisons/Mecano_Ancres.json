@@ -1,0 +1,37 @@
+{
+ "largeur": 12.6,
+ "facade_y": -3.4106655120850116,
+ "entree": {
+  "centre": [
+   -2.513947546482086,
+   -3.4106655120850116,
+   0.0
+  ],
+  "largeur": 1.8,
+  "haut": 2.6
+ },
+ "lanterne": null,
+ "ancres": [
+  {
+   "nom": "Porte_Pivot",
+   "pos": [
+    -3.4706446832418445,
+    -3.4106655120850116,
+    1.2
+   ],
+   "dir": [
+    0.0,
+    -1.0,
+    0.0
+   ]
+  }
+ ],
+ "mesures": {
+  "embrasure_largeur": 1.9133942735195164,
+  "embrasure_haut": 3.1988995552062987,
+  "egout": 5.75,
+  "faitage": 14.75,
+  "hauteur": 15.147153854370117
+ },
+ "convention": "Blender : x vers la droite vue de la fa\u00e7ade, y vers le fond, z vers le haut ; origine au centre de l'emprise, au sol."
+}

@@ -1,0 +1,60 @@
+{
+ "largeur": 8.6,
+ "facade_y": -2.8250000000000357,
+ "entree": {
+  "centre": [
+   -0.96,
+   -2.8250000000000357,
+   0.0
+  ],
+  "largeur": 1.42,
+  "haut": 2.94
+ },
+ "lanterne": [
+  1.0032449665551002,
+  -3.56065810070588,
+  2.503089200991851
+ ],
+ "ancres": [
+  {
+   "nom": "Porte_Pivot",
+   "pos": [
+    -1.67,
+    -2.8250000000000357,
+    0.55
+   ],
+   "dir": [
+    0.0,
+    -1.0,
+    0.0
+   ]
+  },
+  {
+   "nom": "Volet_G",
+   "pos": [
+    1.36,
+    -2.8250000000000357,
+    2.115
+   ],
+   "dir": [
+    0.0,
+    -1.0,
+    0.0
+   ]
+  },
+  {
+   "nom": "Volet_D",
+   "pos": [
+    2.81,
+    -2.8250000000000357,
+    2.115
+   ],
+   "dir": [
+    0.0,
+    -1.0,
+    0.0
+   ]
+  }
+ ],
+ "convention": "Blender : x vers la droite vue de la fa\u00e7ade, y vers le fond, z vers le haut ; origine au centre de l'emprise du soubassement, au sol."
+}
