@@ -1,6 +1,19 @@
 {
   "versions": [
     {
+      "version": "0.9.3",
+      "date": "2026-10-02",
+      "titre": "Les pieds au sol et les pas qui changent",
+      "notes": [
+        "Les personnages touchent maintenant vraiment le sol : ils flottaient d'environ 6 cm, et davantage sur les marches du plateau. La rampe invisible des marches est retirée, et le déplacement est découpé en petits pas pour ne plus rester bloqué à faible cadence.",
+        "Bruits de pas selon la matière : herbe, terre, sable, pierre, bois, métal et eau. Ils sont plus rapides en course, plus sourds en furtif et plus forts à la réception d'un saut. Tu entends aussi ceux des autres joueurs et des squelettes.",
+        "Les dalles de pierre ont maintenant une collision.",
+        "Nouvelle carte (aperçu) : la nouvelle maison de base (style Tripo, porte ouverte, soubassement en pierre) remplace l'ancienne.",
+        "Version de test : les sons de pas n'ont pas encore été écoutés à l'oreille, et les pas des autres joueurs n'ont pas été testés à deux postes.",
+        "Rappel : le jeu normal garde l'ancienne carte. La nouvelle se teste par « Nouvelle carte (aperçu) » dans le menu."
+      ]
+    },
+    {
       "version": "0.9.2",
       "date": "2026-10-02",
       "titre": "La carte se précise",
