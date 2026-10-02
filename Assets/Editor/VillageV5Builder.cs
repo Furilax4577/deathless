@@ -27,6 +27,9 @@ public static partial class VillageBuilder
     public static readonly string[] V5MaisonsNoms = { "Maison_1_A", "Maison_2_B", "Maison_3_A", "Maison_4_B", "Maison_5_A", "Maison_6_B" };
     public static readonly string[] V5MaisonsRoles = { "Taverne", "Mecano", "Maison", "Forge", "Sorcier", "Druide" };
     public static readonly Vector2[] V5MaisonsCentres = { new Vector2(-31f, -16f), new Vector2(27f, -17f), new Vector2(-37f, 10f), new Vector2(32f, 13f), new Vector2(-27f, 28f), new Vector2(21f, 28f) };
+    /// Maisons refaites en Tripo (02/10/2026) : prefab de Assets/Art/Decor/Maisons/ posé à la place du modèle KayKit, rôle par rôle
+    /// (null = le modèle KayKit reste). Seule la maison de base (rôle « Maison ») : taverne, forge, sorcier, druide et mécano sont à part.
+    public static readonly string[] V5MaisonsTripo = { null, null, "Maison_Base", null, null, null };
 
     /// Bassin au pied de la cascade : recalé d'un mètre vers l'ouest et le nord sur la ravine de la pièce Tripo (plan : (0, 38)).
     public static readonly Vector2 V5Bassin = new Vector2(-0.8f, 37.6f);
@@ -294,6 +297,7 @@ public static partial class VillageBuilder
         if (ms == null) return "Maisons absentes";
         for (int i = 0; i < V5MaisonsNoms.Length; i++)
         {
+            if (V5TripoDispo(i)) { sb.Append(V5PoserMaisonTripo(root, ms, i)); continue; }
             Transform h = TrouverMaison(root, V5MaisonsNoms[i]);
             if (h == null) { sb.Append(V5MaisonsNoms[i] + " absente ; "); continue; }
             // ancienne racine retirée (le modèle revient sous Maisons, pose monde gardée)
@@ -338,6 +342,52 @@ public static partial class VillageBuilder
         return sb.ToString();
     }
 
+    static bool V5TripoDispo(int i) { return V5MaisonsTripo[i] != null && AssetDatabase.LoadAssetAtPath<GameObject>(MaisonTripo.CheminPrefab(V5MaisonsTripo[i])) != null; }
+
+    /// Rendu du prefab Tripo posé sous Maisons/Batiment_<Rôle>/<prefab>/Rendu (null si le rôle garde son modèle KayKit).
+    static Transform V5RenduTripo(Transform ms, int i)
+    {
+        if (ms == null || V5MaisonsTripo[i] == null) return null;
+        return ms.Find("Batiment_" + V5MaisonsRoles[i] + "/" + V5MaisonsTripo[i] + "/Rendu");
+    }
+
+    /// Pose la maison Tripo du rôle `i` : retire le bâtiment KayKit (racine, modèle, zone « Porte », lanterne de porte) puis recrée
+    /// Batiment_<Rôle> au centre du plan (pivot au sol, y = 0, façade +Z vers Nyxessa) et y instancie le prefab, branché sur le
+    /// cycle jour / nuit (lanterne, vitres). L'entrée est le marqueur « Entree » du prefab (déclencheur Ignore Raycast).
+    /// Reproductible : ne dépend pas de la présence de l'ancien modèle.
+    static string V5PoserMaisonTripo(Transform root, Transform ms, int i)
+    {
+        string role = V5MaisonsRoles[i], nom = V5MaisonsNoms[i], prefab = V5MaisonsTripo[i];
+        Transform lan = root.Find("Ambiance/Lanternes");
+        if (lan != null) Kill(lan.Find("Lanterne_" + nom));
+        Transform ancien = TrouverMaison(root, nom);
+        Kill(ms.Find("Batiment_" + role));
+        if (ancien != null) Kill(ancien);
+        Vector3 centre = new Vector3(V5MaisonsCentres[i].x, 0f, V5MaisonsCentres[i].y);
+        Transform racine = new GameObject("Batiment_" + role).transform;
+        racine.SetParent(ms, false);
+        racine.SetPositionAndRotation(centre, Quaternion.Euler(0f, YawToward(centre, Vector3.zero), 0f));
+        racine.SetSiblingIndex(i);
+        GameObject m = MaisonTripo.Poser(racine, Object.FindFirstObjectByType<CycleJourNuit>(), prefab);
+        Transform e = m.transform.Find("Entree");
+        return role + " (" + prefab + " Tripo, lacet " + racine.eulerAngles.y.ToString("F1") + ", entrée à " + (e != null ? e.position.ToString("F2") : "?") + ") ; ";
+    }
+
+    /// Emprise au sol du prefab Tripo (sommets du rendu à moins de 10 cm du sol, dans le repère de la racine : soubassement et marches),
+    /// au format de Footprint ; zAvant = bord avant des marches dans le repère de la racine.
+    static Vector4[] V5EmpriseTripo(Transform racine, Transform rendu, out float zAvant)
+    {
+        Vector3 mn = Vector3.one * 999f, mx = -Vector3.one * 999f;
+        foreach (Vector3 v in rendu.GetComponent<MeshFilter>().sharedMesh.vertices)
+        {
+            Vector3 p = racine.InverseTransformPoint(rendu.TransformPoint(v));
+            if (p.y < 0.1f) { mn = Vector3.Min(mn, p); mx = Vector3.Max(mx, p); }
+        }
+        zAvant = mx.z;
+        Vector3 c = racine.TransformPoint((mn + mx) / 2f), r = racine.right, f = racine.forward;
+        return new Vector4[] { new Vector4(c.x, c.z, r.x, r.z), new Vector4(f.x, f.z, (mx.x - mn.x) / 2f, (mx.z - mn.z) / 2f) };
+    }
+
     /// Modèle d'une maison (Maison_<n>_<A|B>) où qu'il soit sous Maisons (directement en v4, sous Batiment_* en v5).
     public static Transform TrouverMaison(Transform village, string nom)
     {
@@ -353,6 +403,11 @@ public static partial class VillageBuilder
         Transform ms = root.Find("Maisons");
         if (ms == null) return;
         foreach (MeshFilter mf in ms.GetComponentsInChildren<MeshFilter>()) if (mf.name.StartsWith("Maison_") && mf.sharedMesh != null) HouseFootprints.Add(Footprint(mf.transform, mf.sharedMesh));
+        for (int i = 0; i < V5MaisonsTripo.Length; i++)    // maisons Tripo : le rendu s'appelle « Rendu », emprise relevée dans le repère de la racine
+        {
+            Transform rendu = V5RenduTripo(ms, i);
+            if (rendu != null) HouseFootprints.Add(V5EmpriseTripo(ms.Find("Batiment_" + V5MaisonsRoles[i]), rendu, out float _));
+        }
     }
 
     // ------------------------------------------------------------------ 2. montagne, grotte, portail
@@ -1284,10 +1339,23 @@ public static partial class VillageBuilder
         if (ms != null)
             for (int i = 0; i < V5MaisonsNoms.Length; i++)
             {
-                Transform h = TrouverMaison(root, V5MaisonsNoms[i]); if (h == null) continue;
-                var mf = h.GetComponent<MeshFilter>(); if (mf == null) continue;
-                Vector3 avant = h.forward; avant.y = 0f; avant.Normalize();
-                Vector3 front = new Vector3(h.position.x, 0f, h.position.z) + avant * (mf.sharedMesh.bounds.max.z * h.lossyScale.z + 0.6f);
+                Vector3 avant, front;
+                Transform rendu = V5RenduTripo(ms, i);
+                if (rendu != null)
+                {
+                    // maison Tripo : l'allée finit au pied des marches, dans l'axe de l'embrasure (marqueur « Entree » du prefab)
+                    Transform bat = ms.Find("Batiment_" + V5MaisonsRoles[i]), ent = rendu.parent.Find("Entree");
+                    V5EmpriseTripo(bat, rendu, out float zAvant);
+                    avant = bat.forward; avant.y = 0f; avant.Normalize();
+                    front = bat.TransformPoint(new Vector3(ent != null ? ent.localPosition.x : 0f, 0f, zAvant + 0.6f)); front.y = 0f;
+                }
+                else
+                {
+                    Transform h = TrouverMaison(root, V5MaisonsNoms[i]); if (h == null) continue;
+                    var mf = h.GetComponent<MeshFilter>(); if (mf == null) continue;
+                    avant = h.forward; avant.y = 0f; avant.Normalize();
+                    front = new Vector3(h.position.x, 0f, h.position.z) + avant * (mf.sharedMesh.bounds.max.z * h.lossyScale.z + 0.6f);
+                }
                 var pts = new List<Vector3>();
                 int gue = V5MaisonsRoles[i] == "Druide" ? 0 : V5MaisonsRoles[i] == "Forge" ? 1 : V5MaisonsRoles[i] == "Mecano" ? 2 : -1;
                 Vector3 premier = gue >= 0 ? new Vector3(V5Gues[gue].x, 0f, V5Gues[gue].y) : front;
@@ -1726,6 +1794,7 @@ public static partial class VillageBuilder
             foreach (Transform racine in ms)
             {
                 Transform h = racine.Find("Porte") != null ? racine.Find("Porte") : racine;
+                foreach (Transform t in racine.GetComponentsInChildren<Transform>()) if (t.name == "Entree") { h = t; break; }   // maison Tripo
                 if (!NavMesh.SamplePosition(h.position, out var hp, 2f, NavMesh.AllAreas)) { sb.AppendLine(racine.name + " : porte hors NavMesh"); continue; }
                 NavMesh.CalculatePath(cible.position, hp.position, NavMesh.AllAreas, path);
                 float L = 0f; for (int i = 1; i < path.corners.Length; i++) L += Vector3.Distance(path.corners[i - 1], path.corners[i]);
