@@ -65,9 +65,8 @@ public static partial class VillageBuilder
     public const float V5PortailGarde = 0.1f;            // bas du disque au-dessus de la dalle
     public const float V5HerbeEchelle = 0.5f;            // touffes d'herbe de la prairie : moitié de leur taille (retour du 02/10/2026)
     public const float V5RouteDroite = 10.4f;            // route de la grotte : dernier tronçon droit, dans l'axe de l'escalier
-    /// Cascade (repère de la pièce) : lèvre en haut de la ravine, coude sur l'éboulis, pied dans le bassin.
+    /// Cascade (repère de la pièce) : axe de la ravine ; la lèvre et le chemin de la nappe sont relevés sur la roche (V5Cascade).
     public static readonly Vector3 V5CascadeLevreLocal = new Vector3(-0.8f, 14f, -2.2f);
-    public static readonly Vector3 V5CascadeCoudeLocal = new Vector3(-0.8f, 3.4f, -4.4f);
     /// Pièces de flanc (Tripo, montagne_flancs_pipeline.py, 02/10/2026) : les deux modèles de Quentin TELS QUELS (pièce entière,
     /// sans miroir, sans recadrage, échelle uniforme de 62 m par unité Tripo posée dans le FBX), même traitement que la pièce
     /// héros (maillage rendu + maillage de collision, jamais marchable), posées seulement si leur FBX existe. Pose = centre de
@@ -714,11 +713,12 @@ public static partial class VillageBuilder
                 float ang = s * 20f + (float)rnd.NextDouble() * 8f;
                 Vector2 p = V5Bassin + new Vector2(Mathf.Sin(ang * Mathf.Deg2Rad), Mathf.Cos(ang * Mathf.Deg2Rad)) * (V5BassinRayon + 0.6f);
                 if (V5DistanceAxe(p.x, p.y, out _) < V5DemiLargeur + 0.8f && Vector2.Distance(p, V5Bassin) > 1f && p.y < V5Bassin.y) continue;
+                if (p.y > V5Bassin.y + 1.5f && Mathf.Abs(p.x - V5Local(V5CascadeLevreLocal).x) < 4.5f) continue;   // côté ravine : le voile ruisselle sur les éboulis de la montagne
                 GameObject st = PlaceRock(berges, Rocks[rnd.Next(Rocks.Length)], new Vector3(p.x, GroundHeight(p.x, p.y) - 0.1f, p.y), 0.7f + (float)rnd.NextDouble() * 0.6f, false);
                 if (st != null) nb++;
             }
         }
-        // f. cascade : voile d'eau (lèvre -> coude -> bassin), gemmes et son (CascadeVillage)
+        // f. cascade : rebord de roche, voile plaqué sur la paroi jusqu'au bassin, gemmes et son (CascadeVillage)
         string cascade = V5Cascade(riv);
         // h. écume : contre les pierres des gués et les piles des ponts, filant vers l'aval (EcumeRiviere)
         {
@@ -863,40 +863,217 @@ public static partial class VillageBuilder
         return piles;
     }
 
+    // ------------------------------------------------------------------ cascade (refaite le 02/10/2026)
+    /// Cascade (retour de Quentin : « elle lévite », « l'eau tombe sur une dalle, l'écume est ailleurs ») : un rebord de roche
+    /// arrondi (la lèvre, qui avance de V5LevreAvance m en surplomb du ledge naturel de la ravine) d'où l'eau jaillit ; la
+    /// nappe est PLAQUÉE sur la roche par lancers de rayons (une colonne tous les ~0,43 m de large : dessus de la lèvre,
+    /// chute verticale sous le surplomb jusqu'à toucher la paroi, puis contour de la paroi et des éboulis jusqu'au pied du
+    /// tas, enfin le bassin) : aucun vide entre l'eau et la pierre, ni au sommet ni sur les côtés. L'écume (CascadeVillage)
+    /// suit ce chemin et se concentre sur les bords et au point d'impact dans le bassin.
+    public const float V5LevreAvance = 1.45f, V5CascadeDemiLargeur = 1.3f;
+    const int V5CascadeColonnes = 7, V5CascadeRangs = 72;
+
+    /// Premier impact sur la roche de la pièce héros ou sur la lèvre (les arbres, rochers de lande et sol sont ignorés).
+    static bool V5RayonRoche(Vector3 origine, Vector3 dir, out RaycastHit hit)
+    {
+        RaycastHit[] hs = Physics.RaycastAll(origine, dir, 80f, ~0, QueryTriggerInteraction.Ignore);
+        float best = float.MaxValue; hit = default(RaycastHit); bool ok = false;
+        foreach (RaycastHit h in hs)
+            if ((h.collider.name == "Montagne_Heros" || h.collider.name == "Levre_Roche") && h.distance < best) { best = h.distance; hit = h; ok = true; }
+        return ok;
+    }
+
+    /// Texel gris de la texture de la pièce héros (loin du noir des marges) : l'UV des rochers ajoutés pour qu'ils aient la roche.
+    static Vector2 V5TexelRoche()
+    {
+        var tex = new Texture2D(2, 2);
+        tex.LoadImage(System.IO.File.ReadAllBytes(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), V5MontagneTex)));
+        Vector2 best = new Vector2(0.5f, 0.5f); float meilleur = float.MaxValue;
+        for (float u = 0.1f; u <= 0.91f; u += 0.05f)
+            for (float v = 0.1f; v <= 0.91f; v += 0.05f)
+            {
+                float min = 1f, max = 0f, somme = 0f; int n = 0;
+                for (int dx = -4; dx <= 4; dx += 2) for (int dy = -4; dy <= 4; dy += 2)
+                {
+                    Color c = tex.GetPixel(Mathf.RoundToInt(u * tex.width) + dx, Mathf.RoundToInt(v * tex.height) + dy);
+                    float l = c.grayscale; min = Mathf.Min(min, l); max = Mathf.Max(max, l); somme += l; n++;
+                }
+                float moy = somme / n;
+                if (min < 0.3f) continue;                         // pas de noir dans le voisinage
+                float score = (max - min) + Mathf.Abs(moy - 0.5f);   // uniforme et gris moyen
+                if (score < meilleur) { meilleur = score; best = new Vector2(u, v); }
+            }
+        Object.DestroyImmediate(tex);
+        return best;
+    }
+
+    /// Rocher arrondi (icosphère subdivisée deux fois, 320 facettes, sommets bruités) aux rayons donnés, facettes plates,
+    /// toutes les UV sur un même texel de la roche de la pièce héros.
+    static Mesh V5MeshRocher(string nom, float rx, float ry, float rz, int graine, Vector2 uv)
+    {
+        float t = (1f + Mathf.Sqrt(5f)) / 2f;
+        var v = new List<Vector3> { new Vector3(-1, t, 0), new Vector3(1, t, 0), new Vector3(-1, -t, 0), new Vector3(1, -t, 0), new Vector3(0, -1, t), new Vector3(0, 1, t),
+            new Vector3(0, -1, -t), new Vector3(0, 1, -t), new Vector3(t, 0, -1), new Vector3(t, 0, 1), new Vector3(-t, 0, -1), new Vector3(-t, 0, 1) };
+        for (int i = 0; i < v.Count; i++) v[i] = v[i].normalized;
+        var f = new List<int[]> { new[] {0,11,5}, new[] {0,5,1}, new[] {0,1,7}, new[] {0,7,10}, new[] {0,10,11}, new[] {1,5,9}, new[] {5,11,4}, new[] {11,10,2}, new[] {10,7,6}, new[] {7,1,8},
+            new[] {3,9,4}, new[] {3,4,2}, new[] {3,2,6}, new[] {3,6,8}, new[] {3,8,9}, new[] {4,9,5}, new[] {2,4,11}, new[] {6,2,10}, new[] {8,6,7}, new[] {9,8,1} };
+        for (int pass = 0; pass < 2; pass++)
+        {
+            var cache = new Dictionary<long, int>(); var nf = new List<int[]>();
+            System.Func<int, int, int> mid = (a, b) =>
+            {
+                long k = a < b ? ((long)a << 32) | (uint)b : ((long)b << 32) | (uint)a;
+                if (cache.TryGetValue(k, out int m)) return m;
+                v.Add(((v[a] + v[b]) * 0.5f).normalized); cache[k] = v.Count - 1; return v.Count - 1;
+            };
+            foreach (var tri in f) { int a = mid(tri[0], tri[1]), b = mid(tri[1], tri[2]), c = mid(tri[2], tri[0]); nf.Add(new[] { tri[0], a, c }); nf.Add(new[] { tri[1], b, a }); nf.Add(new[] { tri[2], c, b }); nf.Add(new[] { a, b, c }); }
+            f = nf;
+        }
+        var rnd = new System.Random(graine);
+        var bruit = new Vector3[v.Count];
+        for (int i = 0; i < v.Count; i++) { float r = 1f + ((float)rnd.NextDouble() - 0.5f) * 0.22f; bruit[i] = new Vector3(v[i].x * rx, v[i].y * ry, v[i].z * rz) * r; }
+        var vs = new List<Vector3>(); var ns = new List<Vector3>(); var us = new List<Vector2>(); var ts = new List<int>();
+        foreach (var tri in f)
+        {
+            Vector3 a = bruit[tri[0]], b = bruit[tri[1]], c = bruit[tri[2]];
+            Vector3 n = Vector3.Cross(b - a, c - a).normalized;
+            if (Vector3.Dot(n, (a + b + c) / 3f) < 0f) { Vector3 tmp = b; b = c; c = tmp; n = -n; }   // vers l'extérieur
+            int i0 = vs.Count; vs.Add(a); vs.Add(b); vs.Add(c);
+            for (int q = 0; q < 3; q++) { ns.Add(n); us.Add(uv); }
+            ts.Add(i0); ts.Add(i0 + 1); ts.Add(i0 + 2);
+        }
+        var m = new Mesh { name = nom };
+        m.SetVertices(vs); m.SetNormals(ns); m.SetUVs(0, us); m.SetTriangles(ts, 0); m.RecalculateBounds();
+        return m;
+    }
+
+    /// z de la paroi à la hauteur y, au plus près du spectateur sur un petit voisinage (les bosses de la roche ne percent pas le voile).
+    static bool V5ZParoi(float x, float y, out float z, out Vector3 normale)
+    {
+        z = float.MaxValue; normale = Vector3.back; bool ok = false;
+        foreach (float dx in new[] { 0f, -0.3f, 0.3f })
+            foreach (float dy in new[] { 0f, -0.3f, 0.3f })
+                if (V5RayonRoche(new Vector3(x + dx, y + dy, 20f), Vector3.forward, out RaycastHit h))
+                {
+                    if (h.point.z < z) z = h.point.z;
+                    if (dx == 0f && dy == 0f) normale = h.normal;
+                    ok = true;
+                }
+        return ok;
+    }
+
+    /// Une colonne du voile à l'abscisse x : points du haut (dessus de la lèvre) au bassin, plaqués sur la roche.
+    static List<Vector3> V5ColonneCascade(float x, float z0, List<Vector3> nor)
+    {
+        var p = new List<Vector3>(); RaycastHit h;
+        if (!V5RayonRoche(new Vector3(x, 40f, z0), Vector3.down, out h)) return null;
+        float yTop = h.point.y;
+        p.Add(new Vector3(x, yTop + 0.1f, z0)); nor.Add(Vector3.up);
+        // front de la lèvre : premier impact horizontal juste sous son sommet
+        float yf = yTop - 0.25f, zFront = z0 - 3f;
+        if (V5ZParoi(x, yf, out float zf, out _)) zFront = zf;
+        for (float z = z0 - 0.35f; z > zFront + 0.25f; z -= 0.35f)
+            if (V5RayonRoche(new Vector3(x, 40f, z), Vector3.down, out h)) { p.Add(new Vector3(x, h.point.y + 0.12f, z)); nor.Add(h.normal); }
+        // chute : le voile ne recule jamais ; sous le surplomb il reste vertical jusqu'à toucher la paroi, puis il la suit
+        float zPrev = p[p.Count - 1].z;
+        for (float y = yf; y > 2.4f; y -= 0.3f)
+        {
+            if (!V5ZParoi(x, y, out float zh, out Vector3 nn)) continue;
+            float z = Mathf.Min(zPrev, zh - 0.12f);
+            p.Add(new Vector3(x, y, z)); nor.Add(nn.sqrMagnitude > 0.5f ? nn : Vector3.back); zPrev = z;
+        }
+        // éboulis : le voile suit le dessus des blocs vers le bassin, jusqu'au pied du tas
+        float zA = p[p.Count - 1].z;
+        for (float z = zA - 0.4f; z > 33f; z -= 0.4f)
+        {
+            float yMax = float.MinValue; Vector3 nm = Vector3.up; bool tout = true;
+            foreach (float dx in new[] { 0f, -0.3f, 0.3f })
+                foreach (float dz in new[] { 0f, -0.3f, 0.3f })
+                    if (V5RayonRoche(new Vector3(x + dx, 12f, z + dz), Vector3.down, out h)) { if (h.point.y > yMax) { yMax = h.point.y; if (dx == 0f && dz == 0f) nm = h.normal; } } else if (dx == 0f && dz == 0f) tout = false;
+            if (!tout || yMax < 0.15f) break;
+            p.Add(new Vector3(x, yMax + 0.12f, z)); nor.Add(nm);
+        }
+        Vector3 dernier = p[p.Count - 1];
+        p.Add(new Vector3(x, V5NiveauEau + 0.04f, dernier.z - 0.55f)); nor.Add(Vector3.up);
+        return p;
+    }
+
     static string V5Cascade(Transform riv)
     {
-        Vector3 levre = V5Local(V5CascadeLevreLocal), coude = V5Local(V5CascadeCoudeLocal);
-        Vector3 pied = new Vector3(V5Bassin.x, V5NiveauEau, V5Bassin.y) + (new Vector3(coude.x, 0f, coude.z) - new Vector3(V5Bassin.x, 0f, V5Bassin.y)).normalized * 1.2f;
+        Physics.SyncTransforms();
         Transform cas = Group(riv, "Cascade");
-        Material voile = V5MateriauEau(V5CascadeMat, new Color(0.62f, 0.8f, 0.94f, 0.72f), new Color(0.9f, 0.97f, 1f, 1f), 0.08f, 3.2f);
-        // voile : ruban vertical de la lèvre au coude, puis nappe sur l'éboulis jusqu'au pied (4 colonnes, rangs serrés)
-        var pts = new List<Vector3>(); var largeurs = new List<float>();
-        for (int i = 0; i <= 12; i++) { float u = i / 12f; pts.Add(Vector3.Lerp(levre, coude, u) + Vector3.forward * 0f); largeurs.Add(Mathf.Lerp(2.2f, 2.8f, u)); }
-        for (int i = 1; i <= 8; i++) { float u = i / 8f; Vector3 q = Vector3.Lerp(coude, pied, u); q.y = Mathf.Lerp(coude.y, pied.y, Mathf.Pow(u, 0.8f)) + 0.08f; pts.Add(q); largeurs.Add(Mathf.Lerp(2.8f, 3.6f, u)); }
-        var v = new List<Vector3>(); var t = new List<int>(); int cols = 4;
-        Vector3 droite = Vector3.Cross(Vector3.up, (new Vector3(pied.x, 0f, pied.z) - new Vector3(levre.x, 0f, levre.z)).normalized);
-        if (droite.sqrMagnitude < 0.01f) droite = Vector3.right;
-        for (int i = 0; i < pts.Count; i++)
-            for (int c = 0; c <= cols; c++) v.Add(pts[i] + droite * Mathf.Lerp(-largeurs[i] / 2f, largeurs[i] / 2f, c / (float)cols));
-        for (int i = 0; i + 1 < pts.Count; i++)
-            for (int c = 0; c < cols; c++)
+        float x0 = V5Local(V5CascadeLevreLocal).x, z0 = 53.0f;
+        // a. rebord : le ledge naturel de la ravine est un replat à ~13,6 m (front vers z = 49,5) ; la lèvre le prolonge de
+        //    V5LevreAvance m vers le sud, sommet 20 cm au-dessus du replat
+        RaycastHit h;
+        if (!V5RayonRoche(new Vector3(x0, 40f, z0 - 1f), Vector3.down, out h)) return "cascade : replat introuvable à x = " + x0.ToString("F1");
+        float yReplat = h.point.y, zBord = z0 - 1f;
+        for (float z = z0 - 1f; z > 44f; z -= 0.1f)
+        {
+            if (V5RayonRoche(new Vector3(x0, 40f, z), Vector3.down, out h) && h.point.y > yReplat - 0.5f) zBord = z; else break;
+        }
+        Vector3 r = new Vector3(2.1f, 0.85f, 1.7f);
+        Vector3 centre = new Vector3(x0, yReplat + 0.2f - r.y, zBord + (r.z - V5LevreAvance));
+        Mesh mesh = V5MeshRocher("Village_CascadeLevre", r.x, r.y, r.z, 77, V5TexelRoche());
+        const string chemMesh = "Assets/Art/Meshes/Village_CascadeLevre.asset";
+        Mesh ex = AssetDatabase.LoadAssetAtPath<Mesh>(chemMesh);
+        if (ex == null) AssetDatabase.CreateAsset(mesh, chemMesh); else { EditorUtility.CopySerialized(mesh, ex); EditorUtility.SetDirty(ex); mesh = ex; }
+        GameObject lev = new GameObject("Levre_Roche"); lev.transform.SetParent(cas, false);
+        lev.transform.position = centre;
+        lev.AddComponent<MeshFilter>().sharedMesh = mesh;
+        lev.AddComponent<MeshRenderer>().sharedMaterial = V5MateriauMontagne(V5MontagneMat, V5MontagneTex);
+        lev.AddComponent<MeshCollider>().sharedMesh = mesh;
+        var mod = lev.AddComponent<NavMeshModifier>(); mod.overrideArea = true; mod.area = 1;
+        GameObjectUtility.SetStaticEditorFlags(lev, StaticEditorFlags.BatchingStatic | StaticEditorFlags.OccludeeStatic);
+        Physics.SyncTransforms();
+        // b. voile : grille (colonnes x rangs) plaquée sur la roche
+        int C = V5CascadeColonnes, N = V5CascadeRangs;
+        var cols = new List<Vector3>[C]; var nors = new List<Vector3>[C];
+        for (int j = 0; j < C; j++)
+        {
+            nors[j] = new List<Vector3>();
+            cols[j] = V5ColonneCascade(x0 + Mathf.Lerp(-V5CascadeDemiLargeur, V5CascadeDemiLargeur, j / (C - 1f)), z0, nors[j]);
+            if (cols[j] == null) return "cascade : colonne " + j + " sans roche";
+        }
+        var grille = new Vector3[C, N]; var gn = new Vector3[C, N];
+        for (int j = 0; j < C; j++)
+        {
+            var p = cols[j]; var cum = new float[p.Count];
+            for (int i = 1; i < p.Count; i++) cum[i] = cum[i - 1] + Vector3.Distance(p[i - 1], p[i]);
+            for (int k = 0; k < N; k++)
             {
-                int a0 = i * (cols + 1) + c, a1 = a0 + 1, b0 = a0 + cols + 1, b1 = b0 + 1;
-                t.Add(a0); t.Add(b0); t.Add(a1); t.Add(a1); t.Add(b0); t.Add(b1);
+                float s = cum[p.Count - 1] * k / (N - 1f); int i = 1;
+                while (i < p.Count - 1 && cum[i] < s) i++;
+                float u = cum[i] > cum[i - 1] ? Mathf.Clamp01((s - cum[i - 1]) / (cum[i] - cum[i - 1])) : 0f;
+                grille[j, k] = Vector3.Lerp(p[i - 1], p[i], u); gn[j, k] = Vector3.Lerp(nors[j][i - 1], nors[j][i], u).normalized;
             }
+        }
+        var v = new List<Vector3>(); var t = new List<int>();
+        for (int k = 0; k < N; k++) for (int j = 0; j < C; j++) v.Add(grille[j, k]);
+        for (int k = 0; k + 1 < N; k++)
+            for (int j = 0; j + 1 < C; j++)
+            {
+                int a0 = k * C + j, a1 = a0 + 1, b0 = a0 + C, b1 = b0 + 1;
+                t.Add(a0); t.Add(a1); t.Add(b0); t.Add(a1); t.Add(b1); t.Add(b0);
+            }
+        Material voile = V5MateriauEau(V5CascadeMat, new Color(0.62f, 0.8f, 0.94f, 0.72f), new Color(0.9f, 0.97f, 1f, 1f), 0.05f, 3.2f);
         GameObject go = new GameObject("Voile"); go.transform.SetParent(cas, false);
         go.AddComponent<MeshFilter>().sharedMesh = V5MeshAsset("Assets/Art/Meshes/Village_Cascade.asset", v, t);
         var mr = go.AddComponent<MeshRenderer>(); mr.sharedMaterial = voile; mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        // repères de l'effet
-        Transform tl = new GameObject("Levre").transform; tl.SetParent(cas, false); tl.position = levre;
-        Vector3 av = new Vector3(coude.x - levre.x, 0f, coude.z - levre.z); if (av.sqrMagnitude < 0.01f) av = Vector3.back;
-        tl.rotation = Quaternion.LookRotation(av.normalized);
-        Transform tc = new GameObject("Coude").transform; tc.SetParent(cas, false); tc.position = coude;
-        Transform tp = new GameObject("Pied").transform; tp.SetParent(cas, false); tp.position = pied;
+        // c. repères et effet : chemin = colonne centrale
+        int mid = C / 2;
+        var chemin = new Vector3[N]; var normales = new Vector3[N]; var largeurs = new float[N];
+        for (int k = 0; k < N; k++) { chemin[k] = grille[mid, k]; normales[k] = gn[mid, k]; largeurs[k] = V5CascadeDemiLargeur * 2f; }
+        Transform tl = new GameObject("Levre").transform; tl.SetParent(cas, false);
+        // la lèvre de l'effet : où l'eau quitte le rebord (premier point sous le sommet)
+        tl.position = chemin[Mathf.Min(N - 1, 8)];
+        tl.rotation = Quaternion.LookRotation(Vector3.back);
+        Transform tp = new GameObject("Pied").transform; tp.SetParent(cas, false); tp.position = chemin[N - 1];
         var cv = cas.gameObject.AddComponent<CascadeVillage>();
-        cv.levre = tl; cv.coude = tc; cv.pied = tp;
+        cv.levre = tl; cv.pied = tp; cv.chemin = chemin; cv.normales = normales; cv.largeurs = largeurs; cv.droite = Vector3.right;
         cv.materiauGemmes = AssetDatabase.LoadAssetAtPath<Material>("Assets/VFX/_RelicCommun/PortalVoxel.mat");
-        return "cascade de " + (levre.y - V5NiveauEau).ToString("F1") + " m";
+        float longueur = 0f; for (int k = 1; k < N; k++) longueur += Vector3.Distance(chemin[k - 1], chemin[k]);
+        return "cascade : rebord à " + yReplat.ToString("F1") + " m (avance de " + V5LevreAvance.ToString("F2") + " m), nappe plaquée sur la roche, " + longueur.ToString("F1") + " m de chemin, impact à (" + tp.position.x.ToString("F1") + ", " + tp.position.z.ToString("F1") + ")";
     }
 
     // ------------------------------------------------------------------ 4. allées

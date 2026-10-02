@@ -61,7 +61,9 @@ Shader "Deathless/Donjon/EauLowPoly"
             half4 Frag(Varyings i) : SV_Target
             {
                 float3 n = normalize(cross(ddy(i.positionWS), ddx(i.positionWS)));
-                if (n.y < 0) n = -n;
+                // surface presque verticale (nappe d'une cascade) : normale tournée vers l'œil, sinon le signe de n.y bascule d'un pixel à l'autre
+                if (abs(n.y) > 0.2) { if (n.y < 0) n = -n; }
+                else if (dot(n, _WorldSpaceCameraPos - i.positionWS) < 0) n = -n;
                 // Chaque facette penche un peu : sa pente décide de sa teinte, entre le fond et le reflet.
                 float pente = saturate(0.5 + (n.x * 0.6 + n.z * 0.45) * _Facettes);
                 half3 c = lerp(_Couleur.rgb, _Reflet.rgb, pente * pente * 0.55);

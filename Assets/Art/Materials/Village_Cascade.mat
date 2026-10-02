@@ -25,7 +25,7 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _Amplitude: 0.08
+    - _Amplitude: 0.05
     - _Echelle: 1.1
     - _Facettes: 5
     - _Vitesse: 3.2
