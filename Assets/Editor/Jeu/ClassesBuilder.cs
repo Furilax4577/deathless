@@ -125,7 +125,10 @@ namespace Deathless.EditorTools
                 if (r.name.EndsWith("HelmetVisor")) { visiere = modele.AddComponent<HelmetVisor>(); visiere.open = true; break; }
 
             var cc = racine.AddComponent<CharacterController>();
-            cc.radius = 0.4f; cc.height = 1.9f; cc.center = Vector3.up * 0.95f; cc.stepOffset = 0.35f; cc.slopeLimit = 45f; cc.skinWidth = 0.06f;
+            // Le contrôleur se pose à skinWidth au-dessus du sol : la capsule est décalée vers le haut de cette valeur pour que
+            // la racine (et le modèle, dont les pieds sont à y = 0) soit au sol ; capsule inchangée dans le monde (02/10/2026).
+            cc.radius = 0.4f; cc.height = 1.9f; cc.stepOffset = 0.35f; cc.slopeLimit = 45f; cc.skinWidth = 0.06f;
+            cc.center = Vector3.up * (0.95f + cc.skinWidth);
             racine.AddComponent<Sante>().equipe = Equipe.Heros;
             racine.AddComponent<HerosEntrees>();
             var classe = (ClasseHeros)racine.AddComponent(d.classe);

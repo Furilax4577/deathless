@@ -1358,7 +1358,7 @@ CharacterController:
   m_StepOffset: 0.35
   m_SkinWidth: 0.06
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0.95, z: 0}
+  m_Center: {x: 0, y: 1.01, z: 0}
 --- !u!114 &4728054945893453418
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1589,6 +1589,14 @@ MonoBehaviour:
       NameHash: 768112428
       Synchronize: 1
       ParameterType: 4
+    - name: GrandeBoule
+      NameHash: 674090735
+      Synchronize: 1
+      ParameterType: 9
+    - name: Mur
+      NameHash: 1799379490
+      Synchronize: 1
+      ParameterType: 9
   AnimatorParametersExpanded: 0
 --- !u!114 &3755665736561772605
 MonoBehaviour:

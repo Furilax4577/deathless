@@ -8,8 +8,9 @@ using UnityEngine;
 // enfoncées et envahies d'herbe en s'enfonçant dans la forêt, jusqu'à quelques pierres éparses près de la clairière.
 // Tracé légèrement sinueux dans le couloir déjà libre d'arbres (VillageBuilder.TrailAxis), qui s'écarte des troncs et des
 // rochers ; 2 lanternes par sentier dans la partie entretenue (au sol, puis sur poteau), réglées par LanterneLumiere et
-// allumées la nuit par CycleJourNuit. Aucune pièce n'a de collider : le NavMesh (colliders physiques) et le héros ne les
-// voient pas. Relançable : Deathless > Village > Sentiers (retire puis refait, puis recuit le NavMesh).
+// allumées la nuit par CycleJourNuit. Aucune pièce n'a de collider à la pose (les cailloux et les herbes n'en ont jamais) ;
+// MatieresSolBuilder.Appliquer, appelé en fin de génération, donne un collider plat à la face des dalles path_* seulement
+// (02/10/2026) : le héros se tient dessus, pieds sur la dalle, et le NavMesh cuit les voit. Relançable : Deathless > Village > Sentiers (retire puis refait, puis recuit le NavMesh).
 public static class SentiersBuilder
 {
     const string Racine = "VillageBlockout";
@@ -134,6 +135,7 @@ public static class SentiersBuilder
             cycle.lanternes = ls.ToArray(); cycle.flammes = fs.ToArray();
             EditorUtility.SetDirty(cycle);
         }
+        MatieresSolBuilder.Appliquer();   // colliders plats des dalles, matières des pas (02/10/2026) : avant la cuisson du NavMesh
         string nav = Deathless.EditorTools.JeuBuilder.CuireNavMesh();
         EditorSceneManager.MarkSceneDirty(root.scene);
         EditorSceneManager.SaveScene(root.scene);

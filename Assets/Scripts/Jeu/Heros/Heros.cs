@@ -122,7 +122,7 @@ namespace Deathless.Jeu
             m_AnimReseau = GetComponent<Unity.Netcode.Components.NetworkAnimator>();
             m_ReseauHeros = GetComponent<Deathless.Reseau.HerosReseau>();
             if (animator != null) foreach (var t in animator.GetComponentsInChildren<Transform>(true)) if (t.name == "chest") { m_Buste = t; break; }
-            if (animator != null && animator.transform != transform) { m_Modele = animator.transform; m_RotModele = m_Modele.localRotation; }
+            if (animator != null && animator.transform != transform) { m_Modele = animator.transform; m_RotModele = m_Modele.localRotation; m_PosModele = m_Modele.localPosition; }
         }
 
         /// Multijoueur : ce héros appartient à un autre poste (avant Initialiser).
@@ -700,7 +700,8 @@ namespace Deathless.Jeu
                 deplacement += m_Poussee;
                 m_Poussee = Vector3.MoveTowards(m_Poussee, Vector3.zero, 10f * dt);
             }
-            var flags = CC.Move((deplacement + Vector3.up * m_VitesseY) * dt);
+            // Sous-pas (02/10/2026) : chaque Move avance de 0,15 m au plus, le stepOffset marche à toute cadence.
+            var flags = DeplacementSousPas.Deplacer(CC, (deplacement + Vector3.up * m_VitesseY) * dt, etaitAuSol && m_VitesseY <= 0f);
             m_AuSol = (flags & CollisionFlags.Below) != 0 || CC.isGrounded;
             SuivreChute(etaitAuSol, impose || EnTransit);
             if (m_AuSol && !etaitAuSol && m_VitesseY < -6f)
@@ -721,10 +722,12 @@ namespace Deathless.Jeu
 
         public bool Sprinte => m_Sprint;
 
-        // ----------------------------------------------------------------- Pas des marionnettes (02/10/2026)
+        // ----------------------------------------------------------------- Pas des marionnettes et pieds au sol (02/10/2026)
 
         Vector3 m_PosPrec;
         bool m_PosPrecOk;
+        PiedsAuSol m_Pieds;
+        Vector3 m_PosModele;
 
         /// Pas d'un héros d'un autre poste : pas de déplacement ici, la position arrive par le réseau ; le chemin parcouru
         /// d'une image à l'autre cadence les pas comme pour le héros local (un pas tous les 2,1 m), en 3D sur la marionnette.
@@ -741,6 +744,18 @@ namespace Deathless.Jeu
             if (animator != null && !animator.GetBool(P_Grounded)) return;
             m_Pas -= d.magnitude / 5f;
             if (m_Pas <= 0f) { m_Pas = 0.42f; PasMatiere.Pas(p, transform, v > 6.5f ? 1.3f : 1f, Classe != null && Classe.Furtif); }
+        }
+
+        /// Pieds au sol : le modèle est abaissé, à l'écran seulement, jusqu'au sol situé sous la racine (voir PiedsAuSol).
+        void AppliquerPieds()
+        {
+            if (m_Modele == null) return;
+            bool vivant = m_EtatCourant != Etat.Mort && m_EtatCourant != Etat.Reapparition && !EnTransit;
+            float decalage = 0f;
+            if (vivant && (Distant ? animator == null || animator.GetBool(P_Grounded) : m_AuSol) && PasMatiere.SolSous(transform.position, transform, out float sol))
+                decalage = m_Pieds.Maj(transform.position.y, sol, true, Time.deltaTime);
+            else decalage = m_Pieds.Maj(transform.position.y, transform.position.y, false, Time.deltaTime);
+            m_Modele.localPosition = m_PosModele + Vector3.up * decalage;
         }
 
         // ----------------------------------------------------------------- Chute (wiki : statuts.md)
@@ -793,6 +808,7 @@ namespace Deathless.Jeu
         /// lacet (utilisé par Update au tour suivant) et penche le buste pour que l'arme suive le tangage de la visée.
         void LateUpdate()
         {
+            AppliquerPieds();
             AppliquerPenche();
             if (Distant || Classe == null) return;
             float k = 1f - Mathf.Exp(-Time.deltaTime * 14f);
