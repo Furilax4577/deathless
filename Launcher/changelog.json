@@ -1,6 +1,20 @@
 {
   "versions": [
     {
+      "version": "0.9.8",
+      "date": "2026-10-03",
+      "titre": "La Furie du Viking",
+      "notes": [
+        "Viking : la rage monte au combat, quand il frappe et quand il encaisse des dégâts.",
+        "Ses compétences (attaque tournante, rugissement, saut percutant) sont maintenant gratuites, avec un temps de recharge.",
+        "À rage pleine, il peut déclencher la FURIE : R3 à la manette, G au clavier. Pendant 10 secondes, il grossit, court plus vite (+20 %), tape plus vite (+15 %), fait plus de dégâts (+10 %) et repousse plus fort les ennemis, avec une aura rouge autour de lui.",
+        "La hache repousse maintenant un peu les ennemis.",
+        "Les autres joueurs voient sa taille et son aura.",
+        "Nouvelle carte (aperçu) : les six bâtiments (maison de base, sorcier, druide, mécano, forge, taverne) sont posés sur le sol. Ce sont des modèles KayKit provisoires, en attendant les modèles Tripo. Les villageois sont debout devant leur porte, et la tavernière se sert toujours avec Interagir.",
+        "Version de test : les sons de la Furie ne sont pas encore créés, les valeurs sont à équilibrer, et la Furie n'a pas été testée en multijoueur à deux postes. La nuit et les touches F8, F9 et F10 de l'aperçu n'ont pas été revérifiées sur les nouveaux bâtiments. Le jeu normal garde l'ancienne carte."
+      ]
+    },
+    {
       "version": "0.9.7",
       "date": "2026-10-02",
       "titre": "Les villageois sortent",
