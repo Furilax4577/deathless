@@ -598,7 +598,7 @@ namespace Deathless.Jeu
                 var ph = Partie.Etat.phase;
                 visiere.open = !(ph == Phase.Crepuscule || ph == Phase.Nuit);
             }
-            if (Distant) return;
+            if (Distant) { PasDistant(dt); return; }
             // Filet de sécurité : un héros passé sous le sol revient au point de réapparition le plus proche.
             if (transform.position.y < -25f && Partie != null)
             {
@@ -703,19 +703,45 @@ namespace Deathless.Jeu
             var flags = CC.Move((deplacement + Vector3.up * m_VitesseY) * dt);
             m_AuSol = (flags & CollisionFlags.Below) != 0 || CC.isGrounded;
             SuivreChute(etaitAuSol, impose || EnTransit);
-            if (m_AuSol && !etaitAuSol && m_VitesseY < -6f) AudioBank.Jouer(SonsDuJeu.Reception, transform.position, 0.6f);
+            if (m_AuSol && !etaitAuSol && m_VitesseY < -6f)
+            {
+                AudioBank.Jouer(SonsDuJeu.Reception, transform.position, 0.6f);
+                PasMatiere.Reception(transform.position, transform, -m_VitesseY);   // impact plus lourd, de la matière du sol
+            }
             if (impose && (flags & CollisionFlags.Sides) != 0 && Classe != null) Classe.SurCollisionCote();
 
             // Pas.
             if (m_AuSol && deplacement.sqrMagnitude > 1f && m_EtatCourant == Etat.Libre && !impose)
             {
                 m_Pas -= dt * deplacement.magnitude / 5f;
-                if (m_Pas <= 0f) { m_Pas = 0.42f; AudioBank.Jouer(SonsDuJeu.Pas, transform.position, 0.35f); }
+                if (m_Pas <= 0f) { m_Pas = 0.42f; PasMatiere.Pas(transform.position, transform, m_Sprint ? 1.3f : 1f, Classe != null && Classe.Furtif); }
             }
             MajAnimation(vitesseAnim);
         }
 
         public bool Sprinte => m_Sprint;
+
+        // ----------------------------------------------------------------- Pas des marionnettes (02/10/2026)
+
+        Vector3 m_PosPrec;
+        bool m_PosPrecOk;
+
+        /// Pas d'un héros d'un autre poste : pas de déplacement ici, la position arrive par le réseau ; le chemin parcouru
+        /// d'une image à l'autre cadence les pas comme pour le héros local (un pas tous les 2,1 m), en 3D sur la marionnette.
+        /// Ni en l'air (paramètre Grounded répliqué par le NetworkAnimator), ni mort, ni à l'arrêt, ni en téléportation.
+        void PasDistant(float dt)
+        {
+            Vector3 p = transform.position;
+            if (!m_PosPrecOk) { m_PosPrec = p; m_PosPrecOk = true; return; }
+            Vector3 d = p - m_PosPrec; d.y = 0f;
+            m_PosPrec = p;
+            if (dt <= 0f || m_EtatCourant == Etat.Mort || m_EtatCourant == Etat.Reapparition) return;
+            float v = d.magnitude / dt;
+            if (v < 1f || v > 11f) return;
+            if (animator != null && !animator.GetBool(P_Grounded)) return;
+            m_Pas -= d.magnitude / 5f;
+            if (m_Pas <= 0f) { m_Pas = 0.42f; PasMatiere.Pas(p, transform, v > 6.5f ? 1.3f : 1f, Classe != null && Classe.Furtif); }
+        }
 
         // ----------------------------------------------------------------- Chute (wiki : statuts.md)
 

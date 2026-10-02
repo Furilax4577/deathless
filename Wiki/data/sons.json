@@ -175,7 +175,7 @@
     "id": "kenney_rpg_footstep",
     "nom": "Joueur — pas",
     "categorie": "Joueurs",
-    "usage": "Pas des joueurs au sol, un par foulée (plus discrets en marche discrète).",
+    "usage": "Pas des joueurs, ancien son unique (jusqu'au 01/10/2026) : repli de PasMatiere si le catalogue n'a pas les pas par matière. Les pas du jeu sont maintenant pas_herbe, pas_terre, pas_sable, pas_pierre, pas_bois, pas_metal et water_step ; footstep00, 06, 07 et 08 sont repris, adaptés, dans pas_pierre et pas_terre.",
     "fichier": "Kenney/RPGAudio/footstep00.ogg",
     "variantes": [
       "Kenney/RPGAudio/footstep00.ogg",
@@ -211,7 +211,7 @@
     "id": "water_step",
     "nom": "Joueur — pas dans l'eau",
     "categorie": "Joueurs",
-    "usage": "Pas dans une salle inondée de Relic. Piste : eau du donjon ou du village.",
+    "usage": "Pas dans l'eau : gués de la rivière du village et bassins du donjon (ZoneEau), lit de la rivière sous le niveau de l'eau. Branché par PasMatiere (02/10/2026).",
     "fichier": "Relic/water_step_1.wav",
     "variantes": [
       "Relic/water_step_1.wav",
@@ -220,7 +220,7 @@
     ],
     "source": "Relic (généré en Python pour le projet)",
     "licence": "Aucune : créé pour le projet",
-    "statut": "disponible"
+    "statut": "utilise"
   },
   {
     "id": "bow_shot_v3",
@@ -3483,7 +3483,7 @@
     "id": "dl_squelette_pas",
     "nom": "Squelette — pas",
     "categorie": "Ennemis",
-    "usage": "Pas d'un squelette (un sur trois, anti-répétition) : os léger sur la terre, niveau très bas. Nouveau. Lot 3, direction sombre (27/09/2026).",
+    "usage": "Pas d'un squelette (un sur trois, anti-répétition) : os léger sur la terre, niveau très bas. Branché le 02/10/2026 (SonsDuJeu.SqueletteMarche, Squelette.PasSon) sur la terre, l'herbe et le sable ; sur la pierre, le bois, le métal et dans l'eau, le pas de la matière (PasMatiere.PasSquelette), plus sourd et discret. Nouveau. Lot 3, direction sombre (27/09/2026).",
     "fichier": "Deathless/Squelettes/squelette_pas_1.wav",
     "variantes": [
       "Deathless/Squelettes/squelette_pas_1.wav",

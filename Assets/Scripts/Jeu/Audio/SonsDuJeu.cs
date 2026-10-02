@@ -16,6 +16,17 @@ namespace Deathless.Jeu
         public static readonly string[] Reception = { "land" };
         public static readonly string[] Esquive = { "dodge" };
         public static readonly string[] Pas = { "kenney_rpg_footstep" };
+        // Pas par matière (02/10/2026, PasMatiere) : le premier id présent dans le catalogue joue, repli sur l'ancien pas.
+        public static readonly string[] PasHerbe = { "pas_herbe", "kenney_rpg_footstep" };
+        public static readonly string[] PasTerre = { "pas_terre", "kenney_rpg_footstep" };
+        public static readonly string[] PasPierre = { "pas_pierre", "kenney_rpg_footstep" };
+        public static readonly string[] PasBois = { "pas_bois", "kenney_rpg_footstep" };
+        public static readonly string[] PasMetal = { "pas_metal", "kenney_rpg_footstep" };
+        public static readonly string[] PasSable = { "pas_sable", "kenney_rpg_footstep" };
+        public static readonly string[] PasEau = { "water_step", "kenney_rpg_footstep" };
+        /// Indexé par Matiere (Herbe, Terre, Pierre, Bois, Metal, Sable, Eau).
+        public static readonly string[][] PasParMatiere = { PasHerbe, PasTerre, PasPierre, PasBois, PasMetal, PasSable, PasEau };
+        public static readonly string[] SqueletteMarche = { "dl_squelette_pas" };
         public static readonly string[] JoueurTouche = { "player_hurt" };
         public static readonly string[] JoueurMort = { "player_death" };
         public static readonly string[] Reapparition = { "dl_nyxessa_reapparition", "respawn" };

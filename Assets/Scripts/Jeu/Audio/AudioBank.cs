@@ -89,15 +89,27 @@ namespace Deathless.Jeu
                 if (m_Dernier.TryGetValue(e.id, out var t) && Time.time - t < anti) return;
                 m_Dernier[e.id] = Time.time;
             }
+            JouerSource(Tirer(e), point, volume, Random.Range(0.95f, 1.05f), e.portee > 0f ? e.portee : PorteeParDefaut);
+        }
+
+        /// Un clip précis, joué en 3D (le choix, la hauteur et le volume sont ceux de l'appelant : pas par matière, qui
+        /// tirent leurs variantes sans répétition et ajoutent leur propre variation).
+        public static void JouerClip(AudioClip clip, Vector3 point, float volume, float hauteur, float portee)
+        {
+            if (Instance != null && clip != null) Instance.JouerSource(clip, point, volume, hauteur, portee);
+        }
+
+        void JouerSource(AudioClip clip, Vector3 point, float volume, float hauteur, float portee)
+        {
             AudioSource libre = null;
             foreach (var s in m_Sources) if (!s.isPlaying) { libre = s; break; }
             if (libre == null) libre = m_Sources[Random.Range(0, m_Sources.Count)];
             libre.transform.position = point;
-            libre.clip = Tirer(e);
+            libre.clip = clip;
             libre.volume = volume * volumeEffets;
-            libre.pitch = Random.Range(0.95f, 1.05f);
+            libre.pitch = hauteur;
             libre.loop = false;
-            libre.maxDistance = e.portee > 0f ? e.portee : PorteeParDefaut;
+            libre.maxDistance = portee;
             libre.Play();
         }
 

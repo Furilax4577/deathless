@@ -308,6 +308,7 @@ namespace Deathless.Jeu
             if (Agent.enabled && m_Stats.vitesse > 0f) Agent.speed = (Court ? VitesseCourse : PasDeBase) * Deathless.Donjon.ZoneEau.FacteurEn(transform.position + Vector3.up * 0.2f)
                 * (Statuts != null ? Statuts.FacteurVitesse : 1f);
             if (animator != null) animator.SetFloat(P_Speed, Agent.enabled && !Agent.isStopped ? VitesseAnimation(Agent.velocity.magnitude) : 0f);
+            PasSon(dt);
             // Invulnérable au début du bond d'esquive (comme le héros), recalculé à chaque image : rien ne reste bloqué.
             Sante.invulnerable = m_Etat == Etat.Esquive && m_EtatDepuis < B.esquiveEnnemiInvulnerable;
             if (P != null && (P.Etat.phase == Phase.Terminee || P.Etat.nyxessa.detruite) && m_Etat != Etat.Mort)
@@ -376,6 +377,21 @@ namespace Deathless.Jeu
         /// Sbire, guerrier, voleur (élites compris) : courent en poursuite et esquivent. Le mage garde ses distances,
         /// Morgrim et le Nécromancien ont leur propre comportement.
         protected virtual bool Agile => type == TypeEnnemi.Sbire || type == TypeEnnemi.Guerrier || type == TypeEnnemi.Voleur;
+
+        // Pas (02/10/2026) : un pas tous les 1,7 m parcourus, seulement à moins de 32 m de l'oreille (ni raycast ni son au-delà).
+        float m_PasSon = -1f;
+
+        void PasSon(float dt)
+        {
+            if (m_Etat == Etat.Mort || m_Etat == Etat.SortieDeTerre || !Agent.enabled || Agent.isStopped) return;
+            float v = Agent.velocity.magnitude;
+            if (v < 0.6f) return;
+            if (m_PasSon < 0f) m_PasSon = UnityEngine.Random.Range(0f, 1.7f);   // les squelettes d'une même vague ne marchent pas au même pas
+            m_PasSon -= dt * v;
+            if (m_PasSon > 0f) return;
+            m_PasSon += 1.7f;
+            if (PasMatiere.Proche(transform.position, 32f)) PasMatiere.PasSquelette(transform.position, transform);
+        }
 
         /// Court en ce moment : poursuite d'un héros loin de lui (jamais en marche vers Nyxessa).
         public bool Court => m_Court && m_Etat == Etat.Poursuite && Agile;

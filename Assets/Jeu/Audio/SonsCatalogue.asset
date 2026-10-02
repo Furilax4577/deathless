@@ -151,7 +151,7 @@ MonoBehaviour:
     portee: 0
   - id: water_step
     nom: "Joueur \u2014 pas dans l'eau"
-    statut: disponible
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: 2ef5013628372de4c87ca528f4128b95, type: 3}
@@ -2338,3 +2338,71 @@ MonoBehaviour:
     clips:
     - {fileID: 8300000, guid: e91e8eea408baeb42b8d22595488d42a, type: 3}
     portee: 50
+  - id: pas_herbe
+    nom: "Joueur \u2014 pas sur l'herbe"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 4176362e30fe0f843adf4f0fda20a4a0, type: 3}
+    - {fileID: 8300000, guid: a87f1445cac93d14bb2062413b905120, type: 3}
+    - {fileID: 8300000, guid: 0a86269ea6f85d54897ca7522549b9bf, type: 3}
+    - {fileID: 8300000, guid: 1ff23972ff98f7c4b862b2f6a2b6ee65, type: 3}
+    - {fileID: 8300000, guid: cfbd27c258dcea042885487af8ba4495, type: 3}
+    portee: 25
+  - id: pas_terre
+    nom: "Joueur \u2014 pas sur la terre"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: fee4cce20d6678d4493987edfde22a28, type: 3}
+    - {fileID: 8300000, guid: b892cb3c17bc17944808503ecfcb6739, type: 3}
+    - {fileID: 8300000, guid: 7536c456916a5544e8227b70afae30d4, type: 3}
+    - {fileID: 8300000, guid: ec0130a671651504e97ad7bdbf6769fd, type: 3}
+    - {fileID: 8300000, guid: d16f8a4c78ddb4e479b40b910cca4c07, type: 3}
+    - {fileID: 8300000, guid: 238aed2162f3a0148be9a75c7c669bc8, type: 3}
+    portee: 25
+  - id: pas_sable
+    nom: "Joueur \u2014 pas sur le sable"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: f660700484619f8488480acf0529121b, type: 3}
+    - {fileID: 8300000, guid: befd99ae3efa2f042940a1ed17aade6b, type: 3}
+    - {fileID: 8300000, guid: de1490f79b25943458cf714ac9b5b08b, type: 3}
+    - {fileID: 8300000, guid: e793ee918da68534fbad47174d89e720, type: 3}
+    - {fileID: 8300000, guid: f62ed8a8d5e003d4e96c280a34fb1ac8, type: 3}
+    portee: 25
+  - id: pas_pierre
+    nom: "Joueur \u2014 pas sur la pierre"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: be46387e0ce2a8f45b58722169e825d9, type: 3}
+    - {fileID: 8300000, guid: 0e9c551acb4e8264f9e44d1b115e2cd1, type: 3}
+    - {fileID: 8300000, guid: 467fbe0600f716e449c52f8a45b33897, type: 3}
+    - {fileID: 8300000, guid: 28e274b39aa8a6d439ffc5fa333f20c6, type: 3}
+    - {fileID: 8300000, guid: 2d6b8c01a7a45314db62bef746fda75e, type: 3}
+    - {fileID: 8300000, guid: d4e23fb292153314e83569c09927d156, type: 3}
+    portee: 25
+  - id: pas_bois
+    nom: "Joueur \u2014 pas sur le bois"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: a38d3b0c4a231a14696a726bbaa8f186, type: 3}
+    - {fileID: 8300000, guid: d3b611b5fc1db7747914ba986a0d021f, type: 3}
+    - {fileID: 8300000, guid: 834ebfce9ebcbfb4d8dba5d90f972066, type: 3}
+    - {fileID: 8300000, guid: 8ca063e045978964a86ac1752f891fbd, type: 3}
+    - {fileID: 8300000, guid: 41141f53b3c31cb4eaa47dede13718d4, type: 3}
+    portee: 25
+  - id: pas_metal
+    nom: "Joueur \u2014 pas sur le m\xE9tal"
+    statut: a_ecouter
+    boucle: 0
+    clips:
+    - {fileID: 8300000, guid: 6703bb1f415d0e84e9f6c5b95338605d, type: 3}
+    - {fileID: 8300000, guid: 0dc3204103d21a646809eebdbbe34448, type: 3}
+    - {fileID: 8300000, guid: d1ef10fc707d04848aea61a4ad7da916, type: 3}
+    - {fileID: 8300000, guid: fae6c86dac044744b8d055d2bdc8bd79, type: 3}
+    - {fileID: 8300000, guid: a479b050aa0b3ac429d1e4a9b58dcad2, type: 3}
+    portee: 25
