@@ -152,9 +152,11 @@ Règles de l'image unique :
 
 ```
 Low-poly 3D game building asset, SMOOTH dense faceting: many small soft-beveled facets blending into rounded, sculpted
-forms, chunky toy-like proportions with softly beveled edges, like a hand-made cozy low-poly game. NOT large flat
-polygon planes, NOT a crystal or gem-cut look, no hard visible triangle edges. Clearly modeled relief: individual
-clay roof tiles, individual stone blocks in the arch and the base slab, thick timber beams.
+forms, chunky toy-like proportions with softly beveled edges, like a hand-made cozy low-poly game, NOT clay or putty-like,
+NOT realistic or architectural-model-like. NOT large flat polygon planes, NOT a crystal or gem-cut look, no hard visible
+triangle edges. Oversized chunky relief: big puffy roof tiles (each about 40 cm, few and large), big rounded stone blocks
+(about 40 cm, few joints) in the arch, the chimney and the plinth, thick rounded timber beams, smooth plaster without
+mottling.
 FLAT UNLIT ALBEDO COLORS: solid clean color zones with crisp boundaries (brick-red tiles, cream plaster, dark brown
 timber, light-grey stone, dark glass), NO cast shadows, NO baked ambient occlusion, NO light gradients, NO glossy
 highlights, no photographic detail, no noise, no wood grain, no painted grime.
@@ -178,8 +180,10 @@ only green light in the world is the emerald relic magic: no green anywhere.
 - **Mécano** : « A shop with a tall front gable, 12.6 m wide and 9.6 m deep, two storeys at the front with two small windows in the front gable, brick-red clay tile roof; an empty arched doorway on the left of the ground floor and, to the right, a very large shop window 4 m wide with many small square panes; a bent grey metal stove pipe through the roof near the back and a small cog-shaped weathervane on the ridge; no shutters. »
 - **Forge** : « A blacksmith workshop, 11.6 m wide and 9.6 m deep, dark brown clay tile roof, a very massive tall stone chimney on the back right of the roof; an empty arched doorway on the front left of center, a window with iron bars to its right; on the RIGHT side an open lean-to shed 5 m wide with no walls, a low sloping brown roof on thick wooden posts, sheltering a stone hearth with an orange fire, stacked logs. »
 - **Druide** : « An herbalist cottage, 11.6 m wide and 8.6 m deep, very steep 50-degree gabled roof thickly covered with dull olive-green moss over brown tiles, a short crooked stone chimney, ivy (matte leaves, no glow) climbing the timber frame; an empty arched doorway on the front left of center, two windows with flower boxes of small yellow and purple flowers; on the RIGHT side a small open drying porch 2 m by 4 m with a lean-to roof on two posts and bunches of dried herbs hanging from the beams. »
-- **Sorcier** : « A wizard's house, 11.6 m wide and 9.6 m deep, dark blue slate shingle roof, with an attached round stone-and-plaster tower of 4.5 m diameter at the BACK RIGHT corner, taller than the roof, with a tall conical dark blue slate roof topped by a crescent-moon weathervane, a round porthole and a slit window; an empty arched doorway on the front left of center and two windows. »
+- **Sorcier** : « A wizard's house made of a small half-timbered house and a round tower. The house is 11.6 m wide and 9.6 m deep, single storey, with a steep 45-degree solid closed roof of dark blue slate shingles (big chunky rounded shingles) and walls standing directly on a stone plinth of exactly TWO low courses of rounded grey stone blocks; an EMPTY arched doorway on the front, left of center, framed by large stone blocks with two small steps (NO door leaf); two windows with plain thick wooden frames to its right (NO shutters). Attached at the BACK RIGHT corner of the house stands a round tower of 4.5 m diameter, cream plaster with a stone plinth, taller than the roof (about 9 m high at the cone's base), topped by a tall conical roof of dark blue slate shingles ending in a crescent-moon weathervane, with a round porthole window with a thick stone frame and a narrow slit window. A short crooked chimney of chunky stone blocks on the house roof, on the LEFT gable. A small hanging lantern beside the doorway. The overall silhouette is asymmetrical: low wide house, tall slim tower rising behind it on the right. »
 - **Taverne** (facultatif) : « A big tavern: a long single-storey great hall 16.6 m wide and 11.6 m deep, walls 5.4 m high, a very tall hipped roof with half-hips at about 40 degrees, brick-red clay tiles; a huge stone chimney rising from the LEFT end wall; a wide empty arched double doorway 3.2 m wide in the middle under a small tiled porch roof on two timber brackets, two steps; a large window with a plain frame on each side of the doorway; dark timber framing with diagonal braces. »
+
+**Cohérence de style (02/10/2026)** : la première forge de Grok était trop fine et réaliste (petites tuiles plates, poutres minces, plâtre moucheté). **Toujours joindre l'image de la maison de base comme référence de style** dans Grok (« same visual style as the reference cottage ») : tuiles bombées de 40 cm, colombages épais, grosses pierres arrondies, plâtre lisse.
 
 ## Portes et volets (pièces animées, une image chacune, vue de face droite sans perspective)
 
