@@ -137,7 +137,7 @@ Accessoires à part : enseigne en forme de chope sur potence de fer, deux tonnea
 
 ## Mode recommandé depuis le 02/10/2026 : UNE SEULE IMAGE (trois-quarts)
 
-**Soubassement (décidé par Quentin, 02/10/2026)** : pour les maisons Tripo, on garde la **dalle basse avec deux marches ET un soubassement de deux rangées de pierres** au pied des murs (comme sur l'image de Grok de la maison de base). Cela remplace la règle « dalle lisse sans maçonnerie » de la maison générée par code ; limite : deux rangées, pas de soubassement haut.
+**Soubassement (décidé par Quentin, 02/10/2026)** : pour les maisons Tripo, on garde **un soubassement de deux rangées de pierres** au pied des murs et **deux marches** devant la porte (comme sur l'image de Grok de la maison de base). **Précision du 02/10 (soir) : pas de grande plateforme dallée autour de la maison** (Tripo la garde et la modélise : 4 m² de dalle inutile) ; la fondation est **le soubassement de deux rangées seul**, avec deux marches devant la porte. Cela remplace la règle « dalle lisse sans maçonnerie » de la maison générée par code ; limite : deux rangées, pas de soubassement haut.
 
 Essai du 02/10/2026 sur la maison de base : avec **la seule vue de face**, Tripo a donné une géométrie très bonne (tuiles en relief, arche en pierres appareillées, colombages, marches, lanterne, toit fermé, une cheminée) ; avec quatre vues peu différentes, un toit creux et deux cheminées. **On passe donc à une image unique par maison**, plus riche : un **trois-quarts** qui montre en même temps la façade, un pignon et le toit.
 
@@ -158,9 +158,10 @@ clay roof tiles, individual stone blocks in the arch and the base slab, thick ti
 FLAT UNLIT ALBEDO COLORS: solid clean color zones with crisp boundaries (brick-red tiles, cream plaster, dark brown
 timber, light-grey stone, dark glass), NO cast shadows, NO baked ambient occlusion, NO light gradients, NO glossy
 highlights, no photographic detail, no noise, no wood grain, no painted grime.
-Half-timbered cottage standing on a LOW light-grey stone slab with two steps in front of the doorway, and at the foot
-of the walls a stone plinth of exactly TWO low courses of rounded grey stone blocks (a stone base below the plaster and
-timber), clean and regular. The doorway is EMPTY: a dark recessed arched opening framed by large stone blocks, with NO door
+Half-timbered cottage whose walls stand directly on a stone plinth of exactly TWO low courses of rounded grey stone
+blocks, the plinth following the footprint of the walls and only a few centimeters wider than them. NO wide platform,
+NO paved terrace and NO large slab around the house: the plinth is the only foundation. In front of the doorway only
+two small stone steps leading up to the threshold. The doorway is EMPTY: a dark recessed arched opening framed by large stone blocks, with NO door
 leaf and NO door. Windows have simple wooden frames and glass panes and NO shutters. The roof is SOLID and CLOSED:
 both slopes completely covered with tiles, no gaps, no holes, nothing see-through.
 Three-quarter view from the front-right, camera about 30 degrees above the horizontal, no extreme perspective, the
