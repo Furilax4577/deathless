@@ -22,9 +22,8 @@ forms, chunky toy-like proportions with softly beveled edges, like a hand-made c
 polygon planes, NOT a crystal or gem-cut look, no hard visible triangle edges. Matte, clean simple surfaces: no wood
 grain, no stone masonry texture, no photographic detail, no noise, no painted grime.
 Half-timbered cottage: smooth cream plaster walls, dark red-brown timber frame, clay-tile roof, stone chimney, an
-arched doorway framed by large plain light-grey stone blocks, EMPTY: a dark recessed doorway with NO door leaf and NO door, windows with simple wooden frames and glass panes and NO shutters, standing on a LOW, smooth,
-plain light-grey stone slab that overhangs the wall slightly, with a couple of steps in front of the door (never on a
-high masonry base).
+arched doorway framed by large plain light-grey stone blocks, EMPTY: a dark recessed doorway with NO door leaf and NO door, windows with simple wooden frames and glass panes and NO shutters, standing on a LOW light-grey stone slab with a couple of steps in front of the door, with a plinth of exactly TWO low
+courses of grey stone blocks at the foot of the walls (never a high masonry base).
 Scale cues: the doorway is 1.8 m wide and 2.6 m tall, the walls are 4.4 m high, a chunky big-headed 2.3 m
 character would be almost as tall as the door.
 Single isolated building centered in frame, entire building visible with margin, nothing cropped. Plain flat dark grey
@@ -138,6 +137,8 @@ Accessoires à part : enseigne en forme de chope sur potence de fer, deux tonnea
 
 ## Mode recommandé depuis le 02/10/2026 : UNE SEULE IMAGE (trois-quarts)
 
+**Soubassement (décidé par Quentin, 02/10/2026)** : pour les maisons Tripo, on garde la **dalle basse avec deux marches ET un soubassement de deux rangées de pierres** au pied des murs (comme sur l'image de Grok de la maison de base). Cela remplace la règle « dalle lisse sans maçonnerie » de la maison générée par code ; limite : deux rangées, pas de soubassement haut.
+
 Essai du 02/10/2026 sur la maison de base : avec **la seule vue de face**, Tripo a donné une géométrie très bonne (tuiles en relief, arche en pierres appareillées, colombages, marches, lanterne, toit fermé, une cheminée) ; avec quatre vues peu différentes, un toit creux et deux cheminées. **On passe donc à une image unique par maison**, plus riche : un **trois-quarts** qui montre en même temps la façade, un pignon et le toit.
 
 Règles de l'image unique :
@@ -157,8 +158,9 @@ clay roof tiles, individual stone blocks in the arch and the base slab, thick ti
 FLAT UNLIT ALBEDO COLORS: solid clean color zones with crisp boundaries (brick-red tiles, cream plaster, dark brown
 timber, light-grey stone, dark glass), NO cast shadows, NO baked ambient occlusion, NO light gradients, NO glossy
 highlights, no photographic detail, no noise, no wood grain, no painted grime.
-Half-timbered cottage on a LOW, smooth, light-grey stone slab that overhangs the wall slightly, with two steps in
-front of the doorway. The doorway is EMPTY: a dark recessed arched opening framed by large stone blocks, with NO door
+Half-timbered cottage standing on a LOW light-grey stone slab with two steps in front of the doorway, and at the foot
+of the walls a stone plinth of exactly TWO low courses of rounded grey stone blocks (a stone base below the plaster and
+timber), clean and regular. The doorway is EMPTY: a dark recessed arched opening framed by large stone blocks, with NO door
 leaf and NO door. Windows have simple wooden frames and glass panes and NO shutters. The roof is SOLID and CLOSED:
 both slopes completely covered with tiles, no gaps, no holes, nothing see-through.
 Three-quarter view from the front-right, camera about 30 degrees above the horizontal, no extreme perspective, the
@@ -206,4 +208,4 @@ Puits à toit de bois (Ø 2 m), potager clôturé (6 × 5 m : choux, carottes, c
 
 ## Vérifications avant d'envoyer à Tripo
 
-Un seul bâtiment par image, entier, centré, fond uni, aucune ombre au sol ; **mêmes proportions, couleurs et détails sur les quatre vues** (même nombre de fenêtres, même cheminée, mêmes teintes) ; **aucun battant de porte ni volet** sur les maisons ; élévations sans perspective ; socle bas et lisse, pas de maçonnerie ; pas de vert luisant ; la façade est bien au bord droit de la vue « gauche » et au bord gauche de la vue « droite ».
+Un seul bâtiment par image, entier, centré, fond uni, aucune ombre au sol ; **mêmes proportions, couleurs et détails sur les quatre vues** (même nombre de fenêtres, même cheminée, mêmes teintes) ; **aucun battant de porte ni volet** sur les maisons ; élévations sans perspective ; socle bas : dalle + soubassement de deux rangées de pierres au pied des murs, pas plus haut ; pas de vert luisant ; la façade est bien au bord droit de la vue « gauche » et au bord gauche de la vue « droite ».

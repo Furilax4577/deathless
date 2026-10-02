@@ -77,6 +77,8 @@ Notés par Quentin après la partie à deux ; rien n'est encore développé.
 
 - **Portes et volets des maisons** {décidé} : la **porte fait un léger mouvement d'ouverture** (15 à 25°) **avec un son** quand on s'en sert, puis fondu au noir vers la zone d'intérieur ; les **volets se ferment la nuit** (ouverts le jour). Conséquence pour les modèles Tripo : battants et volets sont des **pièces à part** (pivots à la charnière), les maisons se modélisent avec **embrasure vide et fenêtres nues** (brief : `Docs/da/brief-maisons.md`).
 
+- **Soubassement des maisons Tripo** {décidé, 02/10/2026} : dalle basse avec deux marches **et deux rangées de pierres** au pied des murs (pas plus), pour les maisons issues de Tripo ; les maisons générées par code gardent la dalle lisse. Brief : `Docs/da/brief-maisons.md`.
+
 ## En attente de validation (Quentin)
 
 - **Personnage du mois** : candidats Barde, Bavaroise, Clochard pétomane et **DJ Bob Douville** (26/09/2026, modèles lissés, pages avec rendus et clips). Choisir le premier ; alléger celui qui est retenu (Barde et Bavaroise un peu au-dessus de 8 000 triangles). Barde : l'attaque de base frappe avec le luth comme une massue, animation de jeu du luth à créer.
