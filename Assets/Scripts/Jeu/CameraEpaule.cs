@@ -102,6 +102,11 @@ namespace Deathless.Jeu
         /// étage, la caméra passait par-dessus le mur d'enceinte.
         public static Bounds? Enceinte;
 
+        /// Donjon en terrasses (aperçu de la nouvelle carte, 02/10/2026) : la découpe autour du héros reste, mais la caméra
+        /// ne traverse plus les murs (recul contre les collisions, comme au village) ; seuls les piliers et les parapets
+        /// (VueLibre) sont traversés et découpés. Faux : ancien donjon, la caméra garde sa distance à travers les murs.
+        public static bool DecoupeSansTraverser;
+
         /// Place l'épaule puis la caméra, sans traverser les murs (personnages ignorés). 1) L'épaule est recalée par un
         /// SphereCast du pivot (centre du héros, à hauteur des yeux) vers la droite : collée à un mur, elle revient vers le
         /// héros, et le second test ne part plus de l'intérieur d'un collider (PhysX l'ignorerait et la caméra passerait
@@ -159,11 +164,12 @@ namespace Deathless.Jeu
         }
 
         /// Colliders que la caméra traverse : personnages (Nyxessa comprise), étages masqués du donjon, troncs de la forêt
-        /// (le feuillage s'estompe à la place, FeuillageMasquage).
+        /// (le feuillage s'estompe à la place, FeuillageMasquage), piliers et parapets du donjon en terrasses (VueLibre, découpés).
         public static bool Ignore(Collider c)
         {
             if (c.GetComponentInParent<Sante>() != null) return true;
             if (Deathless.Donjon.DonjonMasquage.ColliderMasque(c)) return true;
+            if (c.GetComponent<Deathless.Donjon.Terrasses.VueLibre>() != null) return true;
             return FeuillageMasquage.ColliderForet(c);
         }
 
@@ -226,14 +232,15 @@ namespace Deathless.Jeu
             // Donjon (30/09/2026, « see-through ») : la caméra garde sa distance, les murs et plafonds entre elle et le
             // héros sont découpés en disque autour de lui (shader Deathless/DonjonDecoupe) au lieu de la rapprocher.
             bool decoupe = Enceinte.HasValue && b.cameraDecoupeRayon > 0f;
-            if (decoupe) d = distanceVoulue;
+            bool traverse = decoupe && !DecoupeSansTraverser;
+            if (traverse) d = distanceVoulue;
             // Enceinte (donjon) : jamais au-delà des murs ni par-dessus.
             if (Enceinte.HasValue) d = Mathf.Max(ReculMin, Mathf.Min(d, Sortie(epaule, dir, Enceinte.Value) - 0.35f));
             m_Distance = m_Distance <= 0f ? d : (d < m_Distance ? d : Mathf.Lerp(m_Distance, d, 1f - Mathf.Exp(-6f * Time.deltaTime)));
             // Dernier filet : si la position retenue est dans un collider (pilier, bord d'un mur que les lancers ont longé),
             // la caméra se rapproche par pas de 0,2 m jusqu'à être libre.
             float recul = Mathf.Max(ReculMin, m_Distance);
-            if (!decoupe)
+            if (!traverse)
                 for (int i = 0; i < 24 && recul > ReculMin && DansUnCollider(epaule + dir * recul); i++) recul = Mathf.Max(ReculMin, recul - 0.2f);
             if (recul < m_Distance) m_Distance = recul;
             transform.position = epaule + dir * recul;

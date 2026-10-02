@@ -20,6 +20,11 @@ namespace Deathless.Jeu.Dev
     ///   ScenariosDonjon.Horloge(reste)            secondes restantes dans la phase courante
     ///   ScenariosDonjon.Parcourir("butin0", 20)   marche par le NavMesh, avec surveillance de la caméra
     ///   ScenariosDonjon.Perf(120)                 temps d'image, triangles, batches sur N images
+    /// Donjon en terrasses (aperçu de la nouvelle carte, DonjonJeu.TerrassesVoulues) :
+    ///   ScenariosDonjon.Construire(graine)        reconstruit la graine (DonjonJeu.ChangerGraine), gardiens compris
+    ///   ScenariosDonjon.Terrasses()               plan, portes, déclencheurs, gardiens (état, NavMesh, chemin vers le héros)
+    ///   ScenariosDonjon.Aller("escalier2"|"haut2"|"terrasse1"|"piece0"|"porte0"|"declencheur0"|"arche0"|"joueur3") en plus des cibles ci-dessus
+    ///   ScenariosDonjon.Cadrer("porte0", "arche0", 12, "capture")  héros posé, tourné vers une cible, capture
     public class ScenariosDonjon : MonoBehaviour
     {
         // Succès (01/10/2026) : outil de dev utilisé dans ce Play, plus rien ne compte jusqu'à la fin du Play.
@@ -92,6 +97,15 @@ namespace Deathless.Jeu.Dev
         {
             var dj = DJ;
             if (dj == null) return "pas de DonjonJeu";
+            if (DonjonJeu.TerrassesVoulues)
+            {
+                dj.ChangerGraine(graine);
+                var ct = dj.Constructeur;
+                string rt = ct == null ? "pas de donjon en terrasses" : "terrasses graine " + dj.GraineCourante + " " + ct.Plan.NomVariante + " " + ct.Plan.Niveaux + " niveaux, plan " + ct.TempsPlanMs.ToString("F0")
+                    + " ms, géométrie " + ct.TempsConstructionMs.ToString("F0") + " ms, navmesh " + ct.TempsNavMeshMs.ToString("F0") + " ms, coffres " + ct.Butins.Count + ", gardiens " + dj.GardiensVivants;
+                Log(rt);
+                return rt;
+            }
             var t = typeof(DonjonJeu);
             t.GetMethod("Construire", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(dj, new object[] { graine, -1 });
             t.GetMethod("PoserGardiens", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(dj, null);
@@ -218,15 +232,91 @@ namespace Deathless.Jeu.Dev
             return sb.ToString();
         }
 
+        /// Donjon en terrasses : plan, portes et déclencheurs, gardiens (type, état, sur le NavMesh, chemin complet vers le
+        /// héros local, distance), coffres pris.
+        public static string Terrasses()
+        {
+            var dj = DJ;
+            var ct = dj != null ? dj.Constructeur : null;
+            if (ct == null) return "pas de donjon en terrasses";
+            var pl = ct.Plan; var h = H;
+            var sb = new StringBuilder();
+            sb.Append("graine ").Append(dj.GraineCourante).Append(" ").Append(pl.NomVariante).Append(" ").Append(pl.Niveaux).Append(" niveaux ").Append(pl.L).Append("x").Append(pl.P)
+              .Append(" voûte ").Append(pl.Naissance.ToString("F1")).Append("→").Append(pl.Cle.ToString("F1")).Append(" conforme ").Append(ct.Conforme)
+              .Append(" | coffres ").Append(ct.Butins.Count).Append(" pris ").Append(System.Convert.ToString(dj.Pris, 2))
+              .Append(" | escaliers ").Append(pl.escaliers.Count).Append(" terrasses ").Append(pl.terrasses.Count).Append(" pièces ").Append(pl.pieces.Count).Append("\n");
+            foreach (var pt in ct.Portes) sb.Append("porte ").Append(pt.name).Append(" ouverte=").Append(pt.Ouverte).Append(" ; ");
+            foreach (var d in ct.Declencheurs) sb.Append("déclencheur ").Append(d.name).Append(" actif=").Append(d.Actif).Append(" ; ");
+            sb.Append("\n");
+            var liste = Prive(dj, "m_Gardiens") as List<Squelette>;
+            int vivants = 0, surNav = 0, chemins = 0;
+            if (liste != null)
+                foreach (var s in liste)
+                {
+                    if (s == null || !s.Vivant) continue;
+                    vivants++;
+                    var a = s.Agent;
+                    bool nav = a != null && a.enabled && a.isOnNavMesh;
+                    if (nav) surNav++;
+                    string ch = "?";
+                    if (nav && h != null && NavMesh.SamplePosition(h.transform.position, out var hh, 2f, NavMesh.AllAreas))
+                    {
+                        var path = new NavMeshPath();
+                        bool ok = NavMesh.CalculatePath(a.nextPosition, hh.position, NavMesh.AllAreas, path) && path.status == NavMeshPathStatus.PathComplete;
+                        if (ok) chemins++;
+                        ch = ok ? "complet" : path.status.ToString();
+                    }
+                    sb.Append(s.type).Append(" ").Append(s.EtatCourant).Append(" y=").Append(s.transform.position.y.ToString("F1"))
+                      .Append(" d=").Append(h != null ? Vector3.Distance(h.transform.position, s.transform.position).ToString("F1") : "?").Append(" nav=").Append(nav).Append(" chemin=").Append(ch).Append(" ; ");
+                }
+            sb.Append("\ngardiens vivants ").Append(vivants).Append(", sur le NavMesh ").Append(surNav).Append(", chemin complet vers le héros ").Append(chemins);
+            string r = sb.ToString();
+            Log(r);
+            return r;
+        }
+
         // ================================================================== Déplacements
 
         public static Vector3 Cible(string ou)
         {
             var g = G; var dj = DJ;
-            if (g == null) return Vector3.zero;
+            if (dj == null || (g == null && !DonjonJeu.TerrassesVoulues)) return Vector3.zero;
             if (ou == "arrivee") return (Vector3)Prive(dj, "PointArrivee");
             if (ou == "village") return (Vector3)Prive(dj, "SortieVillage");
-            if (ou == "retour") return g.PortailRetour.transform.position + g.PortailRetour.transform.forward * 2f;
+            if (ou == "retour") return dj.RepereRetour.transform.position + dj.RepereRetour.transform.forward * 2f;
+            if (DonjonJeu.TerrassesVoulues && dj.Constructeur != null)
+            {
+                var ct = dj.Constructeur; var pl = ct.Plan;
+                System.Func<string, int> num = pre => int.Parse(ou.Substring(pre.Length));
+                Vector3 vt = Vector3.zero; bool trouve = true;
+                if (ou.StartsWith("escalier") || ou.StartsWith("haut"))
+                {
+                    // pied (escalierN) ou palier d'arrivée en haut (hautN) de l'escalier N
+                    var e = pl.escaliers[num(ou.StartsWith("haut") ? "haut" : "escalier")];
+                    Vector3 ax = new Vector3(Deathless.Donjon.Terrasses.PlanTerrasses.Dx(e.dir), 0f, Deathless.Donjon.Terrasses.PlanTerrasses.Dz(e.dir));
+                    Vector3 o = e.dir == Deathless.Donjon.Terrasses.Dir.Nord ? new Vector3(e.r.CentreX, 0f, e.r.z0) : e.dir == Deathless.Donjon.Terrasses.Dir.Sud ? new Vector3(e.r.CentreX, 0f, e.r.z1)
+                        : e.dir == Deathless.Donjon.Terrasses.Dir.Est ? new Vector3(e.r.x0, 0f, e.r.CentreZ) : new Vector3(e.r.x1, 0f, e.r.CentreZ);
+                    vt = ou.StartsWith("haut") ? o + ax * (e.Longueur + 1.5f) + Vector3.up * e.Sommet : o - ax * 1.5f + Vector3.up * e.Base;
+                }
+                else if (ou.StartsWith("terrasse")) { var te = pl.terrasses[num("terrasse")]; vt = new Vector3(te.r.CentreX, te.Hauteur, te.r.CentreZ); }
+                else if (ou.StartsWith("piece")) { var pc = pl.pieces[num("piece")]; vt = new Vector3(pc.r.CentreX, pc.sol, pc.r.CentreZ); }
+                else if (ou.StartsWith("arche")) { var pa = pl.pieces[num("arche")]; vt = new Vector3(pa.arche.x, pa.sol, pa.arche.z); }
+                else if (ou.StartsWith("porte"))
+                {
+                    // devant l'arche de la pièce N, côté salle (arche.dir : de la pièce vers la salle)
+                    var pc = pl.pieces[num("porte")];
+                    Vector3 n = new Vector3(Deathless.Donjon.Terrasses.PlanTerrasses.Dx(pc.arche.dir), 0f, Deathless.Donjon.Terrasses.PlanTerrasses.Dz(pc.arche.dir));
+                    vt = new Vector3(pc.arche.x, pc.sol, pc.arche.z) + n * 2.2f;   // n : de la pièce vers la salle
+                }
+                else if (ou.StartsWith("declencheur")) { var de = pl.declencheurs[num("declencheur")]; vt = new Vector3(de.pose.x, de.pose.y, de.pose.z) + Quaternion.Euler(0f, de.pose.rotY, 0f) * Vector3.forward * (de.genre == Deathless.Donjon.Terrasses.GenreDeclencheur.BoutonMural ? 1.6f : 0f); }
+                else if (ou.StartsWith("joueur")) return ct.Joueurs[num("joueur")].position;
+                else trouve = false;
+                if (trouve)
+                {
+                    Vector3 w = ct.Monde(vt.x, vt.y, vt.z);
+                    return NavMesh.SamplePosition(w + Vector3.up * 0.5f, out var hn, 2f, NavMesh.AllAreas) ? hn.position : w;
+                }
+            }
             if (ou == "eau")
             {
                 Transform e = null;
@@ -237,7 +327,7 @@ namespace Deathless.Jeu.Dev
             if (ou.StartsWith("butin"))
             {
                 int i = int.Parse(ou.Substring(5));
-                var r = g.Butins[i];
+                var r = dj.Butins[i];
                 // Devant le coffre (il tourne le dos au mur) ; jusqu'au 27/09/2026, « - forward » plaçait le héros dans le mur.
                 Vector3 p = r.transform.position + r.transform.forward * 1.5f;
                 if (NavMesh.SamplePosition(p + Vector3.up * 0.3f, out var hb, 1.2f, NavMesh.AllAreas)) return hb.position;
@@ -246,7 +336,7 @@ namespace Deathless.Jeu.Dev
             if (ou.StartsWith("apparition"))
             {
                 int i = int.Parse(ou.Substring(10));
-                return g.Apparitions[i].transform.position;
+                return dj.Apparitions[i].transform.position;
             }
             if (ou == "portailvillage") { var vc = VueCycle.Instance; return vc != null && vc.portail != null ? vc.portail.Center : Vector3.zero; }
             var parts = ou.Split(',');
@@ -259,8 +349,8 @@ namespace Deathless.Jeu.Dev
             Vector3 p = Cible(ou);
             var h = H;
             if (h == null) return "pas de héros";
-            Vector3 regard = ou == "retour" && G != null ? G.PortailRetour.transform.position : p + h.transform.forward;
-            if (ou.StartsWith("butin")) regard = G.Butins[int.Parse(ou.Substring(5))].transform.position;
+            Vector3 regard = ou == "retour" && DJ != null && DJ.RepereRetour != null ? DJ.RepereRetour.transform.position : p + h.transform.forward;
+            if (ou.StartsWith("butin")) regard = DJ.Butins[int.Parse(ou.Substring(5))].transform.position;
             if (ou == "portailvillage") { var vc = VueCycle.Instance; p = vc.portail.Center + (P.nyxessa.transform.position - vc.portail.Center).normalized * 2.2f; p.y = 0f; regard = vc.portail.Center; }
             Teleporter(p.x, p.y, p.z);
             Vector3 d = regard - p; d.y = 0f;
@@ -285,6 +375,23 @@ namespace Deathless.Jeu.Dev
         }
 
         public static void Capturer(string nom) => DevPartie.Capturer(nom);
+
+        /// Place le héros sur `ou`, tourné vers `vers` (deux cibles de Cible), caméra au tangage donné, puis capture après
+        /// 20 images (caméra posée). `decalage` : lacet ajouté (degrés), pour voir de trois quarts.
+        public static void Cadrer(string ou, string vers, float tangage, string capture, float decalage = 0f) { var i = I; i.StartCoroutine(i.CoCadrer(ou, vers, tangage, capture, decalage)); }
+
+        IEnumerator CoCadrer(string ou, string vers, float tangage, string capture, float decalage)
+        {
+            Vector3 p = Cible(ou), c = Cible(vers);
+            Teleporter(p.x, p.y, p.z);
+            Vector3 d = c - p; d.y = 0f;
+            Regarder(Mathf.Atan2(d.x, d.z) * Mathf.Rad2Deg + decalage, tangage);
+            for (int k = 0; k < 20; k++) yield return null;
+            var cam = P != null ? P.cameraJeu : null;
+            if (capture != null) DevPartie.Capturer(capture);
+            Log("cadrage " + ou + " → " + vers + " : héros " + (H != null ? H.transform.position.ToString("F1") : "?") + ", caméra " + (cam != null ? cam.transform.position.ToString("F1") : "?")
+                + ", recul " + (cam != null && H != null ? Vector3.Distance(cam.transform.position, H.transform.position + Vector3.up * GameBalance.Courant.cameraHauteur).ToString("F2") : "?"));
+        }
 
         public static string Invite()
         {
@@ -387,14 +494,14 @@ namespace Deathless.Jeu.Dev
                 bool mur = false;
                 for (int k = 0; k < n; k++)
                 {
-                    if (hits[k].GetComponentInParent<Sante>() != null || DonjonMasquage.ColliderMasque(hits[k])) continue;
+                    if (CameraEpaule.Ignore(hits[k])) continue;   // personnages, étages masqués, troncs, piliers et parapets des terrasses
                     mur = true; break;
                 }
                 // Tête cachée ?
                 Vector3 tete = h.transform.position + Vector3.up * 1.6f;
                 bool cache = false;
                 if (Physics.Linecast(cam.transform.position, tete, out var lh, ~(1 << 2), QueryTriggerInteraction.Ignore))
-                    cache = lh.collider.GetComponentInParent<Sante>() == null && !DonjonMasquage.ColliderMasque(lh.collider);
+                    cache = !CameraEpaule.Ignore(lh.collider);
                 float recul = Vector3.Distance(cam.transform.position, h.transform.position + Vector3.up * GameBalance.Courant.cameraHauteur);
                 if (recul < reculMin) reculMin = recul;
                 if (mur) { imagesMur++; if (premMur.Length < 300) premMur.Append(cam.transform.position.ToString("F1")).Append(" "); }
@@ -552,9 +659,9 @@ namespace Deathless.Jeu.Dev
 
         IEnumerator CoCoffreVide(int index, string capture)
         {
-            var g = G; var dj = DJ;
-            if (g == null || dj == null) yield break;
-            var r = g.Butins[index];
+            var dj = DJ;
+            if (dj == null) yield break;
+            var r = dj.Butins[index];
             int avant = Triangles(r.visuel), apres;
             Aller("butin" + index);
             yield return null;

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Deathless.Accessoires;
 using Deathless.Donjon;
+using Deathless.Donjon.Terrasses;
 using Deathless.Reseau;
 using Deathless.UI.Donnees;
 using UnityEngine;
@@ -34,10 +35,41 @@ namespace Deathless.Jeu
     {
         /// Coin du donjon (60 x 48 m) : loin du village (le village tient dans ± 240 m, caméra à 400 m).
         public static readonly Vector3 Origine = new Vector3(1000f, 0f, 0f);
-        static readonly Bounds Emprise = new Bounds(Origine + new Vector3(30f, 5f, 24f), new Vector3(66f, 34f, 54f));
+        static readonly Bounds EmpriseAncien = new Bounds(Origine + new Vector3(30f, 5f, 24f), new Vector3(66f, 34f, 54f));
+        /// Emprise du donjon construit (« au donjon ») : celle de l'ancien donjon, ou celle du donjon en terrasses.
+        static Bounds s_Emprise = EmpriseAncien;
         /// Intérieur des murs d'enceinte (faces intérieures à 0,5 m des bords, du fond du bassin au sommet des murs du
         /// dernier étage) : la caméra du joueur local n'en sort pas (CameraEpaule.Enceinte, B1 de l'audit).
         static readonly Bounds EnceinteCamera = EnceinteInterieure();
+
+        // ------------------------------------------------------------------ Donjon en terrasses (aperçu de la nouvelle carte)
+        /// Coin du donjon en terrasses (02/10/2026) : à côté de l'ancien (qui n'est pas construit dans l'aperçu), toujours
+        /// loin de la carte. Le plan va de -10 à L + 10 m (marge des pièces derrière l'enceinte).
+        public static readonly Vector3 OrigineTerrasses = new Vector3(1000f, 0f, 120f);
+        /// Vrai : le donjon est le donjon en terrasses (Deathless.Donjon.Terrasses) au lieu de l'ancien (DonjonGenerateur).
+        /// Seul le mode « Nouvelle carte (aperçu) » (Partie.Exploration) le prend ; le jeu normal garde l'ancien.
+        public static bool TerrassesVoulues => Partie.Exploration;
+        bool Terrasses => TerrassesVoulues;
+        ConstructeurTerrasses m_Terrasses;
+        /// Constructeur du donjon en terrasses (null hors aperçu, ou avant la première construction).
+        public ConstructeurTerrasses Constructeur => m_Terrasses;
+        /// Boîte intérieure de la grande salle (sous la naissance de la voûte), en monde : enceinte de la caméra.
+        Bounds m_SalleTerrasses;
+        /// Intérieur des pièces cachées (monde), passage de l'arche compris : enceinte de la caméra quand le héros y est.
+        readonly List<Bounds> m_PiecesTerrasses = new List<Bounds>();
+        Transform m_BourdonTerrasses;
+        Vector3? m_PiedEscalier;
+        Vector3 m_SortieEscalier;
+        bool m_PiedCherche;
+
+        /// Repères du donjon construit (ancien ou terrasses) : arrivée, portail de retour, butins, apparitions.
+        public DonjonRepere RepereArrivee => Terrasses ? (m_Terrasses != null ? m_Terrasses.Arrivee : null) : generateur != null ? generateur.Arrivee : null;
+        public DonjonRepere RepereRetour => Terrasses ? (m_Terrasses != null ? m_Terrasses.PortailRetour : null) : generateur != null ? generateur.PortailRetour : null;
+        public IList<DonjonRepere> Butins => Terrasses ? (m_Terrasses != null ? (IList<DonjonRepere>)m_Terrasses.Butins : Aucun) : generateur != null ? generateur.Butins : Aucun;
+        public IList<DonjonRepere> Apparitions => Terrasses ? (m_Terrasses != null ? (IList<DonjonRepere>)m_Terrasses.Apparitions : Aucun) : generateur != null ? generateur.Apparitions : Aucun;
+        static readonly DonjonRepere[] Aucun = new DonjonRepere[0];
+        /// Butins suivis par un masque de 32 bits (Pris, PartieReseau.ButinsPris).
+        const int MaxButins = 32;
 
         static Bounds EnceinteInterieure()
         {
@@ -71,7 +103,7 @@ namespace Deathless.Jeu
         public int EssaiCourant { get; private set; }
         /// Butins déjà pris (un bit par emplacement).
         public int Pris { get; private set; }
-        public bool Pret => GraineCourante != 0 && generateur != null && generateur.Arrivee != null;
+        public bool Pret => GraineCourante != 0 && RepereArrivee != null;
 
         Partie P => Partie.Instance;
         GameBalance B => GameBalance.Courant;
@@ -83,7 +115,7 @@ namespace Deathless.Jeu
         const float DureeTransitDepart = 1.1f, DureeTransitArriveeGemmes = 0.5f;
 
         readonly List<Squelette> m_Gardiens = new List<Squelette>();
-        readonly float[] m_Demande = new float[DonjonPlan.NbButins];
+        readonly float[] m_Demande = new float[MaxButins];
         int m_PrisVus;
         bool m_Transit;
         Heros m_HerosTransit;
@@ -160,11 +192,14 @@ namespace Deathless.Jeu
             DonneesUI.Donjon = this;
             if (generateur == null) generateur = GetComponent<DonjonGenerateur>();
             if (generateur != null) generateur.genererAuDemarrage = false;
+            s_Emprise = EmpriseAncien;
         }
 
         void OnDestroy()
         {
             CameraEpaule.Enceinte = null;
+            CameraEpaule.DecoupeSansTraverser = false;
+            s_Emprise = EmpriseAncien;
             if (Instance == this) Instance = null;
             if (ReferenceEquals(DonneesUI.Donjon, this)) DonneesUI.Donjon = null;
         }
@@ -178,7 +213,7 @@ namespace Deathless.Jeu
 
         // ================================================================== Géographie
 
-        public static bool Contient(Vector3 p) => Emprise.Contains(p);
+        public static bool Contient(Vector3 p) => s_Emprise.Contains(p);
         public static bool AuDonjon(Heros h) => h != null && Contient(h.transform.position);
 
         /// Un joueur au moins est au donjon (vote « prêt » bloqué).
@@ -218,6 +253,8 @@ namespace Deathless.Jeu
         {
             get
             {
+                // Nouvelle carte (grotte) : au pied de l'escalier de la grotte, dos au portail.
+                if (PiedEscalier(out var pied, out _)) return pied;
                 var pv = PortailVillage;
                 Vector3 c = pv != null ? pv.Center : Vector3.zero;
                 Vector3 n = P != null && P.nyxessa != null ? P.nyxessa.transform.position : Vector3.zero;
@@ -233,8 +270,15 @@ namespace Deathless.Jeu
         {
             get
             {
-                Transform a = generateur.Arrivee.transform;
+                Transform a = RepereArrivee.transform;
                 Vector3 p = a.position;
+                // Donjon en terrasses : un des quatre points d'arrivée des joueurs (zone de 6 × 5 m), selon le joueur.
+                if (Terrasses && m_Terrasses != null && m_Terrasses.Joueurs.Count > 0)
+                {
+                    int id = P != null && P.HerosLocal != null ? P.HerosLocal.Id : 1;
+                    Vector3 j = m_Terrasses.Joueurs[((id - 1) % m_Terrasses.Joueurs.Count + m_Terrasses.Joueurs.Count) % m_Terrasses.Joueurs.Count].position;
+                    return NavMesh.SamplePosition(j + Vector3.up * 0.3f, out var hj, 1.5f, NavMesh.AllAreas) ? hj.position : j;
+                }
                 if (!NavMesh.SamplePosition(p + Vector3.up * 0.3f, out var h0, 1f, NavMesh.AllAreas)) return p;
                 for (float d = 3f; d >= 1f; d -= 1f)
                 {
@@ -269,6 +313,7 @@ namespace Deathless.Jeu
         /// par l'hôte (clients) ; -1 : l'autorité choisit elle-même l'essai.
         void Construire(int graine, int essai = -1)
         {
+            if (Terrasses) { ConstruireTerrasses(graine); return; }
             if (generateur == null || graine == GraineCourante) return;
             RetirerGardiens();
             ViderSacsLocal();
@@ -286,9 +331,9 @@ namespace Deathless.Jeu
 
         void PreparerButins()
         {
-            for (int i = 0; i < generateur.Butins.Length; i++)
+            for (int i = 0; i < Butins.Count; i++)
             {
-                var r = generateur.Butins[i];
+                var r = Butins[i];
                 if (r == null) continue;
                 if (r.visuel != null) r.visuel.SetActive(ButinActif(i));
                 var coffre = r.butin != TypeButin.TasOr ? CoffreDe(r.visuel, r.butin == TypeButin.GrandCoffre) : null;
@@ -374,11 +419,220 @@ namespace Deathless.Jeu
             return Mathf.RoundToInt(baseOr * (1f + b.orDonjonParNuit * Mathf.Max(0, nuit - 1)));
         }
 
-        public int MontantButin(int index) => generateur != null && index >= 0 && index < generateur.Butins.Length && generateur.Butins[index] != null ? Montant(generateur.Butins[index].butin) : 0;
+        public int MontantButin(int index) => index >= 0 && index < Butins.Count && Butins[index] != null ? Montant(Butins[index].butin) : 0;
         public bool ButinPris(int index) => (Pris & (1 << index)) != 0;
         /// Butin présent dans ce donjon : les tas d'or au sol sont retirés depuis le 30/09/2026 (GameBalance.tasOrDonjon).
-        public bool ButinActif(int index) => generateur != null && index >= 0 && index < generateur.Butins.Length && generateur.Butins[index] != null
-            && (generateur.Butins[index].butin != TypeButin.TasOr || B.tasOrDonjon);
+        public bool ButinActif(int index) => index >= 0 && index < Butins.Count && Butins[index] != null
+            && (Butins[index].butin != TypeButin.TasOr || B.tasOrDonjon);
+
+        // ================================================================== Donjon en terrasses (aperçu de la nouvelle carte)
+
+        /// Tous les postes : construit le donjon en terrasses de cette graine. Le plan est déterministe (même graine, même
+        /// donjon sur toutes les machines, Docs/donjon-generateur.md) : seule la graine circule (PartieReseau.GraineDonjon),
+        /// l'essai retenu ne sert pas. Puis butins (coffres), interactions de l'aperçu, emprise et enceintes de la caméra.
+        void ConstruireTerrasses(int graine)
+        {
+            if (graine == GraineCourante && m_Terrasses != null) return;
+            if (m_Terrasses == null && !CreerTerrasses()) return;
+            RetirerGardiens();
+            ViderSacsLocal();
+            if (ReseauJeu.Autorite) PartieReseau.Instance?.ViderSacs();
+            float t0 = Time.realtimeSinceStartup;
+            bool ok = m_Terrasses.Generer(graine);
+            EssaiCourant = 0;
+            GraineCourante = graine;
+            Pris = 0; m_PrisVus = 0;
+            for (int i = 0; i < m_Demande.Length; i++) m_Demande[i] = 0f;
+            MesurerTerrasses();
+            PreparerButins();
+            PoserMecanismesApercu();
+            var pl = m_Terrasses.Plan;
+            P?.Journal("Donjon en terrasses : graine " + graine + (ok ? "" : " (hors consigne)") + ", " + pl.NomVariante + ", " + pl.Niveaux + " niveaux, "
+                + pl.L + " x " + pl.P + " m, " + m_Terrasses.Butins.Count + " coffres, " + m_Terrasses.Apparitions.Count + " apparitions, " + m_Terrasses.Portes.Count + " porte(s), construit en "
+                + ((Time.realtimeSinceStartup - t0) * 1000f).ToString("F0") + " ms");
+            if (m_Terrasses.Butins.Count > MaxButins) Debug.LogWarning("Donjon en terrasses : " + m_Terrasses.Butins.Count + " coffres, seuls les " + MaxButins + " premiers sont suivis");
+        }
+
+        /// Constructeur du donjon en terrasses, sous ce donjon (OrigineTerrasses). Matériaux chargés des Resources
+        /// (Assets/Jeu/Resources/DonjonTerrasses/) : ils sont dans le build sans toucher à la scène.
+        bool CreerTerrasses()
+        {
+            var pierre = Resources.Load<Material>("DonjonTerrasses/DonjonTerrasses_Pierre");
+            var flamme = Resources.Load<Material>("DonjonTerrasses/DonjonTerrasses_Flamme");
+            if (pierre == null) { Debug.LogWarning("Donjon en terrasses : matériau DonjonTerrasses_Pierre introuvable dans les Resources"); return false; }
+            var go = new GameObject("DonjonTerrasses");
+            go.SetActive(false);   // le constructeur ne génère rien à son Awake : il est réglé avant d'être activé
+            go.transform.SetParent(transform, false);
+            go.transform.SetPositionAndRotation(OrigineTerrasses, Quaternion.identity);
+            m_Terrasses = go.AddComponent<ConstructeurTerrasses>();
+            m_Terrasses.genererAuDemarrage = false;
+            m_Terrasses.construireNavMesh = true;
+            m_Terrasses.voute = true;
+            m_Terrasses.reperesVisibles = false;
+            m_Terrasses.materiauPierre = pierre;
+            m_Terrasses.materiauFlamme = flamme;
+            go.SetActive(true);
+            return true;
+        }
+
+        /// Emprise (« au donjon »), boîte de la grande salle et des pièces cachées (enceintes de la caméra), en monde.
+        void MesurerTerrasses()
+        {
+            var pl = m_Terrasses.Plan;
+            Vector3 o = m_Terrasses.transform.position;
+            float m = PlanTerrasses.Marge;
+            s_Emprise = new Bounds(o + new Vector3(pl.L * 0.5f, pl.Cle * 0.5f, pl.P * 0.5f), new Vector3(pl.L + 2f * m + 2f, pl.Cle + 6f, pl.P + 2f * m + 2f));
+            // Salle : faces intérieures des murs (les blocs saillent de 0,12 m), du sol à 0,4 m sous la naissance de la voûte
+            // (la voûte n'a pas de collision : la caméra ne monte pas jusqu'à elle).
+            const float bord = 0.2f;
+            float y0 = -1f, y1 = pl.Naissance - 0.4f;
+            m_SalleTerrasses = new Bounds(o + new Vector3(pl.L * 0.5f, (y0 + y1) * 0.5f, pl.P * 0.5f), new Vector3(pl.L - 2f * bord, y1 - y0, pl.P - 2f * bord));
+            m_PiecesTerrasses.Clear();
+            foreach (var pc in pl.pieces)
+            {
+                float py0 = pc.sol - 0.5f, py1 = pc.plafond - 0.3f;
+                m_PiecesTerrasses.Add(new Bounds(o + new Vector3(pc.r.CentreX, (py0 + py1) * 0.5f, pc.r.CentreZ),
+                    new Vector3(pc.r.Largeur - 2f * bord, py1 - py0, pc.r.Profondeur - 2f * bord)));
+            }
+        }
+
+        /// Enceinte de la caméra au donjon en terrasses : la pièce cachée où est le héros, sinon la grande salle ; null
+        /// dans le passage d'une arche à travers l'enceinte (la caméra s'y règle sur les collisions, comme au village).
+        Bounds? EnceinteTerrasses(Vector3 pieds)
+        {
+            if (m_Terrasses == null) return null;
+            Vector3 q = pieds + Vector3.up * 0.6f;
+            for (int i = 0; i < m_PiecesTerrasses.Count; i++) if (m_PiecesTerrasses[i].Contains(q)) return m_PiecesTerrasses[i];
+            return m_SalleTerrasses.Contains(q) ? m_SalleTerrasses : (Bounds?)null;
+        }
+
+        /// Centre de l'arche du portail de retour (gemmes du passage) : le donjon en terrasses n'a pas de PortalVisual.
+        Vector3? CentreRetourTerrasses => Terrasses && RepereRetour != null
+            ? RepereRetour.transform.position + Vector3.up * 2.4f + RepereRetour.transform.forward * 0.3f : (Vector3?)null;
+
+        /// Aperçu seulement : portes à serrure ouvertes par la touche Interagir (sans clé), bouton mural des pièces secrètes
+        /// aussi par la touche (la plaque s'enfonce sous les pas) ; un grondement quand une paroi secrète descend.
+        void PoserMecanismesApercu()
+        {
+            if (!Partie.Exploration || m_Terrasses == null) return;
+            foreach (var porte in m_Terrasses.Portes)
+            {
+                if (porte == null) continue;
+                if (porte.genre == GenrePiece.Verrouillee && porte.GetComponent<MecanismeApercu>() == null) porte.gameObject.AddComponent<MecanismeApercu>().porte = porte;
+                if (porte.genre == GenrePiece.Secrete) porte.Ouverture += GrondementParoi;
+            }
+            foreach (var d in m_Terrasses.Declencheurs)
+                if (d != null && d.genre == GenreDeclencheur.BoutonMural && d.GetComponent<MecanismeApercu>() == null) d.gameObject.AddComponent<MecanismeApercu>().bouton = d;
+        }
+
+        static void GrondementParoi(PorteDonjon pd)
+        {
+            var bc = pd.GetComponent<BoxCollider>();
+            AudioBank.Jouer(SonsDuJeu.GolemCoup, pd.transform.TransformPoint(bc != null ? bc.center : Vector3.zero), 0.6f);
+        }
+
+        /// Autorité : gardiens du donjon en terrasses, un par point d'apparition du plan (14), du type du plan (sbire,
+        /// guerrier, voleur, mage), tournés vers la salle ; ils gardent leur poste et poursuivent les héros en vue.
+        void PoserGardiensTerrasses(DirecteurVagues dv)
+        {
+            var ap = Apparitions;
+            for (int k = 0; k < ap.Count; k++)
+            {
+                var a = ap[k];
+                if (a == null) continue;
+                Vector3 p = a.transform.position;
+                if (NavMesh.SamplePosition(p + Vector3.up * 0.5f, out var hit, 2f, NavMesh.AllAreas)) p = hit.position;
+                var type = a.apparition == TypeApparition.Guerrier ? TypeEnnemi.Guerrier : a.apparition == TypeApparition.Voleur ? TypeEnnemi.Voleur
+                    : a.apparition == TypeApparition.Mage ? TypeEnnemi.Mage : TypeEnnemi.Sbire;
+                var sq = dv.Poser(type, p, false, false);
+                if (sq == null) continue;
+                sq.transform.rotation = a.transform.rotation;
+                sq.Garder(p);
+                m_Gardiens.Add(sq);
+            }
+            P?.Journal("Donjon en terrasses : " + m_Gardiens.Count + " gardiens sur " + ap.Count + " points d'apparition");
+        }
+
+        /// Pied de l'escalier de la grotte (nouvelle carte) et direction qui s'éloigne du portail ; faux sans grotte
+        /// (ancienne carte). Cherché une fois : le bord de marche le plus éloigné du portail, puis 1,5 m plus loin, sur le
+        /// NavMesh.
+        bool PiedEscalier(out Vector3 pied, out Vector3 dehors)
+        {
+            if (!m_PiedCherche)
+            {
+                var pv = PortailVillage;
+                var esc = pv != null ? GameObject.Find("Grotte_Escalier") : null;
+                if (pv != null) m_PiedCherche = true;
+                if (esc != null)
+                {
+                    var rs = esc.GetComponentsInChildren<Renderer>();
+                    Vector3 c = pv.Center; c.y = 0f;
+                    Bounds tout = default; bool premier = true;
+                    foreach (var r in rs) { if (premier) { tout = r.bounds; premier = false; } else tout.Encapsulate(r.bounds); }
+                    Vector3 d = tout.center - c; d.y = 0f;
+                    if (!premier && d.sqrMagnitude > 0.01f)
+                    {
+                        d.Normalize();
+                        float loin = 0f;
+                        foreach (var r in rs)
+                        {
+                            Bounds b = r.bounds;
+                            float e = Vector3.Dot(new Vector3(b.center.x, 0f, b.center.z) - c, d) + Mathf.Abs(d.x) * b.extents.x + Mathf.Abs(d.z) * b.extents.z;
+                            if (e > loin) loin = e;
+                        }
+                        Vector3 p = c + d * (loin + 1.5f);
+                        p.y = tout.min.y;
+                        if (NavMesh.SamplePosition(p + Vector3.up, out var hit, 3f, NavMesh.AllAreas)) p = hit.position;
+                        m_PiedEscalier = p;
+                        m_SortieEscalier = d;
+                    }
+                }
+            }
+            pied = m_PiedEscalier ?? Vector3.zero;
+            dehors = m_SortieEscalier;
+            return m_PiedEscalier.HasValue;
+        }
+
+        /// Aperçu seulement (touche de dev, autorité) : F8 construit la graine suivante, Maj + F8 une graine au hasard ; le
+        /// héros local au donjon est reposé à l'arrivée. Les commandes du jeu normal ne changent pas (F8 n'y est lié à rien).
+        void ToucheGraine()
+        {
+            var kb = UnityEngine.InputSystem.Keyboard.current;
+            if (kb == null || !kb.f8Key.wasPressedThisFrame || m_Transit || !ReseauJeu.Autorite) return;
+            ChangerGraine(kb.shiftKey.isPressed ? Random.Range(1, 1000000) : GraineCourante + 1);
+        }
+
+        /// Autorité, aperçu : reconstruit le donjon de cette graine (gardiens compris) ; le héros local au donjon revient
+        /// à l'arrivée. Aussi appelé par les outils de test (ScenariosDonjon.Graine).
+        public void ChangerGraine(int graine)
+        {
+            if (!Terrasses || !ReseauJeu.Autorite) return;
+            if (graine <= 0) graine = 1;
+            var h = P != null ? P.HerosLocal : null;
+            bool dedans = AuDonjon(h);
+            if (graine == GraineCourante) GraineCourante = 0;   // même graine : reconstruite (gardiens remis)
+            Construire(graine);
+            PoserGardiens();
+            if (dedans && h != null && Pret)
+            {
+                h.Teleporter(PointArrivee + Vector3.up * 0.05f);
+                Vector3 v = RepereArrivee.transform.forward; v.y = 0f;
+                if (v.sqrMagnitude > 0.01f)
+                {
+                    h.transform.rotation = Quaternion.LookRotation(v);
+                    if (P.cameraJeu != null) P.cameraJeu.lacet = h.transform.eulerAngles.y;
+                }
+            }
+            AnnoncerGraine();
+        }
+
+        /// Message du HUD : graine du donjon en terrasses et touche de dev (aperçu).
+        void AnnoncerGraine()
+        {
+            if (!Terrasses || m_Terrasses == null) return;
+            var pl = m_Terrasses.Plan;
+            Dire("Donjon : graine " + GraineCourante + " (" + pl.NomVariante + ", " + pl.Niveaux + " niveaux) - F8 : graine suivante, Maj+F8 : au hasard", 8f);
+        }
 
         // ================================================================== Gardiens
 
@@ -386,18 +640,19 @@ namespace Deathless.Jeu
         {
             var dv = DirecteurVagues.Instance;
             if (dv == null || !Pret) return;
+            if (Terrasses) { PoserGardiensTerrasses(dv); return; }
             var b = B;
             // Butins du plus riche au plus modeste ; un gardien par butin, puis un deuxième sur les plus riches.
             var ordre = new List<int>();
-            for (int i = 0; i < generateur.Butins.Length; i++) if (ButinActif(i)) ordre.Add(i);
-            ordre.Sort((x, y) => ((int)generateur.Butins[x].butin).CompareTo((int)generateur.Butins[y].butin));
+            for (int i = 0; i < Butins.Count; i++) if (ButinActif(i)) ordre.Add(i);
+            ordre.Sort((x, y) => ((int)Butins[x].butin).CompareTo((int)Butins[y].butin));
             var pris = new HashSet<DonjonRepere>();
             int nb = Mathf.Max(0, b.gardiensDonjon), guerriers = Mathf.RoundToInt(nb * b.partGuerriersDonjon);
             for (int k = 0; k < nb && ordre.Count > 0; k++)
             {
-                var butin = generateur.Butins[ordre[k % ordre.Count]];
+                var butin = Butins[ordre[k % ordre.Count]];
                 DonjonRepere meilleur = null; float dmin = float.MaxValue;
-                foreach (var a in generateur.Apparitions)
+                foreach (var a in Apparitions)
                 {
                     if (a == null || pris.Contains(a) || a.niveau != butin.niveau && Mathf.Abs(a.transform.position.y - butin.transform.position.y) > 1.5f) continue;
                     float d = (a.transform.position - butin.transform.position).sqrMagnitude;
@@ -439,8 +694,8 @@ namespace Deathless.Jeu
         /// Autorité : le butin `index` va au joueur `joueurId` (s'il est encore là et que le joueur est à côté).
         public void Accorder(int index, int joueurId)
         {
-            if (!Pret || index < 0 || index >= generateur.Butins.Length || ButinPris(index) || !ButinActif(index) || P == null) return;
-            var r = generateur.Butins[index];
+            if (!Pret || index < 0 || index >= Butins.Count || ButinPris(index) || !ButinActif(index) || P == null) return;
+            var r = Butins[index];
             var h = P.HerosDe(joueurId);
             var j = P.Joueur(joueurId);
             if (r == null || h == null || j == null || !h.Vivant) return;
@@ -459,13 +714,13 @@ namespace Deathless.Jeu
             int nouveaux = Pris & ~m_PrisVus;
             if (nouveaux == 0) return;
             m_PrisVus |= nouveaux;
-            for (int i = 0; i < generateur.Butins.Length; i++)
+            for (int i = 0; i < Butins.Count; i++)
                 if ((nouveaux & (1 << i)) != 0) StartCoroutine(Ouvrir(i));
         }
 
         IEnumerator Ouvrir(int i)
         {
-            var r = generateur.Butins[i];
+            var r = Butins[i];
             if (r == null) yield break;
             var cd = r.GetComponent<CoffreDonjon>(); if (cd != null) cd.enabled = false;
             Vector3 p = r.transform.position + Vector3.up * 0.8f;
@@ -716,7 +971,7 @@ namespace Deathless.Jeu
         public string InvitePortail(bool retour, Heros h, out float distance)
         {
             distance = float.MaxValue;
-            if (h == null || h.Distant || h.EnTransit || !h.Vivant || m_Transit || P == null || !P.EnCours || generateur == null) return null;
+            if (h == null || h.Distant || h.EnTransit || !h.Vivant || m_Transit || P == null || !P.EnCours || (generateur == null && !Terrasses)) return null;
             Vector3 ph = h.transform.position;
             if (!retour)
             {
@@ -728,7 +983,7 @@ namespace Deathless.Jeu
                 distance = Horizontal(ph, pv.Center);
                 return distance <= B.distancePortail ? "Entrer dans le donjon" : null;
             }
-            var ret = Pret ? generateur.PortailRetour : null;
+            var ret = Pret ? RepereRetour : null;
             if (ret == null || !AuDonjon(h) || Mathf.Abs(ph.y - ret.transform.position.y) > 2f) return null;
             distance = Horizontal(ph, ret.transform.position);
             return distance <= B.distancePortail ? "Revenir au village" : null;
@@ -741,14 +996,15 @@ namespace Deathless.Jeu
             if (InvitePortail(retour, h, out _) == null) return;
             if (!retour)
             {
-                StartCoroutine(Transit(h, PointArrivee, true, PortailVillage, PortailRetourVisuel));
+                StartCoroutine(Transit(h, PointArrivee, true, PortailVillage, PortailRetourVisuel, null, CentreRetourTerrasses));
                 m_AlerteJouee = false;
+                if (Terrasses && Partie.Exploration) AnnoncerGraine();
                 return;
             }
             var p = P;
             int porte = p.JoueurLocal != null ? p.JoueurLocal.orPorte : 0;
             Deathless.Succes.ServiceSucces.PortailRetour();   // succès « Juste à temps » (moins de 3 s avant la fermeture)
-            StartCoroutine(Transit(h, SortieVillage, false, PortailRetourVisuel, PortailVillage));
+            StartCoroutine(Transit(h, SortieVillage, false, PortailRetourVisuel, PortailVillage, CentreRetourTerrasses, null));
             if (Partie.ClientReseau) PartieReseau.Instance?.DeposerOr();
             else Deposer(h.Id);
             if (porte > 0) Dire(porte + " or versés à la caisse commune", 5f);
@@ -760,7 +1016,8 @@ namespace Deathless.Jeu
         /// ou de devant lui et se reforment, puis le clip d'arrivée (Spawn_Air au donjon, Spawn_Ground au village et au
         /// rappel ; Heros.DeclencherPortail) se joue en entier avant de rendre le contrôle. Diffusé aux autres postes
         /// (effets 203 et 204, avec le code du portail) ; le clip lui-même passe par le NetworkAnimator, comme les emotes.
-        IEnumerator Transit(Heros h, Vector3 destination, bool versDonjon, PortalVisual portailDepart, PortalVisual portailArrivee)
+        IEnumerator Transit(Heros h, Vector3 destination, bool versDonjon, PortalVisual portailDepart, PortalVisual portailArrivee,
+            Vector3? pointDepart = null, Vector3? pointArrivee = null)
         {
             m_Transit = true;
             h.EnTransit = true;
@@ -770,7 +1027,7 @@ namespace Deathless.Jeu
                 var gemmes = EffetsJeu.Gemmes;
                 Bounds corps = EffetsJeu.Volume(h.gameObject);
                 if (portailDepart != null) PortalTransit.Depart(corps, portailDepart, gemmes, DureeTransitDepart);
-                else PortalTransit.Depart(corps, corps.center + Vector3.up * 0.3f, gemmes, DureeTransitDepart);
+                else PortalTransit.Depart(corps, pointDepart ?? corps.center + Vector3.up * 0.3f, gemmes, DureeTransitDepart);
                 h.Classe?.DiffuserTransit(ClasseHeros.EffetTransitDepart, h.transform.position, CodeDe(portailDepart));
                 AudioBank.Jouer(SonsDuJeu.PortailPassage, h.transform.position + Vector3.up, 0.9f);
                 Visible(h, false);
@@ -781,7 +1038,8 @@ namespace Deathless.Jeu
                 Vector3 avant = h.transform.position;
                 h.Teleporter(destination + Vector3.up * 0.05f);
                 // Regard à l'arrivée : vers l'intérieur du donjon (orientation de l'arrivée), ou vers Nyxessa au village.
-                Vector3 v = versDonjon ? generateur.Arrivee.transform.forward
+                Vector3 v = versDonjon ? RepereArrivee.transform.forward
+                    : PiedEscalier(out _, out var dehors) ? dehors   // nouvelle carte : dos à la grotte
                     : (P != null && P.nyxessa != null ? P.nyxessa.transform.position : destination + Vector3.forward) - destination;
                 v.y = 0f;
                 if (v.sqrMagnitude > 0.01f)
@@ -794,7 +1052,7 @@ namespace Deathless.Jeu
                 if (nt != null && nt.IsSpawned && nt.IsOwner) nt.Teleport(h.transform.position, h.transform.rotation, h.transform.localScale);
                 Bounds arrivee = corps; arrivee.center += h.transform.position - avant;
                 if (portailArrivee != null) PortalTransit.Arrive(arrivee, portailArrivee, gemmes, DureeTransitArriveeGemmes);
-                else PortalTransit.Arrive(arrivee, arrivee.center + h.transform.forward * 1.2f, gemmes, DureeTransitArriveeGemmes);
+                else PortalTransit.Arrive(arrivee, pointArrivee ?? arrivee.center + h.transform.forward * 1.2f, gemmes, DureeTransitArriveeGemmes);
                 AudioBank.Jouer(SonsDuJeu.PortailArrivee, arrivee.center, 0.9f);
                 h.Classe?.DiffuserTransit(ClasseHeros.EffetTransitArrivee, h.transform.position, CodeDe(portailArrivee));
                 yield return new WaitForSeconds(DureeTransitArriveeGemmes);
@@ -878,12 +1136,17 @@ namespace Deathless.Jeu
                 if (m_PassageVillage == null) m_PassageVillage = pv.gameObject.AddComponent<PassagePortail>();
                 m_PassageVillage.retour = false;
             }
-            var ret = generateur != null ? generateur.PortailRetour : null;
+            var ret = RepereRetour;
             if (m_PassageRetour == null && ret != null)
             {
                 m_PassageRetour = ret.GetComponent<PassagePortail>();
                 if (m_PassageRetour == null) m_PassageRetour = ret.gameObject.AddComponent<PassagePortail>();
                 m_PassageRetour.retour = true;
+            }
+            if (Terrasses && ret != null && m_BourdonTerrasses != ret.transform)
+            {
+                m_BourdonTerrasses = ret.transform;
+                AudioBank.Boucle(SonsDuJeu.PortailBourdon, ret.transform, 0.4f);
             }
             var visuel = PortailRetourVisuel;
             if (visuel != null && m_BourdonSur != visuel)
@@ -898,7 +1161,7 @@ namespace Deathless.Jeu
         void Update()
         {
             var p = P;
-            if (p == null || generateur == null) return;
+            if (p == null || (generateur == null && !Terrasses)) return;
             // Client : le donjon et ses butins suivent l'hôte.
             if (Partie.ClientReseau)
             {
@@ -936,6 +1199,8 @@ namespace Deathless.Jeu
 
             // Portails : touche Interagir (PassagePortail), plus de passage en marchant dedans (Quentin, 26/09/2026).
             AssurerPortails();
+            // Aperçu de la nouvelle carte : F8 / Maj + F8 changent la graine du donjon en terrasses (outil de dev).
+            if (Terrasses && Partie.Exploration && Pret) ToucheGraine();
 
             var h = p.HerosLocal;
             if (h == null) return;
@@ -943,9 +1208,9 @@ namespace Deathless.Jeu
             if (m_Transit || !h.Vivant || !p.EnCours) return;
             if (!AuDonjon(h) || !Pret) return;
             // Tas d'or : on passe dessus.
-            for (int i = 0; i < generateur.Butins.Length; i++)
+            for (int i = 0; i < Butins.Count; i++)
             {
-                var r = generateur.Butins[i];
+                var r = Butins[i];
                 if (r == null || r.butin != TypeButin.TasOr || ButinPris(i) || !ButinActif(i)) continue;
                 if (Horizontal(h.transform.position, r.transform.position) < B.rayonTasOr && Mathf.Abs(h.transform.position.y - r.transform.position.y) < 1.5f) DemanderButin(i);
             }
@@ -1000,7 +1265,10 @@ namespace Deathless.Jeu
             var h = P != null ? P.HerosLocal : null;
             var cam = CameraJeu;
             bool dedans = h != null && (AuDonjon(h) || (cam != null && Contient(cam.transform.position)));
-            CameraEpaule.Enceinte = h != null && AuDonjon(h) ? EnceinteCamera : (Bounds?)null;
+            CameraEpaule.Enceinte = h != null && AuDonjon(h) ? (Terrasses ? EnceinteTerrasses(h.transform.position) : EnceinteCamera) : (Bounds?)null;
+            // Donjon en terrasses : découpe autour du héros, mais la caméra ne traverse ni les murs ni les terrasses
+            // (recul contre les collisions) ; l'ancien donjon garde sa caméra qui passe à travers les murs.
+            CameraEpaule.DecoupeSansTraverser = Terrasses;
             if (dedans)
             {
                 if (!m_AmbianceActive && cam != null) { m_CamAmbiance = cam; m_FondCamera = cam.clearFlags; m_FondCouleur = cam.backgroundColor; }

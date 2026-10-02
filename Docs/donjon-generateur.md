@@ -1,6 +1,6 @@
 # Générateur procédural du donjon « terrasses étagées »
 
-État au 02/10/2026. Générateur écrit d'après le croquis de Quentin (`Docs/da/brief-donjon.md`, section « Version 2 ») et les dix plans de `Docs/outils/donjon_plans.py` (images `Docs/da/gabarits/donjon-plans/`), qui fixent la plage de variation attendue. **Il tourne dans un banc à part ; le jeu utilise encore l'ancien donjon** (`Assets/Scripts/Donjon/DonjonGenerateur.cs`, appelé par `DonjonJeu`) : le branchement est listé en fin de fiche.
+État au 02/10/2026. Générateur écrit d'après le croquis de Quentin (`Docs/da/brief-donjon.md`, section « Version 2 ») et les dix plans de `Docs/outils/donjon_plans.py` (images `Docs/da/gabarits/donjon-plans/`), qui fixent la plage de variation attendue. **Branché le 02/10/2026 dans le mode « Nouvelle carte (aperçu) »** (scène CarteV5, `Partie.Exploration`) : le portail de la grotte y mène. **Le jeu normal (ancienne carte) garde l'ancien donjon** (`Assets/Scripts/Donjon/DonjonGenerateur.cs`, appelé par `DonjonJeu`). Voir « Branchement dans le jeu » en fin de fiche.
 
 ## Ce qu'il produit
 
@@ -17,10 +17,14 @@ Même graine = même donjon sur toutes les machines : le plan est du C# pur, tir
 | `Assets/Scripts/Jeu/Donjon/Terrasses/ConstructeurTerrasses.cs` | Géométrie, collisions, lumières, repères (`DonjonRepere`), NavMesh, contrôle NavMesh |
 | `Assets/Scripts/Jeu/Donjon/Terrasses/MaillageTampon.cs` | Blocs aux arêtes abattues et normales lissées, fûts, quads, à couleurs par sommet |
 | `Assets/Scripts/Jeu/Donjon/Terrasses/MecanismesDonjon.cs` | `PorteDonjon` (porte à serrure, paroi secrète), `DeclencheurDonjon` (plaque, bouton), `TorcheDonjon` (vacillement) |
+| `Assets/Scripts/Jeu/Donjon/Terrasses/VueLibre.cs` | Marque des collisions que la caméra traverse (piliers libres, parapets) |
+| `Assets/Scripts/Jeu/Donjon/MecanismeApercu.cs` | Aperçu seulement : touche Interagir sur une porte à serrure ou un bouton mural |
+| `Assets/Scripts/Jeu/Donjon/DonjonJeu.cs` | Donjon en partie : construit l'ancien donjon ou celui-ci (`TerrassesVoulues`), portails, butins, gardiens, caméra |
 | `Assets/Scripts/Jeu/Dev/BancDonjonTerrasses.cs` | Banc : régénération par graine, vues joueur / dessus / iso / libre, panneau en jeu |
 | `Assets/Editor/Donjon/DonjonTerrassesMenu.cs` | Menus `Deathless > Donjon > Terrasses`, captures, contrôles en masse, bouton « Générer » de l'inspecteur |
 | `Assets/Scenes/Dev/DonjonBanc.unity` | Scène de banc |
-| `Assets/Art/Donjon/Terrasses/DonjonTerrasses_Pierre.mat`, `DonjonTerrasses_Flamme.mat` | `Deathless/VertexColorLit` (pierre, bois, métal), `Relic/VertexColorUnlit` (flammes, portail, repères) |
+| `Assets/Jeu/Resources/DonjonTerrasses/DonjonTerrasses_Pierre.mat`, `DonjonTerrasses_Flamme.mat` | `Deathless/VertexColorLitDecoupe` (pierre, bois, métal ; découpe autour du héros), `Relic/VertexColorUnlit` (flammes, portail, repères). Dans les Resources : `DonjonJeu` les charge en jeu sans référence de scène |
+| `Assets/Art/Shaders/VertexColorLitDecoupe.shader` | `Deathless/VertexColorLit` + la découpe de `DonjonDecoupeCommun.hlsl` (passes couleur, profondeur, normales) |
 
 ## Utilisation
 
@@ -102,6 +106,8 @@ Côté objets : `PorteDonjon.Ouvrir()` (porte qui pivote de 100° vers l'intéri
 
 Style jouet : **blocs de pierre arrondis** (arêtes abattues, normales lissées) en assises de 0,75 m décalées, sur un fond de mortier sombre ; dalles de 2 m ; marches pleines ; parapets en gros blocs ; piliers en tambours de 1,1 m sur socle et chapiteau ; voûte segmentaire à bandes décalées et arcs doubleaux ; corniche à la naissance ; arches à claveaux et clé. Albédo plat par couleurs de sommet (palette dans `ConstructeurTerrasses`, une teinte par niveau de sol : le Lvl 2 est le plus clair), légères variations par bloc tirées d'un hachage des cotes ; flammes et portail non éclairés. Lumières ponctuelles de 9 m, sans ombre, vacillement léger en jeu.
 
+Coffres : caisse et couvercle à part (enfant `Couvercle_lid`, charnière à l'arrière, à 0,6 m), que `DonjonJeu` fait basculer à l'ouverture. Piliers libres et parapets portent `VueLibre` (la caméra les traverse, ils sont découpés).
+
 Rendu combiné par carrés de 16 m (un seul matériau), murs d'enceinte groupés par côté (la vue en coupe cache le sud et l'ouest), voûte à part (cachée en vue de dessus). Collisions : boîtes des colonnes de la grille fusionnées en rectangles, rampes des volées, seuils, paliers, parapets, capsules des piliers, boîtes des coffres et des portes. NavMesh : `NavMeshSurface` (colliders physiques, agent Humanoid), portes et déclencheurs ignorés. Ordre de grandeur (graines des captures) : 200 000 à 250 000 sommets en ~40 objets rendus, 24 lumières, 45 à 115 collisions ; plan 3 ms, géométrie 40 ms, NavMesh 6 ms dans l'éditeur. Les objets créés dans l'éditeur ne sont jamais enregistrés dans la scène.
 
 ## Banc et captures
@@ -110,9 +116,28 @@ Rendu combiné par carrés de 16 m (un seul matériau), murs d'enceinte groupés
 
 Captures (1920 × 1080, `Assets/Screenshots/donjon_terrasses_g<graine>_<vue>.png`) des graines **9** (v1, 3 niveaux, serrure d'or), **12** (v2, pièce secrète à bouton, serrure de bronze), **16** (v7, serrure crochetable), **17** (v3, serrure de bronze dans le mur de soutènement, pièce secrète à bouton), **21** (v4, 2 niveaux, serrure d'or), **30** (v5, 2 niveaux, pièce secrète à plaque, serrure crochetable) : `dessus` (sans voûte, repères), `joueur` (caméra à l'épaule depuis l'arrivée), `iso` (coupe), `terrasse` (caméra à l'épaule sur la plus haute terrasse), et pour les pièces fermées `porte_<serrure>`, `paroi_secrete`, `paroi_secrete_ouverte`, `declencheur_plaque` ou `declencheur_bouton`.
 
-## Reste à faire
+## Branchement dans le jeu (02/10/2026)
 
-- **Brancher le jeu** : remplacer `DonjonGenerateur` par `ConstructeurTerrasses` dans `DonjonJeu` (mêmes repères `DonjonRepere` : arrivée, portail, butins, apparitions ; la graine passe déjà par `PartieReseau.GraineDonjon`), revoir `DonjonMasquage` (inutile ici : pas d'étages superposés), la caméra (`CameraEpaule.Enceinte` : boîte intérieure L × P × naissance) et les scénarios `ScenariosDonjon`.
-- **Découpe autour du héros** : le shader `Deathless/VertexColorLit` n'a pas la découpe d'occlusion de `Deathless/DonjonDecoupe` ; lui ajouter (ou faire une variante à couleurs de sommet).
-- **Gameplay des pièces fermées** (clés au mécano, crochetage, réplication réseau des ouvertures) et vrais modèles de coffres du jeu sur les repères de butin.
+**Ce qui est branché** (mode « Nouvelle carte (aperçu) » seulement : `DonjonJeu.TerrassesVoulues` = `Partie.Exploration` ; l'ancienne carte et le jeu normal gardent `DonjonGenerateur`, vérifié en Play : graine 5, arrivée, gardiens, retour) :
+
+- **Construction** : `DonjonJeu.Construire` → `ConstruireTerrasses(graine)`. Le constructeur est créé une fois sous l'objet `Donjon`, en `DonjonJeu.OrigineTerrasses` (1000, 0, 120 : à côté de l'ancien, qui n'est pas construit dans l'aperçu), inactif le temps d'être réglé (pas de génération à son `Awake`), matériaux chargés des Resources. Même chemin que l'ancien : l'autorité tire la graine au premier jour (`NouveauDonjon`), elle part aux clients par `PartieReseau.GraineDonjon` et chaque poste construit le même donjon (l'essai `EssaiDonjon` vaut 0, inutile ici). Construction 30 à 60 ms (plan 3, géométrie 30-60, NavMesh 6-7) dans l'éditeur.
+- **Repères** : `DonjonJeu.RepereArrivee`, `RepereRetour`, `Butins`, `Apparitions` lisent l'un ou l'autre donjon ; `Pris` (masque de 32 bits) suit les coffres (5 à 8 par graine). Emprise « au donjon » (`Contient`) : celle du plan, marge des pièces comprise.
+- **Portail de la grotte → donjon** : `PassagePortail` du portail de la carte (inchangé) ; arrivée sur un des quatre points de joueurs (`ct.Joueurs`, selon l'identifiant du joueur), regard vers le nord. Effet de passage : gemmes vers le portail de la grotte, puis depuis le centre de l'arche de retour (`CentreRetourTerrasses` : le donjon en terrasses n'a pas de `PortalVisual`, le passage des autres joueurs se joue « sur place »). Bourdonnement du portail sur le repère de retour.
+- **Portail de retour → carte** : `PassagePortail` posé sur le repère `PortailRetour` (touche Interagir à 3 m), sortie au **pied de l'escalier de la grotte** (`DonjonJeu.PiedEscalier` : bord de marche de `Grotte_Escalier` le plus loin du portail + 1,5 m, sur le NavMesh ; dos à la grotte), or versé à la caisse comme avant. Sans grotte (ancienne carte), sortie inchangée devant le portail du village.
+- **Caméra** : `CameraEpaule.Enceinte` = la pièce cachée où est le héros, sinon la grande salle (faces intérieures des murs, du sol à 0,4 m sous la naissance : la voûte n'a pas de collision), `null` dans le passage d'une arche à travers l'enceinte. `CameraEpaule.DecoupeSansTraverser` (vrai ici) : la découpe autour du héros reste active, mais la caméra **ne traverse plus les murs** (recul contre les collisions, comme au village) ; seuls les piliers libres et les parapets (`VueLibre`) sont traversés et découpés par le shader `Deathless/VertexColorLitDecoupe`. L'ancien donjon garde sa caméra qui passe à travers les murs (`DecoupeSansTraverser` faux). `DonjonMasquage` n'est pas utilisé (pas d'étages superposés) ; ses capteurs restent posés, sans effet.
+- **Gardiens** : `PoserGardiensTerrasses` pose un squelette par point d'apparition du plan (14), du type du plan (`TypeApparition` → `TypeEnnemi` sbire, guerrier, voleur, mage), tourné comme le point, en gardien (`Squelette.Garder`). Ils sont sur le NavMesh construit et le suivent escaliers compris : contrôlé en Play (graines 9, 12, 21 : chemin complet vers le héros pour les 14 ; des gardiens du rez montent les deux volées jusqu'au Lvl 2).
+- **Coffres** : `CoffreDonjon` (touche Interagir), couvercle qui bascule, or porté, comme les coffres actuels (modèles provisoires du constructeur).
+- **Pièces fermées, aperçu seulement** (`MecanismeApercu`) : porte à serrure ouverte par la touche Interagir (« Ouvrir la porte (aperçu, sans clé) », à 3 m), bouton mural par la touche (« Appuyer sur la pierre ») ou en s'en approchant (déclencheur d'origine) ; plaque de pression sous les pas (`CharacterController`). Grondement (`SonsDuJeu.GolemCoup`) quand une paroi secrète descend. `PorteDonjon.Ouvrir()` et `DeclencheurDonjon.Activer()` restent les seules entrées.
+- **Graines (outil de dev, aperçu seulement)** : **F8** graine suivante, **Maj + F8** graine au hasard (`DonjonJeu.ChangerGraine`, autorité ; le héros au donjon revient à l'arrivée) ; message du HUD à l'entrée et à chaque changement. Aucune commande du jeu normal n'est touchée (F8 n'est lié à rien dans `DeathlessControls`).
+- **Tests** (`ScenariosDonjon`, Play) : `Construire(graine)` et `Terrasses()` (plan, portes, déclencheurs, gardiens : état, NavMesh, chemin vers le héros), cibles `escalierN`, `hautN`, `terrasseN`, `pieceN`, `porteN`, `archeN`, `declencheurN`, `joueurN` pour `Aller` et `Parcourir`, `Cadrer(ou, vers, tangage, capture)`. Pour lancer l'aperçu depuis l'éditeur : Play puis `Partie.OuvrirCarteExploration()`.
+
+**Vérifié en Play** (02/10/2026) : aller-retour par les portails (trois fois, après changements de graine compris), marche sur les trois niveaux par les escaliers (graines 9, 12, 21, 30, 444951 ; caméra jamais dans un mur ni le héros caché, sauf 12 images où la caméra frôle de 5 cm l'angle d'une terrasse au pied d'un escalier encastré), coffres, porte d'or (graine 9), paroi secrète au bouton (12) et à la plaque (30), F8, gardiens, aucune erreur ni avertissement en console. Captures `Assets/Screenshots/donjon_apercu_*.png`.
+
+**Ce qui reste** :
+
+- **Arrivée trop exposée** {à équilibrer} : les apparitions sont à 10 m au moins de l'arrivée, les gardiens voient à 12 m et alertent à 8 m : trois à six gardiens sont sur le joueur dans les huit premières secondes (un héros de 150 PV est mort ainsi en test). Pistes : `distanceArriveeApparitions` à 15-16 m (à vérifier sur 5 000 graines), ou zone d'arrivée où les gardiens ne repèrent pas.
+- **Réseau** : l'aperçu est solo (`Partie.Exploration` refuse le multijoueur). La graine passe déjà par `PartieReseau.GraineDonjon` et le plan est identique partout, mais l'ouverture des portes et parois (`PorteDonjon.Ouvrir`) n'est pas répliquée, ni F8.
+- **Gameplay des pièces fermées** : clés au mécano, crochetage, avantage de l'assassin ; vrais modèles de coffres du jeu sur les repères de butin.
+- **Escaliers encastrés** : en haut d'un escalier encastré dans sa terrasse, le NavMesh (agent Humanoid) relie le côté de la volée à la terrasse par une marche de 0,4 m que le héros ne monte pas : un bot qui suit le NavMesh en ligne droite s'y bloque (le joueur, lui, monte par la volée). Sans effet sur les squelettes. Piste : obstacle ou modificateur NavMesh le long des côtés des volées.
+- Portail de retour sans `PortalVisual` (nappe verte du constructeur) : le passage des autres joueurs se joue sur place ; un vrai portail de gemmes dans l'arche serait plus lisible.
 - Allègement possible si besoin : faces arrière et dessous des blocs déjà retirés ; on peut encore réduire les assises au-dessus de 6 m (vues de loin).

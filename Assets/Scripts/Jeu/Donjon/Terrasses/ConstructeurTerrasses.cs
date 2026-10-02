@@ -65,7 +65,7 @@ namespace Deathless.Donjon.Terrasses
         [NonSerialized] readonly MaillageTampon m_Marques = new MaillageTampon();
         [NonSerialized] Transform m_Collisions, m_Objets, m_Lumieres, m_Reperes, m_GroupeVoute, m_GroupeMarques;
         [NonSerialized] NavMeshSurface m_Surface;
-        [NonSerialized] Mesh m_MeshCoffre, m_MeshGrandCoffre;
+        [NonSerialized] Mesh m_MeshCoffre, m_MeshGrandCoffre, m_MeshCouvercle, m_MeshGrandCouvercle;
         // murs d'enceinte par côté (0 nord, 1 est, 2 sud, 3 ouest) : la vue en coupe cache le sud et l'ouest
         [NonSerialized] readonly MaillageTampon[] m_Cotes = { new MaillageTampon(), new MaillageTampon(), new MaillageTampon(), new MaillageTampon() };
         [NonSerialized] readonly MaillageTampon[] m_FlammesCotes = { new MaillageTampon(), new MaillageTampon(), new MaillageTampon(), new MaillageTampon() };
@@ -156,7 +156,7 @@ namespace Deathless.Donjon.Terrasses
             Butins.Clear(); Apparitions.Clear(); Joueurs.Clear(); Portes.Clear(); Declencheurs.Clear();
             m_Pierre.Clear(); m_Voute.Clear(); m_Flammes.Vider(); m_Marques.Vider();
             for (int k = 0; k < 4; k++) { m_Cotes[k].Vider(); m_FlammesCotes[k].Vider(); }
-            Arrivee = null; PortailRetour = null; m_MeshCoffre = null; m_MeshGrandCoffre = null;
+            Arrivee = null; PortailRetour = null; m_MeshCoffre = null; m_MeshGrandCoffre = null; m_MeshCouvercle = null; m_MeshGrandCouvercle = null;
             // restes d'une génération faite avant un rechargement de domaine
             for (int i = transform.childCount - 1; i >= 0; i--)
             {
@@ -493,7 +493,9 @@ namespace Deathless.Donjon.Terrasses
                     Vector3 c = a + tg * ((s0 + s1) * 0.5f) + Vector3.up * ((y0 + y1) * 0.5f);
                     Pierre(c).Bloc(c, new Vector3(s1 - s0 - 0.06f, y1 - y0, 0.52f), rot, 0.12f, MaillageTampon.Teinte(CParapet, MaillageTampon.Hache(c.x, c.y, c.z), 6), MaillageTampon.SansDessous);
                 }
-                Boite(a + tg * (lg * 0.5f) + Vector3.up * ((y0 + y1) * 0.5f + 0.15f), new Vector3(lg, y1 - y0 + 0.3f, 0.52f), rot);
+                var bp = Boite(a + tg * (lg * 0.5f) + Vector3.up * ((y0 + y1) * 0.5f + 0.15f), new Vector3(lg, y1 - y0 + 0.3f, 0.52f), rot);
+                bp.name = "Parapet";
+                bp.AddComponent<VueLibre>();   // la caméra le traverse (découpé autour du héros)
             }
         }
 
@@ -529,6 +531,7 @@ namespace Deathless.Donjon.Terrasses
                     go.transform.localPosition = new Vector3(p.x, (p.bas + haut) * 0.5f, p.z);
                     var cap = go.AddComponent<CapsuleCollider>();
                     cap.radius = r; cap.height = haut - p.bas; cap.direction = 1;
+                    go.AddComponent<VueLibre>();   // la caméra le traverse (découpé autour du héros)
                     NbCollisions++;
                 }
                 else
@@ -761,6 +764,8 @@ namespace Deathless.Donjon.Terrasses
         {
             m_MeshCoffre = MeshCoffre(false);
             m_MeshGrandCoffre = MeshCoffre(true);
+            m_MeshCouvercle = MeshCouvercle(false);
+            m_MeshGrandCouvercle = MeshCouvercle(true);
             int i = 0;
             foreach (var c in m_Plan.coffres)
             {
@@ -771,8 +776,14 @@ namespace Deathless.Donjon.Terrasses
                 go.transform.localRotation = Quaternion.Euler(0f, c.pose.rotY, 0f);
                 go.AddComponent<MeshFilter>().sharedMesh = grand ? m_MeshGrandCoffre : m_MeshCoffre;
                 go.AddComponent<MeshRenderer>().sharedMaterial = materiauPierre;
-                var bc = go.AddComponent<BoxCollider>();
                 float s = grand ? 1.45f : 1f;
+                // couvercle à part, charnière à l'arrière (côté mur) : DonjonJeu le fait basculer à l'ouverture (enfant « _lid »)
+                var lid = new GameObject("Couvercle_lid");
+                lid.transform.SetParent(go.transform, false);
+                lid.transform.localPosition = new Vector3(0f, 0.6f, -0.45f) * s;
+                lid.AddComponent<MeshFilter>().sharedMesh = grand ? m_MeshGrandCouvercle : m_MeshCouvercle;
+                lid.AddComponent<MeshRenderer>().sharedMaterial = materiauPierre;
+                var bc = go.AddComponent<BoxCollider>();
                 bc.center = new Vector3(0f, 0.45f * s, 0f); bc.size = new Vector3(1.36f, 0.9f, 0.9f) * s;
                 var r = go.AddComponent<DonjonRepere>();
                 r.genre = DonjonRepere.Genre.Butin; r.index = i; r.niveau = c.pose.niveau; r.butin = grand ? TypeButin.GrandCoffre : TypeButin.Coffre; r.visuel = go;
@@ -786,12 +797,28 @@ namespace Deathless.Donjon.Terrasses
             var m = new MaillageTampon();
             float s = grand ? 1.45f : 1f;
             Color32 bande = grand ? COr : CFer;
+            // caisse seule ; le couvercle est un maillage à part (MeshCouvercle), posé sur sa charnière
             m.Bloc(new Vector3(0f, 0.31f, 0f) * s, new Vector3(1.3f, 0.62f, 0.84f) * s, Quaternion.identity, 0.07f * s, CBois);
-            m.Bloc(new Vector3(0f, 0.74f, 0f) * s, new Vector3(1.36f, 0.28f, 0.9f) * s, Quaternion.identity, 0.12f * s, MaillageTampon.Teinte(CBois, 7u, 10));
             for (int k = -1; k <= 1; k += 2)
-                m.Bloc(new Vector3(0.42f * k, 0.45f, 0f) * s, new Vector3(0.13f, 0.94f, 0.94f) * s, Quaternion.identity, 0.05f * s, bande);
-            m.Bloc(new Vector3(0f, 0.58f, 0.44f) * s, new Vector3(0.24f, 0.3f, 0.07f) * s, Quaternion.identity, 0.04f * s, grand ? COr : CBronze);
+                m.Bloc(new Vector3(0.42f * k, 0.3f, 0f) * s, new Vector3(0.13f, 0.62f, 0.94f) * s, Quaternion.identity, 0.05f * s, bande);
             var mesh = m.VersMesh(grand ? "GrandCoffre" : "Coffre");
+            m_Crees.Add(mesh);
+            if (!Application.isPlaying) mesh.hideFlags = HideFlags.DontSave;
+            return mesh;
+        }
+
+        /// Couvercle d'un coffre dans le repère de sa charnière (arrière de la caisse, à 0,6 m) : il bascule autour de x.
+        Mesh MeshCouvercle(bool grand)
+        {
+            var m = new MaillageTampon();
+            float s = grand ? 1.45f : 1f;
+            Color32 bande = grand ? COr : CFer;
+            m.Bloc(new Vector3(0f, 0.14f, 0.45f) * s, new Vector3(1.36f, 0.28f, 0.9f) * s, Quaternion.identity, 0.12f * s, MaillageTampon.Teinte(CBois, 7u, 10));
+            for (int k = -1; k <= 1; k += 2)
+                m.Bloc(new Vector3(0.42f * k, 0.16f, 0.45f) * s, new Vector3(0.13f, 0.32f, 0.94f) * s, Quaternion.identity, 0.05f * s, bande);
+            // moraillon de la serrure, au bord avant du couvercle
+            m.Bloc(new Vector3(0f, -0.02f, 0.89f) * s, new Vector3(0.24f, 0.3f, 0.07f) * s, Quaternion.identity, 0.04f * s, grand ? COr : CBronze);
+            var mesh = m.VersMesh(grand ? "GrandCouvercle" : "Couvercle");
             m_Crees.Add(mesh);
             if (!Application.isPlaying) mesh.hideFlags = HideFlags.DontSave;
             return mesh;
@@ -915,7 +942,7 @@ namespace Deathless.Donjon.Terrasses
         }
 
         // ================================================================== Collisions
-        void Boite(Vector3 centre, Vector3 taille, Quaternion rot)
+        GameObject Boite(Vector3 centre, Vector3 taille, Quaternion rot)
         {
             var go = new GameObject("Boite");
             go.transform.SetParent(m_Collisions, false);
@@ -923,6 +950,7 @@ namespace Deathless.Donjon.Terrasses
             go.transform.localRotation = rot;
             go.AddComponent<BoxCollider>().size = taille;
             NbCollisions++;
+            return go;
         }
 
         /// Boîtes des colonnes de la grille, fusionnées en rectangles de colonnes identiques (plein bas, plein haut).

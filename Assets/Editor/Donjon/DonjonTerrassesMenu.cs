@@ -17,7 +17,8 @@ using UnityEngine.SceneManagement;
 public static class DonjonTerrassesMenu
 {
     public const string Scene = "Assets/Scenes/Dev/DonjonBanc.unity";
-    const string DossierMat = "Assets/Art/Donjon/Terrasses";
+    // dans les Resources : DonjonJeu les charge en jeu (aperçu de la nouvelle carte) sans référence de scène
+    const string DossierMat = "Assets/Jeu/Resources/DonjonTerrasses";
     const string MatPierre = DossierMat + "/DonjonTerrasses_Pierre.mat";
     const string MatFlamme = DossierMat + "/DonjonTerrasses_Flamme.mat";
     const string Heros = "Assets/Jeu/Prefabs/Heros_Paladin.prefab";
@@ -39,7 +40,7 @@ public static class DonjonTerrassesMenu
         pierre = AssetDatabase.LoadAssetAtPath<Material>(MatPierre);
         if (pierre == null)
         {
-            pierre = new Material(Shader.Find("Deathless/VertexColorLit")) { name = "DonjonTerrasses_Pierre" };
+            pierre = new Material(Shader.Find("Deathless/VertexColorLitDecoupe")) { name = "DonjonTerrasses_Pierre" };
             pierre.SetFloat("_Smoothness", 0.05f);
             AssetDatabase.CreateAsset(pierre, MatPierre);
         }
