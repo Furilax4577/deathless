@@ -1392,7 +1392,7 @@ public static partial class VillageBuilder
         V5EmprisesMaisons(root);
         if (s_V5Allees.Count == 0) V5AlleesDepuisScene(root);
         Transform foret = root.Find("Foret"); if (foret == null) foret = Group(root, "Foret");
-        Kill(foret.Find("Arbres")); Kill(foret.Find("Lisiere")); Kill(foret.Find("Herbe")); Kill(foret.Find("Lande")); Kill(foret.Find("Pierrier"));
+        Kill(foret.Find("Arbres")); Kill(foret.Find("Lisiere")); Kill(foret.Find("Herbe")); Kill(foret.Find("Herbe_Appoint")); Kill(foret.Find("Lande")); Kill(foret.Find("Pierrier"));
         Transform arbres = Group(foret, "Arbres"), lisiere = Group(foret, "Lisiere"), herbe = Group(foret, "Herbe"), lande = Group(foret, "Lande"), pierrier = Group(foret, "Pierrier");
         int nArbres = 0, nLande = 0, nPierrier = 0, nBuissons = 0, nHerbe = 0;
         // a. forêt au sud et à l'ouest (grille hexagonale espacée, troncs à collider), arbres isolés sur la lande
@@ -1456,6 +1456,101 @@ public static partial class VillageBuilder
         int retires = V5RetirerPresParois(root, arbres, lisiere, lande, pierrier, herbe);
         MarkStatic(foret.gameObject);
         return "Nature : " + nArbres + " arbres, " + nBuissons + " buissons de lisière, " + nLande + " pièces de lande, " + nPierrier + " blocs de pierrier, " + nHerbe + " touffes ; " + retires + " éléments retirés près des parois (arbres et souches à moins de " + V5DistParoiArbre + " m, buissons " + V5DistParoiBuisson + " m, rochers et herbe dans la roche)";
+    }
+
+    // ------------------------------------------------------------------ herbe d'appoint (retour du 02/10/2026)
+    /// « Mets un peu d'herbe sur les zones vertes d'herbe » (Quentin) : après la réduction de moitié des touffes, des zones de
+    /// sol vertes restaient nues. Passe d'APPOINT lancée après le sol (étape 7) : grille jitterée de maille V5HerbeAppointPas m,
+    /// graine fixe ; une touffe (échelle V5HerbeEchelle, comme les autres) est posée si la facette de sol dessous est verte
+    /// (teintes 0 à 5 de GroundPalette : herbes, taches claire et sombre), si le lieu est libre (V5Libre : ni anneau, ni allées,
+    /// ni routes d'attaque de 7 m, ni eau et berges, ni maisons, ni ponts, ni entrée de la grotte), à plus de V5DistParoiAppoint m
+    /// des parois et qu'aucune touffe n'est déjà à moins de V5HerbeAppointVoisine m (les zones vertes déjà garnies ne changent pas).
+    public const float V5HerbeAppointPas = 1.8f, V5HerbeAppointVoisine = 5.2f, V5DistParoiAppoint = 3f;
+
+    static string V5HerbeAppoint(Transform root)
+    {
+        Transform foret = root.Find("Foret"); if (foret == null) return "herbe d'appoint : forêt absente";
+        Kill(foret.Find("Herbe_Appoint"));
+        Transform solT = root.Find("Sol/Sol_Village"); var mf = solT != null ? solT.GetComponent<MeshFilter>() : null;
+        if (mf == null || mf.sharedMesh == null) return "herbe d'appoint : sol absent (lancer l'étape 7)";
+        Mesh sol = mf.sharedMesh; Matrix4x4 M = solT.localToWorldMatrix;
+        Vector3[] vs = sol.vertices; Vector2[] uvs = sol.uv; int[] ts = sol.triangles;
+        // seaux de 4 m : triangles du sol par cellule (plan x, z), teinte = indice de palette lu sur l'UV
+        const float cell = 4f; var seaux = new Dictionary<long, List<int>>();
+        System.Func<int, int, long> cle = (a, b) => ((long)(a + 1000) << 20) | (long)(b + 1000);
+        for (int t = 0; t < ts.Length; t += 3)
+        {
+            Vector3 a = M.MultiplyPoint3x4(vs[ts[t]]), b = M.MultiplyPoint3x4(vs[ts[t + 1]]), c = M.MultiplyPoint3x4(vs[ts[t + 2]]);
+            int x0 = Mathf.FloorToInt(Mathf.Min(a.x, b.x, c.x) / cell), x1 = Mathf.FloorToInt(Mathf.Max(a.x, b.x, c.x) / cell);
+            int z0 = Mathf.FloorToInt(Mathf.Min(a.z, b.z, c.z) / cell), z1 = Mathf.FloorToInt(Mathf.Max(a.z, b.z, c.z) / cell);
+            for (int i = x0; i <= x1; i++) for (int j = z0; j <= z1; j++)
+            {
+                long k = cle(i, j); if (!seaux.TryGetValue(k, out var l)) seaux[k] = l = new List<int>(); l.Add(t);
+            }
+        }
+        System.Func<float, float, int> teinte = (x, z) =>
+        {
+            if (!seaux.TryGetValue(cle(Mathf.FloorToInt(x / cell), Mathf.FloorToInt(z / cell)), out var l)) return -1;
+            foreach (int t in l)
+            {
+                Vector3 a = M.MultiplyPoint3x4(vs[ts[t]]), b = M.MultiplyPoint3x4(vs[ts[t + 1]]), c = M.MultiplyPoint3x4(vs[ts[t + 2]]);
+                float d = (b.z - c.z) * (a.x - c.x) + (c.x - b.x) * (a.z - c.z); if (Mathf.Abs(d) < 1e-9f) continue;
+                float u = ((b.z - c.z) * (x - c.x) + (c.x - b.x) * (z - c.z)) / d, v = ((c.z - a.z) * (x - c.x) + (a.x - c.x) * (z - c.z)) / d, w = 1f - u - v;
+                if (u < 0f || v < 0f || w < 0f) continue;
+                return Mathf.Clamp(Mathf.RoundToInt(uvs[ts[t]].x * GroundPalette.Length - 0.5f), 0, GroundPalette.Length - 1);
+            }
+            return -1;
+        };
+        // touffes déjà posées (prairie) : on n'en met pas à côté
+        var existantes = new List<Vector2>();
+        Transform herbe = foret.Find("Herbe");
+        if (herbe != null) foreach (Transform t in herbe) existantes.Add(new Vector2(t.position.x, t.position.z));
+        int avant = existantes.Count;
+        var grille = new Dictionary<long, List<Vector2>>(); const float gc = V5HerbeAppointVoisine;
+        System.Action<Vector2> noter = q =>
+        {
+            long k = cle(Mathf.FloorToInt(q.x / gc), Mathf.FloorToInt(q.y / gc)); if (!grille.TryGetValue(k, out var l)) grille[k] = l = new List<Vector2>(); l.Add(q);
+        };
+        foreach (var q in existantes) noter(q);
+        System.Func<Vector2, bool> voisine = q =>
+        {
+            int cx = Mathf.FloorToInt(q.x / gc), cz = Mathf.FloorToInt(q.y / gc);
+            for (int i = -1; i <= 1; i++) for (int j = -1; j <= 1; j++)
+                if (grille.TryGetValue(cle(cx + i, cz + j), out var l)) foreach (var o in l) if ((o - q).sqrMagnitude < V5HerbeAppointVoisine * V5HerbeAppointVoisine) return true;
+            return false;
+        };
+        Transform mont = root.Find("Montagne");
+        Transform groupe = Group(foret, "Herbe_Appoint");
+        var rnd = new System.Random(Seed + 905);
+        int vertes = 0, posees = 0, nuesAvant = 0;
+        Physics.SyncTransforms();
+        var candidats = new List<Vector4>();   // x, z, variante, rotation
+        for (float z = -TerrainHalf + 2f; z <= TerrainHalf - 2f; z += V5HerbeAppointPas)
+            for (float x = -TerrainHalf + 2f; x <= TerrainHalf - 2f; x += V5HerbeAppointPas)
+            {
+                float px = x + ((float)rnd.NextDouble() - 0.5f) * V5HerbeAppointPas * 0.9f, pz = z + ((float)rnd.NextDouble() - 0.5f) * V5HerbeAppointPas * 0.9f;
+                float variante = rnd.Next(Grass.Length), rot = (float)rnd.NextDouble() * 360f;
+                Vector3 p = new Vector3(px, 0f, pz);
+                int idx = teinte(px, pz);
+                if (idx < 0 || idx > 5) continue;                                   // pas du sol vert d'herbe
+                if (!V5Libre(p, 0.5f)) continue;                                    // anneau, allées, routes, eau, maisons, ponts, grotte
+                if (mont != null && V5ProcheParoi(mont, new Vector3(px, GroundHeight(px, pz), pz), V5DistParoiAppoint, 0.8f)) continue;
+                candidats.Add(new Vector4(px, pz, variante, rot));
+            }
+        vertes = candidats.Count;
+        for (int i = candidats.Count - 1; i > 0; i--) { int j = rnd.Next(i + 1); var tmp = candidats[i]; candidats[i] = candidats[j]; candidats[j] = tmp; }
+        foreach (Vector4 c in candidats)
+        {
+            Vector2 q = new Vector2(c.x, c.y);
+            if (voisine(q)) continue;                                               // déjà de l'herbe à moins de V5HerbeAppointVoisine m
+            posees++;
+            Vector3 p = new Vector3(c.x, GroundHeight(c.x, c.y), c.y);
+            Place(groupe, ForestRoot + Grass[(int)c.z], p, c.w, Mathf.Lerp(1.5f, 2.2f, (float)rnd.NextDouble()) * V5HerbeEchelle);
+            noter(q);
+        }
+        nuesAvant = posees;
+        MarkStatic(groupe.gameObject);
+        return "Herbe d'appoint : " + avant + " touffes de prairie avant, " + posees + " ajoutées (" + (avant + posees) + " au total) sur " + vertes + " points de sol vert libres (aucune touffe à moins de " + V5HerbeAppointVoisine + " m de chaque point après coup)";
     }
 
     // ------------------------------------------------------------------ parois rocheuses (retour du 02/10/2026)
@@ -1560,7 +1655,7 @@ public static partial class VillageBuilder
         finally { GroundMeshPath = m0; GroundTexPath = t0; GroundMatPath = x0; }
         Kill(root.Find("_vide"));
         Physics.SyncTransforms();
-        return "Sol : " + GroundStats;
+        return "Sol : " + GroundStats + "\n" + V5HerbeAppoint(root);
     }
 
     // ------------------------------------------------------------------ vérification
