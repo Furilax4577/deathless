@@ -875,7 +875,7 @@ MonoBehaviour:
     portee: 0
   - id: kenney_rpg_doorclose
     nom: "Porte \u2014 fermeture"
-    statut: disponible
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: fbb164fd38dd2cb4189704be3b9939f3, type: 3}
@@ -885,7 +885,7 @@ MonoBehaviour:
     portee: 0
   - id: kenney_rpg_dooropen
     nom: "Porte \u2014 ouverture"
-    statut: disponible
+    statut: utilise
     boucle: 0
     clips:
     - {fileID: 8300000, guid: cbc026a945b2ce64781bbf0a7f6ec47e, type: 3}

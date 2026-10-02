@@ -38,17 +38,19 @@ public static partial class VillageBuilder
     public const float V5KKEchelle = 7.5f;
     /// Enfoncement du modèle (m) : pas de jour sous la pierre.
     public const float V5KKEnfoncement = 0.03f;
+    /// Distance (m) entre le bord avant des marches (ou le devant de la porte) et le pied de la porte où le héros réapparaît en sortant.
+    public const float V5KKSeuil = 0.9f;
 
     /// Repère de chaque pièce (mètres à l'échelle 7,5, x vers la droite vue de la façade, z vers l'extérieur) : axe de la porte (centre de
     /// l'escalier, ou de la porte de la cabane), plan de la façade au droit de la porte, position de la lanterne de porte.
-    sealed class V5KKPieceInfo { public float porteX, facadeZ; public Vector2 lanterne; public Vector2 enclume; }
+    sealed class V5KKPieceInfo { public float porteX, facadeZ, pied; public Vector2 lanterne; public Vector2 enclume; }
     static readonly Dictionary<string, V5KKPieceInfo> s_V5KKPieces = new Dictionary<string, V5KKPieceInfo> {
         // escalier de x = -0,28 à 0 (unités du modèle), façade du rez-de-chaussée à z = 0,28 ; lanterne : 35 cm hors de l'escalier, côté gauche (comme avant : (-2,45 ; 4,55))
-        { "home_B",     new V5KKPieceInfo { porteX = -1.05f, facadeZ = 2.10f, lanterne = new Vector2(-2.45f, 4.55f) } },
+        { "home_B",     new V5KKPieceInfo { porteX = -1.05f, facadeZ = 2.10f, pied = 4.20f, lanterne = new Vector2(-2.45f, 4.55f) } },
         // escalier de x = 0,01 à 0,28, façade à z = 0,35 ; lanterne du côté de l'auvent, à 35 cm de l'escalier
-        { "tavern",     new V5KKPieceInfo { porteX = 1.09f, facadeZ = 2.62f, lanterne = new Vector2(-0.35f, 4.55f) } },
+        { "tavern",     new V5KKPieceInfo { porteX = 1.09f, facadeZ = 2.62f, pied = 4.73f, lanterne = new Vector2(-0.35f, 4.55f) } },
         // cabane de x = 0,15 à 0,58, porte au milieu, façade à z = 0,08 ; pas d'escalier : la porte est au sol ; enclume au milieu du devant du four
-        { "blacksmith", new V5KKPieceInfo { porteX = 2.55f, facadeZ = 0.60f, lanterne = new Vector2(4.6f, 2.6f), enclume = new Vector2(0.15f, 6.9f) } },
+        { "blacksmith", new V5KKPieceInfo { porteX = 2.55f, facadeZ = 0.60f, pied = 2.30f, lanterne = new Vector2(4.6f, 2.6f), enclume = new Vector2(0.15f, 6.9f) } },
     };
 
     static string V5KKChemin(int i)
@@ -97,6 +99,9 @@ public static partial class VillageBuilder
         e.transform.localPosition = new Vector3(info.porteX, 0f, info.facadeZ);
         var bc = e.AddComponent<BoxCollider>(); bc.isTrigger = true;
         bc.size = new Vector3(1.8f, 2.6f, 1.6f); bc.center = new Vector3(0f, 1.3f, 0.8f);
+        // Bâtiment entrable (03/10/2026) : touche Interagir devant la porte -> pièce du bâtiment (EntreeBatiment, PiecesBatiments). Le pied de la
+        // porte (réapparition à la sortie) est à V5KKSeuil m devant le bord avant des marches (la forge n'a pas d'escalier : devant le râtelier).
+        V5ConfigurerEntree(e, role, info);
 
         if (piece == "blacksmith")
         {
@@ -115,6 +120,36 @@ public static partial class VillageBuilder
         }
         return role + " (KayKit " + piece + " " + V5MaisonsKayKitCoul[i] + ", lacet " + racine.eulerAngles.y.ToString("F1") + ", porte à " + e.transform.position.ToString("F2") + suite + lanterneInfo + ") ; ";
     }
+
+    /// Pose (ou remet à jour) le composant EntreeBatiment sur un repère Entree : rôle du bâtiment et pied de la porte. Idempotent.
+    static void V5ConfigurerEntree(GameObject entree, string role, V5KKPieceInfo info)
+    {
+        var eb = entree.GetComponent<EntreeBatiment>();
+        if (eb == null) eb = entree.AddComponent<EntreeBatiment>();
+        eb.role = role;
+        eb.seuilLocal = new Vector3(0f, 0f, info.pied + V5KKSeuil - info.facadeZ);
+        EditorUtility.SetDirty(eb);
+    }
+
+    /// Étape 1c : pose les composants EntreeBatiment sur les repères Entree des bâtiments KayKit déjà en place (sans refaire les bâtiments).
+    public static string V5Entrees(Transform root)
+    {
+        Transform ms = root.Find("Maisons");
+        if (ms == null) return "Entrées : Maisons absentes";
+        var sb = new StringBuilder("Entrées : ");
+        for (int i = 0; i < V5MaisonsRoles.Length; i++)
+        {
+            Transform bat = ms.Find("Batiment_" + V5MaisonsRoles[i]);
+            string piece = V5MaisonsKayKitPiece[i];
+            Transform ent = bat != null && piece != null ? bat.Find(V5NomModele(i) + "/Entree") : null;
+            if (ent == null || !s_V5KKPieces.TryGetValue(piece, out V5KKPieceInfo info)) { sb.Append(V5MaisonsRoles[i] + " sans repère Entree ; "); continue; }
+            V5ConfigurerEntree(ent.gameObject, V5MaisonsRoles[i], info);
+            sb.Append(V5MaisonsRoles[i] + " (pied en " + ent.GetComponent<EntreeBatiment>().PointRetour.ToString("F2") + ") ; ");
+        }
+        return sb.ToString();
+    }
+
+    [MenuItem("Deathless/Village/v5/1c. Entrées des bâtiments (portes)")] public static string V5MenuEntrees() { return Etape(V5Entrees); }
 
     /// Lanterne de porte (lantern_standing de KayKit Halloween Bits, comme à l'origine : flamme et lumière au centre de la cage, vitres
     /// émissives, scintillement ; allumage par CycleJourNuit).

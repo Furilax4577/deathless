@@ -1316,7 +1316,7 @@
     "id": "kenney_rpg_doorclose",
     "nom": "Porte — fermeture",
     "categorie": "Kenney divers : objets",
-    "usage": "Piste : portes des maisons ou du donjon.",
+    "usage": "Entrée et sortie des bâtiments de la carte v5 (03/10/2026, PiecesBatiments) : la porte se referme derrière le héros, à son arrivée (dans la pièce en entrant, devant le bâtiment en sortant). 4 variantes tirées au hasard.",
     "fichier": "Kenney/RPGAudio/doorClose_1.ogg",
     "variantes": [
       "Kenney/RPGAudio/doorClose_1.ogg",
@@ -1326,13 +1326,13 @@
     ],
     "source": "Kenney, RPG Audio",
     "licence": "CC0",
-    "statut": "disponible"
+    "statut": "utilise"
   },
   {
     "id": "kenney_rpg_dooropen",
     "nom": "Porte — ouverture",
     "categorie": "Kenney divers : objets",
-    "usage": "Piste : portes des maisons ou du donjon.",
+    "usage": "Entrée et sortie des bâtiments de la carte v5 (03/10/2026, PiecesBatiments) : la porte s'ouvre au moment où le héros touche Interagir devant (au bâtiment en entrant, dans la pièce en sortant), avant le fondu au noir. 2 variantes tirées au hasard. Sert aussi de repli à `chest_open`.",
     "fichier": "Kenney/RPGAudio/doorOpen_1.ogg",
     "variantes": [
       "Kenney/RPGAudio/doorOpen_1.ogg",
@@ -1340,7 +1340,7 @@
     ],
     "source": "Kenney, RPG Audio",
     "licence": "CC0",
-    "statut": "disponible"
+    "statut": "utilise"
   },
   {
     "id": "kenney_rpg_dropleather",
