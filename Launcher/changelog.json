@@ -1,6 +1,15 @@
 {
   "versions": [
     {
+      "version": "0.9.9",
+      "date": "2026-10-03",
+      "titre": "La tavernière retrouve sa taille",
+      "notes": [
+        "Dans « Nouvelle carte (aperçu) », la tavernière est ramenée à la taille d'un héros : elle était 21 % trop grande.",
+        "Version de test : rien d'autre de nouveau. Le jeu normal garde l'ancienne carte."
+      ]
+    },
+    {
       "version": "0.9.8",
       "date": "2026-10-03",
       "titre": "La Furie du Viking",
