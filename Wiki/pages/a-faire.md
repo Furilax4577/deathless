@@ -78,6 +78,8 @@ Notés par Quentin après la partie à deux ; rien n'est encore développé.
 
 - **Portes et volets des maisons** {décidé} : la **porte fait un léger mouvement d'ouverture** (15 à 25°) **avec un son** quand on s'en sert, puis fondu au noir vers la zone d'intérieur ; les **volets se ferment la nuit** (ouverts le jour). Conséquence pour les modèles Tripo : battants et volets sont des **pièces à part** (pivots à la charnière), les maisons se modélisent avec **embrasure vide et fenêtres nues** (brief : `Docs/da/brief-maisons.md`).
 
+- **Donjon en terrasses : générateur procédural** (02/10/2026, voir [Le donjon](donjon.md#générateur-en-terrasses)) : le générateur est écrit et passe ses contrôles dans un banc à part ; reste à le **brancher dans le jeu** à la place de l'ancien donjon, à ajouter la découpe autour du héros à son matériau, et à coder le gameplay des **pièces fermées** {à confirmer} : clés de bronze, d'argent et d'or vendues par le mécano (prix à fixer), kit de crochetage et son mini-jeu (l'assassin favorisé par ses points d'attribut), plaques de pression et boutons des pièces secrètes, ouverture répliquée en réseau. {{dev: `Docs/donjon-generateur.md` ; banc `Assets/Scenes/Dev/DonjonBanc.unity`.}}
+
 - **Soubassement des maisons Tripo** {décidé, 02/10/2026} : dalle basse avec deux marches **et deux rangées de pierres** au pied des murs (pas plus), pour les maisons issues de Tripo ; les maisons générées par code gardent la dalle lisse. Brief : `Docs/da/brief-maisons.md`.
 
 ## En attente de validation (Quentin)

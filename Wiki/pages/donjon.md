@@ -18,6 +18,15 @@ Le donjon est décrit dans le [Déroulé d'une partie](deroule.md) (portails, bu
 - **On ne frappe pas à travers les murs** {décidé, 30/09/2026} : un coup de mêlée ou de zone ne touche qu'un ennemi du même étage (1,8 m d'écart au plus) et sans mur, sol ni plafond entre le torse du héros et le sien. {{dev: `Combat.Ennemis` : `EcartHauteurMax` et `Combat.Degage` (rayon, personnages et feuillage ignorés) ; vaut partout, pas seulement au donjon.}}
 - **Le HUD** : le message du donjon (« Rappelé par Nyxessa… », « N or versés… ») s'affiche sous la pastille de phase et sous la bannière de nuit, jamais dessus ; l'invite « Prêts » du vote n'apparaît pas au donjon.
 
+## Générateur en terrasses {à confirmer}
+
+Le donjon du croquis est maintenant **généré** (02/10/2026), un nouveau à chaque graine, pareil pour tous les joueurs : un grand volume voûté en **deux ou trois niveaux de sol plein** (rez, + 3 m, + 6 m), sept dispositions de terrasses tirées des dix plans de référence, de larges escaliers pleins, des parapets au bord des terrasses, des piliers sur le rez et le long des murs, au moins 4,5 m sous plafond partout où l'on marche, 6 × 5 m dégagés à l'arrivée. Deux ou trois **petites pièces cachées** derrière des arches (sous une terrasse, dans un massif ou derrière l'enceinte), libres le plus souvent. Il n'est pas encore branché dans le jeu (banc de test seulement).
+
+- **Pièce fermée à clé, parfois** {à confirmer} : une porte de bois à serrure de **bronze**, d'**argent** ou d'**or** (ou une serrure simple), dont la clé s'achète au village chez le **mécano** ; jamais de clé cachée dans le donjon. Le contenu suit la serrure : l'or garde le meilleur butin (grand coffre). Toute serrure se **crochète** avec un kit et un mini-jeu, plus difficile pour l'argent et l'or ; l'**assassin** est favorisé par ses points d'attribut. Prix des clés, mini-jeu et bonus de l'assassin restent à fixer.
+- **Pièce dissimulée, parfois** {à confirmer} : un pan de mur, le plus souvent dans un mur de soutènement, identique au reste, qui s'enfonce dans le sol quand on marche sur une **plaque de pression** ou qu'on pousse un **bouton mural discret** placés ailleurs dans le donjon, toujours atteignables sans la pièce. Elle garde deux coffres.
+
+{{dev: Générateur `Assets/Scripts/Jeu/Donjon/Terrasses/` (`PlanTerrasses` en C# pur et déterministe, `ConstructeurTerrasses`, `PorteDonjon`, `DeclencheurDonjon`), banc `Assets/Scenes/Dev/DonjonBanc.unity`, menus `Deathless > Donjon > Terrasses`, fiche complète `Docs/donjon-generateur.md` (paramètres, contrôles, mesures, reste à faire), captures `Assets/Screenshots/donjon_terrasses_g*.png`. 5 000 graines conformes au premier essai ; empreintes identiques sous Unity et .NET.}}
+
 ## Gardiens {décidé, 30/09/2026}
 
 Les gardiens du butin (voir [Déroulé d'une partie](deroule.md)) sont **agressifs** : retour de test de Quentin du 30/09/2026, « les ennemis dans le donjon ne sont pas assez agressifs ».
