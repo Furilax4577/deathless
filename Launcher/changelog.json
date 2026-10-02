@@ -1,6 +1,20 @@
 {
   "versions": [
     {
+      "version": "0.9.2",
+      "date": "2026-10-02",
+      "titre": "La carte se précise",
+      "notes": [
+        "Grotte du portail : le portail est centré dans l'axe de l'arche, l'escalier et la route sont alignés, les lanternes posées au sol sont retirées, et deux potences sont avancées et décalées.",
+        "Les flancs de montagne sont échangés : les pics se voient maintenant depuis la place.",
+        "Cascade : les rochers sont masqués par l'eau, avec des remous et de l'écume sur les bords, et un nouveau son de chute en boucle.",
+        "Rivière : l'eau n'a plus de micro-traits.",
+        "Un peu plus d'herbe sur les zones vertes.",
+        "Pas encore fait : plus de relief au sol.",
+        "Rappel : le jeu normal garde l'ancienne carte. La nouvelle se teste par « Nouvelle carte (aperçu) » dans le menu."
+      ]
+    },
+    {
       "version": "0.9.1",
       "date": "2026-10-02",
       "titre": "La nouvelle carte prend forme",
