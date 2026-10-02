@@ -1,6 +1,19 @@
 {
   "versions": [
     {
+      "version": "0.9.4",
+      "date": "2026-10-02",
+      "titre": "Viser avant de lancer",
+      "notes": [
+        "La grande boule de feu et le mur de flammes du Mage, et la nuée de flèches du Rôdeur, passent en mode visée : un cercle (ou une ligne pour le mur) au sol montre où le sort va tomber, limité à la portée du sort.",
+        "Clic gauche (gâchette droite) confirme et lance le sort. Clic droit (gâchette gauche) annule, sans coût ni recharge.",
+        "Le mana et la recharge ne partent qu'à la confirmation.",
+        "Pendant la visée, on marche à moitié vitesse, sans sprint ni saut. L'esquive annule la visée.",
+        "Pour le Mage, LB et RB permettent de changer de sort pendant la visée.",
+        "Version de test : pas testé en multijoueur ni avec une vraie souris (seulement avec une manette simulée). Les portées et le ralentissement pendant la visée sont à ajuster."
+      ]
+    },
+    {
       "version": "0.9.3",
       "date": "2026-10-02",
       "titre": "Les pieds au sol et les pas qui changent",
