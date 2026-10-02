@@ -1,6 +1,6 @@
 # Brief Grok → Tripo des maisons (02/10/2026)
 
-Six bâtiments, **quatre vues chacun** (face, côté gauche, côté droit, dos) pour le mode **multivue de Tripo** (onglet **Modèle** : image principale = face ; emplacements **Gauche**, **Droite**, **Dos**), comme pour la Bavaroise v4 (`Docs/da/brief-grok-tripo.md`). Dimensions et intérieurs : `Docs/da/maisons-plans.md` et `taverne-plan.md`. Les extérieurs sont fermés (l'intérieur est une zone à part, porte et fondu au noir) ; les accessoires vont **chacun dans leur propre image** (jamais collés au bâtiment).
+Six bâtiments, **quatre vues chacun** (face, côté gauche, côté droit, dos) pour le mode **multivue de Tripo** (onglet **Modèle** : image principale = face ; emplacements **Gauche**, **Droite**, **Dos**), comme pour la Bavaroise v4 (`Docs/da/brief-grok-tripo.md`). Dimensions et intérieurs : `Docs/da/maisons-plans.md` et `taverne-plan.md`. Les extérieurs sont fermés (l'intérieur est une zone à part, porte et fondu au noir) ; les accessoires vont **chacun dans leur propre image** (jamais collés au bâtiment). **Décidé par Quentin le 02/10/2026 : la porte fait un léger mouvement d'ouverture avec un son quand on s'en sert, et les volets se ferment la nuit.** Donc **la porte (battants) et les volets sont des pièces à part, animées dans Unity** : les quatre vues de la maison se demandent **sans battant de porte et sans volets** (embrasure vide, fenêtres nues), et les battants et volets se produisent séparément (section « Portes et volets » plus bas).
 
 **Ordre conseillé** : maison de base (la plus simple, pour tester la chaîne) → mécano → forge → druide → sorcier → taverne (déjà faite par code et validée ; la version Tripo est facultative, à comparer).
 
@@ -9,6 +9,7 @@ Six bâtiments, **quatre vues chacun** (face, côté gauche, côté droit, dos) 
 - **Même conversation Grok pour les quatre vues.** Génère d'abord la **face**, valide-la, puis redemande en joignant cette image : « *Same building, same colors, same proportions, same scale and camera height; now the LEFT side elevation* » (puis droite, puis dos). C'est ce qui garde le même bâtiment sous quatre angles.
 - **Élévations droites, sans perspective** (orthographiques), **caméra à mi-hauteur des murs, parfaitement horizontale**, bâtiment **entier et centré avec de la marge** (du socle au sommet de la cheminée), **même échelle dans les quatre images** (même hauteur de bâtiment en pixels).
 - **Repères** : « face » = la façade à la porte, tournée vers Nyxessa. « Gauche » = le côté qui est à votre **gauche quand vous faites face à la porte, vu de l'extérieur** : sur cette vue, la **façade est au bord DROIT** de l'image. « Droite » = l'autre côté : la **façade est au bord GAUCHE**. « Dos » = le mur opposé à la porte (la gauche du bâtiment est alors à droite de l'image).
+- **Sans battant de porte et sans volets, sur les quatre vues** : la porte est une **embrasure arrondie vide** (renfoncement sombre d'au moins 30 cm de profondeur, cadre de gros blocs de pierre), les fenêtres sont des ouvertures à cadre de bois simple et carreaux, **sans volets**. Les battants et les volets viendront s'y poser, articulés.
 - Format **1:1**, fond uni gris foncé, un seul bâtiment, rien autour.
 
 ## Bloc commun (en anglais, à coller en tête de chaque demande)
@@ -19,10 +20,10 @@ forms, chunky toy-like proportions with softly beveled edges, like a hand-made c
 polygon planes, NOT a crystal or gem-cut look, no hard visible triangle edges. Matte, clean simple surfaces: no wood
 grain, no stone masonry texture, no photographic detail, no noise, no painted grime.
 Half-timbered cottage: smooth cream plaster walls, dark red-brown timber frame, clay-tile roof, stone chimney, an
-arched plank door framed by large plain light-grey stone blocks, windows with shutters, standing on a LOW, smooth,
+arched doorway framed by large plain light-grey stone blocks, EMPTY: a dark recessed doorway with NO door leaf and NO door, windows with simple wooden frames and glass panes and NO shutters, standing on a LOW, smooth,
 plain light-grey stone slab that overhangs the wall slightly, with a couple of steps in front of the door (never on a
 high masonry base).
-Scale cues: the plank door is 1.8 m wide and 2.6 m tall, the walls are 4.4 m high, a chunky big-headed 2.3 m
+Scale cues: the doorway is 1.8 m wide and 2.6 m tall, the walls are 4.4 m high, a chunky big-headed 2.3 m
 character would be almost as tall as the door.
 Single isolated building centered in frame, entire building visible with margin, nothing cropped. Plain flat dark grey
 background (#2b2b2e), no ground, no grass, no path, no fence, no trees, no props around it, no characters, no cast
@@ -45,8 +46,8 @@ La maison standard du jeu : la plus simple, **elle sert de gabarit aux maisons d
 
 ```
 A small single-storey half-timbered cottage, 8.6 m wide and 7.1 m deep, steep 45-degree gabled roof of big smooth
-clay tiles in warm brick red with a visible ridge and a short stone chimney; a single arched plank door on the front,
-set a little to the left, with two steps; one window with blue-grey shutters to the right of the door; a small round
+clay tiles in warm brick red with a visible ridge and a short stone chimney; a single empty arched doorway on the front (no door leaf),
+set a little to the left, with two steps; one window with a plain wooden frame to the right of the door; a small round
 window under the roof peak in each gable; one window on the back wall; one window on each side wall; a small
 hanging lantern between the door and the window.
 ```
@@ -57,9 +58,9 @@ Dos : une fenêtre, pas de porte. Côtés : pignons avec la petite fenêtre rond
 ```
 A shop with a street-facing gable, 12.6 m wide and 9.6 m deep, two storeys at the front: a tall front gable with a
 second floor with two small windows, a steep 45-degree gabled roof of clay tiles in warm brick red, cream plaster
-and dark timber frame; on the ground floor a plank door on the left (door 1.8 m wide) and, to the right of it, a very
+and dark timber frame; on the ground floor an empty arched doorway (no door leaf) on the left (1.8 m wide) and, to the right of it, a very
 large shop window 4 m wide with many small square panes and a wooden sill; a bent grey metal stove pipe goes
-through the roof near the back, with a small cog-shaped weathervane on the ridge; shutters in slate grey-blue; one
+through the roof near the back, with a small cog-shaped weathervane on the ridge; no shutters; one
 window on the back wall, one on each side wall at ground level, an upper window in each gable.
 ```
 Accessoires à part : enseigne en forme d'engrenage et de clé croisés sur potence de fer, caisses de bois empilées.
@@ -69,7 +70,7 @@ Accessoires à part : enseigne en forme d'engrenage et de clé croisés sur pote
 ```
 A blacksmith workshop, 11.6 m wide and 9.6 m deep, half-timbered with cream plaster darkened with a little soot
 near the chimney, a roof of clay tiles in dark brown, a very massive tall stone chimney on the back right of the
-roof; a plain arched plank door on the front, left of center, and one barred window with iron bars and no shutters
+roof; a plain empty arched doorway (no door leaf) on the front, left of center, and one barred window with iron bars and no shutters
 to its right; on the RIGHT side of the building an open lean-to shed, 5 m wide and 7 m deep, with no walls, a low
 sloping brown roof held by thick wooden posts, sheltering a stone hearth with an orange fire, a stack of logs and a
 low wall; one barred window on the back wall and one on the left side wall.
@@ -81,7 +82,7 @@ Accessoires à part : enclume sur billot, tas de bûches, soufflet, roue de meul
 ```
 An herbalist cottage, 11.6 m wide and 8.6 m deep, half-timbered with cream plaster, a very steep 50-degree gabled
 roof covered with thick soft olive-green moss over brown tiles, a short crooked stone chimney, green ivy climbing
-over parts of the timber frame and the front gable (matte leaves, no glow); an arched plank door on the front, left
+over parts of the timber frame and the front gable (matte leaves, no glow); an empty arched doorway (no door leaf) on the front, left
 of center, and two windows with flower boxes full of small yellow and purple flowers under them; on the RIGHT side of
 the building a small open drying porch, 2 m by 4 m, with a lean-to roof on two posts and bunches of dried herbs
 hanging from the beams; one window on the back wall and one on the left wall.
@@ -94,8 +95,8 @@ Accessoires à part : enseigne en forme de fiole ambre, jardinières, claie de s
 A wizard's house, 11.6 m wide and 9.6 m deep, half-timbered with cream plaster, a gabled roof of dark blue slate
 shingles, and an attached round stone-and-plaster tower of 4.5 m diameter standing at the BACK RIGHT corner of the
 house, taller than the roof, with a tall conical dark blue slate roof topped by a crescent-moon weathervane, a round
-porthole window and a small slit window; an arched plank door on the front, left of center, with a crescent moon and
-a few simple symbols painted in dark blue on it, and two windows with deep blue shutters; one window on the back
+porthole window and a small slit window; an empty arched doorway (no door leaf) on the front, left of center, and two windows
+with plain frames and no shutters; one window on the back
 wall, a window on the left wall.
 ```
 Accessoires à part : lanterne à vitre bleutée, cloche de verre (l'éclat de Nyx est à l'intérieur : jamais dessiné ici). Le hublot de la tour est pâle et « qui luit » seulement en blanc-bleu, **pas de vert**.
@@ -105,15 +106,25 @@ Accessoires à part : lanterne à vitre bleutée, cloche de verre (l'éclat de N
 ```
 A big tavern: a very long single-storey great hall, 16.6 m wide and 11.6 m deep, with walls 5.4 m high and a very tall
 hipped roof with half-hips (the gable ends are cut by a small hip) at about 40 degrees, clay tiles in warm brick red; a
-huge stone chimney rising from the LEFT end wall; on the front, in the middle, a pair of wide arched plank double doors
-(3.2 m wide) in a frame of large grey stone blocks, under a small tiled porch roof on two timber brackets, two steps;
-on the front a large window with brown shutters on each side of the doors; one window on each side wall on the
+huge stone chimney rising from the LEFT end wall; on the front, in the middle, a wide empty arched double doorway
+(3.2 m wide, no door leaves) in a frame of large grey stone blocks, under a small tiled porch roof on two timber brackets, two steps;
+on the front a large window with a plain frame and no shutters on each side of the doorway; one window on each side wall on the
 left and right ends; plenty of dark timber framing with diagonal braces; the back wall has timber framing and no
 door.
 ```
 Accessoires à part : enseigne en forme de chope sur potence de fer, deux tonneaux et un banc, lanternes d'applique. Référence visuelle : `sandbox-level/Assets/Screenshots/taverne_ext_*.png` (hors dépôt).
 
 ---
+
+## Portes et volets (pièces animées, une image chacune, vue de face droite sans perspective)
+
+À ajouter à la fin du bloc commun adapté : « Single door leaf / single pair of shutters, flat straight-on elevation, centered, nothing else; same smooth dense low-poly style, plain dark grey background ». Une image de face suffit (le dos se déduit ; demander si besoin une vue de dos pour la ferrure).
+
+- **Battant de porte simple, 1,8 × 2,6 m, arrondi en haut** : planches verticales lisses brun chaud, deux bandes de fer horizontales avec rivets, anneau de fer en guise de poignée, sans cadre de pierre. Variantes : **sorcier** (croissant de lune et quelques symboles peints en bleu nuit), **druide** (feuillage sculpté en relief, un peu plus clair), **mécano** (petite plaque à engrenage), **forge** (planches renforcées de plaques de fer, plus sombre).
+- **Double porte de la taverne, 3,2 × 2,8 m** : deux battants arrondis symétriques à planches et bandes de fer, un anneau chacun (une image du couple).
+- **Paire de volets de fenêtre** (deux battants de 0,6 × 1,4 m, vus **ouverts à plat côte à côte** ou en deux images) : planches avec une barre en Z, charnières de fer apparentes ; teinte par maison (taverne brun, maison de base bleu-gris, druide vert sauge, sorcier bleu nuit ; forge et mécano sans volets).
+
+**Côté Unity** : pivot sur le bord de la charnière, ouverture légère (environ 15 à 25° vers l'intérieur) quand le joueur utilise la porte, **son d'ouverture** ; **volets ouverts le jour, fermés la nuit** (rotation liée au cycle jour/nuit, avec la lumière chaude des vitres derrière). L'embrasure du modèle de maison doit être **plus profonde que le battant** (au moins 30 cm) pour qu'il tienne dedans en s'ouvrant.
 
 ## Accessoires (une image chacun, vue de trois quarts, bloc commun adapté « single prop »)
 
@@ -122,15 +133,15 @@ Puits à toit de bois (Ø 2 m), potager clôturé (6 × 5 m : choux, carottes, c
 ## Réglages Tripo (bâtiments)
 
 - Onglet **Modèle** (multivue) : face en image principale, puis **Gauche**, **Droite**, **Dos**.
-- **Modèle HD**, IA H3.1 ; **Générer par parties : désactivé** (bâtiments d'un bloc ; sinon la texture se fait ensuite avec l'outil Texture) ; Qualité de maillage **Ultra** ; **Texture activée, 4K** ; **PBR désactivé** ; **Supprimer l'éclairage activé** ; **Triangle** ; **200 000 à 300 000 polygones** ; confidentialité privée ; export FBX avec texture dans `ArtSources/References/Decor/maison_<nom>_tripo/`.
+- **Modèle HD**, IA H3.1 ; **Générer par parties : à tester en « Équilibré » sur la maison de base** (Tripo sépare alors toit, murs, cheminée, vitres… : nombre et nature des pièces imprévisibles, à relever avant de généraliser ; la texture se fait ensuite avec l'outil Texture) ; à défaut **désactivé** (maillage d'un bloc, toit et vitres séparés ensuite dans Blender par leurs cotes). Les battants de porte et les volets **ne dépendent pas de ce réglage** : ce sont des pièces à part ; Qualité de maillage **Ultra** ; **Texture activée, 4K** ; **PBR désactivé** ; **Supprimer l'éclairage activé** ; **Triangle** ; **200 000 à 300 000 polygones** ; confidentialité privée ; export FBX avec texture dans `ArtSources/References/Decor/maison_<nom>_tripo/`.
 
 ## Réception côté Blender puis Unity
 
 1. **Échelle** d'après la boîte englobante et les emprises du tableau de `maisons-plans.md` (pas de dimension métrique dans Tripo) ; origine au centre du dessous, façade vers -Y.
 2. **Décimation** : maison de base 8 000 à 11 000 triangles, boutiques 12 000 à 16 000, taverne 20 000 à 25 000 ; normales lissées (faces lisses, arêtes dures aux vrais angles, Weighted Normal) ; **atlas 2048²** cuit depuis la haute définition ; collision simplifiée (boîtes ou maillage convexe).
-3. **Porte** : la façade est fermée ; l'emplacement de la porte (1,8 × 2,6 m, ou 3,2 × 2,8 m pour la taverne) doit rester à la cote du plan pour la zone d'intérieur (porte et fondu au noir) : à vérifier au placement.
+3. **Porte et volets** : l'embrasure (1,8 × 2,6 m, ou 3,2 × 2,8 m pour la taverne) reste à la cote du plan ; le **battant** s'y pose, pivot à la charnière, ouverture légère et son à l'usage, puis fondu au noir vers la zone d'intérieur ; les **volets** se posent de part et d'autre de chaque fenêtre, fermés la nuit. Un vide d'au moins 30 cm derrière l'embrasure (fond sombre simple) évite de voir à travers.
 4. Les toits et les fenêtres éclairées la nuit (émissif chaud, jamais vert) se règlent dans Unity ; prévoir de séparer le toit si on veut le masquer en intérieur.
 
 ## Vérifications avant d'envoyer à Tripo
 
-Un seul bâtiment par image, entier, centré, fond uni, aucune ombre au sol ; **mêmes proportions, couleurs et détails sur les quatre vues** (même nombre de fenêtres, même cheminée, mêmes teintes) ; élévations sans perspective ; socle bas et lisse, pas de maçonnerie ; pas de vert luisant ; la façade est bien au bord droit de la vue « gauche » et au bord gauche de la vue « droite ».
+Un seul bâtiment par image, entier, centré, fond uni, aucune ombre au sol ; **mêmes proportions, couleurs et détails sur les quatre vues** (même nombre de fenêtres, même cheminée, mêmes teintes) ; **aucun battant de porte ni volet** sur les maisons ; élévations sans perspective ; socle bas et lisse, pas de maçonnerie ; pas de vert luisant ; la façade est bien au bord droit de la vue « gauche » et au bord gauche de la vue « droite ».
