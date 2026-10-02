@@ -126,28 +126,6 @@ namespace Deathless.Jeu
         }
     }
 
-    /// Mécano (vendeur traditionnel) : clés de bronze, d'argent et d'or, kit de crochetage.
-    public class Mecano : BoutiqueVillage
-    {
-        static readonly ArticleBoutique[] s_Catalogue = { ArticleBoutique.CleBronze, ArticleBoutique.CleArgent, ArticleBoutique.CleOr, ArticleBoutique.KitCrochetage };
-        protected override ArticleBoutique[] Catalogue => s_Catalogue;
-        protected override string TitreBoutique => "Mécano";
-        protected override string InviteBoutique => "Mécano : acheter";
-        protected override string SousTitreBoutique => "Clés à usage unique et kit de crochetage. L’or est pris dans la caisse commune.";
-        protected override string RefusNuit => "Le mécano ne vend que de jour.";
-    }
-
-    /// Druide : potions de santé, de mana (Mage seulement) et d'endurance.
-    public class Druide : BoutiqueVillage
-    {
-        static readonly ArticleBoutique[] s_Catalogue = { ArticleBoutique.PotionSante, ArticleBoutique.PotionMana, ArticleBoutique.PotionEndurance };
-        protected override ArticleBoutique[] Catalogue => s_Catalogue;
-        protected override string TitreBoutique => "Druide";
-        protected override string InviteBoutique => "Druide : potions";
-        protected override string SousTitreBoutique => "Potions à boire à la croix directionnelle ou aux touches 1, 2, 3. L’or est pris dans la caisse commune.";
-        protected override string RefusNuit => "Le druide ne vend que de jour.";
-    }
-
     /// Règles d'achat des boutiques du village (partagées par les deux vendeurs) : raisons de refus, paiement par l'autorité,
     /// effet sur l'inventaire, pose des composants sur les ancres.
     public static class Boutiques
