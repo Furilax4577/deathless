@@ -12,7 +12,11 @@ namespace Deathless.Jeu
     /// gemmes claires qui montent puis retombent) sur les deux bords de la nappe, sur les éboulis, à la lèvre et surtout au
     /// point d'impact dans le bassin (sur toute la largeur de la nappe, plus large de moitié) ; embrun lent au-dessus du
     /// bassin ; anneaux plats qui s'élargissent à la surface. La nuit, les teintes s'assombrissent avec DayCycle.Night (l'eau ne
-    /// luit pas). Son : boucle « village_cascade » (catalogue).
+    /// luit pas). Remous (retour du 02/10/2026, « plus de remous dans la chute ») : aux points où la nappe frôle la roche (foyers
+    /// relevés par lancers de rayons à la construction, VillageBuilder.V5FoyersCascade : saillies, replats, bords) naissent de
+    /// petits jets de gemmes claires, des tourbillons (spirale de gemmes) et des bandes d'écume le long des deux bords ; au pied,
+    /// des plaques d'écume plates et de grands anneaux s'étalent sur le bassin. Tout reste fin (5 à 13 cm) et dans le même
+    /// maillage dynamique que le reste : un seul appel de dessin. Son : boucle « village_cascade » (catalogue).
     public class CascadeVillage : MonoBehaviour
     {
         [Tooltip("Lèvre de la chute (centre du rebord, là où l'eau quitte la roche).")]
@@ -29,7 +33,7 @@ namespace Deathless.Jeu
         public Vector3 droite = Vector3.right;
         [Tooltip("Matériau des gemmes (Relic/VertexColorUnlit : PortalVoxel.mat ou une copie).")]
         public Material materiauGemmes;
-        public int capacite = 1600;
+        public int capacite = 2000;
         [Tooltip("Filets par seconde (toute la chute).")] public float debitFilets = 240f;
         [Tooltip("Écume fine par seconde sur les deux bords de la nappe.")] public float debitBords = 55f;
         [Tooltip("Écume fine par seconde au point d'impact dans le bassin.")] public float debitImpact = 170f;
@@ -38,7 +42,21 @@ namespace Deathless.Jeu
         [Tooltip("Embrun léger au-dessus du bassin (par seconde).")] public float debitEmbrun = 9f;
         [Tooltip("Anneaux dans le bassin : un anneau toutes les `periodeAnneaux` s.")] public float periodeAnneaux = 0.75f;
         [Tooltip("Assombrissement à la pleine nuit (facteur des teintes).")] public float nuitFacteur = 0.42f;
-        [Tooltip("Volume de la boucle sonore.")] public float volume = 0.8f;
+        [Header("Remous (points de contact eau / roche)")]
+        [Tooltip("Foyers de saillie ou de replat (repère monde), leur normale de roche et leur force (0 à 1).")]
+        public Vector3[] foyers;
+        public Vector3[] foyersNormales;
+        public float[] foyersForce;
+        [Tooltip("Points de bord de la nappe (gauche et droite), leur normale et leur force.")]
+        public Vector3[] bords;
+        public Vector3[] bordsNormales;
+        public float[] bordsForce;
+        [Tooltip("Petits jets de gemmes aux foyers (par seconde).")] public float debitJets = 62f;
+        [Tooltip("Tourbillons (huit gemmes en spirale) aux foyers (par seconde).")] public float debitTourbillons = 2.4f;
+        [Tooltip("Gemmes d'écume le long des deux bords de la nappe (par seconde).")] public float debitBandes = 80f;
+        [Tooltip("Plaques d'écume plates qui s'étalent sur le bassin au pied (par seconde).")] public float debitPlaques = 36f;
+        [Tooltip("Grands anneaux de remous sur le bassin : un tous les `periodeRemous` s.")] public float periodeRemous = 1.3f;
+        [Tooltip("Volume de la boucle sonore.")] public float volume = 0.9f;
 
         public static readonly string[] SonCascade = { "village_cascade" };
 
@@ -50,6 +68,96 @@ namespace Deathless.Jeu
         AudioSource m_Son;
         float[] m_Cumul;      // longueur cumulée du chemin
         float m_Longueur;
+        float m_Jets, m_Tourb, m_Bandes, m_Plaques, m_Remous;
+
+        /// Indice d'un foyer tiré au hasard, plus souvent parmi les plus forts (rejet) ; -1 s'il n'y en a pas.
+        static int Tirer(float[] force)
+        {
+            if (force == null || force.Length == 0) return -1;
+            for (int essai = 0; essai < 8; essai++)
+            {
+                int i = Random.Range(0, force.Length);
+                if (Random.value <= force[i]) return i;
+            }
+            return Random.Range(0, force.Length);
+        }
+
+        /// Remous aux points de contact eau / roche : jets, tourbillons, bandes d'écume des bords (toute la hauteur de la chute).
+        void Remous(float dt)
+        {
+            const float g = 9.81f;
+            if (foyers != null && foyersNormales != null && foyers.Length > 0 && foyersNormales.Length == foyers.Length && foyersForce != null && foyersForce.Length == foyers.Length)
+            {
+                // petits jets : la nappe bute sur la saillie, quelques gemmes claires jaillissent et retombent
+                m_Jets += debitJets * dt;
+                while (m_Jets >= 1f)
+                {
+                    m_Jets -= 1f;
+                    int i = Tirer(foyersForce); if (i < 0) break;
+                    Vector3 n = foyersNormales[i];
+                    Vector3 pos = foyers[i] + n * Random.Range(0.04f, 0.14f) + droite * Random.Range(-0.12f, 0.12f);
+                    Vector3 v = n * Random.Range(0.4f, 1.3f) + Vector3.up * Random.Range(0.6f, 2.0f) + droite * Random.Range(-0.5f, 0.5f);
+                    m_Gemmes.Emettre(pos, v, Random.Range(0.05f, 0.11f), Random.Range(0.45f, 0.8f), Teinte(Random.value < 0.7f ? 4 : 3), g * 0.7f, 0.4f, 0.04f, 0.45f);
+                }
+                // tourbillons : huit gemmes semées en spirale dans le plan de la roche, qui glissent avec le courant
+                m_Tourb += debitTourbillons * dt;
+                while (m_Tourb >= 1f)
+                {
+                    m_Tourb -= 1f;
+                    int i = Tirer(foyersForce); if (i < 0) break;
+                    Vector3 n = foyersNormales[i];
+                    Vector3 t1 = Vector3.Cross(n, Vector3.up); if (t1.sqrMagnitude < 0.01f) t1 = Vector3.right;
+                    t1.Normalize(); Vector3 t2 = Vector3.Cross(n, t1);
+                    float a0 = Random.value * Mathf.PI * 2f, sens = Random.value < 0.5f ? 1f : -1f;
+                    float echelle = Mathf.Lerp(0.7f, 1.2f, foyersForce[i]);
+                    for (int k = 0; k < 8; k++)
+                    {
+                        float a = a0 + sens * k * 0.85f, r = Mathf.Lerp(0.26f, 0.07f, k / 7f) * echelle;
+                        Vector3 pos = foyers[i] + n * 0.08f + (t1 * Mathf.Cos(a) + t2 * Mathf.Sin(a)) * r;
+                        Vector3 v = Vector3.Cross(n, (pos - foyers[i]).normalized) * sens * 0.2f - Vector3.up * 0.7f;
+                        m_Gemmes.Emettre(pos, v, Random.Range(0.05f, 0.085f), 0.34f, Teinte(k % 3 == 0 ? 3 : 4), 0f, 0.3f, 0.05f, 0.35f, default(Vector3), k * 0.035f);
+                    }
+                }
+            }
+            // bandes d'écume le long des deux bords : petites gemmes claires qui filent avec le courant contre la roche
+            if (bords != null && bordsNormales != null && bords.Length > 0 && bordsNormales.Length == bords.Length && bordsForce != null && bordsForce.Length == bords.Length)
+            {
+                m_Bandes += debitBandes * dt;
+                while (m_Bandes >= 1f)
+                {
+                    m_Bandes -= 1f;
+                    int i = Tirer(bordsForce); if (i < 0) break;
+                    float cote = bords[i].x < pied.position.x ? -1f : 1f;
+                    Vector3 n = bordsNormales[i];
+                    Vector3 pos = bords[i] + droite * (cote * Random.Range(-0.05f, 0.12f)) + n * Random.Range(0.04f, 0.14f) + Vector3.down * Random.Range(-0.2f, 0.2f);
+                    Vector3 v = Vector3.down * Random.Range(1.2f, 3.0f) + n * Random.Range(0.1f, 0.4f) + droite * (cote * Random.Range(0.0f, 0.4f));
+                    m_Gemmes.Emettre(pos, v, Random.Range(0.045f, 0.09f), Random.Range(0.4f, 0.7f), Teinte(Random.value < 0.8f ? 4 : 3), 3f, 0.3f, 0.04f, 0.5f);
+                }
+            }
+            // au pied : plaques d'écume plates qui s'étalent sur le bassin, et grands anneaux de remous
+            Vector3 b = pied.position;
+            m_Plaques += debitPlaques * dt;
+            while (m_Plaques >= 1f)
+            {
+                m_Plaques -= 1f;
+                float a = Random.value * Mathf.PI * 2f, r = Random.Range(0.4f, 1.6f);
+                Vector3 d = new Vector3(Mathf.Cos(a), 0f, Mathf.Sin(a));
+                m_Gemmes.Emettre(b + d * r + Vector3.up * 0.03f, d * Random.Range(0.5f, 1.3f), Random.Range(0.07f, 0.13f), Random.Range(1.2f, 2.0f), Teinte(Random.value < 0.7f ? 4 : 3),
+                    0f, 0.9f, 0.15f, 0.4f, new Vector3(1.6f, 0.2f, 1.6f));
+            }
+            m_Remous += dt;
+            if (m_Remous >= periodeRemous)
+            {
+                m_Remous -= periodeRemous;
+                int nb = 26; float a0 = Random.value * Mathf.PI * 2f;
+                for (int i = 0; i < nb; i++)
+                {
+                    float a = a0 + i * Mathf.PI * 2f / nb;
+                    Vector3 d = new Vector3(Mathf.Cos(a), 0f, Mathf.Sin(a));
+                    m_Gemmes.Emettre(b + d * 1.3f + Vector3.up * 0.02f, d * 1.9f, 0.11f, 1.9f, Teinte(i % 4 == 0 ? 3 : 4), 0f, 0.5f, 0.2f, 0.35f, new Vector3(1.6f, 0.2f, 1.6f));
+                }
+            }
+        }
 
         void OnEnable()
         {
@@ -68,7 +176,25 @@ namespace Deathless.Jeu
         void Start()
         {
             if (m_Son == null && levre != null)
+            {
                 m_Son = AudioBank.Boucle(SonCascade, pied != null ? pied : levre, volume);
+                if (m_Son != null) ConfigurerSon(m_Son);
+            }
+        }
+
+        /// Atténuation propre à la cascade (retour du 02/10/2026 : « un son 3D qui s'entend à 40-50 m ») : pleine force à moins de
+        /// 4 m du bassin, puis une décroissance en cloche douce (65 % à 10 m, 38 % à 20 m, 18 % à 35 m, 7 % à 46 m, rien à 50 m)
+        /// au lieu de la droite par défaut (qui ne laisse que 40 % à 30 m et s'éteint à 45 m). Distance max = portée du catalogue.
+        void ConfigurerSon(AudioSource s)
+        {
+            float max = Mathf.Max(10f, s.maxDistance);
+            var courbe = new AnimationCurve(
+                new Keyframe(0f, 1f), new Keyframe(4f / max, 1f), new Keyframe(10f / max, 0.65f), new Keyframe(20f / max, 0.38f),
+                new Keyframe(35f / max, 0.18f), new Keyframe(46f / max, 0.07f), new Keyframe(1f, 0f));
+            for (int i = 0; i < courbe.length; i++) courbe.SmoothTangents(i, 0.35f);
+            s.rolloffMode = AudioRolloffMode.Custom;
+            s.SetCustomCurve(AudioSourceCurveType.CustomRolloff, courbe);
+            s.spread = 30f;      // un peu large : le rideau d'eau est un son étendu, pas un point
         }
 
         void OnDisable() { if (m_Gemmes != null) m_Gemmes.gameObject.SetActive(false); }
@@ -190,6 +316,8 @@ namespace Deathless.Jeu
                         0.15f, 0.4f, new Vector3(1.6f, 0.2f, 1.6f));
                 }
             }
+            // 7'. remous aux points de contact eau / roche
+            Remous(dt);
             // 7. embrun léger, lent, au-dessus du bassin
             m_Embrun += debitEmbrun * dt;
             while (m_Embrun >= 1f)

@@ -1003,12 +1003,16 @@ public static partial class VillageBuilder
         return m;
     }
 
+    /// Décalages (m) du voisinage où l'on cherche la roche la plus avancée sous la nappe (dilatation de la roche : la nappe passe
+    /// devant les bosses de 0,3 m alentour, retour du 02/10/2026 sur les rochers qui apparaissaient dans l'eau).
+    static readonly float[] V5Dilatation = { 0f, -0.3f, 0.3f };
+
     /// z de la paroi à la hauteur y, au plus près du spectateur sur un petit voisinage (les bosses de la roche ne percent pas le voile).
     static bool V5ZParoi(float x, float y, out float z, out Vector3 normale)
     {
         z = float.MaxValue; normale = Vector3.back; bool ok = false;
-        foreach (float dx in new[] { 0f, -0.3f, 0.3f })
-            foreach (float dy in new[] { 0f, -0.3f, 0.3f })
+        foreach (float dx in V5Dilatation)
+            foreach (float dy in V5Dilatation)
                 if (V5RayonRoche(new Vector3(x + dx, y + dy, 20f), Vector3.forward, out RaycastHit h))
                 {
                     if (h.point.z < z) z = h.point.z;
@@ -1043,8 +1047,8 @@ public static partial class VillageBuilder
         for (float z = zA - 0.4f; z > 33f; z -= 0.4f)
         {
             float yMax = float.MinValue; Vector3 nm = Vector3.up; bool tout = true;
-            foreach (float dx in new[] { 0f, -0.3f, 0.3f })
-                foreach (float dz in new[] { 0f, -0.3f, 0.3f })
+            foreach (float dx in V5Dilatation)
+                foreach (float dz in V5Dilatation)
                     if (V5RayonRoche(new Vector3(x + dx, 12f, z + dz), Vector3.down, out h)) { if (h.point.y > yMax) { yMax = h.point.y; if (dx == 0f && dz == 0f) nm = h.normal; } } else if (dx == 0f && dz == 0f) tout = false;
             if (!tout || yMax < 0.15f) break;
             p.Add(new Vector3(x, yMax + 0.12f, z)); nor.Add(nm);
@@ -1053,6 +1057,134 @@ public static partial class VillageBuilder
         p.Add(new Vector3(x, V5NiveauEau + 0.04f, dernier.z - 0.55f)); nor.Add(Vector3.up);
         return p;
     }
+
+    /// Marge fixe (m) entre la roche la plus avancée sous la nappe et la nappe : elle passe toujours devant.
+    public const float V5CascadeMarge = 0.12f;
+
+    /// Premier impact sur la roche (pièce héros ou lèvre) à moins de `dist` m.
+    static bool V5RayonRocheCourt(Vector3 origine, Vector3 dir, float dist, out RaycastHit hit)
+    {
+        RaycastHit[] hs = Physics.RaycastAll(origine, dir, dist, ~0, QueryTriggerInteraction.Ignore);
+        float best = float.MaxValue; hit = default(RaycastHit); bool ok = false;
+        foreach (RaycastHit h in hs)
+            if ((h.collider.name == "Montagne_Heros" || h.collider.name == "Levre_Roche") && h.distance < best) { best = h.distance; hit = h; ok = true; }
+        return ok;
+    }
+
+    static Vector3 V5Bil(Vector3[,] g, int j, int k, float u, float v)
+    {
+        return Vector3.Lerp(Vector3.Lerp(g[j, k], g[j + 1, k], u), Vector3.Lerp(g[j, k + 1], g[j + 1, k + 1], u), v);
+    }
+
+    /// Pousse la nappe devant toute saillie : `pousse` reçoit le total poussé par sommet (m) ; renvoie le nombre de points
+    /// d'échantillonnage encore en défaut après la dernière passe (0 = la nappe passe devant toute la roche).
+    static int V5RecouvrirSaillies(Vector3[,] g, Vector3[,] gn, int C, int N, float[,] pousse, out int passes, out int depart)
+    {
+        const float recul = 1.0f;
+        int defauts = 0; depart = -1; passes = 0;
+        for (int pass = 0; pass < 28; pass++)
+        {
+            int sous = pass < 8 ? 4 : pass < 16 ? 8 : 12;   // échantillonnage grossier d'abord, fin ensuite (le dernier tour ne doit rien trouver)
+            float marge = pass < 8 ? V5CascadeMarge : V5CascadeMarge + 0.06f;   // marge un peu plus large pour les tours fins : les éclats de roche de quelques centimètres
+            var besoinN = new float[C, N]; var besoinZ = new float[C, N]; defauts = 0;
+            for (int k = 0; k + 1 < N; k++)
+                for (int j = 0; j + 1 < C; j++)
+                    for (int a = 0; a < sous; a++)
+                        for (int b = 0; b < sous; b++)
+                        {
+                            float u = (a + 0.5f) / sous, w = (b + 0.5f) / sous;
+                            Vector3 p = V5Bil(g, j, k, u, w), n = V5Bil(gn, j, k, u, w).normalized;
+                            float bn = 0f, bz = 0f;
+                            // 1. la roche sous la nappe, le long de la normale : la nappe doit rester devant elle de V5CascadeMarge
+                            if (V5RayonRocheCourt(p + n * recul, -n, recul + 0.6f, out RaycastHit h)) bn = Mathf.Max(0f, (recul - h.distance) + marge);
+                            // 2. au pied, là où la nappe est encore raide (normale presque horizontale) : la roche qui dépasse devant, vue du sud
+                            //    (là où elle est couchée sur les éboulis, la poussée le long de la normale suffit : pas de bloc d'eau)
+                            if (p.y < 2.5f && n.y < 0.6f && V5RayonRocheCourt(p + Vector3.back * recul, Vector3.forward, recul + 0.6f, out RaycastHit h2)) bz = Mathf.Max(0f, (recul - h2.distance) + marge);
+                            if (bn <= 0f && bz <= 0f) continue;
+                            defauts++;
+                            for (int dj = 0; dj < 2; dj++)
+                                for (int dk = 0; dk < 2; dk++)
+                                {
+                                    besoinN[j + dj, k + dk] = Mathf.Max(besoinN[j + dj, k + dk], bn);
+                                    besoinZ[j + dj, k + dk] = Mathf.Max(besoinZ[j + dj, k + dk], bz);
+                                }
+                        }
+            if (depart < 0) depart = defauts;
+            passes = pass;
+            if (defauts == 0) break;
+            // lissage : un sommet ne pousse jamais moins que son besoin, et entraîne ses voisins à moitié (nappe sans accroc)
+            var bn2 = (float[,])besoinN.Clone(); var bz2 = (float[,])besoinZ.Clone();
+            for (int k = 0; k < N; k++)
+                for (int j = 0; j < C; j++)
+                    for (int dk = -1; dk <= 1; dk++)
+                        for (int dj = -1; dj <= 1; dj++)
+                        {
+                            int jj = j + dj, kk = k + dk; if (jj < 0 || kk < 0 || jj >= C || kk >= N) continue;
+                            bn2[j, k] = Mathf.Max(bn2[j, k], besoinN[jj, kk] * 0.5f); bz2[j, k] = Mathf.Max(bz2[j, k], besoinZ[jj, kk] * 0.5f);
+                        }
+            for (int k = 0; k < N; k++)
+                for (int j = 0; j < C; j++)
+                {
+                    float dn = Mathf.Min(1.0f, bn2[j, k]), dz = Mathf.Min(0.5f, bz2[j, k]);
+                    if (dn <= 0f && dz <= 0f) continue;
+                    g[j, k] += gn[j, k].normalized * dn + Vector3.back * dz;
+                    pousse[j, k] += dn + dz;
+                }
+        }
+        return defauts;
+    }
+
+    // ------------------------------------------------------------------ remous de la chute (foyers d'écume)
+    public const int V5FoyersMax = 90, V5BordsPas = 2;
+
+    /// Points de contact eau / roche sur toute la hauteur de la chute, trouvés par lancers de rayons (CascadeVillage les lit) :
+    /// saillies et replats (la nappe a dû être poussée, ou la roche change de pente : jets et tourbillons) et bords (la roche
+    /// touche le côté de la nappe : bandes d'écume), avec une force de 0 à 1.
+    static string V5FoyersCascade(CascadeVillage cv, Vector3[,] g, Vector3[,] gn, float[,] pousse, int C, int N)
+    {
+        var fp = new List<Vector3>(); var fn = new List<Vector3>(); var ff = new List<float>();
+        var bp = new List<Vector3>(); var bn = new List<Vector3>(); var bf = new List<float>();
+        var pitch = new float[N];
+        for (int k = 0; k < N; k++) pitch[k] = Mathf.Asin(Mathf.Clamp(gn[C / 2, k].normalized.y, -1f, 1f)) * Mathf.Rad2Deg;
+        // 1. saillies (poussée) et ruptures de pente / replats
+        for (int k = 1; k + 1 < N - 1; k++)
+            for (int j = 0; j < C; j++)
+            {
+                float force = Mathf.Clamp01(pousse[j, k] / 0.35f);
+                float rupture = Mathf.Abs(pitch[k + 1] - pitch[k - 1]);
+                if (rupture > 22f && j % 2 == 0) force = Mathf.Max(force, Mathf.Clamp01(rupture / 70f));
+                if (g[j, k].y < 0.6f) continue;                       // le bassin a ses propres remous (CascadeVillage)
+                if (force < 0.18f) continue;
+                fp.Add(g[j, k]); fn.Add(gn[j, k].normalized); ff.Add(force);
+            }
+        // 2. bords : une rangée sur deux, un lancer horizontal vers l'extérieur depuis chaque bord de la nappe
+        for (int k = 1; k < N - 1; k += V5BordsPas)
+            for (int cote = 0; cote < 2; cote++)
+            {
+                int j = cote == 0 ? 0 : C - 1; float s = cote == 0 ? -1f : 1f;
+                Vector3 e = g[j, k]; if (e.y < 0.5f) continue;
+                Vector3 n = gn[j, k].normalized;
+                float d = 1.0f;
+                if (V5RayonRocheCourt(e - n * 0.15f, Vector3.right * s, 1.0f, out RaycastHit h)) d = h.distance;
+                float force = Mathf.Clamp01(1f - d / 1.0f);
+                if (force < 0.25f) continue;
+                bp.Add(e); bn.Add(n); bf.Add(force);
+            }
+        // plafonne : on garde les plus forts
+        System.Action<List<Vector3>, List<Vector3>, List<float>, int> garder = (P, Nn, F, max) =>
+        {
+            while (P.Count > max)
+            {
+                int pire = 0; for (int i = 1; i < F.Count; i++) if (F[i] < F[pire]) pire = i;
+                P.RemoveAt(pire); Nn.RemoveAt(pire); F.RemoveAt(pire);
+            }
+        };
+        garder(fp, fn, ff, V5FoyersMax); garder(bp, bn, bf, V5FoyersMax);
+        cv.foyers = fp.ToArray(); cv.foyersNormales = fn.ToArray(); cv.foyersForce = ff.ToArray();
+        cv.bords = bp.ToArray(); cv.bordsNormales = bn.ToArray(); cv.bordsForce = bf.ToArray();
+        return "remous : " + fp.Count + " foyers de saillie ou de replat, " + bp.Count + " points de bord";
+    }
+
 
     static string V5Cascade(Transform riv)
     {
@@ -1104,6 +1236,11 @@ public static partial class VillageBuilder
                 grille[j, k] = Vector3.Lerp(p[i - 1], p[i], u); gn[j, k] = Vector3.Lerp(nors[j][i - 1], nors[j][i], u).normalized;
             }
         }
+        // b'. recouvrement des saillies (retour du 02/10/2026 : « des rochers apparaissent dans l'eau de la chute ») : chaque cellule
+        //     est échantillonnée finement (4 x 4 points) ; là où de la roche dépasse devant la nappe (ou à moins de V5CascadeMarge),
+        //     les sommets sont poussés vers l'avant le long de la normale, plusieurs passes, jusqu'à ce que plus aucune saillie ne perce
+        var pousse = new float[C, N];
+        int residu = V5RecouvrirSaillies(grille, gn, C, N, pousse, out int passes, out int depart);
         var v = new List<Vector3>(); var t = new List<int>();
         for (int k = 0; k < N; k++) for (int j = 0; j < C; j++) v.Add(grille[j, k]);
         for (int k = 0; k + 1 < N; k++)
@@ -1129,7 +1266,8 @@ public static partial class VillageBuilder
         cv.levre = tl; cv.pied = tp; cv.chemin = chemin; cv.normales = normales; cv.largeurs = largeurs; cv.droite = Vector3.right;
         cv.materiauGemmes = AssetDatabase.LoadAssetAtPath<Material>("Assets/VFX/_RelicCommun/PortalVoxel.mat");
         float longueur = 0f; for (int k = 1; k < N; k++) longueur += Vector3.Distance(chemin[k - 1], chemin[k]);
-        return "cascade : rebord à " + yReplat.ToString("F1") + " m (avance de " + V5LevreAvance.ToString("F2") + " m), nappe plaquée sur la roche, " + longueur.ToString("F1") + " m de chemin, impact à (" + tp.position.x.ToString("F1") + ", " + tp.position.z.ToString("F1") + ")";
+        string remous = V5FoyersCascade(cv, grille, gn, pousse, C, N);
+        return "cascade : " + depart + " points de roche devant la nappe au départ, " + residu + " après " + passes + " passes ; " + remous + " ; rebord à " + yReplat.ToString("F1") + " m (avance de " + V5LevreAvance.ToString("F2") + " m), nappe plaquée sur la roche, " + longueur.ToString("F1") + " m de chemin, impact à (" + tp.position.x.ToString("F1") + ", " + tp.position.z.ToString("F1") + ")";
     }
 
     // ------------------------------------------------------------------ 4. allées

@@ -3656,10 +3656,120 @@
     "id": "village_cascade",
     "nom": "Village — cascade (boucle)",
     "categorie": "Jour et nuit",
-    "usage": "Cascade du village (carte v5) : chute d'eau continue au pied de la montagne du nord, jouée en boucle 3D au bassin par CascadeVillage. Grondement, rideau d'eau, éclaboussures. Nouveau (01/10/2026).",
+    "usage": "Cascade du village (carte v5) : chute d'eau continue au pied de la montagne du nord, jouée en boucle 3D au bassin par CascadeVillage (source attachée au point d'impact, volume 1 à moins de 4 m, qui décroît jusqu'à 50 m : courbe d'atténuation de CascadeVillage, plus de la linéaire par défaut qui ne laissait presque rien à 30 m). Grondement continu de la masse d'eau, rideau d'eau, brillance d'embrun et éclaboussures, boucle de 16 s sans coupure (filtres circulaires, éclaboussures repliées, aucun fondu), niveau perçu -15,5 dB. Refait le 02/10/2026 (retour de Quentin : le son de la cascade).",
     "fichier": "Deathless/Village/cascade_boucle.wav",
-    "portee": 45,
-    "source": "Deathless (synthèse)",
+    "portee": 50,
+    "source": "Deathless (synthèse, Assets/Audio/Deathless/Village/synth_eau.py)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "pas_herbe",
+    "nom": "Joueur — pas sur l'herbe",
+    "categorie": "Joueurs",
+    "usage": "Pas du joueur (héros local et marionnettes), froissement doux : bruit rose filtré en bande 1,5 à 5 kHz, enveloppe de 120 ms, attaque lente, talon très en retrait. Les sols herbeux de la carte (teintes vertes du maillage du sol). Détection par raycast sous les pieds à chaque pas (PasMatiere) ; un pas tous les 2,1 m, plus fort en course, plus doux en marche furtive, réception d'un saut plus lourde. Nouveau (02/10/2026).",
+    "fichier": "Deathless/Pas/herbe_1.wav",
+    "variantes": [
+      "Deathless/Pas/herbe_1.wav",
+      "Deathless/Pas/herbe_2.wav",
+      "Deathless/Pas/herbe_3.wav",
+      "Deathless/Pas/herbe_4.wav",
+      "Deathless/Pas/herbe_5.wav"
+    ],
+    "portee": 25,
+    "source": "Deathless (synthèse, Assets/Audio/Deathless/Pas/synth_pas.py)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "pas_terre",
+    "nom": "Joueur — pas sur la terre",
+    "categorie": "Joueurs",
+    "usage": "Pas du joueur (héros local et marionnettes), sourd et granuleux : bruit brun de 150 à 800 Hz, grains de terre, talon grave. Terre battue au pied des arbres, sous les maisons et le long des allées (teintes brunes du sol). terre_6 est le pas Kenney footstep06 (CC0) adapté. Détection par raycast sous les pieds à chaque pas (PasMatiere) ; un pas tous les 2,1 m, plus fort en course, plus doux en marche furtive, réception d'un saut plus lourde. Nouveau (02/10/2026).",
+    "fichier": "Deathless/Pas/terre_1.wav",
+    "variantes": [
+      "Deathless/Pas/terre_1.wav",
+      "Deathless/Pas/terre_2.wav",
+      "Deathless/Pas/terre_3.wav",
+      "Deathless/Pas/terre_4.wav",
+      "Deathless/Pas/terre_5.wav",
+      "Deathless/Pas/terre_6.wav"
+    ],
+    "portee": 25,
+    "source": "Deathless (synthèse, Assets/Audio/Deathless/Pas/synth_pas.py) et Kenney, RPG Audio (terre_6, adapter_kenney.py)",
+    "licence": "propre et CC0 (Kenney)",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "pas_sable",
+    "nom": "Joueur — pas sur le sable",
+    "categorie": "Joueurs",
+    "usage": "Pas du joueur (héros local et marionnettes), glissant et granuleux, plus clair que la terre : souffle bas et grains fins, attaque douce. Le sable de la lande (teintes beiges du sol). Détection par raycast sous les pieds à chaque pas (PasMatiere) ; un pas tous les 2,1 m, plus fort en course, plus doux en marche furtive, réception d'un saut plus lourde. Nouveau (02/10/2026).",
+    "fichier": "Deathless/Pas/sable_1.wav",
+    "variantes": [
+      "Deathless/Pas/sable_1.wav",
+      "Deathless/Pas/sable_2.wav",
+      "Deathless/Pas/sable_3.wav",
+      "Deathless/Pas/sable_4.wav",
+      "Deathless/Pas/sable_5.wav"
+    ],
+    "portee": 25,
+    "source": "Deathless (synthèse, Assets/Audio/Deathless/Pas/synth_pas.py)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "pas_pierre",
+    "nom": "Joueur — pas sur la pierre",
+    "categorie": "Joueurs",
+    "usage": "Pas du joueur (héros local et marionnettes), claquement sec et court : toc sourd, éclat de talon, grains de gravier. Plateau de Nyxessa et ses marches, dalles et sentiers de pierre, perrons, grotte, soubassements, galets. pierre_4 à 6 sont les pas Kenney footstep00, 07 et 08 (CC0), les plus brefs et les plus durs, adaptés. Détection par raycast sous les pieds à chaque pas (PasMatiere) ; un pas tous les 2,1 m, plus fort en course, plus doux en marche furtive, réception d'un saut plus lourde. Nouveau (02/10/2026).",
+    "fichier": "Deathless/Pas/pierre_1.wav",
+    "variantes": [
+      "Deathless/Pas/pierre_1.wav",
+      "Deathless/Pas/pierre_2.wav",
+      "Deathless/Pas/pierre_3.wav",
+      "Deathless/Pas/pierre_4.wav",
+      "Deathless/Pas/pierre_5.wav",
+      "Deathless/Pas/pierre_6.wav"
+    ],
+    "portee": 25,
+    "source": "Deathless (synthèse, Assets/Audio/Deathless/Pas/synth_pas.py) et Kenney, RPG Audio (pierre_4 à 6, adapter_kenney.py)",
+    "licence": "propre et CC0 (Kenney)",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "pas_bois",
+    "nom": "Joueur — pas sur le bois",
+    "categorie": "Joueurs",
+    "usage": "Pas du joueur (héros local et marionnettes), « toc » résonnant : impulsion et deux modes de 250 à 900 Hz, décroissance de 150 ms. Ponts et planchers des intérieurs (taverne, maisons). Détection par raycast sous les pieds à chaque pas (PasMatiere) ; un pas tous les 2,1 m, plus fort en course, plus doux en marche furtive, réception d'un saut plus lourde. Nouveau (02/10/2026).",
+    "fichier": "Deathless/Pas/bois_1.wav",
+    "variantes": [
+      "Deathless/Pas/bois_1.wav",
+      "Deathless/Pas/bois_2.wav",
+      "Deathless/Pas/bois_3.wav",
+      "Deathless/Pas/bois_4.wav",
+      "Deathless/Pas/bois_5.wav"
+    ],
+    "portee": 25,
+    "source": "Deathless (synthèse, Assets/Audio/Deathless/Pas/synth_pas.py)",
+    "licence": "propre",
+    "statut": "a_ecouter"
+  },
+  {
+    "id": "pas_metal",
+    "nom": "Joueur — pas sur le métal",
+    "categorie": "Joueurs",
+    "usage": "Pas du joueur (héros local et marionnettes), « tic » clair résonnant : impulsion, modes inharmoniques de 1,2 à 6 kHz, 200 ms, semelle sur la tôle. Objets métalliques seulement (enclume de la forge, seau, barres de fer). Détection par raycast sous les pieds à chaque pas (PasMatiere) ; un pas tous les 2,1 m, plus fort en course, plus doux en marche furtive, réception d'un saut plus lourde. Nouveau (02/10/2026).",
+    "fichier": "Deathless/Pas/metal_1.wav",
+    "variantes": [
+      "Deathless/Pas/metal_1.wav",
+      "Deathless/Pas/metal_2.wav",
+      "Deathless/Pas/metal_3.wav",
+      "Deathless/Pas/metal_4.wav",
+      "Deathless/Pas/metal_5.wav"
+    ],
+    "portee": 25,
+    "source": "Deathless (synthèse, Assets/Audio/Deathless/Pas/synth_pas.py)",
     "licence": "propre",
     "statut": "a_ecouter"
   }
