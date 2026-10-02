@@ -31,6 +31,8 @@ Material:
     - _Echelle: 1.1
     - _EcumeForce: 0.55
     - _Facettes: 5
+    - _LargeurMin: 0.1
+    - _LargeurRuban: 6.3
     - _NuitFacteur: 0.45
     - _Trait: 2.2
     - _Vitesse: 0.9

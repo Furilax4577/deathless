@@ -20,6 +20,8 @@ Shader "Deathless/Village/EauRiviere"
         _Trait ("Longueur d'un cycle de trait (m)", Float) = 2.2
         _Densite ("Part de traits éteints (0..1)", Float) = 0.68
         _EcumeForce ("Force de l'écume", Float) = 0.55
+        _LargeurMin ("Largeur minimale d'un trait (m)", Float) = 0.1
+        _LargeurRuban ("Largeur du ruban de rivière (m)", Float) = 6.3
         _NuitFacteur ("Teinte à la pleine nuit", Float) = 0.45
     }
     SubShader
@@ -44,7 +46,7 @@ Shader "Deathless/Village/EauRiviere"
                 half4 _Reflet;
                 half4 _Ecume;
                 float _Amplitude, _Vitesse, _Echelle, _Facettes;
-                float _Courant, _Voies, _Trait, _Densite, _EcumeForce, _NuitFacteur;
+                float _Courant, _Voies, _Trait, _Densite, _EcumeForce, _NuitFacteur, _LargeurMin, _LargeurRuban;
             CBUFFER_END
             float _DeathlessNuit;
 
@@ -56,6 +58,7 @@ Shader "Deathless/Village/EauRiviere"
                 float2 uv : TEXCOORD1;
                 float vit : TEXCOORD2;
                 float brouillard : TEXCOORD3;
+                float disque : TEXCOORD4;
             };
 
             float Hash(float n) { return frac(sin(n * 12.9898) * 43758.5453); }
@@ -70,6 +73,7 @@ Shader "Deathless/Village/EauRiviere"
                 o.positionCS = TransformWorldToHClip(p);
                 o.uv = i.uv;
                 o.vit = max(0.2, i.uv2.x);
+                o.disque = i.uv2.y;   // 1 : disque du bassin (UV0.y = rayon), 0 : ruban de la rivière
                 o.brouillard = ComputeFogFactor(o.positionCS.z);
                 return o;
             }
@@ -80,16 +84,31 @@ Shader "Deathless/Village/EauRiviere"
                 if (n.y < 0) n = -n;
                 float pente = saturate(0.5 + (n.x * 0.6 + n.z * 0.45) * _Facettes);
                 half3 c = lerp(_Couleur.rgb, _Reflet.rgb, pente * pente * 0.55);
-                // courant : traits d'écume par voies, qui avancent vers l'aval à la vitesse locale
+                // courant : traits d'écume par voies, qui avancent vers l'aval. Retour de Quentin du 02/10/2026 (« les micro-traits dans
+                // l'eau, c'est pas GG ») : le défaut venait de la vitesse locale (UV1.x) multipliée par le temps dans la phase du motif :
+                // elle variait d'un point à l'autre, donc la fréquence des traits croissait avec le temps de jeu (traits de 1 à 2 pixels
+                // en peignes, moiré). Maintenant : vitesse de défilement UNIQUE (_Courant), phase = distance - temps seulement ; la
+                // vitesse locale ne règle plus que la densité et la largeur. Traits adoucis par dérivées (pas de scintillement) et
+                // éteints quand ils tombent sous quelques pixels ; largeur physique minimale de _LargeurMin m (10 cm par défaut).
                 float x = i.uv.x * _Voies;
                 float voie = floor(x);
                 float dans = abs(frac(x) - 0.5);
-                float s = (i.uv.y - _Time.y * _Courant * i.vit) / _Trait + Hash(voie + 3.7) * 7.0;
+                float aaX = max(fwidth(x), 1e-4);
+                float s = (i.uv.y - _Time.y * _Courant) / _Trait + Hash(voie + 3.7) * 7.0;
+                float aaS = max(fwidth(s), 1e-4);
                 float cellule = floor(s), f = frac(s);
                 float densite = saturate(_Densite - (i.vit - 1.0) * 0.18);
                 float allume = step(densite, Hash(cellule * 1.618 + voie * 5.31));
                 float longueur = 0.35 + 0.3 * Hash(cellule + voie * 2.1);
-                float trait = allume * step(f, longueur) * step(dans, 0.09 + 0.05 * i.vit) * sin(3.14159 * saturate(f / longueur));
+                // largeur (fraction de voie) : jamais sous _LargeurMin m ; dans le disque du bassin la voie est un arc (2 pi r / voies)
+                float voieM = lerp(_LargeurRuban, 6.2832 * i.uv.y, i.disque) / _Voies;
+                float demiL = max(0.09 + 0.05 * i.vit, 0.5 * _LargeurMin / max(voieM, 0.05));
+                demiL = min(demiL, 0.46);
+                float bord = smoothstep(demiL + aaX, demiL - aaX, dans);
+                float bout = smoothstep(longueur + aaS, longueur - aaS, f);
+                float visible = saturate((2.0 * demiL / aaX - 1.5) / 1.5) * saturate((longueur / aaS - 1.5) / 1.5);
+                float place = saturate((voieM - 2.0 * _LargeurMin) / (2.0 * _LargeurMin));   // voie trop étroite (centre du bassin) : pas de trait
+                float trait = allume * bord * bout * visible * place * sin(3.14159 * saturate(f / longueur));
                 float ecume = saturate(trait * _EcumeForce * saturate(0.6 + 0.4 * i.vit));
                 c = lerp(c, _Ecume.rgb, ecume);
                 c *= lerp(1.0, _NuitFacteur, saturate(_DeathlessNuit));

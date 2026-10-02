@@ -661,13 +661,13 @@ public static partial class VillageBuilder
                 }
             // bassin : disque à facettes (anneaux)
             int b0i = v.Count; int secteurs = 28; float rb = V5BassinRayon + 0.9f;
-            v.Add(new Vector3(V5Bassin.x, V5NiveauEau, V5Bassin.y)); uv.Add(new Vector2(0f, 0f)); uv2.Add(new Vector2(1.8f, 0f));
+            v.Add(new Vector3(V5Bassin.x, V5NiveauEau, V5Bassin.y)); uv.Add(new Vector2(0f, 0f)); uv2.Add(new Vector2(1.8f, 1f));   // uv2.y = 1 : disque du bassin (EauRiviere)
             for (int ring = 1; ring <= 3; ring++)
                 for (int s = 0; s < secteurs; s++)
                 {
                     float ang = (s + (ring % 2) * 0.5f) * Mathf.PI * 2f / secteurs, rr = rb * ring / 3f;
                     v.Add(new Vector3(V5Bassin.x + Mathf.Cos(ang) * rr, V5NiveauEau + 0.002f, V5Bassin.y + Mathf.Sin(ang) * rr));
-                    uv.Add(new Vector2(s / (float)secteurs, rr)); uv2.Add(new Vector2(1.8f, 0f));   // anneaux qui s'élargissent
+                    uv.Add(new Vector2(s / (float)secteurs, rr)); uv2.Add(new Vector2(1.8f, 1f));   // anneaux qui s'élargissent
                 }
             for (int s = 0; s < secteurs; s++) { t.Add(b0i); t.Add(b0i + 1 + (s + 1) % secteurs); t.Add(b0i + 1 + s); }
             for (int ring = 1; ring < 3; ring++)
