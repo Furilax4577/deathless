@@ -274,6 +274,26 @@ namespace Deathless.Reseau
         void ReponseTaverneRpc(FixedString128Bytes message, bool ok, byte article, RpcParams p = default)
             => Taverne.Reponse(message.ToString(), ok, (Taverne.Article)article);
 
+        /// Achat d'un client chez le mécano ou le druide (03/10/2026) : l'hôte décide (caisse commune, maximum porté d'après
+        /// l'inventaire répliqué du client, potion de mana réservée au Mage) et lui répond ; l'article est ajouté à l'inventaire
+        /// du client à la réponse (il l'écrit alors dans HerosReseau, d'où l'hôte le relit). L'hôte tient aussi sa copie à jour
+        /// tout de suite pour juger les achats suivants.
+        public void DemanderBoutique(byte article) => BoutiqueRpc(article);
+
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        void BoutiqueRpc(byte article, RpcParams p = default)
+        {
+            var partie = Partie.Instance;
+            if (partie == null || article > (byte)ArticleBoutique.PotionEndurance) return;
+            ulong client = p.Receive.SenderClientId;
+            string msg = Boutiques.Payer((ArticleBoutique)article, Partie.IdJoueur(client), out bool ok);
+            ReponseBoutiqueRpc(new FixedString128Bytes(msg), ok, article, RpcTarget.Single(client, RpcTargetUse.Temp));
+        }
+
+        [Rpc(SendTo.SpecifiedInParams)]
+        void ReponseBoutiqueRpc(FixedString128Bytes message, bool ok, byte article, RpcParams p = default)
+            => BoutiqueVillage.Reponse(message.ToString(), ok, (ArticleBoutique)article);
+
         /// Hôte : une tournée a été payée ; chaque client enivre son joueur.
         public void AnnoncerTournee(string qui) { if (IsServer) TourneeRpc(new FixedString64Bytes(qui ?? "")); }
 

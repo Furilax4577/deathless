@@ -186,7 +186,9 @@ Clavier : l'Input System lie des **positions physiques** (disposition US). La ta
 | Skill2 | `rightShoulder` (RB, R1) | `r` | R |
 | Skill3 | ButtonWithOneModifier `leftShoulder` + `rightShoulder`, ordre libre | `f` | F |
 | Sprint | `leftStickPress` (L3) | `leftShift` | Maj |
-| DrinkPotion | `dpad/up` | `1` (rangée des chiffres) | 1 (icône ; la touche porte « & » en AZERTY) |
+| DrinkPotion (santé) | `dpad/up` | `1` (rangée des chiffres) | 1 (icône ; la touche porte « & » en AZERTY) |
+| DrinkPotionMana (Mage seulement, 03/10/2026) | `dpad/left` | `2` (rangée des chiffres) | 2 (la touche porte « é » en AZERTY) |
+| DrinkPotionStamina (03/10/2026) | `dpad/right` | `3` (rangée des chiffres) | 3 (la touche porte « " » en AZERTY) |
 | Emote | `dpad/down` (maintenu) | `b` (maintenu) | B |
 | Ready | `<DualShockGamepad>/touchpadButton` (pavé tactile) et `select` (Vue ; Create sur DualSense, voulu) | `f1` | F1 |
 | Pause | `start` (Menu, Options) | `escape` | Échap |

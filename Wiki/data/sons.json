@@ -3772,5 +3772,29 @@
     "source": "Deathless (synthèse, Assets/Audio/Deathless/Pas/synth_pas.py)",
     "licence": "propre",
     "statut": "a_ecouter"
+  },
+  {
+    "id": "dl_boutique_achat",
+    "nom": "Village — achat d'une potion chez le druide",
+    "categorie": "Village",
+    "usage": "Une potion payée à la caisse commune (2D, `SonsDuJeu.AchatBoutique`, 03/10/2026) : pièces posées sur le comptoir, fiole qu'on pose. En attendant : `kenney_rpg_handlecoins`.",
+    "fichier": null,
+    "statut": "a_creer"
+  },
+  {
+    "id": "dl_boutique_cle",
+    "nom": "Village — achat d'une clé ou d'un kit chez le mécano",
+    "categorie": "Village",
+    "usage": "Une clé ou le kit de crochetage payé (3D sur le héros, `SonsDuJeu.AchatCle`, 03/10/2026) : pièces, tintement de métal, petit cliquetis de serrure. En attendant : `kenney_rpg_metallatch`.",
+    "fichier": null,
+    "statut": "a_creer"
+  },
+  {
+    "id": "dl_crochetage",
+    "nom": "Donjon — crochetage d'une serrure",
+    "categorie": "Donjon et défenses",
+    "usage": "Mini-jeu de crochetage (03/10/2026, `Crochetage`) : cliquetis fin tant que l'aiguille est dans la zone, craquement d'un crochet qui casse, déclic de la serrure qui cède. En attendant : `kenney_rpg_metallatch` (clic), `dl_interface_refus` (crochet cassé) et `chest_open` (ouverture).",
+    "fichier": null,
+    "statut": "a_creer"
   }
 ]

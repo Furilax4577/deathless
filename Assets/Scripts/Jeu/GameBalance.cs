@@ -438,6 +438,64 @@ namespace Deathless.Jeu
         [Tooltip("Ondulation de la direction de marche à pleine ivresse (degrés) : une démarche hésitante.")]
         public float ivresseDeviation = 14f;
 
+        [Header("Boutiques du village : mécano (clés, crochets) et druide (potions) ; 03/10/2026, {à équilibrer}")]
+        [Tooltip("Distance horizontale à l'ancre d'échange du mécano ou du druide pour leur parler (m ; comme la taverne).")]
+        public float boutiqueDistance = 2.4f;
+        [Tooltip("Mécano : prix d'une clé de bronze (or, pris dans la caisse commune).")]
+        public int mecanoPrixCleBronze = 40;
+        public int mecanoPrixCleArgent = 120;
+        public int mecanoPrixCleOr = 320;
+        [Tooltip("Mécano : prix du kit de crochetage (or).")]
+        public int mecanoPrixKit = 60;
+        [Tooltip("Clés d'une même sorte qu'un joueur peut porter (à usage unique).")]
+        public int clesMaxParSorte = 2;
+        [Tooltip("Crochets d'un kit. Un crochet casse à chaque échec de crochetage.")]
+        public int crochetsParKit = 5;
+        [Tooltip("Crochets qu'un joueur peut porter (deux kits).")]
+        public int crochetsMax = 10;
+        [Tooltip("Druide : prix d'une potion de santé (or).")]
+        public int druidePrixSante = 20;
+        [Tooltip("Druide : prix d'une potion de mana (or ; réservée au Mage, seul à avoir une jauge de mana).")]
+        public int druidePrixMana = 20;
+        [Tooltip("Druide : prix d'une potion d'endurance (or).")]
+        public int druidePrixEndurance = 15;
+        [Tooltip("Potions d'une même sorte qu'un joueur peut porter.")]
+        public int potionsMaxParSorte = 3;
+        [Tooltip("Potion de santé : part des points de vie maximum rendue (0,4 = 40 %).")]
+        public float potionSantePart = 0.4f;
+        [Tooltip("Potion de mana : part de la jauge de mana rendue (0,5 = 50 %).")]
+        public float potionManaPart = 0.5f;
+        [Tooltip("Potion d'endurance : rend toute l'endurance, puis la récupération est multipliée pendant cette durée (s).")]
+        public float potionEnduranceDuree = 10f;
+        [Tooltip("Potion d'endurance : facteur de la récupération pendant la durée ci-dessus (2 : doublée).")]
+        public float potionEnduranceFacteur = 2f;
+        [Tooltip("Temps minimal entre deux potions bues (s), toutes sortes confondues.")]
+        public float potionRecharge = 1.5f;
+
+        [Header("Crochetage des serrures (mini-jeu, 03/10/2026) : maintenir Interagir pour garder l'aiguille dans la zone, {à confirmer}")]
+        [Tooltip("Essais par serrure : un crochet casse à chaque essai raté ; à 0 crochet, le mini-jeu s'arrête.")]
+        public int crochetageEssais = 3;
+        [Tooltip("Largeur de la zone (part de la piste) pour une serrure simple ou de bronze.")]
+        public float crochetageZoneFacile = 0.30f;
+        [Tooltip("Largeur de la zone pour une serrure d'argent.")]
+        public float crochetageZoneDifficile = 0.20f;
+        [Tooltip("Agilité du joueur : par point au-dessus de 3, part de la zone ajoutée (l'assassin, à 6, gagne 36 % de zone ; le paladin, à 2, en perd 12 %).")]
+        public float crochetageZoneParAgilite = 0.12f;
+        [Tooltip("Agilité du joueur : par point au-dessus de 3, chance qu'un crochet ne casse pas sur un échec.")]
+        public float crochetageEconomieParAgilite = 0.10f;
+        [Tooltip("Vitesse de déplacement de la zone (pistes par seconde), serrure simple ou de bronze, puis d'argent.")]
+        public float crochetageDeriveFacile = 0.28f;
+        public float crochetageDeriveDifficile = 0.45f;
+        [Tooltip("Temps à passer dans la zone pour réussir un essai (s) ; la jauge redescend deux fois plus lentement hors de la zone.")]
+        public float crochetageDureeReussite = 2.4f;
+        [Tooltip("Temps accordé à un essai avant qu'il échoue (s).")]
+        public float crochetageDureeEssai = 12f;
+        [Tooltip("Aiguille : accélération vers le haut quand Interagir est maintenu, et gravité quand il est relâché (pistes par seconde au carré).")]
+        public float crochetageMontee = 2.6f;
+        public float crochetageChute = 2.2f;
+        [Tooltip("Distance à la serrure au-delà de laquelle le crochetage s'arrête (m).")]
+        public float crochetageDistanceMax = 3.4f;
+
         /// Valeur d'un tableau par palier (1 à 5 ; bornée aux extrémités).
         public static T AuPalier<T>(T[] valeurs, int palier) => valeurs == null || valeurs.Length == 0 ? default : valeurs[Mathf.Clamp(palier, 1, valeurs.Length) - 1];
         public float Palier(float[] valeurs, int palier) => AuPalier(valeurs, palier);

@@ -45,7 +45,9 @@ Flèches et carreaux ont une **vitesse** et subissent la **pesanteur** : plus un
 | | Touche | Action |
 |---|---|---|
 | {icone commun_esquive} | B | Esquive, roulade |
-| {icone commun_potion_soin} | Croix directionnelle haut | Boire une potion de soin (vendue par le druide, voir [Le village](village.md)) |
+| {icone commun_potion_soin} | Croix directionnelle haut | Boire une potion de santé (vendue par le druide, voir [Le village](village.md#potions-du-druide-décidé)) |
+| {icone commun_potion_mana} | Croix directionnelle gauche | Boire une potion de mana (Mage seulement) |
+| {icone commun_potion_endurance} | Croix directionnelle droite | Boire une potion d'endurance |
 | {icone commun_coup_critique} | | Coup critique : tête, dos, furtivité selon la classe |
 
 Toutes les touches : voir [Commandes](commandes.md).

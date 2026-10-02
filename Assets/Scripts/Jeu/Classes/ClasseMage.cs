@@ -99,6 +99,12 @@ namespace Deathless.Jeu
         public override bool FaceVisee => m_Action != Action.Aucune;
         public override bool HautDuCorps => m_Action != Action.Aucune;
         public override void RemplirJauge() { m_Mana = JaugeMax; }
+        public override float AjouterMana(float montant)
+        {
+            float avant = m_Mana;
+            m_Mana = Mathf.Min(JaugeMax, m_Mana + Mathf.Max(0f, montant));
+            return m_Mana - avant;
+        }
         public override JaugeClasse Jauge => JaugeClasse.Mana;
         public override float ValeurJauge => m_Mana;
         public override float JaugeMax => B.manaMax * FacteurJauge;   // Esprit gagné : jauge plus grande

@@ -34,6 +34,11 @@ namespace Deathless.Reseau
         // l'hôte les lit pour ce qu'il décide (or ramassé, recul de la parade parfaite).
         readonly NetworkVariable<int> m_Attributs = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
+        // Inventaire (03/10/2026, Inventaire.Tasser : potions, clés, crochets, 4 bits chacun) : écrit par le propriétaire, qui
+        // boit ses potions et tourne ses clés ; l'hôte recopie la valeur dans l'EtatJoueur de la marionnette quand elle change
+        // (il y juge les achats au mécano et au druide) et l'ajoute lui-même à l'achat, sans attendre le propriétaire.
+        readonly NetworkVariable<int> m_Inventaire = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
         /// Héros réseau présents (tous les postes), dans l'ordre d'apparition.
         public static readonly List<HerosReseau> Tous = new List<HerosReseau>();
 
@@ -73,6 +78,7 @@ namespace Deathless.Reseau
             NomJoueur.OnValueChanged += NomChange;
             Classe.OnValueChanged += ClasseChange;
             Tous.Add(this);
+            m_Inventaire.OnValueChanged += InventaireChange;
             BrancherStatuts();
             if (IsOwner && !IsServer) Heros.Sante.Soigne += OnSoigne;
             else if (IsServer && !IsOwner) m_Soins.OnValueChanged += OnSoinsChange;
@@ -89,6 +95,7 @@ namespace Deathless.Reseau
             else
             {
                 p.AttacherHerosDistant(Heros, Classe.Value.ToString(), NomJoueur.Value.ToString(), OwnerClientId);
+                InventaireChange(0, m_Inventaire.Value);   // valeur déjà répliquée à l'apparition (OnValueChanged ne la signale pas)
                 if (IsServer) Heros.Sante.relais = RelayerVersProprietaire;
             }
         }
@@ -97,6 +104,7 @@ namespace Deathless.Reseau
         {
             if (Heros != null && Heros.Sante != null) Heros.Sante.Soigne -= OnSoigne;
             m_Soins.OnValueChanged -= OnSoinsChange;
+            m_Inventaire.OnValueChanged -= InventaireChange;
             NomJoueur.OnValueChanged -= NomChange;
             Classe.OnValueChanged -= ClasseChange;
             m_Pseudo = m_ClasseId = null;
@@ -144,6 +152,13 @@ namespace Deathless.Reseau
             ClassePaladin.SoignerAllies(Heros, montant);
         }
 
+        /// Marionnette : l'inventaire du propriétaire a changé (potion bue, achat, clé tournée) ; recopié dans son EtatJoueur.
+        void InventaireChange(int avant, int apres)
+        {
+            if (IsOwner || Heros == null || Heros.EtatJoueur == null) return;
+            Inventaire.Detasser(apres, Heros.EtatJoueur);
+        }
+
         void OnSoinsChange(float avant, float apres)
         {
             if (apres > avant && Partie.Instance != null) Partie.Instance.CompterSoins(Partie.IdJoueur(OwnerClientId), apres - avant);
@@ -166,6 +181,8 @@ namespace Deathless.Reseau
                 if (m_Furie.Value != furie) m_Furie.Value = furie;
                 int attributs = Attributs.Tasser(Heros.EtatJoueur != null ? Heros.EtatJoueur.attributs : null);
                 if (m_Attributs.Value != attributs) m_Attributs.Value = attributs;
+                int inventaire = Inventaire.Tasser(Heros.EtatJoueur);
+                if (m_Inventaire.Value != inventaire) m_Inventaire.Value = inventaire;
             }
             else
             {

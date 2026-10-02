@@ -19,12 +19,16 @@ Le jeu se joue à la manette Xbox ou PlayStation, ou au clavier et à la souris.
 | Compétence 3 | LB + RB | L1 + R1 | F | {décidé} |
 | **Furie** (ultime du Viking, rage pleine ; sans effet avant 100 et pour les autres classes) | R3 (clic du stick droit) | R3 | G | {décidé, Quentin 03/10/2026} |
 | Sprinter | L3 | L3 | Maj | {décidé} |
-| Boire une potion | Croix directionnelle haut | Croix directionnelle haut | 1 | {décidé} |
+| Boire une potion de **santé** | Croix directionnelle haut | Croix directionnelle haut | 1 | {décidé} |
+| Boire une potion de **mana** (Mage seulement) | Croix directionnelle gauche | Croix directionnelle gauche | 2 | {décidé, Quentin 03/10/2026} |
+| Boire une potion d'**endurance** | Croix directionnelle droite | Croix directionnelle droite | 3 | {décidé, Quentin 03/10/2026} |
 | Roue à emotes (maintenir, pointer, relâcher ; voir [Interface](interface.md)) | Croix directionnelle bas | Croix directionnelle bas | B | {décidé} |
 | Se déclarer prêt (jour, voir [Déroulé d'une partie](deroule.md)) | Vue | Pavé tactile ou Create | F1 | {décidé} |
 | Pause | Menu | Options | Échap | {décidé} |
 
 Au clavier, les touches sont données sur une disposition AZERTY. Le déplacement se fait avec ZQSD et la caméra avec la souris.
+
+Les trois potions occupent les trois directions de la croix qui étaient libres (la croix bas reste la roue à emotes) : **aucune direction n'était déjà prise** en dehors du haut, qui était déjà la potion. Au clavier, les touches 1, 2 et 3 sont celles de la rangée des chiffres (disposition AZERTY : & é "). Détail des potions dans [Le village](village.md#potions-du-druide-décidé). {dev} Actions `DrinkPotion` (santé), `DrinkPotionMana`, `DrinkPotionStamina` de `DeathlessControls`, relayées par `InputChordResolver` comme les autres boutons, lues par `Heros.OnAction` → `UsagePotions.Boire`.
 
 Touche de la Furie (R3, G) {à confirmer} : proposée faute de mieux, R3 étant libre depuis le retrait de l'accroupissement.
 

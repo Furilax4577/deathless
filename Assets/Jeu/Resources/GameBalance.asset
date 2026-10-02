@@ -365,6 +365,35 @@ MonoBehaviour:
   ivresseTournee: 15
   ivresseRoulis: 4
   ivresseDeviation: 14
+  boutiqueDistance: 2.4
+  mecanoPrixCleBronze: 40
+  mecanoPrixCleArgent: 120
+  mecanoPrixCleOr: 320
+  mecanoPrixKit: 60
+  clesMaxParSorte: 2
+  crochetsParKit: 5
+  crochetsMax: 10
+  druidePrixSante: 20
+  druidePrixMana: 20
+  druidePrixEndurance: 15
+  potionsMaxParSorte: 3
+  potionSantePart: 0.4
+  potionManaPart: 0.5
+  potionEnduranceDuree: 10
+  potionEnduranceFacteur: 2
+  potionRecharge: 1.5
+  crochetageEssais: 3
+  crochetageZoneFacile: 0.3
+  crochetageZoneDifficile: 0.2
+  crochetageZoneParAgilite: 0.12
+  crochetageEconomieParAgilite: 0.1
+  crochetageDeriveFacile: 0.28
+  crochetageDeriveDifficile: 0.45
+  crochetageDureeReussite: 2.4
+  crochetageDureeEssai: 12
+  crochetageMontee: 2.6
+  crochetageChute: 2.2
+  crochetageDistanceMax: 3.4
   herosPV: 150
   endurance: 100
   enduranceRegen: 15

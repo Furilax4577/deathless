@@ -695,3 +695,37 @@
     overflow: hidden;
 }
 .hud-relevage__remplissage { height: 100%; width: 0%; background-color: var(--dl-color-life); }
+
+/* ---------- Potions, clés et crochets (03/10/2026) : à droite de la barre de vie, dans le bloc du joueur ---------- */
+.hud-sac { margin-left: 15px; align-items: flex-start; flex-direction: column; display: none; }
+.hud-sac__potions { flex-direction: row; align-items: flex-end; }
+.hud-sac__potion { align-items: center; margin-right: 6px; }
+.hud-sac__case { width: 54px; height: 54px; border-radius: 12px; border-width: 3px; border-color: var(--dl-color-border-strong); background-color: var(--dl-color-panel); align-items: center; justify-content: center; margin-bottom: 6px; }
+.hud-sac__icone { position: absolute; left: 4px; top: 4px; right: 4px; bottom: 4px; }
+.hud-sac__nombre { position: absolute; right: 3px; bottom: 0; margin: 0; padding: 0 3px; -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-Bold-SDF.asset"); font-size: 21px; color: #ffffff; -unity-text-outline-width: 1px; -unity-text-outline-color: var(--dl-color-ink); }
+.hud-sac__potion--vide .hud-sac__icone { opacity: 0.3; }
+.hud-sac__potion--vide .hud-sac__nombre { color: var(--dl-color-text-disabled); }
+.hud-sac__potion--vide .hud-sac__case { border-color: var(--dl-color-line); }
+.hud-sac__potion--max .hud-sac__case { border-color: var(--dl-color-gold); }
+.hud-sac__cles { flex-direction: row; margin-top: 3px; display: none; }
+.hud-sac__cle { flex-direction: row; align-items: center; height: 36px; padding: 0 12px 0 3px; margin-right: 6px; border-radius: 18px; background-color: rgba(16, 19, 27, 0.88); }
+.hud-sac__cle-icone { width: 30px; height: 30px; }
+.hud-sac__cle-nombre { -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); font-size: 21px; color: var(--dl-color-text); margin: 0 0 0 3px; padding: 0; }
+
+/* ---------- Crochetage (03/10/2026) : panneau au centre, piste, zone qui glisse, aiguille, jauge de réussite ---------- */
+.hud-crochetage { position: absolute; left: 50%; bottom: 240px; width: 840px; translate: -50% 0; padding: 24px 36px 18px 36px; border-radius: 21px; border-width: 2px; border-color: var(--dl-color-gold); background-color: rgba(35, 42, 58, 0.96); }
+.hud-crochetage__entete { flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.hud-crochetage__titre { -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); font-size: var(--dl-text-large); color: var(--dl-color-gold); margin: 0; padding: 0; }
+.hud-crochetage__essais { font-size: var(--dl-text-small); color: var(--dl-color-text-muted); margin: 0; padding: 0; }
+.hud-crochetage__piste { height: 48px; border-radius: 24px; background-color: var(--dl-color-well); border-width: 2px; border-color: var(--dl-color-border); overflow: hidden; }
+.hud-crochetage__zone { position: absolute; top: 0; bottom: 0; background-color: rgba(217, 178, 100, 0.55); border-left-width: 3px; border-right-width: 3px; border-color: var(--dl-color-gold); }
+.hud-crochetage--dans .hud-crochetage__zone { background-color: rgba(244, 236, 216, 0.75); }
+.hud-crochetage__aiguille { position: absolute; top: 0; bottom: 0; width: 9px; margin-left: -4px; background-color: var(--dl-color-text); border-radius: 4px; }
+.hud-crochetage__jauge { height: 15px; margin-top: 15px; border-radius: 8px; background-color: var(--dl-color-well); overflow: hidden; }
+.hud-crochetage__progres { height: 100%; background-color: var(--dl-color-gold); border-radius: 8px; }
+.hud-crochetage__temps { height: 6px; margin-top: 6px; border-radius: 3px; background-color: var(--dl-color-well); overflow: hidden; }
+.hud-crochetage__temps-reste { height: 100%; background-color: var(--dl-color-border-strong); }
+.hud-crochetage__message { -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); font-size: var(--dl-text-body); color: var(--dl-color-gold); margin: 12px 0 0 0; padding: 0; -unity-text-align: middle-center; }
+.hud-crochetage__message--vide { color: rgba(0, 0, 0, 0); }
+.hud-crochetage__message--echec { color: #ff8a70; }
+.hud-crochetage__invites { flex-direction: row; justify-content: center; margin-top: 9px; }

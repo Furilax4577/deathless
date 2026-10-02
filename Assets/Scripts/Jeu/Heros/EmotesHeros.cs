@@ -167,7 +167,7 @@ namespace Deathless.Jeu
                     OuvrirRoue();
                     return true;
                 case "Jump": case "Dodge": case "AttackPrimary": case "AttackSecondary":
-                case "Skill1": case "Skill2": case "Skill3": case "Ultimate": case "DrinkPotion":
+                case "Skill1": case "Skill2": case "Skill3": case "Ultimate": case "DrinkPotion": case "DrinkPotionMana": case "DrinkPotionStamina":
                     if (m_Ouverte && !m_RoueTest) FermerRoue();
                     Interrompre(true);
                     return false;
@@ -275,14 +275,15 @@ namespace Deathless.Jeu
             }
         }
 
-        /// Lance l'emote `numero` (1 à 8). Faux si le héros ne peut pas (son de refus).
-        public bool Lancer(int numero)
+        /// Lance l'emote `numero` (1 à 8). Faux si le héros ne peut pas (son de refus). `geste` : le geste sert à autre chose
+        /// qu'une emote (boire une potion, 03/10/2026) : ni son de refus, ni succès d'emote.
+        public bool Lancer(int numero, bool geste = false)
         {
             if (!m_Local || numero < 1 || numero > Definitions.Count) return false;
             if (numero == m_Active) return true;   // déjà en cours (assis, couché, pompes…)
             if (!PeutLancer)
             {
-                VolumesAudio.JouerInterface(SonInterface.Refus, 0.6f);
+                if (!geste) VolumesAudio.JouerInterface(SonInterface.Refus, 0.6f);
                 return false;
             }
             m_Active = numero;
@@ -291,7 +292,7 @@ namespace Deathless.Jeu
             m_AttendNeutre = m_Heros.Entrees != null && m_Heros.Entrees.Deplacement.sqrMagnitude > 0.01f;
             Anim.SetInteger(P_EmoteNum, numero);
             m_Heros.Declencher(P_Emote);
-            Deathless.Succes.ServiceSucces.Emote(m_Heros);   // succès « Danse de la victoire »
+            if (!geste) Deathless.Succes.ServiceSucces.Emote(m_Heros);   // succès « Danse de la victoire »
             return true;
         }
 

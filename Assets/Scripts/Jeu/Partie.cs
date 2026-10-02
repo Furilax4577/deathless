@@ -119,6 +119,8 @@ namespace Deathless.Jeu
                 // Taverne : au comptoir (ancre d'échange : celui, extérieur, de la carte v5, ou celui de l'intérieur de l'ancienne carte).
                 var comptoir = AncreTaverne();
                 if (comptoir != null && comptoir.GetComponent<Taverne>() == null) comptoir.AddComponent<Taverne>();
+                // Carte v5 : boutiques du mécano (clés, crochets) et du druide (potions) sur leurs ancres d'échange (03/10/2026).
+                Boutiques.Assurer();
                 nyxessa.equipe = Equipe.Relique;
                 nyxessa.Initialiser(B.nyxessaPV);
                 nyxessa.Touche += OnNyxessaTouchee;
@@ -282,7 +284,7 @@ namespace Deathless.Jeu
 
         /// Client qui revient après une coupure : ce que ce poste tenait seul (rangs, points, jours survécus), gardé à la
         /// déconnexion (GarderPourRetour) pour le code du salon. Survit au rechargement du village.
-        sealed class Retour { public string code, classeId; public int[] rangs, attributs; public int points, pointsAttribut, nuits; }
+        sealed class Retour { public string code, classeId; public int[] rangs, attributs; public int points, pointsAttribut, nuits, inventaire; }
         static Retour s_Retour;
 
         /// Client déconnecté en partie (LobbyReseau.SurDeconnexion) : rangs et points de compétence gardés pour un retour
@@ -292,7 +294,7 @@ namespace Deathless.Jeu
             var j = m_Local;
             if (j == null || string.IsNullOrEmpty(code)) { s_Retour = null; return; }
             s_Retour = new Retour { code = code, classeId = j.classeId, rangs = (int[])j.rangs?.Clone(), points = j.pointsCompetence, nuits = j.nuitsSurvecues,
-                attributs = (int[])j.attributs?.Clone(), pointsAttribut = j.pointsAttribut };
+                attributs = (int[])j.attributs?.Clone(), pointsAttribut = j.pointsAttribut, inventaire = Inventaire.Tasser(j) };
         }
 
         /// Arrivée en cours de partie : jours survécus d'après l'horloge de l'hôte (1 point par aube passée depuis la nuit
@@ -313,6 +315,8 @@ namespace Deathless.Jeu
                 // Attributs (01/10/2026) : gardés comme les rangs, plus un point par aube passée pendant l'absence.
                 if (r.attributs != null) j.attributs = r.attributs;
                 j.pointsAttribut = r.pointsAttribut + Mathf.Max(0, nuits - r.nuits);
+                // Inventaire (03/10/2026) : potions, clés et crochets gardés comme les rangs.
+                Inventaire.Detasser(r.inventaire, j);
                 return true;
             }
             j.nuitsSurvecues = nuits;

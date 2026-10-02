@@ -77,10 +77,22 @@ MonoBehaviour:
     image: {fileID: 7388822144124034973, guid: 5104afec04b047648b1e0472f9c6774c, type: 3}
   - id: clochard_pet_propulsion
     image: {fileID: 7388822144124034973, guid: 60fc511cf93e2ec44bd25415a385c857, type: 3}
+  - id: commun_cle_argent
+    image: {fileID: 7388822144124034973, guid: e0a3311dee902004f850c7101ac515ec, type: 3}
+  - id: commun_cle_bronze
+    image: {fileID: 7388822144124034973, guid: 63d9192383aaec64a8d848df5b08ef65, type: 3}
+  - id: commun_cle_or
+    image: {fileID: 7388822144124034973, guid: c7d01a3189827d5449be0be9c0eca55d, type: 3}
   - id: commun_coup_critique
     image: {fileID: 7388822144124034973, guid: 1c48d69886e9c76478c9f824937cc9b0, type: 3}
+  - id: commun_crochets
+    image: {fileID: 7388822144124034973, guid: 70da3c59499b1e34c93d2a357ba198a3, type: 3}
   - id: commun_esquive
     image: {fileID: 7388822144124034973, guid: 620acf40a9c0d6040a57f674168025f4, type: 3}
+  - id: commun_potion_endurance
+    image: {fileID: 7388822144124034973, guid: fb9d455f87f7c48429820c2fea1c9fed, type: 3}
+  - id: commun_potion_mana
+    image: {fileID: 7388822144124034973, guid: 630065ab946fec64999a4555a51d5981, type: 3}
   - id: commun_potion_soin
     image: {fileID: 7388822144124034973, guid: 726cd297b1f252242a52b4e26bb1af57, type: 3}
   - id: dj_bob_boule_a_facettes

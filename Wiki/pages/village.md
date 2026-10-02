@@ -85,21 +85,44 @@ Maisons générées (cap « sortir de KayKit », retours de Quentin du 27/09/202
 ## Villageois
 
 - **Sorcier** {décidé} : un villageois sorcier invoque le bouclier de Nyxessa. **Le jour**, il reste **debout devant sa maison** (maisons fermées depuis le 03/10/2026) ; **la nuit**, il se tient près de Nyx et la protège. Pour le moment, on ne lui parle pas. Voir [Nyxessa](nyxessa.md). Il porte un **bâton à cornes dorées**, dont le **cristal est vert**, couleur de Nyxessa {décidé}.
-- **Druide** {décidé} : il vend les potions de soin le jour. {{dev: Pas encore dans le jeu.}} {{dev: Modèle : le druide du pack KayKit Adventurers 2.0 EXTRA (`Assets/Art/KayKit/KayKit_Adventurers_2.0_EXTRA/Characters/fbx/Druid.fbx`, bâton `druid_staff`).}}
-- **Mécano** {décidé} : le vendeur traditionnel. Il tiendra plus tard la **boutique** où l'on achète des **armes et des améliorations**. {{dev: Modèle : l'ingénieur (`Engineer.fbx`, clé `engineer_Wrench`) du pack KayKit Adventurers 2.0 EXTRA. Pas dans la version 0.1.}}
+- **Druide** {décidé} : il vend les **potions** (santé, mana, endurance) le jour, devant sa maison : on lui parle (touche Interagir, à 2,4 m) et un menu d'achat s'ouvre, comme à la taverne. Voir [Potions du druide](#potions-du-druide-décidé). {{dev: Boutique construite le 03/10/2026 : composant `Druide` sur l'ancre `Villageois/Ancre_Echange_Druide` (posée par le builder, étape 1b, et au besoin par `Boutiques.Assurer` au démarrage). Modèle : le druide du pack KayKit Adventurers 2.0 EXTRA (`Assets/Art/KayKit/KayKit_Adventurers_2.0_EXTRA/Characters/fbx/Druid.fbx`, bâton `druid_staff`).}}
+- **Mécano** {décidé} : le vendeur traditionnel. Il vend, devant sa maison, les **clés** des serrures du donjon et le **kit de crochetage** (même menu d'achat). Voir [Le mécano et ses clés](#le-mécano-et-ses-clés-décidé). Il tiendra plus tard la boutique où l'on achète des armes et des améliorations. {{dev: Boutique construite le 03/10/2026 : composant `Mecano` sur l'ancre `Villageois/Ancre_Echange_Mecano`. Modèle : l'ingénieur (`Engineer.fbx`, clé `engineer_Wrench`) du pack KayKit Adventurers 2.0 EXTRA.}}
 - **Forgeron** {décidé} : il améliore l'arme de chaque héros ; le mécano garde la vente des armes neuves. {{dev: Amélioration de l'arme : pas encore dans le jeu (seuls le forgeron et sa forge sont en place, en décor).}} Modèle : le **barbare, sans son chapeau d'ours ni son écharpe** {décidé}. Il **forge dans sa forge** avec un marteau KayKit, jour et nuit : coups réguliers sur l'enclume, étincelles {décidé}. {{dev: Barbare du pack KayKit Adventurers 2.0 FREE (`Barbarian.fbx`, présent dans Relic) ; le chapeau est une pièce séparée, `Barbarian_BearHat`, à masquer.}}
   - **L'enclume** est à sa taille : plus petite qu'avant, sur un billot bas, sa table à hauteur de la main du forgeron, devant lui. Le marteau **frappe la table de l'enclume sans y entrer**, ni pendant le geste ni au repos (entre deux coups, le marteau reste posé sur la table) {décidé}. {{dev: Enclume KayKit `anvil` à l'échelle 0,42 (0,7 × l'ancienne), billot de 10 cm, table à 0,44 m du plancher (`InterieursBuilder.EnclumeEchelle`). `ForgeronBuilder` mesure l'instant du contact (tête du marteau à la hauteur de la table) et place le forgeron pour qu'aucun sommet du marteau ni du corps n'entre dans l'enclume sur tout le geste ; mesure en jeu : 0,0 mm de pénétration. Captures `Assets/Screenshots/forge_contact_*.png`.}}
   - **Le feu de la forge est vivant** : flammes en gemmes qui dansent, étincelles, braises qui palpitent, lumière qui vacille ; couleurs du feu, jamais de vert {décidé}. {{dev: `ForgeFeu` (palette Feu, 54 gemmes au plus, lumière `Feu_Forge` ± 10 %), visuel seulement, chaque poste le joue pour lui. Fiche dans `Docs/vfx.md`.}}
   - **Sons** : à chaque coup, **un des 3 sons de marteau sur l'enclume**, tiré au hasard, et rien d'autre {décidé}. {{dev: Son `forge_enclume` du catalogue (voir [Sons](sons.md)), synthétisé pour Deathless : `Assets/Audio/Forge/enclume_1..3.wav`, générés par `Assets/Audio/Forge/synth_enclume.py`.}}
 - Pas d'autre villageois {décidé}.
 
-## Potions de soin {décidé}
+## Le mécano et ses clés {décidé}
 
-- Les héros **achètent des potions de soin en or, le jour**, au village.
-- Chacun en porte **3 au maximum**. On boit avec la croix directionnelle haut, ou la touche 1 au clavier (voir [Commandes](commandes.md)).
-- Prix et soin rendu : {à équilibrer}.
-- **Le druide** les vend {décidé}. Voir Villageois.
-- {dev} Pas encore dans le jeu : ni achat ni boisson de potion.
+- Le mécano vend, **de jour**, quatre articles, payés dans la **caisse commune** (l'hôte décide en multijoueur) {décidé, Quentin, 03/10/2026} :
+
+| Article | Prix {à équilibrer} | Règle |
+|---|---|---|
+| Clé de bronze | 40 or | ouvre une serrure de bronze, **une seule fois** |
+| Clé d'argent | 120 or | ouvre une serrure d'argent, une seule fois |
+| Clé d'or | 320 or | ouvre une serrure d'or, une seule fois |
+| Kit de crochetage | 60 or | 5 crochets, vendu à tout le monde ; un crochet casse à chaque échec ; ne crochète jamais l'or |
+
+- On porte **2 clés de chaque sorte au plus**, et **10 crochets au plus** (deux kits) {à équilibrer}. Une clé ne se trouve jamais dans le donjon. Les serrures, le crochetage et les messages sont décrits dans [Le donjon](donjon.md#clés-et-crochetage).
+- Le menu affiche, pour chaque article, le prix, ce que l'on porte (« Possédé : 1 / 2 ») et ce qu'il fait ; une ligne est grisée quand l'or manque ou que l'on porte déjà le maximum.
+- {dev} `Mecano` (`BoutiqueVillage`) : invite « Mécano : acheter » ; achat par `Boutiques.Payer` (l'autorité décide, un client passe par `PartieReseau.DemanderBoutique`) ; inventaire dans `EtatJoueur` (`cles`, `crochets`), réplication par `HerosReseau`. Valeurs dans `GameBalance` (`mecanoPrix*`, `clesMaxParSorte`, `crochetsParKit`, `crochetsMax`).
+
+## Potions du druide {décidé}
+
+- Le druide vend, **de jour**, trois potions, payées dans la **caisse commune** {décidé, Quentin, 03/10/2026 ; la potion de soin était décidée le 26/09/2026} :
+
+| Potion | Prix {à équilibrer} | Effet {à équilibrer} |
+|---|---|---|
+| Santé | 20 or | rend 40 % des points de vie |
+| Mana | 20 or | rend 50 % de la jauge de mana ; **réservée au Mage** : les autres classes ne peuvent ni l'acheter ni la boire (la boutique et le message le disent) |
+| Endurance | 15 or | rend toute l'endurance, puis **10 s de récupération doublée** |
+
+- On porte **3 potions de chaque sorte au plus**. On les boit à la **croix directionnelle** (haut : santé, gauche : mana, droite : endurance) ou aux touches **1, 2, 3** du clavier (voir [Commandes](commandes.md)). Boire est **impossible quand la jauge est pleine** (rien n'est consommé, un message le dit), quand il n'en reste pas, ou pendant une courte recharge d'usage (1,5 s {à équilibrer}).
+- Retour : l'aura de soin sur le héros, un son de gorgée, et le geste de boire (celui de « Boire un coup ») **si le héros est immobile** ; en marchant ou en combattant, il boit sans s'arrêter.
+- Les potions sont des pastilles du HUD, à droite de la barre de vie : icône, quantité, bouton ; grisée quand il n'en reste plus ; celle du mana n'apparaît que pour le Mage ; clés et crochets, quand on en porte, sont de petites puces dessous (voir [Interface](interface.md)).
+- L'inventaire (potions, clés, crochets) est propre à chaque joueur et **gardé quand un joueur coupé revient** dans la partie (comme ses rangs de compétence). Il n'est pas gardé d'une partie à l'autre.
+- {dev} `Druide` (`BoutiqueVillage`) : invite « Druide : potions » ; `UsagePotions.Boire` (appelé par `Heros.OnAction`), actions `DrinkPotion`, `DrinkPotionMana`, `DrinkPotionStamina` ; valeurs dans `GameBalance` (`druidePrix*`, `potionsMaxParSorte`, `potionSantePart`, `potionManaPart`, `potionEndurance*`, `potionRecharge`). {à confirmer} : un visuel et un son propres à chaque potion, un modèle de fiole dans la main (pour l'instant la chope), l'usage de la nuit et du donjon (autorisé).
 
 ## Intérieurs {décidé}
 

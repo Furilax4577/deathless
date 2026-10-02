@@ -15,34 +15,25 @@ Ce qui reste ouvert. Une ligne quitte cette page quand la règle est tranchée e
 | Viking : Furie (03/10/2026) | Valeurs de départ de la rage et de la Furie à équilibrer : rage gagnée en encaissant (0,5 par point, 12 au plus par coup), 1 par tic de tournante, plancher de rage 0, durée 10 s, taille ×1,15, vitesse +20 %, cadence +15 %, recul ×1,5 (base 0,4 m), dégâts +10 %, recharges ×1,5 ; tournante 3 s puis 10 s de recharge ; touche de la Furie (R3 / G) ; sons dédiés. | [Viking](classe-viking.md#rage-et-furie) |
 | Mage (banc en jeu, 01/10/2026) | Avec son nouveau kit, le Mage est au-dessus de la moyenne des classes partout : +14 à +38 % en vague (nuits 6 et 12), +16 à +30 % sur une cible (boule et brûlure en paliers). Le réduire avant ou après la 0.8.0, et par quoi (dégâts de la boule, paliers de brûlure, mana) ? Détail : `Docs/equilibrage-classes.md`, « Banc en jeu ». | [Mage](classe-mage.md) |
 
-## Clés, crochetage et potions du village (03/10/2026, proposition à valider)
+## Clés, crochetage et potions du village (03/10/2026)
 
-Demande de Quentin : savoir **qui vend les clés des pièces fermées, à quel prix chacune, et le kit de crochetage** ; et peut-être **des potions de santé, de mana et d'endurance chez le druide**. Repères d'économie : un sbire rapporte 5 or, un guerrier ou un voleur 8, un mage 10 ; à la taverne, une bière coûte 5 or, un repas 15, une tournée 30 ; tout se paie dans la **caisse commune**, l'hôte décide en multijoueur.
+**Le principe est {décidé} (Quentin, 03/10/2026)** et construit : le **mécano** vend les clés et le kit de crochetage, le **druide** vend les potions, tout se paie dans la **caisse commune** (l'hôte décide en multijoueur). Les règles sont dans [Le village](village.md#le-mécano-et-ses-clés-décidé) (boutiques, potions), [Commandes](commandes.md) (croix directionnelle) et [Le donjon](donjon.md#clés-et-crochetage) (serrures). **Les chiffres ci-dessous sont les valeurs de départ {à équilibrer}**, réunies dans `GameBalance` (un champ par valeur) ; repères d'économie : un sbire rapporte 5 or, un guerrier ou un voleur 8, un mage 10 ; à la taverne, une bière coûte 5 or, un repas 15, une tournée 30.
 
-**Le mécano vend les clés et le kit** {à confirmer}. Une clé est **à usage unique**, on peut en porter **2 de chaque sorte au plus** ; elle ne se trouve jamais dans le donjon.
-
-| Article | Prix | Ouvre | Contenu visé de la pièce |
-|---|---|---|---|
-| Clé de bronze | 40 or | les serrures de bronze | environ 100 or |
-| Clé d'argent | 120 or | les serrures d'argent | environ 300 or |
-| Clé d'or | 320 or | les serrures d'or | environ 800 or, et plus tard un objet rare |
-| Kit de crochetage | 60 or, 5 crochets | serrures simples et de bronze (facile), d'argent (difficile) ; **jamais l'or** | selon la serrure |
-
-Idée : la clé coûte à peu près 40 % de ce qu'elle rapporte, donc elle est rentable sans être gratuite ; le kit est moins cher à l'unité mais peut échouer.
-
-**Crochetage** {à confirmer} : un petit mini-jeu à l'ouverture (une aiguille à garder dans une zone qui bouge, 3 essais, un crochet casse à chaque échec). **L'assassin est favorisé** : sa **perception** (ou son agilité, à choisir) agrandit la zone et ralentit l'aiguille, et il casse moins de crochets ; les autres classes y arrivent mais avec une zone étroite. Le kit se vend à tout le monde.
-
-**Potions du druide** {à confirmer} (la potion de soin est déjà décidée, voir [Le village](village.md#potions-de-soin-décidé) ; santé et mana et endurance sont la nouveauté) :
-
-| Potion | Prix | Effet |
+| Article | Prix {à équilibrer} | Règle {décidé} |
 |---|---|---|
-| Santé | 20 or | rend 40 % des points de vie |
-| Mana | 20 or | rend 50 % de la jauge de classe du mage (autres classes : à décider, une potion de jauge ou rien) |
-| Endurance | 15 or | rend toute l'endurance, puis 10 s de récupération doublée |
+| Clé de bronze (mécano) | 40 or | usage unique, 2 de chaque sorte au plus par joueur ; ouvre les serrures de bronze (pièce d'environ 100 or) |
+| Clé d'argent (mécano) | 120 or | idem ; serrures d'argent (environ 300 or) |
+| Clé d'or (mécano) | 320 or | idem ; serrures d'or (environ 800 or, plus tard un objet rare) |
+| Kit de crochetage (mécano) | 60 or | 5 crochets, vendu à tout le monde ; un crochet casse à chaque échec ; serrures simples, de bronze et d'argent, **jamais l'or** |
+| Potion de santé (druide) | 20 or | rend 40 % des points de vie ; 3 au plus |
+| Potion de mana (druide) | 20 or | rend 50 % de la jauge de mana ; **réservée au Mage** (les autres classes ne peuvent ni l'acheter ni la boire, la boutique le dit) ; 3 au plus |
+| Potion d'endurance (druide) | 15 or | rend toute l'endurance, puis 10 s de récupération doublée ; 3 au plus |
 
-On en porte **3 au maximum de chaque sorte**, on les boit à la **croix directionnelle** (haut santé, gauche mana, droite endurance) ou aux touches 1, 2, 3 au clavier. Elles s'achètent le jour, au druide, qui se tient devant sa maison.
-
-**À trancher** : les prix et les effets ci-dessus sont des points de départ ; la potion de mana pour les classes sans mana ; la perception ou l'agilité pour le crochetage ; le contenu d'un coffre fermé.
+**Reste à trancher (ouvert)** :
+- **Crochetage** {à confirmer} : première version du mini-jeu en place (maintenir Interagir pour garder l'aiguille dans une zone qui bouge, 3 essais, un crochet casse à chaque échec, voir [Le donjon](donjon.md#clés-et-crochetage)) ; à juger en jeu. La **perception** de l'assassin n'est que de 2 à son départ (Rôdeur 6, Assassin Agilité 6) : la zone et l'épargne de crochets suivent donc l'**agilité**, ce qui favorise l'assassin (puis le rôdeur) ; à confirmer, ou donner un bonus de classe à l'assassin.
+- **Plafond de crochets** : 10 (deux kits), valeur de départ.
+- **Contenu d'un coffre fermé** et objet rare de la serrure d'or.
+- **Potions** : visuels et sons propres à chaque potion, modèle de fiole dans la main (le geste de boire utilise pour l'instant la chope), usage au donjon et la nuit (autorisé pour l'instant).
 
 ## Visée au sol (02/10/2026)
 

@@ -59,6 +59,7 @@ namespace Deathless.Jeu
         float m_VitesseY;
         bool m_AuSol = true;
         float m_Endurance, m_EnduranceUtilisee = -99f;
+        float m_RegenBoostJusque = -99f, m_RegenBoostFacteur = 1f;   // potion d'endurance
         float m_RechargeEsquive;
         Vector3 m_DirEsquive;
         float m_Etourdi;
@@ -285,6 +286,17 @@ namespace Deathless.Jeu
         /// Endurance vidée (garde brisée).
         public void ViderEndurance() { m_Endurance = 0f; m_EnduranceUtilisee = Time.time; }
 
+        /// Potion d'endurance (03/10/2026) : toute l'endurance, puis la récupération multipliée par `facteur` pendant `duree` s.
+        public void RemplirEndurance(float duree, float facteur)
+        {
+            m_Endurance = EnduranceMax;
+            m_RegenBoostJusque = Time.time + Mathf.Max(0f, duree);
+            m_RegenBoostFacteur = Mathf.Max(1f, facteur);
+        }
+
+        /// Temps restant (s) de la récupération d'endurance accélérée (HUD, tests).
+        public float RegenBoostRestante => Mathf.Max(0f, m_RegenBoostJusque - Time.time);
+
         public void Invulnerable(float duree) { m_InvulnerableJusque = Mathf.Max(m_InvulnerableJusque, Time.time + duree); }
         public bool EstInvulnerable => Time.time < m_InvulnerableJusque;
 
@@ -464,6 +476,10 @@ namespace Deathless.Jeu
             if (Emotes != null && Emotes.SurAction(action)) return;   // roue à emotes ; toute autre action l'interrompt
             // Renversé (26/09/2026) : sans contrôle, seul Saut compte (martelage, accélère le relevé) ; il ne fait pas sauter.
             if (m_EtatCourant == Etat.Renverse) { if (action == "Jump") Marteler(); return; }
+            // Crochetage (03/10/2026) : le héros est pris par le mini-jeu ; Esquive et Saut l'annulent, le reste est ignoré.
+            if (Crochetage.Bloque) { if (action == "Dodge" || action == "Jump") Crochetage.Courant.Annuler(); return; }
+            // Potions (03/10/2026) : santé (croix haut, 1), mana (croix gauche, 2), endurance (croix droite, 3).
+            if (UsagePotions.DeAction(action, out Potion potion)) { if (m_EtatCourant == Etat.Libre) UsagePotions.Boire(this, potion); return; }
             switch (action)
             {
                 case "Interact": PointInteraction.InteragirIci(this); break;
@@ -617,7 +633,7 @@ namespace Deathless.Jeu
             }
 
             bool enJeu = EnJeu;
-            Vector3 dir = enJeu ? DirectionEntree() : Vector3.zero;
+            Vector3 dir = enJeu && !Crochetage.Bloque ? DirectionEntree() : Vector3.zero;   // crochetage : le héros ne bouge pas
             if (Emotes != null && m_EtatCourant == Etat.Libre) dir = Emotes.FiltrerDeplacement(dir);   // emote : immobile, se relève
             Vector3 deplacement = Vector3.zero;
             float vitesseAnim = 0f;
@@ -689,7 +705,7 @@ namespace Deathless.Jeu
 
             // Endurance : régénération après un court délai sans dépense.
             if (Time.time - m_EnduranceUtilisee > b.enduranceDelai)
-                m_Endurance = Mathf.Min(EnduranceMax, m_Endurance + b.enduranceRegen * dt);
+                m_Endurance = Mathf.Min(EnduranceMax, m_Endurance + b.enduranceRegen * dt * (Time.time < m_RegenBoostJusque ? m_RegenBoostFacteur : 1f));
 
             // Gravité et saut.
             bool etaitAuSol = m_AuSol;

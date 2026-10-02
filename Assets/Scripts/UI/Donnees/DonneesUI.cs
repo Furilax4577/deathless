@@ -56,6 +56,12 @@ namespace Deathless.UI.Donnees
         /// rien n'est affiché.
         public static IEtatVieEnnemis VieEnnemis { get; set; }
 
+        /// Potions, clés et crochets du joueur local (posés par le jeu ; null : aucune pastille).
+        public static IInventaireJoueur Inventaire { get; set; }
+
+        /// Mini-jeu de crochetage d'une serrure (posé par le jeu ; null : rien n'est affiché).
+        public static IEtatCrochetage Crochetage { get; set; }
+
         /// Chiffres de dégâts flottants, posés par le jeu ; null : rien n'est affiché.
         public static IDegatsSource Degats { get; set; }
 
@@ -97,6 +103,8 @@ namespace Deathless.UI.Donnees
             Visee = null;
             VieEnnemis = null;
             Degats = null;
+            Inventaire = null;
+            Crochetage = null;
             Changees = null;
         }
     }

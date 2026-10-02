@@ -223,6 +223,26 @@ public partial class @DeathlessControls: IInputActionCollection2, IDisposable
                     ""priority"": 0
                 },
                 {
+                    ""name"": ""DrinkPotionMana"",
+                    ""type"": ""Button"",
+                    ""id"": ""5b1e7c42-9d3a-4f68-a1c0-3e8d6f2b7a91"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false,
+                    ""priority"": 0
+                },
+                {
+                    ""name"": ""DrinkPotionStamina"",
+                    ""type"": ""Button"",
+                    ""id"": ""8f2d4a63-1c7e-4b95-9e0a-6d3b1c8f5e27"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false,
+                    ""priority"": 0
+                },
+                {
                     ""name"": ""Ready"",
                     ""type"": ""Button"",
                     ""id"": ""013a76c4-5aae-566d-974a-252efb13ec2a"",
@@ -613,6 +633,50 @@ public partial class @DeathlessControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""KeyboardMouse"",
                     ""action"": ""DrinkPotion"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a3c91e57-6b2d-4d80-8f14-2e7b5a9c0d36"",
+                    ""path"": ""<Gamepad>/dpad/left"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""DrinkPotionMana"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d7e2b840-3a5c-4f19-b6d8-9c1e4a7f2b53"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""KeyboardMouse"",
+                    ""action"": ""DrinkPotionMana"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4b8f6d12-e0a7-4c35-9a21-7d5c3e8b1f60"",
+                    ""path"": ""<Gamepad>/dpad/right"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""DrinkPotionStamina"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""91c5a7e3-2f4b-4d68-b0e9-5a3d8c1f7e24"",
+                    ""path"": ""<Keyboard>/3"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""KeyboardMouse"",
+                    ""action"": ""DrinkPotionStamina"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1166,6 +1230,8 @@ public partial class @DeathlessControls: IInputActionCollection2, IDisposable
         m_Gameplay_Skill3 = m_Gameplay.FindAction("Skill3", throwIfNotFound: true);
         m_Gameplay_Sprint = m_Gameplay.FindAction("Sprint", throwIfNotFound: true);
         m_Gameplay_DrinkPotion = m_Gameplay.FindAction("DrinkPotion", throwIfNotFound: true);
+        m_Gameplay_DrinkPotionMana = m_Gameplay.FindAction("DrinkPotionMana", throwIfNotFound: true);
+        m_Gameplay_DrinkPotionStamina = m_Gameplay.FindAction("DrinkPotionStamina", throwIfNotFound: true);
         m_Gameplay_Ready = m_Gameplay.FindAction("Ready", throwIfNotFound: true);
         m_Gameplay_Pause = m_Gameplay.FindAction("Pause", throwIfNotFound: true);
         m_Gameplay_Emote = m_Gameplay.FindAction("Emote", throwIfNotFound: true);
@@ -1278,6 +1344,8 @@ public partial class @DeathlessControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Gameplay_Skill3;
     private readonly InputAction m_Gameplay_Sprint;
     private readonly InputAction m_Gameplay_DrinkPotion;
+    private readonly InputAction m_Gameplay_DrinkPotionMana;
+    private readonly InputAction m_Gameplay_DrinkPotionStamina;
     private readonly InputAction m_Gameplay_Ready;
     private readonly InputAction m_Gameplay_Pause;
     private readonly InputAction m_Gameplay_Emote;
@@ -1345,6 +1413,14 @@ public partial class @DeathlessControls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Gameplay/DrinkPotion".
         /// </summary>
         public InputAction @DrinkPotion => m_Wrapper.m_Gameplay_DrinkPotion;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/DrinkPotionMana".
+        /// </summary>
+        public InputAction @DrinkPotionMana => m_Wrapper.m_Gameplay_DrinkPotionMana;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/DrinkPotionStamina".
+        /// </summary>
+        public InputAction @DrinkPotionStamina => m_Wrapper.m_Gameplay_DrinkPotionStamina;
         /// <summary>
         /// Provides access to the underlying input action "Gameplay/Ready".
         /// </summary>
@@ -1426,6 +1502,12 @@ public partial class @DeathlessControls: IInputActionCollection2, IDisposable
             @DrinkPotion.started += instance.OnDrinkPotion;
             @DrinkPotion.performed += instance.OnDrinkPotion;
             @DrinkPotion.canceled += instance.OnDrinkPotion;
+            @DrinkPotionMana.started += instance.OnDrinkPotionMana;
+            @DrinkPotionMana.performed += instance.OnDrinkPotionMana;
+            @DrinkPotionMana.canceled += instance.OnDrinkPotionMana;
+            @DrinkPotionStamina.started += instance.OnDrinkPotionStamina;
+            @DrinkPotionStamina.performed += instance.OnDrinkPotionStamina;
+            @DrinkPotionStamina.canceled += instance.OnDrinkPotionStamina;
             @Ready.started += instance.OnReady;
             @Ready.performed += instance.OnReady;
             @Ready.canceled += instance.OnReady;
@@ -1488,6 +1570,12 @@ public partial class @DeathlessControls: IInputActionCollection2, IDisposable
             @DrinkPotion.started -= instance.OnDrinkPotion;
             @DrinkPotion.performed -= instance.OnDrinkPotion;
             @DrinkPotion.canceled -= instance.OnDrinkPotion;
+            @DrinkPotionMana.started -= instance.OnDrinkPotionMana;
+            @DrinkPotionMana.performed -= instance.OnDrinkPotionMana;
+            @DrinkPotionMana.canceled -= instance.OnDrinkPotionMana;
+            @DrinkPotionStamina.started -= instance.OnDrinkPotionStamina;
+            @DrinkPotionStamina.performed -= instance.OnDrinkPotionStamina;
+            @DrinkPotionStamina.canceled -= instance.OnDrinkPotionStamina;
             @Ready.started -= instance.OnReady;
             @Ready.performed -= instance.OnReady;
             @Ready.canceled -= instance.OnReady;
@@ -1874,6 +1962,20 @@ public partial class @DeathlessControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnDrinkPotion(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "DrinkPotionMana" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnDrinkPotionMana(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "DrinkPotionStamina" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnDrinkPotionStamina(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "Ready" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>

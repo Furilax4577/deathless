@@ -893,6 +893,74 @@ def commun_potion_soin():
     return ic
 
 
+def _flacon(ic, rampe, teinte_table):
+    """Flacon commun des potions du druide : corps à facettes, goulot en os, bouchon de liège, reflet blanc chaud."""
+    ic.gemme(regulier((64, 80), 36, 12, -75), rampe, table=0.6, teinte_table=teinte_table, decalage=0.08)
+    ic.bande([(64, 48), (64, 30)], 20, OS)
+    ic.bande([(64, 32), (64, 26)], 28, OS)
+    ic.bande([(64, 27), (64, 10)], 16, TERRE)
+    ic.poly([(40, 66), (47, 58), (44, 76), (37, 80)], SOIN_BLANC)
+
+
+def commun_potion_mana():
+    ic = Icone("commun_potion_mana", "communes", "Potion de mana",
+               "Commune (croix gauche / 2) : vendue par le druide, réservée au mage ; liquide bleu du mana, étincelle pâle.")
+    _flacon(ic, MANA[:3], MANA[0])
+    cx, cy = 66, 86
+    ic.poly([(cx, cy - 20), (cx + 6, cy - 6), (cx + 20, cy), (cx + 6, cy + 6), (cx, cy + 20), (cx - 6, cy + 6),
+             (cx - 20, cy), (cx - 6, cy - 6)], MANA[3])
+    return ic
+
+
+def commun_potion_endurance():
+    ic = Icone("commun_potion_endurance", "communes", "Potion d'endurance",
+               "Commune (croix droite / 3) : vendue par le druide ; liquide ambre de l'endurance, éclair blanc chaud.")
+    _flacon(ic, CRITIQUE, CRITIQUE[0])
+    ic.poly([(74, 64), (54, 88), (64, 88), (57, 108), (80, 82), (69, 82), (77, 64)], c("Critique", "Blanc chaud"))
+    return ic
+
+
+def _tourner(pts, ang, centre=(64, 64)):
+    ca, sa = math.cos(math.radians(ang)), math.sin(math.radians(ang))
+    return [(centre[0] + (x - centre[0]) * ca - (y - centre[1]) * sa, centre[1] + (x - centre[0]) * sa + (y - centre[1]) * ca)
+            for x, y in pts]
+
+
+def _cle(nom, titre, rampe, notes):
+    ic = Icone(nom, "communes", titre, notes)
+    ang = 38
+    ic.gemme(_tourner(regulier((64, 30), 21, 8, -22.5), ang), rampe, table=0.45, teinte_table=c("Ombre", "Nuit"))
+    ic.bande(_tourner([(64, 50), (64, 116)], ang), 12, rampe)
+    ic.bande(_tourner([(64, 96), (86, 96)], ang), 11, rampe)
+    ic.bande(_tourner([(64, 108), (82, 108)], ang), 11, rampe)
+    return ic
+
+
+def commun_cle_bronze():
+    return _cle("commun_cle_bronze", "Clé de bronze", [c("Critique", "Ambre"), c("Terre", "Terre claire"), c("Critique", "Or chaud")],
+                "Vendue par le mécano (40 or) : ouvre une serrure de bronze, une seule fois.")
+
+
+def commun_cle_argent():
+    return _cle("commun_cle_argent", "Clé d'argent", [c("Rage", "Fer"), c("Rage", "Fer clair"), c("Os", "Os pâle")],
+                "Vendue par le mécano (120 or) : ouvre une serrure d'argent, une seule fois.")
+
+
+def commun_cle_or():
+    return _cle("commun_cle_or", "Clé d'or", SACRE, "Vendue par le mécano (320 or) : ouvre une serrure d'or, une seule fois.")
+
+
+def commun_crochets():
+    ic = Icone("commun_crochets", "communes", "Kit de crochetage",
+               "Vendu par le mécano (60 or, 5 crochets) : deux crochets croisés ; un casse à chaque échec.")
+    ic.bande([(34, 112), (66, 56), (76, 36), (86, 34)], [10, 8, 6, 5], FER)
+    ic.bande([(30, 112), (42, 112)], 10, TERRE)
+    ic.bande([(94, 112), (62, 62), (52, 44), (42, 42)], [10, 8, 6, 5], FER_RAGE)
+    ic.bande([(98, 112), (86, 112)], 10, TERRE)
+    ic.gemme(regulier((64, 74), 9, 6, -90), SACRE, centre=(64, 74))
+    return ic
+
+
 def commun_coup_critique():
     ic = Icone("commun_coup_critique", "communes", "Coup critique", "Retour visuel commun (tête, dos, furtif).")
     cen = (64, 64)
@@ -1775,7 +1843,8 @@ COMPETENCES = [
     rodeur_tir, rodeur_visee, rodeur_nuee_de_fleches, rodeur_roulade_salve,
     assassin_dague, assassin_arbalete, assassin_fumigene, assassin_pas_ombre, assassin_furtif,
     viking_hache, viking_attaque_tournante, viking_rugissement, viking_saut_percutant, jauge_rage,
-    commun_esquive, commun_potion_soin, commun_coup_critique,
+    commun_esquive, commun_potion_soin, commun_potion_mana, commun_potion_endurance,
+    commun_cle_bronze, commun_cle_argent, commun_cle_or, commun_crochets, commun_coup_critique,
     nyxessa_missile, nyxessa_missile_eteint,
 ]
 

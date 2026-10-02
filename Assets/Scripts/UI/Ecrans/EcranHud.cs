@@ -93,6 +93,9 @@ namespace Deathless.UI.Ecrans
         HudRelevage m_Relevage;
         /// Bandeau de la visée d'une zone au sol (classe à part : HudVisee.cs, 02/10/2026).
         HudVisee m_Visee;
+        /// Potions, clés et crochets (classe à part : HudPotions.cs, 03/10/2026) et mini-jeu de crochetage (HudCrochetage.cs).
+        HudPotions m_Sac;
+        HudCrochetage m_Crochetage;
         /// Jauge de parade du paladin, sous le réticule (classe à part : HudParade.cs).
         HudParade m_Parade;
         /// Barres de vie des ennemis et méga barre du/des boss (classe à part : HudVieEnnemis.cs).
@@ -199,6 +202,8 @@ namespace Deathless.UI.Ecrans
             m_Statuts = new HudStatuts(Racine);
             m_Relevage = new HudRelevage(Racine);
             m_Visee = new HudVisee(Racine);
+            m_Sac = new HudPotions(Racine);
+            m_Crochetage = new HudCrochetage(Racine);
             m_Parade = new HudParade(Racine);
             m_VieEnnemis = new HudVieEnnemis(Racine);
             m_Degats = new HudDegats(Racine);
@@ -306,6 +311,8 @@ namespace Deathless.UI.Ecrans
             m_Statuts?.Maj(joueur == null || joueur.EstMort);
             m_Relevage?.Maj();
             m_Visee?.Maj();
+            m_Sac?.Maj(joueur == null || joueur.EstMort);
+            m_Crochetage?.Maj();
             m_Parade?.Maj(joueur == null || joueur.EstMort);
             m_VieEnnemis?.Maj(dt);
             m_Degats?.Suivre();
@@ -817,6 +824,8 @@ namespace Deathless.UI.Ecrans
         /// Potion (croix haut) : seulement si la source du joueur implémente IEtatJoueurPotions.
         void MajPotions(IEtatJoueurPotions potions)
         {
+            // Inventaire du jeu (03/10/2026) : les trois pastilles de HudPotions remplacent l'ancienne case unique.
+            if (DonneesUI.Inventaire != null) { m_Potion.style.display = DisplayStyle.None; return; }
             m_Potion.style.display = potions != null && potions.PotionsMax > 0 ? DisplayStyle.Flex : DisplayStyle.None;
             if (potions == null) return;
             if (potions.Potions != m_PotionsAffichees)

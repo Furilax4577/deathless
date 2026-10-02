@@ -48,6 +48,10 @@ namespace Deathless.Jeu
         public int[] rangs = new int[4]; // rangs des améliorations de compétence (ArbreCompetences), par index
         public int pointsAttribut;       // 1 par jour survécu (crédité à l'aube, en plus du point de compétence), dépensés dans le menu
         public int[] attributs = new int[Attributs.Nombre]; // points d'attribut GAGNÉS, par Attribut (la répartition de départ est celle de la classe)
+        // Inventaire (03/10/2026, mécano et druide du village ; voir Inventaire) : potions et clés par sorte, crochets du kit.
+        public int[] potions = new int[Inventaire.NbPotions];
+        public int[] cles = new int[Inventaire.NbCles];
+        public int crochets;
         public ScoreJoueur score = new ScoreJoueur();
     }
 

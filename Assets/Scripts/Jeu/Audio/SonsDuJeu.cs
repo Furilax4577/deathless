@@ -82,6 +82,11 @@ namespace Deathless.Jeu
         public static readonly string[] PointDepense = { "dl_interface_confirmation", "ui_confirmation" };
         public static readonly string[] Repas = { "kenney_rpg_metalpot" };
         public static readonly string[] Biere = { "kenney_rpg_metalclick" };
+        // Boutiques du village (03/10/2026, mécano et druide) : sons « à créer » en tête (aucun fichier audio n'a été ajouté), repli
+        // sur le son d'or, le verrou de coffre et la marmite de la taverne ; voir Wiki/pages/sons.md.
+        public static readonly string[] AchatBoutique = { "dl_boutique_achat", "kenney_rpg_handlecoins" };
+        public static readonly string[] AchatCle = { "dl_boutique_cle", "kenney_rpg_metallatch", "kenney_rpg_metalclick" };
+        public static readonly string[] PotionBue = { "dl_potion_boire", "kenney_rpg_metalpot" };
         public static readonly string[] ForgeEnclume = { "forge_enclume" };   // forgeron : marteau sur l'enclume (3 variantes)
         public static readonly string[] PointGagne = { "dl_interface_tous_prets", "vote_tous_prets", "ui_confirmation" };
 

@@ -11,8 +11,8 @@ using UnityEngine;
 //   Forgeron   : barbare KayKit sans bonnet ni écharpe, debout au bord de l'atelier ouvert de la forge (ancre Enclume_Ancre du prefab, côté place)
 //   Tavernière : la Bavaroise (TavernierBuilder), à côté de la porte ; l'ancre d'échange Villageois/Ancre_Echange_Taverne (composant Taverne posé
 //                par Partie.Start) est un mètre devant elle : on lui parle (E) dans les 2,4 m, comme au comptoir de l'ancienne taverne
-//   Mécano     : l'ingénieur KayKit (Engineer.fbx), à côté de la porte (nouveau : il n'était pas dans le jeu ; pas de boutique pour l'instant)
-//   Druide     : le druide KayKit (Druid.fbx), à côté de la porte (nouveau : pas de potions à vendre pour l'instant)
+//   Mécano     : l'ingénieur KayKit (Engineer.fbx), à côté de la porte ; ancre d'échange Villageois/Ancre_Echange_Mecano (composant Mecano : clés et kit de crochetage, 03/10/2026)
+//   Druide     : le druide KayKit (Druid.fbx), à côté de la porte ; ancre d'échange Villageois/Ancre_Echange_Druide (composant Druide : potions, 03/10/2026)
 //   Sorcier    : l'objet racine « Sorcier » (Sorcier.cs) vient de lui-même à Villageois/Poste_Sorcier, le jour et à l'aube ; il part de là à la
 //                tombée de la nuit (il marche jusqu'à Nyxessa et incante, comme avant)
 // Jour et nuit : les villageois dehors restent à leur place (seul le sorcier a un travail de nuit). Reproductible : tout est retiré puis refait.
@@ -175,6 +175,14 @@ public static partial class VillageBuilder
             Vector3 p = devant(f);
             GameObject g = V5Pnj(Group(grp, role), nom, fbx, p, lacetDe(f), repos, null);
             sb.Append(nom.ToLowerInvariant() + " " + (g != null ? "en " + V5Pt(p) : "introuvable") + " ; ");
+            // Boutique (03/10/2026) : ancre d'échange un mètre devant le villageois, à hauteur de comptoir, comme la taverne ; le composant
+            // Mecano (clés, kit de crochetage) ou Druide (potions) y est posé ici (Boutiques.Assurer le fait aussi au démarrage de la partie).
+            if (g == null) continue;
+            var ancre = new GameObject("Ancre_Echange_" + role).transform;
+            ancre.SetParent(grp, false);
+            ancre.SetPositionAndRotation(p + Quaternion.Euler(0f, lacetDe(f), 0f) * Vector3.forward * 1.0f + Vector3.up * 0.95f, Quaternion.Euler(0f, lacetDe(f), 0f));
+            if (role == "Mecano") ancre.gameObject.AddComponent<Deathless.Jeu.Mecano>(); else ancre.gameObject.AddComponent<Deathless.Jeu.Druide>();
+            sb.Append("boutique " + role + " ; ");
         }
 
         // Sorcier : l'objet racine « Sorcier » (script Sorcier) lit ce poste

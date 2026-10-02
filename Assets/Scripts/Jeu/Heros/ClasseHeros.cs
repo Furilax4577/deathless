@@ -253,6 +253,9 @@ namespace Deathless.Jeu
         public virtual string NomUltime => string.Empty;
         /// Tests : remplit la jauge de la classe (mana, rage).
         public virtual void RemplirJauge() { }
+        /// Potion de mana (03/10/2026) : ajoute `montant` à la jauge de mana de la classe, sans dépasser le maximum ; renvoie ce qui a
+        /// vraiment été rendu (0 : la classe n'a pas de mana, ou la jauge est pleine).
+        public virtual float AjouterMana(float montant) => 0f;
 
         /// Emplacements 0 à 3 : RT, LT, LB, RB (Vide pour un emplacement sans action).
         public abstract EtatEmplacement Emplacement(int index, out float restant, out float total);

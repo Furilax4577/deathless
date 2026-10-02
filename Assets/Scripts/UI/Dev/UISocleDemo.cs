@@ -34,7 +34,9 @@ namespace Deathless.UI.Dev
             Row("Gameplay/Skill2", "Compétence 2"),
             Row("Gameplay/Skill3", "Compétence 3"),
             Row("Gameplay/Sprint", "Sprinter"),
-            Row("Gameplay/DrinkPotion", "Boire une potion"),
+            Row("Gameplay/DrinkPotion", "Potion de santé"),
+            Row("Gameplay/DrinkPotionMana", "Potion de mana"),
+            Row("Gameplay/DrinkPotionStamina", "Potion d’endurance"),
             Row("Gameplay/Ready", "Se déclarer prêt"),
             Row("Gameplay/Pause", "Pause"),
         };

@@ -27,7 +27,7 @@ namespace Deathless.Jeu
         public event Action<string> Action;
 
         InputChordResolver m_Accords;
-        InputAction m_Move, m_Look, m_Garde, m_Sprint, m_Attaque, m_Emote, m_Jump;
+        InputAction m_Move, m_Look, m_Garde, m_Sprint, m_Attaque, m_Emote, m_Jump, m_Interagir;
         InputActionMap m_Jeu;
         static bool s_NavigateurPresent;
 
@@ -43,6 +43,7 @@ namespace Deathless.Jeu
             m_Attaque = m_Jeu.FindAction("AttackPrimary", true);
             m_Emote = m_Jeu.FindAction("Emote", false);
             m_Jump = m_Jeu.FindAction("Jump", false);
+            m_Interagir = m_Jeu.FindAction("Interact", false);
             m_Accords = InputChordResolver.ForGameplay(actions);
             m_Accords.Triggered += OnAction;
             s_NavigateurPresent = FindAnyObjectByType<Deathless.UI.Ecrans.NavigateurEcrans>() != null;
@@ -60,6 +61,11 @@ namespace Deathless.Jeu
 
         /// Dernière action résolue (tests).
         public string Derniere { get; private set; } = "";
+
+        /// Interagir maintenu (mini-jeu de crochetage, 03/10/2026) ; les tests peuvent l'imposer (InteragirTest).
+        public bool InteragirMaintenu => InteragirTest || (m_Interagir != null && m_Jeu != null && m_Jeu.enabled && m_Accords != null && m_Accords.IsHeld(m_Interagir));
+        /// Tests : Interagir imposé maintenu.
+        public bool InteragirTest;
 
         /// Saut maintenu (accessibilité du relevé du Renversé, mode « maintenir » : OptionsJoueur.RelevageMaintenir).
         public bool SautMaintenu => m_Jump != null && m_Jeu != null && m_Jeu.enabled && m_Accords != null && m_Accords.IsHeld(m_Jump);
