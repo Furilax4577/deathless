@@ -279,6 +279,7 @@ namespace Deathless.Jeu
         /// Pose un squelette (sortie de terre). Au-delà du plafond, ses PV sont répartis sur les vivants.
         public Squelette Poser(TypeEnnemi type, Vector3 point, bool elite, bool compterPlafond)
         {
+            if (Partie.SansMobApercu) return null;   // aperçu de la nouvelle carte, F10 : rien n'apparaît tant que c'est désactivé
             var b = B;
             float mult = GameBalance.ParNuit(b.multiplicateurPV, P != null ? P.Etat.nuit : 1, 1f);
             // Voleur ou mage sans prefab (scène pas encore reconstruite) : joué en sbire, comme avant le 28/09/2026.
@@ -343,6 +344,14 @@ namespace Deathless.Jeu
                 s.Retire += _ => { if (necro != null) necro.Invoques--; };
             }
             return poses;
+        }
+
+        /// Aperçu (F10, « sans mob ») : désintègre tous les squelettes vivants ; renvoie leur nombre.
+        public int RetirerTous()
+        {
+            int n = 0;
+            foreach (var s in new List<Squelette>(m_Vivants)) if (s != null && s.Vivant) { s.Desintegrer(true); n++; }
+            return n;
         }
 
         void OnRetire(Squelette s)

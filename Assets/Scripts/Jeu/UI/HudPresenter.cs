@@ -9,7 +9,7 @@ namespace Deathless.Jeu
     /// IEtatJoueur, IScoreFin et ICommandesPartie en lisant Partie.Etat (aucune logique de jeu ici) et s'enregistre dans
     /// DonneesUI. Au chargement : commandes seules (menu principal) ; partie lancée : toutes les sources (HUD) ; fin :
     /// Phase = Terminee puis PartieTerminee (écran de score). Gère aussi le curseur (caché et verrouillé en jeu).
-    public class HudPresenter : MonoBehaviour, IEtatPartie, IEtatJoueur, IEtatJoueurClasse, IScoreFin, ICommandesPartie, IClassesJouables, IEtatEquipe, IEtatMissiles, IEtatBoss, IEtatVagues
+    public class HudPresenter : MonoBehaviour, IEtatPartie, IEtatJoueur, IEtatJoueurClasse, IScoreFin, ICommandesPartie, IClassesJouables, IEtatEquipe, IEtatMissiles, IEtatBoss, IEtatVagues, IEtatApercu
     {
         public static readonly Color TeintePaladin = new Color32(0xd9, 0xb2, 0x64, 0xff);
 
@@ -109,6 +109,7 @@ namespace Deathless.Jeu
             get
             {
                 if (P == null) return PhasePartie.Jour;
+                if (Partie.NuitApercu && P.Etat.phase == Jeu.Phase.Jour) return PhasePartie.Nuit;   // aperçu : nuit forcée (F9), la phase de jeu reste le jour
                 switch (P.Etat.phase)
                 {
                     case Jeu.Phase.Crepuscule: return PhasePartie.Crepuscule;
@@ -119,6 +120,7 @@ namespace Deathless.Jeu
                 }
             }
         }
+        public bool EnApercu => Partie.Exploration;
         public int NumeroNuit => P != null ? P.Etat.nuit : 1;
         public float TempsRestantPhase => P != null ? P.Etat.TempsRestant : 0f;
         public float VieNyxessa => P != null ? P.Etat.nyxessa.pv : 0f;

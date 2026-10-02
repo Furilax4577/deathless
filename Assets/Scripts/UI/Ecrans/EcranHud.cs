@@ -408,6 +408,9 @@ namespace Deathless.UI.Ecrans
                 m_SecondesTexte = secondes;
                 m_NuitTexte = numeroNuit;
                 m_AubeTexte = aubeAttend;
+                if (partie is IEtatApercu apercu && apercu.EnApercu && (phase == PhasePartie.Jour || phase == PhasePartie.Nuit))
+                    m_Temps.text = phase == PhasePartie.Nuit ? "Nuit · aperçu" : "Jour · aperçu";   // jour figé : ni chrono ni vagues
+                else
                 switch (phase)
                 {
                     case PhasePartie.Jour: m_Temps.text = "Jour · " + Horloge(secondes) + " avant la nuit"; break;

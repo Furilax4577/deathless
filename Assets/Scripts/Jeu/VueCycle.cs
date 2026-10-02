@@ -13,6 +13,10 @@ namespace Deathless.Jeu
 
         AudioSource m_Bourdon;
         bool m_PortailOuvert = true;
+        // Aperçu de la nouvelle carte, F9 : fondu jour <-> nuit forcée (0 jour, 1 nuit) et dernier état entendu (musique).
+        float m_FonduApercu;
+        bool m_NuitApercuVue;
+        const float DureeFonduApercu = 1.2f;
 
         Partie P => Partie.Instance;
 
@@ -78,7 +82,21 @@ namespace Deathless.Jeu
                 case Phase.Aube: cycle.Piloter(CycleJourNuit.Phase.Aube, e.tempsPhase); break;
                 case Phase.Terminee: break;   // ambiance figée
             }
-            cycle.portailForceOuvert = e.phase == Phase.Attente;
+            // Aperçu : la nuit forcée (F9) n'est qu'une ambiance (la phase de jeu reste le jour figé : pas de vagues) ; le
+            // fondu dure ~1 s, la musique et la tombée de la nuit suivent, le portail du donjon reste ouvert.
+            bool apercuNuit = Partie.NuitApercu;
+            if (apercuNuit != m_NuitApercuVue)
+            {
+                m_NuitApercuVue = apercuNuit;
+                if (Partie.Exploration)
+                {
+                    AudioBank.Musique(apercuNuit ? SonsDuJeu.MusiqueNuit : SonsDuJeu.MusiqueJour);
+                    AudioBank.Jouer2D(apercuNuit ? SonsDuJeu.TombeeNuit : SonsDuJeu.Aube, 0.9f);
+                }
+            }
+            m_FonduApercu = Mathf.MoveTowards(m_FonduApercu, apercuNuit ? 1f : 0f, Time.unscaledDeltaTime / DureeFonduApercu);
+            cycle.nuitForcee = Partie.Exploration && e.phase == Phase.Jour && (apercuNuit || m_FonduApercu > 0f) ? m_FonduApercu : -1f;
+            cycle.portailForceOuvert = e.phase == Phase.Attente || Partie.Exploration;
             bool ouvert = portail != null && portail.ouvert;
             if (ouvert != m_PortailOuvert)
             {

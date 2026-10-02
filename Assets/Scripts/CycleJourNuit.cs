@@ -115,6 +115,9 @@ public class CycleJourNuit : MonoBehaviour
     [System.NonSerialized] public bool pilote;
     // Portail ouvert quelle que soit la phase (plan de nuit du menu principal, posé par VueCycle ; jamais en partie).
     [System.NonSerialized] public bool portailForceOuvert;
+    // Nuit forcée (aperçu de la nouvelle carte, touche F9, 02/10/2026) : fondu imposé de 0 (jour, midi) à 1 (nuit), posé par
+    // VueCycle ; négatif = pas de forçage. La phase reste celle du jeu (le jour figé : aucune vague, portail ouvert).
+    [System.NonSerialized] public float nuitForcee = -1f;
     public void Piloter(Phase p, float tempsDansPhase)
     {
         pilote = true;
@@ -150,6 +153,7 @@ public class CycleJourNuit : MonoBehaviour
             case Phase.Nuit: n = 1f; heure = 1f; break;
             default: n = 1f - k; heure = 0f; break;                 // aube : le soleil se lève à l'est
         }
+        if (nuitForcee >= 0f) { n = Mathf.Clamp01(nuitForcee); heure = 0.5f; }
         Nuit = n;
         if (dayCycle != null)
         {

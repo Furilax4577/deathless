@@ -47,6 +47,20 @@ Règles communes {à confirmer} : le héros marche à 50 % pendant la visée, sa
 
 {dev} Code commun : `VisiereZone`, `ClasseHeros.ViseeSurAction` (confirmation par `AttackPrimary`, annulation par `AttackSecondary`, résolus par `InputChordResolver`), invites `HudVisee` (`InputPrompt` sur `Gameplay/AttackPrimary` et `Gameplay/AttackSecondary`, qui suivent le dernier appareil).
 
+## Touches de dev de l'aperçu « Nouvelle carte » {décidé, 02/10/2026} {dev}
+
+Trois touches de clavier réservées au mode « Nouvelle carte (aperçu) » : outils de dev, liés à aucune action de `DeathlessControls`, **sans effet dans le jeu normal** (ancienne carte, parties à vagues). Chaque appui affiche un court message à l'écran.
+
+| Touche | Effet {décidé} | Message |
+|---|---|---|
+| **F8** | Donjon en terrasses : graine suivante ; **Maj + F8** : graine au hasard | « Donjon : graine N (...) » |
+| **F9** | Bascule **jour / nuit** : fondu d'une seconde vers l'ambiance de nuit (lanternes, fenêtres, brume violet-gris, lune, musique de nuit) et retour. Ambiance seulement : la phase reste le jour figé, **jamais de vague** ; le HUD écrit « Jour · aperçu » ou « Nuit · aperçu » ; le donjon garde son éclairage | « Nuit » / « Jour » |
+| **F10** | Bascule **sans mob / avec mob** : sans, tous les ennemis vivants disparaissent (gardiens du donjon, squelettes d'essai) et rien n'apparaît tant que c'est désactivé ; avec, les gardiens reviennent à leurs 14 points et, si le héros est dehors, quatre squelettes d'essai se posent devant lui | « Mobs : désactivés » / « Mobs : activés » |
+
+L'état de F9 et de F10 tient pendant les allers-retours par les portails et s'applique aux donjons que F8 construit ensuite ; il est remis à zéro au chargement de la scène.
+
+{dev} Code : `DonjonJeu.ToucheApercu` (lecture directe du clavier, comme F8 ; `Partie.Exploration` seulement), état dans `Partie.NuitApercu` et `Partie.SansMobApercu`, fondu de nuit dans `VueCycle` (`CycleJourNuit.nuitForcee`), garde « sans mob » dans `DirecteurVagues.Poser`. Détails dans `Docs/donjon-generateur.md`, section « Branchement dans le jeu ».
+
 ## Dans les menus {décidé}
 
 | Action | Xbox | PlayStation | Clavier et souris |

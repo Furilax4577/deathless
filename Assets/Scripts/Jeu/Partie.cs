@@ -66,6 +66,15 @@ namespace Deathless.Jeu
         static bool s_ExplorationDemandee;
         public const string SceneCarteExploration = "CarteV5";
 
+        /// Touches de dev de l'aperçu (02/10/2026, F9 / F10, DonjonJeu.ToucheApercu) : nuit forcée (visuelle seulement : la
+        /// phase reste le jour figé, donc aucune vague) et « sans mob ». Faux hors du mode exploration ; remis à faux à
+        /// chaque chargement de scène. Ils survivent aux allers-retours par les portails du donjon et aux graines de F8.
+        static bool s_NuitApercu, s_SansMobApercu;
+        public static bool NuitApercu => Exploration && s_NuitApercu;
+        public static bool SansMobApercu => Exploration && s_SansMobApercu;
+        public static void DefinirNuitApercu(bool nuit) { if (Exploration) s_NuitApercu = nuit; }
+        public static void DefinirSansMobApercu(bool sansMob) { if (Exploration) s_SansMobApercu = sansMob; }
+
         /// Menu principal > Nouvelle carte (aperçu) : charge la scène de la carte v5 en mode exploration, avec la dernière
         /// classe choisie (Paladin à défaut).
         public static void OuvrirCarteExploration()
@@ -82,6 +91,8 @@ namespace Deathless.Jeu
         {
             Exploration = s_ExplorationDemandee;
             s_ExplorationDemandee = false;
+            s_NuitApercu = false;
+            s_SansMobApercu = false;
             Instance = this;
             Ivresse.Reinitialiser();
             if (reglages != null) GameBalance.Courant = reglages;

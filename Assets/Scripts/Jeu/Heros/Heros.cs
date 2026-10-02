@@ -596,7 +596,7 @@ namespace Deathless.Jeu
             if (visiere != null && Partie != null)
             {
                 var ph = Partie.Etat.phase;
-                visiere.open = !(ph == Phase.Crepuscule || ph == Phase.Nuit);
+                visiere.open = !(ph == Phase.Crepuscule || ph == Phase.Nuit || Deathless.Jeu.Partie.NuitApercu);
             }
             if (Distant) { PasDistant(dt); return; }
             // Filet de sécurité : un héros passé sous le sol revient au point de réapparition le plus proche.

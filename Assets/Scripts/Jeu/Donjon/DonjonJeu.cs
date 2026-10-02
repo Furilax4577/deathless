@@ -602,6 +602,64 @@ namespace Deathless.Jeu
             ChangerGraine(kb.shiftKey.isPressed ? Random.Range(1, 1000000) : GraineCourante + 1);
         }
 
+        /// Aperçu seulement (touches de dev, comme F8 ; le jeu normal ne les lit pas) : F9 bascule jour / nuit (ambiance
+        /// seulement : la phase de jeu reste le jour figé, donc pas de vague ; VueCycle fait le fondu), F10 bascule
+        /// « sans mob » / « avec mob ». Les deux états (Partie.NuitApercu, Partie.SansMobApercu) tiennent à travers les
+        /// portails et s'appliquent aux donjons que F8 construit ensuite.
+        void ToucheApercu()
+        {
+            var kb = UnityEngine.InputSystem.Keyboard.current;
+            if (kb == null) return;
+            if (kb.f9Key.wasPressedThisFrame)
+            {
+                Partie.DefinirNuitApercu(!Partie.NuitApercu);
+                Dire(Partie.NuitApercu ? "Nuit" : "Jour", 3f);
+            }
+            if (kb.f10Key.wasPressedThisFrame && !m_Transit && ReseauJeu.Autorite) BasculerMobsApercu();
+        }
+
+        /// Autorité, aperçu : « sans mob » retire tous les ennemis vivants (gardiens du donjon, squelettes d'essai) et plus
+        /// rien n'apparaît (DirecteurVagues.Poser) ; « avec mob » remet les gardiens aux points d'apparition du donjon et,
+        /// quand le héros est dehors (aucun ennemi n'existe sur la carte extérieure de l'aperçu), quelques squelettes d'essai
+        /// à quelques mètres de lui (des gardiens de poste, qui le poursuivent s'il est en vue).
+        void BasculerMobsApercu()
+        {
+            var dv = DirecteurVagues.Instance;
+            bool sans = !Partie.SansMobApercu;
+            Partie.DefinirSansMobApercu(sans);
+            if (sans)
+            {
+                RetirerGardiens();
+                dv?.RetirerTous();
+                Dire("Mobs : désactivés", 4f);
+                return;
+            }
+            Dire("Mobs : activés", 4f);
+            if (dv == null) return;
+            if (Pret) { RetirerGardiens(); PoserGardiens(); }
+            var h = P != null ? P.HerosLocal : null;
+            if (h != null && !AuDonjon(h)) PoserEssaisExterieur(dv, h);
+        }
+
+        /// Quatre squelettes d'essai (sbires, un guerrier) en arc devant le héros, à 8 m, sur le NavMesh.
+        void PoserEssaisExterieur(DirecteurVagues dv, Heros h)
+        {
+            int poses = 0;
+            Vector3 devant = h.transform.forward; devant.y = 0f;
+            if (devant.sqrMagnitude < 0.01f) devant = Vector3.forward;
+            devant.Normalize();
+            for (int k = 0; k < 4; k++)
+            {
+                Vector3 d = Quaternion.Euler(0f, -45f + 30f * k, 0f) * devant;
+                if (!NavMesh.SamplePosition(h.transform.position + d * 8f, out var hit, 4f, NavMesh.AllAreas)) continue;
+                var sq = dv.Poser(k == 3 ? TypeEnnemi.Guerrier : TypeEnnemi.Sbire, hit.position, false, false);
+                if (sq == null) continue;
+                sq.Garder(hit.position);
+                poses++;
+            }
+            P?.Journal("Aperçu : " + poses + " squelettes d'essai près du joueur (F10)");
+        }
+
         /// Autorité, aperçu : reconstruit le donjon de cette graine (gardiens compris) ; le héros local au donjon revient
         /// à l'arrivée. Aussi appelé par les outils de test (ScenariosDonjon.Graine).
         public void ChangerGraine(int graine)
@@ -1201,6 +1259,7 @@ namespace Deathless.Jeu
             AssurerPortails();
             // Aperçu de la nouvelle carte : F8 / Maj + F8 changent la graine du donjon en terrasses (outil de dev).
             if (Terrasses && Partie.Exploration && Pret) ToucheGraine();
+            if (Partie.Exploration) ToucheApercu();   // F9 jour / nuit, F10 sans mob / avec mob (hors donjon aussi)
 
             var h = p.HerosLocal;
             if (h == null) return;
