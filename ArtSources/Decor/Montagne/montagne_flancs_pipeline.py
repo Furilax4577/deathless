@@ -22,13 +22,16 @@ Options :
     --sans-export       ne pas écrire le FBX ni la texture (essais)
 
 Entrées (Tripo, 02/10/2026, un seul maillage chacune, face vers -Y, x de -0,49 à +0,49 unité) :
-    ouest : ArtSources/References/Decor/montagne_gauche_tripo/low-poly+rock+model.fbx (96 488 triangles,
-            0,98 x 0,46 x 0,35 unité ; point haut à gauche de la pièce, gros rocher en surplomb tout à gauche,
+    ouest : ArtSources/References/Decor/montagne_droite_tripo/rock+formation+3d+model.fbx (96 869 triangles,
+            0,98 x 0,30 x 0,32 unité ; mur de colonnes arrondies, deux grands pics sur la DROITE de la pièce)
+    est   : ArtSources/References/Decor/montagne_gauche_tripo/low-poly+rock+model.fbx (96 488 triangles,
+            0,98 x 0,46 x 0,35 unité ; point haut à GAUCHE de la pièce, gros rocher en surplomb tout à gauche,
             la pente descend vers la droite)
-    est   : ArtSources/References/Decor/montagne_droite_tripo/rock+formation+3d+model.fbx (96 869 triangles,
-            0,98 x 0,30 x 0,32 unité ; mur de colonnes arrondies, deux grands pics sur la droite de la pièce)
-Dans la carte (côté Unity) : l'ouest a son point haut vers l'extérieur (ouest) et descend vers le centre ; l'est a ses
-deux pics vers l'extérieur (est) : les deux pièces sont donc posées SANS miroir, face au sud comme la pièce héros.
+ÉCHANGE du 02/10/2026 (retour de Quentin : « on ne voit pas assez le pic », « inverse gauche et droite comme Tripo ») : les
+deux pièces ont changé de côté, toujours SANS miroir. La pièce « droite » de Tripo (deux pics à droite) est posée à l'OUEST :
+ses pics sont sur sa droite, donc vers le centre du village, bien visibles depuis la place de Nyxessa ; la pièce « gauche »
+(point haut et rocher en surplomb à gauche) est posée à l'EST : son point haut est sur sa gauche, donc vers le centre.
+Les noms de sortie suivent le côté : Montagne_Flanc_Ouest = pièce droite de Tripo, Montagne_Flanc_Est = pièce gauche.
 
 Traitement (par flanc) :
  1. Échelle uniforme (s m par unité Tripo), origine au centre de l'emprise, au sol (le point le plus bas à z = 0).
@@ -50,8 +53,8 @@ log = lambda *a: mp.log(*a)
 ECHELLE_DEFAUT = 62.0   # m par unité Tripo (uniforme)
 
 PIECES = {
-    "ouest": dict(source=os.path.join(REF, "montagne_gauche_tripo", "low-poly+rock+model.fbx"), nom="Montagne_Flanc_Ouest"),
-    "est": dict(source=os.path.join(REF, "montagne_droite_tripo", "rock+formation+3d+model.fbx"), nom="Montagne_Flanc_Est"),
+    "ouest": dict(source=os.path.join(REF, "montagne_droite_tripo", "rock+formation+3d+model.fbx"), nom="Montagne_Flanc_Ouest"),
+    "est": dict(source=os.path.join(REF, "montagne_gauche_tripo", "low-poly+rock+model.fbx"), nom="Montagne_Flanc_Est"),
 }
 
 

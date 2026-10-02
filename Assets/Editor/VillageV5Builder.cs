@@ -76,13 +76,16 @@ public static partial class VillageBuilder
     /// Pièces de flanc (Tripo, montagne_flancs_pipeline.py, 02/10/2026) : les deux modèles de Quentin TELS QUELS (pièce entière,
     /// sans miroir, sans recadrage, échelle uniforme de 62 m par unité Tripo posée dans le FBX), même traitement que la pièce
     /// héros (maillage rendu + maillage de collision, jamais marchable), posées seulement si leur FBX existe. Pose = centre de
-    /// l'emprise au sol (x, y, z) et lacet Unity ; lacet 180 comme la pièce héros (face au sud, x non inversé : l'ouest a son
-    /// point haut et son rocher en surplomb à l'ouest, l'est ses deux pics à l'est). Enfoncées de V5FlancsEnfoncement m.
+    /// l'emprise au sol (x, y, z) et lacet Unity ; lacet 180 comme la pièce héros (face au sud, x non inversé).
+    /// ÉCHANGE du 02/10/2026 (retour de Quentin : « on ne voit pas assez le pic », « inverse gauche et droite comme Tripo ») :
+    /// l'OUEST est la pièce « droite » de Tripo (mur de colonnes, deux grands pics sur SA droite, donc vers le centre, bien
+    /// visibles depuis la place de Nyxessa) ; l'EST est la pièce « gauche » (point haut et gros rocher en surplomb sur SA
+    /// gauche, donc vers le centre). Indices : 0 = est, 1 = ouest. Enfoncées de V5FlancsEnfoncement m.
     /// Une seule grotte, celle de la pièce héros.
     public static readonly string[] V5FlancsFbx = { "Assets/Art/Decor/Montagne/Montagne_Flanc_Est.fbx", "Assets/Art/Decor/Montagne/Montagne_Flanc_Ouest.fbx" };
     public static readonly string[] V5FlancsTex = { "Assets/Art/Decor/Montagne/Montagne_Flanc_Est_Texture.png", "Assets/Art/Decor/Montagne/Montagne_Flanc_Ouest_Texture.png" };
     public static readonly string[] V5FlancsMat = { "Assets/Art/Decor/Montagne/Montagne_Flanc_Est.mat", "Assets/Art/Decor/Montagne/Montagne_Flanc_Ouest.mat" };
-    public static readonly Vector4[] V5FlancsPose = { new Vector4(69.5f, 0f, 43f, 180f), new Vector4(-69.5f, 0f, 40f, 180f) };   // x, -, z, lacet
+    public static readonly Vector4[] V5FlancsPose = { new Vector4(69.5f, 0f, 40f, 180f), new Vector4(-69.5f, 0f, 43f, 180f) };   // x, -, z, lacet
     public const float V5FlancsEnfoncement = 0.4f;
     /// Falaise procédurale en gradins (18, 28, 38 m) : bande continue derrière la pièce héros et sur les flancs.
     public static readonly float[] V5GradinsHaut = { 18f, 28f, 38f };
