@@ -1,6 +1,19 @@
 {
   "versions": [
     {
+      "version": "0.9.1",
+      "date": "2026-10-02",
+      "titre": "La nouvelle carte prend forme",
+      "notes": [
+        "Nouvelle carte (aperçu, menu « Nouvelle carte ») : la falaise est complétée par deux montagnes de flanc, ouest et est, fidèles à tes modèles, avec leurs pics.",
+        "Grotte du portail : escalier droit sur l'axe de l'entrée, portail agrandi, plus de stèle.",
+        "Cascade : l'eau tombe d'un rebord de roche dans le bassin, avec une écume fine sur les côtés et au point d'impact.",
+        "Brume de montagne sur la falaise à partir du haut de la cascade ; plus de rochers qui flottent au sommet.",
+        "Herbes deux fois plus petites, et plus aucun arbre à moins de 3 m d'une paroi.",
+        "Le jeu normal garde l'ancienne carte : cette version se teste par l'aperçu (exploration, jour figé, sans vagues)."
+      ]
+    },
+    {
       "version": "0.9.0",
       "date": "2026-10-02",
       "titre": "Attributs, succès et nouvelle carte à visiter",
