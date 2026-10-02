@@ -1,6 +1,19 @@
 {
   "versions": [
     {
+      "version": "0.10.0",
+      "date": "2026-10-03",
+      "titre": "Boutiques et portes",
+      "notes": [
+        "Nouvelle carte (aperçu) : les six bâtiments sont entrables. Devant la porte, la touche Interagir ouvre : bruit de porte, fondu au noir, puis une pièce basique vide avec une porte pour ressortir.",
+        "Boutique du mécano : clé de bronze 40 or, clé d'argent 120 or, clé d'or 320 or, kit de crochetage 60 or (5 crochets). Boutique du druide : potion de santé 20 or, potion de mana 20 or (pour le Mage), potion d'endurance 15 or. On leur parle devant leur maison avec Interagir.",
+        "On peut porter 3 potions de chaque sorte au plus, et 2 clés de chaque sorte au plus. Les potions se boivent avec la croix directionnelle (haut, gauche, droite) ou avec les touches 1, 2 et 3.",
+        "Dans le donjon de l'aperçu, une porte à serrure de bronze, d'argent ou d'or s'ouvre avec la clé correspondante, ou se crochète avec le kit. Mini-jeu : maintenir Interagir pour garder l'aiguille dans la zone, 3 essais, et un crochet casse à chaque échec. L'assassin est favorisé. Une serrure d'or ne se crochète jamais.",
+        "Les touches de test F8, F9 et F10 de l'aperçu sont corrigées : avec certains claviers, des appuis se perdaient.",
+        "Version de test : les valeurs sont à équilibrer, les sons de boutique et de potion ne sont pas encore créés, le mini-jeu de crochetage est à juger en jeu, les pièces des bâtiments sont vides, et ces nouveautés n'ont pas été testées en réseau à deux postes. Le jeu normal garde l'ancienne carte."
+      ]
+    },
+    {
       "version": "0.9.9",
       "date": "2026-10-03",
       "titre": "La tavernière retrouve sa taille",
