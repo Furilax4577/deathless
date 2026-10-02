@@ -5,7 +5,8 @@ using UnityEngine;
 
 // Villageois de la carte v5 (03/10/2026, demande de Quentin : « vide les bâtiments des meubles, sors les PNJ dehors, chacun devant sa
 // maison »). Les bâtiments Tripo sont fermés : plus d'intérieur (V5RetirerInterieur), les villageois sont dehors, debout, au pied de leur
-// maison, tournés vers l'allée et la place (le +Z du bâtiment regarde Nyxessa). Rien d'ajouté autour d'eux (ni comptoir, ni enclume, ni
+// maison (depuis le 03/10/2026 : bâtiments KayKit posés au sol, au pied des marches et du côté opposé à l'allée, V5KKLateral / V5KKAvant ; forgeron
+// devant l'enclume du modèle, Enclume_Ancre de VillageV5KayKit.cs), tournés vers l'allée et la place (le +Z du bâtiment regarde Nyxessa). Rien d'ajouté autour d'eux (ni comptoir, ni enclume, ni
 // tonneau) : une pose de repos, et c'est tout.
 //   Forgeron   : barbare KayKit sans bonnet ni écharpe, debout au bord de l'atelier ouvert de la forge (ancre Enclume_Ancre du prefab, côté place)
 //   Tavernière : la Bavaroise (TavernierBuilder), à côté de la porte ; l'ancre d'échange Villageois/Ancre_Echange_Taverne (composant Taverne posé
@@ -22,6 +23,11 @@ public static partial class VillageBuilder
     /// Position devant la maison, repère de la porte : décalage latéral (m, - = côté droit vu de la façade, du côté de la fenêtre), distance
     /// devant le bord du soubassement (hors marches), lacet ajouté au regard du bâtiment (positif : vers l'axe de la porte et de l'allée).
     public const float V5VillageoisLateral = -3.2f, V5VillageoisAvant = 1.4f, V5VillageoisLacet = 20f;
+    /// Bâtiments KayKit (03/10/2026) : le villageois est au pied des marches (ou du devant de la porte), de l'autre côté de l'allée que la
+    /// lanterne : décalage latéral par rapport à l'axe de la porte (m ; côté opposé à celui d'où arrive l'allée, V5Facade.cote), distance
+    /// devant le bord avant des marches (le bord où finit l'allée plus 0,6 m : 1,2 m, soit 0,6 m au-delà du bout de l'allée), lacet de 20°
+    /// vers l'axe de la porte et de l'allée. Passage libre entre lui et l'escalier : décalage - 0,35 (corps) - 1,05 (demi-largeur de l'escalier) >= 1,5 m.
+    public const float V5KKLateral = 3.0f, V5KKAvant = 1.2f, V5KKLacet = 20f;
     const string V5VillageoisDossier = "Assets/Jeu/Villageois";
     const string V5VillageoisAnims = "Assets/Art/KayKit/KayKit_Character_Animations_1.1/Animations/fbx/Rig_Medium/Rig_Medium_General.fbx";
     const string V5DruideFbx = "Assets/Art/KayKit/KayKit_Adventurers_2.0_EXTRA/Characters/fbx/Druid.fbx";
@@ -34,6 +40,17 @@ public static partial class VillageBuilder
     {
         public Transform bat;
         public float xPorte, zSoub, zMarches;
+        public bool kaykit;
+        /// Côté où se tient le villageois (bâtiments KayKit) : +1 = vers +x (milieu de la façade pour la maison), -1 = vers -x ; toujours du côté
+        /// opposé à celui d'où arrive l'allée, pour qu'il ne se tienne jamais sur elle.
+        public float cote = 1f;
+        /// Point au sol (monde) à `dx` m de l'axe de la porte et `dz` m devant le bord avant des marches (bâtiments KayKit).
+        public Vector3 PosteMarches(float dx, float dz)
+        {
+            Vector3 p = bat.TransformPoint(new Vector3(xPorte + dx, 0f, zMarches + dz));
+            p.y = GroundHeight(p.x, p.z);
+            return p;
+        }
         /// Point au sol (monde) à `dx` m de l'axe de la porte et `dz` m devant le soubassement.
         public Vector3 Poste(float dx, float dz)
         {
@@ -51,13 +68,28 @@ public static partial class VillageBuilder
         if (rendu == null) return null;
         Transform bat = ms.Find("Batiment_" + role), ent = rendu.parent.Find("Entree");
         if (bat == null || ent == null) return null;
-        var f = new V5Facade { bat = bat, xPorte = bat.InverseTransformPoint(ent.position).x, zSoub = -999f, zMarches = -999f };
+        var f = new V5Facade { bat = bat, xPorte = bat.InverseTransformPoint(ent.position).x, zSoub = -999f, zMarches = -999f, kaykit = V5MaisonsTripo[i] == null };
         foreach (Vector3 v in rendu.GetComponent<MeshFilter>().sharedMesh.vertices)
         {
             Vector3 p = bat.InverseTransformPoint(rendu.TransformPoint(v));
             if (p.y >= 0.1f) continue;
             f.zMarches = Mathf.Max(f.zMarches, p.z);
             if (Mathf.Abs(p.x - f.xPorte) > 2.4f) f.zSoub = Mathf.Max(f.zSoub, p.z);   // le soubassement, sans les marches de la porte
+        }
+        if (f.kaykit)
+        {
+            // côté de l'allée : moyenne des dalles de l'allée entre 2 et 8 m du bout (0,6 m devant les marches), dans le repère de la façade
+            Transform sentier = ms.parent != null ? ms.parent.Find("Sentiers/Sentier_Maison_" + (i + 1)) : null;
+            float somme = 0f; int n = 0;
+            if (sentier != null)
+                foreach (Transform t in sentier.GetComponentsInChildren<Transform>())
+                {
+                    if (!t.name.StartsWith("path_")) continue;
+                    Vector3 l = bat.InverseTransformPoint(t.position);
+                    float d = Vector2.Distance(new Vector2(l.x, l.z), new Vector2(f.xPorte, f.zMarches + 0.6f));
+                    if (d > 2f && d < 8f) { somme += l.x - f.xPorte; n++; }
+                }
+            f.cote = n > 0 && Mathf.Abs(somme / n) > 0.4f ? (somme / n > 0f ? -1f : 1f) : 1f;
         }
         return f;
     }
@@ -104,13 +136,14 @@ public static partial class VillageBuilder
         Transform grp = Group(root, V5VillageoisGroupe);
         var sb = new StringBuilder("Villageois : ");
         AnimatorController repos = V5ControleurRepos();
-        System.Func<V5Facade, Vector3> devant = f => f.Poste(V5VillageoisLateral, V5VillageoisAvant);
+        System.Func<V5Facade, Vector3> devant = f => f.kaykit ? f.PosteMarches(V5KKLateral * f.cote, V5KKAvant) : f.Poste(V5VillageoisLateral, V5VillageoisAvant);
+        System.Func<V5Facade, float> lacetDe = f => f.kaykit ? f.Lacet(-f.cote * V5KKLacet) : f.Lacet(V5VillageoisLacet);
 
         // Tavernière : à côté de la porte ; ancre d'échange un mètre devant elle, à hauteur de comptoir (y + 0,95), regard vers la place
         V5Facade ft = V5FacadeDe(ms, "Taverne");
         if (ft != null)
         {
-            Vector3 p = devant(ft); float lacet = ft.Lacet(V5VillageoisLacet);
+            Vector3 p = devant(ft); float lacet = lacetDe(ft);
             Transform t = Group(grp, "Taverne");
             var ancreV = new GameObject("Ancre_Villageois_Taverne").transform;
             ancreV.SetParent(t, false); ancreV.SetPositionAndRotation(p, Quaternion.Euler(0f, lacet, 0f));
@@ -140,7 +173,7 @@ public static partial class VillageBuilder
             V5Facade f = V5FacadeDe(ms, role);
             if (f == null) { sb.Append(role + " absent ; "); continue; }
             Vector3 p = devant(f);
-            GameObject g = V5Pnj(Group(grp, role), nom, fbx, p, f.Lacet(V5VillageoisLacet), repos, null);
+            GameObject g = V5Pnj(Group(grp, role), nom, fbx, p, lacetDe(f), repos, null);
             sb.Append(nom.ToLowerInvariant() + " " + (g != null ? "en " + V5Pt(p) : "introuvable") + " ; ");
         }
 
@@ -150,7 +183,7 @@ public static partial class VillageBuilder
         {
             Vector3 p = devant(fs);
             var poste = new GameObject("Poste_Sorcier").transform;
-            poste.SetParent(grp, false); poste.SetPositionAndRotation(p, Quaternion.Euler(0f, fs.Lacet(V5VillageoisLacet), 0f));
+            poste.SetParent(grp, false); poste.SetPositionAndRotation(p, Quaternion.Euler(0f, lacetDe(fs), 0f));
             sb.Append("poste du sorcier en " + V5Pt(p) + " ; ");
         }
         else sb.Append("sorcier absent ; ");

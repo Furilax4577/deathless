@@ -15,8 +15,10 @@ using UnityEngine.AI;
 //   Deathless > Village > v5 > Tout appliquer (les étapes 1 à 7, puis le NavMesh), ou une étape à la fois.
 // Cotes : plan serpentin, Docs/outils/plan_village.py --serpente (x vers l'est, y vers le nord, en m ; Unity (x, 0, y)).
 // Montagne : pièce héros Tripo préparée par ArtSources/Decor/Montagne/montagne_pipeline.py (Assets/Art/Decor/Montagne/).
-// Les maisons sont posées au centre que leur donne le plan, façade vers Nyxessa, sans intérieur (les six sont en Tripo, fermées) ; les
-// villageois sont dehors, devant leur maison (étape 1b, VillageV5Villageois.cs). Chaque étape retire ce qu'elle a posé avant de le refaire.
+// Les maisons sont posées au centre que leur donne le plan, façade vers Nyxessa, sans intérieur (fermées) ; depuis le 03/10/2026 les six
+// bâtiments sont les modèles KayKit posés sur le sol, en attendant les futurs bâtiments Tripo (VillageV5KayKit.cs ; les prefabs Tripo
+// restent dans le projet, V5MaisonsTripo les remet en place) ; les villageois sont dehors, devant leur maison (étape 1b,
+// VillageV5Villageois.cs). Chaque étape retire ce qu'elle a posé avant de le refaire.
 public static partial class VillageBuilder
 {
     /// Vrai : le sol, les sentiers et la vérification suivent la carte v5 (rivière, lande, routes est / sud / ouest).
@@ -28,9 +30,10 @@ public static partial class VillageBuilder
     public static readonly string[] V5MaisonsRoles = { "Taverne", "Mecano", "Maison", "Forge", "Sorcier", "Druide" };
     public static readonly Vector2[] V5MaisonsCentres = { new Vector2(-31f, -16f), new Vector2(27f, -17f), new Vector2(-37f, 10f), new Vector2(32f, 13f), new Vector2(-27f, 28f), new Vector2(21f, 28f) };
     /// Maisons refaites en Tripo (02/10/2026) : prefab de Assets/Art/Decor/Maisons/ posé à la place du modèle KayKit, rôle par rôle
-    /// (null = le modèle KayKit reste). Les six bâtiments sont en Tripo : taverne « Le Tonneau Percé », mécano, maison de base, forge,
-    /// sorcier et druide.
-    public static readonly string[] V5MaisonsTripo = { "Taverne", "Mecano", "Maison_Base", "Forge", "Sorcier", "Druide" };
+    /// (null = le modèle KayKit, V5MaisonsKayKitPiece). Depuis le 03/10/2026 (retour de Quentin : « les maisons Tripo ne sont pas abouties »)
+    /// les six bâtiments sont KayKit, posés au sol (VillageV5KayKit.cs) en attendant les prochains bâtiments ; remettre un nom de prefab ici
+    /// ({ "Taverne", "Mecano", "Maison_Base", "Forge", "Sorcier", "Druide" }) pose de nouveau le bâtiment Tripo du rôle.
+    public static readonly string[] V5MaisonsTripo = { null, null, null, null, null, null };
     /// Écart de pose des bâtiments Tripo par rapport au centre du plan (V5MaisonsCentres), rôle par rôle : (x, z) en m, lacet en degrés
     /// ajouté à la direction de Nyxessa. Les modèles sont plus grands que les plans (forge 17,4 x 11,4 m, sorcier 12,4 x 11 m, druide
     /// 14,6 x 10 m, mécano 12,6 x 11,8 m) : un bâtiment qui ne tient pas au centre du plan est décalé ici, jamais en silence
@@ -262,10 +265,10 @@ public static partial class VillageBuilder
         if (root == null) return "VillageBlockout introuvable";
         s_V5Axe = null;
         sb.AppendLine(V5Maisons(root));
-        sb.AppendLine(V5Villageois(root));
         sb.AppendLine(V5Montagne(root));
         sb.AppendLine(V5Riviere(root));
         sb.AppendLine(V5Allees(root));
+        sb.AppendLine(V5Villageois(root));   // après les allées : chaque villageois se tient du côté opposé à celui d'où arrive la sienne
         sb.AppendLine(V5Clairieres(root));
         sb.AppendLine(V5Nature(root));
         sb.AppendLine(V5Sol(root));
@@ -311,6 +314,7 @@ public static partial class VillageBuilder
         for (int i = 0; i < V5MaisonsNoms.Length; i++)
         {
             if (V5TripoDispo(i)) { sb.Append(V5PoserMaisonTripo(root, ms, i)); continue; }
+            if (V5MaisonsKayKitPiece[i] != null) { sb.Append(V5PoserMaisonKayKit(root, ms, i)); continue; }
             Transform h = TrouverMaison(root, V5MaisonsNoms[i]);
             if (h == null) { sb.Append(V5MaisonsNoms[i] + " absente ; "); continue; }
             // ancienne racine retirée (le modèle revient sous Maisons, pose monde gardée)
@@ -357,11 +361,15 @@ public static partial class VillageBuilder
 
     static bool V5TripoDispo(int i) { return V5MaisonsTripo[i] != null && AssetDatabase.LoadAssetAtPath<GameObject>(MaisonTripo.CheminPrefab(V5MaisonsTripo[i])) != null; }
 
-    /// Rendu du prefab Tripo posé sous Maisons/Batiment_<Rôle>/<prefab>/Rendu (null si le rôle garde son modèle KayKit).
+    /// Nom du modèle posé sous Maisons/Batiment_<Rôle> : le prefab Tripo du rôle, sinon « KayKit_<pièce> » (VillageV5KayKit.cs).
+    static string V5NomModele(int i) { return V5TripoDispo(i) ? V5MaisonsTripo[i] : "KayKit_" + V5MaisonsKayKitPiece[i]; }
+
+    /// Rendu du bâtiment posé sous Maisons/Batiment_<Rôle>/<modèle>/Rendu (prefab Tripo ou modèle KayKit ; null si le rôle n'a aucun modèle).
+    /// Le repère « Entree » est son frère, la racine Batiment_<Rôle> est le repère de la façade (+Z vers Nyxessa).
     static Transform V5RenduTripo(Transform ms, int i)
     {
-        if (ms == null || V5MaisonsTripo[i] == null) return null;
-        return ms.Find("Batiment_" + V5MaisonsRoles[i] + "/" + V5MaisonsTripo[i] + "/Rendu");
+        if (ms == null || (V5MaisonsTripo[i] == null && V5MaisonsKayKitPiece[i] == null)) return null;
+        return ms.Find("Batiment_" + V5MaisonsRoles[i] + "/" + V5NomModele(i) + "/Rendu");
     }
 
     /// Pose la maison Tripo du rôle `i` : retire le bâtiment KayKit (racine, modèle, zone « Porte », lanterne de porte) puis recrée
