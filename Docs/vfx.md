@@ -39,6 +39,7 @@ Source unique : `Assets/VFX/_Palettes/` — `VfxPalette.cs` (ScriptableObject : 
 | **Critique** (ajouté le 25/09/2026) | ombre : ambre `#a8641a` · base : or chaud `#e8a53a` · vif : or clair `#ffd166` · cœur : blanc chaud `#fff3d1` · accent : meilleur `#ff5a3c` | coup critique commun à toutes les classes (`Critique`) ; l'accent rouge-orangé ne sert qu'au meilleur critique. Plus clair et plus blanc que Sacre (couleur du paladin) pour se lire sur n'importe quelle classe |
 | **Chasse** (ajouté) | ombre : sous-bois `#23361f` · base : forêt `#3e5a2b` · vif : olive `#7a8c3a` · cœur : ocre clair `#d9b45a` · accent : ocre `#a8742f` | rôdeur : marqueur de la nuée de flèches, flash de pleine charge de l'arc |
 | **Ombre** (ajouté) | ombre : nuit `#140b1f` · base : violet sombre `#2b1840` · vif : violet `#5b3a8a` · cœur : lilas `#a58ad6` · accent : fumée `#6b6478` | assassin : mode furtif (`ModeFurtif`), grenade fumigène (`Fumigene`) |
+| **Eau** (ajouté, 01/10/2026) | ombre : bleu profond `#1c3d66` · base : bleu `#3373b3` · vif : bleu clair `#73b8e6` · cœur : reflet `#cceeff` · accent : Ecume `#f2faff` | eau du village : cascade, remous, écume, teintes du shader `EauRiviere` (jamais vert) |
 | **BouclierPlein / BouclierEntame / BouclierCritique** (ajoutés) | bleu `#0d2e73` `#1a66d9` `#4ca6ff` `#95bfff` + lueur `#59a6ff` · orange `#732e08` `#e67314` `#ffad40` `#ffca8a` + lueur `#ff9933` · rouge `#660a0a` `#d91f1a` `#ff594c` `#ff9f95` + lueur `#ff4033` | bouclier de la relique (`RelicShieldVisual`) : les trois thèmes codent la **vie restante** (> 40 %, 15-40 %, < 15 %), pas un élément ; cœur × 1,2 en HDR par le script (valeurs de Relic inchangées) |
 
 Hors thèmes (inchangés) : fumée grise de `FireEffect` (plus utilisée par la boule de feu), éclair chaud de l'aube de `GemBurst.Rise`, émission de `RelicGlow` (champs du composant), ambiance jour/nuit (`Ambiance`), vitres des intérieurs vues du dedans (`InterieursAmbiance` : `vitreJour` `#8eaacf`, `vitreNuit` `#080a1a`, émission mêlée selon la nuit), brume au sol (`GroundMist` : couleur violet-gris `#73619e`, lueur de nuit `#17122b`).
@@ -417,6 +418,12 @@ Une paire prefab + script par effet sous `Assets/VFX/<Effet>/`, matériau `Porta
 - **Palette** : thème **Feu** (braise, rouge, orange, jaune, accent « Blanc chaud »), relue quand la palette change ; jamais de vert.
 - **Coût** : maillage mis à jour seulement s'il est vu et à moins de 30 m de la caméra ; aucune allocation par image.
 - Capture : `Assets/Screenshots/forge_feu.png`.
+
+### Eau du village : cascade, remous, courant, écume (créé dans Deathless, 01-02/10/2026)
+- **Cascade** : `Assets/Scripts/Jeu/Village/CascadeVillage.cs` sur `VillageBlockout/Riviere/Cascade` (repères `Levre`, `Coude`, `Pied` ; posé par Deathless > Village > v5 > 3). Voile d'eau (ruban, matériau `Village_Cascade.mat`, shader de l'eau du donjon) ; gemmes (`GemmesVolantes`, `PortalVoxel.mat`, 1 500 au plus) : filets qui tombent de la lèvre au coude puis dévalent l'éboulis, écume qui rejaillit, **nuage de remous** (grosses gemmes blanches qui gonflent puis retombent, 34/s), **anneaux de remous** (couronne de 18 gemmes plates toutes les 0,75 s), embrun lent. Teintes relues dans la palette, assombries la nuit (`DayCycle.Night`). Boucle sonore `village_cascade` au pied. Pose aussi la variable globale `_DeathlessNuit`.
+- **Courant** : shader `Assets/Art/Shaders/EauRiviere.shader` (`Village_Riviere.mat`) : facettes de l'eau du donjon plus des traits d'écume qui glissent vers l'aval (UV0.y = distance le long de la rivière, UV1.x = vitesse locale : × 2,6 au pied de la cascade, × 2,2 aux gués) ; dans le bassin, anneaux qui s'élargissent. Aucun coût CPU.
+- **Écume** : `EcumeRiviere.cs` sur `Riviere` : gemmes plates qui naissent contre les 42 pierres des gués et les 8 piles des ponts et filent vers l'aval (2,4/s par obstacle).
+- Captures : `carte_v5_cascade_remous.png`, `carte_v5_riviere_1.png` et `_2.png` (deux instants), `carte_v5_gue_ecume.png`.
 
 ## Banc `VfxBench`
 

@@ -1034,7 +1034,10 @@ namespace Deathless.EditorTools
         [MenuItem("Deathless/Jeu/6. Cuire le NavMesh")]
         public static string CuireNavMesh()
         {
-            var surf = Object.FindAnyObjectByType<NavMeshSurface>();
+            // la surface du village (Jeu/NavMesh, tous les objets), pas celle du donjon (enfants seulement, cuite en jeu)
+            NavMeshSurface surf = null;
+            foreach (var s in Object.FindObjectsByType<NavMeshSurface>(FindObjectsSortMode.None))
+                if (s.collectObjects == CollectObjects.All) { surf = s; break; }
             if (surf == null) return "pas de NavMeshSurface";
             // Réglages de l'agent par défaut (Humanoid) : rayon 0,4 m, hauteur 1,8 m, marche 0,35 m, pente 45°.
             var st = NavMesh.GetSettingsByID(surf.agentTypeID);

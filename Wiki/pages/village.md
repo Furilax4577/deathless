@@ -38,6 +38,14 @@ Chantier ouvert par Quentin le 27/09/2026. **Plan validé sur la maquette grise 
 - **La rivière traverse le village** : elle longe le plateau de Nyxessa (à ~10 m) et sort au sud-ouest ; **deux ponts** (nord près du portail, sud) qui font goulets pour les vagues, et **un gué** (eau peu profonde, ralenti comme l'eau du donjon) pour que l'IA ne soit jamais bloquée ; trois maisons par rive ; la nuit, l'eau reflète la lueur de Nyxessa. **Elle longe le plateau** (à ~10 m, entre Nyxessa et trois maisons) {décidé, 27/09/2026}. **Deux ponts et trois gués** {décidé, 28/09/2026 ; un seul gué le 27/09/2026} : pont est, pont sud, et un gué devant chacune des trois maisons de la rive est.
 - Maquette : `Docs/references/` et le fil de discussion ; générateur du village en v5 dans `sandbox-level`, circulation revérifiée (72 azimuts, remontée aux ponts).
 
+{{dev: **Reportée dans main le 02/10/2026** (plan serpentin `Docs/outils/plan_village.py --serpente`, comparaison `Assets/Screenshots/carte_v5_aerien.png`) : générateur `Assets/Editor/VillageV5Builder.cs`, menu Deathless > Village > v5 (étapes 1 à 7, Tout appliquer, Vérifier).
+- Maisons aux cotes du plan, une racine par bâtiment `Maisons/Batiment_<Rôle>` (pivot au sol au centre de l'emprise, avant vers Nyxessa, zone `Porte` séparée du modèle) ; intérieurs et lanternes déplacés avec elles.
+- Montagne : pièce héros Tripo (`ArtSources/Decor/Montagne/montagne_pipeline.py`, 122 × 40 × 20,5 m) et falaise procédurale en gradins (18, 28, 38 m) derrière et sur les flancs, jamais marchable ; une seule grotte. Emplacements prévus pour deux pièces de flanc (`V5FlancsFbx`, `V5FlancsPose`).
+- Grotte : replat du fond à 2,15 m, escalier ; le portail au fond, sur son socle ; aller-retour au donjon vérifié en jeu.
+- Rivière (4,5 m), bassin, cascade de 14 m (`CascadeVillage`), trois gués (pierres plates, zone « Eau » du NavMesh, ralenti `ZoneEau`), deux ponts de bois (est, sud) ; l'eau est infranchissable ailleurs : lit non praticable pour le NavMesh, héros ramené à la berge (`RiviereVillage`), sans mur invisible. Courant visible (shader `EauRiviere`), écume aux gués et aux piles (`EcumeRiviere`).
+- Routes d'attaque de 7 m et clairières est, sud, ouest ; forêt au sud et à l'ouest, lande à l'est, pierrier ; sol à facettes d'1 m.
+- Vérifié : chaque clairière rejoint Nyxessa en 18,7 à 18,8 s (sbire, 3,4 m/s), l'est et le sud par leur pont ; aucun chemin dans l'eau hors gué ou pont ; deux nuits jouées en Play sans squelette bloqué ni hors passage ; aucune zone du NavMesh au-delà de la falaise.}}
+
 ## Taille des maisons {décidé} {dev}
 
 Les portes des maisons sont à l'échelle du joueur : 2,1 m pour un personnage de 2 m. Les maisons font donc 6 à 6,5 m de large.

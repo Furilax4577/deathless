@@ -20,17 +20,20 @@ namespace Deathless.Jeu
         public float largeur = 2.4f;
         [Tooltip("Matériau des gemmes (Relic/VertexColorUnlit : PortalVoxel.mat ou une copie).")]
         public Material materiauGemmes;
-        public int capacite = 900;
+        public int capacite = 1500;
         [Tooltip("Filets par seconde.")] public float debitFilets = 110f;
         [Tooltip("Gemmes d'écume par seconde.")] public float debitEcume = 70f;
         [Tooltip("Gemmes d'embrun par seconde.")] public float debitEmbrun = 9f;
+        [Tooltip("Nuage de remous au pied : grosses gemmes blanches qui gonflent puis retombent (par seconde).")] public float debitRemous = 34f;
+        [Tooltip("Anneaux de remous dans le bassin : un anneau toutes les `periodeAnneaux` s.")] public float periodeAnneaux = 0.75f;
         [Tooltip("Assombrissement à la pleine nuit (facteur des teintes).")] public float nuitFacteur = 0.42f;
         [Tooltip("Volume de la boucle sonore.")] public float volume = 0.8f;
 
         public static readonly string[] SonCascade = { "village_cascade" };
 
         GemmesVolantes m_Gemmes;
-        float m_Filets, m_Ecume, m_Embrun;
+        float m_Filets, m_Ecume, m_Embrun, m_Remous, m_Anneau;
+        static readonly int s_Nuit = Shader.PropertyToID("_DeathlessNuit");
         Color[] m_Teintes;
         int m_Version = -1;
         AudioSource m_Son;
@@ -76,6 +79,7 @@ namespace Deathless.Jeu
 
         void Update()
         {
+            Shader.SetGlobalFloat(s_Nuit, DayCycle.Night);   // eau de la rivière (EauRiviere) : assombrie la nuit
             if (m_Gemmes == null || levre == null || pied == null) return;
             float dt = Time.deltaTime;
             Vector3 l = levre.position, droite = levre.right, avant = levre.forward;
@@ -121,6 +125,31 @@ namespace Deathless.Jeu
                 Vector3 v = new Vector3(o.x, Random.Range(1.6f, 3.4f), o.y);
                 m_Gemmes.Emettre(p, v, Random.Range(0.12f, 0.24f), Random.Range(0.45f, 0.75f), Teinte(Random.value < 0.6f ? 4 : 3), g, 0.6f,
                     0.04f, 0.5f);
+            }
+            // nuage de remous : grosses gemmes blanches qui gonflent en montant puis retombent, visible de loin
+            m_Remous += debitRemous * dt;
+            while (m_Remous >= 1f)
+            {
+                m_Remous -= 1f;
+                Vector2 o = Random.insideUnitCircle * 1.4f;
+                Vector3 p = b + new Vector3(o.x, 0.1f, o.y);
+                Vector3 v = new Vector3(o.x * 0.7f, Random.Range(1.6f, 3.2f), o.y * 0.7f);
+                m_Gemmes.Emettre(p, v, Random.Range(0.45f, 0.95f), Random.Range(1.3f, 2.0f), Teinte(Random.value < 0.75f ? 4 : 3), 2.6f, 0.7f,
+                    0.45f, 0.55f);
+            }
+            // anneaux de remous : couronne de gemmes plates qui s'élargit à la surface du bassin
+            m_Anneau += dt;
+            if (m_Anneau >= periodeAnneaux)
+            {
+                m_Anneau -= periodeAnneaux;
+                int nb = 18; float a0 = Random.value * Mathf.PI * 2f;
+                for (int i = 0; i < nb; i++)
+                {
+                    float a = a0 + i * Mathf.PI * 2f / nb;
+                    Vector3 d = new Vector3(Mathf.Cos(a), 0f, Mathf.Sin(a));
+                    m_Gemmes.Emettre(b + d * 0.9f + Vector3.up * 0.02f, d * 1.5f, 0.2f, 1.7f, Teinte(i % 3 == 0 ? 3 : 4), 0f, 0.9f,
+                        0.15f, 0.4f, new Vector3(1.5f, 0.22f, 1.5f));
+                }
             }
             m_Embrun += debitEmbrun * dt;
             while (m_Embrun >= 1f)

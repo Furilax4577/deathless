@@ -2331,3 +2331,10 @@ MonoBehaviour:
     clips:
     - {fileID: 8300000, guid: 8dcc30ce5b06a084dbeffe4e23316168, type: 3}
     portee: 40
+  - id: village_cascade
+    nom: "Village \u2014 cascade (boucle)"
+    statut: a_ecouter
+    boucle: 1
+    clips:
+    - {fileID: 8300000, guid: e91e8eea408baeb42b8d22595488d42a, type: 3}
+    portee: 45

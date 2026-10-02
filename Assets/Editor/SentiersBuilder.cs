@@ -65,6 +65,7 @@ public static class SentiersBuilder
                     if (R() < Mathf.Pow(usure, 1.6f) * 0.45f) continue;                  // dalles manquantes plus loin
                     float decal = rangees == 2 ? (k == 0 ? -0.95f : 0.95f) : (R() - 0.5f) * 1.4f * usure;
                     Vector3 p = axe + droite * decal + new Vector3(R() - 0.5f, 0f, R() - 0.5f) * 0.5f * usure;
+                    if (VillageBuilder.V5Actif && (VillageBuilder.V5SurEau(p, 0.8f) || VillageBuilder.V5SurPont(p, 0.3f))) continue;   // carte v5 : ni dans l'eau ni sur les ponts
                     bool caillou = u > 0.8f ? R() < 0.55f : u > 0.55f && R() < 0.15f;
                     string chemin; float echelle, enfonce;
                     if (!caillou)
@@ -106,6 +107,7 @@ public static class SentiersBuilder
                 float lat = Mathf.Sin(rl * 0.11f + phase) * 1.1f * Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(r0, r0 + 8f, rl));
                 float cote = (k % 2 == 0 ? 1f : -1f) * (g % 2 == 0 ? 1f : -1f);
                 Vector3 p = VillageBuilder.Polar(az, rl) + VillageBuilder.Right(az) * (lat + cote * (k == 0 ? 2.5f : 1.9f));
+                for (int essai = 0; essai < 30 && VillageBuilder.V5Actif && (VillageBuilder.V5SurEau(p, 1.5f) || VillageBuilder.V5SurPont(p, 1f)); essai++) p += VillageBuilder.Polar(az, 1f);   // carte v5 : hors de l'eau
                 p = PoserSurSol(Ecarter(p, VillageBuilder.Right(az), 0.8f), sol);
                 bool poteau = k == 1;
                 float ech = poteau ? 1.1f : VillageBuilder.LanternScale;

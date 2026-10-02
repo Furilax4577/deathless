@@ -53,18 +53,20 @@ public static partial class VillageBuilder
     public static readonly Vector3 V5MontagnePos = new Vector3(1f, 0f, 50f);
     public const float V5MontagneLacet = 180f;           // la face avant de la pièce (Blender -Y) regarde le sud
     /// Grotte (repère de la pièce, m) : entrée et fond, sol ; le portail au fond, face au village.
-    public static readonly Vector3 V5GrotteEntreeLocal = new Vector3(-14f, 0f, -11.5f);
-    public static readonly Vector3 V5GrotteFondLocal = new Vector3(-14f, 0f, -5.5f);
+    public static readonly Vector3 V5GrotteEntreeLocal = new Vector3(-14.5f, 0f, -8f);   // seuil (relevé au rayon dans Unity)
+    public static readonly Vector3 V5GrotteFondLocal = new Vector3(-14.5f, 0f, -3.6f);
+    public const float V5GrotteSol = 2.15f, V5GrotteMarche = 4.6f;   // replat du fond à 2,15 m, escalier de 4,6 m
     /// Cascade (repère de la pièce) : lèvre en haut de la ravine, coude sur l'éboulis, pied dans le bassin.
-    public static readonly Vector3 V5CascadeLevreLocal = new Vector3(-1.8f, 15.4f, -2.6f);
-    public static readonly Vector3 V5CascadeCoudeLocal = new Vector3(-1.8f, 4.2f, -5.4f);
-    /// Gradins de la falaise (18, 28, 38 m) et flancs : copies de la pièce (échelle, position, lacet).
-    public static readonly Vector4[] V5Gradins = {
-        new Vector4(1.36f, -24f, 84f, 8f),       // 28 m
-        new Vector4(1.85f, 28f, 116f, 172f),     // 38 m
-        new Vector4(0.85f, 78f, 60f, 196f),      // flanc est
-        new Vector4(0.85f, -80f, 62f, 166f),     // flanc ouest
-    };
+    public static readonly Vector3 V5CascadeLevreLocal = new Vector3(-0.8f, 14f, -2.2f);
+    public static readonly Vector3 V5CascadeCoudeLocal = new Vector3(-0.8f, 3.4f, -4.4f);
+    /// Pièces de flanc (à venir : rendu Tripo alternatif pour les côtés, demandé par Quentin le 02/10/2026) : posées
+    /// seulement si leur FBX existe ; emplacement attendu (pivot au sol, lacet Unity : face avant vers le village,
+    /// échelle 1 = pièce préparée à ses mètres par le même pipeline). Aucune copie de la pièce centrale : une seule
+    /// grotte, aucune ouverture cachée.
+    public static readonly string[] V5FlancsFbx = { "Assets/Art/Decor/Montagne/Montagne_Flanc_Est.fbx", "Assets/Art/Decor/Montagne/Montagne_Flanc_Ouest.fbx" };
+    public static readonly Vector4[] V5FlancsPose = { new Vector4(82f, 0f, 58f, 200f), new Vector4(-84f, 0f, 60f, 160f) };   // x, -, z, lacet
+    /// Falaise procédurale en gradins (18, 28, 38 m) : bande continue derrière la pièce héros et sur les flancs.
+    public static readonly float[] V5GradinsHaut = { 18f, 28f, 38f };
 
     // ------------------------------------------------------------------ géométrie de la rivière
     static List<Vector2> s_V5Axe;
@@ -321,7 +323,9 @@ public static partial class VillageBuilder
     public static Transform V5MontagneRacine(Transform root) { return root.Find("Montagne"); }
     public static Vector3 V5Local(Vector3 local)
     {
-        return V5MontagnePos + Quaternion.Euler(0f, V5MontagneLacet, 0f) * local;
+        // repères « locaux » = coordonnées Blender de la pièce (x, hauteur, y) : avec la pièce tournée de 180°, la face
+        // avant (Blender -Y) regarde le sud et x n'est pas inversé (l'import FBX retourne déjà l'axe x)
+        return V5MontagnePos + Quaternion.Euler(0f, V5MontagneLacet - 180f, 0f) * local;
     }
 
     public static string V5Montagne(Transform root)
@@ -331,10 +335,10 @@ public static partial class VillageBuilder
         GameObject modele = AssetDatabase.LoadAssetAtPath<GameObject>(V5MontagneFbx);
         if (modele == null) return "Montagne : FBX absent (" + V5MontagneFbx + "), lancer montagne_pipeline.py";
         Material mat = V5MateriauMontagne();
-        Mesh rendu = null, collision = null;
+        Mesh rendu = null, collision = null; Quaternion axeFbx = Quaternion.identity;
         foreach (var mf in modele.GetComponentsInChildren<MeshFilter>(true))
         {
-            if (mf.sharedMesh.name.Contains("Collision")) collision = mf.sharedMesh; else rendu = mf.sharedMesh;
+            if (mf.sharedMesh.name.Contains("Collision")) collision = mf.sharedMesh; else { rendu = mf.sharedMesh; axeFbx = mf.transform.localRotation; }
         }
         if (rendu == null) return "Montagne : maillage rendu absent";
         int pieces = 0;
@@ -342,7 +346,7 @@ public static partial class VillageBuilder
         {
             GameObject go = new GameObject(nom);
             go.transform.SetParent(mont, false);
-            go.transform.SetPositionAndRotation(pos, Quaternion.Euler(0f, lacet, 0f));
+            go.transform.SetPositionAndRotation(pos, Quaternion.Euler(0f, lacet, 0f) * axeFbx);   // axe : Z (Blender) vers le haut
             go.transform.localScale = Vector3.one * echelle;
             go.AddComponent<MeshFilter>().sharedMesh = rendu;
             var mr = go.AddComponent<MeshRenderer>(); mr.sharedMaterial = mat;
@@ -353,30 +357,55 @@ public static partial class VillageBuilder
             pieces++;
         };
         poser("Montagne_Heros", V5MontagnePos, V5MontagneLacet, 1f);
-        for (int i = 0; i < V5Gradins.Length; i++)
+        for (int i = 0; i < V5FlancsFbx.Length; i++)
         {
-            Vector4 g = V5Gradins[i];
-            poser(i < 2 ? "Gradin_" + (i == 0 ? "28m" : "38m") : (i == 2 ? "Flanc_Est" : "Flanc_Ouest"), new Vector3(g.y, 0f, g.z), g.w, g.x);
+            GameObject fl = AssetDatabase.LoadAssetAtPath<GameObject>(V5FlancsFbx[i]);
+            if (fl == null) continue;
+            GameObject inst = (GameObject)PrefabUtility.InstantiatePrefab(fl, mont);
+            inst.name = i == 0 ? "Flanc_Est" : "Flanc_Ouest";
+            inst.transform.SetPositionAndRotation(new Vector3(V5FlancsPose[i].x, 0f, V5FlancsPose[i].z), Quaternion.Euler(0f, V5FlancsPose[i].w, 0f));
+            foreach (var mf in inst.GetComponentsInChildren<MeshFilter>())
+            {
+                var c = mf.gameObject.AddComponent<MeshCollider>(); c.sharedMesh = mf.sharedMesh;
+                var md = mf.gameObject.AddComponent<NavMeshModifier>(); md.overrideArea = true; md.area = 1;
+            }
+            pieces++;
         }
+        V5Falaise(mont);
 
-        // Grotte : sol plat de pierre (le fond de la pièce Tripo est bosselé), du seuil au fond ; le portail au fond.
+        // Grotte : le fond de la pièce Tripo est un replat à ~2,1 m derrière un seuil rocheux : dalle de pierre plate à
+        // V5GrotteSol (du seuil au fond), escalier Dungeon élargi qui y monte depuis le sol, rampe invisible pour marcher.
         Vector3 entree = V5Local(V5GrotteEntreeLocal), fond = V5Local(V5GrotteFondLocal);
         Transform grotte = Group(mont, "Grotte");
         {
-            Vector3 axe = fond - entree; axe.y = 0f;
-            GameObject sol = GameObject.CreatePrimitive(PrimitiveType.Cube); sol.name = "Grotte_Sol";
-            sol.transform.SetParent(grotte, false);
-            sol.transform.SetPositionAndRotation((entree + fond) / 2f + Vector3.up * -0.15f, Quaternion.LookRotation(axe.normalized));
-            sol.transform.localScale = new Vector3(5.6f, 0.36f, axe.magnitude + 3f);
-            var dmat = AssetDatabase.LoadAssetAtPath<Material>("Assets/Art/Materials/KayKit_Dungeon.mat");
-            Object.DestroyImmediate(sol.GetComponent<MeshRenderer>());
-            Object.DestroyImmediate(sol.GetComponent<MeshFilter>());
-            // dalles Dungeon au sol de la grotte (grille de 2 m dans l'axe de la grotte)
-            Vector3 dr = Vector3.Cross(Vector3.up, axe.normalized);
-            for (float a = -1f; a <= axe.magnitude + 1.01f; a += 2f)
-                for (float s = -2f; s <= 2.01f; s += 2f)
-                    Dungeon(grotte, Pavers[Random.Range(0, Pavers.Length)], entree + axe.normalized * a + dr * s + Vector3.up * (TileY + 0.02f), Quaternion.LookRotation(axe).eulerAngles.y + 90f * Random.Range(0, 4));
-            if (dmat == null) { }
+            Vector3 axe = fond - entree; axe.y = 0f; Vector3 dir = axe.normalized, dr = Vector3.Cross(Vector3.up, dir);
+            Quaternion q = Quaternion.LookRotation(dir);
+            GameObject sol = new GameObject("Grotte_Sol"); sol.transform.SetParent(grotte, false);
+            sol.transform.SetPositionAndRotation(entree + axe / 2f + dir * 0.5f + Vector3.up * (V5GrotteSol - 0.2f), q);
+            var bs = sol.AddComponent<BoxCollider>(); bs.size = new Vector3(4.6f, 0.4f, axe.magnitude + 1.6f);
+            for (float a = 0.6f; a <= axe.magnitude + 1.01f; a += 2f)
+                for (float t = -1f; t <= 1.01f; t += 2f)
+                    Dungeon(grotte, Pavers[Random.Range(0, Pavers.Length)], entree + dir * a + dr * t + Vector3.up * (V5GrotteSol + TileY), q.eulerAngles.y + 90f * Random.Range(0, 4));
+            // escalier : du sol (à V5GrotteMarche m devant le seuil) jusqu'au replat
+            Vector3 bas = entree - dir * V5GrotteMarche; bas.y = 0f;
+            GameObject esc = Dungeon(grotte, "stairs_wide", Vector3.zero, 0f);
+            if (esc != null)
+            {
+                foreach (var c in esc.GetComponentsInChildren<Collider>(true)) Object.DestroyImmediate(c);
+                Bounds eb = esc.GetComponentInChildren<MeshFilter>().sharedMesh.bounds;
+                esc.transform.localScale = new Vector3(4.4f / eb.size.x, V5GrotteSol / eb.size.y, (V5GrotteMarche + 0.2f) / eb.size.z);
+                // marches montant vers +z du modèle (vérifié sur la capture) : bas devant, haut contre le seuil
+                esc.transform.rotation = q;
+                Physics.SyncTransforms();
+                Bounds wb = esc.GetComponentInChildren<Renderer>().bounds;
+                Vector3 cible = (bas + new Vector3(entree.x, 0f, entree.z)) / 2f;
+                esc.transform.position += new Vector3(cible.x - wb.center.x, -wb.min.y, cible.z - wb.center.z);
+                esc.name = "Grotte_Escalier";
+            }
+            GameObject rampe = new GameObject("Grotte_Rampe"); rampe.transform.SetParent(grotte, false);
+            float lr = Mathf.Sqrt(V5GrotteMarche * V5GrotteMarche + V5GrotteSol * V5GrotteSol), ang = Mathf.Atan2(V5GrotteSol, V5GrotteMarche) * Mathf.Rad2Deg;
+            rampe.transform.SetPositionAndRotation((bas + new Vector3(entree.x, V5GrotteSol, entree.z)) / 2f - Vector3.up * 0.1f, q * Quaternion.Euler(-ang, 0f, 0f));
+            var br = rampe.AddComponent<BoxCollider>(); br.size = new Vector3(4.2f, 0.2f, lr + 0.1f);
         }
         // Portail : socle et disque de gemmes (objets d'origine, déplacés ensemble), face au village.
         Transform por = root.Find("Portail");
@@ -387,21 +416,104 @@ public static partial class VillageBuilder
             Transform socle = por.Find("Portail_Socle"), disque = por.Find("PortailDonjon");
             if (disque != null)
             {
-                Vector3 pp = fond; pp.y = 0f;
+                Vector3 pp = fond; pp.y = 0f;   // au sol du replat (V5GrotteSol), voir plus bas
                 float az = AzOf(pp);
                 // vers Nyxessa : comme à l'origine (PortalAz + 90), la face fine du cube racine regarde le centre
                 if (socle != null)
                 {
-                    socle.position = pp;
+                    socle.position = pp + Vector3.up * V5GrotteSol;
                     socle.rotation = Quaternion.Euler(0f, Mathf.Repeat(az, 360f / PlateauSides), 0f);
                 }
-                disque.position = pp + Vector3.up * PortalHeight;
+                disque.position = pp + Vector3.up * (V5GrotteSol + PortalHeight);
                 disque.rotation = Quaternion.Euler(0f, az + 90f, 0f);
                 portail = "portail au fond de la grotte (" + pp.x.ToString("F1") + ", " + pp.z.ToString("F1") + "), az " + az.ToString("F0") + "°";
             }
         }
         // Lumière de la grotte : la lueur verte vient du portail (PortalVisual) ; rien d'autre ici.
         return "Montagne : " + pieces + " pièces (" + rendu.triangles.Length / 3 + " triangles chacune), grotte " + Vector3.Distance(entree, fond).ToString("F1") + " m ; " + portail;
+    }
+
+    /// Falaise procédurale : champ de hauteur facetté au nord (x de -112 à 112, z de 34 à 126), trois gradins de 18, 28
+    /// et 38 m dont le front suit la pièce héros (derrière elle au centre, à z ≈ 44 sur les flancs), fronts et hauteurs
+    /// bruités ; fronts raides (infranchissables, sans mur invisible), jamais marchable (NavMesh), collision par le
+    /// maillage lui-même. Teintes de roche (palette de 4 gris) ; gros rochers au pied et sur les replats.
+    static void V5Falaise(Transform mont)
+    {
+        const float x0 = -112f, x1 = 112f, z0 = 34f, z1 = 126f, pas = 2.5f;
+        System.Func<float, float> front = x =>
+        {
+            float ax = Mathf.Abs(x);
+            float f = Mathf.Lerp(60f, 44f, Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(46f, 64f, ax)));
+            return f + (Mathf.PerlinNoise(x * 0.05f + 3f, 7.3f) - 0.5f) * 6f;
+        };
+        System.Func<float, float, float> hauteur = (x, z) =>
+        {
+            float f = front(x), h = 0f;
+            for (int k = 0; k < V5GradinsHaut.Length; k++)
+            {
+                float fk = f + k * 21f + (Mathf.PerlinNoise(x * 0.07f + k * 11f, 2.1f) - 0.5f) * 5f;
+                float dh = V5GradinsHaut[k] - (k > 0 ? V5GradinsHaut[k - 1] : 0f);
+                h += dh * Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(fk, fk + 7f + k * 1.5f, z));
+            }
+            if (h > 0.5f) h += (Mathf.PerlinNoise(x * 0.21f + 40f, z * 0.21f + 9f) - 0.5f) * 2.4f * Mathf.Clamp01(h / 6f);
+            return Mathf.Max(-0.3f, h - 0.2f);
+        };
+        var gris = new[] { new Color(0.42f, 0.41f, 0.42f), new Color(0.5f, 0.49f, 0.5f), new Color(0.58f, 0.57f, 0.58f), new Color(0.35f, 0.34f, 0.36f) };
+        Texture2D tex = new Texture2D(16, 4, TextureFormat.RGBA32, false);
+        for (int x = 0; x < 16; x++) for (int y = 0; y < 4; y++) tex.SetPixel(x, y, gris[x / 4]);
+        tex.Apply();
+        const string texPath = "Assets/Art/Textures/Falaise_Palette.png", matPath = "Assets/Art/Materials/Falaise.mat";
+        System.IO.File.WriteAllBytes(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), texPath), tex.EncodeToPNG());
+        Object.DestroyImmediate(tex);
+        AssetDatabase.ImportAsset(texPath, ImportAssetOptions.ForceUpdate);
+        var imp = (TextureImporter)AssetImporter.GetAtPath(texPath);
+        if (imp.filterMode != FilterMode.Point || imp.mipmapEnabled) { imp.filterMode = FilterMode.Point; imp.mipmapEnabled = false; imp.textureCompression = TextureImporterCompression.Uncompressed; imp.wrapMode = TextureWrapMode.Clamp; imp.SaveAndReimport(); }
+        Material mat = AssetDatabase.LoadAssetAtPath<Material>(matPath);
+        if (mat == null) { mat = new Material(Shader.Find("Universal Render Pipeline/Lit")); AssetDatabase.CreateAsset(mat, matPath); }
+        mat.SetTexture("_BaseMap", AssetDatabase.LoadAssetAtPath<Texture2D>(texPath)); mat.SetColor("_BaseColor", Color.white); mat.SetFloat("_Smoothness", 0.05f);
+        EditorUtility.SetDirty(mat);
+        var v = new List<Vector3>(); var n = new List<Vector3>(); var uv = new List<Vector2>(); var t = new List<int>();
+        var rnd = new System.Random(6100);
+        int nx = Mathf.CeilToInt((x1 - x0) / pas), nz = Mathf.CeilToInt((z1 - z0) / pas);
+        for (int j = 0; j < nz; j++)
+            for (int i = 0; i < nx; i++)
+            {
+                float xa = x0 + i * pas, xb = xa + pas, za = z0 + j * pas, zb = za + pas;
+                Vector3 a = new Vector3(xa, hauteur(xa, za), za), b = new Vector3(xa, hauteur(xa, zb), zb), c = new Vector3(xb, hauteur(xb, zb), zb), d = new Vector3(xb, hauteur(xb, za), za);
+                if (Mathf.Max(Mathf.Max(a.y, b.y), Mathf.Max(c.y, d.y)) < 0.05f) continue;   // seulement là où la falaise sort du sol
+                var tris = ((i + j) % 2 == 0) ? new[] { new[] { a, b, c }, new[] { a, c, d } } : new[] { new[] { a, b, d }, new[] { b, c, d } };
+                foreach (var tri in tris)
+                {
+                    Vector3 nn = Vector3.Cross(tri[1] - tri[0], tri[2] - tri[0]).normalized;
+                    int k = nn.y < 0.55f ? (rnd.Next(2) == 0 ? 0 : 3) : rnd.Next(1, 3);
+                    Vector2 u = new Vector2((k + 0.5f) / 4f, 0.5f);
+                    int i0 = v.Count;
+                    for (int q = 0; q < 3; q++) { v.Add(tri[q]); n.Add(nn); uv.Add(u); }
+                    t.Add(i0); t.Add(i0 + 1); t.Add(i0 + 2);
+                }
+            }
+        const string meshPath = "Assets/Art/Meshes/Village_Falaise.asset";
+        Mesh m = AssetDatabase.LoadAssetAtPath<Mesh>(meshPath);
+        bool neuf = m == null; if (neuf) m = new Mesh();
+        m.Clear(); m.name = "Village_Falaise"; m.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+        m.SetVertices(v); m.SetNormals(n); m.SetUVs(0, uv); m.SetTriangles(t, 0); m.RecalculateBounds();
+        if (neuf) AssetDatabase.CreateAsset(m, meshPath); else EditorUtility.SetDirty(m);
+        GameObject go = new GameObject("Falaise_Gradins"); go.transform.SetParent(mont, false);
+        go.AddComponent<MeshFilter>().sharedMesh = m; go.AddComponent<MeshRenderer>().sharedMaterial = mat;
+        go.AddComponent<MeshCollider>().sharedMesh = m;
+        var mod = go.AddComponent<NavMeshModifier>(); mod.overrideArea = true; mod.area = 1;
+        GameObjectUtility.SetStaticEditorFlags(go, StaticEditorFlags.BatchingStatic | StaticEditorFlags.OccludeeStatic);
+        Transform rochers = Group(mont, "Falaise_Rochers");
+        for (int i = 0; i < 70; i++)
+        {
+            float x = (float)(rnd.NextDouble() * 2 - 1) * 108f;
+            int k = rnd.Next(3);
+            float z = front(x) + k * 21f + (k == 0 ? -1.5f : 3f) + (float)rnd.NextDouble() * 6f;
+            if (Mathf.Abs(x) < 58f && k == 0) continue;       // derrière la pièce héros : rien à voir
+            float y = hauteur(x, z);
+            PlaceRock(rochers, Rocks[rnd.Next(Rocks.Length)], new Vector3(x, y - 0.4f, z), 3f + (float)rnd.NextDouble() * 5f, false);
+        }
+        MarkStatic(rochers.gameObject);
     }
 
     static Material V5MateriauMontagne()
@@ -425,22 +537,28 @@ public static partial class VillageBuilder
         Kill(root.Find("Riviere"));
         Transform riv = Group(root, "Riviere");
         var axe = V5Axe();
-        Material eau = V5MateriauEau(V5EauMat, new Color(0.13f, 0.3f, 0.48f, 0.78f), new Color(0.45f, 0.62f, 0.8f, 1f), 0.05f, 0.9f);
+        Material eau = V5MateriauRiviere();
         // a. surface : ruban le long de l'axe (5 bandes en travers, un rang tous les ~0,75 m), disque du bassin
         {
-            var v = new List<Vector3>(); var t = new List<int>();
-            float demi = V5DemiLargeur + 0.9f;            // le bord passe sous la berge
+            var v = new List<Vector3>(); var t = new List<int>(); var uv = new List<Vector2>(); var uv2 = new List<Vector2>();
+            float demi = V5DemiLargeur + 0.9f;
+            float dist = 0f; Vector2 prec = axe[0];            // le bord passe sous la berge
             int cols = 6, rangs = 0;
             for (int i = 0; i < axe.Count; i += 1)
             {
                 if (i % 2 == 1 && i != axe.Count - 1) continue;
                 Vector2 a = axe[Mathf.Max(0, i - 1)], b = axe[Mathf.Min(axe.Count - 1, i + 1)];
                 Vector2 dir = (b - a).normalized, n = new Vector2(-dir.y, dir.x);
+                dist += Vector2.Distance(prec, axe[i]); prec = axe[i];
+                // courant plus vif au pied de la cascade (10 premiers mètres) et aux gués
+                float vit = 1f + 1.6f * (1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(4f, 12f, dist)))
+                              + 1.2f * (1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(V5GueRayon - 0.5f, V5GueRayon + 2.5f, V5Gue(axe[i].x, axe[i].y))));
                 for (int c = 0; c <= cols; c++)
                 {
                     float s = Mathf.Lerp(-demi, demi, c / (float)cols);
                     Vector2 p = axe[i] + n * s;
                     v.Add(new Vector3(p.x, V5NiveauEau, p.y));
+                    uv.Add(new Vector2(c / (float)cols, dist)); uv2.Add(new Vector2(vit, 0f));
                 }
                 rangs++;
             }
@@ -452,12 +570,13 @@ public static partial class VillageBuilder
                 }
             // bassin : disque à facettes (anneaux)
             int b0i = v.Count; int secteurs = 28; float rb = V5BassinRayon + 0.9f;
-            v.Add(new Vector3(V5Bassin.x, V5NiveauEau, V5Bassin.y));
+            v.Add(new Vector3(V5Bassin.x, V5NiveauEau, V5Bassin.y)); uv.Add(new Vector2(0f, 0f)); uv2.Add(new Vector2(1.8f, 0f));
             for (int ring = 1; ring <= 3; ring++)
                 for (int s = 0; s < secteurs; s++)
                 {
                     float ang = (s + (ring % 2) * 0.5f) * Mathf.PI * 2f / secteurs, rr = rb * ring / 3f;
                     v.Add(new Vector3(V5Bassin.x + Mathf.Cos(ang) * rr, V5NiveauEau + 0.002f, V5Bassin.y + Mathf.Sin(ang) * rr));
+                    uv.Add(new Vector2(s / (float)secteurs, rr)); uv2.Add(new Vector2(1.8f, 0f));   // anneaux qui s'élargissent
                 }
             for (int s = 0; s < secteurs; s++) { t.Add(b0i); t.Add(b0i + 1 + (s + 1) % secteurs); t.Add(b0i + 1 + s); }
             for (int ring = 1; ring < 3; ring++)
@@ -467,7 +586,7 @@ public static partial class VillageBuilder
                     int o0 = b0i + 1 + ring * secteurs + s, o1 = b0i + 1 + ring * secteurs + (s + 1) % secteurs;
                     t.Add(i0); t.Add(i1); t.Add(o0); t.Add(i1); t.Add(o1); t.Add(o0);
                 }
-            Mesh m = V5MeshAsset("Assets/Art/Meshes/Village_Riviere.asset", v, t);
+            Mesh m = V5MeshAsset("Assets/Art/Meshes/Village_Riviere.asset", v, t, uv, uv2);
             GameObject go = new GameObject("Eau"); go.transform.SetParent(riv, false);
             go.AddComponent<MeshFilter>().sharedMesh = m;
             var mr = go.AddComponent<MeshRenderer>(); mr.sharedMaterial = eau; mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
@@ -531,7 +650,8 @@ public static partial class VillageBuilder
         }
         // d. ponts : modèle KayKit à l'échelle, tablier et rampes en boîtes (marchables), garde-corps
         Transform ponts = Group(riv, "Ponts");
-        for (int k = 0; k < V5Ponts.Length; k++) V5Pont(ponts, k == 0 ? "Pont_Est" : "Pont_Sud", new Vector3(V5Ponts[k].x, 0f, V5Ponts[k].y), V5PontsLacet[k]);
+        var piles = new List<Vector3>();
+        for (int k = 0; k < V5Ponts.Length; k++) piles.AddRange(V5Pont(ponts, k == 0 ? "Pont_Est" : "Pont_Sud", new Vector3(V5Ponts[k].x, 0f, V5Ponts[k].y), V5PontsLacet[k]));
         // e. berges : pierres le long des deux rives (sans collider), hors gués, ponts, allées et bassin
         Transform berges = Group(riv, "Berges");
         int nb = 0;
@@ -564,6 +684,22 @@ public static partial class VillageBuilder
         }
         // f. cascade : voile d'eau (lèvre -> coude -> bassin), gemmes et son (CascadeVillage)
         string cascade = V5Cascade(riv);
+        // h. écume : contre les pierres des gués et les piles des ponts, filant vers l'aval (EcumeRiviere)
+        {
+            var pts = new List<Vector3>(); var avals = new List<Vector3>(); var rays = new List<float>();
+            System.Action<Vector3, float> ajouter = (q, r) =>
+            {
+                V5DistanceAxe(q.x, q.z, out int si);
+                Vector2 dd = (axe[Mathf.Min(axe.Count - 1, si + 1)] - axe[Mathf.Max(0, si - 1)]).normalized;
+                pts.Add(new Vector3(q.x, V5NiveauEau, q.z)); avals.Add(new Vector3(dd.x, 0f, dd.y)); rays.Add(r);
+            };
+            foreach (Transform st in gues.GetComponentsInChildren<Transform>()) if (st.name == "Pierre_Gue") ajouter(st.position, 0.4f);
+            foreach (var q in piles) ajouter(q, 0.22f);
+            var ec = riv.gameObject.AddComponent<EcumeRiviere>();
+            ec.points = pts.ToArray(); ec.aval = avals.ToArray(); ec.rayons = rays.ToArray();
+            ec.materiauGemmes = AssetDatabase.LoadAssetAtPath<Material>("Assets/VFX/_RelicCommun/PortalVoxel.mat");
+            cascade += ", écume sur " + pts.Count + " obstacles";
+        }
         // g. comportement : le héros ne traverse l'eau qu'aux gués et sur les ponts
         var rv = riv.gameObject.AddComponent<RiviereVillage>();
         var tr = new Vector3[axe.Count]; for (int i = 0; i < axe.Count; i++) tr[i] = new Vector3(axe[i].x, 0f, axe[i].y);
@@ -577,6 +713,7 @@ public static partial class VillageBuilder
         return "Rivière : " + axe.Count + " points d'axe, " + volumes + " volumes de lit, " + V5Gues.Length + " gués (" + pierres + " pierres), " + V5Ponts.Length + " ponts, " + nb + " pierres de berge ; " + cascade;
     }
 
+    public static bool V5SurPont(Vector3 p, float marge) { return V5PresPont(new Vector2(p.x, p.z), marge); }
     static bool V5PresPont(Vector2 p, float marge)
     {
         for (int k = 0; k < V5Ponts.Length; k++)
@@ -588,15 +725,31 @@ public static partial class VillageBuilder
         return false;
     }
 
-    static Mesh V5MeshAsset(string path, List<Vector3> v, List<int> t)
+    static Mesh V5MeshAsset(string path, List<Vector3> v, List<int> t, List<Vector2> uv = null, List<Vector2> uv2 = null)
     {
         Mesh m = AssetDatabase.LoadAssetAtPath<Mesh>(path);
         bool neuf = m == null;
         if (neuf) m = new Mesh();
         m.Clear(); m.name = System.IO.Path.GetFileNameWithoutExtension(path);
         m.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
-        m.SetVertices(v); m.SetTriangles(t, 0); m.RecalculateNormals(); m.RecalculateBounds();
+        m.SetVertices(v); if (uv != null) m.SetUVs(0, uv); if (uv2 != null) m.SetUVs(1, uv2);
+        m.SetTriangles(t, 0); m.RecalculateNormals(); m.RecalculateBounds();
         if (neuf) AssetDatabase.CreateAsset(m, path); else EditorUtility.SetDirty(m);
+        return m;
+    }
+
+    public const string V5RiviereMat = "Assets/Art/Materials/Village_Riviere.mat";
+    /// Eau courante de la rivière (shader EauRiviere) : teintes du thème Eau (palette), traits d'écume du courant.
+    static Material V5MateriauRiviere()
+    {
+        Material m = AssetDatabase.LoadAssetAtPath<Material>(V5RiviereMat);
+        if (m == null) { m = new Material(Shader.Find("Deathless/Village/EauRiviere")); AssetDatabase.CreateAsset(m, V5RiviereMat); }
+        Color fond = VfxPalette.Couleur(VfxTheme.Eau, VfxRole.Ombre, new Color(0.11f, 0.24f, 0.4f)); fond.a = 0.8f;
+        m.SetColor("_Couleur", fond);
+        m.SetColor("_Reflet", VfxPalette.Couleur(VfxTheme.Eau, VfxRole.Vif, new Color(0.45f, 0.72f, 0.9f)));
+        m.SetColor("_Ecume", VfxPalette.Accent(VfxTheme.Eau, "Ecume", new Color(0.95f, 0.98f, 1f)));
+        m.SetFloat("_EcumeForce", 0.55f); m.SetFloat("_Densite", 0.68f);
+        EditorUtility.SetDirty(m);
         return m;
     }
 
@@ -616,30 +769,44 @@ public static partial class VillageBuilder
     }
 
     const string V5PontModele = "Assets/Art/KayKit/KayKit_Medieval_Builder_Pack_1.0/Models/objects/fbx/bridge.fbx";
-    static void V5Pont(Transform parent, string nom, Vector3 c, float lacet)
+    static List<Vector3> V5Pont(Transform parent, string nom, Vector3 c, float lacet)
     {
+        var piles = new List<Vector3>();
         Transform p = Group(parent, nom);
         p.SetPositionAndRotation(c, Quaternion.Euler(0f, lacet, 0f));
-        GameObject modele = AssetDatabase.LoadAssetAtPath<GameObject>(V5PontModele);
-        if (modele != null)
+        // visuel : planches, longerons, poteaux et main courante en bois (le pont KayKit du Builder Pack n'a pas de matériau)
+        Material bois = FlatMaterial("Assets/Art/Materials/Pont_Bois.mat", "Universal Render Pipeline/Lit", new Color(0.55f, 0.36f, 0.22f));
+        Material boisSombre = FlatMaterial("Assets/Art/Materials/Pont_Bois_Sombre.mat", "Universal Render Pipeline/Lit", new Color(0.36f, 0.23f, 0.14f));
+        var rnd = new System.Random(nom.GetHashCode() & 0xffff);
+        System.Action<string, Vector3, Vector3, Vector3, Material> boite = (n, lp, le, ls, m) =>
         {
-            GameObject vis = (GameObject)PrefabUtility.InstantiatePrefab(modele, p);
-            vis.name = "Pont_Visuel";
-            vis.transform.localPosition = Vector3.zero; vis.transform.localRotation = Quaternion.identity; vis.transform.localScale = Vector3.one;
-            foreach (var col in vis.GetComponentsInChildren<Collider>(true)) Object.DestroyImmediate(col);
-            // mise à l'échelle sur la longueur et la largeur voulues (axe long du modèle -> axe z local)
-            Bounds b = new Bounds(c, Vector3.zero); bool un = false;
-            foreach (var r in vis.GetComponentsInChildren<Renderer>()) { if (!un) { b = r.bounds; un = true; } else b.Encapsulate(r.bounds); }
-            Vector3 lb = p.InverseTransformVector(b.size); lb = new Vector3(Mathf.Abs(lb.x), Mathf.Abs(lb.y), Mathf.Abs(lb.z));
-            bool long_x = lb.x > lb.z;
-            if (long_x) { vis.transform.localRotation = Quaternion.Euler(0f, 90f, 0f); lb = new Vector3(lb.z, lb.y, lb.x); }
-            float sz = V5PontLongueur / Mathf.Max(0.01f, lb.z), sx = (V5PontLargeur + 0.4f) / Mathf.Max(0.01f, lb.x);
-            float s = Mathf.Min(sz, sx * 1.3f);
-            vis.transform.localScale = new Vector3(sx, s, sz);
-            // recaler : bas des culées au niveau du sol, centré
-            b = new Bounds(c, Vector3.zero); un = false;
-            foreach (var r in vis.GetComponentsInChildren<Renderer>()) { if (!un) { b = r.bounds; un = true; } else b.Encapsulate(r.bounds); }
-            vis.transform.position += new Vector3(c.x - b.center.x, -0.35f - b.min.y, c.z - b.center.z);
+            GameObject g = GameObject.CreatePrimitive(PrimitiveType.Cube); g.name = n;
+            Object.DestroyImmediate(g.GetComponent<Collider>());
+            g.transform.SetParent(p, false); g.transform.localPosition = lp; g.transform.localEulerAngles = le; g.transform.localScale = ls;
+            g.GetComponent<MeshRenderer>().sharedMaterial = m;
+        };
+        float Lv = V5PontLongueur, haut = V5PontHaut;
+        // planches en travers, qui suivent le profil (rampes aux bouts)
+        for (float z = -Lv / 2f + 0.22f; z <= Lv / 2f - 0.2f; z += 0.46f)
+        {
+            float bout = Mathf.Abs(z) - (Lv / 2f - 1.6f);
+            float y = bout > 0f ? haut * (1f - bout / 1.6f) : haut;
+            float pente = bout > 0f ? Mathf.Sign(z) * Mathf.Atan2(haut, 1.6f) * Mathf.Rad2Deg : 0f;
+            boite("Planche", new Vector3(((float)rnd.NextDouble() - 0.5f) * 0.08f, y - 0.05f, z), new Vector3(pente, ((float)rnd.NextDouble() - 0.5f) * 3f, 0f), new Vector3(V5PontLargeur, 0.1f, 0.42f), bois);
+        }
+        foreach (int sgn in new[] { -1, 1 })
+        {
+            float x = sgn * (V5PontLargeur / 2f - 0.2f);
+            boite("Longeron", new Vector3(x, haut - 0.22f, 0f), Vector3.zero, new Vector3(0.22f, 0.25f, Lv - 3f), boisSombre);
+            for (float z = -(Lv / 2f - 1.6f); z <= Lv / 2f - 1.6f + 0.01f; z += (Lv - 3.2f) / 2f)
+                boite("Poteau", new Vector3(sgn * (V5PontLargeur / 2f + 0.1f), haut + 0.2f, z), Vector3.zero, new Vector3(0.18f, 1.4f, 0.18f), boisSombre);
+            boite("Main_Courante", new Vector3(sgn * (V5PontLargeur / 2f + 0.1f), haut + 0.95f, 0f), Vector3.zero, new Vector3(0.14f, 0.12f, Lv - 3.0f), bois);
+            // piles dans l'eau (l'écume s'y forme), sous les longerons
+            foreach (float pz in new[] { -1.15f, 1.15f })
+            {
+                boite("Pile", new Vector3(sgn * (V5PontLargeur / 2f - 0.2f), -0.45f + haut / 2f - 0.15f, pz), Vector3.zero, new Vector3(0.3f, 1.2f + haut, 0.3f), boisSombre);
+                piles.Add(p.TransformPoint(new Vector3(sgn * (V5PontLargeur / 2f - 0.2f), 0f, pz)));
+            }
         }
         // tablier marchable : plat au centre, rampes aux deux bouts (pente ≈ 11°), garde-corps de 1 m
         float L = V5PontLongueur, rampe = 1.6f, plat = L - 2f * rampe;
@@ -657,6 +824,7 @@ public static partial class VillageBuilder
             g0.transform.localPosition = new Vector3(sgn * (V5PontLargeur / 2f + 0.1f), V5PontHaut + 0.5f, 0f);
             var bg = g0.AddComponent<BoxCollider>(); bg.size = new Vector3(0.2f, 1.0f, plat + 0.4f);
         }
+        return piles;
     }
 
     static string V5Cascade(Transform riv)
@@ -913,10 +1081,10 @@ public static partial class VillageBuilder
     /// Approximation de l'emprise au sol de la pièce héros (relevé du profil avant, repère de la pièce).
     static bool V5DansMontagne(Vector3 p)
     {
-        Vector3 l = Quaternion.Inverse(Quaternion.Euler(0f, V5MontagneLacet, 0f)) * (p - V5MontagnePos);
+        Vector3 l = Quaternion.Inverse(Quaternion.Euler(0f, V5MontagneLacet - 180f, 0f)) * (p - V5MontagnePos);
         // l.z < 0 = devant ; profil avant au sol (m) relevé à 0,3 m de haut, tous les 4 m de -60 à +60
         float[] av = { -3.0f, -4.7f, -7.8f, -9.2f, -7.6f, -8.8f, -10.3f, -12.5f, -13.5f, -13.5f, -12.7f, -11.1f, -6.9f, -13.1f, -9.3f, -12.4f, -16.0f, -17.5f, -18.7f, -16.8f, -15.4f, -16.7f, -16.1f, -14.2f, -19.6f, -17.1f, -11.2f, -9.7f, -6.3f, -1.3f, 1.8f };
-        float u = (-l.x + 60f) / 4f;   // pièce tournée de 180° : x local = -x Blender
+        float u = (l.x + 60f) / 4f;
         if (u < 0f || u > av.Length - 1) return false;
         int i = Mathf.FloorToInt(u); float f = u - i;
         float front = Mathf.Lerp(av[i], av[Mathf.Min(av.Length - 1, i + 1)], f);
@@ -968,7 +1136,7 @@ public static partial class VillageBuilder
                 for (int i = 1; i < co.Length; i++)
                 {
                     L += Vector3.Distance(co[i - 1], co[i]);
-                    for (int k = 0; k < V5Ponts.Length; k++) if (V5PresPont(new Vector2(co[i].x, co[i].z), 0.5f) && !via.Contains("pont")) via += " pont " + (k == 0 ? "est" : "sud");
+                    for (int k = 0; k < V5Ponts.Length; k++) if (Vector2.Distance(new Vector2(co[i].x, co[i].z), V5Ponts[k]) < V5PontLongueur / 2f + 1f && !via.Contains(k == 0 ? "pont est" : "pont sud")) via += k == 0 ? " pont est" : " pont sud";
                     for (int k = 0; k < V5Gues.Length; k++) if (Vector2.Distance(new Vector2(co[i].x, co[i].z), V5Gues[k]) < V5GueRayon + 1f && !via.Contains("gué " + k)) via += " gué " + k;
                 }
                 // passage de l'eau : le chemin traverse-t-il la rivière ? (échantillons tous les 0,5 m)
@@ -982,6 +1150,8 @@ public static partial class VillageBuilder
                         {
                             bool permis = V5Gue(q.x, q.z) < V5GueRayon + 0.5f || V5PresPont(new Vector2(q.x, q.z), 0.3f);
                             traverse += permis ? 1 : 100;
+                            if (permis) { for (int k = 0; k < V5Ponts.Length; k++) if (V5PresPont(new Vector2(q.x, q.z), 0.3f) && Vector2.Distance(new Vector2(q.x, q.z), V5Ponts[k]) < 6f && !via.Contains(k == 0 ? "pont est" : "pont sud")) via += k == 0 ? " pont est" : " pont sud";
+                                          for (int k = 0; k < V5Gues.Length; k++) if (Vector2.Distance(new Vector2(q.x, q.z), V5Gues[k]) < V5GueRayon + 0.5f && !via.Contains("gué " + k)) via += " gué " + k; }
                         }
                         ancien = d;
                     }
