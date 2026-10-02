@@ -81,9 +81,9 @@ Repère du plan : mètres, x vers l'est, z vers le nord, y vers le haut ; origin
 | `probaPieceVerrouillee`, `probaPieceSecrete` | 0,5, 0,4 | Mécanismes (voir plus bas) |
 | `hauteurLibreMin` | 4,5 m | Hauteur libre contrôlée partout où l'on marche |
 | `espacementPiliersMin` | 8 m | Entre deux piliers libres |
-| `espacementApparitionsMin`, `distanceArriveeApparitions` | 5 m, 10 m | Apparitions |
+| `espacementApparitionsMin`, `distanceArriveeApparitions` | 5 m, 16 m | Apparitions ; 16 m depuis le 02/10/2026 (10 m avant : les gardiens, qui repèrent à 12 m, tombaient sur le joueur dès l'arrivée). Les points de joueurs étant à 2-3 m du point d'arrivée, le gardien le plus proche est à 13 m au moins d'un héros fraîchement arrivé |
 | `espacementTorches`, `maxTorchesAllumees` | 7 m, 24 | Torches et lumières |
-| `maxEssais` | 40 | Essais avant d'abandonner (jamais atteint : 5 000 graines conformes au premier essai) |
+| `maxEssais` | 40 | Essais avant d'abandonner (jamais atteint : 5 000 graines conformes, 4 541 au premier essai et 459 au deuxième ou plus, faute de place pour les 14 apparitions à 16 m de l'arrivée) |
 
 Constantes (`PlanTerrasses`) : niveau 3 m ; marche 0,30 × 0,50 m, volée de 5 m (31°), palier 2 m ; escalier de 4 m (6 m au centre de v4 et v7) ; arche de 3 × 4,5 m en plein cintre (naissance à 3 m) ; dalle de 0,6 m au-dessus d'une pièce ; pièce derrière l'enceinte haute de 5 m ; parapet de 0,9 m ; pilier de 0,85 m de rayon, pilastre de 0,7 m.
 
@@ -91,7 +91,7 @@ Constantes (`PlanTerrasses`) : niveau 3 m ; marche 0,30 × 0,50 m, volée de 5 m
 
 Niveaux 2 ou 3 et chaque terrasse atteinte ; zone d'arrivée de 6 × 5 m libre (ni pilier, ni coffre, ni apparition, ni déclencheur) ; **connexité** : toute case de sol atteinte depuis l'arrivée (portes ouvertes), et portes fermées tout sauf l'intérieur des pièces fermées ; **hauteur libre ≥ 4,5 m** sur toute case praticable (voûte, plafond des pièces, linteaux) ; escaliers : pente ≤ 31°, longueur exacte, pied et palier d'arrivée praticables ; **aucun surplomb** (tout plein haut est le plafond d'une pièce fermée sur ses côtés) ; pièces assez hautes, arches assez grandes, pièce fermée inatteignable sans l'ouvrir, déclencheur atteignable sans la pièce ; piliers à 8 m les uns des autres ; coffres et apparitions atteignables, apparitions espacées et loin de l'arrivée. Le banc vérifie en plus le **NavMesh construit** (`VerifierNavMesh` : chaque coffre, chaque apparition et le portail atteints depuis l'arrivée, portes ouvertes).
 
-Mesures : 5 000 graines sous .NET, toutes conformes au premier essai, 0,8 ms par plan (2,8 ms dans l'éditeur, contrôles compris) ; NavMesh sans défaut sur les graines 1 à 12 et sur les six graines des captures. Piliers libres : 1 à 6 (sept plans sur 5 000 n'en ont aucun, quand le rez est trop encombré).
+Mesures : 5 000 graines sous .NET, toutes conformes (à 16 m d'arrivée : 459 refaites avec l'essai suivant de la même graine, 14 apparitions placées partout ; à 18 m : 1 441 refaites, toujours 5 000 conformes ; à 10 m, valeur d'avant : aucune), 0,8 ms par plan (2,8 ms dans l'éditeur, contrôles compris) ; NavMesh sans défaut sur les graines 1 à 12 et sur les six graines des captures. Piliers libres : 1 à 6 (sept plans sur 5 000 n'en ont aucun, quand le rez est trop encombré).
 
 ## Pièces fermées {à confirmer}
 
@@ -135,7 +135,7 @@ Captures (1920 × 1080, `Assets/Screenshots/donjon_terrasses_g<graine>_<vue>.png
 
 **Ce qui reste** :
 
-- **Arrivée trop exposée** {à équilibrer} : les apparitions sont à 10 m au moins de l'arrivée, les gardiens voient à 12 m et alertent à 8 m : trois à six gardiens sont sur le joueur dans les huit premières secondes (un héros de 150 PV est mort ainsi en test). Pistes : `distanceArriveeApparitions` à 15-16 m (à vérifier sur 5 000 graines), ou zone d'arrivée où les gardiens ne repèrent pas.
+- **Arrivée** (corrigée le 02/10/2026, à surveiller au jeu) : à 10 m d'arrivée, trois à six gardiens tombaient sur le joueur dans les huit premières secondes (un héros de 150 PV est mort ainsi en test). Deux causes : (1) `distanceArriveeApparitions` passée de 10 à 16 m (valeur retenue, la plus haute essayée qui garde les 5 000 graines conformes avec 14 apparitions ; empreintes des graines 1 à 50 identiques sous Unity (Mono) et .NET 10) ; (2) le **voleur gardien** repérait à 14 m (`voleurDistanceChasse`) à travers les murs, hors laisse, et alertait ses voisins : un gardien voleur n'utilise plus que `gardienDetection` (12 m), la ligne de vue et la laisse, comme les autres gardiens (`Voleur.ChoisirCible`, `JoueurIsole` ; l'ancien donjon n'a pas de voleurs gardiens, aucun effet ailleurs). Vérifié en Play (graines 9, 12, 21, par le portail) : le gardien le plus proche est à 13,5 à 14 m du héros, personne ne bouge pendant 15 s à l'arrivée, puis deux ou trois gardiens (sbire, guerrier, voleur) répondent dès que le héros s'avance à 10 m de l'un d'eux ; aucune erreur en console. Si ce reste trop dur, reculer encore (17 m laisse 5 000 graines conformes ; au-delà, de plus en plus de plans refaits).
 - **Réseau** : l'aperçu est solo (`Partie.Exploration` refuse le multijoueur). La graine passe déjà par `PartieReseau.GraineDonjon` et le plan est identique partout, mais l'ouverture des portes et parois (`PorteDonjon.Ouvrir`) n'est pas répliquée, ni F8.
 - **Gameplay des pièces fermées** : clés au mécano, crochetage, avantage de l'assassin ; vrais modèles de coffres du jeu sur les repères de butin.
 - **Escaliers encastrés** : en haut d'un escalier encastré dans sa terrasse, le NavMesh (agent Humanoid) relie le côté de la volée à la terrasse par une marche de 0,4 m que le héros ne monte pas : un bot qui suit le NavMesh en ligne droite s'y bloque (le joueur, lui, monte par la volée). Sans effet sur les squelettes. Piste : obstacle ou modificateur NavMesh le long des côtés des volées.

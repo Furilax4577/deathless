@@ -47,7 +47,7 @@ namespace Deathless.Donjon.Terrasses
         public float hauteurLibreMin = 4.5f;
         public float espacementPiliersMin = 8f;
         public float espacementApparitionsMin = 5f;
-        public float distanceArriveeApparitions = 10f;
+        public float distanceArriveeApparitions = 16f;
         public float espacementTorches = 7f;
         public int maxTorchesAllumees = 24;
         public int maxEssais = 40;
