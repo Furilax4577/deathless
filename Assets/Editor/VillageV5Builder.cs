@@ -62,12 +62,13 @@ public static partial class VillageBuilder
     /// Cascade (repère de la pièce) : lèvre en haut de la ravine, coude sur l'éboulis, pied dans le bassin.
     public static readonly Vector3 V5CascadeLevreLocal = new Vector3(-0.8f, 14f, -2.2f);
     public static readonly Vector3 V5CascadeCoudeLocal = new Vector3(-0.8f, 3.4f, -4.4f);
-    /// Pièces de flanc (à venir : rendu Tripo alternatif pour les côtés, demandé par Quentin le 02/10/2026) : posées
-    /// seulement si leur FBX existe ; emplacement attendu (pivot au sol, lacet Unity : face avant vers le village,
-    /// échelle 1 = pièce préparée à ses mètres par le même pipeline). Aucune copie de la pièce centrale : une seule
-    /// grotte, aucune ouverture cachée.
+    /// Pièces de flanc (Tripo, montagne_flancs_pipeline.py, 02/10/2026) : même traitement que la pièce héros (maillage rendu
+    /// + maillage de collision, jamais marchable), posées seulement si leur FBX existe ; pose = centre de l'emprise au sol
+    /// (x, -, z) et lacet Unity. Miroir et enfouissement côté centre faits dans Blender ; une seule grotte, celle de la pièce héros.
     public static readonly string[] V5FlancsFbx = { "Assets/Art/Decor/Montagne/Montagne_Flanc_Est.fbx", "Assets/Art/Decor/Montagne/Montagne_Flanc_Ouest.fbx" };
-    public static readonly Vector4[] V5FlancsPose = { new Vector4(82f, 0f, 58f, 200f), new Vector4(-84f, 0f, 60f, 160f) };   // x, -, z, lacet
+    public static readonly string[] V5FlancsTex = { "Assets/Art/Decor/Montagne/Montagne_Flanc_Est_Texture.png", "Assets/Art/Decor/Montagne/Montagne_Flanc_Ouest_Texture.png" };
+    public static readonly string[] V5FlancsMat = { "Assets/Art/Decor/Montagne/Montagne_Flanc_Est.mat", "Assets/Art/Decor/Montagne/Montagne_Flanc_Ouest.mat" };
+    public static readonly Vector4[] V5FlancsPose = { new Vector4(74.4f, 0f, 42f, 160f), new Vector4(-71.4f, 0f, 49.3f, 180f) };   // x, -, z, lacet
     /// Falaise procédurale en gradins (18, 28, 38 m) : bande continue derrière la pièce héros et sur les flancs.
     public static readonly float[] V5GradinsHaut = { 18f, 28f, 38f };
 
@@ -348,45 +349,36 @@ public static partial class VillageBuilder
     {
         Kill(root.Find("Montagne"));
         Transform mont = Group(root, "Montagne");
-        GameObject modele = AssetDatabase.LoadAssetAtPath<GameObject>(V5MontagneFbx);
-        if (modele == null) return "Montagne : FBX absent (" + V5MontagneFbx + "), lancer montagne_pipeline.py";
-        Material mat = V5MateriauMontagne();
-        Mesh rendu = null, collision = null; Quaternion axeFbx = Quaternion.identity;
-        foreach (var mf in modele.GetComponentsInChildren<MeshFilter>(true))
+        int pieces = 0; int trianglesRendu = 0;
+        // une pièce = un maillage rendu + un maillage de collision (deux objets du FBX), posés sur un seul objet
+        System.Action<string, string, Material, Vector3, float> poser = (fbx, nom, materiau, pos, lacet) =>
         {
-            if (mf.sharedMesh.name.Contains("Collision")) collision = mf.sharedMesh; else { rendu = mf.sharedMesh; axeFbx = mf.transform.localRotation; }
-        }
-        if (rendu == null) return "Montagne : maillage rendu absent";
-        int pieces = 0;
-        System.Action<string, Vector3, float, float> poser = (nom, pos, lacet, echelle) =>
-        {
+            GameObject modele = AssetDatabase.LoadAssetAtPath<GameObject>(fbx);
+            if (modele == null) return;
+            Mesh rendu = null, collision = null; Quaternion axeFbx = Quaternion.identity;
+            foreach (var mf in modele.GetComponentsInChildren<MeshFilter>(true))
+            {
+                if (mf.sharedMesh.name.Contains("Collision")) collision = mf.sharedMesh; else { rendu = mf.sharedMesh; axeFbx = mf.transform.localRotation; }
+            }
+            if (rendu == null) return;
             GameObject go = new GameObject(nom);
             go.transform.SetParent(mont, false);
             go.transform.SetPositionAndRotation(pos, Quaternion.Euler(0f, lacet, 0f) * axeFbx);   // axe : Z (Blender) vers le haut
-            go.transform.localScale = Vector3.one * echelle;
+            go.transform.localScale = Vector3.one;
             go.AddComponent<MeshFilter>().sharedMesh = rendu;
-            var mr = go.AddComponent<MeshRenderer>(); mr.sharedMaterial = mat;
+            var mr = go.AddComponent<MeshRenderer>(); mr.sharedMaterial = materiau;
             if (collision != null) { var mc = go.AddComponent<MeshCollider>(); mc.sharedMesh = collision; }
             // jamais marchable : la crête est infranchissable par la géométrie et le NavMesh (pas de mur invisible)
             var mod = go.AddComponent<NavMeshModifier>(); mod.overrideArea = true; mod.area = 1;
             GameObjectUtility.SetStaticEditorFlags(go, StaticEditorFlags.BatchingStatic | StaticEditorFlags.OccludeeStatic);
-            pieces++;
+            pieces++; trianglesRendu += rendu.triangles.Length / 3;
         };
-        poser("Montagne_Heros", V5MontagnePos, V5MontagneLacet, 1f);
+        if (AssetDatabase.LoadAssetAtPath<GameObject>(V5MontagneFbx) == null) return "Montagne : FBX absent (" + V5MontagneFbx + "), lancer montagne_pipeline.py";
+        poser(V5MontagneFbx, "Montagne_Heros", V5MateriauMontagne(V5MontagneMat, V5MontagneTex), V5MontagnePos, V5MontagneLacet);
+        // flancs (montagne_flancs_pipeline.py) : même traitement que la pièce héros, posés à V5FlancsPose (centre de l'emprise, au sol)
         for (int i = 0; i < V5FlancsFbx.Length; i++)
-        {
-            GameObject fl = AssetDatabase.LoadAssetAtPath<GameObject>(V5FlancsFbx[i]);
-            if (fl == null) continue;
-            GameObject inst = (GameObject)PrefabUtility.InstantiatePrefab(fl, mont);
-            inst.name = i == 0 ? "Flanc_Est" : "Flanc_Ouest";
-            inst.transform.SetPositionAndRotation(new Vector3(V5FlancsPose[i].x, 0f, V5FlancsPose[i].z), Quaternion.Euler(0f, V5FlancsPose[i].w, 0f));
-            foreach (var mf in inst.GetComponentsInChildren<MeshFilter>())
-            {
-                var c = mf.gameObject.AddComponent<MeshCollider>(); c.sharedMesh = mf.sharedMesh;
-                var md = mf.gameObject.AddComponent<NavMeshModifier>(); md.overrideArea = true; md.area = 1;
-            }
-            pieces++;
-        }
+            poser(V5FlancsFbx[i], i == 0 ? "Flanc_Est" : "Flanc_Ouest", V5MateriauMontagne(V5FlancsMat[i], V5FlancsTex[i]),
+                new Vector3(V5FlancsPose[i].x, 0f, V5FlancsPose[i].z), V5FlancsPose[i].w);
         V5Falaise(mont);
 
         // Grotte : le fond de la pièce Tripo est un replat à ~2,1 m derrière un seuil rocheux : dalle de pierre plate à
@@ -446,7 +438,7 @@ public static partial class VillageBuilder
             }
         }
         // Lumière de la grotte : la lueur verte vient du portail (PortalVisual) ; rien d'autre ici.
-        return "Montagne : " + pieces + " pièces (" + rendu.triangles.Length / 3 + " triangles chacune), grotte " + Vector3.Distance(entree, fond).ToString("F1") + " m ; " + portail;
+        return "Montagne : " + pieces + " pièces (" + trianglesRendu + " triangles rendus au total), grotte " + Vector3.Distance(entree, fond).ToString("F1") + " m ; " + portail;
     }
 
     /// Falaise procédurale : champ de hauteur facetté au nord (x de -112 à 112, z de 34 à 126), trois gradins de 18, 28
@@ -532,11 +524,11 @@ public static partial class VillageBuilder
         MarkStatic(rochers.gameObject);
     }
 
-    static Material V5MateriauMontagne()
+    static Material V5MateriauMontagne(string matPath, string texPath)
     {
-        Material m = AssetDatabase.LoadAssetAtPath<Material>(V5MontagneMat);
-        if (m == null) { m = new Material(Shader.Find("Universal Render Pipeline/Lit")); AssetDatabase.CreateAsset(m, V5MontagneMat); }
-        m.SetTexture("_BaseMap", AssetDatabase.LoadAssetAtPath<Texture2D>(V5MontagneTex));
+        Material m = AssetDatabase.LoadAssetAtPath<Material>(matPath);
+        if (m == null) { m = new Material(Shader.Find("Universal Render Pipeline/Lit")); AssetDatabase.CreateAsset(m, matPath); }
+        m.SetTexture("_BaseMap", AssetDatabase.LoadAssetAtPath<Texture2D>(texPath));
         m.SetColor("_BaseColor", Color.white);
         m.SetFloat("_Smoothness", 0.05f);
         m.SetFloat("_Metallic", 0f);

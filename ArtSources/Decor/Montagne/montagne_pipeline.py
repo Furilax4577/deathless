@@ -54,6 +54,7 @@ BUDGET_COLLISION = arg("--collision", 3000, int)
 TAILLE_TEXTURE = arg("--texture", 2048, int)
 ANGLE_LISSAGE = math.radians(arg("--angle", 50.0))
 ECHELLE = (125.0, 115.0, 110.0)
+NOM = "Montagne_Heros"   # nom de la pièce (objets, maillage, matériau, texture) ; montagne_flancs_pipeline.py le change
 
 
 def log(*a):
@@ -156,8 +157,8 @@ def cuire(src, cible):
     T = TAILLE_TEXTURE
     if "--sans-cuisson" in ARGS:
         # texture Tripo réduite, UV Tripo gardées par la décimation
-        img = image_source(src).copy(); img.name = "Montagne_Heros_Texture"; img.scale(T, T)
-        mat = bpy.data.materials.new("Montagne_Heros"); mat.use_nodes = True
+        img = image_source(src).copy(); img.name = NOM + "_Texture"; img.scale(T, T)
+        mat = bpy.data.materials.new(NOM); mat.use_nodes = True
         noeud = mat.node_tree.nodes.new("ShaderNodeTexImage"); noeud.image = img
         mat.node_tree.links.new(noeud.outputs["Color"], mat.node_tree.nodes["Principled BSDF"].inputs["Base Color"])
         cible.data.materials.clear(); cible.data.materials.append(mat)
@@ -176,8 +177,8 @@ def cuire(src, cible):
     bpy.ops.mesh.select_all(action="SELECT")
     bpy.ops.uv.smart_project(angle_limit=math.radians(60), island_margin=0.002, area_weight=0.0, scale_to_bounds=True)
     bpy.ops.object.mode_set(mode="OBJECT")
-    img = bpy.data.images.new("Montagne_Heros_Texture", T, T, alpha=False)
-    mat = bpy.data.materials.new("Montagne_Heros"); mat.use_nodes = True
+    img = bpy.data.images.new(NOM + "_Texture", T, T, alpha=False)
+    mat = bpy.data.materials.new(NOM); mat.use_nodes = True
     noeud = mat.node_tree.nodes.new("ShaderNodeTexImage"); noeud.image = img
     mat.node_tree.nodes.active = noeud
     bsdf = mat.node_tree.nodes.get("Principled BSDF")
@@ -233,9 +234,9 @@ def exporter(objs):
 
 def main():
     hd = importer()
-    rendu = decimer(hd, BUDGET, "Montagne_Heros")
+    rendu = decimer(hd, BUDGET, NOM)
     lisser(rendu)
-    collision = decimer(hd, BUDGET_COLLISION, "Montagne_Heros_Collision")
+    collision = decimer(hd, BUDGET_COLLISION, NOM + "_Collision")
     collision.data.materials.clear()
     img = cuire(hd, rendu)
     if "--rendus" in ARGS:
@@ -251,4 +252,5 @@ def main():
     log("terminé : rendu %d triangles, collision %d triangles" % (triangles(rendu), triangles(collision)))
 
 
-main()
+if __name__ == "__main__":   # importé par montagne_flancs_pipeline.py : ne rien lancer
+    main()
