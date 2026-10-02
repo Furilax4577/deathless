@@ -136,6 +136,48 @@ Accessoires à part : enseigne en forme de chope sur potence de fer, deux tonnea
 
 ---
 
+## Mode recommandé depuis le 02/10/2026 : UNE SEULE IMAGE (trois-quarts)
+
+Essai du 02/10/2026 sur la maison de base : avec **la seule vue de face**, Tripo a donné une géométrie très bonne (tuiles en relief, arche en pierres appareillées, colombages, marches, lanterne, toit fermé, une cheminée) ; avec quatre vues peu différentes, un toit creux et deux cheminées. **On passe donc à une image unique par maison**, plus riche : un **trois-quarts** qui montre en même temps la façade, un pignon et le toit.
+
+Règles de l'image unique :
+- **Trois-quarts avant-droit, caméra à environ 30° au-dessus de l'horizontale** (on voit la façade avec l'embrasure, le pignon droit, et le dessus du toit), bâtiment **entier, centré, avec de la marge**, rien d'autre dans l'image.
+- **Couleurs plates et franches, sans ombres peintes** : la couleur de la texture Tripo vient de l'image. Demander « flat unlit albedo colors, no cast shadows, no baked ambient occlusion, no gradients of light » donne des zones propres (tuiles, plâtre, colombage, pierre) que la recoloration en palette sépare sans bavure.
+- **Relief visible** : tuiles individuelles, claveaux de l'arche, poutres épaisses : Tripo ne crée pas de relief qu'il ne voit pas.
+- **Sans battant de porte ni volets** (pièces à part), **toit entièrement fermé**, **une seule cheminée** à la place indiquée.
+- Tripo : onglet **Image** (une image, pas multivue), mêmes réglages ; la **texture se fait ensuite** (outil Texture) ; côté Blender, je recolore en **palette de 6 à 8 couleurs** (la texture Tripo est floue : tuiles en tache, arêtes qui bavent).
+
+### Bloc commun « une image » (en anglais, à coller en tête)
+
+```
+Low-poly 3D game building asset, SMOOTH dense faceting: many small soft-beveled facets blending into rounded, sculpted
+forms, chunky toy-like proportions with softly beveled edges, like a hand-made cozy low-poly game. NOT large flat
+polygon planes, NOT a crystal or gem-cut look, no hard visible triangle edges. Clearly modeled relief: individual
+clay roof tiles, individual stone blocks in the arch and the base slab, thick timber beams.
+FLAT UNLIT ALBEDO COLORS: solid clean color zones with crisp boundaries (brick-red tiles, cream plaster, dark brown
+timber, light-grey stone, dark glass), NO cast shadows, NO baked ambient occlusion, NO light gradients, NO glossy
+highlights, no photographic detail, no noise, no wood grain, no painted grime.
+Half-timbered cottage on a LOW, smooth, light-grey stone slab that overhangs the wall slightly, with two steps in
+front of the doorway. The doorway is EMPTY: a dark recessed arched opening framed by large stone blocks, with NO door
+leaf and NO door. Windows have simple wooden frames and glass panes and NO shutters. The roof is SOLID and CLOSED:
+both slopes completely covered with tiles, no gaps, no holes, nothing see-through.
+Three-quarter view from the front-right, camera about 30 degrees above the horizontal, no extreme perspective, the
+facade with the doorway on the left of the picture and the right gable wall visible on its right. Single isolated
+building centered in frame, entire building visible with margin, nothing cropped. Plain flat dark grey background
+(#2b2b2e), no ground, no grass, no path, no fence, no trees, no props, no characters, no cast shadow on the
+background. Soft even studio lighting from the front. Square image 1:1. No text, no labels, no UI, no watermark. The
+only green light in the world is the emerald relic magic: no green anywhere.
+```
+
+### Descriptions par maison (à ajouter après le bloc commun)
+
+- **Maison de base** : « A small single-storey cottage, 8.6 m wide and 7.1 m deep, steep 45-degree gabled roof of brick-red clay tiles, exactly ONE short stone chimney standing against the LEFT gable wall and rising above the ridge; the empty arched doorway on the front, set a little to the left; one window with a plain wooden frame to the right of the doorway; a small hanging lantern between them; a small round window under the roof peak in the right gable. »
+- **Mécano** : « A shop with a tall front gable, 12.6 m wide and 9.6 m deep, two storeys at the front with two small windows in the front gable, brick-red clay tile roof; an empty arched doorway on the left of the ground floor and, to the right, a very large shop window 4 m wide with many small square panes; a bent grey metal stove pipe through the roof near the back and a small cog-shaped weathervane on the ridge; no shutters. »
+- **Forge** : « A blacksmith workshop, 11.6 m wide and 9.6 m deep, dark brown clay tile roof, a very massive tall stone chimney on the back right of the roof; an empty arched doorway on the front left of center, a window with iron bars to its right; on the RIGHT side an open lean-to shed 5 m wide with no walls, a low sloping brown roof on thick wooden posts, sheltering a stone hearth with an orange fire, stacked logs. »
+- **Druide** : « An herbalist cottage, 11.6 m wide and 8.6 m deep, very steep 50-degree gabled roof thickly covered with dull olive-green moss over brown tiles, a short crooked stone chimney, ivy (matte leaves, no glow) climbing the timber frame; an empty arched doorway on the front left of center, two windows with flower boxes of small yellow and purple flowers; on the RIGHT side a small open drying porch 2 m by 4 m with a lean-to roof on two posts and bunches of dried herbs hanging from the beams. »
+- **Sorcier** : « A wizard's house, 11.6 m wide and 9.6 m deep, dark blue slate shingle roof, with an attached round stone-and-plaster tower of 4.5 m diameter at the BACK RIGHT corner, taller than the roof, with a tall conical dark blue slate roof topped by a crescent-moon weathervane, a round porthole and a slit window; an empty arched doorway on the front left of center and two windows. »
+- **Taverne** (facultatif) : « A big tavern: a long single-storey great hall 16.6 m wide and 11.6 m deep, walls 5.4 m high, a very tall hipped roof with half-hips at about 40 degrees, brick-red clay tiles; a huge stone chimney rising from the LEFT end wall; a wide empty arched double doorway 3.2 m wide in the middle under a small tiled porch roof on two timber brackets, two steps; a large window with a plain frame on each side of the doorway; dark timber framing with diagonal braces. »
+
 ## Portes et volets (pièces animées, une image chacune, vue de face droite sans perspective)
 
 À ajouter à la fin du bloc commun adapté : « Single door leaf / single pair of shutters, flat straight-on elevation, centered, nothing else; same smooth dense low-poly style, plain dark grey background ». Une image de face suffit (le dos se déduit ; demander si besoin une vue de dos pour la ferrure).
