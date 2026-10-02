@@ -597,9 +597,34 @@ namespace Deathless.Jeu
         /// héros local au donjon est reposé à l'arrivée. Les commandes du jeu normal ne changent pas (F8 n'y est lié à rien).
         void ToucheGraine()
         {
-            var kb = UnityEngine.InputSystem.Keyboard.current;
-            if (kb == null || !kb.f8Key.wasPressedThisFrame || m_Transit || !ReseauJeu.Autorite) return;
-            ChangerGraine(kb.shiftKey.isPressed ? Random.Range(1, 1000000) : GraineCourante + 1);
+            if (m_Transit || !ReseauJeu.Autorite || !AppuiApercu(UnityEngine.InputSystem.Key.F8, ref m_DernierF8)) return;
+            ChangerGraine(MajEnfoncee() ? Random.Range(1, 1000000) : GraineCourante + 1);
+        }
+
+        // Touches de dev F8 / F9 / F10 : lues sur TOUS les claviers (InputSystem.devices filtré), pas sur Keyboard.current, qui ne suit que le
+        // dernier clavier ayant émis : un clavier ou une souris de joueur qui expose plusieurs périphériques « clavier » (interface
+        // NKRO, récepteur, touches multimédia) le détournait et l'appui sur F9 se perdait la plupart du temps (03/10/2026). Un même
+        // appui vu par deux interfaces (images voisines) ne compte qu'une fois : 0,2 s minimum entre deux actions d'une touche.
+        const float EspaceToucheApercu = 0.2f;
+        float m_DernierF8 = -10f, m_DernierF9 = -10f, m_DernierF10 = -10f;
+
+        static bool AppuiApercu(UnityEngine.InputSystem.Key touche, ref float dernier)
+        {
+            var peripheriques = UnityEngine.InputSystem.InputSystem.devices;
+            bool appui = false;
+            for (int i = 0; i < peripheriques.Count && !appui; i++)
+                appui = peripheriques[i] is UnityEngine.InputSystem.Keyboard clavier && clavier[touche].wasPressedThisFrame;
+            if (!appui || Time.unscaledTime - dernier < EspaceToucheApercu) return false;
+            dernier = Time.unscaledTime;
+            return true;
+        }
+
+        static bool MajEnfoncee()
+        {
+            var peripheriques = UnityEngine.InputSystem.InputSystem.devices;
+            for (int i = 0; i < peripheriques.Count; i++)
+                if (peripheriques[i] is UnityEngine.InputSystem.Keyboard clavier && clavier.shiftKey.isPressed) return true;
+            return false;
         }
 
         /// Aperçu seulement (touches de dev, comme F8 ; le jeu normal ne les lit pas) : F9 bascule jour / nuit (ambiance
@@ -608,14 +633,12 @@ namespace Deathless.Jeu
         /// portails et s'appliquent aux donjons que F8 construit ensuite.
         void ToucheApercu()
         {
-            var kb = UnityEngine.InputSystem.Keyboard.current;
-            if (kb == null) return;
-            if (kb.f9Key.wasPressedThisFrame)
+            if (AppuiApercu(UnityEngine.InputSystem.Key.F9, ref m_DernierF9))
             {
                 Partie.DefinirNuitApercu(!Partie.NuitApercu);
                 Dire(Partie.NuitApercu ? "Nuit" : "Jour", 3f);
             }
-            if (kb.f10Key.wasPressedThisFrame && !m_Transit && ReseauJeu.Autorite) BasculerMobsApercu();
+            if (!m_Transit && ReseauJeu.Autorite && AppuiApercu(UnityEngine.InputSystem.Key.F10, ref m_DernierF10)) BasculerMobsApercu();
         }
 
         /// Autorité, aperçu : « sans mob » retire tous les ennemis vivants (gardiens du donjon, squelettes d'essai) et plus
