@@ -1,6 +1,22 @@
 {
   "versions": [
     {
+      "version": "0.9.0",
+      "date": "2026-10-02",
+      "titre": "Attributs, succès et nouvelle carte à visiter",
+      "notes": [
+        "Attributs : six attributs par personnage (18 points au départ selon la classe, +1 point à chaque aube, plafond 10), répartis dans l'onglet du menu du personnage.",
+        "Succès : 41 succès, avec une bannière quand on en débloque un et un écran pour les revoir.",
+        "Boss : Morgrim attaque plus (poursuite, enchaînements) ; Nyxar n'est plus invulnérable, ses éclats de Nyx cèdent quand il perd les deux tiers puis le tiers de ses points de vie, et ses crânes sont plus lents.",
+        "Interface : le numéro de vague reste affiché en permanence ; le vote « prêt » montre un badge « Prêt » sur chaque personnage qui a voté et dit clairement si tu es prêt ou non (F1 pour te déclarer prêt ou annuler).",
+        "Emote bière : la chope est plus grosse, avec de la mousse, et elle monte vraiment à la bouche.",
+        "Mage : la boule de feu ne rend plus de mana, seule la régénération passive en rend.",
+        "Taverne : nouvelle Bavaroise, plus ronde, à la taille d'un héros, les mains vides derrière le comptoir.",
+        "Nouvelle carte à visiter : le menu propose « Nouvelle carte (aperçu) », une promenade en exploration (jour figé, sans vagues) dans le village refait : montagne et cascade, grotte du portail, rivière avec ses gués et ses ponts. Le jeu normal garde l'ancienne carte.",
+        "Version de test : attributs, succès et boss revus n'ont pas encore été joués en entier."
+      ]
+    },
+    {
       "version": "0.8.1",
       "date": "2026-10-01",
       "titre": "Une bière derrière le comptoir",
