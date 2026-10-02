@@ -14,6 +14,35 @@ Ce qui reste ouvert. Une ligne quitte cette page quand la règle est tranchée e
 | Succès | Trier la liste proposée le 01/10/2026 (garder, renommer, retirer), puis décider quand coder le module (local d'abord, Steam plus tard). | [Succès](succes.md) |
 | Mage (banc en jeu, 01/10/2026) | Avec son nouveau kit, le Mage est au-dessus de la moyenne des classes partout : +14 à +38 % en vague (nuits 6 et 12), +16 à +30 % sur une cible (boule et brûlure en paliers). Le réduire avant ou après la 0.8.0, et par quoi (dégâts de la boule, paliers de brûlure, mana) ? Détail : `Docs/equilibrage-classes.md`, « Banc en jeu ». | [Mage](classe-mage.md) |
 
+## Clés, crochetage et potions du village (03/10/2026, proposition à valider)
+
+Demande de Quentin : savoir **qui vend les clés des pièces fermées, à quel prix chacune, et le kit de crochetage** ; et peut-être **des potions de santé, de mana et d'endurance chez le druide**. Repères d'économie : un sbire rapporte 5 or, un guerrier ou un voleur 8, un mage 10 ; à la taverne, une bière coûte 5 or, un repas 15, une tournée 30 ; tout se paie dans la **caisse commune**, l'hôte décide en multijoueur.
+
+**Le mécano vend les clés et le kit** {à confirmer}. Une clé est **à usage unique**, on peut en porter **2 de chaque sorte au plus** ; elle ne se trouve jamais dans le donjon.
+
+| Article | Prix | Ouvre | Contenu visé de la pièce |
+|---|---|---|---|
+| Clé de bronze | 40 or | les serrures de bronze | environ 100 or |
+| Clé d'argent | 120 or | les serrures d'argent | environ 300 or |
+| Clé d'or | 320 or | les serrures d'or | environ 800 or, et plus tard un objet rare |
+| Kit de crochetage | 60 or, 5 crochets | serrures simples et de bronze (facile), d'argent (difficile) ; **jamais l'or** | selon la serrure |
+
+Idée : la clé coûte à peu près 40 % de ce qu'elle rapporte, donc elle est rentable sans être gratuite ; le kit est moins cher à l'unité mais peut échouer.
+
+**Crochetage** {à confirmer} : un petit mini-jeu à l'ouverture (une aiguille à garder dans une zone qui bouge, 3 essais, un crochet casse à chaque échec). **L'assassin est favorisé** : sa **perception** (ou son agilité, à choisir) agrandit la zone et ralentit l'aiguille, et il casse moins de crochets ; les autres classes y arrivent mais avec une zone étroite. Le kit se vend à tout le monde.
+
+**Potions du druide** {à confirmer} (la potion de soin est déjà décidée, voir [Le village](village.md#potions-de-soin-décidé) ; santé et mana et endurance sont la nouveauté) :
+
+| Potion | Prix | Effet |
+|---|---|---|
+| Santé | 20 or | rend 40 % des points de vie |
+| Mana | 20 or | rend 50 % de la jauge de classe du mage (autres classes : à décider, une potion de jauge ou rien) |
+| Endurance | 15 or | rend toute l'endurance, puis 10 s de récupération doublée |
+
+On en porte **3 au maximum de chaque sorte**, on les boit à la **croix directionnelle** (haut santé, gauche mana, droite endurance) ou aux touches 1, 2, 3 au clavier. Elles s'achètent le jour, au druide, qui se tient devant sa maison.
+
+**À trancher** : les prix et les effets ci-dessus sont des points de départ ; la potion de mana pour les classes sans mana ; la perception ou l'agilité pour le crochetage ; le contenu d'un coffre fermé.
+
 ## Visée au sol (02/10/2026)
 
 Quentin a demandé que le mage voie où son sort va tomber (clic gauche confirme, clic droit annule, même mécanique que la nuée du rôdeur). Construit et décrit dans [Mage](classe-mage.md#règles), [Rôdeur](classe-rodeur.md#règles) et [Commandes](commandes.md#viser-une-zone-au-sol). Restent {à confirmer} : le ralenti à 50 % pendant la visée, les portées (20 m grande boule, 14 m mur, 25 m nuée), le mur posé en travers de la ligne mage → point, l'ennemi du « cœur » de la grande boule (1,5 m), LT (et non B) comme bouton d'annulation à la manette (B reste l'esquive, qui ferme aussi la visée), la visée aussi appliquée à la nuée du rôdeur.
