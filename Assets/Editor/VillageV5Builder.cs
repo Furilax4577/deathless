@@ -63,6 +63,7 @@ public static partial class VillageBuilder
     public const float V5GrotteLargeur = 4.6f;           // escalier et dalle : même largeur, tirés sur l'axe de l'entrée
     public const float V5PortailRayon = 2.56f;           // portail du village : 1,6 m x 1,6 (retour du 02/10/2026)
     public const float V5PortailGarde = 0.1f;            // bas du disque au-dessus de la dalle
+    public const float V5HerbeEchelle = 0.5f;            // touffes d'herbe de la prairie : moitié de leur taille (retour du 02/10/2026)
     public const float V5RouteDroite = 10.4f;            // route de la grotte : dernier tronçon droit, dans l'axe de l'escalier
     /// Cascade (repère de la pièce) : lèvre en haut de la ravine, coude sur l'éboulis, pied dans le bassin.
     public static readonly Vector3 V5CascadeLevreLocal = new Vector3(-0.8f, 14f, -2.2f);
@@ -480,7 +481,7 @@ public static partial class VillageBuilder
     /// Falaise procédurale : champ de hauteur facetté au nord (x de -112 à 112, z de 34 à 126), trois gradins de 18, 28
     /// et 38 m dont le front suit la pièce héros (derrière elle au centre, à z ≈ 44 sur les flancs), fronts et hauteurs
     /// bruités ; fronts raides (infranchissables, sans mur invisible), jamais marchable (NavMesh), collision par le
-    /// maillage lui-même. Teintes de roche (palette de 4 gris) ; gros rochers au pied et sur les replats.
+    /// maillage lui-même. Teintes de roche (palette de 4 gris) ; aucun rocher posé dessus.
     static void V5Falaise(Transform mont)
     {
         const float x0 = -112f, x1 = 112f, z0 = 34f, z1 = 126f, pas = 2.5f;
@@ -547,17 +548,8 @@ public static partial class VillageBuilder
         go.AddComponent<MeshCollider>().sharedMesh = m;
         var mod = go.AddComponent<NavMeshModifier>(); mod.overrideArea = true; mod.area = 1;
         GameObjectUtility.SetStaticEditorFlags(go, StaticEditorFlags.BatchingStatic | StaticEditorFlags.OccludeeStatic);
-        Transform rochers = Group(mont, "Falaise_Rochers");
-        for (int i = 0; i < 70; i++)
-        {
-            float x = (float)(rnd.NextDouble() * 2 - 1) * 108f;
-            int k = rnd.Next(3);
-            float z = front(x) + k * 21f + (k == 0 ? -1.5f : 3f) + (float)rnd.NextDouble() * 6f;
-            if (Mathf.Abs(x) < 58f && k == 0) continue;       // derrière la pièce héros : rien à voir
-            float y = hauteur(x, z);
-            PlaceRock(rochers, Rocks[rnd.Next(Rocks.Length)], new Vector3(x, y - 0.4f, z), 3f + (float)rnd.NextDouble() * 5f, false);
-        }
-        MarkStatic(rochers.gameObject);
+        // Plus de rochers sur la falaise (retour du 02/10/2026) : les blocs KayKit, posés au hasard sur les gradins, flottaient
+        // ou ressemblaient à des cubes ; la falaise reste le champ de hauteur facetté, sans rien dessus.
     }
 
     static Material V5MateriauMontagne(string matPath, string texPath)
@@ -1087,11 +1079,54 @@ public static partial class VillageBuilder
             if (!V5Libre(p, 0.6f) || p.z > 31f) continue;
             if (V5Lande(new Vector2(p.x, p.z)) > 0.55f && Random.value < 0.7f) continue;
             p.y = GroundHeight(p.x, p.z);
-            Place(herbe, ForestRoot + Grass[Random.Range(0, Grass.Length)], p, Random.Range(0f, 360f), Random.Range(1.5f, 2.2f));
+            Place(herbe, ForestRoot + Grass[Random.Range(0, Grass.Length)], p, Random.Range(0f, 360f), Random.Range(1.5f, 2.2f) * V5HerbeEchelle);
             nHerbe++;
         }
+        int retires = V5RetirerPresParois(root, arbres, lisiere, lande, pierrier, herbe);
         MarkStatic(foret.gameObject);
-        return "Nature : " + nArbres + " arbres, " + nBuissons + " buissons de lisière, " + nLande + " pièces de lande, " + nPierrier + " blocs de pierrier, " + nHerbe + " touffes";
+        return "Nature : " + nArbres + " arbres, " + nBuissons + " buissons de lisière, " + nLande + " pièces de lande, " + nPierrier + " blocs de pierrier, " + nHerbe + " touffes ; " + retires + " éléments retirés près des parois (arbres et souches à moins de " + V5DistParoiArbre + " m, buissons " + V5DistParoiBuisson + " m, rochers et herbe dans la roche)";
+    }
+
+    // ------------------------------------------------------------------ parois rocheuses (retour du 02/10/2026)
+    /// Aucun arbre, souche ou buisson à moins de 3 m d'une paroi rocheuse (pièces Tripo, falaise procédurale) : les buissons
+    /// de lisière sont larges (échelle 3 à 5), 4 m ; rochers et herbe seulement hors de la roche.
+    public const float V5DistParoiArbre = 3f, V5DistParoiBuisson = 4f, V5DistParoiRocher = 0.9f;
+
+    /// Vrai si une paroi rocheuse (collider sous Montagne, hors grotte) est à moins de `rayon` m du segment vertical de `p`
+    /// (de 0,2 à `haut` m) : le plan et la hauteur, donc aussi les surplombs que la cime d'un arbre toucherait.
+    static bool V5ProcheParoi(Transform montagne, Vector3 p, float rayon, float haut)
+    {
+        Transform grotte = montagne.Find("Grotte");
+        Collider[] cs = Physics.OverlapCapsule(p + Vector3.up * 0.2f, p + Vector3.up * haut, rayon, ~0, QueryTriggerInteraction.Ignore);
+        foreach (Collider c in cs)
+            if (c.transform.IsChildOf(montagne) && (grotte == null || !c.transform.IsChildOf(grotte))) return true;
+        return false;
+    }
+
+    /// Retire des groupes de la forêt tout ce qui touche une paroi : fait après coup, pour ne pas décaler les tirages
+    /// aléatoires (le reste de la forêt garde sa disposition).
+    static int V5RetirerPresParois(Transform root, params Transform[] groupes)
+    {
+        Transform mont = root.Find("Montagne");
+        if (mont == null) return 0;
+        Physics.SyncTransforms();
+        int n = 0;
+        foreach (Transform g in groupes)
+        {
+            var aRetirer = new List<GameObject>();
+            foreach (Transform t in g)
+            {
+                string nom = t.name;
+                bool buisson = nom.StartsWith("Bush"), roche = nom.StartsWith("Rock"), herbe = nom.StartsWith("Grass");
+                Vector3 p = t.position;
+                bool pres = roche || herbe ? V5ProcheParoi(mont, p, V5DistParoiRocher, 0.8f)
+                          : V5ProcheParoi(mont, p, buisson ? V5DistParoiBuisson : V5DistParoiArbre, buisson ? 3.5f : 6f);
+                if (pres) aRetirer.Add(t.gameObject);
+            }
+            foreach (GameObject go in aRetirer) Object.DestroyImmediate(go);
+            n += aRetirer.Count;
+        }
+        return n;
     }
 
     /// Reconstruit la liste des allées d'après les tuiles posées (étape 6 lancée seule).
