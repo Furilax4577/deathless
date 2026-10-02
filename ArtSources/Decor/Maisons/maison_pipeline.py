@@ -2,14 +2,14 @@
 """
 Maisons du village : chaîne reproductible « maison Tripo (une seule image) -> Unity ».
 Script Blender sans interface, sur le modèle de ArtSources/Decor/Montagne/montagne_pipeline.py (mêmes fonctions de base :
-sélection, décimation, lissage des normales). Pièces du tableau PIECES : base (maison de base), forge, sorcier, druide, mecano ;
+sélection, décimation, lissage des normales). Pièces du tableau PIECES : base (maison de base), forge, sorcier, druide, mecano, taverne ;
 une pièce de plus = une entrée de plus (source, largeur, budget, graines de la palette). Les mesures propres à une pièce
 (embrasure, lanterne, tour, foyer de la forge) sont faites sur le maillage (cf. ancres_maison, ancres_forge, collision_forge).
 
 Lancement (Blender 5.2) :
     "C:/Users/Furilax/Tools/blender-5.2.2-windows-x64/blender.exe" -b --python ArtSources/Decor/Maisons/maison_pipeline.py -- --piece base [options]
 Options :
-    --piece <nom>       base | forge | sorcier | druide | mecano (obligatoire ; « base » = la maison de base)
+    --piece <nom>       base | forge | sorcier | druide | mecano | taverne (obligatoire ; « base » = la maison de base)
     --largeur <m>       largeur hors tout (X, toit compris) ; défaut : celle du tableau (8,6 m pour la maison de base)
     --budget <n>        triangles du maillage rendu avant retrait des faces du dessous (défaut du tableau)
     --ey <f>, --ez <f>  échelles de la profondeur et de la hauteur relatives à la largeur (défaut : tableau ; 1 = uniforme)
@@ -168,6 +168,26 @@ PIECES = {
             creme=[(227, 188, 152), (219, 180, 145), (206, 169, 136), (175, 144, 118)],
             embrasure=[(32, 21, 14)], metal=[(14, 12, 11)]),
     ),
+    # Taverne « Le Tonneau Percé » (02/10/2026, une seule image Grok -> Tripo) : grande salle basse à toit de tuiles et demi-croupes,
+    # haute cheminée de pierre à gauche, tonneau posé de travers sur le toit, enseigne (planche sans texte) suspendue à une potence de
+    # fer à droite, une seule porte étroite en arche. Pas d'émission (les vitres sombres se confondent avec les ombres des tuiles dans la texture). Échelle : la largeur est celle du TOIT (l'enseigne dépasse de 2,3 m à droite et
+    # n'entre pas dans la largeur : x_enseigne_tripo = abscisse Tripo où commence la potence). Profondeur étirée (echelle_y > 1 : le
+    # modèle Tripo est beaucoup plus plat que le plan, 0,44 de profondeur sur largeur contre 0,70), hauteur gardée.
+    "taverne": dict(
+        nom="Taverne", type="taverne",
+        source=os.path.join(REF, "taverne_tripo", "medieval+tavern+3d+model.fbx"),
+        largeur=19.0, largeur_ref_tripo=0.882, echelle_y=1.25, budget=21000, atlas=2048, collision=420,
+        sans_emission=True, inset_arche=0.177, x_enseigne_tripo=0.375, emprise_z_tripo=(0.041, 0.049), cadre=(4.4, 0.45), arche_x_tripo=(0.0, 0.24),
+        protege_pierre=0.8, lanterne=False,
+        protege=[],
+        # en unités Tripo (x0, x1, y0, y1, z0, z1, poids) : soubassement et façade, enseigne et potence, tonneau du toit, cheminée
+        protege_tripo=[(-0.50, 0.40, -0.23, 0.0, -0.01, 0.30, 0.55),
+                       (0.36, 0.50, -0.16, -0.05, 0.03, 0.30, 0.95),
+                       (0.06, 0.22, -0.21, -0.03, 0.25, 0.45, 0.9),
+                       (-0.37, -0.28, -0.14, -0.04, 0.28, 0.55, 0.85)],
+        palette=dict(brique="#C4512F", creme="#EBD3AB", bois="#6A4428", pierre="#A39D95", vitre="#2F3B4A",
+                     lanterne="#F4A93C", embrasure="#2C1B12", metal="#232327"),
+    ),
 }
 
 ARGS = mp.ARGS
@@ -228,7 +248,7 @@ def importer():
     me = o.data
     n = len(me.vertices)
     co = np.empty(n * 3, dtype=np.float64); me.vertices.foreach_get("co", co); co = co.reshape(-1, 3)
-    largeur_tripo = co[:, 0].max() - co[:, 0].min()
+    largeur_tripo = CFG.get("largeur_ref_tripo", co[:, 0].max() - co[:, 0].min())   # taverne : le toit, sans l'enseigne
     s = LARGEUR / largeur_tripo
     co *= s
     co[:, 1] *= CFG.get("echelle_y", 1.0)
@@ -247,10 +267,16 @@ def importer():
     else:
         # origine : centre de l'emprise du soubassement (tranche z 0,6-0,95 m, hors cadre d'arche et marches), au sol
         ez = CFG.get("emprise_z", (0.6 * LARGEUR / 8.6, 0.95 * LARGEUR / 8.6))
+        if "emprise_z_tripo" in CFG:
+            ez = tuple(v * s * CFG.get("echelle_z", 1.0) for v in CFG["emprise_z_tripo"])
         tr = (co[:, 2] > ez[0]) & (co[:, 2] < ez[1])
+        if "x_enseigne_tripo" in CFG:   # l'enseigne et sa potence ne comptent pas dans l'emprise
+            tr &= co[:, 0] < CFG["x_enseigne_tripo"] * s
         cx = (co[tr, 0].min() + co[tr, 0].max()) / 2
         cy = (co[tr, 1].min() + co[tr, 1].max()) / 2
         ORIGINE = dict(cx=float(cx), cy=float(cy), plan_x=0.0, plan_y=0.0)
+    ORIGINE.update(s=float(s), ey=float(CFG.get("echelle_y", 1.0)), ez=float(CFG.get("echelle_z", 1.0)),
+                   x_ens=float(CFG["x_enseigne_tripo"] * s - cx) if "x_enseigne_tripo" in CFG else 1e9)
     co[:, 0] -= cx; co[:, 1] -= cy; co[:, 2] -= co[:, 2].min()
     # forge : le sol de l'atelier (dalles de 0,36 m) est « à même le sol » : on enfonce tout pour que son dessus soit au terrain
     co[:, 2] -= CFG.get("enfoncement", 0.0)
@@ -261,6 +287,19 @@ def importer():
         % (triangles(o), s, np.ptp(co[:, 0]), np.ptp(co[:, 1]), np.ptp(co[:, 2]),
            np.ptp(co[tr, 0]), np.ptp(co[tr, 1]), cx, cy))
     return o
+
+
+def tx(X):
+    """Abscisse du repère final d'une abscisse Tripo (unités du fichier source) ; ty, tz : de même (taverne)."""
+    return X * ORIGINE["s"] - ORIGINE["cx"]
+
+
+def ty(Y):
+    return Y * ORIGINE["s"] * ORIGINE["ey"] - ORIGINE["cy"]
+
+
+def tz(Z):
+    return Z * ORIGINE["s"] * ORIGINE["ez"]
 
 
 ORIGINE = dict(cx=0.0, cy=0.0, plan_x=0.0, plan_y=0.0)   # décalage appliqué à l'import (m) ; origine du plan de la forge
@@ -397,6 +436,9 @@ def poids_sommets(co):
         dx, dy, dz = -ORIGINE["cx"], -ORIGINE["cy"], -CFG.get("enfoncement", 0.0)
     for (x0, x1, y0, y1, z0, z1, p) in CFG["protege"]:
         m = ((x - dx) >= x0) & ((x - dx) <= x1) & ((y - dy) >= y0) & ((y - dy) <= y1) & ((z - dz) >= z0) & ((z - dz) <= z1)
+        w = np.where(m, np.maximum(w, p), w)
+    for (x0, x1, y0, y1, z0, z1, p) in CFG.get("protege_tripo", []):   # boîtes en unités Tripo (taverne)
+        m = (x >= tx(x0)) & (x <= tx(x1)) & (y >= ty(y0)) & (y <= ty(y1)) & (z >= tz(z0)) & (z <= tz(z1))
         w = np.where(m, np.maximum(w, p), w)
     if CFG.get("protege_herbes") and POIDS_COULEURS is not None:
         # bouquets d'herbes suspendus sous l'auvent : vert-olive, dans le dernier quart de la largeur, à hauteur des poutres
@@ -673,6 +715,8 @@ def collision(hd):
         return collision_forge(hd)
     if CFG.get("type") == "maison":
         return collision_maison(hd)
+    if CFG.get("type") == "taverne":
+        return collision_taverne(hd)
     co = coords(hd)
     x, y, z = co[:, 0], co[:, 1], co[:, 2]
     zegout = 3.0 * LARGEUR / 8.6   # le toit commence à l'égout (sablière haute)
@@ -754,6 +798,8 @@ def ancres(hd):
         return ancres_forge(hd)
     if CFG.get("type") == "maison":
         return ancres_maison(hd)
+    if CFG.get("type") == "taverne":
+        return ancres_taverne(hd)
     p = CFG["porte"]; f = CFG["fenetre"]
     co = coords(hd)
     col = couleur_aux_sommets(hd)
@@ -914,7 +960,8 @@ def detecter_arche(co, col, m):
     amas = max(((bornes[i + 1] - bornes[i], xs[bornes[i]], xs[bornes[i + 1] - 1]) for i in range(len(bornes) - 1)))
     xa, xb = float(amas[1]), float(amas[2])
     wf = xb - xa
-    x0, x1 = xa + 0.235 * wf, xb - 0.235 * wf
+    ins = CFG.get("inset_arche", 0.235)   # taverne : 0,177 (ouverture de 2,0 m relevée sur la capture de détail)
+    x0, x1 = xa + ins * wf, xb - ins * wf
     zb = 1.2
     zh = float(z[cadre].max()) - 0.5
     log("embrasure : cadre de pierre x %.2f à %.2f (largeur %.2f), ouverture x %.2f à %.2f (%.2f), nu du mur y = %.2f"
@@ -948,7 +995,115 @@ def ancres_maison(hd):
         convention="Blender : x vers la droite vue de la façade, y vers le fond, z vers le haut ; origine au centre de l'emprise, au sol.")
 
 
+# ---------------------------------------------------------------------------------------------- taverne
+def masques_taverne(co, col):
+    """Parties repérées sur la taverne (repère final) : enseigne (planche), tonneau du toit, souche de cheminée. Retourne un dict
+    de masques et de mesures."""
+    hue, sat, v = teinte(col)
+    x, y, z = co[:, 0], co[:, 1], co[:, 2]
+    r, g = col[:, 0], col[:, 1]
+    xs = ORIGINE["x_ens"]
+    # planche de l'enseigne : sommets clairs (bois, pas le fer) au-delà de la potence, sous les crochets
+    planche = (x > xs) & (z < tz(0.168)) & (v > 0.15)   # le bord haut de la planche est à z = 0,167 (unités Tripo) ; au-dessus : crochets
+    sign = (x > xs)
+    # tonneau : sommets qui dépassent du pan avant du toit (plan ajusté sur les tuiles hors tonneau et hors cheminée)
+    tuile = (r > g * 1.8) & (r > 0.25)
+    fit = tuile & (y < ty(-0.03)) & (y > ty(-0.19)) & (z > tz(0.26)) & (((x > tx(-0.25)) & (x < tx(0.0))) | ((x > tx(0.22)) & (x < tx(0.26))))
+    A = np.c_[np.ones(fit.sum()), y[fit]]
+    c, _, _, _ = np.linalg.lstsq(A, z[fit], rcond=None)
+    d = z - (c[0] + c[1] * y)
+    reg = (x > tx(-0.15)) & (x < tx(0.32)) & (y < ty(0.0)) & (y > ty(-0.2)) & (z > tz(0.25))
+    tonneau = reg & (d > 0.02 * ORIGINE["s"] * ORIGINE["ez"])
+    pierre = (sat < 0.17) & (v > 0.28) & (v < 0.7)
+    souche = pierre & (x < tx(-0.29)) & (x > tx(-0.40)) & (z > tz(0.30))
+    return dict(planche=planche, sign=sign, tonneau=tonneau, souche=souche, pente=float(c[1]), pierre=pierre)
+
+
+def collision_taverne(hd):
+    """Corps (soubassement, murs, jusqu'à l'égout), toit (égout au faîtage), marches et rebord du soubassement, souche de la
+    cheminée au-dessus du toit, planche de l'enseigne : enveloppes convexes (jamais le maillage rendu). L'auvent de l'arche et le
+    tonneau du toit ne comptent pas (hors de portée, et l'auvent barrerait l'accès à la porte)."""
+    co = coords(hd); col = couleur_aux_sommets(hd)
+    x, y, z = co[:, 0], co[:, 1], co[:, 2]
+    k = masques_taverne(co, col)
+    m = mesures_maison(co[~k["sign"]])
+    log("mesures : nu du mur y = %.2f, égout z = %.2f, faîtage z = %.2f" % (m["ymur"], m["egout"], m["faitage"]))
+    corps_x = ~k["sign"]
+    marches = corps_x & (y < m["ymur"] - 0.1) & (z < 1.6)
+    corps = corps_x & (z < m["egout"]) & ~marches & (y > m["ymur"] - 0.2)
+    toit = corps_x & (z >= m["egout"]) & (z <= m["faitage"]) & ~k["souche"] & ~k["tonneau"]
+    souche_h = k["souche"] & (z >= m["egout"] - 0.5)
+    parts = [("marches", co[marches], 40), ("corps", co[corps], 60), ("toit", co[toit], 70), ("souche", co[souche_h], 30),
+             ("enseigne", co[k["planche"]], 20)]
+    return joindre_enveloppes(parts)
+
+
+def ancres_taverne(hd):
+    """Embrasure (porte étroite), plan de façade, enseigne (planche), tonneau du toit et cheminée, détectés sur le maillage ;
+    au repère final de Blender."""
+    co = coords(hd); col = couleur_aux_sommets(hd)
+    hue, sat, v = teinte(col)
+    x, y, z = co[:, 0], co[:, 1], co[:, 2]
+    k = masques_taverne(co, col)
+    m = mesures_maison(co[~k["sign"]])
+    ymur = m["ymur"]
+    # embrasure : cadre de pierre dans la fenêtre d'abscisses arche_x_tripo (ni cheminée ni soubassement)
+    ax0, ax1 = (tx(a) for a in CFG["arche_x_tripo"])
+    sel = (x > ax0 - 0.8) & (x < ax1 + 0.8)
+    x0, x1, zb, zh = detecter_arche(co[sel], col[sel], dict(ymur=ymur, xmin=ax0 - 0.8, xmax=ax1 + 0.8))
+    xc = (x0 + x1) / 2
+    sombre = (v < 0.12) & (x > x0) & (x < x1) & (y < ymur + 0.6) & (z > 0.5) & (z < zh)
+    if sombre.sum() > 20:
+        zb = float(np.percentile(z[sombre], 3))
+    log("porte : ouverture x %.2f à %.2f (largeur %.2f), seuil z = %.2f, haut z = %.2f" % (x0, x1, x1 - x0, zb, zh))
+    # enseigne
+    p = k["planche"]
+    if p.sum() < 50:
+        raise RuntimeError("planche de l'enseigne introuvable")
+    px0, px1 = float(np.percentile(x[p], 0.5)), float(np.percentile(x[p], 99.5))
+    pz0, pz1 = float(np.percentile(z[p], 0.5)), float(np.percentile(z[p], 99.5))
+    yf = float(y[p].min()); yb = float(y[p].max())
+    ens = dict(centre=[(px0 + px1) / 2, yf, (pz0 + pz1) / 2], largeur=px1 - px0, haut=pz1 - pz0, epaisseur=yb - yf)
+    log("enseigne : planche x %.2f à %.2f (%.2f m), z %.2f à %.2f (%.2f m), face avant y = %.2f, épaisseur %.2f m"
+        % (px0, px1, px1 - px0, pz0, pz1, pz1 - pz0, yf, yb - yf))
+    # tonneau
+    t = k["tonneau"]
+    if t.sum() < 200:
+        raise RuntimeError("tonneau du toit introuvable")
+    zt = z[t]
+    bas = t & (z < zt.min() + 0.2 * np.ptp(zt))
+    ton = co[t].mean(0)
+    sortie = co[bas].mean(0)
+    pente = k["pente"]   # dz/dy du pan avant ; la bière descend vers -y
+    n = math.hypot(1.0, pente)
+    log("tonneau : %d sommets, centre (%.2f, %.2f, %.2f), x %.2f à %.2f, z %.2f à %.2f ; pente du pan avant %.2f (%.0f degrés)"
+        % (t.sum(), ton[0], ton[1], ton[2], co[t, 0].min(), co[t, 0].max(), zt.min(), zt.max(), pente, math.degrees(math.atan(pente))))
+    # cheminée : sommet de la souche
+    so = k["souche"]
+    zh_c = float(z[so].max())
+    haut = so & (z > zh_c - 0.6)
+    ch = [float(x[haut].mean()), float(y[haut].mean()), zh_c]
+    log("cheminée : sommet (%.2f, %.2f, %.2f), %.1f x %.1f m en haut" % (ch[0], ch[1], ch[2], np.ptp(x[haut]), np.ptp(y[haut])))
+    face = [0.0, -1.0, 0.0]
+    return dict(
+        largeur=LARGEUR, facade_y=ymur,
+        entree=dict(centre=[xc, ymur, 0.0], largeur=1.8, haut=2.6),
+        lanterne=None,
+        ancres=[dict(nom="Porte_Pivot", pos=[x0, ymur, zb], dir=face),
+                dict(nom="Enseigne", pos=ens["centre"], dir=face),
+                dict(nom="Tonneau_Fuite", pos=[float(sortie[0]), float(sortie[1]), float(sortie[2])], dir=[0.0, -1.0 / n, -pente / n]),
+                dict(nom="Cheminee", pos=ch, dir=[0.0, 0.0, 0.0])],
+        enseigne=ens,
+        mesures=dict(embrasure_largeur=x1 - x0, embrasure_haut=zh - zb, egout=m["egout"], faitage=m["faitage"],
+                     hauteur=float(z.max()), tonneau_centre=[float(a) for a in ton], pente_toit=pente),
+        convention="Blender : x vers la droite vue de la façade, y vers le fond, z vers le haut ; origine au centre de l'emprise "
+                   "du soubassement (sans l'enseigne), au sol.")
+
+
 # ---------------------------------------------------------------------------------------------- rendus
+DONNEES_RENDU = {}   # ancres calculées (vues de détail de la taverne)
+
+
 def rendus(dossier, objs, mat_img=None):
     os.makedirs(dossier, exist_ok=True)
     sc = bpy.context.scene
@@ -969,6 +1124,16 @@ def rendus(dossier, objs, mat_img=None):
         vues = (("face", 0, 8, o, centre), ("dos", 180, 8, o, centre), ("profil", 90, 8, o, centre),
                 ("trois_quarts", 35, 28, o, centre), ("dessus", 0, 89.9, 22.0, Vector((0, 0, 0))),
                 ("atelier", 20, 35, 13.0, Vector((4.0, 2.0, 2.0))))
+    elif CFG.get("type") == "taverne":
+        co_r = coords(objs[0]); zm = float(co_r[:, 2].max())
+        centre = Vector((1.0, 0, zm * 0.42)); o = max(zm * 1.45, LARGEUR * 1.3)
+        vues = [("face", 0, 8, o, centre), ("dos", 180, 8, o, centre), ("profil", 90, 8, o, centre),
+                ("trois_quarts", 35, 28, o, centre), ("dessus", 0, 89.9, o, Vector((0, 0, 0)))]
+        if DONNEES_RENDU:
+            e = DONNEES_RENDU["enseigne"]["centre"]; tc = DONNEES_RENDU["mesures"]["tonneau_centre"]
+            vues += [("enseigne", 12, 8, 7.0, Vector((e[0], e[1], e[2]))), ("tonneau", 20, 22, 9.0, Vector(tc)),
+                     ("porte", 12, 12, 9.0, Vector((tx(0.10), -4.0, 2.4)))]
+        vues = tuple(vues)
     elif CFG["nom"] != "Maison_Base":
         co_r = coords(objs[0]); zm = float(co_r[:, 2].max())
         centre = Vector((0, 0, zm * 0.46)); o = max(zm * 1.45, 16.0)
@@ -1028,6 +1193,7 @@ def main():
     img1 = image_depuis(NOM + "_Texture_P1", px1)
     emi = image_depuis(NOM + "_Emission", carte_emission(cls, utile))
     if "--rendus" in ARGS:
+        DONNEES_RENDU.update(dat)
         rendus(ARGS[ARGS.index("--rendus") + 1], [rendu])
     bpy.data.objects.remove(hd)
     ntri = triangles(rendu)

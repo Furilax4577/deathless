@@ -13,7 +13,10 @@ using UnityEngine.SceneManagement;
 // (building_home_A_blue x 7,5), la maison de base Tripo et sa variante de palette, puis la forge, le sorcier, le druide et le
 // mécano, chacun suivi de sa variante de palette ; un héros (Modele de Heros_Paladin, 2,18 m) devant la porte de chaque
 // maison pour l'échelle (et aux trois postes du forgeron). Captures 1920 x 1080 dans Assets/Screenshots/ (maison_base_*,
-// forge_*, sorcier_*, druide_*, mecano_*), Camera.Render en édition, sans Play.
+// forge_*, sorcier_*, druide_*, mecano_*, taverne_*), Camera.Render en édition, sans Play.
+// Taverne (02/10/2026) : AjouterAuBanc("Taverne") l'ajoute à la scène SANS la régénérer (ouverture additive de MaisonBanc.unity,
+// jamais écrite si elle est déjà ouverte) ; CapturerTaverneAdditif() photographie le prefab dans une scène temporaire additive
+// loin de l'origine (la scène active, par exemple CarteV5, n'est ni remplacée ni modifiée ; son éclairage s'applique).
 public static class MaisonBanc
 {
     public const string Scene = "Assets/Scenes/Dev/MaisonBanc.unity";
@@ -21,9 +24,9 @@ public static class MaisonBanc
     const string MatStandard = "Assets/Art/Materials/KayKit_Hexagons_medieval_Maisons.mat";
     const string Heros = "Assets/Jeu/Prefabs/Heros_Paladin.prefab";
     const float EspaceX = 17f;
-    static readonly string[] Pieces = { "Maison_Base", "Forge", "Sorcier", "Druide", "Mecano" };
-    static readonly float[] PosX = { 0f, 70f, 140f, 205f, 270f };
-    static readonly float[] PosVariante = { 17f, 92f, 156f, 224f, 286f };
+    static readonly string[] Pieces = { "Maison_Base", "Forge", "Sorcier", "Druide", "Mecano", "Taverne" };
+    static readonly float[] PosX = { 0f, 70f, 140f, 205f, 270f, 345f };
+    static readonly float[] PosVariante = { 17f, 92f, 156f, 224f, 286f, 380f };
 
     [System.Serializable] class PlanJson { public float[] origine_plan; }
 
@@ -98,6 +101,138 @@ public static class MaisonBanc
         System.IO.Directory.CreateDirectory("Assets/Scenes/Dev");
         EditorSceneManager.SaveScene(sc, Scene);
         return sb.ToString();
+    }
+
+
+    // ------------------------------------------------------------------------------------------------ taverne (sans remplacer la scène active)
+    [MenuItem("Deathless/Village/Taverne Tripo - ajouter au banc")]
+    public static void MenuAjouterTaverne() { Debug.Log(AjouterAuBanc("Taverne")); }
+
+    [MenuItem("Deathless/Village/Taverne Tripo - captures")]
+    public static void MenuCapturesTaverne() { Debug.Log(CapturerTaverneAdditif()); }
+
+    /// Ajoute une pièce (Pieces) et sa variante de palette à MaisonBanc.unity, sans régénérer le reste : la scène est ouverte en
+    /// additif (la scène active n'est pas touchée), complétée, enregistrée puis refermée. Refus si le banc est déjà ouvert (écrire
+    /// une scène ouverte déclenche le dialogue modal « modified externally » dans l'éditeur qui l'a ouverte).
+    public static string AjouterAuBanc(string piece)
+    {
+        if (EditorApplication.isPlaying) return "refusé : éditeur en Play";
+        int k = System.Array.IndexOf(Pieces, piece);
+        if (k < 0) return "pièce inconnue : " + piece;
+        if (SceneManager.GetSceneByPath(Scene).isLoaded) return "refusé : " + Scene + " est déjà ouverte";
+        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(MaisonTripo.CheminPrefab(piece));
+        if (prefab == null) return piece + " : prefab absent";
+        var active = SceneManager.GetActiveScene();
+        var sc = EditorSceneManager.OpenScene(Scene, OpenSceneMode.Additive);
+        try
+        {
+            Transform g = null, h = null;
+            foreach (var r in sc.GetRootGameObjects()) { if (r.name == "Maisons") g = r.transform; else if (r.name == "Heros") h = r.transform; }
+            if (g == null || h == null) return "banc inattendu (Maisons / Heros introuvables)";
+            if (g.Find(piece + "_Tripo") != null) return piece + " déjà dans le banc";
+            SceneManager.SetActiveScene(sc);
+            var m = (GameObject)PrefabUtility.InstantiatePrefab(prefab, g); m.name = piece + "_Tripo"; m.transform.position = new Vector3(PosX[k], 0f, 0f);
+            var mv = (GameObject)PrefabUtility.InstantiatePrefab(prefab, g); mv.name = piece + "_Tripo_Variante"; mv.transform.position = new Vector3(PosVariante[k], 0f, 0f);
+            mv.transform.Find("Rendu").GetComponent<MeshRenderer>().sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>(MaisonTripo.Dossier + "/" + piece + "_Variante.mat");
+            Heroes(h, "Heros_" + piece, m.transform.Find("Entree").position + new Vector3(0f, 0f, 2.3f), 180f);
+            Heroes(h, "Heros_" + piece + "_Variante", mv.transform.Find("Entree").position + new Vector3(0f, 0f, 2.3f), 180f);
+            EditorSceneManager.MarkSceneDirty(sc);
+            EditorSceneManager.SaveScene(sc);
+            return piece + " ajoutée au banc (x = " + PosX[k] + " et " + PosVariante[k] + ")";
+        }
+        finally
+        {
+            SceneManager.SetActiveScene(active);
+            EditorSceneManager.CloseScene(sc, true);
+        }
+    }
+
+    /// Captures de la taverne dans une scène additive temporaire (5 km de l'origine), éclairage de la scène active (aucune scène
+    /// remplacée ni écrite). taverne_trois_quarts, _face, _dos, _profil_droit, _arche, _jeu_3e_personne (héros devant la porte,
+    /// caméra d'épaule 5,5 m, 22°), _enseigne (héros sous la planche, caméra d'épaule à 6,5 m : le nom doit être lisible),
+    /// _enseigne_gros_plan, _tonneau, _palettes_0_1.
+    public static string CapturerTaverneAdditif()
+    {
+        if (EditorApplication.isPlaying) return "refusé : éditeur en Play";
+        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(MaisonTripo.CheminPrefab("Taverne"));
+        if (prefab == null) return "Taverne : prefab absent";
+        var active = SceneManager.GetActiveScene();
+        var sc = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Additive);
+        var sb = new StringBuilder("Taverne (captures) : ");
+        try
+        {
+            SceneManager.SetActiveScene(sc);
+            Vector3 o = new Vector3(5000f, 0f, 5000f);
+            var sol = GameObject.CreatePrimitive(PrimitiveType.Plane); sol.name = "Sol"; sol.transform.localScale = new Vector3(14f, 1f, 10f); sol.transform.position = o + new Vector3(15f, 0f, 0f);
+            sol.GetComponent<MeshRenderer>().sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/Art/Materials/Ground.mat");
+            var m = (GameObject)PrefabUtility.InstantiatePrefab(prefab); m.name = "Taverne_Tripo"; m.transform.position = o;
+            var mv = (GameObject)PrefabUtility.InstantiatePrefab(prefab); mv.name = "Taverne_Tripo_Variante"; mv.transform.position = o + new Vector3(38f, 0f, 0f);
+            mv.transform.Find("Rendu").GetComponent<MeshRenderer>().sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>(MaisonTripo.Dossier + "/Taverne_Variante.mat");
+            var h = new GameObject("Heros").transform;
+            Transform e = m.transform.Find("Entree"), ens = m.transform.Find("Enseigne"), ton = m.transform.Find("Tonneau_Fuite");
+            Heroes(h, "Heros_Porte", e.position + new Vector3(0f, 0f, 2.3f), 180f);
+            Vector3 pe = ens.position; pe.y = 0f;
+            Heroes(h, "Heros_Enseigne", pe + new Vector3(0.9f, 0f, 1.6f), 180f);
+            Bounds b = m.transform.Find("Rendu").GetComponent<MeshRenderer>().bounds;
+            Vector3 c = b.center - Vector3.up * (0.07f * b.size.y);
+            float dist = 1.7f * Mathf.Max(b.size.y * 1.1f, b.size.x * 0.75f, 12f);
+            Photo("taverne_trois_quarts", c + new Vector3(-0.55f, 0.28f, 0.78f).normalized * dist, c, 36f, sb);
+            Photo("taverne_face", c + new Vector3(0f, 0.12f, 1f).normalized * dist, c, 36f, sb);
+            Photo("taverne_dos", c + new Vector3(0.25f, 0.2f, -1f).normalized * dist, c, 36f, sb);
+            Photo("taverne_profil_droit", c + new Vector3(-1f, 0.15f, 0.1f).normalized * dist, c, 36f, sb);
+            Photo("taverne_arche", e.position + new Vector3(-1.2f, 1.9f, 6.2f), e.position + new Vector3(0f, 1.6f, -0.5f), 40f, sb);
+            // caméra de jeu : pivot à 1,6 m au-dessus du héros, tangage 22°, épaule 0,6 m à droite, recul 5,5 m, champ 60°
+            Quaternion rot = Quaternion.Euler(22f, 180f, 0f);
+            foreach (var cas in new[] { new[] { "taverne_jeu_3e_personne", "Heros_Porte" }, new[] { "taverne_enseigne", "Heros_Enseigne" } })
+            {
+                var hero = GameObject.Find(cas[1]).transform;
+                Vector3 pivot = hero.position + Vector3.up * 1.6f; Vector3 epaule = pivot + rot * Vector3.right * 0.6f;
+                Photo(cas[0], epaule - rot * Vector3.forward * 5.5f, epaule, 60f, sb, rot);
+            }
+            Photo("taverne_enseigne_gros_plan", ens.position + new Vector3(-1.2f, 0.3f, 7.5f), ens.position, 30f, sb);
+            Photo("taverne_tonneau", ton.position + new Vector3(-3.5f, 3.2f, 9.5f), ton.position + Vector3.up * 0.8f, 40f, sb);
+            Vector3 mid = (c + (mv.transform.Find("Rendu").GetComponent<MeshRenderer>().bounds.center - Vector3.up * (0.07f * b.size.y))) / 2f;
+            Photo("taverne_palettes_0_1", mid + new Vector3(0f, 0.12f, 1f).normalized * Mathf.Max((38f + b.size.x) * 0.5f / 0.577f * 1.12f, b.size.y * 1.6f), mid, 36f, sb);
+        }
+        finally
+        {
+            SceneManager.SetActiveScene(active);
+            EditorSceneManager.CloseScene(sc, true);
+        }
+        return sb.ToString();
+    }
+
+    /// À lancer EN PLAY (l'éditeur doit déjà y être) : pose le prefab Taverne à 5 km de l'origine dans la scène active, laisse tourner
+    /// les effets (BiereFuite, FumeeCheminee) quelques secondes, photographie la fuite et la fumée (taverne_effet_fuite,
+    /// taverne_effet_fumee) puis retire le tout. Rien n'est enregistré dans une scène.
+    [MenuItem("Deathless/Village/Taverne Tripo - effets (en Play)")]
+    public static void MenuEffetsPlay()
+    {
+        if (!EditorApplication.isPlaying) { Debug.Log("Taverne effets : à lancer en Play"); return; }
+        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(MaisonTripo.CheminPrefab("Taverne"));
+        if (prefab == null) { Debug.Log("Taverne effets : prefab absent"); return; }
+        Vector3 o = new Vector3(5000f, 0f, 5000f);
+        var m = (GameObject)Object.Instantiate(prefab, o, Quaternion.identity);
+        var sol = GameObject.CreatePrimitive(PrimitiveType.Plane); sol.transform.localScale = new Vector3(8f, 1f, 8f); sol.transform.position = o;
+        sol.GetComponent<MeshRenderer>().sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/Art/Materials/Ground.mat");
+        var bf = m.GetComponentInChildren<BiereFuite>(); var fc = m.GetComponentInChildren<FumeeCheminee>();
+        if (bf != null) bf.distanceMax = 1e9f;
+        if (fc != null) fc.distanceMax = 1e9f;
+        float t0 = Time.realtimeSinceStartup; bool fait = false;
+        EditorApplication.CallbackFunction cb = null;
+        cb = () =>
+        {
+            if (fait || Time.realtimeSinceStartup - t0 < 6f) return;
+            fait = true; EditorApplication.update -= cb;
+            var sb = new StringBuilder("Taverne effets (Play) : ");
+            if (bf != null) Photo("taverne_effet_fuite", bf.transform.position + new Vector3(-2.2f, 1.6f, 4.2f), bf.transform.position + bf.transform.forward * 0.9f, 40f, sb);
+            if (fc != null) Photo("taverne_effet_fumee", fc.transform.position + new Vector3(-6f, -2f, 16f), fc.transform.position + Vector3.up * 2.5f, 40f, sb);
+            Debug.Log(sb + (bf == null ? "BiereFuite absente " : "") + (fc == null ? "FumeeCheminee absente" : ""));
+            Object.Destroy(m); Object.Destroy(sol);
+            foreach (var g in Object.FindObjectsByType<GemmesVolantes>(FindObjectsSortMode.None))
+                if (g.name == "BiereFuite_Gemmes" || g.name == "FumeeCheminee_Gemmes") Object.Destroy(g.gameObject);
+        };
+        EditorApplication.update += cb;
     }
 
     static void Heroes(Transform parent, string nom, Vector3 pos, float lacet)
