@@ -1,6 +1,19 @@
 {
   "versions": [
     {
+      "version": "0.9.7",
+      "date": "2026-10-02",
+      "titre": "Les villageois sortent",
+      "notes": [
+        "Dans « Nouvelle carte (aperçu) », les bâtiments sont vidés de leur mobilier : on ne le voyait plus que par les portes.",
+        "Les villageois sont dehors, debout, chacun devant sa maison : le forgeron au bord de l'atelier, la tavernière devant « Le Tonneau Percé », le mécano, le druide et le sorcier.",
+        "La tavernière se parle avec la touche Interagir : se restaurer, bière, tournée.",
+        "Le sorcier part vers Nyxessa à la tombée de la nuit et revient à l'aube.",
+        "Les boutiques du mécano et du druide ne sont pas encore branchées.",
+        "Version de test : le menu d'achat de la taverne n'a été vérifié que dans son état, pas dans son affichage. Pas de multijoueur testé, pas encore de portes animées ni d'intérieurs. Le jeu normal garde l'ancienne carte."
+      ]
+    },
+    {
       "version": "0.9.6",
       "date": "2026-10-02",
       "titre": "Le village prend ses nouveaux bâtiments",
