@@ -1,6 +1,19 @@
 {
   "versions": [
     {
+      "version": "0.9.6",
+      "date": "2026-10-02",
+      "titre": "Le village prend ses nouveaux bâtiments",
+      "notes": [
+        "Dans « Nouvelle carte (aperçu) », la forge, la maison du sorcier, celle du druide, la boutique du mécano et la taverne « Le Tonneau Percé » remplacent les anciens modèles. La taverne a son enseigne avec son nom, un tonneau penché sur le toit qui laisse couler de la bière qui mousse, et une cheminée qui fume. La forge a un feu dans son foyer.",
+        "Les bâtiments sont fermés : on ne peut plus y entrer, les intérieurs seront refaits plus tard. On voit quand même le forgeron et le tavernier par la porte, et la tavernière se sert depuis le pied des marches de la taverne.",
+        "Trois bâtiments ont été déplacés de quelques mètres pour bien tenir sur la carte : la forge, la maison du druide et celle du sorcier.",
+        "Touches de test de l'aperçu : F8 passe à la graine suivante du donjon, Maj+F8 prend une graine au hasard, F9 bascule entre jour et nuit, F10 bascule entre sans mob et avec mob.",
+        "La cascade a maintenant son tourbillon centré sur la chute.",
+        "Version de test : le menu d'achat de la taverne n'a pas été joué, les portes ne s'animent pas encore, les intérieurs sont fermés, et F9 et F10 n'existent qu'au clavier. Le jeu normal garde l'ancienne carte."
+      ]
+    },
+    {
       "version": "0.9.5",
       "date": "2026-10-02",
       "titre": "Le nouveau donjon dans la nouvelle carte",
