@@ -18,16 +18,95 @@ public static class CaptureV5
         return Prendre(nom, pos, cible, c.fieldOfView, largeur, hauteur);
     }
 
-    public static string Prendre(string nom, Vector3 pos, Vector3 cible, float fov = 62f, int largeur = 1920, int hauteur = 1080)
+    /// Vue de dessus orthographique (nord en haut, est à droite) : `demiHauteur` m du centre au bord haut de l'image (40 : toute la carte
+    /// du village, 80 m de haut sur 142 m de large).
+    public static string PrendreDessus(string nom, Vector3 centre, float demiHauteur, int largeur = 1920, int hauteur = 1080)
+    {
+        // les nuages du ciel (Ciel_Nuages) passeraient entre la caméra et le sol : écartés le temps du rendu
+        GameObject nuages = GameObject.Find("VillageBlockout/Ciel_Nuages");
+        bool etait = nuages != null && nuages.activeSelf;
+        if (etait) nuages.SetActive(false);
+        bool brouillard = RenderSettings.fog; RenderSettings.fog = false;   // le brouillard de distance blanchirait la carte vue de 150 m
+        try { return Prendre(nom, centre + Vector3.up * 150f, centre, 62f, largeur, hauteur, demiHauteur); }
+        finally { RenderSettings.fog = brouillard; if (etait) nuages.SetActive(true); }
+    }
+
+    /// Vue joueur « épaule » (celle de CameraEpaule : 5,5 m derrière le héros, tangage de 22°, champ de 62°) : le héros est debout en
+    /// `heros`, regard de lacet `lacet` ; l'épaule droite est à 0,6 m. La caméra ne tient pas compte des colliders (capture de contrôle).
+    public static string PrendreEpaule(string nom, Vector3 heros, float lacet, float distance = 5.5f, float tangage = 22f, int largeur = 1920, int hauteur = 1080)
+    {
+        Quaternion rot = Quaternion.Euler(tangage, lacet, 0f);
+        Vector3 pivot = heros + Vector3.up * 1.6f + Quaternion.Euler(0f, lacet, 0f) * Vector3.right * 0.6f;
+        Vector3 pos = pivot + rot * Vector3.back * distance;
+        return Prendre(nom, pos, pos + rot * Vector3.forward * 10f, 62f, largeur, hauteur);
+    }
+
+    /// Série de contrôle des bâtiments Tripo (carte v5) : vue de dessus de toute la carte (40 m), puis pour chaque bâtiment Tripo une vue de
+    /// dessus de près et la vue joueur « épaule » (5,5 m, 22°) à 3 m devant les marches, dans l'axe de l'embrasure ; la forge a en plus deux
+    /// vues d'atelier (au poste de chauffe, face au foyer ; au poste de frappe). Fichiers Assets/Screenshots/<prefixe><...>.png.
+    public static string SerieTripo(string prefixe)
+    {
+        string anc = Prefixe; Prefixe = prefixe;
+        var sb = new System.Text.StringBuilder();
+        try
+        {
+            sb.AppendLine(PrendreDessus("dessus_carte", Vector3.zero, 40f));
+            Transform ms = GameObject.Find("VillageBlockout/Maisons").transform;
+            foreach (Transform bat in ms)
+            {
+                Transform rendu = null, entree = null;
+                foreach (Transform t in bat.GetComponentsInChildren<Transform>()) { if (t.name == "Rendu") rendu = t; else if (t.name == "Entree") entree = t; }
+                if (rendu == null || entree == null) continue;
+                string role = bat.name.Replace("Batiment_", "").ToLowerInvariant();
+                Vector3 c = bat.position; c.y = 0f;
+                sb.AppendLine(PrendreDessus(role + "_dessus", c, 14f));
+                // pied des marches : bord avant des sommets au sol (repère de la bat), dans l'axe de l'embrasure
+                float zAvant = -999f;
+                foreach (Vector3 v in rendu.GetComponent<MeshFilter>().sharedMesh.vertices)
+                { Vector3 p = bat.InverseTransformPoint(rendu.TransformPoint(v)); if (p.y < 0.1f) zAvant = Mathf.Max(zAvant, p.z); }
+                Vector3 heros = bat.TransformPoint(new Vector3(bat.InverseTransformPoint(entree.position).x, 0f, zAvant + 3f));
+                heros.y = VillageBuilder.GroundHeight(heros.x, heros.z);
+                float lacet = bat.eulerAngles.y + 180f;
+                sb.AppendLine(PrendreEpaule(role + "_joueur_face", heros, lacet));
+                // trois-quarts droit et gauche : héros décalé de 5 m sur le côté, regard vers la porte
+                foreach (float cote in new[] { -1f, 1f })
+                {
+                    Vector3 h2 = heros + bat.right * cote * 5f; h2.y = VillageBuilder.GroundHeight(h2.x, h2.z);
+                    Vector3 vers = bat.TransformPoint(new Vector3(bat.InverseTransformPoint(entree.position).x, 0f, zAvant)) - h2; vers.y = 0f;
+                    sb.AppendLine(PrendreEpaule(role + (cote > 0f ? "_joueur_gauche" : "_joueur_droite"), h2, Quaternion.LookRotation(vers).eulerAngles.y));
+                }
+                Transform enseigne = null; foreach (Transform t in bat.GetComponentsInChildren<Transform>()) if (t.name == "Enseigne") enseigne = t;
+                if (enseigne != null) sb.AppendLine(Prendre(role + "_enseigne", enseigne.position + bat.forward * 7f + Vector3.up * 0.4f, enseigne.position, 50f));
+                if (bat.name == "Batiment_Forge")
+                {
+                    foreach (string poste in new[] { "Poste_Chauffe", "Poste_Frappe", "Poste_Trempe" })
+                    {
+                        Transform a = null; foreach (Transform t in bat.GetComponentsInChildren<Transform>()) if (t.name == poste) a = t;
+                        if (a == null) continue;
+                        Vector3 h3 = a.position; h3.y = VillageBuilder.GroundHeight(h3.x, h3.z);
+                        sb.AppendLine(PrendreEpaule("forge_atelier_" + poste.ToLowerInvariant(), h3, a.eulerAngles.y));
+                    }
+                    Transform foyer = null; foreach (Transform t in bat.GetComponentsInChildren<Transform>()) if (t.name == "Foyer_Feu") foyer = t;
+                    if (foyer != null) sb.AppendLine(Prendre("forge_foyer", foyer.position + foyer.forward * 3.5f + Vector3.up * 0.8f, foyer.position, 50f));
+                }
+            }
+        }
+        finally { Prefixe = anc; }
+        return sb.ToString();
+    }
+
+    public static string Prendre(string nom, Vector3 pos, Vector3 cible, float fov = 62f, int largeur = 1920, int hauteur = 1080, float ortho = 0f)
     {
         var go = new GameObject("_CaptureV5");
         try
         {
             var cam = go.AddComponent<Camera>();
             cam.fieldOfView = fov; cam.nearClipPlane = 0.15f; cam.farClipPlane = 600f;
+            if (ortho > 0f) { cam.orthographic = true; cam.orthographicSize = ortho; }
             cam.clearFlags = CameraClearFlags.Skybox; cam.useOcclusionCulling = false;
             go.AddComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
-            go.transform.position = pos; go.transform.LookAt(cible);
+            go.transform.position = pos;
+            if (ortho > 0f) go.transform.rotation = Quaternion.Euler(90f, 0f, 0f); else go.transform.LookAt(cible);
             var rt = new RenderTexture(largeur, hauteur, 24, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
             cam.targetTexture = rt;
             cam.Render();

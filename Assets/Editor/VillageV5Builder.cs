@@ -28,8 +28,20 @@ public static partial class VillageBuilder
     public static readonly string[] V5MaisonsRoles = { "Taverne", "Mecano", "Maison", "Forge", "Sorcier", "Druide" };
     public static readonly Vector2[] V5MaisonsCentres = { new Vector2(-31f, -16f), new Vector2(27f, -17f), new Vector2(-37f, 10f), new Vector2(32f, 13f), new Vector2(-27f, 28f), new Vector2(21f, 28f) };
     /// Maisons refaites en Tripo (02/10/2026) : prefab de Assets/Art/Decor/Maisons/ posé à la place du modèle KayKit, rôle par rôle
-    /// (null = le modèle KayKit reste). Seule la maison de base (rôle « Maison ») : taverne, forge, sorcier, druide et mécano sont à part.
-    public static readonly string[] V5MaisonsTripo = { null, null, "Maison_Base", null, null, null };
+    /// (null = le modèle KayKit reste). Les six bâtiments sont en Tripo : taverne « Le Tonneau Percé », mécano, maison de base, forge,
+    /// sorcier et druide.
+    public static readonly string[] V5MaisonsTripo = { "Taverne", "Mecano", "Maison_Base", "Forge", "Sorcier", "Druide" };
+    /// Écart de pose des bâtiments Tripo par rapport au centre du plan (V5MaisonsCentres), rôle par rôle : (x, z) en m, lacet en degrés
+    /// ajouté à la direction de Nyxessa. Les modèles sont plus grands que les plans (forge 17,4 x 11,4 m, sorcier 12,4 x 11 m, druide
+    /// 14,6 x 10 m, mécano 12,6 x 11,8 m) : un bâtiment qui ne tient pas au centre du plan est décalé ici, jamais en silence
+    /// (chaque écart est écrit dans le rapport de V5Maisons et dans Wiki/pages/village.md).
+    public static readonly Vector3[] V5MaisonsTripoEcart = {
+        new Vector3(-1f, -2f, 0f),          // Taverne : 19 x 11,6 m (21 m avec l'enseigne), débordait de 0,5 m sur la route d'attaque ouest ; 2 m au sud, 1 m à l'ouest
+        Vector3.zero,                       // Mécano : tient au centre du plan
+        Vector3.zero,                       // Maison de base : tient au centre du plan
+        new Vector3(11f, 3f, 0f),           // Forge : 17,4 x 11,4 m, serait à 1,3 m du druide et sur la route d'attaque est ; 11 m plus à l'est, 3 m plus au nord
+        new Vector3(0f, -4f, 0f),           // Sorcier : le fond de la maison et la tour touchent la falaise à (-27 ; 28) ; 4 m plus au sud
+        new Vector3(3f, -4f, -20f) };       // Druide : toit sous la falaise et à 1,3 m de la forge ; 3 m à l'est, 4 m au sud, tourné de 20° vers le gué
 
     /// Bassin au pied de la cascade : recalé d'un mètre vers l'ouest et le nord sur la ravine de la pièce Tripo (plan : (0, 38)).
     public static readonly Vector2 V5Bassin = new Vector2(-0.8f, 37.6f);
@@ -354,6 +366,8 @@ public static partial class VillageBuilder
     /// Pose la maison Tripo du rôle `i` : retire le bâtiment KayKit (racine, modèle, zone « Porte », lanterne de porte) puis recrée
     /// Batiment_<Rôle> au centre du plan (pivot au sol, y = 0, façade +Z vers Nyxessa) et y instancie le prefab, branché sur le
     /// cycle jour / nuit (lanterne, vitres). L'entrée est le marqueur « Entree » du prefab (déclencheur Ignore Raycast).
+    /// Le centre est celui du plan plus V5MaisonsTripoEcart (écart noté dans le rapport). L'intérieur du rôle (Interieurs/Interieur_*)
+    /// est recalé dans le bâtiment, porte sur porte (V5RangerInterieur) ; la forge reçoit son feu (V5FeuForge).
     /// Reproductible : ne dépend pas de la présence de l'ancien modèle.
     static string V5PoserMaisonTripo(Transform root, Transform ms, int i)
     {
@@ -363,14 +377,106 @@ public static partial class VillageBuilder
         Transform ancien = TrouverMaison(root, nom);
         Kill(ms.Find("Batiment_" + role));
         if (ancien != null) Kill(ancien);
-        Vector3 centre = new Vector3(V5MaisonsCentres[i].x, 0f, V5MaisonsCentres[i].y);
+        Vector3 ecart = V5MaisonsTripoEcart[i];
+        Vector3 centre = new Vector3(V5MaisonsCentres[i].x + ecart.x, 0f, V5MaisonsCentres[i].y + ecart.y);
         Transform racine = new GameObject("Batiment_" + role).transform;
         racine.SetParent(ms, false);
-        racine.SetPositionAndRotation(centre, Quaternion.Euler(0f, YawToward(centre, Vector3.zero), 0f));
+        racine.SetPositionAndRotation(centre, Quaternion.Euler(0f, YawToward(centre, Vector3.zero) + ecart.z, 0f));
         racine.SetSiblingIndex(i);
         GameObject m = MaisonTripo.Poser(racine, Object.FindFirstObjectByType<CycleJourNuit>(), prefab);
         Transform e = m.transform.Find("Entree");
-        return role + " (" + prefab + " Tripo, lacet " + racine.eulerAngles.y.ToString("F1") + ", entrée à " + (e != null ? e.position.ToString("F2") : "?") + ") ; ";
+        string suite = V5RangerInterieur(root, racine, m.transform);
+        if (role == "Forge") suite += V5FeuForge(m.transform);
+        if (role == "Taverne") suite += V5ComptoirALaPorte(root, racine, m.transform);
+        return role + " (" + prefab + " Tripo, lacet " + racine.eulerAngles.y.ToString("F1") + ", entrée à " + (e != null ? e.position.ToString("F2") : "?")
+            + (ecart != Vector3.zero ? ", ÉCART au plan (" + ecart.x.ToString("F1") + " ; " + ecart.y.ToString("F1") + ") m, lacet " + ecart.z.ToString("F0") + "°" : "") + suite + ") ; ";
+    }
+
+    /// Recale l'intérieur du rôle dans le bâtiment Tripo : même lacet que le bâtiment, linteau de l'intérieur sur le plan de la façade
+    /// (Porte_Pivot) et dans l'axe de l'embrasure (Entree), hauteur du sol gardée. L'intérieur reste dans le volume fermé du bâtiment
+    /// (le joueur n'y entre plus : l'intérieur deviendra une zone à part avec fondu au noir) et le sorcier (Sorcier.cs) en ressort toujours
+    /// par le linteau, donc par la porte du modèle. Idempotent : le recalage est absolu.
+    static string V5RangerInterieur(Transform root, Transform racine, Transform modele)
+    {
+        string role = racine.name.Substring("Batiment_".Length);
+        string nomInt = role == "Forge" ? "Forgeron" : role;
+        Transform it = root.Find("Interieurs/Interieur_" + nomInt);
+        if (it == null) return "";
+        Transform linteau = null;
+        foreach (Transform t in it.GetComponentsInChildren<Transform>(true)) if (t.name == "Linteau") { linteau = t; break; }
+        Transform entree = modele.Find("Entree"), pivot = modele.Find("Porte_Pivot");
+        if (linteau == null || entree == null) return ", intérieur sans linteau (non recalé)";
+        float zFacade = pivot != null ? racine.InverseTransformPoint(pivot.position).z : racine.InverseTransformPoint(entree.position).z;
+        float xEntree = racine.InverseTransformPoint(entree.position).x;
+        it.rotation = Quaternion.Euler(0f, racine.eulerAngles.y, 0f);
+        Vector3 l = it.InverseTransformPoint(linteau.position);
+        Vector3 cible = racine.TransformPoint(new Vector3(xEntree, 0f, zFacade));
+        Vector3 actuel = it.TransformPoint(new Vector3(l.x, 0f, l.z)); actuel.y = 0f;
+        Vector3 d = cible - actuel; d.y = 0f;
+        it.position += d;
+        // reste dans l'emprise du bâtiment (côtés) : un intérieur qui déborderait d'un mur serait vu de l'extérieur ; décalé latéralement au besoin
+        Vector3 emn = Vector3.one * 999f, emx = -Vector3.one * 999f;
+        foreach (Vector3 v in modele.Find("Rendu").GetComponent<MeshFilter>().sharedMesh.vertices)
+        {
+            Vector3 p = racine.InverseTransformPoint(modele.Find("Rendu").TransformPoint(v));
+            if (p.y < 0.1f) { emn = Vector3.Min(emn, p); emx = Vector3.Max(emx, p); }
+        }
+        float imn = 999f, imx = -999f;
+        foreach (MeshFilter mf in it.GetComponentsInChildren<MeshFilter>())
+            foreach (Vector3 v in mf.sharedMesh.vertices)
+            {
+                float x = racine.InverseTransformPoint(mf.transform.TransformPoint(v)).x;
+                imn = Mathf.Min(imn, x); imx = Mathf.Max(imx, x);
+            }
+        float marge = 0.5f, decal = 0f;
+        if (imx > emx.x - marge) decal = emx.x - marge - imx; else if (imn < emn.x + marge) decal = emn.x + marge - imn;
+        if (decal != 0f) it.position += racine.right * decal;
+        return ", intérieur recalé porte sur porte (linteau à " + new Vector2(cible.x, cible.z).ToString("F2") + (decal != 0f ? ", décalé de " + decal.ToString("F2") + " m pour rester dans les murs" : "") + ")";
+    }
+
+    /// Taverne : le tavernier reste dans la salle (visible par l'embrasure), mais le comptoir est dans le volume fermé du bâtiment, hors de
+    /// portée du joueur (taverneDistance 2,4 m, à plat). L'ancre d'échange (Interieurs/Interieur_Taverne/Ancre_Echange_Taverne, qui porte
+    /// le composant Taverne, posé par Partie.Start) est donc ramenée au pied des marches, dans l'axe de l'embrasure : on commande au
+    /// tavernier depuis la porte, comme au comptoir. À reprendre quand l'intérieur sera une zone à part (porte, fondu au noir).
+    static string V5ComptoirALaPorte(Transform root, Transform racine, Transform modele)
+    {
+        Transform it = root.Find("Interieurs/Interieur_Taverne");
+        Transform ancre = it != null ? it.Find("Ancre_Echange_Taverne") : null;
+        Transform rendu = modele.Find("Rendu"), entree = modele.Find("Entree");
+        if (ancre == null || rendu == null || entree == null) return ", ancre d'échange de la taverne introuvable";
+        V5EmpriseTripo(racine, rendu, out float zAvant);
+        Vector3 pied = racine.TransformPoint(new Vector3(racine.InverseTransformPoint(entree.position).x, 0f, zAvant + 0.3f));
+        pied.y = GroundHeight(pied.x, pied.z) + 0.95f;
+        ancre.position = pied;
+        ancre.rotation = racine.rotation * Quaternion.Euler(0f, 180f, 0f);
+        return ", comptoir (ancre d'échange) ramené au pied des marches " + new Vector2(pied.x, pied.z).ToString("F2");
+    }
+
+    /// Feu de la forge dans la bouche du foyer : l'effet existant ForgeFeu (flammes, étincelles et braises en gemmes de la palette Feu,
+    /// jamais de vert) et une lumière chaude légère « Feu_Forge » ; visuel seulement, rien sur le réseau. Les gemmes ne tournent qu'en
+    /// Play (ForgeFeu n'a pas ExecuteAlways). L'ancre Foyer_Feu du prefab (brief : x_plan 12,48) est à 0,9 m à côté de la bouche réelle,
+    /// mesurée au lancer de rayons sur le maillage rendu (repère du prefab : bouche de x = -4,2 à -2,2, plancher du foyer à y = 1,19,
+    /// façade du foyer à z = +0,55, fond à z = -1,25, voûte à 3,0 m) : le feu est posé au milieu de la bouche (V5ForgeFeuLocal), l'ancre
+    /// reste telle quelle. Écart signalé dans Wiki/pages/village.md.
+    public static readonly Vector3 V5ForgeFeuLocal = new Vector3(-3.2f, 1.22f, -0.45f);
+    static string V5FeuForge(Transform modele)
+    {
+        Material gemmes = AssetDatabase.LoadAssetAtPath<Material>("Assets/VFX/_RelicCommun/PortalVoxel.mat");
+        if (gemmes == null) return ", PortalVoxel.mat absent : pas de feu";
+        var go = new GameObject("Forge_FeuVivant");
+        go.transform.SetParent(modele, false);
+        go.transform.localPosition = V5ForgeFeuLocal;
+        var lg = new GameObject("Feu_Forge"); lg.transform.SetParent(modele, false); lg.transform.localPosition = V5ForgeFeuLocal + new Vector3(0f, 0.8f, 0.4f);
+        Light l = lg.AddComponent<Light>();
+        l.type = LightType.Point; l.range = 8f; l.shadows = LightShadows.None;
+        l.color = Color.Lerp(VfxPalette.Couleur(VfxTheme.Feu, VfxRole.Vif, new Color(1f, 0.38f, 0.04f)), VfxPalette.Couleur(VfxTheme.Feu, VfxRole.Coeur, new Color(1f, 0.9f, 0.4f)), 0.3f);
+        l.intensity = 2.2f;
+        var feu = go.AddComponent<ForgeFeu>();
+        feu.materiau = gemmes; feu.lumiere = l; feu.intensite = 2.2f; feu.partJour = 0.75f;
+        feu.demiLit = new Vector2(0.45f, 0.35f); feu.hauteur = 0.55f; feu.flammes = 44; feu.etincelles = 8; feu.braisesVives = 20;
+        go.transform.localScale = Vector3.one * 1.6f;   // la bouche fait 2 m de large : le feu de l'intérieur (0,84 m de lit), agrandi de 60 %
+        EditorUtility.SetDirty(feu);
+        return ", feu ForgeFeu + lumière chaude dans la bouche du foyer (" + V5ForgeFeuLocal.ToString("F2") + " ; ancre Foyer_Feu à " + (modele.Find("Foyer_Feu") != null ? modele.Find("Foyer_Feu").localPosition.ToString("F2") : "absente") + ")";
     }
 
     /// Emprise au sol du prefab Tripo (sommets du rendu à moins de 10 cm du sol, dans le repère de la racine : soubassement et marches),
@@ -1726,6 +1832,71 @@ public static partial class VillageBuilder
         return "Sol : " + GroundStats + "\n" + V5HerbeAppoint(root);
     }
 
+    // ------------------------------------------------------------------ implantation des bâtiments Tripo
+    /// Contrôle d'implantation des bâtiments Tripo (02/10/2026), mesuré sur le maillage rendu posé dans la scène : marge (m, ≥ 0 = libre) à la berge
+    /// de la rivière (sol de l'emprise), à l'eau (toit compris), aux routes d'attaque, à l'anneau pavé, aux ponts, aux autres bâtiments,
+    /// à la roche (falaise et flancs : plus petit rayon qui touche), aux arbres de la forêt déjà posés, et au bord de la carte.
+    [MenuItem("Deathless/Village/v5/Contrôler l'implantation des bâtiments Tripo")]
+    public static string V5MenuControleTripo() { string r = V5ControleTripo(Find("VillageBlockout")); Debug.Log(r); return r; }
+
+    public static string V5ControleTripo(Transform root, int seul = -1)
+    {
+        var sb = new StringBuilder("Implantation des bâtiments Tripo (marges en m ; négatif = empiète) :\n");
+        Transform ms = root != null ? root.Find("Maisons") : null;
+        if (ms == null) return "Maisons absentes";
+        Transform mont = root.Find("Montagne"), arbres = root.Find("Foret/Arbres");
+        Physics.SyncTransforms();
+        var emprises = new Vector4[V5MaisonsNoms.Length][];
+        for (int i = 0; i < V5MaisonsNoms.Length; i++)
+        {
+            Transform rd = V5RenduTripo(ms, i);
+            if (rd != null) { emprises[i] = V5EmpriseTripo(ms.Find("Batiment_" + V5MaisonsRoles[i]), rd, out float _); continue; }
+            Transform h = TrouverMaison(root, V5MaisonsNoms[i]); var mf = h != null ? h.GetComponent<MeshFilter>() : null;
+            if (mf != null) emprises[i] = Footprint(h, mf.sharedMesh);
+        }
+        for (int i = 0; i < V5MaisonsNoms.Length; i++)
+        {
+            Transform rd = V5RenduTripo(ms, i);
+            if (rd == null || (seul >= 0 && seul != i)) continue;
+            Transform bat = ms.Find("Batiment_" + V5MaisonsRoles[i]);
+            Mesh mesh = rd.GetComponent<MeshFilter>().sharedMesh;
+            float eauSol = 99f, eauToit = 99f, route = 99f, anneau = 99f, bord = 99f, autres = 99f, arbre = 99f; bool pont = false;
+            Vector4[] f = emprises[i];
+            foreach (Vector3 v in mesh.vertices)
+            {
+                Vector3 w = rd.TransformPoint(v), lb = bat.InverseTransformPoint(w);
+                Vector2 m = new Vector2(w.x, w.z);
+                eauToit = Mathf.Min(eauToit, V5DistanceEau(m.x, m.y) - V5DemiLargeur);
+                bord = Mathf.Min(bord, TerrainHalf - Mathf.Max(Mathf.Abs(m.x), Mathf.Abs(m.y)));
+                if (lb.y > 0.1f) continue;
+                eauSol = Mathf.Min(eauSol, V5DistanceEau(m.x, m.y) - V5BergeExt);
+                route = Mathf.Min(route, V5DistanceRoute(m) - V5DemiRoute);
+                anneau = Mathf.Min(anneau, m.magnitude - PaversRadius);
+                if (V5PresPont(m, 1f)) pont = true;
+                for (int j = 0; j < emprises.Length; j++) if (j != i && emprises[j] != null) autres = Mathf.Min(autres, FootprintDistance(emprises[j], m));
+            }
+            if (arbres != null) foreach (Transform t in arbres) arbre = Mathf.Min(arbre, FootprintDistance(f, new Vector2(t.position.x, t.position.z)));
+            // roche : plus petit rayon qui touche l'une des paroi, en suivant le contour du rectangle d'emprise (un point tous les mètres)
+            float roche = 99f;
+            if (mont != null)
+            {
+                Vector2 c = new Vector2(f[0].x, f[0].y), ax = new Vector2(f[0].z, f[0].w), az = new Vector2(f[1].x, f[1].y);
+                float hx = f[1].z, hz = f[1].w;
+                foreach (float r in new[] { 0.5f, 1f, 1.5f, 2f, 3f, 4f, 6f, 8f, 12f, 20f })
+                {
+                    bool touche = false;
+                    for (float a = -hx; a <= hx && !touche; a += 1f) foreach (float s in new[] { -hz, hz }) { Vector2 q = c + ax * a + az * s; if (V5ProcheParoi(mont, new Vector3(q.x, GroundHeight(q.x, q.y), q.y), r, 8f)) { touche = true; break; } }
+                    for (float b = -hz; b <= hz && !touche; b += 1f) foreach (float s in new[] { -hx, hx }) { Vector2 q = c + ax * s + az * b; if (V5ProcheParoi(mont, new Vector3(q.x, GroundHeight(q.x, q.y), q.y), r, 8f)) { touche = true; break; } }
+                    if (touche) { roche = r; break; }
+                }
+            }
+            sb.AppendLine("  " + V5MaisonsRoles[i] + " : centre (" + f[0].x.ToString("F1") + " ; " + f[0].y.ToString("F1") + "), demi-emprise " + f[1].z.ToString("F1") + " x " + f[1].w.ToString("F1")
+                + " | berge " + eauSol.ToString("F1") + " | eau (toit) " + eauToit.ToString("F1") + " | route " + route.ToString("F1") + " | anneau " + anneau.ToString("F1") + " | pont " + (pont ? "EMPIÈTE" : "libre")
+                + " | autres bâtiments " + autres.ToString("F1") + " | roche à moins de " + (roche >= 99f ? ">20" : roche.ToString("F0")) + " m | arbre le plus proche " + arbre.ToString("F1") + " | bord de carte " + bord.ToString("F0"));
+        }
+        return sb.ToString();
+    }
+
     // ------------------------------------------------------------------ vérification
     /// Chemins NavMesh de chaque clairière à Nyxessa (longueur, temps au pas d'un sbire, passage par un pont ou un gué),
     /// accès au portail, au fond de la grotte et à chaque maison depuis Nyxessa.
@@ -1770,10 +1941,10 @@ public static partial class VillageBuilder
                         float d = V5DistanceEau(q.x, q.z);
                         if (d < V5DemiLargeur && ancien >= V5DemiLargeur)
                         {
-                            bool permis = V5Gue(q.x, q.z) < V5GueRayon + 0.5f || V5PresPont(new Vector2(q.x, q.z), 0.3f);
+                            bool permis = V5Gue(q.x, q.z) < V5GueRayon + 2.1f || V5PresPont(new Vector2(q.x, q.z), 0.3f);   // gué : fond remonté jusqu'à V5GueRayon + 1,6 m (V5Creux), + 0,5 m de marge
                             traverse += permis ? 1 : 100;
                             if (permis) { for (int k = 0; k < V5Ponts.Length; k++) if (V5PresPont(new Vector2(q.x, q.z), 0.3f) && Vector2.Distance(new Vector2(q.x, q.z), V5Ponts[k]) < 6f && !via.Contains(k == 0 ? "pont est" : "pont sud")) via += k == 0 ? " pont est" : " pont sud";
-                                          for (int k = 0; k < V5Gues.Length; k++) if (Vector2.Distance(new Vector2(q.x, q.z), V5Gues[k]) < V5GueRayon + 0.5f && !via.Contains("gué " + k)) via += " gué " + k; }
+                                          for (int k = 0; k < V5Gues.Length; k++) if (Vector2.Distance(new Vector2(q.x, q.z), V5Gues[k]) < V5GueRayon + 2.1f && !via.Contains("gué " + k)) via += " gué " + k; }
                         }
                         ancien = d;
                     }
@@ -1795,10 +1966,25 @@ public static partial class VillageBuilder
             {
                 Transform h = racine.Find("Porte") != null ? racine.Find("Porte") : racine;
                 foreach (Transform t in racine.GetComponentsInChildren<Transform>()) if (t.name == "Entree") { h = t; break; }   // maison Tripo
-                if (!NavMesh.SamplePosition(h.position, out var hp, 2f, NavMesh.AllAreas)) { sb.AppendLine(racine.name + " : porte hors NavMesh"); continue; }
+                string tripo = "";
+                int ir = System.Array.IndexOf(V5MaisonsRoles, racine.name.Replace("Batiment_", ""));
+                Transform rd = ir >= 0 ? V5RenduTripo(ms, ir) : null;
+                if (rd != null)
+                {
+                    // maison Tripo : le but est le pied des marches (là où finit l'allée), dans l'axe de l'embrasure ; le corps du bâtiment ne doit pas être marchable
+                    V5EmpriseTripo(racine, rd, out float zAvant);
+                    Vector3 pied = racine.TransformPoint(new Vector3(racine.InverseTransformPoint(h.position).x, 0f, zAvant + 0.6f));
+                    Vector3 corps = racine.TransformPoint(racine.InverseTransformPoint(h.position).x * Vector3.right + Vector3.forward * (racine.InverseTransformPoint(h.position).z - 2.5f));
+                    h = new GameObject("_pied").transform; h.position = pied;
+                    tripo = NavMesh.SamplePosition(corps, out var cp, 0.5f, NavMesh.AllAreas) ? " ; CORPS MARCHABLE derrière la porte (" + cp.position.ToString("F1") + ")" : " ; corps non marchable";
+                }
+                bool surNav = NavMesh.SamplePosition(h.position, out var hp, 2f, NavMesh.AllAreas);
+                float ecartNav = surNav ? Vector3.Distance(new Vector3(h.position.x, hp.position.y, h.position.z), hp.position) : 0f;
+                if (rd != null) Object.DestroyImmediate(h.gameObject);
+                if (!surNav) { sb.AppendLine(racine.name + " : porte hors NavMesh"); continue; }
                 NavMesh.CalculatePath(cible.position, hp.position, NavMesh.AllAreas, path);
                 float L = 0f; for (int i = 1; i < path.corners.Length; i++) L += Vector3.Distance(path.corners[i - 1], path.corners[i]);
-                sb.AppendLine("Nyxessa -> porte de " + racine.name + " : " + path.status + ", " + L.ToString("F1") + " m");
+                sb.AppendLine("Nyxessa -> " + (rd != null ? "pied des marches de " : "porte de ") + racine.name + " : " + path.status + ", " + L.ToString("F1") + " m" + (rd != null ? ", point du NavMesh à " + ecartNav.ToString("F2") + " m du pied" : "") + tripo);
             }
         return sb.ToString();
     }
