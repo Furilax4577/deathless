@@ -59,6 +59,11 @@ public static partial class VillageBuilder
     public static readonly Vector3 V5GrotteEntreeLocal = new Vector3(-14.5f, 0f, -8f);   // seuil (relevé au rayon dans Unity)
     public static readonly Vector3 V5GrotteFondLocal = new Vector3(-14.5f, 0f, -3.6f);
     public const float V5GrotteSol = 2.15f, V5GrotteMarche = 4.6f;   // replat du fond à 2,15 m, escalier de 4,6 m
+    public const int V5GrotteMarches = 10;               // marches régulières (21,5 cm de haut, 46 cm de profondeur)
+    public const float V5GrotteLargeur = 4.6f;           // escalier et dalle : même largeur, tirés sur l'axe de l'entrée
+    public const float V5PortailRayon = 2.56f;           // portail du village : 1,6 m x 1,6 (retour du 02/10/2026)
+    public const float V5PortailGarde = 0.1f;            // bas du disque au-dessus de la dalle
+    public const float V5RouteDroite = 10.4f;            // route de la grotte : dernier tronçon droit, dans l'axe de l'escalier
     /// Cascade (repère de la pièce) : lèvre en haut de la ravine, coude sur l'éboulis, pied dans le bassin.
     public static readonly Vector3 V5CascadeLevreLocal = new Vector3(-0.8f, 14f, -2.2f);
     public static readonly Vector3 V5CascadeCoudeLocal = new Vector3(-0.8f, 3.4f, -4.4f);
@@ -385,60 +390,87 @@ public static partial class VillageBuilder
                 new Vector3(V5FlancsPose[i].x, -V5FlancsEnfoncement, V5FlancsPose[i].z), V5FlancsPose[i].w);
         V5Falaise(mont);
 
-        // Grotte : le fond de la pièce Tripo est un replat à ~2,1 m derrière un seuil rocheux : dalle de pierre plate à
-        // V5GrotteSol (du seuil au fond), escalier Dungeon élargi qui y monte depuis le sol, rampe invisible pour marcher.
+        // Grotte (retours de Quentin du 02/10/2026) : tout est tiré au cordeau sur l'axe de l'entrée (le +z du repère de la
+        // pièce, donc du monde) : la route pavée (V5Allees), l'escalier (marches régulières, parapets symétriques), la dalle et
+        // le portail. Le fond de la pièce Tripo est un replat à ~2,1 m derrière un seuil rocheux, avec des vides sur les côtés
+        // du seuil : la dalle repose sur un socle maçonné qui descend au sol (aucun angle de dalle en l'air).
         Vector3 entree = V5Local(V5GrotteEntreeLocal), fond = V5Local(V5GrotteFondLocal);
         Transform grotte = Group(mont, "Grotte");
+        Material pierre = FlatMaterial("Assets/Art/Materials/Grotte_Pierre.mat", "Universal Render Pipeline/Lit", new Color(0.5f, 0.53f, 0.58f));
+        pierre.SetFloat("_Smoothness", 0.05f);
         {
-            Vector3 axe = fond - entree; axe.y = 0f; Vector3 dir = axe.normalized, dr = Vector3.Cross(Vector3.up, dir);
-            Quaternion q = Quaternion.LookRotation(dir);
+            Vector3 axe = fond - entree; axe.y = 0f; Vector3 dir = axe.normalized;
+            float lon = axe.magnitude + 1.6f, larg = V5GrotteLargeur;
+            Vector3 centreSol = entree + axe / 2f + dir * 0.5f;
             GameObject sol = new GameObject("Grotte_Sol"); sol.transform.SetParent(grotte, false);
-            sol.transform.SetPositionAndRotation(entree + axe / 2f + dir * 0.5f + Vector3.up * (V5GrotteSol - 0.2f), q);
-            var bs = sol.AddComponent<BoxCollider>(); bs.size = new Vector3(4.6f, 0.4f, axe.magnitude + 1.6f);
+            sol.transform.SetPositionAndRotation(centreSol + Vector3.up * (V5GrotteSol - 0.2f), Quaternion.LookRotation(dir));
+            var bs = sol.AddComponent<BoxCollider>(); bs.size = new Vector3(larg, 0.4f, lon);
+            // socle maçonné : du sol (un peu enterré) jusque sous les dalles (dessous des dalles à V5GrotteSol - 0,1)
+            GameObject socle = GameObject.CreatePrimitive(PrimitiveType.Cube); socle.name = "Grotte_Socle"; socle.transform.SetParent(grotte, false);
+            float s0 = -0.3f, s1 = V5GrotteSol - 0.1f;
+            socle.transform.SetPositionAndRotation(centreSol + Vector3.up * ((s0 + s1) / 2f), Quaternion.LookRotation(dir));
+            socle.transform.localScale = new Vector3(larg, s1 - s0, lon);
+            socle.GetComponent<MeshRenderer>().sharedMaterial = pierre;
+            // dalles : deux colonnes de carreaux de 2 m, de part et d'autre de l'axe
+            Vector3 dr = Vector3.Cross(Vector3.up, dir);
             for (float a = 0.6f; a <= axe.magnitude + 1.01f; a += 2f)
                 for (float t = -1f; t <= 1.01f; t += 2f)
-                    Dungeon(grotte, Pavers[Random.Range(0, Pavers.Length)], entree + dir * a + dr * t + Vector3.up * (V5GrotteSol + TileY), q.eulerAngles.y + 90f * Random.Range(0, 4));
-            // escalier : du sol (à V5GrotteMarche m devant le seuil) jusqu'au replat
+                    Dungeon(grotte, Pavers[Random.Range(0, Pavers.Length)], entree + dir * a + dr * t + Vector3.up * (V5GrotteSol + TileY), Quaternion.LookRotation(dir).eulerAngles.y + 90f * Random.Range(0, 4));
+            // escalier droit : V5GrotteMarches marches régulières de largeur V5GrotteLargeur (parapets de 0,4 m de chaque côté,
+            // symétriques), du sol (V5GrotteMarche m devant le seuil) jusqu'au replat ; chaque marche est un bloc plein
             Vector3 bas = entree - dir * V5GrotteMarche; bas.y = 0f;
-            GameObject esc = Dungeon(grotte, "stairs_wide", Vector3.zero, 0f);
-            if (esc != null)
+            Transform esc = Group(grotte, "Grotte_Escalier");
+            int n = V5GrotteMarches; float prof = V5GrotteMarche / n, haut = V5GrotteSol / n, parapet = 0.4f;
+            for (int i = 1; i <= n; i++)
             {
-                foreach (var c in esc.GetComponentsInChildren<Collider>(true)) Object.DestroyImmediate(c);
-                Bounds eb = esc.GetComponentInChildren<MeshFilter>().sharedMesh.bounds;
-                esc.transform.localScale = new Vector3(4.4f / eb.size.x, V5GrotteSol / eb.size.y, (V5GrotteMarche + 0.2f) / eb.size.z);
-                // marches montant vers +z du modèle (vérifié sur la capture) : bas devant, haut contre le seuil
-                esc.transform.rotation = q;
-                Physics.SyncTransforms();
-                Bounds wb = esc.GetComponentInChildren<Renderer>().bounds;
-                Vector3 cible = (bas + new Vector3(entree.x, 0f, entree.z)) / 2f;
-                esc.transform.position += new Vector3(cible.x - wb.center.x, -wb.min.y, cible.z - wb.center.z);
-                esc.name = "Grotte_Escalier";
+                Vector3 c = bas + dir * ((i - 0.5f) * prof);
+                GameObject m = GameObject.CreatePrimitive(PrimitiveType.Cube); m.name = "Marche_" + i; m.transform.SetParent(esc, false);
+                m.transform.SetPositionAndRotation(c + Vector3.up * (i * haut / 2f), Quaternion.LookRotation(dir));
+                m.transform.localScale = new Vector3(larg - 2f * parapet, i * haut, prof);
+                m.GetComponent<MeshRenderer>().sharedMaterial = pierre; Object.DestroyImmediate(m.GetComponent<Collider>());
+                foreach (float cote in new[] { -1f, 1f })
+                {
+                    GameObject pr = GameObject.CreatePrimitive(PrimitiveType.Cube); pr.name = "Parapet_" + (cote < 0f ? "G" : "D") + "_" + i; pr.transform.SetParent(esc, false);
+                    float hp = i * haut + 0.55f;
+                    pr.transform.SetPositionAndRotation(c + dr * (cote * (larg / 2f - parapet / 2f)) + Vector3.up * (hp / 2f), Quaternion.LookRotation(dir));
+                    pr.transform.localScale = new Vector3(parapet, hp, prof);
+                    pr.GetComponent<MeshRenderer>().sharedMaterial = pierre;
+                }
             }
+            // rampe invisible pour marcher : légèrement au-dessus de la pente des marches (pieds sur les nez de marche)
             GameObject rampe = new GameObject("Grotte_Rampe"); rampe.transform.SetParent(grotte, false);
             float lr = Mathf.Sqrt(V5GrotteMarche * V5GrotteMarche + V5GrotteSol * V5GrotteSol), ang = Mathf.Atan2(V5GrotteSol, V5GrotteMarche) * Mathf.Rad2Deg;
-            rampe.transform.SetPositionAndRotation((bas + new Vector3(entree.x, V5GrotteSol, entree.z)) / 2f - Vector3.up * 0.1f, q * Quaternion.Euler(-ang, 0f, 0f));
-            var br = rampe.AddComponent<BoxCollider>(); br.size = new Vector3(4.2f, 0.2f, lr + 0.1f);
+            rampe.transform.SetPositionAndRotation((bas + new Vector3(entree.x, V5GrotteSol, entree.z)) / 2f + Vector3.up * (haut * 0.5f - 0.1f), Quaternion.LookRotation(dir) * Quaternion.Euler(-ang, 0f, 0f));
+            var br = rampe.AddComponent<BoxCollider>(); br.size = new Vector3(larg - 2f * parapet - 0.1f, 0.2f, lr + 0.1f);
         }
-        // Portail : socle et disque de gemmes (objets d'origine, déplacés ensemble), face au village.
+        // Portail : disque de gemmes (objet d'origine, déplacé), face à la route, agrandi (V5PortailRayon) pour remplir
+        // l'entrée de la grotte ; la stèle (socle rond en pierre) est supprimée. Interaction (GameBalance.distancePortail, 3 m,
+        // horizontale, et 3 m en hauteur entre les pieds et le centre) et collision : le cube racine suit la taille du disque.
         Transform por = root.Find("Portail");
         string portail = "portail absent";
         if (por != null)
         {
-            Kill(por.Find("Portail_Place")); Kill(por.Find("Portail_Chemin"));
-            Transform socle = por.Find("Portail_Socle"), disque = por.Find("PortailDonjon");
+            Kill(por.Find("Portail_Place")); Kill(por.Find("Portail_Chemin")); Kill(por.Find("Portail_Socle"));
+            Transform disque = por.Find("PortailDonjon");
             if (disque != null)
             {
-                Vector3 pp = fond; pp.y = 0f;   // au sol du replat (V5GrotteSol), voir plus bas
-                float az = AzOf(pp);
-                // vers Nyxessa : comme à l'origine (PortalAz + 90), la face fine du cube racine regarde le centre
-                if (socle != null)
+                Vector3 pp = fond; pp.y = 0f;
+                float ray = V5PortailRayon;
+                disque.position = pp + Vector3.up * (V5GrotteSol + V5PortailGarde + ray);
+                disque.rotation = Quaternion.Euler(0f, 90f, 0f);            // face fine du cube racine vers le sud : le disque regarde la route
+                disque.localScale = new Vector3(0.3f, 3f, 2.5f) * (ray / 1.6f);
+                var pv = disque.GetComponent<PortalVisual>();
+                if (pv != null)
                 {
-                    socle.position = pp + Vector3.up * V5GrotteSol;
-                    socle.rotation = Quaternion.Euler(0f, Mathf.Repeat(az, 360f / PlateauSides), 0f);
+                    var so = new SerializedObject(pv);
+                    so.FindProperty("radius").floatValue = ray;
+                    so.FindProperty("cell").floatValue = 0.1f * Mathf.Sqrt(ray / 1.6f);
+                    so.FindProperty("particleCount").intValue = Mathf.RoundToInt(1700f * (ray / 1.6f));
+                    so.ApplyModifiedPropertiesWithoutUndo();
                 }
-                disque.position = pp + Vector3.up * (V5GrotteSol + PortalHeight);
-                disque.rotation = Quaternion.Euler(0f, az + 90f, 0f);
-                portail = "portail au fond de la grotte (" + pp.x.ToString("F1") + ", " + pp.z.ToString("F1") + "), az " + az.ToString("F0") + "°";
+                var lum = disque.GetComponentInChildren<Light>(true);
+                if (lum != null) lum.range = 9f * (ray / 1.6f);
+                portail = "portail de rayon " + ray.ToString("F2") + " m au fond de la grotte (" + pp.x.ToString("F1") + ", " + pp.z.ToString("F1") + "), centre à " + disque.position.y.ToString("F2") + " m, sans stèle";
             }
         }
         // Lumière de la grotte : la lueur verte vient du portail (PortalVisual) ; rien d'autre ici.
@@ -913,14 +945,19 @@ public static partial class VillageBuilder
                 else { PavedPath(grp, pts[0], front, 1); V5NoterAllee(pts[0], front, 1f); }
                 n++;
             }
-        // route de la grotte : 4 m pavés, de l'anneau au seuil de la grotte, lanternes de part et d'autre
+        // route de la grotte : 4 m pavés, de l'anneau au pied de l'escalier ; dernier tronçon (V5RouteDroite m) strictement droit,
+        // dans l'axe de l'entrée et de l'escalier (retour du 02/10/2026 : la route arrivait de biais) ; lanternes de part et d'autre
         Vector3 entree = V5Local(V5GrotteEntreeLocal); entree.y = 0f;
-        Vector3 depart = Polar(AzOf(entree), PaversRadius - 0.5f);
-        Vector3 arrivee = entree + (depart - entree).normalized * 0.5f;
+        Vector3 axeG = V5Local(V5GrotteFondLocal) - entree; axeG.y = 0f; axeG.Normalize();
+        Vector3 pied = entree - axeG * V5GrotteMarche;
+        Vector3 coude = pied - axeG * V5RouteDroite;
+        Vector3 depart = Polar(AzOf(coude), PaversRadius - 0.5f);
+        Vector3 arrivee = pied + axeG * 0.5f;
         Transform route = Group(sentiers, "Route_Grotte");
-        PavedPath(route, depart, arrivee, 2); V5NoterAllee(depart, arrivee, 2f);
-        int lanternes = V5LanternesRoute(root, route, depart, arrivee);
-        return "Allées : " + n + " maisons (trois par un gué), route de la grotte " + Vector3.Distance(depart, arrivee).ToString("F1") + " m et " + lanternes + " lanternes";
+        PavedPath(route, depart, coude, 2); V5NoterAllee(depart, coude, 2f);
+        PavedPath(route, coude, arrivee, 2); V5NoterAllee(coude, arrivee, 2f);
+        int lanternes = V5LanternesRoute(root, route, coude, arrivee);
+        return "Allées : " + n + " maisons (trois par un gué), route de la grotte " + (Vector3.Distance(depart, coude) + Vector3.Distance(coude, arrivee)).ToString("F1") + " m dont " + Vector3.Distance(coude, arrivee).ToString("F1") + " m droits dans l'axe, et " + lanternes + " lanternes";
     }
 
     static void V5NoterAllee(Vector3 a, Vector3 b, float demi) { s_V5Allees.Add(new Vector4(a.x, a.z, b.x, b.z)); s_V5AlleesLarg.Add(demi); }
