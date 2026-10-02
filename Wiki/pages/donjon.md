@@ -1,6 +1,6 @@
 # Le donjon
 
-Le donjon est décrit dans le [Déroulé d'une partie](deroule.md) (portails, butin, or porté, rappel par Nyxessa). Cette page fixe les **règles de construction** du lieu lui-même : ce qu'un joueur doit voir, et ce qu'il ne doit plus voir. Les balcons et les niveaux (« des balcons plus que des étages ») restent une décision de conception à venir {à confirmer}.
+Le donjon est décrit dans le [Déroulé d'une partie](deroule.md) (portails, butin, or porté, rappel par Nyxessa). Cette page fixe les **règles de construction** du lieu lui-même : ce qu'un joueur doit voir, et ce qu'il ne doit plus voir. **Direction du 02/10/2026** {à confirmer} : Quentin n'est pas convaincu par le donjon actuel et le veut **plus ouvert, avec de vraies salles, moins d'effet « balcon parisien »** (galeries et mezzanines qui bordent les murs). Disposition cible à six salles, un seul niveau, ouvertures larges, voûtes et piliers : `Docs/da/brief-donjon.md` (prompts Grok). La décision « balcons plutôt qu'étages » est remplacée par « vraies salles ».
 
 ## Ce qu'on voit {décidé}
 
