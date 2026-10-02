@@ -96,6 +96,8 @@ Le druide, le mécano et le forgeron ont **chacun leur maison**, qui leur sert d
 
 ## Taverne {décidé}
 
+**Nom {décidé, 02/10/2026}** : la taverne s'appelle **« Le Tonneau Percé »** ; deux tonneaux contre la façade, de part et d'autre de la porte, et une enseigne suspendue à une potence de fer (planche arrondie, tonneau qui fuit en un mince jet de bière). Le nom est écrit dans le moteur (texte sur l'enseigne), pas dans le modèle.
+
 **Refonte du 28/09/2026** {décidé} : la taverne est un lieu convivial, avec de la **musique festive**. La tavernière est **la Bavaroise** ; **le barde** joue sur une estrade ; **le clochard pétomane** est le client récurrent, sur son banc près de l'âtre ; et il y a la place pour les quatre joueurs. Salle de 16 × 11 m à double hauteur, comptoir de 6 m (quatre joueurs de front), galerie au-dessus du service, **décor seulement** (l'escalier est fermé par une corde) {décidé}. Plan chiffré : `Docs/da/taverne-plan.md`. {{dev: Les trois restent des candidats jouables ; à la taverne ce sont des villageois.}}
 
 **Intérieurs en zones à part** {décidé, 01/10/2026} : on entre dans une maison comme dans le donjon : la porte s'ouvre un peu, bruit de porte, fondu au noir, et on arrive dans l'intérieur, une zone séparée du village. Les intérieurs peuvent être plus grands que la maison vue de dehors (cosy) ; dehors, les maisons restent simples pour garder le village lisible pendant les vagues.
