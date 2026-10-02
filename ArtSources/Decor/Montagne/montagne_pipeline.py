@@ -12,6 +12,7 @@ Options :
     --angle <deg>     angle de lissage des normales (défaut 50 : arêtes plus vives marquées dures)
     --rendus <dossier>  rendus de vérification Workbench (face, dessus, trois-quarts)
     --sans-export     ne pas écrire le FBX ni la texture (essais)
+    --sans-escalier   ne pas creuser la roche sous l'escalier de la grotte (voir ESCALIER)
 
 Entrée : ArtSources/References/Decor/montagne_heros_tripo/low-poly+rock+cave+3d+model.fbx (Tripo, 01/10/2026) : un seul
 maillage de 140 376 sommets, 280 752 triangles, une texture basecolor 4096², 0,98 × 0,35 × 0,19 unité (largeur,
@@ -54,6 +55,11 @@ BUDGET_COLLISION = arg("--collision", 3000, int)
 TAILLE_TEXTURE = arg("--texture", 2048, int)
 ANGLE_LISSAGE = math.radians(arg("--angle", 50.0))
 ECHELLE = (125.0, 115.0, 110.0)
+# Escalier de la grotte (retour du 02/10/2026 : un bloc de roche perçait les marches du côté gauche) : coordonnées Blender de la
+# pièce (x, y ; le monde Unity est x + 1, z + 50), alignées sur VillageV5Builder (V5GrotteEntreeLocal x = -15,2 ; seuil à y = -8 ;
+# V5GrotteMarche 4,6 m en 10 marches de 0,46 m x 0,215 m ; largeur 4,6 m). Les sommets de la roche (rendu et collision) qui
+# dépassent au-dessus des marches sont ramenés sous leur surface, avec une transition de 0,45 m sur les côtés et 0,3 m devant.
+ESCALIER = dict(x=-15.2, y0=-12.6, marches=10, prof=0.46, haut=0.215, demi=2.3, marge=0.45, marge_avant=0.3, sous=0.2, epaisseur=1.4)
 NOM = "Montagne_Heros"   # nom de la pièce (objets, maillage, matériau, texture) ; montagne_flancs_pipeline.py le change
 
 
@@ -141,6 +147,28 @@ def lisser(o):
     mod.weight = 50
     bpy.ops.object.modifier_apply(modifier=mod.name)
     log("lissage : %d arêtes dures (> %.0f°)" % (dures, math.degrees(ANGLE_LISSAGE)))
+
+
+def creuser_escalier(o):
+    """Ramène sous la surface des marches les sommets de roche compris dans l'emprise de l'escalier (pas de topologie ni d'UV changés)."""
+    E = ESCALIER
+    y_fin = E["y0"] + E["marches"] * E["prof"]
+    n = 0
+    for v in o.data.vertices:
+        x, y, z = v.co
+        dx = abs(x - E["x"]) - E["demi"]
+        dy = E["y0"] - y
+        if dx >= E["marge"] or dy >= E["marge_avant"] or y > y_fin:
+            continue
+        i = min(E["marches"], max(1, math.ceil((y - E["y0"]) / E["prof"]))) if y > E["y0"] else 0
+        cible = i * E["haut"] - E["sous"]
+        t = max(0.0, dx) / E["marge"] if dx > 0 else 0.0
+        if dy > 0:
+            t = max(t, dy / E["marge_avant"])
+        if cible < z < cible + E["epaisseur"]:   # seulement le bloc posé sur les marches (pas la voûte de la grotte, au-dessus)
+            v.co.z = z + (cible - z) * (1.0 - t); n += 1
+    o.data.update()
+    log("escalier : %d sommets de %s ramenés sous les marches" % (n, o.name))
 
 
 # ---------------------------------------------------------------------------------------------- 3. atlas
@@ -239,6 +267,8 @@ def main():
     collision = decimer(hd, BUDGET_COLLISION, NOM + "_Collision")
     collision.data.materials.clear()
     img = cuire(hd, rendu)
+    if "--sans-escalier" not in ARGS:     # après la cuisson (la texture est celle de la roche d'origine)
+        creuser_escalier(rendu); creuser_escalier(collision)
     if "--rendus" in ARGS:
         rendus(ARGS[ARGS.index("--rendus") + 1], rendu)
     bpy.data.objects.remove(hd)

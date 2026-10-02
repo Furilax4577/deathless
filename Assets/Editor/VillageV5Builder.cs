@@ -56,8 +56,14 @@ public static partial class VillageBuilder
     public static readonly Vector3 V5MontagnePos = new Vector3(1f, 0f, 50f);
     public const float V5MontagneLacet = 180f;           // la face avant de la pièce (Blender -Y) regarde le sud
     /// Grotte (repère de la pièce, m) : entrée et fond, sol ; le portail au fond, face au village.
-    public static readonly Vector3 V5GrotteEntreeLocal = new Vector3(-14.5f, 0f, -8f);   // seuil (relevé au rayon dans Unity)
-    public static readonly Vector3 V5GrotteFondLocal = new Vector3(-14.5f, 0f, -3.6f);
+    // x = -15,2 : axe du trou de la grotte relevé sur le maillage de la pièce héros (ouverture de -17,3 à -11,1 m à 4-6 m de haut, centre
+    // à x monde = -14,2 m, retour du 02/10/2026 : « centre le portail, dans l'axe du trou ») ; la route, l'escalier, la dalle et le portail s'y alignent
+    public static readonly Vector3 V5GrotteEntreeLocal = new Vector3(-15.2f, 0f, -8f);   // seuil (relevé au rayon dans Unity)
+    public static readonly Vector3 V5GrotteFondLocal = new Vector3(-15.2f, 0f, -3.6f);
+    /// Potences à lanterne suspendue au pied de l'escalier (retour du 02/10/2026 : « avance les deux lanternes suspendues en
+    /// quinconce » ; lanternes posées au sol supprimées) : distances en m avant le pied de l'escalier, le long de l'axe, vers le joueur.
+    /// Une potence de chaque côté, l'une (côté droit) à V5PotenceAvance, l'autre (côté gauche) V5PotenceDecalage m plus loin.
+    public const float V5PotenceAvance = 2.5f, V5PotenceDecalage = 4.0f, V5PotenceLateral = 2.7f;
     public const float V5GrotteSol = 2.15f, V5GrotteMarche = 4.6f;   // replat du fond à 2,15 m, escalier de 4,6 m
     public const int V5GrotteMarches = 10;               // marches régulières (21,5 cm de haut, 46 cm de profondeur)
     public const float V5GrotteLargeur = 4.6f;           // escalier et dalle : même largeur, tirés sur l'axe de l'entrée
@@ -1185,17 +1191,17 @@ public static partial class VillageBuilder
         Material flammeMat = AssetDatabase.LoadAssetAtPath<Material>("Assets/Art/Materials/Lanterne_Flamme.mat");
         var lumieres = new List<Light>(); var flammes = new List<GameObject>();
         Vector3 d = (b - a); d.y = 0f; Vector3 dir = d.normalized, droite = Vector3.Cross(Vector3.up, dir);
-        float[] places = { 0.3f, 0.55f, 0.8f, 0.97f };
-        for (int k = 0; k < places.Length; k++)
+        // deux potences seulement (lanterne suspendue), en quinconce : droite à V5PotenceAvance, gauche V5PotenceDecalage plus loin
+        float[] avant = { V5PotenceAvance, V5PotenceAvance + V5PotenceDecalage };
+        for (int k = 0; k < avant.Length; k++)
         {
-            float cote = k % 2 == 0 ? 1f : -1f;
-            Vector3 p = a + d * places[k] + droite * cote * 2.7f;
+            float cote = k == 0 ? 1f : -1f;
+            Vector3 p = b - dir * (0.5f + avant[k]) + droite * cote * V5PotenceLateral;   // b = pied + 0,5 m
             p.y = GroundHeight(p.x, p.z);
-            bool poteau = k >= 2;
-            float ech = poteau ? 1.1f : LanternScale;
-            GameObject lan = Place(parent, HalloweenRoot + (poteau ? "post_lantern" : "lantern_standing"), p, Quaternion.LookRotation(-droite * cote).eulerAngles.y, ech);
+            const float ech = 1.1f;
+            GameObject lan = Place(parent, HalloweenRoot + "post_lantern", p, Quaternion.LookRotation(-droite * cote).eulerAngles.y, ech);
             if (lan == null) continue;
-            lan.name = "Lanterne_Grotte_" + (k + 1);
+            lan.name = "Potence_Grotte_" + (k + 1);
             GameObject fl = GameObject.CreatePrimitive(PrimitiveType.Sphere); fl.name = "Flamme";
             Object.DestroyImmediate(fl.GetComponent<Collider>());
             fl.transform.SetParent(lan.transform, false); fl.transform.localScale = Vector3.one * 0.14f / ech;
