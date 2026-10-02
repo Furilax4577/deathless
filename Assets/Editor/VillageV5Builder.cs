@@ -11,12 +11,12 @@ using UnityEngine.AI;
 // sol dans SolVillage_V5.asset / SolVillage_Palette_V5.png / SolVillage_V5.mat). Ce fichier ne doit JAMAIS modifier Village.unity
 // ni les assets de l'ancienne carte (solo et multijoueur) : toutes les étapes refusent de s'exécuter hors de CarteV5.unity.
 // Carte v5 du village (report dans main du 01/10/2026 ; wiki : village.md, Refonte de la carte). Appliquée à la scène
-// ouverte (CarteV5.unity), sans regénérer le reste (Nyxessa, plateau et sa rampe, intérieurs, taverne, cycle) :
+// ouverte (CarteV5.unity), sans regénérer le reste (Nyxessa, plateau et sa rampe, cycle) ; les intérieurs KayKit sont retirés (03/10/2026) :
 //   Deathless > Village > v5 > Tout appliquer (les étapes 1 à 7, puis le NavMesh), ou une étape à la fois.
 // Cotes : plan serpentin, Docs/outils/plan_village.py --serpente (x vers l'est, y vers le nord, en m ; Unity (x, 0, y)).
 // Montagne : pièce héros Tripo préparée par ArtSources/Decor/Montagne/montagne_pipeline.py (Assets/Art/Decor/Montagne/).
-// Les maisons gardent leur modèle et leur intérieur : chacune est déplacée (avec son intérieur et sa lanterne) au centre
-// que lui donne le plan, façade vers Nyxessa. Chaque étape retire ce qu'elle a posé avant de le refaire.
+// Les maisons sont posées au centre que leur donne le plan, façade vers Nyxessa, sans intérieur (les six sont en Tripo, fermées) ; les
+// villageois sont dehors, devant leur maison (étape 1b, VillageV5Villageois.cs). Chaque étape retire ce qu'elle a posé avant de le refaire.
 public static partial class VillageBuilder
 {
     /// Vrai : le sol, les sentiers et la vérification suivent la carte v5 (rivière, lande, routes est / sud / ouest).
@@ -262,6 +262,7 @@ public static partial class VillageBuilder
         if (root == null) return "VillageBlockout introuvable";
         s_V5Axe = null;
         sb.AppendLine(V5Maisons(root));
+        sb.AppendLine(V5Villageois(root));
         sb.AppendLine(V5Montagne(root));
         sb.AppendLine(V5Riviere(root));
         sb.AppendLine(V5Allees(root));
@@ -274,7 +275,7 @@ public static partial class VillageBuilder
         return r;
     }
 
-    [MenuItem("Deathless/Village/v5/1. Maisons et intérieurs")] public static string V5MenuMaisons() { return Etape(V5Maisons); }
+    [MenuItem("Deathless/Village/v5/1. Maisons (intérieurs retirés)")] public static string V5MenuMaisons() { return Etape(V5Maisons); }
     [MenuItem("Deathless/Village/v5/2. Montagne, grotte et portail")] public static string V5MenuMontagne() { return Etape(V5Montagne); }
     [MenuItem("Deathless/Village/v5/3. Rivière, bassin, cascade, gués, ponts")] public static string V5MenuRiviere() { return Etape(V5Riviere); }
     [MenuItem("Deathless/Village/v5/4. Allées et route de la grotte")] public static string V5MenuAllees() { return Etape(V5Allees); }
@@ -366,8 +367,8 @@ public static partial class VillageBuilder
     /// Pose la maison Tripo du rôle `i` : retire le bâtiment KayKit (racine, modèle, zone « Porte », lanterne de porte) puis recrée
     /// Batiment_<Rôle> au centre du plan (pivot au sol, y = 0, façade +Z vers Nyxessa) et y instancie le prefab, branché sur le
     /// cycle jour / nuit (lanterne, vitres). L'entrée est le marqueur « Entree » du prefab (déclencheur Ignore Raycast).
-    /// Le centre est celui du plan plus V5MaisonsTripoEcart (écart noté dans le rapport). L'intérieur du rôle (Interieurs/Interieur_*)
-    /// est recalé dans le bâtiment, porte sur porte (V5RangerInterieur) ; la forge reçoit son feu (V5FeuForge).
+    /// Le centre est celui du plan plus V5MaisonsTripoEcart (écart noté dans le rapport). L'intérieur KayKit du rôle (Interieurs/Interieur_*)
+    /// est retiré (V5RetirerInterieur : les bâtiments Tripo sont fermés, les villageois sont dehors, V5Villageois) ; la forge reçoit son feu (V5FeuForge).
     /// Reproductible : ne dépend pas de la présence de l'ancien modèle.
     static string V5PoserMaisonTripo(Transform root, Transform ms, int i)
     {
@@ -385,71 +386,29 @@ public static partial class VillageBuilder
         racine.SetSiblingIndex(i);
         GameObject m = MaisonTripo.Poser(racine, Object.FindFirstObjectByType<CycleJourNuit>(), prefab);
         Transform e = m.transform.Find("Entree");
-        string suite = V5RangerInterieur(root, racine, m.transform);
+        string suite = V5RetirerInterieur(root, role);
         if (role == "Forge") suite += V5FeuForge(m.transform);
-        if (role == "Taverne") suite += V5ComptoirALaPorte(root, racine, m.transform);
         return role + " (" + prefab + " Tripo, lacet " + racine.eulerAngles.y.ToString("F1") + ", entrée à " + (e != null ? e.position.ToString("F2") : "?")
             + (ecart != Vector3.zero ? ", ÉCART au plan (" + ecart.x.ToString("F1") + " ; " + ecart.y.ToString("F1") + ") m, lacet " + ecart.z.ToString("F0") + "°" : "") + suite + ") ; ";
     }
 
-    /// Recale l'intérieur du rôle dans le bâtiment Tripo : même lacet que le bâtiment, linteau de l'intérieur sur le plan de la façade
-    /// (Porte_Pivot) et dans l'axe de l'embrasure (Entree), hauteur du sol gardée. L'intérieur reste dans le volume fermé du bâtiment
-    /// (le joueur n'y entre plus : l'intérieur deviendra une zone à part avec fondu au noir) et le sorcier (Sorcier.cs) en ressort toujours
-    /// par le linteau, donc par la porte du modèle. Idempotent : le recalage est absolu.
-    static string V5RangerInterieur(Transform root, Transform racine, Transform modele)
+    /// Retire l'intérieur KayKit du rôle (Interieurs/Interieur_<Rôle> : mobilier, comptoir, âtre, tables, tonneaux, battants, vitres, lumières,
+    /// collisions, volumes d'interdiction du NavMesh, ancres, forgeron et tavernier de la salle) : les bâtiments Tripo sont fermés, le joueur n'y
+    /// entre plus, et l'intérieur se voyait par l'embrasure (03/10/2026). Les villageois sont dehors (V5Villageois). Le groupe Interieurs
+    /// (et son InterieursAmbiance) disparaît avec son dernier intérieur. L'ancienne carte (Village.unity) garde ses intérieurs :
+    /// InterieursBuilder y reste en service. Idempotent.
+    static string V5RetirerInterieur(Transform root, string role)
     {
-        string role = racine.name.Substring("Batiment_".Length);
         string nomInt = role == "Forge" ? "Forgeron" : role;
-        Transform it = root.Find("Interieurs/Interieur_" + nomInt);
-        if (it == null) return "";
-        Transform linteau = null;
-        foreach (Transform t in it.GetComponentsInChildren<Transform>(true)) if (t.name == "Linteau") { linteau = t; break; }
-        Transform entree = modele.Find("Entree"), pivot = modele.Find("Porte_Pivot");
-        if (linteau == null || entree == null) return ", intérieur sans linteau (non recalé)";
-        float zFacade = pivot != null ? racine.InverseTransformPoint(pivot.position).z : racine.InverseTransformPoint(entree.position).z;
-        float xEntree = racine.InverseTransformPoint(entree.position).x;
-        it.rotation = Quaternion.Euler(0f, racine.eulerAngles.y, 0f);
-        Vector3 l = it.InverseTransformPoint(linteau.position);
-        Vector3 cible = racine.TransformPoint(new Vector3(xEntree, 0f, zFacade));
-        Vector3 actuel = it.TransformPoint(new Vector3(l.x, 0f, l.z)); actuel.y = 0f;
-        Vector3 d = cible - actuel; d.y = 0f;
-        it.position += d;
-        // reste dans l'emprise du bâtiment (côtés) : un intérieur qui déborderait d'un mur serait vu de l'extérieur ; décalé latéralement au besoin
-        Vector3 emn = Vector3.one * 999f, emx = -Vector3.one * 999f;
-        foreach (Vector3 v in modele.Find("Rendu").GetComponent<MeshFilter>().sharedMesh.vertices)
-        {
-            Vector3 p = racine.InverseTransformPoint(modele.Find("Rendu").TransformPoint(v));
-            if (p.y < 0.1f) { emn = Vector3.Min(emn, p); emx = Vector3.Max(emx, p); }
-        }
-        float imn = 999f, imx = -999f;
-        foreach (MeshFilter mf in it.GetComponentsInChildren<MeshFilter>())
-            foreach (Vector3 v in mf.sharedMesh.vertices)
-            {
-                float x = racine.InverseTransformPoint(mf.transform.TransformPoint(v)).x;
-                imn = Mathf.Min(imn, x); imx = Mathf.Max(imx, x);
-            }
-        float marge = 0.5f, decal = 0f;
-        if (imx > emx.x - marge) decal = emx.x - marge - imx; else if (imn < emn.x + marge) decal = emn.x + marge - imn;
-        if (decal != 0f) it.position += racine.right * decal;
-        return ", intérieur recalé porte sur porte (linteau à " + new Vector2(cible.x, cible.z).ToString("F2") + (decal != 0f ? ", décalé de " + decal.ToString("F2") + " m pour rester dans les murs" : "") + ")";
-    }
-
-    /// Taverne : le tavernier reste dans la salle (visible par l'embrasure), mais le comptoir est dans le volume fermé du bâtiment, hors de
-    /// portée du joueur (taverneDistance 2,4 m, à plat). L'ancre d'échange (Interieurs/Interieur_Taverne/Ancre_Echange_Taverne, qui porte
-    /// le composant Taverne, posé par Partie.Start) est donc ramenée au pied des marches, dans l'axe de l'embrasure : on commande au
-    /// tavernier depuis la porte, comme au comptoir. À reprendre quand l'intérieur sera une zone à part (porte, fondu au noir).
-    static string V5ComptoirALaPorte(Transform root, Transform racine, Transform modele)
-    {
-        Transform it = root.Find("Interieurs/Interieur_Taverne");
-        Transform ancre = it != null ? it.Find("Ancre_Echange_Taverne") : null;
-        Transform rendu = modele.Find("Rendu"), entree = modele.Find("Entree");
-        if (ancre == null || rendu == null || entree == null) return ", ancre d'échange de la taverne introuvable";
-        V5EmpriseTripo(racine, rendu, out float zAvant);
-        Vector3 pied = racine.TransformPoint(new Vector3(racine.InverseTransformPoint(entree.position).x, 0f, zAvant + 0.3f));
-        pied.y = GroundHeight(pied.x, pied.z) + 0.95f;
-        ancre.position = pied;
-        ancre.rotation = racine.rotation * Quaternion.Euler(0f, 180f, 0f);
-        return ", comptoir (ancre d'échange) ramené au pied des marches " + new Vector2(pied.x, pied.z).ToString("F2");
+        Transform its = root.Find("Interieurs");
+        if (its == null) return "";
+        Transform it = its.Find("Interieur_" + nomInt);
+        string r = "";
+        if (it != null) { Kill(it); r = ", intérieur " + nomInt + " retiré"; }
+        bool reste = false;
+        foreach (Transform t in its) if (t.name.StartsWith("Interieur_")) { reste = true; break; }
+        if (!reste) { Kill(its); r += " (groupe Interieurs retiré)"; }
+        return r;
     }
 
     /// Feu de la forge dans la bouche du foyer : l'effet existant ForgeFeu (flammes, étincelles et braises en gemmes de la palette Feu,

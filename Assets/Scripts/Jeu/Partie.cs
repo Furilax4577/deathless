@@ -101,14 +101,23 @@ namespace Deathless.Jeu
 
         void OnDestroy() { if (Instance == this) Instance = null; }
 
+        /// Ancre d'échange de la taverne (le composant Taverne s'y pose ; on y commande depuis 2,4 m à plat). Carte v5 (03/10/2026) : au
+        /// comptoir de service extérieur de la tavernière, devant la porte (Villageois/Ancre_Echange_Taverne) ; ancienne carte : au comptoir
+        /// de l'intérieur. Null si le village n'a pas de taverne.
+        public static GameObject AncreTaverne()
+        {
+            var a = GameObject.Find("VillageBlockout/Villageois/Ancre_Echange_Taverne");
+            return a != null ? a : GameObject.Find("VillageBlockout/Interieurs/Interieur_Taverne/Ancre_Echange_Taverne");
+        }
+
         void Start()
         {
             if (nyxessa != null)
             {
                 // Achats des paliers à la relique (touche Interagir, de jour).
                 if (nyxessa.GetComponent<AchatRelique>() == null) nyxessa.gameObject.AddComponent<AchatRelique>();
-                // Taverne : au comptoir (ancre d'échange de l'intérieur), si la maison est ouverte.
-                var comptoir = GameObject.Find("VillageBlockout/Interieurs/Interieur_Taverne/Ancre_Echange_Taverne");
+                // Taverne : au comptoir (ancre d'échange : celui, extérieur, de la carte v5, ou celui de l'intérieur de l'ancienne carte).
+                var comptoir = AncreTaverne();
                 if (comptoir != null && comptoir.GetComponent<Taverne>() == null) comptoir.AddComponent<Taverne>();
                 nyxessa.equipe = Equipe.Relique;
                 nyxessa.Initialiser(B.nyxessaPV);

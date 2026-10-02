@@ -4,8 +4,10 @@ using UnityEngine.AI;
 namespace Deathless.Jeu
 {
     /// Villageois sorcier (wiki : village, nyxessa ; sans combat, on ne lui parle pas pour l'instant). Le jour, il reste
-    /// dans sa maison : debout à sa place (Ancre_Villageois_Sorcier, intérieurs de InterieursBuilder), visible par la porte
-    /// ouverte ; sans intérieur, invisible devant la porte. Au crépuscule, il traverse la pièce, passe la porte, puis sort, marche jusqu'à Nyxessa, lève son bâton et incante
+    /// à son poste. Carte v5 (03/10/2026, les maisons Tripo sont fermées) : dehors, debout devant sa maison, au pied des marches, face à
+    /// l'allée (Villageois/Poste_Sorcier, posé par VillageBuilder.V5Villageois) ; il y reste le jour, part de là à la tombée de la nuit
+    /// et y revient à l'aube. Ancienne carte : dans sa maison, debout à sa place (Ancre_Villageois_Sorcier, intérieurs de
+    /// InterieursBuilder), visible par la porte ouverte ; sans intérieur ni poste, invisible devant la porte. Au crépuscule, il (traverse la pièce, passe la porte, puis) sort, marche jusqu'à Nyxessa, lève son bâton et incante
     /// toute la nuit (sort en boucle, son `sorcier_incantation`) : il lève le bouclier (BouclierNyxessa) à la tombée de la
     /// nuit. À l'aube, le bouclier redescend et il rentre chez lui. Bouclier brisé : il meurt (dissolution, son énergie
     /// retourne à Nyxessa : MortAllie) et réapparaît chez lui le jour suivant. Les squelettes peuvent le frapper comme
@@ -34,6 +36,8 @@ namespace Deathless.Jeu
         // Intérieur (maison ouverte) : sa place et le passage de la porte (place -> milieu de la pièce -> seuil -> dehors),
         // marché sans NavMesh (les pièces sont hors NavMesh : les squelettes n'y entrent pas).
         bool m_Interieur;
+        // Poste dehors (carte v5) : Villageois/Poste_Sorcier ; m_Porte et m_RotationPorte en sont la position et le regard.
+        bool m_Dehors;
         Vector3 m_Place0; Quaternion m_RotationPlace = Quaternion.identity;
         Vector3[] m_Chemin, m_Couloir; int m_Pas;
         float m_VitesseCouloir;
@@ -119,9 +123,13 @@ namespace Deathless.Jeu
                 m_RotationPorte = Quaternion.LookRotation(avant);
             }
             else m_Porte = nyx + new Vector3(-12f, 0f, 0f);
-            if (NavMesh.SamplePosition(m_Porte, out var h1, 4f, NavMesh.AllAreas)) m_Porte = h1.position;
+            // Carte v5 : le poste de jour est dehors, devant la maison (aucun passage de porte : le bâtiment est fermé).
+            var poste = GameObject.Find("VillageBlockout/Villageois/Poste_Sorcier");
+            m_Dehors = poste != null;
+            if (m_Dehors) { m_Porte = poste.transform.position; m_RotationPorte = Quaternion.Euler(0f, poste.transform.eulerAngles.y, 0f); }
+            if (NavMesh.SamplePosition(m_Porte, out var h1, m_Dehors ? 1.0f : 4f, NavMesh.AllAreas)) m_Porte = h1.position;
             // Maison ouverte : sa place à l'intérieur et le passage de la porte, dans l'axe du linteau (repère de l'intérieur).
-            var it = GameObject.Find("VillageBlockout/Interieurs/Interieur_Sorcier");
+            var it = m_Dehors ? null : GameObject.Find("VillageBlockout/Interieurs/Interieur_Sorcier");
             var ancre = it != null ? it.transform.Find("Ancre_Villageois_Sorcier") : null;
             Transform linteau = null;
             if (it != null) foreach (var c in it.GetComponentsInChildren<Transform>(true)) if (c.name == "Linteau") { linteau = c; break; }
@@ -238,7 +246,7 @@ namespace Deathless.Jeu
             if (m_Interieur) transform.SetPositionAndRotation(m_Place0, m_RotationPlace);
             else transform.SetPositionAndRotation(m_Porte, m_RotationPorte);
             Agent.enabled = false;
-            Visible(m_Interieur);
+            Visible(m_Interieur || m_Dehors);
             m_Etat = Etat.Maison;
             if (!debut) P?.Journal("Sorcier : chez lui");
         }
@@ -384,7 +392,8 @@ namespace Deathless.Jeu
                         if (animator != null) { animator.SetBool(P_Cone, false); if (avant == Etat.Mort) { animator.SetBool(P_Dead, false); animator.SetTrigger(P_Respawn); } }
                         CancelInvoke(nameof(Dissoudre));
                         if (m_Interieur) transform.SetPositionAndRotation(m_Place0, m_RotationPlace);
-                        Visible(m_Interieur);
+                        else if (m_Dehors) transform.SetPositionAndRotation(m_Porte, m_RotationPorte);
+                        Visible(m_Interieur || m_Dehors);
                         break;
                     case Etat.Sortie:
                     case Etat.Retour:

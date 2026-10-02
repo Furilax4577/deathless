@@ -48,6 +48,7 @@ public static class ForgeronBuilder
         if (v != null) { EditorSceneManager.MarkSceneDirty(v.scene); EditorSceneManager.SaveScene(v.scene); }
     }
 
+    /// Forgeron de l'intérieur de l'ancienne carte (Interieur_Forgeron, InterieursBuilder) : ancre et enclume de la pièce, et feu vivant.
     public static string Poser()
     {
         var it = GameObject.Find("VillageBlockout/Interieurs/Interieur_Forgeron");
@@ -59,7 +60,16 @@ public static class ForgeronBuilder
             else if (enclume == null && t.name.ToLower().StartsWith("anvil")) enclume = t;
         }
         if (ancre == null || enclume == null) return "Forgeron : ancre ou enclume introuvable";
-        var vieux = it.transform.Find("Forgeron");
+        string r = Poser(it.transform, ancre, enclume);
+        return r.StartsWith("Forgeron :") ? r : r + "\n" + PoserFeu(it);
+    }
+
+    /// Forgeron sous `parent` (enfant « Forgeron ») : debout au plus près de `ancre` (position : sol ; regard : +Z), l'enclume `enclume`
+    /// (maillage KayKit `anvil` et son billot de BillotHauteur / BillotRayon, sol à la hauteur de l'ancre) devant sa main droite. Sert
+    /// l'intérieur de l'ancienne carte (Poser()) et le poste extérieur de la carte v5 (VillageBuilder.V5Villageois).
+    public static string Poser(Transform parent, Transform ancre, Transform enclume)
+    {
+        var vieux = parent.Find("Forgeron");
         if (vieux != null) Object.DestroyImmediate(vieux.gameObject);
         System.IO.Directory.CreateDirectory(Dossier);
 
@@ -71,7 +81,7 @@ public static class ForgeronBuilder
         // Le marteau posé sur l'enclume par InterieursBuilder : c'est maintenant celui du forgeron, dans sa main.
         var large = be; large.Expand(0.3f);
         var poses = new List<GameObject>();
-        foreach (var t in it.GetComponentsInChildren<Transform>(true)) if (t.name == "hammer" && large.Contains(t.position)) poses.Add(t.gameObject);
+        foreach (var t in parent.GetComponentsInChildren<Transform>(true)) if (t.name == "hammer" && large.Contains(t.position)) poses.Add(t.gameObject);
         foreach (var g in poses) Object.DestroyImmediate(g);
         Vector3 face = ancre.forward; face.y = 0f;
         if (face.sqrMagnitude < 1e-4f) face = Vector3.forward;
@@ -79,7 +89,7 @@ public static class ForgeronBuilder
 
         // Racine (collider, script) et modèle.
         var racine = new GameObject("Forgeron");
-        racine.transform.SetParent(it.transform, false);
+        racine.transform.SetParent(parent, false);
         racine.transform.SetPositionAndRotation(ancre.position, Quaternion.LookRotation(face));
         var col = racine.AddComponent<CapsuleCollider>(); col.center = new Vector3(0f, 0.9f, 0f); col.height = 1.8f; col.radius = 0.32f;
         var modele = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(Modele), racine.transform);
@@ -87,14 +97,7 @@ public static class ForgeronBuilder
         modele.transform.localPosition = Vector3.zero; modele.transform.localRotation = Quaternion.identity; modele.transform.localScale = Vector3.one * Echelle;
 
         // Sans bonnet d'ours ; sans écharpe ; texture alternative.
-        var mat = Materiau();
-        string echarpe = "";
-        foreach (var smr in modele.GetComponentsInChildren<SkinnedMeshRenderer>(true))
-        {
-            if (smr.name == "Barbarian_BearHat") { smr.gameObject.SetActive(false); continue; }
-            if (smr.name == "Barbarian_Body") echarpe = RetirerEcharpe(smr);
-            smr.sharedMaterial = mat;
-        }
+        string echarpe = Habiller(modele);
 
         // Marteau dans la main droite ; point de la tête.
         Transform main = null;
@@ -281,7 +284,7 @@ public static class ForgeronBuilder
         return "Forgeron posé : enclume à l'échelle " + enclume.localScale.x.ToString("0.00") + ", table à " + (relief.haut - ancre.position.y).ToString("0.000")
             + " m du plancher ; contact à " + tImpact.ToString("0.0000") + " s / " + duree.ToString("0.000") + " s (" + (tImpact / duree * 100f).ToString("0.0") + " %"
             + "), jeu tête-table au contact " + (jeu * 1000f).ToString("0.00") + " mm ; recalé de " + avance.ToString("0.00") + " m de l'ancre ; " + essais
-            + " ; contrôle graphe/SampleAnimation " + (controle * 1000f).ToString("0.0") + " mm ; " + echarpe + "\n" + PoserFeu(it);
+            + " ; contrôle graphe/SampleAnimation " + (controle * 1000f).ToString("0.0") + " mm ; " + echarpe;
     }
 
     // ---------------- Relief de l'enclume ----------------
@@ -572,6 +575,24 @@ public static class ForgeronBuilder
         Vector3 p = t.position;
         return InterieursVerif.CaptureLibre(p + it.right * 1.7f + it.forward * 0.3f + Vector3.up * 0.6f, p + Vector3.up * 0.2f, 55f, "Assets/Screenshots/forge_feu" + suffixe + ".png");
     }
+
+    /// Habille le Barbarian du forgeron : sans bonnet d'ours (Barbarian_BearHat masqué), sans écharpe (triangles retirés d'une copie du
+    /// maillage du corps), texture alternative B. Rend la phrase de rapport de RetirerEcharpe. Sert Poser et le poste debout de la carte v5.
+    public static string Habiller(GameObject modele)
+    {
+        var mat = Materiau();
+        string echarpe = "";
+        foreach (var smr in modele.GetComponentsInChildren<SkinnedMeshRenderer>(true))
+        {
+            if (smr.name == "Barbarian_BearHat") { smr.gameObject.SetActive(false); continue; }
+            if (smr.name == "Barbarian_Body") echarpe = RetirerEcharpe(smr);
+            smr.sharedMaterial = mat;
+        }
+        return echarpe;
+    }
+
+    /// Chemin du modèle KayKit du forgeron (Barbarian).
+    public const string ModeleBarbarian = Modele;
 
     static Material Materiau()
     {

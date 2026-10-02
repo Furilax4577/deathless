@@ -21,6 +21,7 @@ public static class TavernierBuilder
         if (v != null) { EditorSceneManager.MarkSceneDirty(v.scene); EditorSceneManager.SaveScene(v.scene); }
     }
 
+    /// Tavernière de l'intérieur de l'ancienne carte (Interieur_Taverne, ancre Ancre_Villageois_Taverne).
     public static string Poser()
     {
         var it = GameObject.Find("VillageBlockout/Interieurs/Interieur_Taverne");
@@ -28,12 +29,20 @@ public static class TavernierBuilder
         Transform ancre = null;
         foreach (var t in it.GetComponentsInChildren<Transform>(true)) if (t.name == "Ancre_Villageois_Taverne") ancre = t;
         if (ancre == null) return "Tavernier : ancre introuvable";
-        var vieux = it.transform.Find("Tavernier");
+        return Poser(it.transform, ancre);
+    }
+
+    /// Tavernière sous `parent` (enfant « Tavernier ») : debout à `ancre` (position et regard), au repos avec un geste de temps en temps.
+    /// Sert l'intérieur de l'ancienne carte et le poste extérieur de la carte v5 (VillageBuilder.V5Villageois : devant la porte, derrière
+    /// son comptoir de service).
+    public static string Poser(Transform parent, Transform ancre)
+    {
+        var vieux = parent.Find("Tavernier");
         if (vieux != null) Object.DestroyImmediate(vieux.gameObject);
         System.IO.Directory.CreateDirectory(Dossier);
 
         var racine = new GameObject("Tavernier");
-        racine.transform.SetParent(it.transform, false);
+        racine.transform.SetParent(parent, false);
         racine.transform.SetPositionAndRotation(ancre.position, ancre.rotation);
         var col = racine.AddComponent<CapsuleCollider>(); col.center = new Vector3(0f, 0.9f, 0f); col.height = 1.8f; col.radius = 0.3f;
         var modele = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(Modele), racine.transform);
@@ -56,6 +65,6 @@ public static class TavernierBuilder
         if (repos != null) repos.SampleAnimation(anim.gameObject, 0f);
         var occ = racine.AddComponent<VillageoisOccupe>(); occ.animator = anim;
         EditorUtility.SetDirty(occ);
-        return "Tavernière posée derrière le comptoir (Bavaroise ; repos " + (repos != null) + ", geste " + (geste != null) + ")";
+        return "Tavernière posée (Bavaroise ; repos " + (repos != null) + ", geste " + (geste != null) + ")";
     }
 }

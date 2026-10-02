@@ -95,6 +95,46 @@ public static class CaptureV5
         return sb.ToString();
     }
 
+    /// Série des villageois dehors (03/10/2026) : vue de dessus de la carte, puis pour chaque villageois (forgeron, tavernière, mécano, druide,
+    /// sorcier) la vue joueur « épaule » (5,5 m, 22°) à 3,5 m devant lui, regard vers lui, et la vue joueur dans l'axe de la porte de sa
+    /// maison (à 3 m devant les marches, comme SerieTripo) où il doit se voir à côté de l'allée, et une vue de dessus de près.
+    public static string SerieVillageois(string prefixe)
+    {
+        string anc = Prefixe; Prefixe = prefixe;
+        var sb = new System.Text.StringBuilder();
+        try
+        {
+            sb.AppendLine(PrendreDessus("dessus_carte", Vector3.zero, 40f));
+            Transform vil = GameObject.Find("VillageBlockout/Villageois").transform;
+            string[] roles = { "Forge", "Taverne", "Mecano", "Druide", "Sorcier" };
+            string[] pnj = { "Forgeron", "Tavernier", "Mecano", "Druide", null };
+            for (int k = 0; k < roles.Length; k++)
+            {
+                Transform bat = GameObject.Find("VillageBlockout/Maisons/Batiment_" + roles[k]).transform;
+                Transform p = pnj[k] != null ? vil.Find(roles[k] + "/" + pnj[k]) : vil.Find("Poste_Sorcier");
+                if (p == null) { sb.AppendLine(roles[k] + " : villageois absent"); continue; }
+                string nom = roles[k].ToLowerInvariant();
+                Vector3 c = p.position; c.y = 0f;
+                sb.AppendLine(PrendreDessus(nom + "_dessus", c, 9f));
+                // héros 3,5 m devant le villageois (dans le sens du regard du bâtiment), regard vers lui
+                Vector3 h = p.position + bat.forward * 3.5f; h.y = VillageBuilder.GroundHeight(h.x, h.z);
+                Vector3 vers = p.position - h; vers.y = 0f;
+                sb.AppendLine(PrendreEpaule(nom + "_joueur_devant", h, Quaternion.LookRotation(vers).eulerAngles.y));
+                // héros dans l'axe de l'embrasure, 3 m devant les marches, regard vers la porte
+                Transform rendu = null, entree = null;
+                foreach (Transform t in bat.GetComponentsInChildren<Transform>()) { if (t.name == "Rendu") rendu = t; else if (t.name == "Entree") entree = t; }
+                float zAvant = -999f;
+                foreach (Vector3 v in rendu.GetComponent<MeshFilter>().sharedMesh.vertices)
+                { Vector3 q = bat.InverseTransformPoint(rendu.TransformPoint(v)); if (q.y < 0.1f) zAvant = Mathf.Max(zAvant, q.z); }
+                Vector3 h2 = bat.TransformPoint(new Vector3(bat.InverseTransformPoint(entree.position).x, 0f, zAvant + 3f));
+                h2.y = VillageBuilder.GroundHeight(h2.x, h2.z);
+                sb.AppendLine(PrendreEpaule(nom + "_joueur_porte", h2, bat.eulerAngles.y + 180f));
+            }
+        }
+        finally { Prefixe = anc; }
+        return sb.ToString();
+    }
+
     public static string Prendre(string nom, Vector3 pos, Vector3 cible, float fov = 62f, int largeur = 1920, int hauteur = 1080, float ortho = 0f)
     {
         var go = new GameObject("_CaptureV5");

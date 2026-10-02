@@ -269,7 +269,7 @@ namespace Deathless.Reseau
         /// l'hôte décide, tous les joueurs sont ivres (le journal donne la réponse et l'ivresse).
         bool Taverne(Partie p, Heros h, float t)
         {
-            var comptoir = GameObject.Find("VillageBlockout/Interieurs/Interieur_Taverne/Ancre_Echange_Taverne");
+            var comptoir = Deathless.Jeu.Partie.AncreTaverne();
             if (m_EtapeAchat == 0 && t > 6f)
             {
                 m_EtapeAchat = 1;

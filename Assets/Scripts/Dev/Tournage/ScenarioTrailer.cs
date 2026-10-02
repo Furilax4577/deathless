@@ -596,7 +596,7 @@ namespace Deathless.Dev.Tournage
         IEnumerator Plan6()
         {
             var h = H;
-            var ancre = GameObject.Find("VillageBlockout/Interieurs/Interieur_Taverne/Ancre_Echange_Taverne");
+            var ancre = Deathless.Jeu.Partie.AncreTaverne();
             if (ancre == null) { Tournage.Log("plan 6 : taverne introuvable"); yield break; }
             Vector3 a = ancre.transform.position; a.y = 0f;
             Vector3 f = Plat(ancre.transform.forward).normalized;
