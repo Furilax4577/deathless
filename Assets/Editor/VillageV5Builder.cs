@@ -257,6 +257,7 @@ public static partial class VillageBuilder
     [MenuItem("Deathless/Village/v5/5. Clairières (est, sud, ouest)")] public static string V5MenuClairieres() { return Etape(V5Clairieres); }
     [MenuItem("Deathless/Village/v5/6. Forêt, lande, pierrier, herbe")] public static string V5MenuNature() { return Etape(V5Nature); }
     [MenuItem("Deathless/Village/v5/7. Sol")] public static string V5MenuSol() { return Etape(V5Sol); }
+    [MenuItem("Deathless/Village/v5/2b. Brume de montagne")] public static string V5MenuBrume() { return Etape(V5Brume); }
     [MenuItem("Deathless/Village/v5/Vérifier")] public static string V5MenuVerifier() { string r = V5Verifier(); Debug.Log(r); return r; }
 
     static string Etape(System.Func<Transform, string> f)
@@ -474,7 +475,53 @@ public static partial class VillageBuilder
             }
         }
         // Lumière de la grotte : la lueur verte vient du portail (PortalVisual) ; rien d'autre ici.
-        return "Montagne : " + pieces + " pièces (" + trianglesRendu + " triangles rendus au total), grotte " + Vector3.Distance(entree, fond).ToString("F1") + " m ; " + portail;
+        string brume = V5Brume(root);
+        return "Montagne : " + pieces + " pièces (" + trianglesRendu + " triangles rendus au total), grotte " + Vector3.Distance(entree, fond).ToString("F1") + " m ; " + portail + " ; " + brume;
+    }
+
+    // ------------------------------------------------------------------ brume de montagne (retour du 02/10/2026)
+    /// Brume basse et douce sur les gradins, les flancs et les crêtes à partir du haut de la cascade (V5BrumeBas) : le bas de
+    /// la falaise reste net, la brume s'épaissit vers le haut (BrumeMontagne : trois bandes d'altitude). Positions relevées sur
+    /// la roche réelle (lancers de rayons verticaux) : une nappe par point retenu, posée de 0,3 à 1,7 m au-dessus de la surface.
+    public const float V5BrumeBas = 14f;
+    public const int V5BrumeNappes = 130;
+    static string V5Brume(Transform root)
+    {
+        Kill(root.Find("Brume_Montagne"));
+        Transform mont = root.Find("Montagne");
+        if (mont == null) return "brume : montagne absente";
+        Physics.SyncTransforms();
+        var pos = new List<Vector3>(); var larg = new List<float>(); var haut = new List<float>(); var bande = new List<byte>();
+        var rnd = new System.Random(8800);
+        for (int essai = 0; essai < 6000 && pos.Count < V5BrumeNappes; essai++)
+        {
+            float x = Mathf.Lerp(-106f, 106f, (float)rnd.NextDouble()), z = Mathf.Lerp(30f, 112f, (float)rnd.NextDouble());
+            if (!Physics.Raycast(new Vector3(x, 80f, z), Vector3.down, out RaycastHit h, 120f, ~0, QueryTriggerInteraction.Ignore)) continue;
+            if (!h.collider.transform.IsChildOf(mont)) continue;
+            float surf = h.point.y;
+            if (surf < V5BrumeBas - 0.5f) continue;
+            float y = surf + (float)rnd.NextDouble() * 1.5f - 0.3f;
+            if (rnd.NextDouble() > 0.3 + 0.7 * Mathf.InverseLerp(V5BrumeBas, 40f, y)) continue;    // plus dense en montant
+            int b = y < 22f ? 0 : y < 31f ? 1 : 2;
+            float w = Mathf.Lerp(12f, 24f, (float)rnd.NextDouble()) * (1f + 0.2f * b), hh = Mathf.Lerp(3.5f, 7f, (float)rnd.NextDouble()) * (1f + 0.2f * b);
+            y = Mathf.Max(y, V5BrumeBas - 0.5f + hh / 2f);                                            // le bas de la nappe reste au-dessus de la cascade
+            pos.Add(new Vector3(x, y, z)); bande.Add((byte)b); larg.Add(w); haut.Add(hh);
+        }
+        const string matPath = "Assets/VFX/_Ambiance/BrumeMontagne.mat";
+        Material modele = AssetDatabase.LoadAssetAtPath<Material>(matPath);
+        if (modele == null)
+        {
+            var src = AssetDatabase.LoadAssetAtPath<Material>("Assets/VFX/_Ambiance/GroundMist.mat");
+            modele = src != null ? new Material(src) : new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            AssetDatabase.CreateAsset(modele, matPath);
+        }
+        modele.SetColor("_BaseColor", new Color(0.9f, 0.93f, 0.97f, 0.3f));
+        EditorUtility.SetDirty(modele);
+        Transform g = Group(root, "Brume_Montagne");
+        var br = g.gameObject.AddComponent<BrumeMontagne>();
+        br.alphaBandes = new[] { 0.10f, 0.15f, 0.21f };
+        br.modele = modele; br.positions = pos.ToArray(); br.largeurs = larg.ToArray(); br.hauteurs = haut.ToArray(); br.bandes = bande.ToArray();
+        return "brume de montagne : " + pos.Count + " nappes de " + V5BrumeBas.ToString("F0") + " à " + (pos.Count > 0 ? Mathf.Max(pos.ConvertAll(q => q.y).ToArray()).ToString("F0") : "-") + " m";
     }
 
     /// Falaise procédurale : champ de hauteur facetté au nord (x de -112 à 112, z de 34 à 126), trois gradins de 18, 28
