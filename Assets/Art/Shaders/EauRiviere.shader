@@ -4,6 +4,10 @@
 // et UV1.x = facteur de vitesse (plus vif au pied de la cascade et aux gués). Dans le bassin, UV0.y est le rayon : les
 // traits deviennent des anneaux qui s'élargissent. Teintes posées depuis la palette Eau (VillageBuilder), jamais vert.
 // La nuit (_DeathlessNuit, global posé par CascadeVillage depuis DayCycle.Night), l'eau et l'écume s'assombrissent.
+// Anneaux du bassin (retour du 02/10/2026 : « le centre de l'animation n'est pas aligné avec la cascade ») : le disque du
+// maillage est centré sur le bassin, 1 m à l'ouest du pied de la nappe ; quand CascadeVillage pose _DeathlessCascadePied
+// (x, z monde du pied mesuré sur la nappe, w = 1), le rayon et l'angle des anneaux sont calculés dans le fragment à partir
+// de ce point (cercles parfaitement centrés sur le pied), au lieu des UV du disque.
 Shader "Deathless/Village/EauRiviere"
 {
     Properties
@@ -49,6 +53,7 @@ Shader "Deathless/Village/EauRiviere"
                 float _Courant, _Voies, _Trait, _Densite, _EcumeForce, _NuitFacteur, _LargeurMin, _LargeurRuban;
             CBUFFER_END
             float _DeathlessNuit;
+            float4 _DeathlessCascadePied;   // xy = pied de la cascade (monde, x et z), w = 1 si posé
 
             struct Attributs { float4 positionOS : POSITION; float2 uv : TEXCOORD0; float2 uv2 : TEXCOORD1; };
             struct Varyings
@@ -90,18 +95,23 @@ Shader "Deathless/Village/EauRiviere"
                 // en peignes, moiré). Maintenant : vitesse de défilement UNIQUE (_Courant), phase = distance - temps seulement ; la
                 // vitesse locale ne règle plus que la densité et la largeur. Traits adoucis par dérivées (pas de scintillement) et
                 // éteints quand ils tombent sous quelques pixels ; largeur physique minimale de _LargeurMin m (10 cm par défaut).
-                float x = i.uv.x * _Voies;
+                // disque du bassin : rayon et angle autour du pied de la nappe (si posé), sinon UV du maillage
+                float2 dp = i.positionWS.xz - _DeathlessCascadePied.xy;
+                float2 uvPolaire = float2(atan2(dp.y, dp.x) * 0.15915494 + 0.5, length(dp));
+                float2 uv = (i.disque > 0.5 && _DeathlessCascadePied.w > 0.5) ? uvPolaire : i.uv;
+                float x = uv.x * _Voies;
+                float xDecale = frac(uv.x + 0.5) * _Voies;   // dérivée sans la couture de l'angle (atan2 saute de 1 à 0)
                 float voie = floor(x);
                 float dans = abs(frac(x) - 0.5);
-                float aaX = max(fwidth(x), 1e-4);
-                float s = (i.uv.y - _Time.y * _Courant) / _Trait + Hash(voie + 3.7) * 7.0;
+                float aaX = max(min(fwidth(x), fwidth(xDecale)), 1e-4);
+                float s = (uv.y - _Time.y * _Courant) / _Trait + Hash(voie + 3.7) * 7.0;
                 float aaS = max(fwidth(s), 1e-4);
                 float cellule = floor(s), f = frac(s);
                 float densite = saturate(_Densite - (i.vit - 1.0) * 0.18);
                 float allume = step(densite, Hash(cellule * 1.618 + voie * 5.31));
                 float longueur = 0.35 + 0.3 * Hash(cellule + voie * 2.1);
                 // largeur (fraction de voie) : jamais sous _LargeurMin m ; dans le disque du bassin la voie est un arc (2 pi r / voies)
-                float voieM = lerp(_LargeurRuban, 6.2832 * i.uv.y, i.disque) / _Voies;
+                float voieM = lerp(_LargeurRuban, 6.2832 * uv.y, i.disque) / _Voies;
                 float demiL = max(0.09 + 0.05 * i.vit, 0.5 * _LargeurMin / max(voieM, 0.05));
                 demiL = min(demiL, 0.46);
                 float bord = smoothstep(demiL + aaX, demiL - aaX, dans);

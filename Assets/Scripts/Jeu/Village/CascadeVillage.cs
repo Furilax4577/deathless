@@ -17,6 +17,12 @@ namespace Deathless.Jeu
     /// petits jets de gemmes claires, des tourbillons (spirale de gemmes) et des bandes d'écume le long des deux bords ; au pied,
     /// des plaques d'écume plates et de grands anneaux s'étalent sur le bassin. Tout reste fin (5 à 13 cm) et dans le même
     /// maillage dynamique que le reste : un seul appel de dessin. Son : boucle « village_cascade » (catalogue).
+    /// Centre des effets du pied (retour du 02/10/2026 : « le centre de l'animation n'est pas aligné avec la cascade » : tourbillon
+    /// et anneaux étaient décalés vers l'avant et la gauche de la nappe) : à l'activation, le pied est MESURÉ sur le maillage de
+    /// la nappe (centroïde des sommets les plus bas, ramené à la hauteur de l'eau du bassin, axe du pied par analyse en composantes
+    /// principales) ; tous les effets du pied (impact, plaques, anneaux, grands anneaux, embrun, son) et les anneaux du shader de
+    /// l'eau (global `_DeathlessCascadePied`, EauRiviere) sont centrés sur ce point, au lieu du dernier point de la colonne du
+    /// milieu (devant la nappe, 20 cm au-dessus de l'eau) et du centre du disque du bassin (1 m à l'ouest de l'axe de la nappe).
     public class CascadeVillage : MonoBehaviour
     {
         [Tooltip("Lèvre de la chute (centre du rebord, là où l'eau quitte la roche).")]
@@ -57,8 +63,25 @@ namespace Deathless.Jeu
         [Tooltip("Plaques d'écume plates qui s'étalent sur le bassin au pied (par seconde).")] public float debitPlaques = 36f;
         [Tooltip("Grands anneaux de remous sur le bassin : un tous les `periodeRemous` s.")] public float periodeRemous = 1.3f;
         [Tooltip("Volume de la boucle sonore.")] public float volume = 0.9f;
+        [Header("Pied mesuré sur la nappe")]
+        [Tooltip("Maillage de la nappe (le pied est mesuré sur ses sommets les plus bas) ; à défaut, l'enfant « Voile ».")]
+        public MeshFilter voile;
+        [Tooltip("Hauteur (m) au-dessus du sommet le plus bas où un sommet compte encore pour le pied : poids plein jusqu'à la moitié, nul à cette hauteur.")]
+        public float bandePied = 0.5f;
+        [Tooltip("Hauteur (m) des gemmes plates (anneaux, plaques, impact) au-dessus de l'eau : plus que les vagues de l'eau (5 cm).")]
+        public float hauteurSurface = 0.07f;
 
         public static readonly string[] SonCascade = { "village_cascade" };
+        /// Centre du pied pour le shader de l'eau : (x, z) monde, w = 1 quand il est posé (EauRiviere : anneaux du bassin).
+        public static readonly int s_PiedEau = Shader.PropertyToID("_DeathlessCascadePied");
+
+        /// Pied mesuré de la nappe (monde, à la hauteur de l'eau), axe horizontal du pied et largeur de la ligne de contact.
+        public Vector3 PiedMesure { get { return m_Pied; } }
+        public Vector3 AxePied { get { return m_AxePied; } }
+        public float LargeurMesuree { get { return m_LargPied; } }
+        Vector3 m_Pied, m_AxePied = Vector3.right;
+        float m_LargPied = 2.4f, m_Niveau;
+        bool m_Mesure;
 
         GemmesVolantes m_Gemmes;
         float m_Filets, m_Bords, m_Impact, m_Eboulis, m_Levre, m_Embrun, m_Anneau;
@@ -127,7 +150,7 @@ namespace Deathless.Jeu
                 {
                     m_Bandes -= 1f;
                     int i = Tirer(bordsForce); if (i < 0) break;
-                    float cote = bords[i].x < pied.position.x ? -1f : 1f;
+                    float cote = Vector3.Dot(bords[i] - m_Pied, droite) < 0f ? -1f : 1f;   // côté de la nappe, relatif au pied mesuré
                     Vector3 n = bordsNormales[i];
                     Vector3 pos = bords[i] + droite * (cote * Random.Range(-0.05f, 0.12f)) + n * Random.Range(0.04f, 0.14f) + Vector3.down * Random.Range(-0.2f, 0.2f);
                     Vector3 v = Vector3.down * Random.Range(1.2f, 3.0f) + n * Random.Range(0.1f, 0.4f) + droite * (cote * Random.Range(0.0f, 0.4f));
@@ -135,14 +158,14 @@ namespace Deathless.Jeu
                 }
             }
             // au pied : plaques d'écume plates qui s'étalent sur le bassin, et grands anneaux de remous
-            Vector3 b = pied.position;
+            Vector3 b = m_Pied;
             m_Plaques += debitPlaques * dt;
             while (m_Plaques >= 1f)
             {
                 m_Plaques -= 1f;
                 float a = Random.value * Mathf.PI * 2f, r = Random.Range(0.4f, 1.6f);
                 Vector3 d = new Vector3(Mathf.Cos(a), 0f, Mathf.Sin(a));
-                m_Gemmes.Emettre(b + d * r + Vector3.up * 0.03f, d * Random.Range(0.5f, 1.3f), Random.Range(0.07f, 0.13f), Random.Range(1.2f, 2.0f), Teinte(Random.value < 0.7f ? 4 : 3),
+                m_Gemmes.Emettre(b + d * r + Vector3.up * hauteurSurface, d * Random.Range(0.5f, 1.3f), Random.Range(0.07f, 0.13f), Random.Range(1.2f, 2.0f), Teinte(Random.value < 0.7f ? 4 : 3),
                     0f, 0.9f, 0.15f, 0.4f, new Vector3(1.6f, 0.2f, 1.6f));
             }
             m_Remous += dt;
@@ -154,7 +177,7 @@ namespace Deathless.Jeu
                 {
                     float a = a0 + i * Mathf.PI * 2f / nb;
                     Vector3 d = new Vector3(Mathf.Cos(a), 0f, Mathf.Sin(a));
-                    m_Gemmes.Emettre(b + d * 1.3f + Vector3.up * 0.02f, d * 1.9f, 0.11f, 1.9f, Teinte(i % 4 == 0 ? 3 : 4), 0f, 0.5f, 0.2f, 0.35f, new Vector3(1.6f, 0.2f, 1.6f));
+                    m_Gemmes.Emettre(b + d * 1.3f + Vector3.up * hauteurSurface, d * 1.9f, 0.11f, 1.9f, Teinte(i % 4 == 0 ? 3 : 4), 0f, 0.5f, 0.2f, 0.35f, new Vector3(1.6f, 0.2f, 1.6f));
                 }
             }
         }
@@ -171,6 +194,77 @@ namespace Deathless.Jeu
             m_Cumul = new float[chemin.Length];
             for (int i = 1; i < chemin.Length; i++) m_Cumul[i] = m_Cumul[i - 1] + Vector3.Distance(chemin[i - 1], chemin[i]);
             m_Longueur = Mathf.Max(0.1f, m_Cumul[chemin.Length - 1]);
+            MesurerPied();
+        }
+
+        /// Niveau de l'eau du bassin (m) : surface du maillage « Eau » de la rivière (frère du groupe « Cascade »), à défaut `defaut`.
+        float NiveauEau(float defaut)
+        {
+            Transform racine = transform.parent;
+            Transform e = racine != null ? racine.Find("Eau") : null;
+            Renderer r = e != null ? e.GetComponent<Renderer>() : null;
+            return r != null ? r.bounds.center.y : defaut;
+        }
+
+        /// Mesure le pied de la nappe sur son maillage : centroïde (x, z) des sommets les plus bas (poids 1 jusqu'à `bandePied`/2
+        /// au-dessus du plus bas, nul à `bandePied`), posé à la hauteur de l'eau ; axe de la ligne de contact = direction principale
+        /// des mêmes sommets (la nappe, plaquée sur les éboulis, touche l'eau en biais) et sa largeur. Sans maillage lisible : le
+        /// repère `pied` posé par le constructeur.
+        public void MesurerPied()
+        {
+            m_Pied = pied != null ? pied.position : transform.position;
+            m_AxePied = droite.sqrMagnitude > 0.01f ? new Vector3(droite.x, 0f, droite.z).normalized : Vector3.right;
+            m_Niveau = NiveauEau(m_Pied.y);
+            m_Mesure = false;
+            MeshFilter mf = voile;
+            if (mf == null) { Transform t = transform.Find("Voile"); if (t != null) mf = t.GetComponent<MeshFilter>(); }
+            Mesh m = mf != null ? mf.sharedMesh : null;
+            if (m != null && m.isReadable && m.vertexCount > 2)
+            {
+                Vector3[] vs = m.vertices;
+                Matrix4x4 l2w = mf.transform.localToWorldMatrix;
+                float minY = float.MaxValue;
+                for (int i = 0; i < vs.Length; i++) { vs[i] = l2w.MultiplyPoint3x4(vs[i]); if (vs[i].y < minY) minY = vs[i].y; }
+                float demiBande = Mathf.Max(0.02f, bandePied * 0.5f);
+                double sw = 0, sx = 0, sz = 0;
+                for (int i = 0; i < vs.Length; i++)
+                {
+                    float w = Mathf.Clamp01((bandePied - (vs[i].y - minY)) / demiBande);
+                    if (w <= 0f) continue;
+                    sw += w; sx += w * vs[i].x; sz += w * vs[i].z;
+                }
+                if (sw > 1e-3)
+                {
+                    float cx = (float)(sx / sw), cz = (float)(sz / sw);
+                    double sxx = 0, sxz = 0, szz = 0;
+                    for (int i = 0; i < vs.Length; i++)
+                    {
+                        float w = Mathf.Clamp01((bandePied - (vs[i].y - minY)) / demiBande);
+                        if (w <= 0f) continue;
+                        double dx = vs[i].x - cx, dz = vs[i].z - cz;
+                        sxx += w * dx * dx; sxz += w * dx * dz; szz += w * dz * dz;
+                    }
+                    if (sxx + szz > 1e-4)
+                    {
+                        float a = 0.5f * Mathf.Atan2((float)(2 * sxz), (float)(sxx - szz));   // direction principale (plan x, z)
+                        m_AxePied = new Vector3(Mathf.Cos(a), 0f, Mathf.Sin(a));
+                        if (m_AxePied.x < 0f) m_AxePied = -m_AxePied;
+                    }
+                    float lo = float.MaxValue, hi = float.MinValue;
+                    for (int i = 0; i < vs.Length; i++)
+                    {
+                        if (vs[i].y - minY > bandePied * 0.5f) continue;
+                        float u = (vs[i].x - cx) * m_AxePied.x + (vs[i].z - cz) * m_AxePied.z;
+                        if (u < lo) lo = u; if (u > hi) hi = u;
+                    }
+                    m_LargPied = Mathf.Max(1f, hi - lo);
+                    m_Pied = new Vector3(cx, m_Niveau, cz);
+                    m_Mesure = true;
+                }
+            }
+            else m_Pied.y = m_Niveau;
+            if (pied != null) pied.position = m_Pied;   // le son (Start) et tout lecteur du repère suivent le pied mesuré
+            Shader.SetGlobalVector(s_PiedEau, new Vector4(m_Pied.x, m_Pied.z, 0f, 1f));
         }
 
         void Start()
@@ -197,7 +291,11 @@ namespace Deathless.Jeu
             s.spread = 30f;      // un peu large : le rideau d'eau est un son étendu, pas un point
         }
 
-        void OnDisable() { if (m_Gemmes != null) m_Gemmes.gameObject.SetActive(false); }
+        void OnDisable()
+        {
+            if (m_Gemmes != null) m_Gemmes.gameObject.SetActive(false);
+            Shader.SetGlobalVector(s_PiedEau, Vector4.zero);   // l'eau retrouve les anneaux du disque du bassin
+        }
 
         Color Teinte(int k)
         {
@@ -237,7 +335,7 @@ namespace Deathless.Jeu
             Shader.SetGlobalFloat(s_Nuit, DayCycle.Night);   // eau de la rivière (EauRiviere) : assombrie la nuit
             if (m_Gemmes == null || chemin == null || chemin.Length < 2 || pied == null || m_Cumul == null) return;
             float dt = Time.deltaTime;
-            Vector3 b = pied.position;
+            Vector3 b = m_Pied;
             Vector3 avant = Vector3.Cross(droite, Vector3.up);   // horizontal, vers le spectateur ou l'inverse : seulement pour l'embrun
             const float g = 9.81f;
 
@@ -279,15 +377,15 @@ namespace Deathless.Jeu
             }
             // 4. impact dans le bassin : beaucoup de petites gemmes qui montent puis retombent, sur toute la largeur de la nappe
             //    (et un peu au-delà), plus serrées au centre
-            float demi = LargeurPied() * 0.5f * 1.15f;
+            float demi = LargeurPied() * 0.5f * 1.15f;   // largeur mesurée de la ligne de contact
             m_Impact += debitImpact * dt;
             while (m_Impact >= 1f)
             {
                 m_Impact -= 1f;
                 float u = (Random.value + Random.value - 1f) * demi;
-                Vector3 p = b + droite * u + Vector3.up * 0.04f;
+                Vector3 p = b + m_AxePied * u + Vector3.up * hauteurSurface;
                 Vector2 o = Random.insideUnitCircle;
-                Vector3 v = new Vector3(o.x * 1.1f, Random.Range(1.4f, 3.6f), o.y * 1.1f) + droite * (u / Mathf.Max(0.1f, demi)) * 0.7f;
+                Vector3 v = new Vector3(o.x * 1.1f, Random.Range(1.4f, 3.6f), o.y * 1.1f) + m_AxePied * (u / Mathf.Max(0.1f, demi)) * 0.7f;
                 m_Gemmes.Emettre(p, v, Random.Range(0.05f, 0.13f), Random.Range(0.5f, 0.95f), Teinte(Random.value < 0.65f ? 4 : 3), 6.5f, 0.4f, 0.04f, 0.45f);
             }
             // 5. lèvre : quelques éclaboussures à l'endroit où l'eau quitte le rebord
@@ -312,7 +410,7 @@ namespace Deathless.Jeu
                 {
                     float a = a0 + i * Mathf.PI * 2f / nb;
                     Vector3 d = new Vector3(Mathf.Cos(a), 0f, Mathf.Sin(a));
-                    m_Gemmes.Emettre(b + d * 0.9f + Vector3.up * 0.02f, d * 1.5f, 0.12f, 1.7f, Teinte(i % 3 == 0 ? 3 : 4), 0f, 0.9f,
+                    m_Gemmes.Emettre(b + d * 0.9f + Vector3.up * hauteurSurface, d * 1.5f, 0.12f, 1.7f, Teinte(i % 3 == 0 ? 3 : 4), 0f, 0.9f,
                         0.15f, 0.4f, new Vector3(1.6f, 0.2f, 1.6f));
                 }
             }
@@ -324,12 +422,12 @@ namespace Deathless.Jeu
             {
                 m_Embrun -= 1f;
                 Vector2 o = Random.insideUnitCircle * 2.2f;
-                Vector3 p = b + new Vector3(o.x, Random.Range(0.3f, 1.2f), o.y);
+                Vector3 p = b + new Vector3(o.x, Random.Range(0.45f, 1.35f), o.y);
                 Vector3 v = new Vector3(Random.Range(-0.3f, 0.3f), Random.Range(0.25f, 0.6f), Random.Range(-0.3f, 0.3f)) - avant * 0.2f;
                 m_Gemmes.Emettre(p, v, Random.Range(0.12f, 0.2f), Random.Range(1.6f, 2.6f), Teinte(4) * 0.92f, -0.05f, 0.4f, 0.5f, 0.35f);
             }
         }
 
-        float LargeurPied() { return largeurs != null && largeurs.Length > 0 ? largeurs[largeurs.Length - 1] : 2.4f; }
+        float LargeurPied() { return m_Mesure ? m_LargPied : largeurs != null && largeurs.Length > 0 ? largeurs[largeurs.Length - 1] : 2.4f; }
     }
 }
