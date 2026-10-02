@@ -62,13 +62,17 @@ public static partial class VillageBuilder
     /// Cascade (repère de la pièce) : lèvre en haut de la ravine, coude sur l'éboulis, pied dans le bassin.
     public static readonly Vector3 V5CascadeLevreLocal = new Vector3(-0.8f, 14f, -2.2f);
     public static readonly Vector3 V5CascadeCoudeLocal = new Vector3(-0.8f, 3.4f, -4.4f);
-    /// Pièces de flanc (Tripo, montagne_flancs_pipeline.py, 02/10/2026) : même traitement que la pièce héros (maillage rendu
-    /// + maillage de collision, jamais marchable), posées seulement si leur FBX existe ; pose = centre de l'emprise au sol
-    /// (x, -, z) et lacet Unity. Miroir et enfouissement côté centre faits dans Blender ; une seule grotte, celle de la pièce héros.
+    /// Pièces de flanc (Tripo, montagne_flancs_pipeline.py, 02/10/2026) : les deux modèles de Quentin TELS QUELS (pièce entière,
+    /// sans miroir, sans recadrage, échelle uniforme de 62 m par unité Tripo posée dans le FBX), même traitement que la pièce
+    /// héros (maillage rendu + maillage de collision, jamais marchable), posées seulement si leur FBX existe. Pose = centre de
+    /// l'emprise au sol (x, y, z) et lacet Unity ; lacet 180 comme la pièce héros (face au sud, x non inversé : l'ouest a son
+    /// point haut et son rocher en surplomb à l'ouest, l'est ses deux pics à l'est). Enfoncées de V5FlancsEnfoncement m.
+    /// Une seule grotte, celle de la pièce héros.
     public static readonly string[] V5FlancsFbx = { "Assets/Art/Decor/Montagne/Montagne_Flanc_Est.fbx", "Assets/Art/Decor/Montagne/Montagne_Flanc_Ouest.fbx" };
     public static readonly string[] V5FlancsTex = { "Assets/Art/Decor/Montagne/Montagne_Flanc_Est_Texture.png", "Assets/Art/Decor/Montagne/Montagne_Flanc_Ouest_Texture.png" };
     public static readonly string[] V5FlancsMat = { "Assets/Art/Decor/Montagne/Montagne_Flanc_Est.mat", "Assets/Art/Decor/Montagne/Montagne_Flanc_Ouest.mat" };
-    public static readonly Vector4[] V5FlancsPose = { new Vector4(74.4f, 0f, 42f, 160f), new Vector4(-71.4f, 0f, 49.3f, 180f) };   // x, -, z, lacet
+    public static readonly Vector4[] V5FlancsPose = { new Vector4(69.5f, 0f, 43f, 180f), new Vector4(-69.5f, 0f, 40f, 180f) };   // x, -, z, lacet
+    public const float V5FlancsEnfoncement = 0.4f;
     /// Falaise procédurale en gradins (18, 28, 38 m) : bande continue derrière la pièce héros et sur les flancs.
     public static readonly float[] V5GradinsHaut = { 18f, 28f, 38f };
 
@@ -378,7 +382,7 @@ public static partial class VillageBuilder
         // flancs (montagne_flancs_pipeline.py) : même traitement que la pièce héros, posés à V5FlancsPose (centre de l'emprise, au sol)
         for (int i = 0; i < V5FlancsFbx.Length; i++)
             poser(V5FlancsFbx[i], i == 0 ? "Flanc_Est" : "Flanc_Ouest", V5MateriauMontagne(V5FlancsMat[i], V5FlancsTex[i]),
-                new Vector3(V5FlancsPose[i].x, 0f, V5FlancsPose[i].z), V5FlancsPose[i].w);
+                new Vector3(V5FlancsPose[i].x, -V5FlancsEnfoncement, V5FlancsPose[i].z), V5FlancsPose[i].w);
         V5Falaise(mont);
 
         // Grotte : le fond de la pièce Tripo est un replat à ~2,1 m derrière un seuil rocheux : dalle de pierre plate à
