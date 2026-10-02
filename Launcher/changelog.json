@@ -1,6 +1,19 @@
 {
   "versions": [
     {
+      "version": "0.9.5",
+      "date": "2026-10-02",
+      "titre": "Le nouveau donjon dans la nouvelle carte",
+      "notes": [
+        "Dans « Nouvelle carte (aperçu) », le portail de la grotte mène maintenant à un nouveau donjon généré. La graine est la même pour tous les joueurs. Le donjon a trois niveaux en terrasses reliés par des escaliers de 4 m, des piliers, des torches, des coffres et des gardiens squelettes. Le portail de retour te ramène à la grotte.",
+        "La caméra reste dans la salle : les piliers et les parapets sont découpés quand ils gênent la vue.",
+        "Les coffres s'ouvrent avec E. Les pièces à serrure s'ouvrent aussi avec E, sans clé pour l'instant. Les pièces secrètes s'ouvrent avec un bouton sur un mur ou une plaque au sol. Les clés du mécano et le crochetage ne sont pas encore là.",
+        "Touche F8 : passer à la graine suivante, donc à un autre donjon. Maj+F8 : une graine au hasard.",
+        "Le jeu normal garde l'ancien donjon.",
+        "Version de test : solo seulement (les portes ne sont pas encore partagées entre joueurs en réseau). L'arrivée est adoucie, mais les gardiens sont encore à régler, et le portail de retour est sommaire."
+      ]
+    },
+    {
       "version": "0.9.4",
       "date": "2026-10-02",
       "titre": "Viser avant de lancer",
