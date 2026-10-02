@@ -11,7 +11,7 @@ using Object = UnityEngine.Object;
 // Scène de rendu Assets/Scenes/Dev/BavaroiseRendu.unity (recréée à chaque fois), puis retour à la scène ouverte avant.
 // Sorties (Assets/Screenshots/) :
 // - <préfixe>_planche.png : planche en haut, rendu en bas (vues de 654 x 986 réduites) ;
-// - <préfixe>_comparaison.png (1920 x 1080) : la Bavaroise à sa taille de jeu (x 1,18, 2,15 m) entre les héros KayKit du jeu
+// - <préfixe>_comparaison.png (1920 x 1080) : la Bavaroise à sa taille de jeu (x 0,97, 1,75 m) entre les héros KayKit du jeu
 //   (Paladin, Viking, Mage, Rôdeur, prefabs Assets/Jeu/Prefabs/Heros_*.prefab), tous en Idle_A : cohérence de style et de taille ;
 // - <préfixe>_animation.png (Idle_A, Running_A, Melee_Dualwield_Attack_Slice), <préfixe>_gros_plan.png (visage, tablier),
 //   <préfixe>_portrait.png (720 x 720, 3/4 face, cadrage des portraits du wiki) ;
@@ -24,7 +24,7 @@ public static class BavaroiseRendu
     const string Planche = "ArtSources/References/Personnages/bavaroise_planche.jpg";
     const string Sortie = "Assets/Screenshots/";
     const int L = 654, H = 986;
-    const float EchelleJeu = 1.18f;   // TavernierBuilder : 1,82 m -> 2,15 m
+    const float EchelleJeu = TavernierBuilder.Echelle;   // 1,81 m -> 1,75 m, la taille d'un héros
     static readonly string[] Heros = { "Assets/Jeu/Prefabs/Heros_Paladin.prefab", "Assets/Jeu/Prefabs/Heros_Viking.prefab", "Assets/Jeu/Prefabs/Heros_Mage.prefab", "Assets/Jeu/Prefabs/Heros_Rodeur.prefab" };
 
     // Vues de la planche : x, y (depuis le haut), largeur, hauteur en pixels de la planche (1792 x 1008).

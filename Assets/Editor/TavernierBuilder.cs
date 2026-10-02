@@ -12,6 +12,12 @@ public static class TavernierBuilder
     const string Modele = "Assets/Art/Bavaroise/Bavaroise.prefab";
     const string Anims = "Assets/Art/KayKit/KayKit_Character_Animations_1.1/Animations/fbx/Rig_Medium/Rig_Medium_General.fbx";
     const string Dossier = "Assets/Jeu/Tavernier";
+    /// Échelle de la Bavaroise v4 (sommet du crâne à 1,808 m, chignon compris, à l'échelle 1). Les héros et villageois KayKit sont posés à 0,8 :
+    /// leur sommet de tête, sans chapeau ni casque, mesuré en pose de repos (Idle_A, silhouette rendue), est à 1,72 m (Mage), 1,82 (Paladin),
+    /// 1,74 (Viking), 1,81 (Rôdeur), 1,73 (Assassin), soit 1,76 m en moyenne. 0,97 donne 1,75 m à la tavernière (03/10/2026, retour de
+    /// Quentin : « trop grande »). L'ancienne valeur 1,18 (2,13 m) comparait à tort la Bavaroise aux hauteurs non mises à l'échelle des héros
+    /// (Paladin « 2,18 m » = casque avec visière, avant l'échelle de 0,8 du Modele).
+    public const float Echelle = 0.97f;
 
     [MenuItem("Deathless/Niveau/Tavernier")]
     public static void Menu()
@@ -47,7 +53,7 @@ public static class TavernierBuilder
         var col = racine.AddComponent<CapsuleCollider>(); col.center = new Vector3(0f, 0.9f, 0f); col.height = 1.8f; col.radius = 0.3f;
         var modele = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(Modele), racine.transform);
         modele.name = "Modele";
-        modele.transform.localPosition = Vector3.zero; modele.transform.localRotation = Quaternion.identity; modele.transform.localScale = Vector3.one * 1.18f;   // Bavaroise v4 1,82 m → ~2,15 m, la taille d'un héros (Paladin 2,18 m) ; la v3 (1,95 m) était à 1,1, le Rogue à 0,8
+        modele.transform.localPosition = Vector3.zero; modele.transform.localRotation = Quaternion.identity; modele.transform.localScale = Vector3.one * Echelle;   // sommet de la tête à 1,75 m : la taille d'un héros (moyenne 1,76 m hors chapeau)
         // La Bavaroise garde ses matériaux (texture Tripo cuite) : plus de matériau du Rogue.
 
         AnimationClip repos = null, geste = null;
