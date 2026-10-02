@@ -57,6 +57,12 @@ one window on each side wall; a small hanging lantern between the doorway and th
 
 **Vues** : *face* : embrasure à gauche, une fenêtre à droite, lanterne entre les deux, pan avant du toit ; la cheminée de pierre monte contre le pignon GAUCHE. *Gauche* : pignon avec la cheminée au centre qui dépasse le faîte, une fenêtre en bas à côté. *Droite* : pignon avec une fenêtre et un petit hublot rond sous le faîte, pas de cheminée. *Dos* : une fenêtre au centre, pan arrière du toit, la cheminée visible à l'extrémité gauche du faîte (donc à DROITE de l'image).
 
+**Phrases à ajouter à la phrase de vue (maison de base, en anglais)** :
+- Face : « The single stone chimney is seen at the far left, rising behind the front roof slope; the round window of the right gable is not visible from here. »
+- Gauche : « On this wall we see the gable end with the single stone chimney rising up its center above the ridge, and one window at the bottom beside it; no round window on this gable. »
+- Droite : « On this wall we see the gable end with one window and a small round window under the roof peak; no chimney on this gable. »
+- Dos : « One window in the middle of the back wall, the back roof slope, and the single chimney at the end of the ridge (it appears on the RIGHT side of the picture since the building's left is on the right here); no door on this wall. »
+
 ## 2. Boutique du mécano (12,6 × 9,6 m, un étage en façade, faîtage environ 9,5 m)
 
 ```
