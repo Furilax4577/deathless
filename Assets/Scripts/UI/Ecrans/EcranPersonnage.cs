@@ -162,9 +162,12 @@ namespace Deathless.UI.Ecrans
                 var textes = new VisualElement(); textes.AddToClassList("perso__objet-textes");
                 l.nom = new Label(); l.nom.AddToClassList("dl-text"); l.nom.AddToClassList("perso__objet-nom");
                 l.desc = new Label(); l.desc.AddToClassList("perso__objet-desc");
-                textes.Add(l.nom); textes.Add(l.desc);
+                // nom et quantité sur la même ligne, description dessous sur toute la largeur (la carte est étroite)
+                var entete = new VisualElement(); entete.AddToClassList("perso__objet-entete");
                 l.quantite = new Label(); l.quantite.AddToClassList("perso__objet-quantite");
-                l.racine.Add(l.icone); l.racine.Add(textes); l.racine.Add(l.quantite);
+                entete.Add(l.nom); entete.Add(l.quantite);
+                textes.Add(entete); textes.Add(l.desc);
+                l.racine.Add(l.icone); l.racine.Add(textes);
                 m_Objets.Add(l.racine);
                 m_LignesObjets.Add(l);
             }

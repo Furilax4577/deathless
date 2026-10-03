@@ -15,6 +15,7 @@ using Deathless.Jeu;
 ///
 /// Règles (chemin relatif à VillageBlockout) :
 ///   Sol/Sol_Village → palette (teinte du triangle : herbe, terre, sable, galets) ; Sol/Sol_Plane → herbe
+///   Metal_* (pièces de fer de la forge KayKit de la carte v5 : enclume, lame) → métal
 ///   Nexus/** (plateau, gemme), Maisons/**, Portail/**, Montagne/** (grotte, falaises) → pierre
 ///   Riviere/Ponts/** → bois ; Riviere/Cascade/** → eau (les gués : ZoneEau, voir PasMatiere)
 ///   Interieurs/Interieur_Forgeron → pierre (dallage), sauf enclume, seau et barres de fer → métal
@@ -80,6 +81,8 @@ public static class MatieresSolBuilder
     public static Matiere? Regle(string chemin, string nom)
     {
         if (chemin.StartsWith("Sol/")) return Matiere.Herbe;
+        // Pièces de fer de la forge KayKit de la carte v5 (enclume, lame devant le four : VillageBuilder.V5MetalForgeKayKit)
+        if (nom.StartsWith("Metal_")) return Matiere.Metal;
         if (chemin.StartsWith("Nexus/") || chemin.StartsWith("Maisons/") || chemin.StartsWith("Portail/") || chemin.StartsWith("Montagne/")) return Matiere.Pierre;
         if (chemin.StartsWith("Riviere/Ponts/")) return Matiere.Bois;
         if (chemin.StartsWith("Riviere/Cascade")) return Matiere.Eau;

@@ -135,7 +135,7 @@ public static partial class VillageBuilder
             EditorUtility.SetDirty(cycle);
         }
         string effets = V5FumeeKayKit(mod, piece, info);
-        if (piece == "blacksmith") effets += V5FeuForgeKayKit(mod, info);
+        if (piece == "blacksmith") effets += V5FeuForgeKayKit(mod, info) + V5MetalForgeKayKit(mod);
         return role + " (KayKit " + piece + " " + V5MaisonsKayKitCoul[i] + ", lacet " + racine.eulerAngles.y.ToString("F1") + ", porte à " + e.transform.position.ToString("F2") + suite + lanterneInfo + effets + ") ; ";
     }
 
@@ -185,6 +185,53 @@ public static partial class VillageBuilder
         go.transform.localScale = Vector3.one * 1.6f;
         EditorUtility.SetDirty(feu);
         return ", feu ForgeFeu + lumière chaude dans la bouche du four (" + bouche.ToString("F2") + ")";
+    }
+
+    /// Pièces de fer de la forge KayKit pour les bruits de pas (03/10/2026) : le modèle est d'un seul maillage, sa collision est marquée
+    /// pierre ; on pose, exactement sur le dessus de l'enclume et de la lame posée devant le four, des boîtes de collision minces (une par bande de 15 cm, dessus au 90e centile des hauteurs relevées)
+    /// (Metal_<pièce>, marqueur MatiereSol métal, MatieresSolBuilder.Regle les garde en métal) : le rayon des pas (PasMatiere, sol le
+    /// plus proche) les touche avant la pierre, la marche est inchangée (dessus à 1 cm au plus du maillage). Zones relevées sur
+    /// building_blacksmith (repère du modèle enfoncé, m) : enclume x -1,2 à 0,9, z 3,0 à 4,8, dessus au-dessus de 0,4 m ; lame
+    /// x -3,1 à -1,6, z 2,0 à 2,9, au-dessus de 0,12 m (le dallage de pierre dessous reste pierre). Le plancher de la cabane reste
+    /// pierre. Le seau et les outils du râtelier ne se marchent pas (verticaux ou hors d'atteinte). Idempotent.
+    public static string V5MetalForgeKayKit(Transform mod)
+    {
+        Transform col = mod.Find("Collision");
+        var mc = col != null ? col.GetComponent<MeshCollider>() : null;
+        if (mc == null) return ", pas de collision : pas de pièces de fer";
+        for (int k = mod.childCount - 1; k >= 0; k--) if (mod.GetChild(k).name.StartsWith("Metal_")) Object.DestroyImmediate(mod.GetChild(k).gameObject);
+        Physics.SyncTransforms();
+        // rayons lancés de yDepart (sous le linteau du four, qui surplombe la lame) ; dessus = 90e centile des hauteurs touchées
+        var zones = new (string nom, float x0, float x1, float z0, float z1, float yMin, float yDepart)[] { ("Enclume", -1.2f, 0.9f, 3.0f, 4.8f, 0.4f, 1.2f), ("Lame", -3.1f, -1.6f, 2.0f, 2.9f, 0.12f, 0.6f) };
+        var sb = new StringBuilder();
+        const float pas = 0.05f, bande = 0.15f, ep = 0.06f;
+        foreach (var z in zones)
+        {
+            // une boîte par bande de 15 cm en z (étendue en x et dessus de la bande) : la forme de la pièce est suivie, pas de rebord invisible
+            GameObject go = null; int n = 0, boites = 0;
+            for (float b0 = z.z0; b0 < z.z1; b0 += bande)
+            {
+                float x0 = 99f, x1 = -99f; var hauts = new List<float>();
+                for (float x = z.x0; x <= z.x1; x += pas)
+                    for (float zz = b0; zz < b0 + bande - 0.001f; zz += pas)
+                    {
+                        Vector3 w = mod.TransformPoint(new Vector3(x, z.yDepart, zz));
+                        if (!mc.Raycast(new Ray(w, Vector3.down), out RaycastHit h, z.yDepart + 1f)) continue;
+                        float y = mod.InverseTransformPoint(h.point).y;
+                        if (y < z.yMin) continue;
+                        x0 = Mathf.Min(x0, x); x1 = Mathf.Max(x1, x); hauts.Add(y); n++;
+                    }
+                if (hauts.Count < 3) continue;
+                hauts.Sort(); float haut = hauts[Mathf.Min(hauts.Count - 1, (int)(hauts.Count * 0.9f))];
+                if (go == null) { go = new GameObject("Metal_" + z.nom); go.transform.SetParent(mod, false); go.AddComponent<Deathless.Jeu.MatiereSol>().matiere = Deathless.Jeu.Matiere.Metal; }
+                var bc = go.AddComponent<BoxCollider>();
+                bc.size = new Vector3(x1 - x0 + pas, ep, bande);
+                bc.center = new Vector3((x0 + x1) / 2f, haut + 0.005f - ep / 2f, b0 + bande / 2f);
+                boites++;
+            }
+            sb.Append(", fer ").Append(z.nom).Append(go != null ? " (" + n + " points, " + boites + " boîtes)" : " introuvable");
+        }
+        return sb.ToString();
     }
 
     /// Pose (ou remet à jour) le composant EntreeBatiment sur un repère Entree : rôle du bâtiment et pied de la porte. Idempotent.

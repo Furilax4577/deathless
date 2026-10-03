@@ -78,7 +78,8 @@
 .perso__objet--vide { opacity: 0.45; }
 .perso__objet-icone { width: 54px; height: 54px; flex-shrink: 0; margin-right: 12px; }
 .perso__objet-textes { flex-grow: 1; flex-shrink: 1; flex-basis: 0; }
-.perso__objet-nom { margin: 0; padding: 0; white-space: normal; -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); }
+.perso__objet-entete { flex-direction: row; align-items: center; justify-content: space-between; }
+.perso__objet-nom { margin: 0; padding: 0; white-space: normal; flex-shrink: 1; -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); }
 .perso__objet-desc { margin: 2px 0 0 0; padding: 0; white-space: normal; font-size: var(--dl-text-caption); color: var(--dl-color-text-muted); }
 .perso__objet-quantite { margin: 0 0 0 12px; padding: 0; flex-shrink: 0; -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); font-size: var(--dl-text-large); color: var(--dl-color-gold); }
 

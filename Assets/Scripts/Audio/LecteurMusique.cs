@@ -99,6 +99,8 @@ namespace Deathless.Audio
                 m_Prochain = Time.unscaledTime + PeriodeChoix;
                 var v = Voulue();
                 if (v != m_Liste) Changer(v);
+                // Liste restée muette faute de morceaux (fichiers ajoutés depuis, réglages chargés plus tard) : on retente.
+                else if (m_Actif < 0 && m_Liste != ListeMusique.Aucune) LancerSuivant();
             }
 
             // Enchaînement : le morceau actif touche à sa fin, le suivant de la liste démarre en fondu.
@@ -137,7 +139,9 @@ namespace Deathless.Audio
             int k = dernier < 0 ? Random.Range(0, clips.Length) : (dernier + 1) % clips.Length;
             for (int essai = 0; essai < clips.Length && clips[k] == null; essai++) k = (k + 1) % clips.Length;
             m_Dernier[(int)m_Liste] = k;
-            int cible = m_Actif == 0 ? 1 : 0;
+            // La source la plus faible reçoit le nouveau morceau : un changement de liste en plein fondu ne coupe jamais
+            // net le morceau encore audible (vérifié le 03/10/2026 : jour_1 à 91 % était coupé quand la nuit tombait).
+            int cible = m_Gain[0] <= m_Gain[1] ? 0 : 1;
             var s = m_Source[cible];
             s.Stop();
             s.clip = clips[k];
