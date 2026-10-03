@@ -1653,7 +1653,10 @@ namespace Deathless.Donjon.Terrasses
             foreach (var t in terrasses) aireTot += t.r.Largeur * t.r.Profondeur;
             foreach (var t in terrasses)
             {
-                int n = t.niveau == nmax ? 3 : Math.Max(2, (int)Math.Round(total * 0.35f * t.r.Largeur * t.r.Profondeur / Math.Max(1, aireTot)));
+                // 35 % des apparitions au prorata de l'aire, arrondi en entiers (03/10/2026 : l'arrondi flottant de « total × 0,35 × aire / aire
+                // totale » tombait parfois pile sur ,5 et Mono, qui calcule en double, ne tranchait pas comme .NET : graines 5, 24, 25… différentes)
+                long num = 35L * total * t.r.Largeur * t.r.Profondeur, den = 100L * Math.Max(1, aireTot);
+                int n = t.niveau == nmax ? 3 : Math.Max(2, (int)((2 * num + den) / (2 * den)));
                 n = Math.Min(n, restant);
                 parTerrasse[t.index] = n; restant -= n;
             }
@@ -1690,8 +1693,12 @@ namespace Deathless.Donjon.Terrasses
                     if (bord && !ParapetPres(CentreX(i), CentreZ(j), 2.6f)) continue;
                     cands.Add(k);
                 }
-            float e2 = Prm.espacementApparitionsMin * Prm.espacementApparitionsMin;
-            float da2 = Prm.distanceArriveeApparitions * Prm.distanceArriveeApparitions;
+            // Seuils diminués d'1 mm² (03/10/2026) : les cotes sont au décimètre, les carrés de distance tombent pile sur le seuil
+            // (3² + 4² = 5²) et Mono, qui calcule en double, ne tranchait pas comme .NET (graines 378, 394) ; la marge rend le test
+            // identique partout sans rien changer d'autre (aucune distance réelle n'est entre le seuil et le seuil moins 0,01 m²).
+            const float marge = 0.001f;
+            float e2 = Prm.espacementApparitionsMin * Prm.espacementApparitionsMin - marge;
+            float da2 = Prm.distanceArriveeApparitions * Prm.distanceArriveeApparitions - marge;
             // tous les candidats, dans un ordre tiré au sort (mélange de Fisher-Yates déterministe)
             for (int t = 0; t < cands.Count; t++)
             {
@@ -1704,8 +1711,8 @@ namespace Deathless.Donjon.Terrasses
                 float ax = x - arrivee.x, az = z - arrivee.z;
                 if (ax * ax + az * az < da2) ok = false;
                 if (ok) foreach (var a in apparitions) { float dx = a.pose.x - x, dz = a.pose.z - z; if (dx * dx + dz * dz < e2) { ok = false; break; } }
-                if (ok) foreach (var c in coffres) { float dx = c.pose.x - x, dz = c.pose.z - z; if (dx * dx + dz * dz < 2.5f * 2.5f) { ok = false; break; } }
-                if (ok) foreach (var d in declencheurs) { float dx = d.pose.x - x, dz = d.pose.z - z; if (dx * dx + dz * dz < 2.5f * 2.5f) { ok = false; break; } }
+                if (ok) foreach (var c in coffres) { float dx = c.pose.x - x, dz = c.pose.z - z; if (dx * dx + dz * dz < 2.5f * 2.5f - marge) { ok = false; break; } }
+                if (ok) foreach (var d in declencheurs) { float dx = d.pose.x - x, dz = d.pose.z - z; if (dx * dx + dz * dz < 2.5f * 2.5f - marge) { ok = false; break; } }
                 if (ok && (PresArche(x, z, 3f) || PresEscalier(x, z, 1.5f) || PresPilier(x, z, 1.2f))) ok = false;
                 if (!ok) continue;
                 // regard vers le centre de la grande salle
