@@ -3716,7 +3716,7 @@
     "portee": 25,
     "source": "Deathless (synthèse, Assets/Audio/Deathless/Pas/synth_pas.py)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "pas_pierre",
@@ -3753,7 +3753,7 @@
     "portee": 25,
     "source": "Deathless (synthèse, Assets/Audio/Deathless/Pas/synth_pas.py)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
   },
   {
     "id": "pas_metal",
@@ -3771,7 +3771,64 @@
     "portee": 25,
     "source": "Deathless (synthèse, Assets/Audio/Deathless/Pas/synth_pas.py)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "utilise"
+  },
+  {
+    "id": "pas_bois_v2",
+    "nom": "Joueur — pas sur le bois (v2)",
+    "categorie": "Joueurs",
+    "usage": "Proposition v2 du pas sur le bois, en attente d'écoute : « toc » boisé sourd et bref (210 ms), un vrai coup de bois Kenney assombri, résonance de planche et poids du pied ; un grincement très discret sur deux variantes sur cinq. Ponts, planchers des pièces entrables. Même détection et mêmes réglages que l'actuel (PasMatiere, 5 variantes tirées sans répéter la dernière) ; le jeu continue de jouer l'actuel tant que Quentin n'a pas validé celui-ci. Refait le 03/10/2026 après le retour « nul » de Quentin : la v1, synthétisée sans oreille, était sourde et grave.",
+    "fichier": "Deathless/Pas/bois_v2_1.wav",
+    "variantes": [
+      "Deathless/Pas/bois_v2_1.wav",
+      "Deathless/Pas/bois_v2_2.wav",
+      "Deathless/Pas/bois_v2_3.wav",
+      "Deathless/Pas/bois_v2_4.wav",
+      "Deathless/Pas/bois_v2_5.wav"
+    ],
+    "portee": 25,
+    "source": "Deathless (v2 : échantillons Kenney RPG Audio chop, bookPlace1-2, doorClose_4, creak3, retravaillés et complétés par une synthèse modale, Assets/Audio/Deathless/Pas/synth_pas_v2.py)",
+    "licence": "propre et CC0 (Kenney)",
+    "statut": "a_ecouter",
+    "remplace": "pas_bois"
+  },
+  {
+    "id": "pas_sable_v2",
+    "nom": "Joueur — pas sur le sable (v2)",
+    "categorie": "Joueurs",
+    "usage": "Proposition v2 du pas sur le sable, en attente d'écoute : « froissement granuleux » doux et court (225 ms), l'allure d'un vrai pas Kenney filtrée, grains fins, souffle de sable et foulée grave, rien au-dessus de 5,5 kHz. Le sable de la lande. Même détection et mêmes réglages que l'actuel (PasMatiere, 5 variantes tirées sans répéter la dernière) ; le jeu continue de jouer l'actuel tant que Quentin n'a pas validé celui-ci. Refait le 03/10/2026 après le retour « nul » de Quentin : la v1, synthétisée sans oreille, était sourde et grave.",
+    "fichier": "Deathless/Pas/sable_v2_1.wav",
+    "variantes": [
+      "Deathless/Pas/sable_v2_1.wav",
+      "Deathless/Pas/sable_v2_2.wav",
+      "Deathless/Pas/sable_v2_3.wav",
+      "Deathless/Pas/sable_v2_4.wav",
+      "Deathless/Pas/sable_v2_5.wav"
+    ],
+    "portee": 25,
+    "source": "Deathless (v2 : échantillons Kenney RPG Audio footstep01, 02, 04, 05, 09 retravaillés et complétés par des grains synthétiques, Assets/Audio/Deathless/Pas/synth_pas_v2.py)",
+    "licence": "propre et CC0 (Kenney)",
+    "statut": "a_ecouter",
+    "remplace": "pas_sable"
+  },
+  {
+    "id": "pas_metal_v2",
+    "nom": "Joueur — pas sur le métal (v2)",
+    "categorie": "Joueurs",
+    "usage": "Proposition v2 du pas sur le métal, en attente d'écoute : « tchank » sourd d'une plaque ou d'une botte ferrée (230 ms), l'attaque d'un vrai choc métallique Kenney, modes de plaque graves et courts, semelle ; ni cloche ni sifflement. Enclume, seau et barres de fer de la forge. Même détection et mêmes réglages que l'actuel (PasMatiere, 5 variantes tirées sans répéter la dernière) ; le jeu continue de jouer l'actuel tant que Quentin n'a pas validé celui-ci. Refait le 03/10/2026 après le retour « nul » de Quentin : la v1, synthétisée sans oreille, était sourde et grave.",
+    "fichier": "Deathless/Pas/metal_v2_1.wav",
+    "variantes": [
+      "Deathless/Pas/metal_v2_1.wav",
+      "Deathless/Pas/metal_v2_2.wav",
+      "Deathless/Pas/metal_v2_3.wav",
+      "Deathless/Pas/metal_v2_4.wav",
+      "Deathless/Pas/metal_v2_5.wav"
+    ],
+    "portee": 25,
+    "source": "Deathless (v2 : échantillons Kenney RPG Audio metalClick, metalLatch, metalPot1, metalPot3 retravaillés et complétés par une synthèse modale, Assets/Audio/Deathless/Pas/synth_pas_v2.py)",
+    "licence": "propre et CC0 (Kenney)",
+    "statut": "a_ecouter",
+    "remplace": "pas_metal"
   },
   {
     "id": "dl_boutique_achat",

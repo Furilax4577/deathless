@@ -9,6 +9,8 @@ Tous les sons présents dans le projet, à écouter ici. Ils viennent de Relic, 
 
 {sons à écouter}
 
+Pas de bois, de sable et de métal, v2 (03/10/2026, après le retour « nul » de Quentin) : refaits à partir d'échantillons Kenney retravaillés (`Assets/Audio/Deathless/Pas/synth_pas_v2.py`), en attente d'écoute (ids `pas_bois_v2`, `pas_sable_v2`, `pas_metal_v2`, qui remplacent `pas_bois`, `pas_sable`, `pas_metal` après accord). Page d'écoute locale, avec les anciens à côté et un bouton « Marcher » : `Docs/audio-ecoute/pas-v2.html`.
+
 Les boucles (vol d'un projectile, cône de flammes, bourdonnement du portail…) sont marquées « (boucle) » : le lecteur ne les joue qu'une fois. Un son en plusieurs variantes a un lecteur par variante, tirée au hasard en jeu.
 
 > Le catalogue est le fichier `Wiki/data/sons.json`. Pour ajouter un son ou en générer un nouveau avec les scripts de synthèse, voir `Docs/sons.md`.
