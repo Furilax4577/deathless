@@ -1,8 +1,8 @@
 {
   "date": "2026-10-03",
-  "pourcent": 65.5,
+  "pourcent": 65.0,
   "kaykit": 1251,
-  "total": 1911,
+  "total": 1926,
   "familles": [
     {
       "nom": "Modèles 3D",
@@ -31,7 +31,7 @@
     {
       "nom": "Sons",
       "kaykit": 0,
-      "total": 461,
+      "total": 476,
       "pourcent": 0.0
     }
   ]

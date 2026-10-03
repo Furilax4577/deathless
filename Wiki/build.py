@@ -251,6 +251,23 @@ def charger_sons():
             manque = [k for k in ("id", "nom", "categorie", "statut") if not s.get(k)]
             if manque or s["statut"] not in STATUTS_SONS or (s["statut"] != "a_creer" and not s.get("fichier")):
                 raise SystemExit("data/sons.json, entrée incomplète ou statut inconnu : %r" % s)
+        par_id = {s["id"]: s for s in _sons}
+        for s in _sons:  # `remplace` : id du son actuel que ce son en attente doit remplacer (comparaison côte à côte)
+            r = s.get("remplace")
+            if not r:
+                continue
+            p = par_id.get(r)
+            if p is None or r == s["id"]:
+                raise SystemExit("data/sons.json, `remplace` de %s : id introuvable (%r)" % (s["id"], r))
+            if s["statut"] != "a_ecouter":
+                print("Attention : %s a `remplace` mais n'est pas à écouter : ignoré." % s["id"])
+            elif p["statut"] == "a_creer" or not p.get("fichier"):
+                print("Attention : %s remplace %s qui n'a pas de fichier : pas de comparaison." % (s["id"], r))
+            else:
+                if p["statut"] != "utilise":
+                    print("Attention : %s remplace %s qui n'est pas au statut utilisé (%s)." % (s["id"], r, p["statut"]))
+                s["_pred"] = p
+                p.setdefault("_candidats", []).append(s["id"])
     return _sons
 
 
@@ -263,6 +280,53 @@ def lecteur(rel):
     return '<audio controls preload="none" src="sons/%s"></audio>' % html.escape(urllib.parse.quote(rel), quote=True)
 
 
+def lecteurs(s):
+    """Lecteur(s) d'un son (un par variante) et la liste de ses fichiers."""
+    fichiers = s.get("variantes") or [s["fichier"]]
+    if len(fichiers) > 1:
+        ecoute = "".join('<div class="var"><span>%d</span>%s</div>' % (n, lecteur(f)) for n, f in enumerate(fichiers, 1))
+    else:
+        ecoute = lecteur(fichiers[0])
+    return ecoute, fichiers
+
+
+def etiquette_ancien(p):
+    """Étiquette de la colonne gauche d'une comparaison, d'après le statut du son remplacé."""
+    return {"utilise": "Utilisé actuellement", "disponible": "Ancien son (disponible)",
+            "a_ecouter": "Version précédente (à écouter)"}.get(p["statut"], "Son remplacé")
+
+
+def widget_validation(s, comparaison):
+    """Boutons de validation d'un son à écouter (état gardé dans le navigateur, voir JS_VALID)."""
+    i = html.escape(s["id"], quote=True)
+    rem = ' data-remplace="%s"' % html.escape(s["_pred"]["id"], quote=True) if s.get("_pred") else ""
+    nom = html.escape(s["nom"], quote=True)
+    if comparaison:
+        return ('<div class="valid valid--cmp" role="group" aria-label="Validation : %s" data-id="%s"%s>'
+                '<button type="button" class="valid__btn valid__btn--ok" data-val="ok" aria-pressed="false">Prendre le nouveau</button>'
+                '<button type="button" class="valid__btn valid__btn--ko" data-val="ko" aria-pressed="false">Garder l\'ancien</button>'
+                '</div>' % (nom, i, rem))
+    return ('<div class="valid" role="group" aria-label="Validation : %s" data-id="%s"%s>'
+            '<button type="button" class="valid__btn valid__btn--attente" data-val="attente" aria-pressed="false">À écouter</button>'
+            '<button type="button" class="valid__btn valid__btn--ok" data-val="ok" aria-pressed="false">Validé ✓</button>'
+            '<button type="button" class="valid__btn valid__btn--ko" data-val="ko" aria-pressed="false">Refusé ✗</button>'
+            '</div>' % (nom, i, rem))
+
+
+def bloc_comparaison(s, usage=True):
+    """Bloc côte à côte : à gauche le son actuel (toutes ses variantes), à droite le nouveau en attente."""
+    p = s["_pred"]
+    e_old, f_old = lecteurs(p)
+    e_new, f_new = lecteurs(s)
+    haut = ('<div class="cmp"><div class="cmp__col cmp__col--ancien"><p class="cmp__etiquette">%s</p>'
+            '<p class="cmp__nom"><strong>%s</strong><br><code class="fic">%s</code></p>%s</div>'
+            '<div class="cmp__col cmp__col--nouveau"><p class="cmp__etiquette">En attente</p>'
+            '<p class="cmp__nom"><strong>%s</strong><br><code class="fic">%s</code></p>%s</div>'
+            % (etiquette_ancien(p), html.escape(p["nom"]), html.escape(p["id"]), e_old,
+               html.escape(s["nom"]), html.escape(s["id"]), e_new))
+    return haut + widget_validation(s, True) + "</div>"
+
+
 def ligne_son(s, colonnes):
     libelle, classe = STATUTS_SONS[s["statut"]][:2]
     q = sans_accents(" ".join(str(s.get(k) or "") for k in ("nom", "categorie", "usage", "source", "id", "fichier")))
@@ -272,20 +336,26 @@ def ligne_son(s, colonnes):
     usage = inline(s.get("usage") or "") or "—"
     if colonnes == "a_creer":
         return "<tr%s><td>%s</td><td>%s</td><td>%s</td></tr>" % (attrs, nom, html.escape(s["categorie"]), usage)
-    fichiers = s.get("variantes") or [s["fichier"]]
-    if len(fichiers) > 1:
-        ecoute = "".join('<div class="var"><span>%d</span>%s</div>' % (n, lecteur(f)) for n, f in enumerate(fichiers, 1))
-        fic = "%s <small>(%d variantes)</small>" % (html.escape(fichiers[0]), len(fichiers))
-    else:
-        ecoute, fic = lecteur(fichiers[0]), html.escape(fichiers[0])
     source = "%s<br><small>%s</small>" % (html.escape(s.get("source") or ""), html.escape(s.get("licence") or ""))
+    if s["statut"] == "a_ecouter" and s.get("_pred"):  # comparaison : la ligne s'étale sur les colonnes 2 à 4
+        fic = html.escape((s.get("variantes") or [s["fichier"]])[0])
+        return ('<tr%s class="ligne-cmp"><td>%s<br><code class="fic">%s</code><br><small>%s</small></td>'
+                '<td colspan="3">%s<p class="cmp__usage">%s</p></td></tr>' % (
+                    attrs, nom, fic, source.replace("<br>", " · "), bloc_comparaison(s), usage))
+    ecoute, fichiers = lecteurs(s)
+    fic = ("%s <small>(%d variantes)</small>" % (html.escape(fichiers[0]), len(fichiers))) if len(fichiers) > 1 else html.escape(fichiers[0])
+    if s["statut"] == "a_ecouter":
+        ecoute += widget_validation(s, False)
+    elif s.get("_candidats"):
+        nom += "".join('<br><small><a class="cmp-lien" href="#son-%s">voir la comparaison</a></small>' % html.escape(c, quote=True)
+                       for c in s["_candidats"])
     return '<tr%s><td>%s<br><code class="fic">%s</code></td><td>%s</td><td>%s</td><td>%s</td></tr>' % (
         attrs, nom, fic, ecoute, usage, source)
 
 
 JS_SONS = """
 document.addEventListener('DOMContentLoaded',function(){
-  var q=document.getElementById('sons-q'),c=document.getElementById('sons-cat'),s=document.getElementById('sons-statut'),nb=document.getElementById('sons-nb');
+  var q=document.getElementById('sons-q'),c=document.getElementById('sons-cat'),s=document.getElementById('sons-statut'),nb=document.getElementById('sons-nb'),v=document.getElementById('sons-valid');
   if(!q) return;
   function norm(t){return t.toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'');}
   function filtre(){
@@ -293,17 +363,70 @@ document.addEventListener('DOMContentLoaded',function(){
     document.querySelectorAll('.bloc-sons').forEach(function(b){
       var vis=0;
       b.querySelectorAll('tbody tr').forEach(function(tr){
-        var ok=(!cat||tr.dataset.cat===cat)&&(!st||tr.dataset.statut===st)&&mots.every(function(m){return tr.dataset.q.indexOf(m)>=0;});
+        var ok=(!cat||tr.dataset.cat===cat)&&(!st||tr.dataset.statut===st)&&(!v||!v.value||(tr.dataset.statut==='a_ecouter'&&(tr.dataset.valid||'attente')===v.value))&&mots.every(function(m){return tr.dataset.q.indexOf(m)>=0;});
         tr.hidden=!ok; if(ok) vis++;
       });
       b.hidden=!vis; n+=vis;
     });
     nb.textContent=n+(n>1?' sons affichés':' son affiché');
   }
-  [q,c,s].forEach(function(e){e.addEventListener('input',filtre);});
+  [q,c,s,v].forEach(function(e){if(e)e.addEventListener('input',filtre);});window.sonsFiltre=filtre;
   document.addEventListener('play',function(e){document.querySelectorAll('audio').forEach(function(a){if(a!==e.target)a.pause();});},true);
   filtre();
 });
+"""
+
+
+JS_VALID = r"""
+(function(){
+  var CLE='deathless-sons-validation-v1', etat={};
+  function lire(){try{var t=window.localStorage.getItem(CLE);etat=t?JSON.parse(t)||{}:{};}catch(e){etat=etat||{};}}
+  function ecrire(){try{window.localStorage.setItem(CLE,JSON.stringify(etat));}catch(e){}}
+  function unique(){var vus={},l=[];document.querySelectorAll('.valid[data-id]').forEach(function(w){
+    var i=w.getAttribute('data-id');if(!vus[i]){vus[i]=1;l.push(w);}});return l;}
+  function appliquer(){
+    var ok=0,ko=0,tout=unique();
+    tout.forEach(function(w){var v=etat[w.getAttribute('data-id')];if(v==='ok')ok++;else if(v==='ko')ko++;});
+    document.querySelectorAll('.valid').forEach(function(w){
+      var v=etat[w.getAttribute('data-id')]||'attente';
+      w.setAttribute('data-etat',v);
+      w.querySelectorAll('.valid__btn').forEach(function(b){var on=b.getAttribute('data-val')===v;
+        b.classList.toggle('on',on);b.setAttribute('aria-pressed',on?'true':'false');});
+    });
+    document.querySelectorAll('tr[id^="son-"][data-statut="a_ecouter"]').forEach(function(tr){
+      tr.setAttribute('data-valid',etat[tr.id.slice(4)]||'attente');});
+    var txt=ok+(ok>1?' validés':' validé')+', '+ko+(ko>1?' refusés':' refusé')+', '+(tout.length-ok-ko)+' à écouter';
+    document.querySelectorAll('.val-compteur').forEach(function(e){e.textContent=txt;});
+    if(window.sonsFiltre)window.sonsFiltre();
+  }
+  function choisir(id,val){if(val==='attente'||etat[id]===val)delete etat[id];else etat[id]=val;ecrire();appliquer();}
+  function selection(){
+    var d=new Date(),p=function(n){return n<10?'0'+n:''+n;},lignes=[],ok=0,ko=0;
+    unique().forEach(function(w){var i=w.getAttribute('data-id'),v=etat[i],r=w.getAttribute('data-remplace');
+      if(v==='ok'){ok++;lignes.push(i+' : valider'+(r?' (remplace '+r+')':''));}
+      else if(v==='ko'){ko++;lignes.push(i+' : refuser');}});
+    return 'Sélection de sons, wiki Deathless, '+d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes())
+      +' ('+ok+' validés, '+ko+' refusés)\n'+(lignes.length?lignes.join('\n'):'(rien de coché)');
+  }
+  function info(m){document.querySelectorAll('.val-info').forEach(function(e){e.textContent=m;});}
+  function copier(){
+    var t=selection(),zone=document.querySelector('.val-texte');
+    function secours(){if(zone){zone.hidden=false;zone.value=t;zone.focus();zone.select();}
+      try{if(document.execCommand('copy')){info('Copié. Colle-le dans le chat.');return;}}catch(e){}
+      info('Copie impossible ici : le texte est sélectionné, copie-le à la main (Ctrl+C).');}
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(t).then(function(){info('Copié ('+(t.split('\n').length-1)+' ligne(s)). Colle-le dans le chat.');},secours);
+    }else secours();
+  }
+  function reset(){if(window.confirm('Tout réinitialiser : effacer toutes les validations et tous les refus de ce navigateur ?')){etat={};ecrire();appliquer();info('Réinitialisé.');}}
+  document.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('.valid__btn');
+    if(b){var w=b.closest('.valid');choisir(w.getAttribute('data-id'),b.getAttribute('data-val'));return;}
+    var a=e.target.closest&&e.target.closest('[data-act]');
+    if(a){var act=a.getAttribute('data-act');if(act==='copier')copier();else if(act==='reset')reset();}
+  });
+  document.addEventListener('DOMContentLoaded',function(){lire();appliquer();});
+})();
 """
 
 
@@ -319,7 +442,11 @@ def catalogue_sons():
            '<input id="sons-q" type="search" placeholder="Rechercher un son, un usage, un fichier…" aria-label="Rechercher un son" autocomplete="off">'
            '<select id="sons-cat" aria-label="Catégorie"><option value="">Toutes les catégories</option>%s</select>'
            '<select id="sons-statut" aria-label="Statut"><option value="">Tous les statuts</option>%s</select>'
-           '<span id="sons-nb" aria-live="polite"></span></div>'
+           '<select id="sons-valid" aria-label="Validation"><option value="">Validation : toutes</option><option value="attente">Seulement à écouter</option>'
+           '<option value="ok">Seulement validés ✓</option><option value="ko">Seulement refusés ✗</option></select>'
+           '<span id="sons-nb" aria-live="polite"></span>'
+           '<span class="val-compteur" aria-live="polite"></span>'
+           '<button type="button" class="val-bouton" data-act="copier">Copier ma sélection</button></div>'
            % (options, "".join('<option value="%s">%s</option>' % (k, v[2]) for k, v in STATUTS_SONS.items()))]
     titres = []
     for cat in cats:
@@ -350,7 +477,9 @@ def sons_a_creer():
 
 
 def sons_a_ecouter():
-    """{sons à écouter} : encart qui liste, par catégorie, les sons créés en attente d'écoute, avec un lien vers chacun."""
+    """{sons à écouter} : encart de relecture. Par catégorie, chaque son créé qui attend l'écoute de Quentin : un son qui en
+    remplace un autre (`remplace`) s'affiche en comparaison côte à côte, les autres avec leur lecteur ; chacun a ses boutons
+    de validation (état gardé dans le navigateur, bouton « Copier ma sélection » : voir JS_VALID)."""
     sons = [s for s in charger_sons() if s["statut"] == "a_ecouter"]
     if not sons:
         return "<aside class=\"note encart-ecoute\" id=\"a-ecouter\">Aucun son en attente d'écoute.</aside>", []
@@ -358,13 +487,35 @@ def sons_a_ecouter():
     for s in sons:
         if s["categorie"] not in cats:
             cats.append(s["categorie"])
-    lignes = "".join('<li><strong>%s</strong> : %s</li>' % (html.escape(c), ", ".join(
-        '<a href="#son-%s">%s</a>' % (html.escape(s["id"], quote=True), html.escape(s["nom"])) for s in sons if s["categorie"] == c))
-        for c in cats)
+    nb_cmp = sum(1 for s in sons if s.get("_pred"))
+    sections = []
+    for c in cats:
+        items = []
+        for s in (x for x in sons if x["categorie"] == c):
+            lien = '<a href="#son-%s">dans le catalogue</a>' % html.escape(s["id"], quote=True)
+            if s.get("_pred"):
+                items.append('<li class="ecoute-item ecoute-item--cmp" data-id="%s">%s<p class="cmp__usage">%s <small>(%s)</small></p></li>' % (
+                    html.escape(s["id"], quote=True), bloc_comparaison(s), inline(s.get("usage") or ""), lien))
+            else:
+                ecoute, _ = lecteurs(s)
+                items.append('<li class="ecoute-item" data-id="%s"><p class="ecoute-item__nom"><strong>%s</strong> <small>(%s)</small></p>'
+                             '<div class="ecoute-item__corps"><div class="ecoute-item__lecteurs">%s</div>%s</div>'
+                             '<p class="cmp__usage">%s</p></li>' % (
+                                 html.escape(s["id"], quote=True), html.escape(s["nom"]), lien, ecoute, widget_validation(s, False),
+                                 inline(s.get("usage") or "")))
+        sections.append('<details class="ecoute-cat" open><summary>%s <small>(%d)</small></summary><ul class="ecoute-liste">%s</ul></details>' % (
+            html.escape(c), sum(1 for x in sons if x["categorie"] == c), "".join(items)))
     return ('<aside class="note encart-ecoute" id="a-ecouter"><p><span class="badge ecoute">à écouter</span> '
-            "<strong>%d sons créés attendent d'être écoutés par Quentin</strong> : un clic mène au son dans le catalogue. Une fois validé, "
-            'son statut passe à « utilisé » dans <code>Wiki/data/sons.json</code>.</p><ul>%s</ul></aside>'
-            % (len(sons), lignes)), [(2, "À écouter", "a-ecouter")]
+            "<strong>%d sons créés attendent d'être écoutés par Quentin</strong> dont %d en comparaison avec le son actuel. Pour chacun : "
+            "écouter, puis « Validé ✓ » / « Refusé ✗ » (ou « Prendre le nouveau » / « Garder l'ancien » en comparaison). "
+            "Le choix reste dans ce navigateur ; « Copier ma sélection » en fait un texte à coller dans le chat avec Claude, "
+            "qui applique les changements dans <code>Wiki/data/sons.json</code>.</p>"
+            '<div class="val-barre"><span class="val-compteur" aria-live="polite"></span>'
+            '<button type="button" class="val-bouton" data-act="copier">Copier ma sélection</button>'
+            '<button type="button" class="val-bouton val-bouton--reset" data-act="reset">Tout réinitialiser</button>'
+            '<span class="val-info" role="status"></span></div>%s'
+            '<textarea class="val-texte" hidden readonly rows="8" aria-label="Sélection à copier"></textarea>'
+            '<script>%s</script></aside>' % (len(sons), nb_cmp, "".join(sections), JS_VALID)), [(2, "À écouter", "a-ecouter")]
 
 
 def jauge_kaykit():
@@ -386,8 +537,76 @@ def jauge_kaykit():
     return bloc, []
 
 
+def jauge_kenney():
+    """{jauge-kenney} : part des sons et des icônes encore issus des packs Kenney et usage réel de chaque fichier
+    (Wiki/jauge_kenney.py, recalculée à chaque génération), puis le tableau « à remplacer » trié par fréquence d'usage.
+    Même cap que KayKit : dégager Kenney (décision de Quentin, 03/10/2026)."""
+    import jauge_kenney as jn
+    d = jn.ecrire()
+    s, ic = d["sons"], d["icones"]
+
+    def barre(pct, k, tot):
+        return ('<div class="jauge"><div class="jauge__piste"><div class="jauge__remplissage" style="width:%.1f%%"></div></div>'
+                '<span class="jauge__valeur">%.1f %%</span><small>%d / %d</small></div>') % (pct, pct, k, tot)
+
+    def pct(k, tot):
+        return 100.0 * k / tot if tot else 0.0
+    mo = lambda o: "%.1f Mo" % (o / 1048576.0)
+    ligne = lambda nom, k, tot: "<tr><td>%s</td><td>%s</td></tr>" % (html.escape(nom), barre(pct(k, tot), k, tot))
+    parts = "".join((
+        ligne("Sons câblés dans le jeu", s["jeu_ids_kenney"], s["jeu_ids_effectifs"]),
+        ligne("Entrées du catalogue de sons", s["catalogue_entrees_kenney"], s["catalogue_entrees"]),
+        ligne("Fichiers audio du projet", s["fichiers"], s["total_sons_projet"]),
+    ))
+    etats = s["etats"]
+    usage = "".join((
+        ligne("Sons joués par le jeu", etats["joue"], s["fichiers"]),
+        ligne("Sons en secours (derrière un son propre)", etats["repli"], s["fichiers"]),
+        ligne("Sons au catalogue, jamais appelés", etats["catalogue"], s["fichiers"]),
+        ligne("Sons seulement sur le disque", etats["disque"], s["fichiers"]),
+        ligne("Icônes de boutons utilisées", ic["utilisees"], ic["fichiers"]),
+    ))
+    freq = {5: "constante", 4: "à chaque combat", 3: "régulière", 2: "occasionnelle", 1: "rare"}
+    etat_txt = {"joue": "joué", "repli": "secours seulement", "catalogue": "jamais appelé"}
+    par_id = {x["id"]: x for x in charger_sons()}
+    lignes = []
+    for r in d["a_remplacer"]:
+        cands = "".join(' <a href="sons.html#son-%s"><code>%s</code></a>' % (html.escape(c, quote=True), html.escape(c))
+                        for c in r["candidats"] if c in par_id and par_id[c]["statut"] == "a_ecouter")
+        attente = ' <span class="badge ecoute">candidat à écouter</span>%s' % cands if cands else ""
+        lignes.append("<tr><td><code>%s</code><br><small>%s, %d variante%s</small></td><td>%s</td><td>%s<br><small>%s</small></td><td>%s</td>"
+                      '<td><span class="badge wait">%s</span>%s</td></tr>' % (
+                          html.escape(r["id"]), html.escape(r["pack"]), r["variantes"], "s" if r["variantes"] > 1 else "",
+                          html.escape(" ; ".join(r["evenements"])), freq.get(r["frequence"], str(r["frequence"])),
+                          etat_txt.get(r["etat"], r["etat"]), html.escape(r["remplacant"]), r["avancement"], attente))
+    tableau = ('<div class="table"><table class="jauge-kenney__remplacer"><thead><tr><th>Son Kenney</th><th>Usage dans le jeu</th>'
+               '<th>Fréquence</th><th>Remplaçant proposé</th><th>État</th></tr></thead><tbody>%s</tbody></table></div>'
+               % "".join(lignes))
+    derives = ", ".join("<code>%s</code>" % html.escape(x["id"]) for x in d["derives"]) or "aucun"
+    autres = "".join('<li><strong>%s</strong> : %d fichiers, %.1f Mo, %s (%s).</li>' % (
+        html.escape(a["nom"]), a["fichiers"], a["octets"] / 1048576.0, html.escape(a["licence"]), html.escape(a["note"]))
+        for a in d["autres_sources"])
+    bloc = ('<div class="jauge-kaykit jauge-kenney"><p class="jauge-kaykit__titre">Part de Kenney dans les assets du jeu : '
+            '<strong>%.1f %%</strong> des sons câblés <small>(%d sur %d, mesuré le %s ; %d fichiers Kenney, %s)</small></p>%s'
+            '<table class="jauge-kaykit__table"><tbody>%s</tbody></table>'
+            '<p class="jauge-kaykit__note">Kenney = packs RPG Audio et Interface Sounds (sons, <code>Assets/Audio/Kenney/</code>) et Input Prompts '
+            '(icônes de boutons, <code>Assets/Art/UI/KenneyInputPrompts/</code>), tous CC0. Un son est « câblé » quand il est le premier id présent '
+            "d'un tableau de <code>SonsDuJeu</code> ou <code>SonsPortes</code> (les sons à écouter jouent déjà devant leur repli Kenney). Objectif : 0 %%.</p>"
+            '<p class="jauge-kaykit__titre" style="margin-top:14px">Usage des %d fichiers Kenney <small>(sons %s, icônes %s)</small></p>'
+            '<table class="jauge-kaykit__table"><tbody>%s</tbody></table>'
+            '<p class="jauge-kaykit__note">Sons dérivés (échantillons Kenney retravaillés dans un son propre) : %s.</p>'
+            "<p class=\"jauge-kaykit__titre\" style=\"margin-top:14px\">À remplacer, par fréquence d'usage <small>(%d sons Kenney appelés par le jeu ; "
+            "les %d autres, jamais appelés, sont à retirer sans remplaçant)</small></p>%s"
+            "<p class=\"jauge-kaykit__titre\" style=\"margin-top:14px\">Autres sources tierces repérées</p><ul>%s</ul></div>") % (
+        s["pourcent_jeu"], s["jeu_ids_kenney"], s["jeu_ids_effectifs"], d["date"], d["total_fichiers"], mo(d["total_octets"]),
+        barre(s["pourcent_jeu"], s["jeu_ids_kenney"], s["jeu_ids_effectifs"]), parts,
+        d["total_fichiers"], mo(s["octets"]), mo(ic["octets"]), usage, derives,
+        len(d["a_remplacer"]), d["non_branches"]["fichiers"], tableau, autres)
+    return bloc, []
+
+
 BALISES = {"{catalogue sons}": catalogue_sons, "{sons à créer}": sons_a_creer, "{sons à écouter}": sons_a_ecouter,
-           "{jauge-kaykit}": jauge_kaykit}
+           "{jauge-kaykit}": jauge_kaykit, "{jauge-kenney}": jauge_kenney}
 
 
 def copier_sons():
@@ -580,9 +799,9 @@ def convertir(md):
 
 CSS = """
 :root{--fond:#f6f3ec;--surface:#ffffff;--encre:#1f2433;--doux:#5b5f6b;--ligne:#e2dccd;--accent:#8a6a1f;--nyx:#1e7a45;
---ok-fond:#dcf1e3;--ok:#1b6a3a;--wait-fond:#fbe8c8;--wait:#7a4a06;--fx-fond:#dde6f7;--fx:#23457a;--tune-fond:#efe3f5;--tune:#5e2a7a;--code:#efe9dc;color-scheme:light}
+--ok-fond:#dcf1e3;--ok:#1b6a3a;--wait-fond:#fbe8c8;--wait:#7a4a06;--fx-fond:#dde6f7;--fx:#23457a;--tune-fond:#efe3f5;--tune:#5e2a7a;--code:#efe9dc;--ko-fond:#f8d9d6;--ko:#8c2323;color-scheme:light}
 @media (prefers-color-scheme: dark){:root{--fond:#161a24;--surface:#1f2533;--encre:#f4ecd8;--doux:#b9b3a3;--ligne:#333b52;
---accent:#d9b264;--nyx:#6fd08f;--ok-fond:#1d3b2a;--ok:#9fe0b4;--wait-fond:#3d2f16;--wait:#f5c77a;--fx-fond:#1f2d47;--fx:#a9c3f0;--tune-fond:#35243f;--tune:#dcb6ef;--code:#2a3142;color-scheme:dark}}
+--accent:#d9b264;--nyx:#6fd08f;--ok-fond:#1d3b2a;--ok:#9fe0b4;--wait-fond:#3d2f16;--wait:#f5c77a;--fx-fond:#1f2d47;--fx:#a9c3f0;--tune-fond:#35243f;--tune:#dcb6ef;--code:#2a3142;--ko-fond:#46201f;--ko:#f1a8a4;color-scheme:dark}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--fond);color:var(--encre);font:16px/1.6 "Segoe UI",system-ui,sans-serif}
 .cadre{display:grid;grid-template-columns:260px minmax(0,1fr);min-height:100vh}
@@ -630,9 +849,40 @@ table.sons audio{display:block;width:210px;height:32px}
 .carte-video img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;background:#1c1f26}
 .carte-video code{font-size:12px;word-break:break-all}.carte-video .badge{margin-left:0}
 .badge.emote{background:var(--tune-fond);color:var(--tune)}
+.valid{display:inline-flex;flex-wrap:wrap;gap:6px;margin:6px 0 2px}
+.valid__btn,.val-bouton{padding:5px 12px;min-height:34px;border-radius:999px;border:1px solid var(--ligne);background:var(--surface);color:var(--encre);font:inherit;font-size:13px;cursor:pointer}
+.valid__btn:hover,.val-bouton:hover{border-color:var(--accent)}
+.valid__btn:focus-visible,.val-bouton:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.valid__btn.on{font-weight:600}
+.valid__btn--attente.on{background:var(--code);border-color:var(--doux)}
+.valid__btn--ok.on{background:var(--ok-fond);color:var(--ok);border-color:var(--ok)}
+.valid__btn--ko.on{background:var(--ko-fond);color:var(--ko);border-color:var(--ko)}
+.valid--cmp{display:flex;grid-column:1/-1}.valid--cmp .valid__btn{flex:1 1 180px;min-height:44px;font-size:15px;font-weight:600;border-radius:12px}
+.val-barre{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0 12px}
+.val-compteur{font-weight:600;font-size:13px;color:var(--encre)}.val-info{font-size:13px;color:var(--doux)}
+.val-texte{width:100%;margin-top:8px;font:12px/1.4 ui-monospace,Consolas,monospace;background:var(--surface);color:var(--encre);border:1px solid var(--ligne);border-radius:8px}
+.filtres-sons select#sons-valid{max-width:14em}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:stretch;margin:6px 0}
+.cmp__col{display:flex;flex-direction:column;min-width:0;padding:10px 12px;border:1px solid var(--ligne);border-radius:12px;background:var(--surface)}
+.cmp__col--ancien{border-left:4px solid var(--doux)}.cmp__col--nouveau{border-left:4px solid var(--accent)}
+.cmp__etiquette{margin:0 0 4px;font-size:12px;letter-spacing:.5px;text-transform:uppercase;font-weight:700;color:var(--doux)}
+.cmp__col--nouveau .cmp__etiquette{color:var(--accent)}
+.cmp__nom{margin:0 0 6px;font-size:14px}.cmp audio{display:block;width:100%;max-width:260px;height:32px}
+.cmp__usage{margin:6px 0 0;font-size:13px;color:var(--doux);max-width:none}
+tr.ligne-cmp td{padding-top:10px;padding-bottom:10px}
+a.cmp-lien{font-weight:600}
+.ecoute-cat{margin:10px 0;border:1px solid var(--ligne);border-radius:10px;background:var(--fond)}
+.ecoute-cat summary{cursor:pointer;padding:8px 12px;font-weight:600}.ecoute-cat summary small{color:var(--doux);font-weight:400}
+.encart-ecoute ul.ecoute-liste{list-style:none;margin:0;padding:0 12px 8px;font-size:inherit}
+.ecoute-item{max-width:none;margin:0;padding:10px 0;border-top:1px solid var(--ligne)}
+.ecoute-item__nom{margin:0 0 4px}.ecoute-item__corps{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.ecoute-item__lecteurs audio{display:block;width:240px;max-width:100%;height:32px}
+@media (max-width:640px){.cmp{grid-template-columns:minmax(0,1fr)}.cmp audio{max-width:none}}
 .jauge-kaykit{margin:12px 0 18px;padding:12px 14px;background:var(--surface);border:1px solid var(--ligne);border-radius:12px}
 .jauge-kaykit__titre{margin:0 0 8px}.jauge-kaykit__note{margin:8px 0 0;font-size:12px;color:var(--doux)}
 .jauge-kaykit__table{width:100%;border-collapse:collapse}.jauge-kaykit__table td{padding:4px 8px 4px 0;font-size:13px}.jauge-kaykit__table td:first-child{width:11em;color:var(--doux)}
+.jauge-kenney table.jauge-kenney__remplacer{font-size:13px}.jauge-kenney__remplacer td,.jauge-kenney__remplacer th{padding:6px 8px}
+.jauge-kenney ul{margin:6px 0 0;font-size:13px}
 .jauge{display:flex;align-items:center;gap:8px}.jauge__piste{flex:1;height:10px;border-radius:5px;background:var(--code);overflow:hidden}
 .jauge__remplissage{height:100%;background:var(--wait);border-radius:5px}.jauge__valeur{min-width:4em;font-weight:600}.jauge small{color:var(--doux);font-size:12px}
 .spoil{margin:12px 0 16px;border:1px solid var(--ligne);border-radius:12px;background:var(--surface)}

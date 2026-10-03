@@ -9,6 +9,8 @@ Tous les sons présents dans le projet, à écouter ici. Ils viennent de Relic, 
 
 {sons à écouter}
 
+**Comparer et valider.** Quand un son à écouter en remplace un autre déjà joué, l'encart le montre en deux colonnes : à gauche « Utilisé actuellement », à droite « En attente » (tous les lecteurs côte à côte, un clic pour passer de l'un à l'autre). Pour chaque son, coche « Validé ✓ », « Refusé ✗ » (ou « Prendre le nouveau » / « Garder l'ancien ») : le choix reste dans ton navigateur, rien n'est écrit dans le projet. Puis clique sur « Copier ma sélection » et colle le texte dans le chat avec Claude, qui applique les changements. {{dev: Mécanisme et champ `remplace` du catalogue : `Docs/sons.md`.}}
+
 Pas de bois, de sable et de métal, v2 (03/10/2026, après le retour « nul » de Quentin) : refaits à partir d'échantillons Kenney retravaillés (`Assets/Audio/Deathless/Pas/synth_pas_v2.py`), en attente d'écoute (ids `pas_bois_v2`, `pas_sable_v2`, `pas_metal_v2`, qui remplacent `pas_bois`, `pas_sable`, `pas_metal` après accord). Page d'écoute locale, avec les anciens à côté et un bouton « Marcher » : `Docs/audio-ecoute/pas-v2.html`.
 
 Les boucles (vol d'un projectile, cône de flammes, bourdonnement du portail…) sont marquées « (boucle) » : le lecteur ne les joue qu'une fois. Un son en plusieurs variantes a un lecteur par variante, tirée au hasard en jeu.

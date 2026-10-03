@@ -2309,7 +2309,8 @@
     ],
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "ui_survol"
   },
   {
     "id": "dl_interface_clic",
@@ -2323,7 +2324,8 @@
     ],
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "ui_clic"
   },
   {
     "id": "dl_interface_retour",
@@ -2333,7 +2335,8 @@
     "fichier": "Deathless/Interface/interface_retour.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "ui_retour"
   },
   {
     "id": "dl_interface_refus",
@@ -2343,7 +2346,8 @@
     "fichier": "Deathless/Interface/interface_refus.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "ui_refus"
   },
   {
     "id": "dl_interface_confirmation",
@@ -2353,7 +2357,8 @@
     "fichier": "Deathless/Interface/interface_confirmation.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "ui_confirmation"
   },
   {
     "id": "dl_interface_decompte",
@@ -2363,7 +2368,8 @@
     "fichier": "Deathless/Interface/interface_decompte.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "ui_decompte"
   },
   {
     "id": "dl_interface_onglet",
@@ -2383,7 +2389,8 @@
     "fichier": "Deathless/Interface/interface_pret.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "vote_pret"
   },
   {
     "id": "dl_interface_pret_annule",
@@ -2393,7 +2400,8 @@
     "fichier": "Deathless/Interface/interface_pret_annule.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "vote_annule"
   },
   {
     "id": "dl_interface_tous_prets",
@@ -2403,7 +2411,8 @@
     "fichier": "Deathless/Interface/interface_tous_prets.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "vote_tous_prets"
   },
   {
     "id": "dl_nyxessa_tir",
@@ -2419,7 +2428,8 @@
     "portee": 60,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "relic_pulse"
   },
   {
     "id": "dl_nyxessa_frappee",
@@ -2435,7 +2445,8 @@
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "relic_hit"
   },
   {
     "id": "dl_nyxessa_alerte",
@@ -2445,7 +2456,8 @@
     "fichier": "Deathless/Nyxessa/nyxessa_alerte.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "nyxessa_alerte"
   },
   {
     "id": "dl_nyxessa_palier",
@@ -2456,7 +2468,8 @@
     "portee": 60,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "nyxessa_palier"
   },
   {
     "id": "dl_nyxessa_charge_portail",
@@ -2467,7 +2480,8 @@
     "portee": 60,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "nyxessa_charge_portail"
   },
   {
     "id": "dl_nyxessa_retour_energie",
@@ -2478,7 +2492,8 @@
     "portee": 60,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "nyxessa_retour_energie"
   },
   {
     "id": "dl_nyxessa_onde",
@@ -2489,7 +2504,8 @@
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "nyxessa_onde_passage"
   },
   {
     "id": "dl_nyxessa_destruction",
@@ -2511,7 +2527,8 @@
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "skull_flight_loop"
   },
   {
     "id": "dl_nyxessa_missile_eclat",
@@ -2527,7 +2544,8 @@
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "skull_explosion"
   },
   {
     "id": "dl_nyxessa_rappel",
@@ -2775,7 +2793,8 @@
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "player_hurt"
   },
   {
     "id": "dl_esquive",
@@ -2786,7 +2805,8 @@
     "portee": 20,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "dodge"
   },
   {
     "id": "dl_joueur_mort",
@@ -2797,7 +2817,8 @@
     "portee": 60,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "player_death"
   },
   {
     "id": "dl_potion_boire",
@@ -2819,7 +2840,8 @@
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "coup_critique"
   },
   {
     "id": "dl_critique_meilleur",
@@ -2830,7 +2852,8 @@
     "portee": 60,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "coup_critique_meilleur"
   },
   {
     "id": "dl_epee_elan",
@@ -2841,7 +2864,8 @@
     "portee": 20,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "kenney_rpg_knifeslice"
   },
   {
     "id": "dl_epee_impact",
@@ -2852,7 +2876,8 @@
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "skeleton_hit"
   },
   {
     "id": "dl_blocage",
@@ -2863,7 +2888,8 @@
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "shield_block"
   },
   {
     "id": "dl_parade_parfaite",
@@ -2885,7 +2911,8 @@
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "knight_heal"
   },
   {
     "id": "dl_hache_elan",
@@ -2896,7 +2923,8 @@
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "kenney_rpg_chop"
   },
   {
     "id": "dl_rugissement",
@@ -2907,7 +2935,8 @@
     "portee": 60,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "viking_roar"
   },
   {
     "id": "dl_saut_percutant_impact",
@@ -2918,7 +2947,8 @@
     "portee": 60,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "viking_leap_land"
   },
   {
     "id": "dl_boule_lancer",
@@ -2929,7 +2959,8 @@
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "fireball_cast"
   },
   {
     "id": "dl_boule_explosion",
@@ -2940,7 +2971,8 @@
     "portee": 60,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "fireball_explosion"
   },
   {
     "id": "dl_cone",
@@ -2951,7 +2983,8 @@
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "mage_flame_cone_loop"
   },
   {
     "id": "dl_arc_tir",
@@ -2962,7 +2995,8 @@
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "bow_shot_v3"
   },
   {
     "id": "dl_arc_tir_charge",
@@ -2973,7 +3007,8 @@
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "bow_shot_v3_charged"
   },
   {
     "id": "dl_fleche_impact_os",
@@ -2984,7 +3019,8 @@
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "arrow_impact"
   },
   {
     "id": "dl_dague_elan",
@@ -2995,7 +3031,8 @@
     "portee": 20,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "kenney_rpg_knifeslice"
   },
   {
     "id": "dl_furtif_entree",
@@ -3005,7 +3042,8 @@
     "fichier": "Deathless/Assassin/furtif_entree.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "assassin_furtif"
   },
   {
     "id": "dl_fumee",
@@ -3016,7 +3054,8 @@
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "smoke_bomb"
   },
   {
     "id": "dl_squelette_sortie",
@@ -3028,6 +3067,7 @@
     "source": "Deathless (synthèse)",
     "licence": "propre",
     "statut": "a_ecouter",
+    "remplace": "skeleton_spawn",
     "variantes": [
       "Deathless/Squelettes/squelette_sortie_1.wav",
       "Deathless/Squelettes/squelette_sortie_2.wav",
@@ -3044,6 +3084,7 @@
     "source": "Deathless (synthèse)",
     "licence": "propre",
     "statut": "a_ecouter",
+    "remplace": "kenney_rpg_drawknife",
     "variantes": [
       "Deathless/Squelettes/squelette_preparation_1.wav",
       "Deathless/Squelettes/squelette_preparation_2.wav",
@@ -3060,6 +3101,7 @@
     "source": "Deathless (synthèse)",
     "licence": "propre",
     "statut": "a_ecouter",
+    "remplace": "skeleton_hit",
     "variantes": [
       "Deathless/Squelettes/squelette_touche_1.wav",
       "Deathless/Squelettes/squelette_touche_2.wav",
@@ -3077,6 +3119,7 @@
     "source": "Deathless (synthèse)",
     "licence": "propre",
     "statut": "a_ecouter",
+    "remplace": "skeleton_death",
     "variantes": [
       "Deathless/Squelettes/squelette_mort_1.wav",
       "Deathless/Squelettes/squelette_mort_2.wav",
@@ -3093,6 +3136,7 @@
     "source": "Deathless (synthèse)",
     "licence": "propre",
     "statut": "a_ecouter",
+    "remplace": "dawn_vaporize",
     "variantes": [
       "Deathless/Squelettes/squelette_aube_1.wav",
       "Deathless/Squelettes/squelette_aube_2.wav"
@@ -3118,7 +3162,8 @@
     "portee": 60,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "viking_leap_land"
   },
   {
     "id": "dl_massue_onde",
@@ -3172,7 +3217,8 @@
     "portee": 20,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "brulure"
   },
   {
     "id": "dl_renverse_chute",
@@ -3203,7 +3249,8 @@
     "fichier": "Deathless/Village/or_caisse_1.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "kenney_rpg_handlecoins"
   },
   {
     "id": "dl_coffre_ouvre",
@@ -3214,7 +3261,8 @@
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "chest_open"
   },
   {
     "id": "dl_taverne_biere",
@@ -3224,7 +3272,8 @@
     "fichier": "Deathless/Village/taverne_biere.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "kenney_rpg_metalclick"
   },
   {
     "id": "dl_crepuscule",
@@ -3234,7 +3283,8 @@
     "fichier": "Deathless/JourNuit/crepuscule.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "nightfall"
   },
   {
     "id": "dl_aube",
@@ -3244,7 +3294,8 @@
     "fichier": "Deathless/JourNuit/aube.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "dawn"
   },
   {
     "id": "dl_vague",
@@ -3254,7 +3305,8 @@
     "fichier": "Deathless/JourNuit/vague.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "nuit_vague"
   },
   {
     "id": "dl_victoire",
@@ -3264,7 +3316,8 @@
     "fichier": "Deathless/JourNuit/victoire.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "partie_victoire"
   },
   {
     "id": "dl_defaite",
@@ -3337,7 +3390,8 @@
     "fichier": "Deathless/Musique/musique_jour_boucle.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "musique_dehors_jour"
   },
   {
     "id": "dl_musique_nuit",
@@ -3347,7 +3401,8 @@
     "fichier": "Deathless/Musique/musique_nuit_boucle.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "musique_dehors_nuit"
   },
   {
     "id": "dl_musique_donjon",
@@ -3357,7 +3412,8 @@
     "fichier": "Deathless/Musique/musique_donjon_boucle.wav",
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "musique_dedans_donjon"
   },
   {
     "id": "epee_elan",
@@ -3598,7 +3654,8 @@
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "skull_flight_loop"
   },
   {
     "id": "dl_mage_squelette_missile_eclat",
@@ -3613,7 +3670,8 @@
     "portee": 40,
     "source": "Deathless (synthèse)",
     "licence": "propre",
-    "statut": "a_ecouter"
+    "statut": "a_ecouter",
+    "remplace": "skull_explosion"
   },
   {
     "id": "dl_voleur_elan",

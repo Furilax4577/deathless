@@ -1,0 +1,527 @@
+{
+  "date": "2026-10-03",
+  "sons": {
+    "fichiers": 151,
+    "octets": 1688118,
+    "par_pack": [
+      {
+        "pack": "Interface Sounds",
+        "fichiers": 100,
+        "octets": 960599
+      },
+      {
+        "pack": "RPG Audio",
+        "fichiers": 51,
+        "octets": 727519
+      }
+    ],
+    "etats": {
+      "joue": 25,
+      "repli": 14,
+      "catalogue": 112,
+      "disque": 0
+    },
+    "octets_par_etat": {
+      "joue": 406495,
+      "repli": 134074,
+      "catalogue": 1147549,
+      "disque": 0
+    },
+    "utilises": 25,
+    "pourcent_utilises": 16.6,
+    "total_sons_projet": 476,
+    "octets_sons_projet": 105499360,
+    "pourcent_fichiers_projet": 31.7,
+    "catalogue_entrees": 322,
+    "catalogue_entrees_kenney": 119,
+    "pourcent_catalogue": 37.0,
+    "jeu_evenements": 127,
+    "jeu_ids_effectifs": 111,
+    "jeu_ids_kenney": 12,
+    "pourcent_jeu": 10.8,
+    "ids_kenney_joues": [
+      "kenney_rpg_chop",
+      "kenney_rpg_cloth",
+      "kenney_rpg_doorclose",
+      "kenney_rpg_dooropen",
+      "kenney_rpg_drawknife",
+      "kenney_rpg_handlecoins",
+      "kenney_rpg_knifeslice",
+      "kenney_rpg_metalclick",
+      "kenney_rpg_metallatch",
+      "kenney_rpg_metalpot",
+      "nuit_vague",
+      "ui_retour"
+    ]
+  },
+  "icones": {
+    "fichiers": 492,
+    "octets": 348679,
+    "utilisees": 144,
+    "octets_utilises": 97534,
+    "familles": [
+      {
+        "nom": "Keyboard & Mouse",
+        "fichiers": 257,
+        "utilisees": 85,
+        "octets": 152279
+      },
+      {
+        "nom": "PlayStation Series",
+        "fichiers": 136,
+        "utilisees": 29,
+        "octets": 113281
+      },
+      {
+        "nom": "Xbox Series",
+        "fichiers": 99,
+        "utilisees": 30,
+        "octets": 83119
+      }
+    ]
+  },
+  "categories": [
+    {
+      "nom": "Objets, or et taverne",
+      "evenements": 6,
+      "kenney_joue": 5,
+      "kenney_repli": 1
+    },
+    {
+      "nom": "Combat",
+      "evenements": 5,
+      "kenney_joue": 5,
+      "kenney_repli": 0
+    },
+    {
+      "nom": "Portes",
+      "evenements": 2,
+      "kenney_joue": 2,
+      "kenney_repli": 0
+    },
+    {
+      "nom": "Interface",
+      "evenements": 10,
+      "kenney_joue": 1,
+      "kenney_repli": 9
+    },
+    {
+      "nom": "Coffres et cadenas",
+      "evenements": 2,
+      "kenney_joue": 1,
+      "kenney_repli": 1
+    },
+    {
+      "nom": "Joueur",
+      "evenements": 1,
+      "kenney_joue": 1,
+      "kenney_repli": 0
+    },
+    {
+      "nom": "Jour et nuit",
+      "evenements": 1,
+      "kenney_joue": 1,
+      "kenney_repli": 0
+    },
+    {
+      "nom": "Pas",
+      "evenements": 8,
+      "kenney_joue": 0,
+      "kenney_repli": 8
+    },
+    {
+      "nom": "Autre",
+      "evenements": 92,
+      "kenney_joue": 0,
+      "kenney_repli": 0
+    }
+  ],
+  "a_remplacer": [
+    {
+      "id": "kenney_rpg_footstep",
+      "etat": "repli",
+      "variantes": 10,
+      "octets": 99800,
+      "pack": "RPG Audio",
+      "categorie": "Pas",
+      "evenements": [
+        "secours de : pas du joueur (8 tableaux)"
+      ],
+      "frequence": 5,
+      "appels": 0,
+      "remplacant": "Pas propres par matière (herbe, terre, sable, pierre, bois, métal) : en cours de refonte ; retirer le repli et refaire terre_6 et pierre_4 à 6 (échantillons Kenney) par synthèse",
+      "candidats": [
+        "pas_herbe",
+        "pas_terre",
+        "pas_pierre",
+        "pas_sable_v2",
+        "pas_bois_v2",
+        "pas_metal_v2"
+      ],
+      "avancement": "à faire"
+    },
+    {
+      "id": "kenney_rpg_knifeslice",
+      "etat": "joue",
+      "variantes": 2,
+      "octets": 30631,
+      "pack": "RPG Audio",
+      "categorie": "Combat",
+      "evenements": [
+        "Coup d'épée (élan)",
+        "Coup de dague"
+      ],
+      "frequence": 4,
+      "appels": 8,
+      "remplacant": "Souffle de lame : dl_epee_elan et dl_dague_elan (à écouter, pas encore câblés dans SonsDuJeu)",
+      "candidats": [
+        "dl_epee_elan",
+        "dl_dague_elan"
+      ],
+      "avancement": "à faire"
+    },
+    {
+      "id": "kenney_rpg_chop",
+      "etat": "joue",
+      "variantes": 1,
+      "octets": 9370,
+      "pack": "RPG Audio",
+      "categorie": "Combat",
+      "evenements": [
+        "Coup de faux de Nyxar",
+        "Coup de hache"
+      ],
+      "frequence": 4,
+      "appels": 5,
+      "remplacant": "Souffle de hache : dl_hache_elan (à écouter, pas encore câblé) ; faux de Nyxar : à créer",
+      "candidats": [
+        "dl_hache_elan"
+      ],
+      "avancement": "à faire"
+    },
+    {
+      "id": "kenney_rpg_drawknife",
+      "etat": "joue",
+      "variantes": 3,
+      "octets": 36255,
+      "pack": "RPG Audio",
+      "categorie": "Combat",
+      "evenements": [
+        "Squelette : préparation d'un coup"
+      ],
+      "frequence": 4,
+      "appels": 1,
+      "remplacant": "Crécelle d'os du squelette : dl_squelette_preparation (à écouter)",
+      "candidats": [
+        "dl_squelette_preparation"
+      ],
+      "avancement": "à faire"
+    },
+    {
+      "id": "kenney_rpg_handlecoins",
+      "etat": "joue",
+      "variantes": 2,
+      "octets": 38488,
+      "pack": "RPG Audio",
+      "categorie": "Objets, or et taverne",
+      "evenements": [
+        "Or qui entre ou sort de la caisse",
+        "Achat à la boutique"
+      ],
+      "frequence": 3,
+      "appels": 7,
+      "remplacant": "Pièces dans une bourse de cuir : dl_or_caisse (à écouter) ; achat de boutique : à créer",
+      "candidats": [
+        "dl_or_caisse"
+      ],
+      "avancement": "à faire"
+    },
+    {
+      "id": "kenney_rpg_cloth",
+      "etat": "joue",
+      "variantes": 4,
+      "octets": 51770,
+      "pack": "RPG Audio",
+      "categorie": "Joueur",
+      "evenements": [
+        "Saut"
+      ],
+      "frequence": 3,
+      "appels": 2,
+      "remplacant": "Saut : souffle et tissu synthétisés (id jump, à créer)",
+      "candidats": [],
+      "avancement": "à faire"
+    },
+    {
+      "id": "ui_retour",
+      "etat": "joue",
+      "variantes": 1,
+      "octets": 6997,
+      "pack": "Interface Sounds",
+      "categorie": "Interface",
+      "evenements": [
+        "Visée annulée",
+        "secours de : Prêt annulé"
+      ],
+      "frequence": 3,
+      "appels": 2,
+      "remplacant": "Visée annulée : ajouter dl_interface_retour au tableau ViseeAnnule, ou créer dl_visee_annule",
+      "candidats": [
+        "dl_interface_retour"
+      ],
+      "avancement": "à faire"
+    },
+    {
+      "id": "nyxessa_alerte",
+      "etat": "repli",
+      "variantes": 1,
+      "octets": 9215,
+      "pack": "Interface Sounds",
+      "categorie": "Interface",
+      "evenements": [
+        "secours de : Alerte de Nyxessa"
+      ],
+      "frequence": 3,
+      "appels": 0,
+      "remplacant": "Repli seulement : dl_nyxessa_alerte (à écouter) joue déjà ; retirer le repli",
+      "candidats": [
+        "dl_nyxessa_alerte"
+      ],
+      "avancement": "à faire"
+    },
+    {
+      "id": "ui_confirmation",
+      "etat": "repli",
+      "variantes": 1,
+      "octets": 14169,
+      "pack": "Interface Sounds",
+      "categorie": "Interface",
+      "evenements": [
+        "secours de : Palier acheté, Point dépensé, Point gagné et 2 autres"
+      ],
+      "frequence": 3,
+      "appels": 0,
+      "remplacant": "Repli seulement : dl_interface_confirmation (à écouter) joue déjà ; retirer le repli à la validation",
+      "candidats": [
+        "dl_interface_confirmation"
+      ],
+      "avancement": "à faire"
+    },
+    {
+      "id": "ui_refus",
+      "etat": "repli",
+      "variantes": 1,
+      "octets": 6393,
+      "pack": "Interface Sounds",
+      "categorie": "Interface",
+      "evenements": [
+        "secours de : Achat refusé"
+      ],
+      "frequence": 3,
+      "appels": 0,
+      "remplacant": "Repli seulement : dl_interface_refus (à écouter) joue déjà ; retirer le repli à la validation",
+      "candidats": [
+        "dl_interface_refus"
+      ],
+      "avancement": "à faire"
+    },
+    {
+      "id": "kenney_rpg_metallatch",
+      "etat": "joue",
+      "variantes": 1,
+      "octets": 10208,
+      "pack": "RPG Audio",
+      "categorie": "Objets, or et taverne",
+      "evenements": [
+        "Achat d'une clé",
+        "Cadenas d'un coffre"
+      ],
+      "frequence": 2,
+      "appels": 7,
+      "remplacant": "Cadenas et loquet propres : clé qui tourne, pêne de fer (à créer, coffre et boutique)",
+      "candidats": [],
+      "avancement": "à faire"
+    },
+    {
+      "id": "kenney_rpg_metalclick",
+      "etat": "joue",
+      "variantes": 1,
+      "octets": 13615,
+      "pack": "RPG Audio",
+      "categorie": "Objets, or et taverne",
+      "evenements": [
+        "Bière à la taverne",
+        "secours de : Achat d'une clé, Cadenas d'un coffre"
+      ],
+      "frequence": 2,
+      "appels": 2,
+      "remplacant": "Cadenas qui claque propre ; bière : voir dl_taverne_biere (à écouter)",
+      "candidats": [
+        "dl_taverne_biere"
+      ],
+      "avancement": "à faire"
+    },
+    {
+      "id": "kenney_rpg_doorclose",
+      "etat": "joue",
+      "variantes": 4,
+      "octets": 73953,
+      "pack": "RPG Audio",
+      "categorie": "Portes",
+      "evenements": [
+        "Porte d'un bâtiment qui se ferme"
+      ],
+      "frequence": 2,
+      "appels": 1,
+      "remplacant": "Porte de bois propre : battant qui se referme, loquet, écho de la pièce (à créer, 4 variantes)",
+      "candidats": [],
+      "avancement": "à faire"
+    },
+    {
+      "id": "kenney_rpg_dooropen",
+      "etat": "joue",
+      "variantes": 2,
+      "octets": 53128,
+      "pack": "RPG Audio",
+      "categorie": "Portes",
+      "evenements": [
+        "Porte d'un bâtiment qui s'ouvre",
+        "secours de : Coffre qui s'ouvre"
+      ],
+      "frequence": 2,
+      "appels": 1,
+      "remplacant": "Porte de bois propre : gonds, loquet, bois qui cède (à créer, en 2 variantes, tonalité sombre)",
+      "candidats": [],
+      "avancement": "à faire"
+    },
+    {
+      "id": "kenney_rpg_metalpot",
+      "etat": "joue",
+      "variantes": 3,
+      "octets": 77232,
+      "pack": "RPG Audio",
+      "categorie": "Objets, or et taverne",
+      "evenements": [
+        "Repas à la taverne",
+        "secours de : Potion bue"
+      ],
+      "frequence": 2,
+      "appels": 1,
+      "remplacant": "Repas : couverts et chope en étain, propres (à créer)",
+      "candidats": [],
+      "avancement": "à faire"
+    },
+    {
+      "id": "nuit_vague",
+      "etat": "joue",
+      "variantes": 1,
+      "octets": 4848,
+      "pack": "Interface Sounds",
+      "categorie": "Jour et nuit",
+      "evenements": [
+        "Nouvelle vague lancée"
+      ],
+      "frequence": 2,
+      "appels": 1,
+      "remplacant": "Trois coups de peau de guerre : dl_vague (à écouter)",
+      "candidats": [
+        "dl_vague"
+      ],
+      "avancement": "à faire"
+    },
+    {
+      "id": "ui_decompte",
+      "etat": "repli",
+      "variantes": 1,
+      "octets": 4497,
+      "pack": "Interface Sounds",
+      "categorie": "Interface",
+      "evenements": [
+        "secours de : Alerte de la nuit"
+      ],
+      "frequence": 2,
+      "appels": 0,
+      "remplacant": "Repli seulement : dl_interface_decompte (à écouter, pas branché) ; retirer le repli",
+      "candidats": [
+        "dl_interface_decompte"
+      ],
+      "avancement": "à faire"
+    }
+  ],
+  "non_branches": {
+    "entrees": 102,
+    "fichiers": 112,
+    "octets": 1147549
+  },
+  "derives": [
+    {
+      "id": "pas_terre",
+      "nom": "Joueur — pas sur la terre",
+      "statut": "a_ecouter"
+    },
+    {
+      "id": "pas_pierre",
+      "nom": "Joueur — pas sur la pierre",
+      "statut": "a_ecouter"
+    },
+    {
+      "id": "pas_bois_v2",
+      "nom": "Joueur — pas sur le bois (v2)",
+      "statut": "a_ecouter"
+    },
+    {
+      "id": "pas_sable_v2",
+      "nom": "Joueur — pas sur le sable (v2)",
+      "statut": "a_ecouter"
+    },
+    {
+      "id": "pas_metal_v2",
+      "nom": "Joueur — pas sur le métal (v2)",
+      "statut": "a_ecouter"
+    }
+  ],
+  "total_fichiers": 643,
+  "total_octets": 2036797,
+  "autres_sources": [
+    {
+      "nom": "KayKit (modèles, animations, textures)",
+      "chemin": "Assets/Art/KayKit",
+      "fichiers": 1265,
+      "octets": 104887292,
+      "licence": "CC0",
+      "note": "voir la jauge KayKit ci-dessus"
+    },
+    {
+      "nom": "Sonniss GDC (hache dans le vent)",
+      "chemin": "Assets/Audio/Sonniss",
+      "fichiers": 3,
+      "octets": 105972,
+      "licence": "libre de droits pour les jeux",
+      "note": "3 fichiers du catalogue"
+    },
+    {
+      "nom": "Relic (sons générés en Python, propres au projet)",
+      "chemin": "Assets/Audio/Relic",
+      "fichiers": 139,
+      "octets": 60377227,
+      "licence": "propre",
+      "note": "pas une source tierce : sons de Relic recopiés"
+    },
+    {
+      "nom": "Forge (enclume générée en Python)",
+      "chemin": "Assets/Audio/Forge",
+      "fichiers": 4,
+      "octets": 336193,
+      "licence": "propre",
+      "note": "pas une source tierce"
+    },
+    {
+      "nom": "Fredoka (police)",
+      "chemin": "Assets/Art/Fonts/Fredoka",
+      "fichiers": 5,
+      "octets": 203973,
+      "licence": "SIL OFL 1.1",
+      "note": "polices de l'interface"
+    }
+  ]
+}

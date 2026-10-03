@@ -8,6 +8,18 @@ Travaux prévus ou notés, pas encore faits. Une ligne quitte cette page quand l
 
 {jauge-kaykit}
 
+- **Cap : sortir de Kenney** {décidé} (03/10/2026, Quentin : « noter et mesurer l'usage de Kenney, à dégager comme KayKit ») : même cap que KayKit pour les packs Kenney, sons RPG Audio et Interface Sounds, icônes Input Prompts (tous CC0) : les remplacer à terme par des sons et des icônes propres à Deathless, pour se différencier. Les sons de remplacement se génèrent par synthèse (scripts de `Assets/Audio/Deathless/`, page [Sons](sons.md)) ; chaque son propre passe par l'écoute de Quentin avant de prendre la place du son Kenney. La jauge ci-dessous (`Wiki/jauge_kenney.py`, données `Wiki/data/kenney.json`) se recalcule à chaque génération du wiki. Ordre de remplacement proposé, du plus fréquent au plus rare :
+  - **1. Pas** (constants) : en cours par un autre agent, bois, sable et métal d'abord, puis herbe, terre et pierre (`terre_6` et `pierre_4` à 6 sont encore des échantillons Kenney) ; le repli `kenney_rpg_footstep` se retire quand les six matières sont validées.
+  - **2. Combat** : souffles d'épée, de dague et de hache (`kenney_rpg_knifeslice`, `kenney_rpg_chop`, sons propres déjà à l'écoute mais pas encore câblés dans `SonsDuJeu`), préparation du squelette (`kenney_rpg_drawknife`, remplacé par `dl_squelette_preparation` à l'écoute).
+  - **3. Portes, coffres et cadenas** : portes des bâtiments (`kenney_rpg_dooropen` et `kenney_rpg_doorclose`, à créer, tonalité sombre), cadenas (`kenney_rpg_metallatch`, `kenney_rpg_metalclick`).
+  - **4. Or, boutique et taverne** : pièces (`dl_or_caisse` à écouter), repas, bière (`dl_taverne_biere` à écouter), achat de boutique et de clé.
+  - **5. Reste du jeu** : saut (`kenney_rpg_cloth`), nouvelle vague (`nuit_vague`, `dl_vague` à écouter), visée annulée (`ui_retour`).
+  - **6. Replis** : `ui_confirmation`, `ui_refus`, `ui_decompte`, `nyxessa_alerte` ne jouent plus que si le son propre manque ; les retirer des tableaux de `SonsDuJeu` quand les sons propres sont validés.
+  - **7. Nettoyage** : retirer du projet les sons Kenney jamais appelés (disponibles au catalogue, sans usage), après accord ; au besoin les regénérer plus tard par synthèse.
+  - **8. Icônes de boutons** (Input Prompts : Xbox, PlayStation, clavier et souris) : en dernier, un jeu d'icônes maison au style de l'interface ; seule une part est utilisée, le reste est à retirer.
+
+{jauge-kenney}
+
 - **Barres de vie des ennemis** {décidé} (26/09/2026, règles dans [Interface](interface.md#barres-de-vie-des-ennemis)) : barre fine sous les statuts des ennemis blessés (toujours visible sur un élite), méga barre du boss sous celle de Nyxessa ; **chiffres de dégâts** flottants et option « Afficher les dégâts » (onglet Jeu, `OptionsJoueur`), même page du wiki. Maquette dans `sandbox-ui` d'abord, capture à valider par Quentin, puis intégration au HUD et au jeu.
 - **Maisons générées : modèle standard refait et personnalisation** (retours de Quentin du 27/09/2026, règles dans [Village](village.md#taille-des-maisons)) : socle à une assise, murs 7,6 × 6 m, façade à porte décalée et deux fenêtres, fiche de paramètres (teintes, fenêtres, options). Éléments distinctifs, deux ou trois par maison, validés par Quentin le 27/09/2026 {décidé} ; à faire une par une après le standard, capture à chaque fois :
   - **Taverne** : enseigne suspendue (chope) sur potence en fer forgé ; auvent au-dessus d'une porte à deux vantaux, deux tonneaux et un banc dessous ; cheminée plus massive qui fume, fenêtres plus larges et plus chaudes la nuit.
