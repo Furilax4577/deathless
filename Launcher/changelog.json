@@ -1,6 +1,21 @@
 {
   "versions": [
     {
+      "version": "0.11.0",
+      "date": "2026-10-03",
+      "titre": "Un donjon plus grand, un ponton et des clés à trouver",
+      "notes": [
+        "Nouvelle carte (aperçu) : le donjon en terrasses est plus grand, environ 1,8 fois la surface, avec des niveaux plus hauts et 20 gardiens.",
+        "Nouvelle disposition « ponton suspendu », d'après le croquis de Quentin : un ponton de bois relie deux terrasses, et la salle continue en dessous.",
+        "Les clés et le kit de crochetage se trouvent aussi dans les coffres du donjon (30 % de chances d'une clé, 15 % d'un kit, et une clé sûre dans le grand coffre) et dans le sac d'un joueur mort. Ils apparaissent dans l'inventaire (Tab).",
+        "Carte v5 : les bâtiments sont enfoncés pour reposer sur le sol, les cheminées fument, le four de la forge a son feu, et il n'y a plus de métal posé sur l'enclume de la forge.",
+        "Correction du donjon : tous les joueurs ont le même plan pour une même graine. Un défaut de calcul changeait le plan de 7 graines sur 50.",
+        "Lecteur de musique prêt (jour, nuit, taverne), mais les morceaux ne sont pas encore là : il n'y a donc pas de musique pour l'instant.",
+        "Touches F8, F9 et F10 : à essayer au vrai clavier.",
+        "Version de test : les valeurs sont à équilibrer. Les pièces fermées, la paroi secrète et le crochetage n'ont pas été revérifiés aux nouvelles tailles. Le réseau des clés et des butins n'a pas été testé à deux postes. Le ponton se lit mal de loin, car la salle est sombre. Pas de musique pour l'instant. Le jeu normal garde l'ancienne carte."
+      ]
+    },
+    {
       "version": "0.10.0",
       "date": "2026-10-03",
       "titre": "Boutiques et portes",
