@@ -23,7 +23,7 @@ Les boucles (vol d'un projectile, cône de flammes, bourdonnement du portail…)
 
 ## Musique
 
-Le jeu a un lecteur de musique (`Assets/Scripts/Audio/LecteurMusique.cs`, {effet validé}) prêt à recevoir les morceaux ; il n'y en a pas encore. Cinq fichiers sont attendus dans `Assets/Audio/Deathless/Musique/` : `jour_1.ogg`, `jour_2.ogg`, `nuit_1.ogg`, `nuit_2.ogg`, `taverne.ogg` (le brief de création est dans `Docs/da/brief-musiques.md`). Tant qu'ils manquent, le jeu reste silencieux, sans message d'erreur ; dès qu'ils sont déposés, l'éditeur les branche tout seul sur les réglages audio (menu `Deathless > Audio > Brancher les musiques` pour le refaire à la main).
+Le jeu a un lecteur de musique (`Assets/Scripts/Audio/LecteurMusique.cs`, {à confirmer}) prêt à recevoir les morceaux ; il n'y en a pas encore. Vérifié le 03/10/2026 avec de faux morceaux (deux sinus, non gardés) : alternance des morceaux d'une liste, taverne qui se rejoue, fondus de 2,5 s, passage jour → taverne → jour → nuit, sortie dans le groupe Musique ; un changement de liste en plein fondu ne coupe plus net le morceau encore audible. Cinq fichiers sont attendus dans `Assets/Audio/Deathless/Musique/` : `jour_1.ogg`, `jour_2.ogg`, `nuit_1.ogg`, `nuit_2.ogg`, `taverne.ogg` (le brief de création est dans `Docs/da/brief-musiques.md`). Tant qu'ils manquent, le jeu reste silencieux, sans message d'erreur ; dès qu'ils sont déposés, l'éditeur les branche tout seul sur les réglages audio (menu `Deathless > Audio > Brancher les musiques` pour le refaire à la main).
 
 | Liste | Morceaux | Jouée quand |
 |---|---|---|
