@@ -16,6 +16,19 @@ namespace Deathless.UI.Donnees
         int Cles(int sorte);
         /// Crochets restants du kit de crochetage.
         int Crochets { get; }
+
+        // Objets portés pour le menu du personnage (Tab), dans l'ordre : 3 potions, 3 clés, le kit de crochetage.
+        /// Nombre d'objets décrits (InventaireTaille.Objets).
+        int NbObjets { get; }
+        string ObjetNom(int i);
+        string ObjetDescription(int i);
+        /// Identifiant d'icône (IconesUI).
+        string ObjetIcone(int i);
+        /// Quantité portée (pour le kit : les crochets) et maximum portable.
+        int ObjetQuantite(int i);
+        int ObjetMax(int i);
+        /// Faux : l'objet est inutile à cette classe (potion de mana hors Mage) : la ligne est masquée.
+        bool ObjetUtilisable(int i);
     }
 
     /// Mini-jeu de crochetage d'une serrure (03/10/2026 ; wiki : donjon.md) : on maintient Interagir pour monter l'aiguille et on
@@ -50,6 +63,6 @@ namespace Deathless.UI.Donnees
     /// Nombre de sortes de potions et de clés (les index de IInventaireJoueur vont de 0 à ces nombres moins un).
     public static class InventaireTaille
     {
-        public const int Potions = 3, Cles = 3;
+        public const int Potions = 3, Cles = 3, Objets = 7;
     }
 }

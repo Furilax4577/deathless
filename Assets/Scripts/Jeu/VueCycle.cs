@@ -30,8 +30,7 @@ namespace Deathless.Jeu
         void Start()
         {
             if (P != null) P.PhaseChangee += OnPhase;
-            // Menu principal (partie en attente) : plan de nuit, donc musique de nuit ; le jour 1 relance celle du jour.
-            AudioBank.Musique(P != null && P.Etat.phase != Phase.Attente && P.Etat.phase != Phase.Nuit ? SonsDuJeu.MusiqueJour : SonsDuJeu.MusiqueNuit);
+            // Musique : LecteurMusique (Assets/Scripts/Audio) choisit la liste d'après la phase et la zone, plus d'appel ici.
             if (portail != null) m_Bourdon = AudioBank.Boucle(SonsDuJeu.PortailBourdon, portail.transform, 0.5f);
         }
 
@@ -41,18 +40,15 @@ namespace Deathless.Jeu
             switch (apres)
             {
                 case Phase.Jour:
-                    AudioBank.Musique(SonsDuJeu.MusiqueJour);
                     break;
                 case Phase.Crepuscule:
                     AudioBank.Jouer2D(SonsDuJeu.TombeeNuit, 0.9f);
                     AudioBank.Jouer(SonsDuJeu.PortailFermeture, pp, 1f);
                     AudioBank.Jouer(SonsDuJeu.RetourEnergie, pp, 0.8f);
-                    AudioBank.Musique(SonsDuJeu.MusiqueNuit);
                     break;
                 case Phase.Aube:
                     AudioBank.Jouer2D(SonsDuJeu.Aube, 0.9f);
                     AudioBank.Jouer(SonsDuJeu.ChargePortail, pp, 0.8f);
-                    AudioBank.Musique(SonsDuJeu.MusiqueJour);
                     break;
             }
         }
@@ -90,7 +86,6 @@ namespace Deathless.Jeu
                 m_NuitApercuVue = apercuNuit;
                 if (Partie.Exploration)
                 {
-                    AudioBank.Musique(apercuNuit ? SonsDuJeu.MusiqueNuit : SonsDuJeu.MusiqueJour);
                     AudioBank.Jouer2D(apercuNuit ? SonsDuJeu.TombeeNuit : SonsDuJeu.Aube, 0.9f);
                 }
             }

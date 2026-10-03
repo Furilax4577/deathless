@@ -17,6 +17,22 @@ Les boucles (vol d'un projectile, cône de flammes, bourdonnement du portail…)
 
 {sons à créer}
 
+## Musique
+
+Le jeu a un lecteur de musique (`Assets/Scripts/Audio/LecteurMusique.cs`, {effet validé}) prêt à recevoir les morceaux ; il n'y en a pas encore. Cinq fichiers sont attendus dans `Assets/Audio/Deathless/Musique/` : `jour_1.ogg`, `jour_2.ogg`, `nuit_1.ogg`, `nuit_2.ogg`, `taverne.ogg` (le brief de création est dans `Docs/da/brief-musiques.md`). Tant qu'ils manquent, le jeu reste silencieux, sans message d'erreur ; dès qu'ils sont déposés, l'éditeur les branche tout seul sur les réglages audio (menu `Deathless > Audio > Brancher les musiques` pour le refaire à la main).
+
+| Liste | Morceaux | Jouée quand |
+|---|---|---|
+| Jour | `jour_1`, `jour_2` | jour, crépuscule, aube, et au menu principal |
+| Nuit | `nuit_1`, `nuit_2` | nuit (et nuit forcée de l'aperçu, touche F9) |
+| Taverne | `taverne` | le héros est à l'intérieur de la taverne (quel que soit le moment) |
+
+- Les morceaux d'une même liste s'enchaînent en alternance, avec un fondu enchaîné de 2,5 s ; la liste de la taverne n'ayant qu'un morceau, il se rejoue sur lui-même.
+- Au changement de liste (entrée dans la taverne, tombée de la nuit), la nouvelle liste monte en fondu enchaîné de 2,5 s ; si la liste ne change pas, le morceau en cours continue (pas de redémarrage au changement de scène).
+- En réseau, chaque poste joue sa propre musique d'après sa phase de partie et sa zone : rien n'est envoyé.
+- Le volume se règle dans les options (réglage Musique, groupe Musique du mixeur, 10 % par défaut).
+- Les anciennes boucles `musique_dehors_jour` et `musique_dehors_nuit` ne sont plus jouées par le jeu.
+
 ## Sources et licences
 
 | Source | Licence | Crédit |

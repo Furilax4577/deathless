@@ -22,6 +22,11 @@ namespace Deathless.Audio
         [Tooltip("Action refusée (classe verrouillée…), joué doucement.")]
         public AudioClip refus;
 
+        [Header("Musique (Assets/Audio/Deathless/Musique/ : jour_1, jour_2, nuit_1, nuit_2, taverne ; remplies par l'éditeur à l'import)")]
+        public AudioClip[] musiquesJour;
+        public AudioClip[] musiquesNuit;
+        public AudioClip[] musiquesTaverne;
+
         [Header("Aperçu du réglage Effets (son de combat court)")]
         public AudioClip apercuEffets;
     }

@@ -76,6 +76,8 @@ public static partial class VillageBuilder
             f.zMarches = Mathf.Max(f.zMarches, p.z);
             if (Mathf.Abs(p.x - f.xPorte) > 2.4f) f.zSoub = Mathf.Max(f.zSoub, p.z);   // le soubassement, sans les marches de la porte
         }
+        // KayKit enfoncé (03/10/2026) : les marches du bas sont sous terre, le pied de l'escalier est celui de la dernière marche visible.
+        if (f.kaykit && V5PiedKayKit(bat, out float piedVisible)) f.zMarches = piedVisible;
         if (f.kaykit)
         {
             // côté de l'allée : moyenne des dalles de l'allée entre 2 et 8 m du bout (0,6 m devant les marches), dans le repère de la façade

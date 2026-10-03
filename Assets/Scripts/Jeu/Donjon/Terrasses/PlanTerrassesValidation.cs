@@ -42,7 +42,10 @@ namespace Deathless.Donjon.Terrasses
                         if (!Surface(i, j, s, out h, out haut)) continue;
                         int nd = Index(i, j) * 2 + s;
                         if (!ouvert[nd]) { ilots++; continue; }
-                        if (haut - h < hMin - 0.01f) bas++;
+                        // sous un ponton, le rez garde moins de hauteur (le tablier passe à 3,15 m) : on y passe
+                        var cs = cellules[Index(i, j)];
+                        float hReq = s == 0 && cs.genre == GenreCellule.Ponton ? HauteurSousPontonMin : hMin;
+                        if (haut - h < hReq - 0.01f) bas++;
                         var c = cellules[Index(i, j)];
                         if (!ferme[nd] && !(s == 0 && Fermee(c))) ilots++;
                     }
@@ -70,7 +73,7 @@ namespace Deathless.Donjon.Terrasses
             foreach (var e in escaliers)
             {
                 if (pente > 0.62f) sortie.Add("escalier " + e.index + " trop raide");
-                if (e.Largeur < LargeurEscalier) sortie.Add("escalier " + e.index + " trop étroit");
+                if (e.Largeur < LargeurEscalierMin) sortie.Add("escalier " + e.index + " trop étroit");
                 float len = e.dir == Dir.Nord || e.dir == Dir.Sud ? e.r.Profondeur : e.r.Largeur;
                 if (Math.Abs(len - e.Longueur) > 0.01f) sortie.Add("escalier " + e.index + " : longueur " + len + " au lieu de " + e.Longueur);
                 if (!BoutPraticable(e, true)) sortie.Add("escalier " + e.index + " : pas de sol au pied");
@@ -82,7 +85,7 @@ namespace Deathless.Donjon.Terrasses
                 for (int i = 0; i < NX; i++)
                 {
                     var c = cellules[Index(i, j)];
-                    if (!c.AUnHaut) continue;
+                    if (!c.AUnHaut || c.genre == GenreCellule.Ponton) continue;
                     if ((c.genre != GenreCellule.Cavite && c.genre != GenreCellule.Passage) || c.piece < 0) { sortie.Add("surplomb en (" + (i - Marge) + ", " + (j - Marge) + ")"); continue; }
                     for (int d = 0; d < 4; d++)
                     {
@@ -94,6 +97,30 @@ namespace Deathless.Donjon.Terrasses
                         if (!plein && !devantArche) { sortie.Add("pièce " + c.piece + " ouverte sur un côté en (" + (i - Marge) + ", " + (j - Marge) + ")"); break; }
                     }
                 }
+
+            // --- pontons : tablier atteint, les deux bouts sur un sol de même hauteur, garde-corps des deux côtés
+            foreach (var po in pontons)
+            {
+                bool est = po.axe == Dir.Est || po.axe == Dir.Ouest;
+                for (int bout = 0; bout < 2; bout++)
+                {
+                    int n = 0, ok = 0;
+                    for (int t = 0; t < (est ? po.r.Profondeur : po.r.Largeur); t++)
+                    {
+                        int x = est ? (bout == 0 ? po.r.x0 - 1 : po.r.x1) : po.r.x0 + t, z = est ? po.r.z0 + t : (bout == 0 ? po.r.z0 - 1 : po.r.z1);
+                        n++;
+                        int i = x + Marge, j = z + Marge;
+                        float hh, tt;
+                        if (DansGrille(i, j) && Surface(i, j, 0, out hh, out tt) && Math.Abs(hh - po.Hauteur) < 0.01f && ferme[Index(i, j) * 2]) ok++;
+                    }
+                    if (ok < n) sortie.Add("ponton : bout " + bout + " sans terrasse à " + po.Hauteur.ToString("0.0") + " m");
+                }
+                int ic = CelluleI(po.r.CentreX), jc = CelluleJ(po.r.CentreZ);
+                if (!ferme[Index(ic, jc) * 2 + 1]) sortie.Add("ponton : tablier inaccessible");
+                int gc = 0;
+                foreach (var pa in parapets) if (pa.bois) gc++;
+                if (gc < 2) sortie.Add("ponton : garde-corps manquants");
+            }
 
             // --- pièces cachées
             foreach (var p in pieces)

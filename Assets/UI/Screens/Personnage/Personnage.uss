@@ -71,7 +71,16 @@
 /* Inventaire : cases vides */
 .perso__cases { flex-direction: row; flex-wrap: wrap; margin: 12px -6px 6px -6px; }
 .perso__case { width: 96px; height: 96px; margin: 6px; border-radius: var(--dl-radius-md); border-width: 2px; border-color: var(--dl-color-border); background-color: rgba(16, 19, 27, 0.6); }
-.perso__vide { margin: 6px 0 0 0; }
+.perso__vide { margin: 6px 0 0 0; white-space: normal; }
+/* Inventaire : une ligne par objet (icône, nom et description, quantité) */
+.perso__objets { flex-direction: column; margin: 12px 0 6px 0; }
+.perso__objet { flex-direction: row; align-items: center; padding: 9px 12px; margin: 0 0 6px 0; border-radius: var(--dl-radius-md); border-width: 2px; border-color: var(--dl-color-border); background-color: rgba(16, 19, 27, 0.6); }
+.perso__objet--vide { opacity: 0.45; }
+.perso__objet-icone { width: 54px; height: 54px; flex-shrink: 0; margin-right: 12px; }
+.perso__objet-textes { flex-grow: 1; flex-shrink: 1; flex-basis: 0; }
+.perso__objet-nom { margin: 0; padding: 0; white-space: normal; -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); }
+.perso__objet-desc { margin: 2px 0 0 0; padding: 0; white-space: normal; font-size: var(--dl-text-caption); color: var(--dl-color-text-muted); }
+.perso__objet-quantite { margin: 0 0 0 12px; padding: 0; flex-shrink: 0; -unity-font-definition: url("/Assets/UI/Fonts/Fredoka-SemiBold-SDF.asset"); font-size: var(--dl-text-large); color: var(--dl-color-gold); }
 
 /* Compétences */
 .perso__competences-entete { flex-direction: row; align-items: center; justify-content: space-between; }

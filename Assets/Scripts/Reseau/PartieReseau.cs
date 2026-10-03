@@ -37,13 +37,14 @@ namespace Deathless.Reseau
         public Vector3 position;
         public int montant;
         public FixedString64Bytes nom;
+        public int objets;   // clés et crochets du sac (Inventaire.Tasser)
 
         public void NetworkSerialize<T>(BufferSerializer<T> s) where T : IReaderWriter
         {
-            s.SerializeValue(ref id); s.SerializeValue(ref position); s.SerializeValue(ref montant); s.SerializeValue(ref nom);
+            s.SerializeValue(ref id); s.SerializeValue(ref position); s.SerializeValue(ref montant); s.SerializeValue(ref nom); s.SerializeValue(ref objets);
         }
 
-        public bool Equals(SacReseau o) => id == o.id && position == o.position && montant == o.montant && nom.Equals(o.nom);
+        public bool Equals(SacReseau o) => id == o.id && position == o.position && montant == o.montant && nom.Equals(o.nom) && objets == o.objets;
     }
 
     /// Monde de la partie réseau (Docs/reseau.md, étape 2), possédé par l'hôte qui fait foi : horloge (phase, nuit, temps),
@@ -222,11 +223,31 @@ namespace Deathless.Reseau
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         void SacRpc(int id, RpcParams p = default) => DonjonJeu.Instance?.RamasserSac(id, Partie.IdJoueur(p.Receive.SenderClientId));
 
+        /// Hôte : des clés ou des crochets (coffre du donjon, sac ramassé) sont accordés à un client ; son poste les ajoute à son
+        /// inventaire (il l'écrit dans HerosReseau, d'où l'hôte le relit) et annonce la trouvaille. `recu` : ce qui entre vraiment
+        /// (maximums respectés), `trouve` : ce qui a été trouvé (0 pour un sac, déjà annoncé). Emballage : Inventaire.Tasser.
+        public void DonnerObjets(ulong clientId, int recu, int trouve)
+        {
+            if (IsServer) DonnerObjetsRpc(recu, trouve, RpcTarget.Single(clientId, RpcTargetUse.Temp));
+        }
+
+        [Rpc(SendTo.SpecifiedInParams)]
+        void DonnerObjetsRpc(int recu, int trouve, RpcParams p = default) => DonjonJeu.RecevoirObjets(recu, trouve);
+
+        /// Hôte : le joueur de ce client est mort au donjon, ses clés et ses crochets sont partis dans un sac ; son poste les vide.
+        public void RetirerButinClient(ulong clientId)
+        {
+            if (IsServer) RetirerButinRpc(RpcTarget.Single(clientId, RpcTargetUse.Temp));
+        }
+
+        [Rpc(SendTo.SpecifiedInParams)]
+        void RetirerButinRpc(RpcParams p = default) => Inventaire.RetirerButin(Partie.Instance != null ? Partie.Instance.JoueurLocal : null);
+
         /// Hôte seulement : un sac tombe (mort au donjon), un sac est pris, ou les sacs restants disparaissent à la
         /// fermeture (un seul événement réseau, `Sacs.Clear`, plutôt qu'un par sac).
-        public void CreerSacReseau(int id, Vector3 position, int montant, string nom)
+        public void CreerSacReseau(int id, Vector3 position, int montant, string nom, int objets = 0)
         {
-            if (IsServer) Sacs.Add(new SacReseau { id = id, position = position, montant = montant, nom = new FixedString64Bytes(nom ?? "") });
+            if (IsServer) Sacs.Add(new SacReseau { id = id, position = position, montant = montant, nom = new FixedString64Bytes(nom ?? ""), objets = objets });
         }
 
         public void RetirerSacReseau(int id)

@@ -457,6 +457,7 @@ public static partial class VillageBuilder
             if (p.y < 0.1f) { mn = Vector3.Min(mn, p); mx = Vector3.Max(mx, p); }
         }
         zAvant = mx.z;
+        if (V5PiedKayKit(racine, out float piedVisible)) zAvant = piedVisible;   // KayKit enfoncé : les marches du bas sont sous terre
         Vector3 c = racine.TransformPoint((mn + mx) / 2f), r = racine.right, f = racine.forward;
         return new Vector4[] { new Vector4(c.x, c.z, r.x, r.z), new Vector4(f.x, f.z, (mx.x - mn.x) / 2f, (mx.z - mn.z) / 2f) };
     }

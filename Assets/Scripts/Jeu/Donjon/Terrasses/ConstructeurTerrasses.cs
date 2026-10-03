@@ -10,6 +10,7 @@ namespace Deathless.Donjon.Terrasses
     /// Construit le donjon « terrasses étagées » d'une graine à partir de PlanTerrasses : blocs de pierre arrondis
     /// (murs d'enceinte, murs de soutènement, massifs, parois des pièces cachées), dalles, escaliers pleins, parapets,
     /// piliers et pilastres, voûte segmentaire à arcs doubleaux, arches de pierre, portes à serrure et parois secrètes,
+    /// ponton suspendu de bois (variante 8 : tablier, garde-corps, chaînes pendues à la voûte, corbeaux),
     /// portail de retour, torches (lumières légères), coffres, repères (DonjonRepere), collisions (boîtes) et NavMesh.
     ///
     /// Tout est déterministe (aucun tirage hors du plan ; les variations de blocs viennent d'un hachage des cotes) : en
@@ -93,6 +94,8 @@ namespace Deathless.Donjon.Terrasses
         static readonly Color32 CBois = new Color32(110, 76, 46, 255);
         static readonly Color32 CBoisSombre = new Color32(74, 51, 32, 255);
         static readonly Color32 CFer = new Color32(58, 61, 68, 255);
+        static readonly Color32 CPlanche = new Color32(124, 88, 54, 255);
+        static readonly Color32 CCorde = new Color32(150, 122, 82, 255);
         static readonly Color32 CBronze = new Color32(176, 118, 58, 255);
         static readonly Color32 CArgent = new Color32(196, 202, 212, 255);
         static readonly Color32 COr = new Color32(228, 178, 60, 255);
@@ -128,7 +131,7 @@ namespace Deathless.Donjon.Terrasses
             Vider();
             NbCollisions = 0;
             CreerRacine();
-            Sols(); Murs(); Chapeaux(); Plafonds(); Escaliers(); Parapets(); Piliers(); Voute(); Arches(); Portail(); Torches(); Coffres(); Mecanismes(); Reperes();
+            Sols(); Murs(); Chapeaux(); Plafonds(); Escaliers(); Parapets(); Pontons(); Piliers(); Voute(); Arches(); Portail(); Torches(); Coffres(); Mecanismes(); Reperes();
             Finaliser();
             Collisions();
             TempsConstructionMs = (float)chrono.Elapsed.TotalMilliseconds;
@@ -244,12 +247,13 @@ namespace Deathless.Donjon.Terrasses
                             int i = bx + dx, j = bz + dz;
                             if (!P.DansGrille(i, j)) continue;
                             var c = P.cellules[P.Index(i, j)];
-                            if (c.genre == GenreCellule.Sol || c.genre == GenreCellule.Cavite || c.genre == GenreCellule.Passage)
+                            if (c.genre == GenreCellule.Sol || c.genre == GenreCellule.Cavite || c.genre == GenreCellule.Passage || c.genre == GenreCellule.Ponton)
                             {
                                 h[n] = c.sol; ci[n] = i; cj[n] = j;
-                                col[n] = c.genre == GenreCellule.Sol ? CouleurSol(c.sol) : CSolPiece; n++;
+                                col[n] = c.genre == GenreCellule.Sol || c.genre == GenreCellule.Ponton ? CouleurSol(c.sol) : CSolPiece; n++;
                             }
-                            if (c.AUnHaut && c.sommet < P.HautMur - 0.5f)
+                            // le dessus d'un ponton est un tablier de planches (Pontons), pas une dalle
+                            if (c.AUnHaut && c.sommet < P.HautMur - 0.5f && c.genre != GenreCellule.Ponton)
                             {
                                 h[n] = c.sommet; ci[n] = i; cj[n] = j; col[n] = CouleurSol(c.sommet); n++;
                             }
@@ -276,7 +280,7 @@ namespace Deathless.Donjon.Terrasses
                 }
         }
 
-        Color32 CouleurSol(float h) { return h < 1f ? CSol0 : h < 4f ? CSol1 : CSol2; }
+        Color32 CouleurSol(float h) { return h < PlanTerrasses.HauteurNiveau * 0.5f ? CSol0 : h < PlanTerrasses.HauteurNiveau * 1.5f ? CSol1 : CSol2; }
 
         void Dalle(float x, float z, float t, float h, Color32 col)
         {
@@ -394,7 +398,7 @@ namespace Deathless.Donjon.Terrasses
                 for (int i = 0; i < P.NX; i++)
                 {
                     var c = P.cellules[P.Index(i, j)];
-                    if (!c.AUnHaut) continue;
+                    if (!c.AUnHaut || c.genre == GenreCellule.Ponton) continue;
                     float x0 = i - PlanTerrasses.Marge, z0 = j - PlanTerrasses.Marge, y = c.plafond;
                     var col = MaillageTampon.Teinte(CPlafond, MaillageTampon.Hache(i, j, 11), 4);
                     Pierre(new Vector3(x0, y, z0)).Quad(new Vector3(x0, y, z0), new Vector3(x0 + 1f, y, z0), new Vector3(x0 + 1f, y, z0 + 1f), new Vector3(x0, y, z0 + 1f), Vector3.down, col);
@@ -479,6 +483,7 @@ namespace Deathless.Donjon.Terrasses
         {
             foreach (var p in m_Plan.parapets)
             {
+                if (p.bois) { GardeCorps(p); continue; }
                 Vector3 n = N(p.dir);
                 Vector3 a = new Vector3(p.x0, 0f, p.z0) - n * 0.27f, b = new Vector3(p.x1, 0f, p.z1) - n * 0.27f;
                 Vector3 tg = b - a; float lg = tg.magnitude; tg /= lg;
@@ -496,6 +501,99 @@ namespace Deathless.Donjon.Terrasses
                 var bp = Boite(a + tg * (lg * 0.5f) + Vector3.up * ((y0 + y1) * 0.5f + 0.15f), new Vector3(lg, y1 - y0 + 0.3f, 0.52f), rot);
                 bp.name = "Parapet";
                 bp.AddComponent<VueLibre>();   // la caméra le traverse (découpé autour du héros)
+            }
+        }
+
+        // ================================================================== Ponton suspendu
+        const float HautGardeCorps = 1.1f;
+
+        /// Garde-corps de bois d'un ponton : collision seule (le visuel est posé par Pontons), mince, traversée par la caméra.
+        void GardeCorps(Parapet p)
+        {
+            Vector3 n = N(p.dir);
+            Vector3 a = new Vector3(p.x0, 0f, p.z0) - n * 0.12f, b = new Vector3(p.x1, 0f, p.z1) - n * 0.12f;
+            Vector3 tg = b - a; float lg = tg.magnitude;
+            var bp = Boite((a + b) * 0.5f + Vector3.up * (p.y + HautGardeCorps * 0.5f), new Vector3(lg, HautGardeCorps, 0.2f), Quaternion.LookRotation(n, Vector3.up));
+            bp.name = "GardeCorps";
+            bp.AddComponent<VueLibre>();
+        }
+
+        /// Ponton : tablier de planches sur deux longerons et des traverses, poteaux et deux lisses (main courante et
+        /// corde) sur toute la longueur des deux côtés, chaînes de fer des poteaux jusqu'à la voûte, corbeaux de pierre
+        /// sous les bouts. Collision du tablier : boîte de la grille (Collisions), marquée VueLibre.
+        void Pontons()
+        {
+            var P = m_Plan;
+            foreach (var po in P.pontons)
+            {
+                bool selonX = po.axe == Dir.Est || po.axe == Dir.Ouest;
+                Vector3 u = selonX ? Vector3.right : Vector3.forward, w = selonX ? Vector3.forward : Vector3.right;
+                float lg = po.Longueur, larg = selonX ? po.r.Profondeur : po.r.Largeur, H = po.Hauteur, bas = po.Dessous;
+                Vector3 o = selonX ? new Vector3(po.r.x0, 0f, po.r.CentreZ) : new Vector3(po.r.CentreX, 0f, po.r.z0);   // milieu du bout de départ
+                Quaternion rot = Quaternion.LookRotation(u, Vector3.up);
+                Vector3 mid = o + u * (lg * 0.5f);
+                // longerons (prolongés de 0,3 m dans les terrasses) et planches en travers
+                for (int s = -1; s <= 1; s += 2)
+                {
+                    Vector3 c = mid + w * (s * (larg * 0.5f - 0.45f)) + Vector3.up * (bas + 0.17f);
+                    Pierre(c).Bloc(c, new Vector3(0.32f, 0.34f, lg + 0.6f), rot, 0.06f, MaillageTampon.Teinte(CBoisSombre, MaillageTampon.Hache(c.x, c.z, 31), 5));
+                }
+                int np = Mathf.Max(1, Mathf.RoundToInt(lg / 0.42f));
+                float pas = lg / np;
+                for (int k = 0; k < np; k++)
+                {
+                    uint hh = MaillageTampon.Hache(k, po.r.x0 * 7 + po.r.z0, 41);
+                    float dl = ((hh >> 4) % 5u) * 0.03f - 0.06f;             // planches de longueurs un peu inégales
+                    float dy = ((hh >> 8) % 3u) * 0.012f;
+                    Vector3 c = o + u * (pas * (k + 0.5f)) + w * (dl * 0.5f) + Vector3.up * (H - 0.06f + dy * 0.5f - 0.006f);
+                    Pierre(c).Bloc(c, new Vector3(larg - 0.04f + dl, 0.12f + dy, pas - 0.05f), rot, 0.025f,
+                        MaillageTampon.Teinte((hh & 3u) == 0u ? CBois : CPlanche, hh, 9), MaillageTampon.SansDessous);
+                }
+                // poteaux, traverses dessous, lisses, chaînes
+                int nPot = Mathf.Max(2, Mathf.RoundToInt(lg / 2.4f) + 1);
+                for (int k = 0; k < nPot; k++)
+                {
+                    float sk = Mathf.Lerp(0.25f, lg - 0.25f, k / (float)(nPot - 1));
+                    Vector3 t = o + u * sk + Vector3.up * (bas - 0.12f);
+                    Pierre(t).Bloc(t, new Vector3(0.24f, 0.24f, larg + 0.3f), Quaternion.LookRotation(w, Vector3.up), 0.04f, MaillageTampon.Teinte(CBoisSombre, MaillageTampon.Hache(k, t.x, t.z), 5));
+                    for (int s = -1; s <= 1; s += 2)
+                    {
+                        Vector3 pb = o + u * sk + w * (s * (larg * 0.5f - 0.1f));
+                        Vector3 c = pb + Vector3.up * (H + HautGardeCorps * 0.5f - 0.1f);
+                        Pierre(c).Bloc(c, new Vector3(0.17f, HautGardeCorps + 0.2f, 0.17f), rot, 0.04f, MaillageTampon.Teinte(CBois, MaillageTampon.Hache(k, s, 43), 6));
+                        // chaîne : maillons alternés jusqu'à la voûte, anneau scellé
+                        float y0 = H + HautGardeCorps + 0.1f, y1 = P.Voute(pb.x) - 0.1f;
+                        int nm = Mathf.Max(1, Mathf.FloorToInt((y1 - y0) / 0.28f));
+                        for (int m = 0; m < nm; m++)
+                        {
+                            Vector3 cm = pb + Vector3.up * (y0 + (m + 0.5f) * (y1 - y0) / nm);
+                            Quaternion rm = Quaternion.LookRotation((m & 1) == 0 ? u : w, Vector3.up);
+                            Pierre(cm).Bloc(cm, new Vector3(0.06f, 0.3f, 0.16f), rm, 0.02f, CFer);
+                        }
+                        Vector3 an = pb + Vector3.up * (y1 + 0.02f);
+                        Pierre(an).Bloc(an, new Vector3(0.36f, 0.12f, 0.36f), Quaternion.identity, 0.03f, CFer);
+                    }
+                }
+                for (int s = -1; s <= 1; s += 2)
+                {
+                    Vector3 cote = mid + w * (s * (larg * 0.5f - 0.1f));
+                    Vector3 c = cote + Vector3.up * (H + HautGardeCorps - 0.02f);
+                    Pierre(c).Bloc(c, new Vector3(0.14f, 0.12f, lg + 0.1f), rot, 0.04f, MaillageTampon.Teinte(CBois, MaillageTampon.Hache(c.x, c.z, 47), 5));
+                    Vector3 cc = cote + Vector3.up * (H + 0.55f);
+                    Pierre(cc).Bloc(cc, new Vector3(0.07f, 0.07f, lg - 0.1f), rot, 0.03f, CCorde);
+                    Vector3 cp = cote + Vector3.up * (H + 0.08f);
+                    Pierre(cp).Bloc(cp, new Vector3(0.1f, 0.16f, lg), rot, 0.03f, MaillageTampon.Teinte(CBoisSombre, MaillageTampon.Hache(c.x, c.z, 53), 5));
+                }
+                // corbeaux de pierre sous les longerons, contre les murs des terrasses
+                for (int bout = 0; bout < 2; bout++)
+                {
+                    Vector3 e = o + u * (bout == 0 ? 0.3f : lg - 0.3f);
+                    for (int s = -1; s <= 1; s += 2)
+                    {
+                        Vector3 c = e + w * (s * (larg * 0.5f - 0.45f)) + Vector3.up * (bas - 0.3f);
+                        Pierre(c).Bloc(c, new Vector3(0.5f, 0.6f, 0.6f), rot, 0.1f, MaillageTampon.Teinte(CChapiteau, MaillageTampon.Hache(c.x, c.z, 59), 5));
+                    }
+                }
             }
         }
 
@@ -993,7 +1091,11 @@ namespace Deathless.Donjon.Terrasses
                     if (sol > PlanTerrasses.FondSol + 0.01f)
                         Boite(new Vector3(x0 + w * 0.5f, (PlanTerrasses.FondSol + sol) * 0.5f, z0 + h * 0.5f), new Vector3(w, sol - PlanTerrasses.FondSol, h), Quaternion.identity);
                     if (c.AUnHaut)
-                        Boite(new Vector3(x0 + w * 0.5f, (c.plafond + c.sommet) * 0.5f, z0 + h * 0.5f), new Vector3(w, c.sommet - c.plafond, h), Quaternion.identity);
+                    {
+                        var bh = Boite(new Vector3(x0 + w * 0.5f, (c.plafond + c.sommet) * 0.5f, z0 + h * 0.5f), new Vector3(w, c.sommet - c.plafond, h), Quaternion.identity);
+                        // tablier du ponton : la caméra le traverse (vue sous le ponton), il est découpé autour du héros
+                        if (c.genre == GenreCellule.Ponton) { bh.name = "Ponton"; bh.AddComponent<VueLibre>(); }
+                    }
                 }
         }
 
@@ -1043,6 +1145,26 @@ namespace Deathless.Donjon.Terrasses
             foreach (var c in P.coffres) if (Chemin(a, new Vector3(c.pose.x, c.pose.y, c.pose.z) + Quaternion.Euler(0f, c.pose.rotY, 0f) * Vector3.forward * 1.1f) < 0f) d.Add("coffre " + c.pose + " hors d'atteinte");
             foreach (var s in P.apparitions) if (Chemin(a, new Vector3(s.pose.x, s.pose.y, s.pose.z)) < 0f) d.Add("apparition " + s.pose + " hors d'atteinte");
             if (Chemin(a, new Vector3(P.portail.x, 0f, 1.2f)) < 0f) d.Add("portail hors d'atteinte");
+            // ponton : le tablier (au milieu) et le rez dessous, depuis l'arrivée
+            foreach (var po in P.pontons)
+            {
+                if (Chemin(a, new Vector3(po.r.CentreX, po.Hauteur, po.r.CentreZ)) < 0f) d.Add("ponton hors d'atteinte");
+                if (Chemin(a, new Vector3(po.r.CentreX, 0f, po.r.CentreZ)) < 0f) d.Add("dessous du ponton hors d'atteinte");
+            }
+            // chaque terrasse (son centre ou la case libre la plus proche)
+            foreach (var t in P.terrasses)
+            {
+                bool ok = false;
+                for (int z = t.r.z0; z < t.r.z1 && !ok; z++)
+                    for (int x = t.r.x0; x < t.r.x1 && !ok; x++)
+                    {
+                        var c = P.CelluleEn(x + 0.5f, z + 0.5f);
+                        if (c.genre != GenreCellule.Sol || c.obstacle || Mathf.Abs(c.sol - t.Hauteur) > 0.01f) continue;
+                        if (Mathf.Abs(x + 0.5f - t.r.CentreX) > 1.5f && Mathf.Abs(z + 0.5f - t.r.CentreZ) > 1.5f) continue;
+                        ok = Chemin(a, new Vector3(x + 0.5f, t.Hauteur, z + 0.5f)) >= 0f;
+                    }
+                if (!ok) d.Add("terrasse " + t.index + " (Lvl " + t.niveau + ") hors d'atteinte");
+            }
             foreach (var o in obs) o.enabled = Application.isPlaying;
             return d;
         }

@@ -16,8 +16,8 @@ using UnityEngine;
 //   forge                : building_blacksmith (cabane à toit bleu collée au grand four de pierre, enclume, marteau, râtelier, seau, dalles)
 //   taverne              : building_tavern (toit en tonneau couché, auvent de bois avec tables, soubassement de pierre et escalier)
 // Pose « sur le sol » : le bas du maillage (soubassement de pierre) est à y = 0, le sol sous les bâtiments est plat (GroundHeight = 0 sur
-// tout le village), enfoncé de V5KKEnfoncement (3 cm) pour qu'aucun jour ne reste entre la pierre et l'herbe ; les marches de l'escalier
-// partent du sol (quatre marches de 39 cm, 52 cm de giron) ; aucun vide, ni creux, ni plancher surélevé sous le bâtiment.
+// tout le village), enfoncé par modèle (V5KKEnfoncementMaison 1,15 m, V5KKEnfoncementForge 0,74 m : le sol arrive à la dernière marche, il reste une marche
+// de 40 cm devant la porte) pour qu'aucun jour ne reste entre la pierre et l'herbe ; les deux premières marches de l'escalier sont sous terre ; aucun vide, ni creux, ni plancher surélevé sous le bâtiment.
 // Structure sous Maisons/Batiment_<Rôle> (comme les prefabs Tripo : V5RenduTripo, V5EmpriseTripo, V5FacadeDe les lisent tels quels) :
 //   KayKit_<pièce>/Rendu       maillage KayKit à l'échelle 7,5 (porte de 2,10 m), matériau des maisons (vitres émissives la nuit)
 //   KayKit_<pièce>/Collision   MeshCollider du même maillage + NavMeshModifier « Not Walkable » (les marches se montent à pied, le corps
@@ -36,22 +36,38 @@ public static partial class VillageBuilder
     public static readonly Vector2[] V5MaisonsKayKitEcart = { Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(0f, -3f), new Vector2(3f, -4f) };
     /// Échelle des bâtiments KayKit : celle de l'ancienne carte (HouseDoorTarget / HouseDoorLocal = 2,1 / 0,28), porte de 2,10 m.
     public const float V5KKEchelle = 7.5f;
-    /// Enfoncement du modèle (m) : pas de jour sous la pierre.
-    public const float V5KKEnfoncement = 0.03f;
+    /// Enfoncement du modèle (m), propre à chaque modèle (03/10/2026, Quentin : « le soubassement nettement enfoncé »). Mesuré sur les modèles à
+    /// l'échelle 7,5 (aire des faces horizontales par hauteur) : home_B et tavern ont leur plancher à 1,57 m et des marches à 0,40 / 0,80 / 1,20 m ;
+    /// 1,15 m d'enfoncement met le sol à 5 cm sous le dessus de la dernière marche (reste une marche de 0,40 m devant la porte, plancher à 0,42 m).
+    /// building_blacksmith n'a pas de marches : un dallage de pierre à 0,79 m devant la cabane (dessus à 0,79 à 0,88 m) puis le plancher de la
+    /// cabane à 1,16 m, soit la même marche de 0,37 m ; 0,74 m d'enfoncement = même rendu (sol 5 cm sous le dallage, plancher à 0,42 m).
+    public const float V5KKEnfoncementMaison = 1.15f, V5KKEnfoncementForge = 0.74f;
     /// Distance (m) entre le bord avant des marches (ou le devant de la porte) et le pied de la porte où le héros réapparaît en sortant.
     public const float V5KKSeuil = 0.9f;
 
     /// Repère de chaque pièce (mètres à l'échelle 7,5, x vers la droite vue de la façade, z vers l'extérieur) : axe de la porte (centre de
     /// l'escalier, ou de la porte de la cabane), plan de la façade au droit de la porte, position de la lanterne de porte.
-    sealed class V5KKPieceInfo { public float porteX, facadeZ, pied; public Vector2 lanterne; public Vector2 enclume; }
+    sealed class V5KKPieceInfo { public float porteX, facadeZ, pied, enfoncement; public Vector2 lanterne; public Vector2 enclume; }
     static readonly Dictionary<string, V5KKPieceInfo> s_V5KKPieces = new Dictionary<string, V5KKPieceInfo> {
-        // escalier de x = -0,28 à 0 (unités du modèle), façade du rez-de-chaussée à z = 0,28 ; lanterne : 35 cm hors de l'escalier, côté gauche (comme avant : (-2,45 ; 4,55))
-        { "home_B",     new V5KKPieceInfo { porteX = -1.05f, facadeZ = 2.10f, pied = 4.20f, lanterne = new Vector2(-2.45f, 4.55f) } },
+        // escalier de x = -0,28 à 0 (unités du modèle), façade du rez-de-chaussée à z = 0,28 ; lanterne : 35 cm hors de l'escalier, côté gauche ;
+        // pied = bord avant de la dernière marche visible (z = 0,42 du modèle ; les deux premières marches sont sous terre), lanterne reculée d'autant
+        { "home_B",     new V5KKPieceInfo { porteX = -1.05f, facadeZ = 2.10f, pied = 3.15f, enfoncement = V5KKEnfoncementMaison, lanterne = new Vector2(-2.45f, 3.51f) } },
         // escalier de x = 0,01 à 0,28, façade à z = 0,35 ; lanterne du côté de l'auvent, à 35 cm de l'escalier
-        { "tavern",     new V5KKPieceInfo { porteX = 1.09f, facadeZ = 2.62f, pied = 4.73f, lanterne = new Vector2(-0.35f, 4.55f) } },
+        { "tavern",     new V5KKPieceInfo { porteX = 1.09f, facadeZ = 2.62f, pied = 3.68f, enfoncement = V5KKEnfoncementMaison, lanterne = new Vector2(-0.35f, 3.51f) } },
         // cabane de x = 0,15 à 0,58, porte au milieu, façade à z = 0,08 ; pas d'escalier : la porte est au sol ; enclume au milieu du devant du four
-        { "blacksmith", new V5KKPieceInfo { porteX = 2.55f, facadeZ = 0.60f, pied = 2.30f, lanterne = new Vector2(4.6f, 2.6f), enclume = new Vector2(0.15f, 6.9f) } },
+        { "blacksmith", new V5KKPieceInfo { porteX = 2.55f, facadeZ = 0.60f, pied = 2.30f, enfoncement = V5KKEnfoncementForge, lanterne = new Vector2(4.6f, 2.6f), enclume = new Vector2(0.15f, 6.9f) } },
     };
+
+    /// Pied de l'escalier visible (bord avant de la dernière marche, ou devant de la porte) d'un bâtiment KayKit : racine Batiment_<Rôle>, dans son repère.
+    static bool V5PiedKayKit(Transform racine, out float pied)
+    {
+        pied = 0f;
+        if (racine == null || !racine.name.StartsWith("Batiment_")) return false;
+        int i = System.Array.IndexOf(V5MaisonsRoles, racine.name.Substring("Batiment_".Length));
+        if (i < 0 || V5MaisonsTripo[i] != null || V5MaisonsKayKitPiece[i] == null) return false;
+        pied = s_V5KKPieces[V5MaisonsKayKitPiece[i]].pied;
+        return true;
+    }
 
     static string V5KKChemin(int i)
     {
@@ -84,7 +100,7 @@ public static partial class VillageBuilder
         mod.SetParent(racine, false);
 
         GameObject r = new GameObject("Rendu"); r.transform.SetParent(mod, false);
-        r.transform.localPosition = new Vector3(0f, -V5KKEnfoncement, 0f); r.transform.localScale = Vector3.one * V5KKEchelle;
+        r.transform.localPosition = new Vector3(0f, -info.enfoncement, 0f); r.transform.localScale = Vector3.one * V5KKEchelle;
         r.AddComponent<MeshFilter>().sharedMesh = maillage;
         var mr = r.AddComponent<MeshRenderer>(); mr.sharedMaterial = mat;
         mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
@@ -118,7 +134,57 @@ public static partial class VillageBuilder
             rs.Add(mr); cycle.maisons = rs.ToArray();
             EditorUtility.SetDirty(cycle);
         }
-        return role + " (KayKit " + piece + " " + V5MaisonsKayKitCoul[i] + ", lacet " + racine.eulerAngles.y.ToString("F1") + ", porte à " + e.transform.position.ToString("F2") + suite + lanterneInfo + ") ; ";
+        string effets = V5FumeeKayKit(mod, piece, info);
+        if (piece == "blacksmith") effets += V5FeuForgeKayKit(mod, info);
+        return role + " (KayKit " + piece + " " + V5MaisonsKayKitCoul[i] + ", lacet " + racine.eulerAngles.y.ToString("F1") + ", porte à " + e.transform.position.ToString("F2") + suite + lanterneInfo + effets + ") ; ";
+    }
+
+    /// Sommet de la cheminée (m, repère du modèle à l'échelle 7,5, avant enfoncement ; x déjà retourné : l'import Unity inverse l'axe X du FBX) et réglages de
+    /// la fumée (03/10/2026, Quentin) : maisons = filet gris, fin et léger ; forge = fumée noire, plus dense et plus large, lisible sans masquer le bâtiment.
+    /// Relevé sur les maillages (face horizontale grise du couronnement) : home_B (-1,05 ; 9,60 ; -3,15), blacksmith (-1,58 ; 7,35 ; -1,05).
+    /// La taverne KayKit n'a pas de cheminée (celle de la taverne Tripo porte déjà sa fumée).
+    static string V5FumeeKayKit(Transform mod, string piece, V5KKPieceInfo info)
+    {
+        Vector3 sommet; bool forge = piece == "blacksmith";
+        if (piece == "home_B") sommet = new Vector3(-1.05f, 9.60f, -3.15f);
+        else if (forge) sommet = new Vector3(-1.58f, 7.35f, -1.05f);
+        else return "";
+        Material mat = AssetDatabase.LoadAssetAtPath<Material>("Assets/VFX/BiereFuite/BiereFuite.mat");
+        if (mat == null) mat = AssetDatabase.LoadAssetAtPath<Material>("Assets/VFX/_RelicCommun/PortalVoxel.mat");
+        if (mat == null) return ", pas de matériau de gemmes : pas de fumée";
+        var a = new GameObject("Cheminee"); a.transform.SetParent(mod, false);
+        a.transform.localPosition = new Vector3(sommet.x, sommet.y - info.enfoncement + 0.08f, sommet.z);
+        var f = a.AddComponent<FumeeCheminee>();
+        f.materiau = mat; f.theme = VfxTheme.Fumee;
+        if (forge) { f.teinteA = "Suie"; f.teinteB = "Noire"; f.debit = 3.2f; f.taille = 1.25f; f.montee = 1.1f; f.rayon = 0.3f; f.duree = 1.25f; f.capacite = 110; f.distanceMax = 80f; }
+        else { f.teinteA = "Grise"; f.teinteB = "Claire"; f.debit = 0.9f; f.taille = 0.55f; f.montee = 0.8f; f.rayon = 0.12f; f.duree = 1.15f; f.capacite = 30; f.distanceMax = 60f; }
+        EditorUtility.SetDirty(f);
+        return ", fumée " + (forge ? "noire" : "grise") + " en " + a.transform.localPosition.ToString("F2");
+    }
+
+    /// Feu dans la bouche du four de pierre de la forge KayKit : l'effet ForgeFeu (flammes, étincelles et braises en gemmes de la palette Feu, comme
+    /// les flammes des sorts du mage ; jamais de vert) et une lumière chaude qui vacille (portée 8 m, sans ombre), allumés jour et nuit.
+    /// Géométrie relevée sur building_blacksmith (échelle 7,5, x retourné) : l'arche du four a ses piédroits à x = -2,35 et -0,80 (bouche de 1,55 m),
+    /// son linteau à 1,58 m ; le plancher de la bouche est à 0,49 m (la forge est enfoncée de 0,74 m : il passe à 0,25 m sous le sol, on
+    /// pose le feu à 0,12 m au-dessus du sol), le fond à z = 0,79 et l'avant du linteau à z = 1,45. Le feu est au milieu de la bouche (z = 1,6), à l'échelle 1,6 de
+    /// l'effet de l'intérieur (lit de 1,4 x 1,1 m) et de hauteur réduite pour ne pas traverser le linteau.
+    static string V5FeuForgeKayKit(Transform mod, V5KKPieceInfo info)
+    {
+        Material gemmes = AssetDatabase.LoadAssetAtPath<Material>("Assets/VFX/_RelicCommun/PortalVoxel.mat");
+        if (gemmes == null) return ", PortalVoxel.mat absent : pas de feu";
+        Vector3 bouche = new Vector3(-1.58f, Mathf.Max(0.12f, 0.49f - info.enfoncement + 0.12f), 1.6f);
+        var go = new GameObject("Forge_FeuVivant"); go.transform.SetParent(mod, false); go.transform.localPosition = bouche;
+        var lg = new GameObject("Feu_Forge"); lg.transform.SetParent(mod, false); lg.transform.localPosition = bouche + new Vector3(0f, 0.8f, 0.5f);
+        Light l = lg.AddComponent<Light>();
+        l.type = LightType.Point; l.range = 8f; l.shadows = LightShadows.None;
+        l.color = Color.Lerp(VfxPalette.Couleur(VfxTheme.Feu, VfxRole.Vif, new Color(1f, 0.38f, 0.04f)), VfxPalette.Couleur(VfxTheme.Feu, VfxRole.Coeur, new Color(1f, 0.9f, 0.4f)), 0.3f);
+        l.intensity = 2.2f;
+        var feu = go.AddComponent<ForgeFeu>();
+        feu.materiau = gemmes; feu.lumiere = l; feu.intensite = 2.2f; feu.partJour = 1f;   // allumé aussi fort le jour que la nuit
+        feu.demiLit = new Vector2(0.45f, 0.35f); feu.hauteur = 0.4f; feu.flammes = 40; feu.etincelles = 8; feu.braisesVives = 18;
+        go.transform.localScale = Vector3.one * 1.6f;
+        EditorUtility.SetDirty(feu);
+        return ", feu ForgeFeu + lumière chaude dans la bouche du four (" + bouche.ToString("F2") + ")";
     }
 
     /// Pose (ou remet à jour) le composant EntreeBatiment sur un repère Entree : rôle du bâtiment et pied de la porte. Idempotent.

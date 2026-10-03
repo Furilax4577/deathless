@@ -31,6 +31,11 @@ public static class DonjonTerrassesMenu
     [MenuItem("Deathless/Donjon/Terrasses/Captures des graines du banc")]
     public static void MenuCaptures() { Debug.Log(Captures(GrainesCaptures)); }
 
+    [MenuItem("Deathless/Donjon/Terrasses/Captures du ponton (variante 8)")]
+    public static void MenuCapturesPonton() { Debug.Log(CapturesPonton(GrainesPonton)); }
+
+    public static readonly int[] GrainesPonton = { 3, 7, 11 };
+
     [MenuItem("Deathless/Donjon/Terrasses/Contrôler 2000 graines (plan)")]
     public static void MenuValider() { Debug.Log(Valider(1, 2000)); }
 
@@ -188,6 +193,101 @@ public static class DonjonTerrassesMenu
         });
     }
 
+    /// Variante 8 imposée (ponton suspendu) : contrôle NavMesh, puis captures donjon_ponton_g<graine>_{dessus, iso, joueur,
+    /// ponton (à hauteur de joueur sur le tablier), sous_ponton (depuis le rez), niveau2 (depuis le Lvl 2 vers le ponton)}.
+    /// La variante du constructeur est rendue telle qu'elle était.
+    public static string CapturesPonton(int[] graines)
+    {
+        return AvecBanc((sc, banc) =>
+        {
+            var sb = new StringBuilder();
+            var ct = banc.constructeur;
+            int avant = ct.parametres.variante;
+            ct.parametres.variante = 8;
+            try
+            {
+                foreach (int g in graines)
+                {
+                    banc.Regenerer(g);
+                    var P = ct.Plan;
+                    var defNav = ct.VerifierNavMesh();
+                    sb.Append(P.Resume()).Append(" | NavMesh : ").Append(defNav.Count == 0 ? "ok" : string.Join(", ", defNav)).Append(" | ")
+                      .Append(ct.NbSommets).Append(" sommets, ").Append(ct.NbCollisions).Append(" collisions | ");
+                    string pre = "donjon_ponton_g" + g + "_";
+                    foreach (var v in new[] { BancDonjonTerrasses.Vue.Dessus, BancDonjonTerrasses.Vue.Iso, BancDonjonTerrasses.Vue.Joueur })
+                    {
+                        banc.vue = v; banc.PlacerCamera();
+                        Rendre(banc.cam, sc, pre + v.ToString().ToLowerInvariant());
+                    }
+                    if (P.pontons.Count == 0) { sb.AppendLine("pas de ponton"); continue; }
+                    var po = P.pontons[0];
+                    // le grand côté (Lvl 2) est-il à l'ouest ? On part de son bout et on regarde vers le petit Lvl 1.
+                    Terrasse t2 = P.terrasses.Find(t => t.niveau == 2);
+                    bool depuisOuest = t2 == null || t2.r.CentreX < po.r.CentreX;
+                    float x = depuisOuest ? po.r.x0 + 1.5f : po.r.x1 - 1.5f, lacet = depuisOuest ? 90f : 270f;
+                    PoserVue(banc, sc, x, po.Hauteur, po.r.CentreZ, lacet, pre + "ponton");
+                    // depuis le rez, sous le ponton : on regarde vers le fond
+                    PoserVue(banc, sc, po.r.CentreX, 0f, po.r.z0 - 4f, 0f, pre + "sous_ponton");
+                    if (t2 != null)
+                    {
+                        float hx = t2.r.CentreX, hz = t2.r.CentreZ;
+                        float l2 = Mathf.Atan2(po.r.CentreX - hx, po.r.CentreZ - hz) * Mathf.Rad2Deg;
+                        // recule le héros vers l'angle pour voir le Lvl 2, le couloir et le ponton
+                        float dx = Mathf.Sin(l2 * Mathf.Deg2Rad), dz = Mathf.Cos(l2 * Mathf.Deg2Rad);
+                        hx -= dx * 2.5f; hz -= dz * 2.5f;
+                        PoserVue(banc, sc, hx, t2.Hauteur, hz, l2, pre + "niveau2");
+                    }
+                    sb.AppendLine(pre + "{dessus, iso, joueur, ponton, sous_ponton, niveau2}");
+                }
+            }
+            finally
+            {
+                ct.parametres.variante = avant;
+                banc.vue = BancDonjonTerrasses.Vue.Joueur;
+                banc.Regenerer(graines[0]);
+            }
+            return sb.ToString();
+        });
+    }
+
+    /// Hauteur avant / après (03/10/2026) : la capture iso d'avant (fichier d'origine, gardé) à gauche, la même vue de la
+    /// même graine avec les hauteurs nouvelles à droite ; écrit donjon_ponton_hauteur_avant_apres.png (1920 × 540).
+    public static string ComparaisonHauteur(string ancienne, int g, int variante)
+    {
+        if (!File.Exists(ancienne)) return "introuvable : " + ancienne;
+        var vieux = new Texture2D(2, 2); vieux.LoadImage(File.ReadAllBytes(ancienne));
+        string res = AvecBanc((sc, banc) =>
+        {
+            var ct = banc.constructeur;
+            int avant = ct.parametres.variante;
+            ct.parametres.variante = variante;
+            try
+            {
+                banc.Regenerer(g);
+                banc.vue = BancDonjonTerrasses.Vue.Iso; banc.PlacerCamera();
+                Rendre(banc.cam, sc, "donjon_ponton_hauteur_apres");
+                return ct.Plan.Resume();
+            }
+            finally { ct.parametres.variante = avant; banc.vue = BancDonjonTerrasses.Vue.Joueur; banc.Regenerer(g); }
+        });
+        var neuf = new Texture2D(2, 2); neuf.LoadImage(File.ReadAllBytes("Assets/Screenshots/donjon_ponton_hauteur_apres.png"));
+        var sortie = new Texture2D(W, H / 2, TextureFormat.RGB24, false);
+        for (int y = 0; y < H / 2; y++)
+            for (int x = 0; x < W; x++)
+            {
+                var src = x < W / 2 ? vieux : neuf;
+                int sx = (x % (W / 2)) * 2, sy = y * 2;
+                Color c = (src.GetPixel(sx, sy) + src.GetPixel(sx + 1, sy) + src.GetPixel(sx, sy + 1) + src.GetPixel(sx + 1, sy + 1)) * 0.25f;
+                if (x == W / 2 || x == W / 2 - 1) c = Color.white;
+                sortie.SetPixel(x, y, c);
+            }
+        sortie.Apply();
+        File.WriteAllBytes("Assets/Screenshots/donjon_ponton_hauteur_avant_apres.png", sortie.EncodeToPNG());
+        File.Delete("Assets/Screenshots/donjon_ponton_hauteur_apres.png");
+        Object.DestroyImmediate(vieux); Object.DestroyImmediate(neuf); Object.DestroyImmediate(sortie);
+        return "donjon_ponton_hauteur_avant_apres.png ; après : " + res;
+    }
+
     /// Vues rapprochées des pièces fermées : la porte à serrure, la paroi secrète fermée puis ouverte, son déclencheur.
     static string CapturesMecanismes(BancDonjonTerrasses banc, Scene sc, int g)
     {
@@ -339,7 +439,7 @@ public static class DonjonTerrassesMenu
     {
         var plan = new PlanTerrasses();
         int ok = 0, relances = 0, verrou = 0, secret = 0, pieces = 0;
-        var parVar = new int[8]; var niv = new int[4];
+        var parVar = new int[9]; var niv = new int[4];
         var defauts = new Dictionary<string, int>();
         var chrono = System.Diagnostics.Stopwatch.StartNew();
         for (int g = de; g < de + nb; g++)
@@ -353,29 +453,44 @@ public static class DonjonTerrassesMenu
         var sb = new StringBuilder();
         sb.Append(ok).Append('/').Append(nb).Append(" plans conformes (").Append((chrono.ElapsedMilliseconds / (double)nb).ToString("0.00")).Append(" ms par graine), ")
           .Append(relances).Append(" relancés ; variantes ");
-        for (int v = 1; v < 8; v++) sb.Append('v').Append(v).Append(':').Append(parVar[v]).Append(' ');
+        for (int v = 1; v < 9; v++) sb.Append('v').Append(v).Append(':').Append(parVar[v]).Append(' ');
         sb.Append("; 2 niveaux : ").Append(niv[2]).Append(", 3 niveaux : ").Append(niv[3]).Append(" ; pièces cachées ").Append(pieces).Append(" (verrouillées ").Append(verrou).Append(", secrètes ").Append(secret).Append(')');
         foreach (var kv in defauts) sb.Append(" ; ").Append(kv.Value).Append(" × ").Append(kv.Key);
         return sb.ToString();
     }
 
     /// Contrôle NavMesh (construit) de quelques graines dans le banc.
-    public static string ValiderNavMesh(int de, int nb)
+    public static string ValiderNavMesh(int de, int nb, int variante = 0)
     {
         return AvecBanc((sc, banc) =>
         {
             var sb = new StringBuilder();
+            int avant = banc.constructeur.parametres.variante;
+            banc.constructeur.parametres.variante = variante;
             int ok = 0;
-            float tp = 0f, tc = 0f, tn = 0f;
+            float tp = 0f, tc = 0f, tn = 0f, parcours = 0f;
             for (int g = de; g < de + nb; g++)
             {
                 banc.Regenerer(g);
                 var d = banc.constructeur.VerifierNavMesh();
                 tp += banc.constructeur.TempsPlanMs; tc += banc.constructeur.TempsConstructionMs; tn += banc.constructeur.TempsNavMeshMs;
+                // parcours : de l'arrivée au grand coffre (le fond, sur la plus haute terrasse), à 5 m/s (course sans sprint)
+                var pl = banc.constructeur.Plan;
+                var arr = new Vector3(pl.arrivee.x, pl.arrivee.y, pl.arrivee.z);
+                float lmax = 0f;
+                foreach (var co in pl.coffres)
+                {
+                    if (co.type != TypeCoffre.GrandCoffre || co.piece >= 0) continue;
+                    float l = banc.constructeur.Chemin(arr, new Vector3(co.pose.x, co.pose.y, co.pose.z) + Quaternion.Euler(0f, co.pose.rotY, 0f) * Vector3.forward * 1.1f);
+                    lmax = Mathf.Max(lmax, l);
+                }
+                parcours += lmax; sb.Append("g").Append(g).Append(" v").Append(pl.Variante).Append(" ").Append(pl.L).Append("x").Append(pl.P).Append(" fond ").Append(lmax.ToString("0")).Append(" m ; ");
+                if (variante == 8) sb.Append("g").Append(g).Append(" : ").Append(banc.constructeur.Plan.coffres.Count).Append(" coffres, ").Append(banc.constructeur.Plan.apparitions.Count).Append(" apparitions ; ");
                 if (d.Count == 0) ok++; else sb.Append("graine ").Append(g).Append(" : ").Append(string.Join(", ", d)).Append(" ; ");
             }
+            banc.constructeur.parametres.variante = avant;
             banc.Regenerer(GrainesCaptures[0]);
-            return ok + "/" + nb + " graines sans défaut NavMesh ; moyennes : plan " + (tp / nb).ToString("0.0") + " ms, géométrie " + (tc / nb).ToString("0") + " ms, NavMesh " + (tn / nb).ToString("0") + " ms. " + sb;
+            return ok + "/" + nb + " graines sans défaut NavMesh ; arrivée → grand coffre : " + (parcours / nb).ToString("0") + " m en moyenne (" + (parcours / nb / 5f).ToString("0") + " s à 5 m/s) ; moyennes : plan " + (tp / nb).ToString("0.0") + " ms, géométrie " + (tc / nb).ToString("0") + " ms, NavMesh " + (tn / nb).ToString("0") + " ms. " + sb;
         });
     }
 }

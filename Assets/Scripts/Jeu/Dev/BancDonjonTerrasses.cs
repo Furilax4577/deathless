@@ -123,7 +123,7 @@ namespace Deathless.Jeu.Dev
         void OnGUI()
         {
             if (!Application.isPlaying || constructeur == null) return;
-            GUILayout.BeginArea(new Rect(10, 10, 560, 230), GUI.skin.box);
+            GUILayout.BeginArea(new Rect(10, 10, 560, 260), GUI.skin.box);
             GUILayout.Label("Donjon « terrasses » : générateur procédural (N : graine suivante, V : vue)");
             GUILayout.BeginHorizontal();
             GUILayout.Label("Graine", GUILayout.Width(50));
@@ -137,6 +137,12 @@ namespace Deathless.Jeu.Dev
             GUILayout.BeginHorizontal();
             foreach (Vue v in System.Enum.GetValues(typeof(Vue)))
                 if (GUILayout.Toggle(vue == v, v.ToString(), GUI.skin.button, GUILayout.Width(80)) && vue != v) { vue = v; PlacerCamera(); }
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Variante", GUILayout.Width(60));
+            int vf = constructeur.parametres.variante;
+            if (GUILayout.Toggle(vf == 0, "Tirée", GUI.skin.button, GUILayout.Width(70)) && vf != 0) { constructeur.parametres.variante = 0; Regenerer(constructeur.graine); }
+            if (GUILayout.Toggle(vf == 8, "Ponton (v8)", GUI.skin.button, GUILayout.Width(100)) && vf != 8) { constructeur.parametres.variante = 8; Regenerer(constructeur.graine); }
             GUILayout.EndHorizontal();
             var P = constructeur.Plan;
             if (P != null)

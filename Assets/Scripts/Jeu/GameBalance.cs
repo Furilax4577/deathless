@@ -400,6 +400,23 @@ namespace Deathless.Jeu
         public int orTasOr = 20;
         [Tooltip("Hausse de l'or du donjon par nuit déjà passée (0,1 : +10 % par nuit).")]
         public float orDonjonParNuit = 0.1f;
+
+        [Header("Butin de clés et de crochets (03/10/2026, {à équilibrer}) : on en trouve dans les coffres du donjon")]
+        [Tooltip("Coffre (deux par donjon) : chance (0 à 1) de contenir une clé. 03/10/2026, Quentin : « les clés et le kit devraient pouvoir se looter ».")]
+        public float cleCoffreChance = 0.30f;
+        [Tooltip("Coffre : chance de contenir un kit de crochetage.")]
+        public float kitCoffreChance = 0.15f;
+        [Tooltip("Grand coffre (2e étage) : chance de contenir une clé (1 : toujours).")]
+        public float cleGrandCoffreChance = 1f;
+        [Tooltip("Grand coffre : chance de contenir un kit de crochetage.")]
+        public float kitGrandCoffreChance = 0.35f;
+        [Tooltip("Clés trouvées quand la chance réussit (même sorte), pour un coffre puis pour le grand coffre ; un kit trouvé donne GameBalance.crochetsParKit crochets.")]
+        public int cleCoffreQuantite = 1;
+        public int cleGrandCoffreQuantite = 1;
+        [Tooltip("Sorte de la clé trouvée dans un coffre : poids relatifs (bronze, argent, or).")]
+        public Vector3 cleCoffrePoids = new Vector3(70f, 30f, 0f);
+        [Tooltip("Sorte de la clé trouvée dans le grand coffre : poids relatifs (bronze, argent, or).")]
+        public Vector3 cleGrandCoffrePoids = new Vector3(20f, 55f, 25f);
         [Tooltip("Part du butin porté gardée quand Nyxessa rappelle le joueur (ou s'il meurt au donjon), par palier de Nyxessa (1 à 5).")]
         public float[] partGardeeRappel = { 0f, 0.2f, 0.4f, 0.6f, 0.75f };
         [Tooltip("Squelettes qui gardent le butin (sbires et guerriers), posés chaque jour sur les points d'apparition du donjon.")]

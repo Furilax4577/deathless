@@ -118,6 +118,90 @@ namespace Deathless.Jeu
             return true;
         }
 
+        // ----------------------------------------------------------------- Butin (03/10/2026 : coffres du donjon, sac d'un joueur mort)
+
+        /// Quantités d'un article dans l'emballage réseau (clés et crochets seulement pour un butin ; le kit donne ses crochets).
+        public static int TasseDe(ArticleBoutique a, int n)
+        {
+            n = Mathf.Clamp(n, 0, 15);
+            if (EstPotion(a)) return n << (4 * (int)DePotion(a));
+            if (EstCle(a)) return n << (4 * (NbPotions + (int)a));
+            return n << (4 * (NbPotions + NbCles));
+        }
+
+        /// Ce qui tombe dans le sac d'un joueur mort : ses clés et ses crochets (pas ses potions), emballés.
+        public static int TasserButin(EtatJoueur j) => Tasser(j) & ~0xFFF;
+
+        /// Le joueur porte-t-il des clés ou des crochets ?
+        public static bool ABut(EtatJoueur j) => TasserButin(j) != 0;
+
+        /// Vide les clés et les crochets (ils sont partis dans un sac).
+        public static void RetirerButin(EtatJoueur j)
+        {
+            if (j == null) return;
+            if (j.cles != null) for (int i = 0; i < j.cles.Length; i++) j.cles[i] = 0;
+            j.crochets = 0;
+        }
+
+        /// Ajoute les quantités emballées, dans la limite des maximums ; renvoie ce qui a vraiment été ajouté (emballé).
+        public static int AjouterTasse(EtatJoueur j, int tasse)
+        {
+            if (j == null || tasse == 0) return 0;
+            if (j.potions == null || j.potions.Length < NbPotions) System.Array.Resize(ref j.potions, NbPotions);
+            if (j.cles == null || j.cles.Length < NbCles) System.Array.Resize(ref j.cles, NbCles);
+            int recu = 0;
+            for (int i = 0; i < NbPotions; i++)
+            {
+                int n = (tasse >> (4 * i)) & 0xF; if (n == 0) continue;
+                int apres = Mathf.Min(Max(ArticleDe((Potion)i)), j.potions[i] + n);
+                recu |= Mathf.Max(0, apres - j.potions[i]) << (4 * i); j.potions[i] = Mathf.Max(j.potions[i], apres);
+            }
+            for (int i = 0; i < NbCles; i++)
+            {
+                int n = (tasse >> (4 * (NbPotions + i))) & 0xF; if (n == 0) continue;
+                int apres = Mathf.Min(Max((ArticleBoutique)i), j.cles[i] + n);
+                recu |= Mathf.Max(0, apres - j.cles[i]) << (4 * (NbPotions + i)); j.cles[i] = Mathf.Max(j.cles[i], apres);
+            }
+            int c = (tasse >> (4 * (NbPotions + NbCles))) & 0xF;
+            if (c > 0)
+            {
+                int apres = Mathf.Min(Max(ArticleBoutique.KitCrochetage), j.crochets + c);
+                recu |= Mathf.Clamp(apres - j.crochets, 0, 15) << (4 * (NbPotions + NbCles)); j.crochets = Mathf.Max(j.crochets, apres);
+            }
+            return recu;
+        }
+
+        /// Texte d'une trouvaille emballée : « une clé d’argent, 5 crochets » (vide si rien).
+        public static string TexteTasse(int tasse)
+        {
+            var sb = new System.Text.StringBuilder();
+            for (int i = 0; i < NbCles; i++)
+            {
+                int n = (tasse >> (4 * (NbPotions + i))) & 0xF; if (n == 0) continue;
+                if (sb.Length > 0) sb.Append(", ");
+                sb.Append(n == 1 ? "une " : n + " ").Append(n == 1 ? Nom((ArticleBoutique)i).ToLowerInvariant() : Nom((ArticleBoutique)i).ToLowerInvariant().Replace("clé", "clés"));
+            }
+            int c = (tasse >> (4 * (NbPotions + NbCles))) & 0xF;
+            if (c > 0) { if (sb.Length > 0) sb.Append(", "); sb.Append(c == 1 ? "un crochet" : c + " crochets"); }
+            return sb.ToString();
+        }
+
+        /// Description d'un article pour le menu du personnage.
+        public static string Description(ArticleBoutique a)
+        {
+            var b = B;
+            switch (a)
+            {
+                case ArticleBoutique.CleBronze: return "Ouvre une serrure de bronze au donjon. Usage unique.";
+                case ArticleBoutique.CleArgent: return "Ouvre une serrure d’argent au donjon. Usage unique.";
+                case ArticleBoutique.CleOr: return "Ouvre une serrure d’or au donjon. Usage unique.";
+                case ArticleBoutique.KitCrochetage: return "Crochète une serrure simple, de bronze ou d’argent. Un crochet casse à chaque essai raté.";
+                case ArticleBoutique.PotionSante: return "Rend " + Mathf.RoundToInt(b.potionSantePart * 100f) + " % de la vie. Croix haut, ou 1.";
+                case ArticleBoutique.PotionMana: return "Rend " + Mathf.RoundToInt(b.potionManaPart * 100f) + " % du mana (Mage). Croix gauche, ou 2.";
+                default: return "Rend toute l’endurance, puis la récupère " + b.potionEnduranceFacteur.ToString("0.#") + " fois plus vite pendant " + Mathf.RoundToInt(b.potionEnduranceDuree) + " s. Croix droite, ou 3.";
+            }
+        }
+
         // ----------------------------------------------------------------- Emballage réseau (4 bits par quantité)
 
         /// Les sept quantités dans un entier : potions (santé, mana, endurance), clés (bronze, argent, or), crochets. Chacune

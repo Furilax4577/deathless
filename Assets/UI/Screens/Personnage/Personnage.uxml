@@ -45,11 +45,11 @@
                             <ui:VisualElement name="perso-attributs" class="perso__attributs" />
                         </ui:VisualElement>
                     </ui:VisualElement>
-                    <!-- L'inventaire (vide pour l'instant) -->
+                    <!-- L'inventaire : potions, clés et kit de crochetage (lignes bâties par EcranPersonnage) -->
                     <ui:VisualElement class="dl-panel perso__carte perso__inventaire">
                         <ui:Label text="INVENTAIRE" class="dl-section-label" />
-                        <ui:VisualElement name="perso-cases" class="perso__cases" />
-                        <ui:Label text="Vide pour l’instant." class="dl-text dl-text--muted perso__vide" />
+                        <ui:VisualElement name="perso-cases" class="perso__objets" />
+                        <ui:Label name="perso-vide" text="Rien dans les poches. Le druide vend des potions, le mécano des clés ; on en trouve aussi dans les coffres du donjon." class="dl-text dl-text--small dl-text--muted perso__vide" />
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:ScrollView>

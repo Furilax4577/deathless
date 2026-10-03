@@ -9,8 +9,13 @@ namespace Deathless.UI.Ecrans
     /// (icône, nom, rangs, effet) ; Valider améliore, Retour ferme. Superposé au HUD : la partie continue.
     public class EcranPersonnage : Ecran
     {
-        /// Cases de l'inventaire (vides pour l'instant).
-        public const int CasesInventaire = 9;
+        /// Ligne d'un objet de l'inventaire (potions, clés, kit de crochetage ; DonneesUI.Inventaire).
+        sealed class LigneObjet
+        {
+            public VisualElement racine, icone;
+            public Label nom, desc, quantite;
+            public string iconePosee;
+        }
 
         sealed class Ligne
         {
@@ -34,6 +39,9 @@ namespace Deathless.UI.Ecrans
         VisualElement m_Embleme, m_Carac, m_Ameliorations, m_Attributs, m_CarteAttributs;
         Label m_Nom, m_Classe, m_Points, m_PointsAttributs, m_Message;
         readonly List<Ligne> m_Lignes = new List<Ligne>();
+        readonly List<LigneObjet> m_LignesObjets = new List<LigneObjet>();
+        VisualElement m_Objets;
+        Label m_Vide;
         readonly List<LigneAttribut> m_LignesAttributs = new List<LigneAttribut>();
         readonly List<(Label libelle, Label valeur)> m_LignesCarac = new List<(Label, Label)>();
         string m_EmblemePose;
@@ -54,12 +62,8 @@ namespace Deathless.UI.Ecrans
             m_Message = Racine.Q<Label>("perso-message");
             var afflictions = Racine.Q("perso-afflictions");
             if (afflictions != null) m_Afflictions = new SectionAfflictions(afflictions, Racine.Q<Label>("perso-afflictions-vide"), Racine);
-            var cases = Racine.Q("perso-cases");
-            for (int i = 0; i < CasesInventaire; i++)
-            {
-                var c = new VisualElement(); c.AddToClassList("perso__case");
-                cases.Add(c);
-            }
+            m_Objets = Racine.Q("perso-cases");
+            m_Vide = Racine.Q<Label>("perso-vide");
         }
 
         /// Prépare l'écran pour ce menu (avant Navigateur.Ouvrir).
@@ -142,6 +146,45 @@ namespace Deathless.UI.Ecrans
                 m_Attributs.Add(l.bouton);
                 m_LignesAttributs.Add(l);
             }
+        }
+
+        /// Inventaire : une ligne par objet (grisée à quantité nulle) ; les lignes sont bâties à la première lecture.
+        void RafraichirInventaire()
+        {
+            var inv = DonneesUI.Inventaire;
+            if (m_Objets == null) return;
+            int n = inv != null ? inv.NbObjets : 0;
+            while (m_LignesObjets.Count < n)
+            {
+                var l = new LigneObjet { racine = new VisualElement() };
+                l.racine.AddToClassList("perso__objet");
+                l.icone = new VisualElement(); l.icone.AddToClassList("dl-icone"); l.icone.AddToClassList("perso__objet-icone");
+                var textes = new VisualElement(); textes.AddToClassList("perso__objet-textes");
+                l.nom = new Label(); l.nom.AddToClassList("dl-text"); l.nom.AddToClassList("perso__objet-nom");
+                l.desc = new Label(); l.desc.AddToClassList("perso__objet-desc");
+                textes.Add(l.nom); textes.Add(l.desc);
+                l.quantite = new Label(); l.quantite.AddToClassList("perso__objet-quantite");
+                l.racine.Add(l.icone); l.racine.Add(textes); l.racine.Add(l.quantite);
+                m_Objets.Add(l.racine);
+                m_LignesObjets.Add(l);
+            }
+            int portes = 0;
+            for (int i = 0; i < m_LignesObjets.Count; i++)
+            {
+                var l = m_LignesObjets[i];
+                bool vu = inv != null && i < n && inv.ObjetUtilisable(i);
+                l.racine.style.display = vu ? DisplayStyle.Flex : DisplayStyle.None;
+                if (!vu) continue;
+                int q = inv.ObjetQuantite(i);
+                if (q > 0) portes++;
+                l.nom.text = inv.ObjetNom(i);
+                l.desc.text = inv.ObjetDescription(i);
+                l.quantite.text = q + " / " + inv.ObjetMax(i);
+                string ic = inv.ObjetIcone(i);
+                if (l.iconePosee != ic) { l.iconePosee = ic; IconesUI.Poser(l.icone, ic); }
+                l.racine.EnableInClassList("perso__objet--vide", q <= 0);
+            }
+            if (m_Vide != null) m_Vide.style.display = portes == 0 ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
         static string TextePoints(int points) => points == 0 ? "Aucun point à dépenser" : points == 1 ? "1 point à dépenser" : points + " points à dépenser";
@@ -227,6 +270,8 @@ namespace Deathless.UI.Ecrans
                     l.bouton.EnableInClassList("perso__ligne--impossible", !a.Possible);
                 }
             }
+
+            RafraichirInventaire();
 
             bool vide = string.IsNullOrEmpty(m.Message);
             m_Message.text = vide ? "Message" : m.Message;

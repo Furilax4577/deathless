@@ -20,7 +20,7 @@ using System.Text;
 namespace Deathless.Donjon.Terrasses
 {
     public enum Dir : byte { Nord = 0, Est = 1, Sud = 2, Ouest = 3 }
-    public enum GenreCellule : byte { Hors, Sol, Massif, Escalier, Cavite, Passage }
+    public enum GenreCellule : byte { Hors, Sol, Massif, Escalier, Cavite, Passage, Ponton }
     public enum GenreFace : byte { Enceinte, Soutenement, Massif, Piece, Linteau }
     public enum Emplacement : byte { SousTerrasse, DerriereEnceinte, DansMassif }
     public enum GenrePiece : byte { Libre, Verrouillee, Secrete }
@@ -34,22 +34,29 @@ namespace Deathless.Donjon.Terrasses
     [Serializable]
     public class ParametresTerrasses
     {
-        /// 0 : tirée par la graine ; 1 à 7 : variante imposée (voir PlanTerrasses.NomsVariantes).
+        /// 0 : tirée par la graine ; 1 à 8 : variante imposée (voir PlanTerrasses.NomsVariantes ; 8 : ponton suspendu).
         public int variante = 0;
         /// 0 : tiré par la graine (2 ou 3, rez compris) ; 2 ou 3 : imposé (une variante incompatible l'emporte).
         public int niveaux = 0;
         public float probaDeuxNiveaux = 0.3f;
-        public int nbApparitions = 14;
+        /// Échelle du plan en pour cent (03/10/2026 : 135, soit 1,8 fois la surface d'avant) : cotes des terrasses, du volume,
+        /// largeur des escaliers et du ponton, dégagement devant la salle. Entier : aucun flottant dans les décisions.
+        public int echellePct = 135;
+        public int nbApparitions = 20;
         public int coffresParTerrasse = 2;
         public float probaTroisiemePiece = 0.35f;
         public float probaPieceVerrouillee = 0.5f;
         public float probaPieceSecrete = 0.4f;
         public float hauteurLibreMin = 4.5f;
-        public float espacementPiliersMin = 8f;
+        /// Naissance de la voûte au-dessus du plus haut sol.
+        public float hauteurSousVoute = 5f;
+        /// Flèche de la voûte (clé au-dessus de la naissance) : 10 % de la largeur, bornée à [min, max].
+        public float flecheVouteMin = 3f, flecheVouteMax = 4.5f;
+        public float espacementPiliersMin = 10f;
         public float espacementApparitionsMin = 5f;
         public float distanceArriveeApparitions = 16f;
         public float espacementTorches = 7f;
-        public int maxTorchesAllumees = 24;
+        public int maxTorchesAllumees = 28;
         public int maxEssais = 40;
 
         public ParametresTerrasses Copie() { return (ParametresTerrasses)MemberwiseClone(); }
@@ -93,7 +100,8 @@ namespace Deathless.Donjon.Terrasses
         public string role;
     }
 
-    /// Escalier droit plein (massif dessous), 10 marches de 0,30 × 0,50 m par niveau, palier de 2 m entre deux volées.
+    /// Escalier droit plein (massif dessous), 12 marches de 0,30 × 0,50 m par niveau (volée de 6 m), palier de 2 m entre
+    /// deux volées.
     public sealed class Escalier
     {
         public int index;
@@ -140,6 +148,19 @@ namespace Deathless.Donjon.Terrasses
         public float x, z, sol;
         public Dir dir;
         public float largeur, hauteur;
+    }
+
+    /// Ponton suspendu (variante 8) : passerelle de bois de `r` (4 m de large à l'échelle 135 %) entre deux terrasses de même niveau, au-dessus
+    /// du rez ; garde-corps sur toute la longueur, chaînes pendues à la voûte. Dans la grille, ses cellules sont du genre
+    /// Ponton : sol du rez dessous (on passe sous le tablier), plein haut de `Dessous` à `Hauteur` (le tablier).
+    public sealed class Ponton
+    {
+        public RectM r;
+        public Dir axe;                 // Est : il franchit d'ouest en est ; Nord : du sud au nord
+        public int niveau;
+        public float Hauteur => niveau * PlanTerrasses.HauteurNiveau;
+        public float Dessous => Hauteur - PlanTerrasses.EpaisseurPonton;
+        public float Longueur => axe == Dir.Est || axe == Dir.Ouest ? r.Largeur : r.Profondeur;
     }
 
     public sealed class PieceCachee
@@ -192,6 +213,7 @@ namespace Deathless.Donjon.Terrasses
         public float x0, z0, x1, z1;
         public Dir dir;                 // vers le vide
         public float y;                 // pied du parapet
+        public bool bois;               // garde-corps de bois d'un ponton (pas un parapet de pierre)
     }
 
     public sealed class Coffre
@@ -219,23 +241,32 @@ namespace Deathless.Donjon.Terrasses
     {
         // ------------------------------------------------------------------ Constantes
         public const float Infini = 1e6f;
-        public const float HauteurNiveau = 3f;
+        // Écart entre deux niveaux : 3,6 m depuis le 03/10/2026 (3 m avant ; hausse modeste, à la mesure du plan agrandi),
+        // soit 12 marches de 0,30 m et une volée de 6 m (nombre entier de mètres : la grille est au mètre).
+        public const int MarchesParNiveau = 12;
         public const float Marche = 0.3f, Giron = 0.5f;
-        public const float Volee = HauteurNiveau / Marche * Giron;     // 5 m par niveau
+        public const float HauteurNiveau = 3.6f;
+        public const float Volee = MarchesParNiveau * Giron;           // 6 m par niveau
         public const float Palier = 2f;
-        public const int LargeurEscalier = 4;
+        int LargeurEscalier;            // 4 m à l'échelle (S(4))
+        int LargeurPonton;              // 3 m à l'échelle (S(3))
+        int LibreAvant;                 // 13 m à l'échelle : dégagement de l'avant de la grande salle
         public const float ArcheLargeur = 3f, ArcheHauteur = 4.5f, ArcheNaissance = 3f;
         public const float EpaisseurDalle = 0.6f, HauteurPiece = 5f, FondSol = -0.6f;
         public const float HauteurParapet = 0.9f, ChuteParapet = 1.5f, MarcheMax = 0.65f, PassageMin = 2.2f;
-        public const int Marge = 10, LibreAvant = 13;
+        public const int Marge = 10;
         public const float RayonPilier = 0.85f, RayonPilastre = 0.7f;
+        /// Tablier du ponton (planches et longerons) ; hauteur libre dessous tolérée (le rez passe sous le ponton).
+        public const float EpaisseurPonton = 0.45f, HauteurSousPontonMin = 3.1f;
+        /// Largeur minimale d'un escalier (contrôle) ; largeur posée : 4 m à l'échelle (5 m à 135 %).
+        public const int LargeurEscalierMin = 4;
         public static readonly string[] NomsVariantes =
         {
             "", "Deux terrasses, couloir central", "Chaîne Lvl 1 puis Lvl 2", "Trois terrasses, estrade centrale",
             "Grande terrasse et estrade haute", "Deux niveaux, terrasses inégales", "Terrasses latérales en vis-à-vis",
-            "Grande terrasse, estrade centrale haute"
+            "Grande terrasse, estrade centrale haute", "Ponton suspendu entre deux Lvl 1"
         };
-        static readonly int[] VariantesTroisNiveaux = { 1, 2, 3, 4, 6, 7 };
+        static readonly int[] VariantesTroisNiveaux = { 1, 2, 3, 4, 6, 7, 8 };
         static readonly int[] VariantesDeuxNiveaux = { 1, 4, 5, 6 };
         static readonly int[] DX = { 0, 1, 0, -1 }, DZ = { 1, 0, -1, 0 };
         public static int Dx(Dir d) { return DX[(int)d]; }
@@ -260,6 +291,7 @@ namespace Deathless.Donjon.Terrasses
         public readonly List<Terrasse> terrasses = new List<Terrasse>();
         public readonly List<RectM> massifs = new List<RectM>();
         public readonly List<Escalier> escaliers = new List<Escalier>();
+        public readonly List<Ponton> pontons = new List<Ponton>();
         public readonly List<PieceCachee> pieces = new List<PieceCachee>();
         public readonly List<Declencheur> declencheurs = new List<Declencheur>();
         public readonly List<Pilier> piliers = new List<Pilier>();
@@ -303,18 +335,19 @@ namespace Deathless.Donjon.Terrasses
         void Construire()
         {
             m_Alea = new Alea(Graine, Essai);
-            terrasses.Clear(); massifs.Clear(); escaliers.Clear(); pieces.Clear(); declencheurs.Clear(); piliers.Clear(); nervures.Clear();
+            terrasses.Clear(); massifs.Clear(); escaliers.Clear(); pontons.Clear(); pieces.Clear(); declencheurs.Clear(); piliers.Clear(); nervures.Clear();
             faces.Clear(); parapets.Clear(); coffres.Clear(); torches.Clear(); apparitions.Clear();
 
             int niv = Prm.niveaux == 2 || Prm.niveaux == 3 ? Prm.niveaux : (m_Alea.Proba(Prm.probaDeuxNiveaux) ? 2 : 3);
             int v = Prm.variante;
-            if (v < 1 || v > 7) v = niv == 2 ? VariantesDeuxNiveaux[m_Alea.Entier(VariantesDeuxNiveaux.Length)] : VariantesTroisNiveaux[m_Alea.Entier(VariantesTroisNiveaux.Length)];
+            if (v < 1 || v > 8) v = niv == 2 ? VariantesDeuxNiveaux[m_Alea.Entier(VariantesDeuxNiveaux.Length)] : VariantesTroisNiveaux[m_Alea.Entier(VariantesTroisNiveaux.Length)];
             if (v == 5) niv = 2;
-            if (v == 2 || v == 3 || v == 7) niv = 3;
+            if (v == 2 || v == 3 || v == 7 || v == 8) niv = 3;
             Variante = v;
-            L = m_Alea.Choix(32, 34, 36, 38, 40);
-            P = m_Alea.Choix(30, 32, 34, 36);
-            B = m_Alea.Choix(12, 13, 14, 15);
+            LargeurEscalier = S(4); LargeurPonton = S(3); LibreAvant = S(13);
+            L = C(32, 34, 36, 38, 40);
+            P = C(30, 32, 34, 36);
+            B = C(12, 13, 14, 15);
             bool deux = niv == 2;
             switch (v)
             {
@@ -324,6 +357,7 @@ namespace Deathless.Donjon.Terrasses
                 case 4: V4(deux); break;
                 case 5: V5(); break;
                 case 6: V6(deux); break;
+                case 8: V8(); break;
                 default: V7(); break;
             }
             int nmax = 0;
@@ -335,8 +369,8 @@ namespace Deathless.Donjon.Terrasses
                 terrasses[i].role = terrasses[i].niveau == 2 ? "Trésor" : "Armurerie";
             }
             for (int i = 0; i < escaliers.Count; i++) escaliers[i].index = i;
-            Naissance = nmax * HauteurNiveau + 5f;
-            Cle = Naissance + Math.Min(3.5f, Math.Max(3f, 0.1f * L));
+            Naissance = nmax * HauteurNiveau + Prm.hauteurSousVoute;
+            Cle = Naissance + Math.Min(Prm.flecheVouteMax, Math.Max(Prm.flecheVouteMin, 0.1f * L));
             HautMur = Cle + 0.6f;
 
             Rasteriser();
@@ -352,6 +386,11 @@ namespace Deathless.Donjon.Terrasses
             PlacerApparitions();
         }
 
+        /// Cote de référence (plans de donjon_plans.py) mise à l'échelle du plan, en entiers.
+        int S(int v) { return (v * Math.Max(50, Prm.echellePct) + 50) / 100; }
+        /// Tirage d'une cote de référence, mise à l'échelle.
+        int C(params int[] v) { return S(m_Alea.Choix(v)); }
+
         // ------------------------------------------------------------------ Variantes (cotes à la manière de donjon_plans.py :
         // x vers l'est, y depuis le FOND (mur nord) ; converties en z = P - y)
         void AjTerrasse(int x0, int y0, int x1, int y1, int niveau)
@@ -364,7 +403,7 @@ namespace Deathless.Donjon.Terrasses
             if (x1 - x0 >= 2 && y1 - y0 >= 2) massifs.Add(new RectM(x0, P - y1, x1, P - y0));
         }
 
-        static int LongueurEscalier(int volees) { return (int)(volees * Volee + (volees - 1) * Palier); }
+        static int LongueurEscalier(int volees) { return (int)Math.Round(volees * Volee + (volees - 1) * Palier); }
 
         /// Escalier de face qui monte vers le fond jusqu'au bord avant d'une terrasse (y = yFace). Il s'encastre dans la
         /// terrasse s'il mangerait sinon l'avant de la grande salle (LibreAvant), en laissant au moins 4 m de terrasse au-dessus.
@@ -374,6 +413,7 @@ namespace Deathless.Donjon.Terrasses
             int e = Math.Max(0, yFace + len - (P - LibreAvant));
             int maxE = yFace - yFond - 4;
             if (e > maxE) e = Math.Max(0, maxE);
+            if (e > len) e = len;           // le pied reste devant la terrasse
             int haut = yFace - e;
             AjEscalier(xa, haut, largeur, nb, nh);
             return haut;
@@ -398,7 +438,7 @@ namespace Deathless.Donjon.Terrasses
         /// v1 : deux terrasses côte à côte (Lvl 1 et Lvl 2), couloir central fermé par un massif, escaliers le long des murs.
         void V1(bool deux)
         {
-            int wl = m_Alea.Choix(12, 13, 14), wr = m_Alea.Choix(12, 13, 14);
+            int wl = C(12, 13, 14), wr = C(12, 13, 14);
             int nl, nr;
             if (deux) { nl = nr = 1; }
             else if (m_Alea.Proba(0.5f)) { nl = 2; nr = 1; }
@@ -407,17 +447,17 @@ namespace Deathless.Donjon.Terrasses
             AjTerrasse(L - wr, 0, L, B, nr);
             AjEscalierFace(0, LargeurEscalier, B, 0, 0, nl);
             AjEscalierFace(L - LargeurEscalier, LargeurEscalier, B, 0, 0, nr);
-            AjMassif(wl, 0, L - wr, B - 3);
+            AjMassif(wl, 0, L - wr, B - S(3));
         }
 
         /// v2 : chaîne. Lvl 1 d'un côté (escalier depuis le rez), Lvl 2 de l'autre, atteint depuis le Lvl 1 par un escalier
         /// latéral posé sur une bande Lvl 1 le long du mur du fond ; couloir du rez entre les deux, sous la bande.
         void V2()
         {
-            int wa = m_Alea.Choix(14, 15, 16), wb = m_Alea.Choix(10, 11, 12);
+            int wa = C(14, 15, 16), wb = C(10, 11, 12);
             bool est = m_Alea.Proba(0.5f);
-            int sd = 6;
-            int db = B - m_Alea.Choix(0, 1, 2);
+            int sd = S(6);
+            int db = B - C(0, 1, 2);
             bool escMur = m_Alea.Proba(0.5f);
             if (est)
             {
@@ -440,9 +480,9 @@ namespace Deathless.Donjon.Terrasses
         /// v3 : deux Lvl 1 aux extrémités, un Lvl 2 au centre atteint depuis les deux Lvl 1 (boucle).
         void V3()
         {
-            int e = m_Alea.Choix(10, 11, 12);
-            while (L - 2 * e < 10) e--;
-            int b2 = B - m_Alea.Choix(0, 2);
+            int e = C(10, 11, 12);
+            while (L - 2 * e < S(10)) e--;
+            int b2 = B - C(0, 2);
             AjTerrasse(0, 0, e, B, 1);
             AjTerrasse(e, 0, L - e, b2, 2);
             AjTerrasse(L - e, 0, L, B, 1);
@@ -456,9 +496,9 @@ namespace Deathless.Donjon.Terrasses
         void V4(bool deux)
         {
             bool est = m_Alea.Proba(0.5f);
-            int w2 = m_Alea.Choix(12, 13, 14), d2 = m_Alea.Choix(7, 8);
+            int w2 = C(12, 13, 14), d2 = C(7, 8);
             AjTerrasse(0, 0, L, B, 1);
-            AjEscalierFace(L / 2 - 3, 6, B, 0, 0, 1);
+            AjEscalierFace(L / 2 - S(6) / 2, S(6), B, 0, 0, 1);
             if (deux) return;
             if (est) { AjTerrasse(L - w2, 0, L, d2, 2); AjEscalierLateral(L - w2, true, 0, 1, 2); }
             else { AjTerrasse(0, 0, w2, d2, 2); AjEscalierLateral(w2, false, 0, 1, 2); }
@@ -467,25 +507,25 @@ namespace Deathless.Donjon.Terrasses
         /// v5 : deux niveaux, deux terrasses Lvl 1 inégales, massif entre elles.
         void V5()
         {
-            int wl = m_Alea.Choix(10, 12), wr = m_Alea.Choix(14, 16);
+            int wl = C(10, 12), wr = C(14, 16), b2 = B + S(2);
             if (m_Alea.Proba(0.5f))
             {
-                AjTerrasse(0, 0, wl, B, 1); AjTerrasse(L - wr, 0, L, B + 2, 1);
-                AjEscalierFace(0, LargeurEscalier, B, 0, 0, 1); AjEscalierFace(L - LargeurEscalier, LargeurEscalier, B + 2, 0, 0, 1);
-                AjMassif(wl, 0, L - wr, B - 2);
+                AjTerrasse(0, 0, wl, B, 1); AjTerrasse(L - wr, 0, L, b2, 1);
+                AjEscalierFace(0, LargeurEscalier, B, 0, 0, 1); AjEscalierFace(L - LargeurEscalier, LargeurEscalier, b2, 0, 0, 1);
+                AjMassif(wl, 0, L - wr, B - S(2));
             }
             else
             {
-                AjTerrasse(0, 0, wr, B + 2, 1); AjTerrasse(L - wl, 0, L, B, 1);
-                AjEscalierFace(0, LargeurEscalier, B + 2, 0, 0, 1); AjEscalierFace(L - LargeurEscalier, LargeurEscalier, B, 0, 0, 1);
-                AjMassif(wr, 0, L - wl, B - 2);
+                AjTerrasse(0, 0, wr, b2, 1); AjTerrasse(L - wl, 0, L, B, 1);
+                AjEscalierFace(0, LargeurEscalier, b2, 0, 0, 1); AjEscalierFace(L - LargeurEscalier, LargeurEscalier, B, 0, 0, 1);
+                AjMassif(wr, 0, L - wl, B - S(2));
             }
         }
 
         /// v6 : terrasses le long des murs est et ouest, en vis-à-vis ; le fond reste au rez.
         void V6(bool deux)
         {
-            int d = m_Alea.Choix(10, 11, 12), h = m_Alea.Choix(14, 16);
+            int d = C(10, 11, 12), h = C(14, 16);
             int n1 = 1, n2 = 1;
             if (!deux) { if (m_Alea.Proba(0.5f)) n1 = 2; else n2 = 2; }
             AjTerrasse(0, 0, d, h, n1);
@@ -497,13 +537,45 @@ namespace Deathless.Donjon.Terrasses
         /// v7 : grande terrasse Lvl 1, estrade centrale Lvl 2 ; grand escalier central en deux volées séparées d'un palier.
         void V7()
         {
-            int c = m_Alea.Choix(12, 14);
+            int c = C(12, 14);
             AjTerrasse(0, 0, L, B, 1);
-            int yt1 = AjEscalierFace(L / 2 - 3, 6, B, 0, 0, 1);
+            int yt1 = AjEscalierFace(L / 2 - S(6) / 2, S(6), B, 0, 0, 1);
             int bas2 = yt1 - 2, haut2 = bas2 - LongueurEscalier(1);
             int d2 = haut2 + 2;
             AjTerrasse((L - c) / 2, 0, (L + c) / 2, d2, 2);
-            AjEscalier(L / 2 - 2, haut2, LargeurEscalier, 1, 2);
+            AjEscalier(L / 2 - LargeurEscalier / 2, haut2, LargeurEscalier, 1, 2);
+        }
+
+        /// v8 (croquis de Quentin du 03/10/2026) : à l'ouest, un grand Lvl 1 en L (bande au-dessus de la grande salle et
+        /// couloir central qui monte vers le fond) qui mène au Lvl 2 (angle nord-ouest) ; au nord-est, un petit Lvl 1 ;
+        /// entre les deux, un ponton suspendu au-dessus du rez. Escaliers : rez → grand Lvl 1 le long du mur ouest, grand
+        /// Lvl 1 → Lvl 2 contre le couloir (encastré dans le Lvl 2), rez → petit Lvl 1 le long du mur est. Boucle : on
+        /// monte d'un côté, on traverse le ponton, on redescend de l'autre. Une fois sur deux en miroir (grand côté à l'est).
+        void V8()
+        {
+            L = C(36, 38, 40);
+            P = C(32, 34, 36);
+            bool miroir = m_Alea.Proba(0.5f);
+            int w2 = C(11, 12, 13), d2 = C(10, 11, 12);
+            int wc = C(4, 5), bl = C(8, 9, 10);
+            int lp = C(10, 12, 14);
+            int ws = Math.Max(S(9), Math.Min(S(12), L - w2 - wc - lp)), ds = C(12, 13, 14);
+            int yp = C(3, 4, 5);
+            // abscisse ouest de l'intervalle [x0, x1[ du plan de base (miroir est-ouest)
+            Func<int, int, int> X = (x0, x1) => miroir ? L - x1 : x0;
+            // grand Lvl 1 (couloir et bande) et Lvl 2 dans l'angle
+            AjTerrasse(X(0, w2), 0, X(0, w2) + w2, d2, 2);
+            AjTerrasse(X(w2, w2 + wc), 0, X(w2, w2 + wc) + wc, d2, 1);
+            AjTerrasse(X(0, w2 + wc), d2, X(0, w2 + wc) + w2 + wc, d2 + bl, 1);
+            // petit Lvl 1
+            AjTerrasse(X(L - ws, L), 0, X(L - ws, L) + ws, ds, 1);
+            // escaliers
+            AjEscalierFace(X(0, LargeurEscalier), LargeurEscalier, d2 + bl, d2, 0, 1);
+            AjEscalier(X(w2 - LargeurEscalier, w2), Math.Min(d2, d2 + bl - LongueurEscalier(1) - 2), LargeurEscalier, 1, 2);
+            AjEscalierFace(X(L - LargeurEscalier, L), LargeurEscalier, ds, 0, 0, 1);
+            // ponton : du bord du couloir au bord du petit Lvl 1
+            int lg = L - ws - w2 - wc, xa = X(w2 + wc, L - ws);
+            pontons.Add(new Ponton { r = new RectM(xa, P - (yp + LargeurPonton), xa + lg, P - yp), axe = Dir.Est, niveau = 1 });
         }
 
         // ================================================================== Grille
@@ -551,6 +623,11 @@ namespace Deathless.Donjon.Terrasses
             {
                 var es = e;
                 Remplir(e.r, (ref Cellule c) => { c.genre = GenreCellule.Escalier; c.sol = es.Base; c.escalier = (short)es.index; });
+            }
+            foreach (var po in pontons)
+            {
+                var pp = po;
+                Remplir(po.r, (ref Cellule c) => { c.genre = GenreCellule.Ponton; c.sol = 0f; c.plafond = pp.Dessous; c.sommet = pp.Hauteur; c.terrasse = -1; });
             }
         }
 
@@ -636,7 +713,7 @@ namespace Deathless.Donjon.Terrasses
             GenreCellule genre = hc.genre;
             float hote = hc.sol;
             Emplacement emp;
-            if (genre == GenreCellule.Sol) { if (hote - f < HauteurNiveau + 2.1f) return false; emp = Emplacement.SousTerrasse; }
+            if (genre == GenreCellule.Sol) { if (hote - f < Prm.hauteurLibreMin + EpaisseurDalle + 0.01f) return false; emp = Emplacement.SousTerrasse; }
             else if (genre == GenreCellule.Hors)
             {
                 // derrière l'enceinte : jamais au sud (arrivée), et loin de l'avant de la salle
@@ -705,7 +782,7 @@ namespace Deathless.Donjon.Terrasses
             foreach (var p in pieces)
             {
                 float dx = p.r.CentreX - x, dz = p.r.CentreZ - z;
-                if (dx * dx + dz * dz < 12f * 12f) return false;
+                if (dx * dx + dz * dz < S(12) * S(12)) return false;
             }
             return true;
         }
@@ -713,7 +790,8 @@ namespace Deathless.Donjon.Terrasses
         void AjouterPiece(Candidat c)
         {
             var p = new PieceCachee { index = pieces.Count, emplacement = c.emp, sol = c.f };
-            p.plafond = c.emp == Emplacement.SousTerrasse ? c.hote - EpaisseurDalle : c.f + HauteurPiece;
+            // sous une terrasse haute (8,4 m), la pièce garde 6 m sous plafond : le reste est une dalle épaisse
+            p.plafond = c.emp == Emplacement.SousTerrasse ? Math.Min(c.hote - EpaisseurDalle, c.f + HauteurPiece + 1f) : c.f + HauteurPiece;
             int a = (c.w - 3) / 2;
             int ia, ja, ib, jb;
             Locale(c.d, c.i0, c.j0, 0, 1, out ia, out ja); Locale(c.d, c.i0, c.j0, c.w - 1, c.dd, out ib, out jb);
@@ -767,6 +845,7 @@ namespace Deathless.Donjon.Terrasses
                     case GenreCellule.Sol:
                     case GenreCellule.Cavite:
                     case GenreCellule.Passage:
+                    case GenreCellule.Ponton:
                         h = c.sol; break;
                     case GenreCellule.Escalier:
                         h = HauteurEscalier(i, j); break;
@@ -861,6 +940,7 @@ namespace Deathless.Donjon.Terrasses
                                 else if (a.genre == GenreCellule.Massif) g = GenreFace.Massif;
                                 else g = GenreFace.Soutenement;
                                 if (a.genre == GenreCellule.Cavite || a.genre == GenreCellule.Passage) { if (p == 0) continue; }
+                                if (a.genre == GenreCellule.Ponton) continue;   // tablier de bois : construit à part
                                 var cle = new FaceCle
                                 {
                                     dir = (Dir)d, ligne = LigneFace(i, j, (Dir)d), y0 = Q(y0), y1 = Q(y1),
@@ -946,7 +1026,8 @@ namespace Deathless.Donjon.Terrasses
                         float hb;
                         if (!Dessus(ni, nj, out hb)) continue;
                         if (ha - hb < ChuteParapet) continue;
-                        long cle = ((long)d << 48) | ((long)LigneFace(i, j, (Dir)d) << 32) | (uint)Q(ha);
+                        bool bois = cellules[Index(i, j)].genre == GenreCellule.Ponton;
+                        long cle = ((long)d << 48) | (bois ? 1L << 47 : 0L) | ((long)LigneFace(i, j, (Dir)d) << 32) | (uint)Q(ha);
                         List<int> l;
                         if (!cles.TryGetValue(cle, out l)) cles[cle] = l = new List<int>();
                         l.Add(d == 0 || d == 2 ? i : j);
@@ -959,13 +1040,14 @@ namespace Deathless.Donjon.Terrasses
                 var pos = cles[cle];
                 pos.Sort();
                 Dir d = (Dir)(cle >> 48);
+                bool bois = ((cle >> 47) & 1L) != 0;
                 int ligne = (int)((cle >> 32) & 0xFFFF);
                 float y = (int)(cle & 0xFFFFFFFF) / 100f;
                 int deb = pos[0], prec = pos[0];
                 for (int n = 1; n <= pos.Count; n++)
                 {
                     if (n < pos.Count && pos[n] == prec + 1) { prec = pos[n]; continue; }
-                    var pa = new Parapet { dir = d, y = y };
+                    var pa = new Parapet { dir = d, y = y, bois = bois };
                     float l = ligne - Marge;
                     if (d == Dir.Nord || d == Dir.Sud) { pa.z0 = pa.z1 = l; pa.x0 = deb - Marge; pa.x1 = prec + 1 - Marge; }
                     else { pa.x0 = pa.x1 = l; pa.z0 = deb - Marge; pa.z1 = prec + 1 - Marge; }
@@ -1111,7 +1193,7 @@ namespace Deathless.Donjon.Terrasses
                         float u0 = xa + 3.5f, u1 = xb - 3.5f;
                         if (u1 >= u0)
                         {
-                            int n = Math.Max(1, Math.Min(L >= 36 ? 3 : 2, 1 + (int)((u1 - u0) / 9.5f)));
+                            int n = Math.Max(1, Math.Min(L >= 48 ? 4 : L >= 36 ? 3 : 2, 1 + (int)((u1 - u0) / (Prm.espacementPiliersMin + 1.5f))));
                             if (n == 1) xs.Add((u0 + u1) * 0.5f);
                             else for (int k = 0; k < n; k++) xs.Add(u0 + (u1 - u0) * k / (n - 1));
                         }
@@ -1648,6 +1730,7 @@ namespace Deathless.Donjon.Terrasses
             m(Graine); m(Essai); m(Variante); m(L); m(P);
             foreach (var c in cellules) { m((int)c.genre); f(c.sol); f(c.AUnHaut ? c.plafond : -1f); f(c.sommet); m(c.obstacle ? 1 : 0); m(c.piece); }
             foreach (var e in escaliers) { m(e.r.x0); m(e.r.z0); m(e.r.x1); m(e.r.z1); m((int)e.dir); }
+            foreach (var po in pontons) { m(po.r.x0); m(po.r.z0); m(po.r.x1); m(po.r.z1); m(po.niveau); }
             foreach (var p in pieces) { m(p.r.x0); m(p.r.z0); m((int)p.genre); m((int)p.serrure); m(p.declencheur); }
             foreach (var d in declencheurs) { m((int)d.genre); f(d.pose.x); f(d.pose.z); }
             foreach (var p in piliers) { f(p.x); f(p.z); f(p.haut); }
@@ -1663,7 +1746,8 @@ namespace Deathless.Donjon.Terrasses
             var sb = new StringBuilder();
             sb.Append("Graine ").Append(Graine).Append(" (essai ").Append(Essai).Append(") : v").Append(Variante).Append(" « ").Append(NomVariante).Append(" », ")
               .Append(Niveaux).Append(" niveaux, ").Append(L).Append(" × ").Append(P).Append(" m, voûte ").Append(Naissance.ToString("0.0")).Append(" → ").Append(Cle.ToString("0.0")).Append(" m ; ")
-              .Append(terrasses.Count).Append(" terrasses, ").Append(escaliers.Count).Append(" escaliers, ").Append(pieces.Count).Append(" pièces cachées");
+              .Append(terrasses.Count).Append(" terrasses, ").Append(escaliers.Count).Append(" escaliers, ")
+              .Append(pontons.Count > 0 ? pontons.Count + " ponton (" + pontons[0].Longueur + " m), " : "").Append(pieces.Count).Append(" pièces cachées");
             foreach (var p in pieces)
             {
                 sb.Append(" [").Append(p.nom).Append(", ").Append(p.emplacement).Append(", sol ").Append(p.sol.ToString("0")).Append(" m");

@@ -180,7 +180,7 @@ namespace Deathless.Jeu
         readonly Dictionary<GameObject, Coffre> m_Coffres = new Dictionary<GameObject, Coffre>();
 
         /// Sac d'un joueur mort au donjon (26/09/2026) : voir les méthodes « Sacs des joueurs morts » plus bas.
-        struct Sac { public int id; public Vector3 position; public int montant; public string nom; }
+        struct Sac { public int id; public Vector3 position; public int montant; public string nom; public int objets; }   // objets : clés et crochets emballés (Inventaire.Tasser)
         readonly List<Sac> m_Sacs = new List<Sac>();
         readonly Dictionary<int, GameObject> m_VisuelsSacs = new Dictionary<int, GameObject>();
         readonly Dictionary<int, float> m_DemandeSac = new Dictionary<int, float>();
@@ -597,26 +597,41 @@ namespace Deathless.Jeu
         /// héros local au donjon est reposé à l'arrivée. Les commandes du jeu normal ne changent pas (F8 n'y est lié à rien).
         void ToucheGraine()
         {
-            if (m_Transit || !ReseauJeu.Autorite || !AppuiApercu(UnityEngine.InputSystem.Key.F8, ref m_DernierF8)) return;
+            if (m_Transit || !ReseauJeu.Autorite || !AppuiApercu(UnityEngine.InputSystem.Key.F8, m_F8)) return;
             ChangerGraine(MajEnfoncee() ? Random.Range(1, 1000000) : GraineCourante + 1);
         }
 
         // Touches de dev F8 / F9 / F10 : lues sur TOUS les claviers (InputSystem.devices filtré), pas sur Keyboard.current, qui ne suit que le
-        // dernier clavier ayant émis : un clavier ou une souris de joueur qui expose plusieurs périphériques « clavier » (interface
-        // NKRO, récepteur, touches multimédia) le détournait et l'appui sur F9 se perdait la plupart du temps (03/10/2026). Un même
-        // appui vu par deux interfaces (images voisines) ne compte qu'une fois : 0,2 s minimum entre deux actions d'une touche.
-        const float EspaceToucheApercu = 0.2f;
-        float m_DernierF8 = -10f, m_DernierF9 = -10f, m_DernierF10 = -10f;
+        // dernier clavier ayant émis (03/10/2026). Un appui = exactement une action : la touche est lue comme un ÉTAT agrégé (enfoncée sur
+        // au moins un clavier), pas comme un front par clavier. Cause du bug « jour, nuit, jour, nuit… avant de se stabiliser » : le front
+        // wasPressedThisFrame était relu sur chaque périphérique clavier et chaque image ; un clavier exposant plusieurs interfaces, ou
+        // renvoyant l'appui (répétition, resynchronisation de l'état au changement de focus) à plus de 0,2 s d'intervalle, relançait
+        // la bascule autant de fois. Désormais l'action part au passage « relâchée → enfoncée » de l'état agrégé, et la touche ne se
+        // réarme qu'après 0,3 s continues sans aucun clavier qui la signale enfoncée (les rebonds et répétitions ne comptent pas).
+        const float RearmementToucheApercu = 0.3f;
+        sealed class ToucheDev { public bool armee = true; public float vue = -10f; }
+        readonly ToucheDev m_F8 = new ToucheDev(), m_F9 = new ToucheDev(), m_F10 = new ToucheDev();
 
-        static bool AppuiApercu(UnityEngine.InputSystem.Key touche, ref float dernier)
+        static bool AppuiApercu(UnityEngine.InputSystem.Key touche, ToucheDev e)
         {
             var peripheriques = UnityEngine.InputSystem.InputSystem.devices;
-            bool appui = false;
-            for (int i = 0; i < peripheriques.Count && !appui; i++)
-                appui = peripheriques[i] is UnityEngine.InputSystem.Keyboard clavier && clavier[touche].wasPressedThisFrame;
-            if (!appui || Time.unscaledTime - dernier < EspaceToucheApercu) return false;
-            dernier = Time.unscaledTime;
-            return true;
+            bool enfoncee = false;
+            for (int i = 0; i < peripheriques.Count && !enfoncee; i++)
+            {
+                if (!(peripheriques[i] is UnityEngine.InputSystem.Keyboard clavier)) continue;
+                var c = clavier[touche];
+                enfoncee = c.isPressed || c.wasPressedThisFrame;
+            }
+            float t = Time.unscaledTime;
+            if (enfoncee)
+            {
+                e.vue = t;
+                if (!e.armee) return false;
+                e.armee = false;
+                return true;
+            }
+            if (!e.armee && t - e.vue >= RearmementToucheApercu) e.armee = true;
+            return false;
         }
 
         static bool MajEnfoncee()
@@ -633,12 +648,12 @@ namespace Deathless.Jeu
         /// portails et s'appliquent aux donjons que F8 construit ensuite.
         void ToucheApercu()
         {
-            if (AppuiApercu(UnityEngine.InputSystem.Key.F9, ref m_DernierF9))
+            if (AppuiApercu(UnityEngine.InputSystem.Key.F9, m_F9))
             {
                 Partie.DefinirNuitApercu(!Partie.NuitApercu);
                 Dire(Partie.NuitApercu ? "Nuit" : "Jour", 3f);
             }
-            if (!m_Transit && ReseauJeu.Autorite && AppuiApercu(UnityEngine.InputSystem.Key.F10, ref m_DernierF10)) BasculerMobsApercu();
+            if (!m_Transit && ReseauJeu.Autorite && AppuiApercu(UnityEngine.InputSystem.Key.F10, m_F10)) BasculerMobsApercu();
         }
 
         /// Autorité, aperçu : « sans mob » retire tous les ennemis vivants (gardiens du donjon, squelettes d'essai) et plus
@@ -786,7 +801,52 @@ namespace Deathless.Jeu
             int or = Mathf.RoundToInt(Montant(r.butin) * Attributs.FacteurOr(j));
             j.orPorte += or;
             if (r.butin != TypeButin.TasOr) Deathless.Succes.ServiceSucces.CoffreOuvert(joueurId);   // succès (coffres)
-            P.Journal("Donjon : " + j.nom + " prend " + (r.butin == TypeButin.GrandCoffre ? "le grand coffre" : r.butin == TypeButin.Coffre ? "un coffre" : "un tas d'or") + " (" + or + " or ; porté : " + j.orPorte + ")");
+            int trouve = r.butin == TypeButin.TasOr ? 0 : TirerObjets(r.butin == TypeButin.GrandCoffre);
+            int recu = Inventaire.AjouterTasse(j, trouve);   // l'hôte tient la copie de ce joueur ; son poste l'applique à la réception
+            P.Journal("Donjon : " + j.nom + " prend " + (r.butin == TypeButin.GrandCoffre ? "le grand coffre" : r.butin == TypeButin.Coffre ? "un coffre" : "un tas d'or") + " (" + or + " or ; porté : " + j.orPorte + ")"
+                + (trouve != 0 ? ", trouve " + Inventaire.TexteTasse(trouve) + (recu != trouve ? " (reçu : " + (recu != 0 ? Inventaire.TexteTasse(recu) : "rien") + ")" : "") : ""));
+            if (trouve != 0)
+            {
+                if (EstLocal(j)) AnnoncerTrouvaille(trouve, recu);
+                else if (ReseauJeu.EnPartie) PartieReseau.Instance?.DonnerObjets((ulong)(joueurId - 1), recu, trouve);
+            }
+        }
+
+        /// Ce joueur est celui de ce poste (sinon c'est la copie que l'hôte tient d'un autre poste).
+        bool EstLocal(EtatJoueur j) => P != null && P.JoueurLocal != null && j != null && P.JoueurLocal.id == j.id;
+
+        /// Autorité : clés et kit trouvés dans un coffre (chances et quantités dans GameBalance), emballés (Inventaire.TasseDe).
+        int TirerObjets(bool grand)
+        {
+            int tasse = 0;
+            if (Random.value < (grand ? B.cleGrandCoffreChance : B.cleCoffreChance))
+            {
+                Vector3 w = grand ? B.cleGrandCoffrePoids : B.cleCoffrePoids;
+                float tirage = Random.value * Mathf.Max(0.0001f, w.x + w.y + w.z);
+                var cle = tirage < w.x ? ArticleBoutique.CleBronze : tirage < w.x + w.y ? ArticleBoutique.CleArgent : ArticleBoutique.CleOr;
+                tasse |= Inventaire.TasseDe(cle, Mathf.Max(1, grand ? B.cleGrandCoffreQuantite : B.cleCoffreQuantite));
+            }
+            if (Random.value < (grand ? B.kitGrandCoffreChance : B.kitCoffreChance))
+                tasse |= Inventaire.TasseDe(ArticleBoutique.KitCrochetage, Mathf.Max(1, B.crochetsParKit));
+            return tasse;
+        }
+
+        /// Ce poste : annonce du HUD pour ce qui a été trouvé dans un coffre (`recu` : ce qui est vraiment entré dans l'inventaire).
+        public void AnnoncerTrouvaille(int trouve, int recu)
+        {
+            string txt = Inventaire.TexteTasse(trouve);
+            if (txt.Length == 0) return;
+            Dire(recu == 0 ? "Tu trouves " + txt + ", mais tu n’as plus de place" : "Tu trouves " + txt, 5f);
+            if (recu != 0) AudioBank.Jouer2D(SonsDuJeu.AchatCle, 0.8f);
+        }
+
+        /// Poste d'un client : l'hôte lui a accordé ces objets (coffre, sac) ; ils entrent dans son inventaire.
+        public static void RecevoirObjets(int recu, int trouve)
+        {
+            var p = Partie.Instance;
+            if (p == null) return;
+            Inventaire.AjouterTasse(p.JoueurLocal, recu);
+            if (Instance != null && trouve != 0) Instance.AnnoncerTrouvaille(trouve, recu);
         }
 
         /// Tous les postes : les butins pris depuis la dernière image s'ouvrent (coffre) ou disparaissent (tas d'or).
@@ -922,14 +982,17 @@ namespace Deathless.Jeu
         /// N'importe quel joueur peut le ramasser tant que le donjon est ouvert (Wiki : deroule.md, Mort au donjon).
         void CreerSac(EtatJoueur j, Vector3 position)
         {
-            if (j == null || j.orPorte <= 0) return;
+            if (j == null || (j.orPorte <= 0 && !Inventaire.ABut(j))) return;
             int id = ++m_ProchainSacId;
             int montant = j.orPorte;
             string nom = j.nom;
+            int objets = Inventaire.TasserButin(j);   // le sac contient aussi ses clés et ses crochets (pas ses potions)
             j.orPorte = 0;
-            m_Sacs.Add(new Sac { id = id, position = position, montant = montant, nom = nom });
-            if (ReseauJeu.EnPartie) PartieReseau.Instance?.CreerSacReseau(id, position, montant, nom);
-            P?.Journal("Donjon : " + nom + " meurt au donjon, un sac tombe (" + montant + " or)");
+            Inventaire.RetirerButin(j);
+            if (!EstLocal(j) && ReseauJeu.EnPartie) PartieReseau.Instance?.RetirerButinClient((ulong)(j.id - 1));
+            m_Sacs.Add(new Sac { id = id, position = position, montant = montant, nom = nom, objets = objets });
+            if (ReseauJeu.EnPartie) PartieReseau.Instance?.CreerSacReseau(id, position, montant, nom, objets);
+            P?.Journal("Donjon : " + nom + " meurt au donjon, un sac tombe (" + montant + " or" + (objets != 0 ? ", " + Inventaire.TexteTasse(objets) : "") + ")");
         }
 
         /// Autorité : le sac `id` va au joueur `joueurId`, s'il est encore là et que le joueur est à côté (marché dessus).
@@ -945,8 +1008,10 @@ namespace Deathless.Jeu
             m_Sacs.RemoveAt(idx);
             if (ReseauJeu.EnPartie) PartieReseau.Instance?.RetirerSacReseau(id);
             j.orPorte += sac.montant;
+            int recu = Inventaire.AjouterTasse(j, sac.objets);
+            if (recu != 0 && !EstLocal(j) && ReseauJeu.EnPartie) PartieReseau.Instance?.DonnerObjets((ulong)(joueurId - 1), recu, 0);
             if (sac.nom != j.nom) Deathless.Succes.ServiceSucces.SacAllie(joueurId);   // succès « Ce qui est à toi est à moi »
-            P.Journal("Donjon : " + j.nom + " ramasse le sac de " + sac.nom + " (" + sac.montant + " or ; porté : " + j.orPorte + ")");
+            P.Journal("Donjon : " + j.nom + " ramasse le sac de " + sac.nom + " (" + sac.montant + " or ; porté : " + j.orPorte + ")" + (sac.objets != 0 ? ", " + Inventaire.TexteTasse(sac.objets) : ""));
         }
 
         /// Ce poste demande le sac `id` pour son joueur (marché dessus) ; message local optimiste, comme le dépôt à la caisse.
@@ -958,7 +1023,8 @@ namespace Deathless.Jeu
             int idx = IndexSac(id);
             if (h == null || idx < 0) return;
             var sac = m_Sacs[idx];
-            Dire("Tu ramasses le sac de " + sac.nom + " : " + sac.montant + " or", 5f);
+            string objets = Inventaire.TexteTasse(sac.objets);
+            Dire("Tu ramasses le sac de " + sac.nom + " : " + sac.montant + " or" + (objets.Length > 0 ? ", " + objets : ""), 5f);
             if (Partie.ClientReseau) PartieReseau.Instance?.DemanderSac(id);
             else RamasserSac(id, h.Id);
         }
@@ -998,7 +1064,7 @@ namespace Deathless.Jeu
             {
                 var s = distants[k];
                 if (IndexSac(s.id) >= 0) continue;
-                m_Sacs.Add(new Sac { id = s.id, position = s.position, montant = s.montant, nom = s.nom.ToString() });
+                m_Sacs.Add(new Sac { id = s.id, position = s.position, montant = s.montant, nom = s.nom.ToString(), objets = s.objets });
             }
         }
 
@@ -1266,9 +1332,12 @@ namespace Deathless.Jeu
                 bool mort = false;
                 foreach (var j in p.Etat.joueurs)
                 {
-                    if (!j.mort || j.orPorte <= 0) continue;
+                    if (!j.mort) continue;
                     var hj = p.HerosDe(j.id);
-                    if (AuDonjon(hj)) CreerSac(j, hj.transform.position); else Perdre(j, out _, out _, "mort au donjon");
+                    bool auDonjon = AuDonjon(hj);
+                    // Clés et crochets : dans le sac au donjon ; ailleurs, le mort les garde (seul l'or se perd).
+                    if (j.orPorte <= 0 && !(auDonjon && Inventaire.ABut(j))) continue;
+                    if (auDonjon) CreerSac(j, hj.transform.position); else Perdre(j, out _, out _, "mort au donjon");
                     mort = true;
                 }
                 if (p.Etat.phase == Phase.Jour && (mort || Time.time >= m_ProchaineEvalPrets))

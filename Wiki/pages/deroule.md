@@ -83,7 +83,7 @@ Le donjon est **régénéré chaque nuit** : chaque jour, le portail mène à un
 
   **Plus de tas d'or au sol** {décidé, 30/09/2026} (Quentin : « les tas de pièces dans le donjon c'est ciao ») : leur or (4 × 20) est passé aux coffres, le total du donjon ne change pas (300). {{dev: `GameBalance.tasOrDonjon` = faux : le plan place toujours les 4 emplacements (même tirage, mêmes gardiens), mais `DonjonJeu.ButinActif` les cache et ils ne se ramassent plus ; les gardiens ne gardent que les coffres.}}
 
-  **Ouvrir un coffre est gratuit** {décidé} : on ne dépense jamais d'or pour l'ouvrir. Plus tard, certains coffres pourront demander une **clé** {à confirmer}. L'invite dit seulement « Ouvrir le coffre », sans montant.
+  **Ouvrir un coffre est gratuit** {décidé} : on ne dépense jamais d'or pour l'ouvrir. Plus tard, certains coffres pourront demander une **clé** {à confirmer}. **Ils contiennent parfois une clé ou un kit de crochetage** {décidé, 03/10/2026, {à équilibrer}} : 30 % / 15 % pour un coffre, une clé sûre pour le grand coffre ; le sac d'un joueur mort au donjon garde aussi ses clés et ses crochets (voir [Clés et crochetage](donjon.md#clés-et-crochetage)). L'invite dit seulement « Ouvrir le coffre », sans montant.
 
   **Pas de cadenas** {décidé} (décision de Quentin du 26/09/2026) : plus aucun cadenas sur les coffres. Pour l'instant, tous les coffres du donjon s'ouvrent sans clé : à la touche Interagir, le couvercle bascule directement. Les coffres sont des modèles sans serrure (`Assets/Art/Coffres`).
 

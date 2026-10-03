@@ -1,10 +1,10 @@
 # Générateur procédural du donjon « terrasses étagées »
 
-État au 02/10/2026. Générateur écrit d'après le croquis de Quentin (`Docs/da/brief-donjon.md`, section « Version 2 ») et les dix plans de `Docs/outils/donjon_plans.py` (images `Docs/da/gabarits/donjon-plans/`), qui fixent la plage de variation attendue. **Branché le 02/10/2026 dans le mode « Nouvelle carte (aperçu) »** (scène CarteV5, `Partie.Exploration`) : le portail de la grotte y mène. **Le jeu normal (ancienne carte) garde l'ancien donjon** (`Assets/Scripts/Donjon/DonjonGenerateur.cs`, appelé par `DonjonJeu`). Voir « Branchement dans le jeu » en fin de fiche.
+État au 03/10/2026 (**donjons plus grands**, 1,8 fois la surface, et **variante 8 « ponton suspendu »** : sections « Taille et hauteurs » et « Ponton suspendu »). Générateur écrit d'après le croquis de Quentin (`Docs/da/brief-donjon.md`, section « Version 2 ») et les dix plans de `Docs/outils/donjon_plans.py` (images `Docs/da/gabarits/donjon-plans/`), qui fixent la plage de variation attendue. **Branché le 02/10/2026 dans le mode « Nouvelle carte (aperçu) »** (scène CarteV5, `Partie.Exploration`) : le portail de la grotte y mène. **Le jeu normal (ancienne carte) garde l'ancien donjon** (`Assets/Scripts/Donjon/DonjonGenerateur.cs`, appelé par `DonjonJeu`). Voir « Branchement dans le jeu » en fin de fiche.
 
 ## Ce qu'il produit
 
-Un seul grand volume fermé sous une voûte commune, en **2 ou 3 niveaux de sol plein** (rez compris) : la grande salle au rez (Lvl 0, arrivée et portail de retour au sud), des terrasses à + 3 m (Lvl 1) et + 6 m (Lvl 2) adossées au fond ou aux côtés, tenues par de **gros murs de soutènement** (jamais de balcon, de galerie ni de mezzanine), de **larges escaliers pleins** (4 à 6 m), des **arches sans vantail** vers de **petites pièces cachées**, des **piliers** sur le rez et des pilastres le long des murs, des coffres, des torches, les points d'arrivée des joueurs et les points d'apparition des monstres.
+Un seul grand volume fermé sous une voûte commune, en **2 ou 3 niveaux de sol plein** (rez compris) : la grande salle au rez (Lvl 0, arrivée et portail de retour au sud), des terrasses à + 3,6 m (Lvl 1) et + 7,2 m (Lvl 2) (3 et 6 m avant le 03/10/2026) adossées au fond ou aux côtés, tenues par de **gros murs de soutènement** (jamais de balcon, de galerie ni de mezzanine ; seule exception, voulue par Quentin le 03/10/2026 : le **ponton suspendu** de la variante 8), de **larges escaliers pleins** (5 à 8 m), des **arches sans vantail** vers de **petites pièces cachées**, des **piliers** sur le rez et des pilastres le long des murs, des coffres, des torches, les points d'arrivée des joueurs et les points d'apparition des monstres.
 
 Même graine = même donjon sur toutes les machines : le plan est du C# pur, tiré par un générateur entier maison (xorshift32), sans aucune décision prise sur un flottant calculé. Contrôlé : l'empreinte du plan (`PlanTerrasses.Empreinte()`) des graines 1 à 50 est identique dans Unity (Mono) et sous .NET 10. En réseau (NGO), seule la graine circule : chaque poste appelle `Generer(graine)`.
 
@@ -44,13 +44,13 @@ Repère du plan : mètres, x vers l'est, z vers le nord, y vers le haut ; origin
 
 ## Étapes du plan
 
-1. **Niveaux et variante** : 2 niveaux avec une chance sur trois (`probaDeuxNiveaux`), sinon 3 ; variante tirée parmi celles qui conviennent (3 niveaux : v1, v2, v3, v4, v6, v7 ; 2 niveaux : v1, v4, v5, v6). Volume de 32 à 40 m × 30 à 36 m, bande du fond de 12 à 15 m.
+1. **Niveaux et variante** : 2 niveaux avec une chance sur trois (`probaDeuxNiveaux`), sinon 3 ; variante tirée parmi celles qui conviennent (3 niveaux : v1, v2, v3, v4, v6, v7, v8 ; 2 niveaux : v1, v4, v5, v6). Cotes des plans de référence mises à l'échelle `echellePct` (135 %) : volume de 43 à 54 m × 41 à 49 m (v8 : 49 à 54 × 43 à 49 m), bande du fond de 16 à 20 m (avant le 03/10/2026 : 32 à 40 × 30 à 36 m, bande de 12 à 15 m).
 2. **Terrasses, massifs, escaliers** (variante, cotes de `donjon_plans.py`).
 3. **Grille** de colonnes de 1 m avec 10 m de marge (enceinte, pièces derrière elle) : chaque colonne est pleine jusqu'à son sol ; une cavité (pièce, passage d'arche) a un plein haut (dalle, linteau).
 4. **Arrivée** : dalle de bois de 6 × 2 m devant le portail (milieu du mur sud), zone d'arrivée libre de 6 × 5 m, quatre points de joueurs.
-5. **Pièces cachées** (2, parfois 3) cherchées partout où elles tiennent : **sous une terrasse** qui domine de 5,1 m au moins le sol de devant (arche dans le mur de soutènement, priorité du croquis), **dans un massif**, ou **derrière l'enceinte** (jamais au sud) ; 6 à 8 × 5 à 6 m, murs de 1 m au moins, 12 m entre deux pièces.
+5. **Pièces cachées** (2, parfois 3 ; 16 m entre deux pièces) cherchées partout où elles tiennent : **sous une terrasse** qui domine de 5,1 m au moins le sol de devant (donc sous un Lvl 2 vu du rez ; la pièce y garde 6 m sous plafond au plus, le reste est une dalle épaisse) (arche dans le mur de soutènement, priorité du croquis), **dans un massif**, ou **derrière l'enceinte** (jamais au sud) ; 6 à 8 × 5 à 6 m, murs de 1 m au moins, 12 m entre deux pièces.
 6. **Faces de murs** (enceinte, soutènement, massif, parois des pièces, linteaux) et **parapets** (0,9 m, sur tout bord qui domine de 1,5 m au moins, ouverts en haut des escaliers).
-7. **Voûte** : naissance à 5 m au-dessus du plus haut sol (8 ou 11 m), clé 3 à 3,5 m plus haut ; arcs doubleaux tous les 8 m environ sur des pilastres des murs latéraux ; pilastres aussi le long des murs de soutènement de plus de 10 m.
+7. **Voûte** : naissance à 5 m au-dessus du plus haut sol (`hauteurSousVoute` ; 8,6 ou 12,2 m, contre 8 ou 11 m avant le 03/10/2026), clé 4,3 à 4,5 m plus haut (10 % de la largeur, bornée à 3-4,5 m) ; arcs doubleaux tous les 8 m environ sur des pilastres des murs latéraux ; pilastres aussi le long des murs de soutènement de plus de 10 m.
 8. **Piliers libres** sur le rez : une ou deux rangées (en quinconce si elles sont à moins de 8 m), sur chaque tronçon dégagé, à 3 m au moins de tout mur, escalier ou terrasse, jamais dans la zone d'arrivée ni sur l'allée arrivée → pied d'escalier, espacés de 8 m au moins.
 9. **Pièces fermées** : une pièce verrouillée (une fois sur deux), une pièce secrète (deux fois sur cinq) et son déclencheur.
 10. **Coffres** contre les murs (grand coffre sur la plus haute terrasse, deux coffres par terrasse, contenu des pièces selon leur genre), **torches** (une tous les 7 m sur les murs, deux qui encadrent le portail, une au fond de chaque pièce ; 24 lumières au plus, réparties au plus loin les unes des autres), **apparitions** (gardiens sur les terrasses, dont un mage au bord pour tirer d'en haut, le reste au rez).
@@ -67,25 +67,57 @@ Repère du plan : mètres, x vers l'est, z vers le nord, y vers le haut ; origin
 | v5 | Deux niveaux : deux terrasses Lvl 1 inégales, massif entre elles | (inchangé) |
 | v6 | Terrasses le long des murs est et ouest, en vis-à-vis ; le fond reste au rez | Escalier du Lvl 2 encastré avec palier ; en 2 niveaux, deux Lvl 1 |
 | v7 | Grande terrasse Lvl 1, estrade centrale Lvl 2, grand escalier central en deux volées | Estrade calée sur la place réelle des deux volées et du palier de 2 m |
+| v8 | **Ponton suspendu** (croquis de Quentin du 03/10/2026) : grand Lvl 1 en L d'un côté (bande au-dessus du rez et couloir qui monte au fond), Lvl 2 dans l'angle du fond, petit Lvl 1 dans l'autre angle du fond, ponton entre le couloir et le petit Lvl 1 | Nouvelle ; une fois sur deux en miroir. Voir la section « Ponton suspendu » |
 
 ## Paramètres (`ParametresTerrasses`, sérialisés sur le constructeur)
 
 | Champ | Défaut | Rôle |
 |---|---|---|
-| `variante` | 0 | 0 : tirée ; 1 à 7 : imposée |
-| `niveaux` | 0 | 0 : tiré ; 2 ou 3 : imposé (v2, v3, v7 font toujours 3, v5 toujours 2) |
+| `variante` | 0 | 0 : tirée ; 1 à 8 : imposée (8 : ponton suspendu ; aussi par le bouton « Ponton (v8) » du banc et le menu « Captures du ponton ») |
+| `niveaux` | 0 | 0 : tiré ; 2 ou 3 : imposé (v2, v3, v7, v8 font toujours 3, v5 toujours 2) |
 | `probaDeuxNiveaux` | 0,3 | Part des donjons à 2 niveaux |
-| `nbApparitions` | 14 | Points d'apparition des monstres |
+| `nbApparitions` | 20 | Points d'apparition des monstres (14 avant le 03/10/2026 ; relevé avec la surface, {à équilibrer}) |
 | `coffresParTerrasse` | 2 | Coffres par terrasse (1 sur une petite terrasse) |
 | `probaTroisiemePiece` | 0,35 | Troisième pièce cachée |
 | `probaPieceVerrouillee`, `probaPieceSecrete` | 0,5, 0,4 | Mécanismes (voir plus bas) |
-| `hauteurLibreMin` | 4,5 m | Hauteur libre contrôlée partout où l'on marche |
-| `espacementPiliersMin` | 8 m | Entre deux piliers libres |
+| `echellePct` | 135 | Échelle du plan en pour cent (entier : déterminisme) : cotes des terrasses, du volume, des massifs, largeur des escaliers (4 → 5 m, 6 → 8 m au centre) et du ponton (3 → 4 m), dégagement de l'avant de la salle (13 → 18 m), écart entre pièces cachées (12 → 16 m). 100 : tailles d'avant le 03/10/2026 |
+| `hauteurLibreMin` | 4,5 m | Hauteur libre contrôlée partout où l'on marche (sous le tablier d'un ponton : 3,1 m, `HauteurSousPontonMin`) |
+| `hauteurSousVoute` | 5 m | Naissance de la voûte au-dessus du plus haut sol |
+| `flecheVouteMin`, `flecheVouteMax` | 3 m, 4,5 m | Flèche de la voûte : 10 % de la largeur, bornée (3,5 m au plus avant) |
+| `espacementPiliersMin` | 10 m | Entre deux piliers libres (8 m avant le 03/10/2026) ; jusqu'à 4 piliers par rangée si la salle fait 48 m de large |
 | `espacementApparitionsMin`, `distanceArriveeApparitions` | 5 m, 16 m | Apparitions ; 16 m depuis le 02/10/2026 (10 m avant : les gardiens, qui repèrent à 12 m, tombaient sur le joueur dès l'arrivée). Les points de joueurs étant à 2-3 m du point d'arrivée, le gardien le plus proche est à 13 m au moins d'un héros fraîchement arrivé |
-| `espacementTorches`, `maxTorchesAllumees` | 7 m, 24 | Torches et lumières |
+| `espacementTorches`, `maxTorchesAllumees` | 7 m, 28 | Torches et lumières (24 lumières avant le 03/10/2026) |
 | `maxEssais` | 40 | Essais avant d'abandonner (jamais atteint : 5 000 graines conformes, 4 541 au premier essai et 459 au deuxième ou plus, faute de place pour les 14 apparitions à 16 m de l'arrivée) |
 
-Constantes (`PlanTerrasses`) : niveau 3 m ; marche 0,30 × 0,50 m, volée de 5 m (31°), palier 2 m ; escalier de 4 m (6 m au centre de v4 et v7) ; arche de 3 × 4,5 m en plein cintre (naissance à 3 m) ; dalle de 0,6 m au-dessus d'une pièce ; pièce derrière l'enceinte haute de 5 m ; parapet de 0,9 m ; pilier de 0,85 m de rayon, pilastre de 0,7 m.
+Constantes (`PlanTerrasses`) : niveau **3,6 m** (`HauteurNiveau`, 3 m avant le 03/10/2026) ; **12 marches** de 0,30 × 0,50 m par niveau (`MarchesParNiveau`), volée de 6 m (31°, pente inchangée), palier 2 m (un escalier de deux niveaux fait 14 m) ; un escalier encastré garde toujours son pied devant la terrasse ; escalier de 4 m (6 m au centre de v4 et v7) ; arche de 3 × 4,5 m en plein cintre (naissance à 3 m) ; dalle de 0,6 m au-dessus d'une pièce ; pièce derrière l'enceinte haute de 5 m ; parapet de 0,9 m ; pilier de 0,85 m de rayon, pilastre de 0,7 m.
+
+## Taille et hauteurs (03/10/2026)
+
+Demande de Quentin, corrigée le même jour : des donjons **plus grands** (il avait d'abord écrit « plus hauts »), de 1,5 à 2 fois la surface du donjon en terrasses, comme l'ancien donjon (`DonjonPlan` : 15 × 12 cellules de 4 m, 60 × 48 m, environ 2 900 m² au sol par niveau). Toutes les cotes des plans passent par `echellePct` = 135 % : **surface moyenne 2 190 m²** sur 5 000 graines (1 200 m² avant, soit **× 1,82** ; v8 : 2 350 m²). Escaliers (5 m de large, 8 m au centre de v4 et v7), ponton (4 m), dégagement devant la salle, écart des pièces cachées et des piliers suivent ; 20 apparitions au lieu de 14, 28 lumières au plus.
+
+Hauteur : une hausse **modeste** seulement, pour garder des niveaux lisibles dans un volume plus large : écart entre niveaux 3 → **3,6 m** (12 marches, volée de 6 m, même pente), naissance à 5 m au-dessus du plus haut sol (inchangé), flèche 10 % de la largeur bornée à 4,5 m : clé à **16,7 m** en trois niveaux (14,5 m avant), 13,1 m en deux (11,5 m avant). Un essai intermédiaire à 4,2 m par niveau et 7 m sous voûte (clé à 20 m) a été abandonné après la correction.
+
+Parcours de l'arrivée au fond (grand coffre de la plus haute terrasse) : mesure sur la grille (pas de 1 m, 4 voisins, 2 000 graines) **47 → 65 cases** (× 1,37 ; v8 : 75) ; sur le NavMesh construit, voir « Mesures ». **Les graines ne donnent plus les mêmes donjons qu'avant** : les captures `donjon_terrasses_g*` datent d'avant.
+
+## Ponton suspendu (variante 8, 03/10/2026) {à confirmer}
+
+Croquis de Quentin `Docs/references/donjon-croquis-quentin-20261003-ponton.jpg` (vue de dessus, portail en spirale au bas) : en bas, le grand Lvl 0 (arrivée) ; à gauche, une bande Lvl 1 avec son escalier et, au-dessus d'elle, le Lvl 2 dans l'angle du fond ; au milieu, un couloir qui monte vers le fond ; en haut à droite, un petit Lvl 1 relié au rez par un escalier le long du mur droit ; entre le couloir et le petit Lvl 1, une passerelle de planches (le ponton) au-dessus du rez.
+
+Plan généré (cotes depuis le mur du fond ; une fois sur deux en miroir est-ouest) :
+
+| Élément | Cotes |
+|---|---|
+| Lvl 2 (+ 7,2 m) | angle du fond, 15 à 18 × 14 à 16 m |
+| Grand Lvl 1 (+ 3,6 m) | couloir de 5 à 7 m contre le Lvl 2, sur toute sa profondeur ; bande de 11 à 14 m devant le Lvl 2 et le couloir |
+| Petit Lvl 1 (+ 3,6 m) | autre angle du fond, 12 à 16 × 16 à 19 m |
+| Escaliers (5 m de large) | rez → bande le long du mur du grand côté (encastré si besoin) ; bande → Lvl 2 contre le couloir ; rez → petit Lvl 1 le long de l'autre mur |
+| Ponton | 4 m de large, 12 à 19 m de long, à 4 à 7 m du mur du fond, du couloir au petit Lvl 1, à + 3,6 m ; le rez continue dessous (3,15 m sous le tablier) |
+
+Boucle : on monte d'un côté, on traverse le ponton, on redescend de l'autre ; les gardiens le traversent (NavMesh). Le rez sous le ponton et le recoin entre le ponton et le mur du fond restent praticables (parfois une pièce cachée derrière l'enceinte y ouvre).
+
+Dans la grille, les cellules du ponton sont du genre `Ponton` : sol du rez dessous, plein haut de 3,15 à 3,6 m (le tablier, `EpaisseurPonton` 0,45 m), donc deux surfaces praticables comme le dessus d'une pièce cachée ; les contrôles de surplomb l'acceptent, la hauteur libre dessous est contrôlée à 3,1 m, et `Valider` vérifie les deux bouts (terrasse à la même hauteur atteinte), le tablier atteint et les garde-corps. Les bords du tablier qui dominent le rez reçoivent des **garde-corps de bois** (`Parapet.bois`) **sur toute la longueur des deux côtés** (choix fait pour éviter les chutes bêtes : on ne tombe pas du ponton).
+
+Géométrie (`ConstructeurTerrasses.Pontons`) : planches en travers (0,42 m, longueurs et teintes un peu inégales) sur deux longerons engagés de 0,3 m dans les terrasses, traverses sous chaque paire de poteaux, poteaux tous les 2,4 m environ, main courante, corde à mi-hauteur et lisse basse, **chaînes de fer** des poteaux jusqu'à la voûte (anneau scellé), corbeaux de pierre arrondis sous les bouts des longerons. Collisions : la boîte du tablier (grille) et une boîte mince par garde-corps (1,1 m), toutes deux `VueLibre` (la caméra les traverse, elles sont découpées autour du héros : vue sous le ponton sans saut de caméra). Le dessus n'a pas de dalle de pierre ; le sol du rez continue dessous.
 
 ## Contrôles (`Valider`)
 

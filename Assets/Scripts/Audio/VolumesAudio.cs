@@ -40,6 +40,7 @@ namespace Deathless.Audio
             Charger();
             Appliquer();
             LecteurAudio.Creer();
+            LecteurMusique.Creer();
         }
 
         static void Charger()
